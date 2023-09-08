@@ -1,0 +1,11 @@
+version: '3.12.12'
+
+services:
+  app:
+    build: .
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true

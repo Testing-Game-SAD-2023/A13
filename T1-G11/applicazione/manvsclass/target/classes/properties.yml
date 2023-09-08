@@ -1,0 +1,21 @@
+server:
+  error:
+    include-message: always
+spring:
+  data:
+    mongodb:
+	auto-index-creation: true
+	authentication-database: admin
+	username: root
+	password: osimhen
+	database : manvsclass
+	port:27017
+	host:localhost
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG

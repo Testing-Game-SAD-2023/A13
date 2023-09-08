@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Avvenuta registrazione</title>
+    <link rel="stylesheet" th:href="@{/t23/css/mail_register.css}" />
+    <script th:src="@{/t23/js/mail_register.js}"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>CONTROLLA LA TUA EMAIL</h1>
+      <form th:action="@{/mail_register}" method="post">
+      <p>Ti abbiamo inviato un'email con il tuo ID. </p>
+      <p> Se non hai ricevuto alcuna email, clicca qui. </p>
+      <a href="#" id="conferma-link"> Inviami una nuova email</a>
+     <p id="confermato-msg" class="hidden">Ti abbiamo inviato una nuova email.</p> 
+    </div>
+  </form>
+  </body>
+</html>

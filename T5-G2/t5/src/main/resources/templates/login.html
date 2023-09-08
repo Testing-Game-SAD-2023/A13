@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+    <link th:href="@{./css/main.css}" rel="stylesheet" />
+    <link th:href="@{./css/main2.css}" rel="stylesheet" />
+    <link th:href="@{./bootstrap-4/css/bootstrap.min.css}" rel="stylesheet" />
+    <script th:src="@{/js/main.js}">
+    </script>
+    <title>Login</title>
+</head>
+
+<body class=bg-custom>
+    <!-- inclusione jquery-->
+    <script th:src="@{/jquery/jquery-3.7.0.com.js}"  th:inline="javascript">
+    </script>
+
+
+    <div class="container">
+        <h1 style="color: white;font-size: 36px; text-align: center; margin-top: 10px;">Welcome</h1>
+        <div class="login_cont">
+            <div class="form-row form-row label under_label ">
+            <label for="username" style="color: white;">Username</label>
+            <input type="text" id="username" maxlength="20" name="username" placeholder="Enter username here" style="color:white ">
+            <div class="user_pass">
+            <label for="password" style="color: white;">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter password here" style="color:white ">
+            <div class="forgot_pass">
+                <a target="_blank" th:href="@{./change_password}" style="color:white;">Hai dimenticato la password?</a>
+            </div>
+            <div>
+
+            </div>
+            <div class = "button_dist">
+                <button class="login-button" type="submit" th:onclick="redirectToPagemainlogin(); saveLoginData()">Login</button>
+            </div>
+        </div>   
+        </div>
+        </div>
+
+
+        
+</body>
+
+
+</html>
+

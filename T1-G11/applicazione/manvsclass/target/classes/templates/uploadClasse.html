@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+
+<title>documents app - Bootdey.com</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+    	body{
+    background-color: #f4f7f6;
+    margin-top:20px;
+}
+.file_manager .file a:hover .hover,
+.file_manager .file .file-name small{
+    display: block
+}
+.file_manager .file {
+    padding: 0 !important
+}
+
+.file_manager .file .icon{
+    text-align: center
+}
+
+
+.file_manager .file {
+    position: relative;
+    border-radius: .55rem;
+    overflow: hidden
+}
+
+.file_manager .file .image,
+.file_manager .file .icon {
+    max-height: 180px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: top
+}
+
+.file_manager .file .hover {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: none;
+    transition: all 0.2s ease-in-out
+}
+
+.file_manager .file a:hover .hover {
+    transition: all 0.2s ease-in-out
+}
+
+.file_manager .file .icon {
+    padding: 15px 10px;
+    display: table;
+    width: 100%
+}
+
+.file_manager .file .icon i {
+    display: table-cell;
+    font-size: 30px;
+    vertical-align: middle;
+    color: #777;
+    line-height: 100px
+}
+
+.file_manager .file .file-name {
+    padding: 10px;
+    border-top: 1px solid #f7f7f7
+}
+
+.file_manager .file .file-name small .date {
+    float: right
+}
+
+.folder {
+    padding: 20px;
+    display: block;
+    color: #777
+}
+
+@media only screen and (max-width: 992px) {
+    .file_manager .nav-tabs {
+        padding-left: 0;
+        padding-right: 0
+    }
+    .file_manager .nav-tabs .nav-item {
+        display: inline-block
+    }
+}
+
+.card {
+    background: #fff;
+    transition: .5s;
+    border: 0;
+    margin-bottom: 30px;
+    border-radius: .55rem;
+    position: relative;
+    width: 100%;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
+}
+
+a:hover {
+    text-decoration:none;
+}
+    </style>
+</head>
+<body>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<div id="main-content" class="file_manager">
+
+<div class="container w-50">
+
+
+<div class="card">
+<div class="file">
+
+<br>
+<center><p class="h3">Class upload</p></center>
+<div class="icon">
+<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-file-earmark-arrow-up-fill text-success" viewBox="0 0 16 16">
+  <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM6.354 9.854a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 8.707V12.5a.5.5 0 0 1-1 0V8.707L6.354 9.854z"></path>
+</svg>
+<br><br>
+</div>
+
+</a>
+</div>
+
+<div class="card-body">
+ <form id="uploadForm">
+  <div class="mb-3">
+    <label for="className" class="form-label">Class name</label>
+    <input type="text" class="form-control" id="className" aria-describedby="classNameHelp">
+  </div>
+  
+  <div class="mb-3">
+    <label for="date" class="form-label">Date</label>
+    <input type="date" class="form-control" id="date" aria-describedby="dateHelp" >
+  </div>
+  
+  <div class="mb-3">
+  <label for="difficulty" class="form-label">Difficulty</label>
+  <select class="form-select" id="difficulty" aria-describedby="difficultyHelp">
+    <option value="Beginner">Beginner</option>
+    <option value="Intermediate">Intermediate</option>
+    <option value="Advanced">Advanced</option>
+  </select>
+  <div id="difficultyHelp" class="form-text">Select the difficulty level of this item</div>
+</div>
+  
+  
+  <div class="mb-3">
+    <label for="description" class="form-label">Description</label>
+    <textarea class="form-control" id="description" rows="3"></textarea>
+  </div>
+  
+  <div class="mb-3">
+    <label for="category1" class="form-label">Category 1</label>
+    <input type="text" class="form-control" id="category1" aria-describedby="categoryHelp">
+  </div>
+
+  <div class="mb-3">
+    <label for="category2" class="form-label">Category 2</label>
+    <input type="text" class="form-control" id="category2" aria-describedby="categoryHelp">
+  </div>
+
+  <div class="mb-3">
+    <label for="category3" class="form-label">Category 3</label>
+    <input type="text" class="form-control" id="category3" aria-describedby="categoryHelp">
+  </div>
+
+  <div class="form-group mt-3">
+    <label class="mr-2">Upload your file (.java) :</label>
+    <input type="file" name="file" id="fileInput">
+  </div>
+
+  <div class="col-12">
+    <button type="button" onclick="uploadFile()" class="btn btn-success">Upload</button>
+  </div>
+</form>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+<br>
+
+
+</a>
+</div>
+</div>
+
+
+
+
+
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript">
+</script>
+
+
+
+
+<script>
+const form = document.getElementById('formId');
+
+
+function uploadFile(event) {
+  
+  const name = document.getElementById('className').value;
+  const date = document.getElementById('date').value;
+  const difficulty = document.getElementById('difficulty').value;
+  const code_Uri = "" ;
+  const description = document.getElementById('description').value;
+  const category = [
+    document.getElementById('category1').value,
+    document.getElementById('category2').value,
+    document.getElementById('category3').value
+  ];
+
+  const fileInput = document.getElementById('fileInput');
+  const file = fileInput.files[0];
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('model', JSON.stringify({
+    name: name,
+    date: date,
+    difficulty: difficulty,
+    code_Uri: code_Uri,
+    description: description,
+    category: category
+  }));
+
+  fetch('/uploadFile', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Success:', data);
+	window.location.href = "/home_adm";
+    // Aggiungi qui il codice per gestire la risposta dal server
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    // Aggiungi qui il codice per gestire gli errori
+  });
+}
+</script>
+ 
+
+
+
+
+</body>
+</html>

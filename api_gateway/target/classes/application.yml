@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: api-gateway
+
+server:
+  port: 8090
+
+ribbon:
+  eureka:
+    enabled: false
+
+zuul: 
+  host:
+    connect-timeout-millis: 600000 
+    socket-timeout-millis: 600000
+  routes:
+    jacoco-service:
+      sensitiveHeaders:
+      path: /api/getJaCoCoReport/**
+      url: http://t6-g12-app-1:80/getJaCoCoReport
+    receiveClass-service:
+      sensitiveHeaders:
+      path: /api/receiveClassUnderTest/**
+      url: http://t6-g12-app-1:80/receiveClassUnderTest
+    sendInfo-service:
+      sensitiveHeaders:
+      path: /api/sendInfo/**
+      url: http://t6-g12-app-1:80/sendInfo
+    saveData-service:
+      sensitiveHeaders:
+      path: /api/save-data/**
+      url: http://t5-app-1:8080/save-data
+    downloadFile-service:
+      sensitiveHeaders:
+      path: /api/downloadFile/**
+      url: http://manvsclass-controller-1:8080/downloadFile
+    run-service:
+      sensitiveHeaders:
+      path: /api/run/**
+      url: http://t6-g12-app-1:80/run
+
+eureka:
+  client:
+    enabled: false

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+
+<title>documents app - Bootdey.com</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+    	body{
+    background-color: #f4f7f6;
+    margin-top:20px;
+}
+.file_manager .file a:hover .hover,
+.file_manager .file .file-name small{
+    display: block
+}
+.file_manager .file {
+    padding: 0 !important
+}
+
+.file_manager .file .icon{
+    text-align: center
+}
+
+
+.file_manager .file {
+    position: relative;
+    border-radius: .55rem;
+    overflow: hidden
+}
+
+.file_manager .file .image,
+.file_manager .file .icon {
+    max-height: 180px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: top
+}
+
+.file_manager .file .hover {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: none;
+    transition: all 0.2s ease-in-out
+}
+
+.file_manager .file a:hover .hover {
+    transition: all 0.2s ease-in-out
+}
+
+.file_manager .file .icon {
+    padding: 15px 10px;
+    display: table;
+    width: 100%
+}
+
+.file_manager .file .icon i {
+    display: table-cell;
+    font-size: 30px;
+    vertical-align: middle;
+    color: #777;
+    line-height: 100px
+}
+
+.file_manager .file .file-name {
+    padding: 10px;
+    border-top: 1px solid #f7f7f7
+}
+
+.file_manager .file .file-name small .date {
+    float: right
+}
+
+.folder {
+    padding: 20px;
+    display: block;
+    color: #777
+}
+
+@media only screen and (max-width: 992px) {
+    .file_manager .nav-tabs {
+        padding-left: 0;
+        padding-right: 0
+    }
+    .file_manager .nav-tabs .nav-item {
+        display: inline-block
+    }
+}
+
+.card {
+    background: #fff;
+    transition: .5s;
+    border: 0;
+    margin-bottom: 30px;
+    border-radius: .55rem;
+    position: relative;
+    width: 100%;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
+}
+
+a:hover {
+    text-decoration:none;
+}
+    </style>
+</head>
+<body>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<div id="main-content" class="file_manager">
+
+<div class="container w-50">
+
+
+<div class="card">
+<div class="file">
+
+<br>
+<center><p class="h3">Registrazione Amministratore</p></center>
+<div class="icon">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
+  <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Zm9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382l.045-.148ZM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/>
+</svg>
+<br><br>
+</div>
+
+</a>
+</div>
+
+<div class="card-body">
+ <form id="uploadForm">
+  <div class="mb-3">
+    <label for="nome" class="form-label">Nome</label>
+    <input type="text" class="form-control" id="nome" aria-describedby="classNameHelp">
+  </div>
+  
+  <div class="mb-3">
+    <label for="cognome" class="form-label">Cognome</label>
+    <input type="text" class="form-control" id="cognome" aria-describedby="classNameHelp">
+  </div>
+  
+  <div class="mb-3">
+    <label for="username" class="form-label">username</label>
+    <input type="text" class="form-control" id="username" aria-describedby="classNameHelp">
+  </div>
+  
+  <div class="mb-3">
+    <label for="password" class="form-label">Password</label>
+    <input type="password" class="form-control" id="password" aria-describedby="passwordHelp">
+</div>
+  
+  
+  
+  
+
+  <div class="col-12">
+    <button type="button" onclick="Regi()" class="btn btn-success">Registrati</button>
+  </div>
+</form>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+<br>
+
+
+</a>
+</div>
+</div>
+
+
+
+
+
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript">
+</script>
+
+
+
+
+<script>
+
+function Regi() {
+  
+  const nome = document.getElementById('nome').value;
+  const cognome = document.getElementById('cognome').value;
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+ 
+  
+  const data = {
+    nome: nome,
+    cognome: cognome,
+    username: username,
+    password: password
+  };
+
+   fetch('/registraAdmin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Success:', data);
+	window.location.href = "/home_adm";
+    // Aggiungi qui il codice per gestire la risposta dal server
+  })
+  .catch((error) => {
+  window.location.href = "/registraAdmin";
+    console.error('Error:', error);
+    // Aggiungi qui il codice per gestire gli errori
+  });
+}
+</script>
+ 
+
+
+
+
+</body>
+</html>

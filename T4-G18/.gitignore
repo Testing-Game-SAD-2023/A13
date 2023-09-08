@@ -1,0 +1,8 @@
+build
+data/
+*.out
+config.json
+tmp
+.vscode
+coverage
+env

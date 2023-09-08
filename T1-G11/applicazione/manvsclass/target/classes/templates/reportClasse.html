@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+
+<title>documents app - Bootdey.com</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style type="text/css">
+    	body{
+    background-color: #f4f7f6;
+    margin-top:20px;
+}
+.file_manager .file a:hover .hover,
+.file_manager .file .file-name small{
+    display: block
+}
+.file_manager .file {
+    padding: 0 !important
+}
+
+.file_manager .file .icon{
+    text-align: center
+}
+
+
+.file_manager .file {
+    position: relative;
+    border-radius: .55rem;
+    overflow: hidden
+}
+
+.file_manager .file .image,
+.file_manager .file .icon {
+    max-height: 180px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: top
+}
+
+.file_manager .file .hover {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: none;
+    transition: all 0.2s ease-in-out
+}
+
+.file_manager .file a:hover .hover {
+    transition: all 0.2s ease-in-out
+}
+
+.file_manager .file .icon {
+    padding: 15px 10px;
+    display: table;
+    width: 100%
+}
+
+.file_manager .file .icon i {
+    display: table-cell;
+    font-size: 30px;
+    vertical-align: middle;
+    color: #777;
+    line-height: 100px
+}
+
+.file_manager .file .file-name {
+    padding: 10px;
+    border-top: 1px solid #f7f7f7
+}
+
+.file_manager .file .file-name small .date {
+    float: right
+}
+
+.folder {
+    padding: 20px;
+    display: block;
+    color: #777
+}
+
+@media only screen and (max-width: 992px) {
+    .file_manager .nav-tabs {
+        padding-left: 0;
+        padding-right: 0
+    }
+    .file_manager .nav-tabs .nav-item {
+        display: inline-block
+    }
+}
+
+.card {
+    background: #fff;
+    transition: .5s;
+    border: 0;
+    margin-bottom: 30px;
+    border-radius: .55rem;
+    position: relative;
+    width: 100%;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
+}
+
+a:hover {
+    text-decoration:none;
+}
+    </style>
+</head>
+<body>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<div id="main-content" class="file_manager">
+
+<div class="container w-50">
+
+
+<div class="card " id="classut-list">
+<div class="file">
+
+<br>
+
+<div class="icon">
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript">
+</script>
+
+
+<div class="file">
+
+<center><p class="h3" id="nomeC"> </p></center>
+<div class="icon">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-flag-fill text-danger" viewBox="0 0 16 16">
+  <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12.435 12.435 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A19.626 19.626 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a19.587 19.587 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
+</svg>
+<br><br>
+</div>
+
+</a>
+</div>			
+					
+					<div class="card-body">
+ <form id="uploadForm">
+  <div class="mb-3">
+
+  
+  
+  <div class="mb-3">
+    <label for="description" class="form-label" >Comment</label>
+    <textarea class="form-control" id="description" rows="3"></textarea>
+  </div>
+  
+
+  <div class="col-12">
+    <button type="button" onclick="uploadReport()" class="btn btn-success">Invia</button>
+  </div>
+</form>
+
+  </div>
+
+</div>
+					
+					
+					
+</div>
+
+
+<br><br>
+</div>
+
+</a>
+</div>
+
+
+
+
+
+
+
+
+<br>
+
+
+</a>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+<script>
+	var parametro = location.search.split('parametro=')[1];
+	document.getElementById('nomeC').innerHTML="Report "+parametro;
+function uploadReport(event) {
+  const description = document.getElementById('description').value;
+
+
+
+  fetch('/newReport/' + parametro, {
+   method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: description
+
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Success:', data);
+	window.location.href = "/home";
+    // Aggiungi qui il codice per gestire la risposta dal server
+  })
+  .catch((error) => {
+  window.location.href = "/home";
+    console.error('Error:', error);
+    // Aggiungi qui il codice per gestire gli errori
+  });
+}
+</script>
+
+</html>
