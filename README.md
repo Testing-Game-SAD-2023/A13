@@ -35,6 +35,12 @@ L'intera applicazione è adesso pienamente configurata e raggiungibile sulla por
 
 # VIDEO DIMOSTRAZIONE
 ## Studente
-https://github.com/Testing-Game-SAD-2023/T10-G40/blob/main/Videos/video-utente.mp4
+
+
+https://github.com/Testing-Game-SAD-2023/T10-G40/assets/33938788/c6cd06c7-5d3a-4988-a651-7e1dc5896909
+
+
+
 ## Admin
-https://github.com/Testing-Game-SAD-2023/T10-G40/blob/main/Videos/video-admin.mp4
+
+https://github.com/Testing-Game-SAD-2023/T10-G40/assets/33938788/da3e5d04-7106-40ae-a0f3-1b7d6923c0cd
