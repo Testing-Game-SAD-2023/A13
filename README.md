@@ -32,3 +32,9 @@ Per fare ciò bisogna fare le seguenti operazioni:
 
 ## PASSO 3
 L'intera applicazione è adesso pienamente configurata e raggiungibile sulla porta :80.
+
+# VIDEO DIMOSTRAZIONE
+## Studente
+https://github.com/Testing-Game-SAD-2023/T10-G40/blob/main/Videos/video-studente.mp4
+## Admin
+https://github.com/Testing-Game-SAD-2023/T10-G40/blob/main/Videos/video-admin.mp4
