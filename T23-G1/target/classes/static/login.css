@@ -1,0 +1,132 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    background-image: url('https://media.licdn.com/dms/image/D4D22AQFv6lqHmb3osQ/feedshare-shrink_800/0/1685964874554?e=1688601600&v=beta&t=lH3d4hmDaW-gCXG6vQ-lTEZCgKBERrL98hD8gvqaN0A');
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+}
+
+.container {
+    width: 30%;
+    height: 55%;
+    margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    border-radius: 5%;
+    background-color: rgb(255, 255, 255);  
+    border: 2px solid #666;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 2px;
+}
+
+h1 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 2.5rem;
+    color: rgb(161, 0, 174);
+    -webkit-text-stroke: 0.5px white;
+    text-stroke: 0.5px white;
+}
+
+
+input[type="text"],
+input[type="password"] {
+    width: 80%;
+    max-width: 300px;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    border: 1px solid #959595;
+    text-align: center;
+
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+color: #8e8e8e;
+}
+
+input[type="text"]:focus::placeholder,
+input[type="password"]:focus::placeholder {
+color: transparent;
+}
+
+input[type="submit"] {
+    display: block;
+    margin: 0 auto;
+    background-color: rgb(161, 0, 174);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+        background-color: rgb(219, 0, 118);
+        color: rgb(255, 255, 255);
+}
+
+/* Bottone Google */
+button.google-login-button {
+    margin: 0 auto;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    outline: 1px #333;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    display: block;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    padding: 20px 50px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+    button.google-login-button:hover {
+        background-color: gray;
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg');
+    }
+
+/*Tasto "Prima volta su GameAPPS? Registrati"*/
+.login-signup-now {
+    display: block;
+    margin-top: 40px;
+    text-align: center;
+    font-size: 15px;
+    color: rgb(219, 0, 118);
+}
+
+
+    .login-signup-now:hover {
+            text-decoration: underline;
+            color: rgb(161, 0, 174);
+        }
+
+/*Tasto "Hai dimenticato la password"*/
+.login-help-link {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 15px;
+    color: rgb(219, 0, 118);
+}
+
+    .login-help-link:hover {
+        text-decoration: underline;
+        color: rgb(161, 0, 174);
+    }

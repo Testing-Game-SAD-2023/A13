@@ -1,0 +1,10 @@
+.git
+build
+data
+tmp
+.postman
+.github
+LICENSE
+.vscode
+coverage
+env

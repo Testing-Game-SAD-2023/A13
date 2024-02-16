@@ -1,0 +1,136 @@
+openapi: 3.0.3
+info:
+  title: My API
+  version: 1.0.0
+paths:
+  /receiveClassUnderTest:
+    post:
+      summary: Receive Class Under Test
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                idUtente:
+                  type: string
+                idPartita:
+                  type: string
+                idTurno:
+                  type: string
+                nomeCUT:
+                  type: string
+                robotScelto:
+                  type: string
+                difficolta:
+                  type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error
+
+  /sendInfo:
+    post:
+      summary: Send Info
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                testingClassName:
+                  type: string
+                testingClassCode:
+                  type: string
+                underTestClassName:
+                  type: string
+                underTestClassCode:
+                  type: string
+                file1:
+                  type: string
+                  format: binary
+                file2:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Success
+        '500':
+          description: Internal Server Error
+
+  /getResultXml:
+    get:
+      summary: Get Result XML
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error
+
+  /getResultRobot:
+    get:
+      summary: Get Result Robot
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error
+
+  /getJaCoCoReport:
+    get:
+      summary: Get JaCoCo Report
+      responses:
+        '200':
+          description: Success
+          content:
+            text/html:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error
+
+  /inviaDatiEFile:
+    post:
+      summary: Invia Dati e File
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                idUtente:
+                  type: string
+                idPartita:
+                  type: string
+                idTurno:
+                  type: string
+                robotScelto:
+                  type: string
+                difficolta:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+                playerTestClass:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '500':
+          description: Internal Server Error

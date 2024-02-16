@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="./t5/css/main.css" rel="stylesheet" />
+    <link href="./t5/css/main2.css" rel="stylesheet" />
+    <link href="./t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="./t5/js/main.js"></script>
+    <title>Choose your game mode</title>
+</head>
+
+
+
+<body class="bg-custom">
+
+    <div class="mt-2 row">
+        <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" >Username: <span id="usernameField"></span></p>
+        <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="mt-0 row">
+
+            <div class="col-md-5 custom-column ">
+                <!-- Contenuto della prima colonna -->
+                <div class="v5_2090">
+                    <div class="v5_2095" >
+                        <span class="v5_2096">CHOOSE YOUR GAMEMODE</span>
+                        <div class="lista">  
+                        <!-- Creo una lista composta di elementi lista-item che stampano 
+                        il valore degli elementi contenuti nella lista java "classi" -->
+                        <span class="spa">
+                            <div class="col-md-4">
+                                <button type="button" class ="lista-item my-button" onclick="selectGameMode('Sfida un Robot')">Sfida un Robot</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class ="lista-item my-button" onclick="selectGameMode('Multiplayer')">Multiplayer</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class ="lista-item my-button" onclick="selectGameMode('Allenamento')">Allenamento</button>
+                            </div>
+                        </span> 
+                        </div>
+                        <div class="name"></div>
+
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <script>
+        var username = parseJwt(getCookie("jwt")).sub;
+        username = username.toString();
+        localStorage.setItem("username", username);
+        console.log("username :", username);
+    </script>
+</body>
+
+</html>
+

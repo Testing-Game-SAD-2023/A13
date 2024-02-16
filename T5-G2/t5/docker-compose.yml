@@ -1,0 +1,16 @@
+version: '3.12.12'
+
+services:
+  app:
+    build: .
+    restart: always
+    expose:
+      - 8080
+    # ports:
+    #   - 8082:8080
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true

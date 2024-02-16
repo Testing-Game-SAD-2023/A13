@@ -1,0 +1,8 @@
+Main.class
+interfaces\ISubject.class
+randoop\RandoopObserver.class
+randoop\EmmaCoverage.class
+randoop\RandoopSubject.class
+interfaces\IObserver.class
+randoop\FolderOperations.class
+randoop\RunRandoop.class

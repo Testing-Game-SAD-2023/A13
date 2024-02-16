@@ -1,0 +1,12 @@
+version: '2'
+services:
+  proxy:
+    build: ./
+    ports:
+      - 80:80
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true

@@ -1,0 +1,1212 @@
+openapi: "3.0.0"
+info:
+    version: "0.0.1"
+    title: "Game Repository API"
+    description: Game Repository REST API
+
+servers:
+    - url: https://sad.capass.org
+      description: Stage server (public available)
+    - url: http://localhost:3000
+      description: Local server (used for  local development)
+
+paths:
+    /games/{id}:
+        parameters:
+            - name: id
+              description: Game identifier
+              in: path
+              required: true
+              schema:
+                  type: integer
+                  format: int64
+        get:
+            summary: Retrieve a game by id
+            description: Retrieve a game by id
+            tags:
+                - games
+            responses:
+                "200":
+                    description: The game corresponding to the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Game"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No game found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+        put:
+            summary: Update a game
+            description: Update a game by id
+            tags:
+                - games
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                currentRound:
+                                    type: integer
+                                description:
+                                    type: string
+                                startedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                                closedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                        example:
+                            name: "New Game name"
+                            currentRound: 2
+                            description: "description"
+
+            responses:
+                "200":
+                    description: Updated
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Game"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No game found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+        delete:
+            summary: Delete a Game
+            description: Delete a game by id
+            tags:
+                - games
+            responses:
+                "204":
+                    description: Game deleted
+                "404":
+                    description: No game found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /games:
+        post:
+            tags:
+                - games
+            summary: Create a Game
+            description: Create a game registering all the provided players in the system.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                players:
+                                    type: array
+                                    items:
+                                        type: string
+                                name:
+                                    type: string
+                                description:
+                                    type: string
+                                difficulty:
+                                    type: string
+                                startedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                                closedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                        example:
+                            name: Game name
+                            players: ["id1", "id2"]
+                            description: "description"
+                            difficulty: "easy"
+
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/GameShort"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+        get:
+            tags:
+                - games
+            summary: Retrieve games by date interval
+            description: Retrieve games in the system within an interval and paginated. Default interval is current day.
+            parameters:
+                - in: query
+                  name: startDate
+                  description: First date for the interval. Must bee in YYYY-MM-DD format
+                  schema:
+                      type: string
+                      format: date
+                      default: "2022-01-30"
+                  required: false
+                - in: query
+                  name: endDate
+                  description: Last date for the interval. Must bee in YYYY-MM-DD format
+                  schema:
+                      type: string
+                      format: date
+                      default: "2023-12-31"
+                  required: false
+                - in: query
+                  name: page
+                  description: Page number to retrieve
+                  schema:
+                      type: integer
+                      format: int64
+                      minimum: 1
+                      default: 1
+                  required: false
+                - in: query
+                  name: pageSize
+                  description: Number of items per page
+                  schema:
+                      type: integer
+                      format: int64
+                      minimum: 10
+                      default: 100
+                  required: false
+                - in: query
+                  name: accountId
+                  description: Id of the player
+                  schema:
+                      type: string
+                  required: false
+            responses:
+                "200":
+                    description: Games in the inteval
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/GetGamesResponse"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No game found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /rounds/{id}:
+        parameters:
+            - name: id
+              description: Round identifier
+              in: path
+              required: true
+              schema:
+                  type: integer
+                  format: int64
+        get:
+            summary: Retrieve a round
+            description: Retrieve a round by id
+            tags:
+                - rounds
+            responses:
+                "200":
+                    description: The Round corresponding to the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Round"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No round found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+        put:
+            summary: Update a round
+            description: Update a round by id
+            tags:
+                - rounds
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                startedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                                closedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+
+            responses:
+                "200":
+                    description: Updated
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Round"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No round found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+        delete:
+            summary: Delete a round
+            description: Delete a round by id
+            tags:
+                - rounds
+            responses:
+                "204":
+                    description: Round deleted
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No Round found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /rounds:
+        post:
+            summary: Creates a round
+            description: Create a round
+            tags:
+                - rounds
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                gameId:
+                                    type: integer
+                                    format: int64
+                                testClassId:
+                                    type: string
+                                order:
+                                    type: integer
+                                startedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                                closedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                        example:
+                            gameId: 1
+                            testClassId: "a_test_class.java"
+
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Round"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+        get:
+            summary: Retrieve rounds per game
+            description: Retrieve all rounds given a game id
+            tags:
+                - rounds
+            parameters:
+                - in: query
+                  name: gameId
+                  description: Id of the game
+                  schema:
+                      type: integer
+                      format: int64
+                  required: true
+
+            responses:
+                "200":
+                    description: List of rounds
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Round"
+                "404":
+                    description: No game found for the provided id
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "400":
+                    description: Invalid game id
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /turns/{id}:
+        parameters:
+            - name: id
+              description: Turn identifier
+              in: path
+              required: true
+              schema:
+                  type: integer
+                  format: int64
+
+        get:
+            summary: Retrieve a turn
+            description: Retrieve a turn by id
+            tags:
+                - turns
+            responses:
+                "200":
+                    description: The Turn corresponding to the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Turn"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No Turn found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+        put:
+            summary: Update a turn
+            description: Update a turn by id
+            tags:
+                - turns
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                scores:
+                                    type: string
+                                isWinner:
+                                    type: boolean
+                                startedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                                closedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                        example:
+                            scores: "a new score in JSON format"
+                            isWinner: true
+
+            responses:
+                "200":
+                    description: Updated
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Turn"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: Not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+        delete:
+            summary: Delete a turn
+            description: Delete a turn by id
+            tags:
+                - turns
+            responses:
+                "204":
+                    description: Turn deleted
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No Turn found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /turns/{id}/files:
+        parameters:
+            - name: id
+              description: Turn identifier
+              in: path
+              required: true
+              schema:
+                  type: integer
+                  format: int64
+        put:
+            summary: Upload turn files
+            description: Upload turn files as a zip
+            tags:
+                - turns
+            requestBody:
+                required: true
+                content:
+                    application/zip:
+                        schema:
+                            type: string
+                            format: binary
+            responses:
+                "200":
+                    description: File uploaded successfully
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No Turn found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+        get:
+            summary: Download turn files
+            description: Download turn files as a zip
+            tags:
+                - turns
+            responses:
+                "200":
+                    description: Zip uploaded by user
+                    content:
+                        application/zip:
+                            schema:
+                                type: string
+                                format: binary
+
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No Turn found for the provided `Id`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /turns:
+        get:
+            summary: Retrieve turns in a round
+            description: Retrieve all turns in a round
+            tags:
+                - turns
+            parameters:
+                - in: query
+                  name: roundId
+                  description: Id of the round
+                  schema:
+                      type: integer
+                      format: int64
+                  required: true
+            responses:
+                "200":
+                    description: List of turns
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Turn"
+                "404":
+                    description: No round found for the provided id
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "400":
+                    description: Invalid round id
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+        post:
+            tags:
+                - turns
+            summary: Create turns for players
+            description: Create turns for provided players in round x
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                players:
+                                    type: array
+                                    items:
+                                        type: string
+                                roundId:
+                                    type: integer
+                                    format: int64
+                                startedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                                closedAt:
+                                    type: string
+                                    format: date-time
+                                    nullable: true
+                        example:
+                            players: ["id1", "id2"]
+                            roundId: 1
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Turn"
+                "400":
+                    description: Bad request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "404":
+                    description: No round or player found for the provided id
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "409":
+                    description: User turn already exists in round
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /robots:
+        get:
+            summary: Retrieve test results with filters
+            description: Retrieve test results filtering by test engine, difficulty and test class id. If type is Randoop, a random result will be chosen.
+            tags:
+                - robots
+            parameters:
+                - in: query
+                  name: testClassId
+                  description: Identifier of the test class
+                  schema:
+                      type: string
+                      default: "a_test_class.java"
+                  required: true
+                - in: query
+                  name: difficulty
+                  description: Difficulty identifier
+                  schema:
+                      type: string
+                      default: "easy"
+                  required: true
+                - in: query
+                  name: type
+                  description: Type of test engine
+                  schema:
+                      type: string
+                      enum: [randoop, evosuite]
+                      default: randoop
+                  required: true
+            responses:
+                "200":
+                    description: List of robots
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Robot"
+                "404":
+                    description: No result found for the provided id
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "400":
+                    description: Invalid  parameters
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+        delete:
+            summary: Delete test results by a specific class id
+            description: Delete test results by a specific class id
+            tags:
+                - robots
+            parameters:
+                - in: query
+                  name: testClassId
+                  description: Identifier of the test class
+                  schema:
+                      type: string
+                      default: "a_test_class.java"
+                  required: true
+            responses:
+                "204":
+                    description: Successfully deleted
+                "404":
+                    description: No results found for the provided id
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "400":
+                    description: Invalid  parameters
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+        post:
+            tags:
+                - robots
+            summary: Create a robot results in batch
+            description: Create a robot result entry with provided data in batch mode.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                robots:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            difficulty:
+                                                type: string
+                                            type:
+                                                type: string
+                                                enum: [randoop, evosuite]
+                                            scores:
+                                                type: string
+                                            testClassId:
+                                                type: string
+                        example:
+                            robots:
+                                [
+                                    {
+                                        "difficulty": "easy_v1",
+                                        "type": "randoop",
+                                        "scores": "some scores in some format",
+                                        "testClassId": a_test_class.java,
+                                    },
+                                ]
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    created:
+                                        type: integer
+                "400":
+                    description: Invalid parameters
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "413":
+                    description: Request body too large
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "429":
+                    description: Too many requests
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+components:
+    schemas:
+        Game:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                currentRound:
+                    type: integer
+                name:
+                    type: string
+                description:
+                    type: string
+                difficulty:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                startedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+                closedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+                players:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            id:
+                                type: integer
+                                format: int64
+                            accountId:
+                                type: string
+
+        GameShort:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                currentRound:
+                    type: integer
+                name:
+                    type: string
+                description:
+                    type: string
+                difficulty:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                startedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+                closedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+        Round:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                testClassId:
+                    type: string
+                order:
+                    type: integer
+                gameId:
+                    type: integer
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                startedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+                closedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+
+        Turn:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                isWinner:
+                    type: boolean
+                playerId:
+                    type: integer
+                roundId:
+                    type: integer
+                scores:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                startedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+                closedAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+
+        Robot:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                testClassId:
+                    type: string
+                difficulty:
+                    type: string
+                scores:
+                    type: string
+                type:
+                    type: integer
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+
+        Error:
+            type: "object"
+            properties:
+                message:
+                    type: string
+
+        GetGamesResponse:
+            type: "object"
+            properties:
+                metadata:
+                    type: object
+                    properties:
+                        hasNext:
+                            type: boolean
+                        count:
+                            type: integer
+                            format: int64
+                        page:
+                            type: integer
+                            format: int64
+                        pageSize:
+                            type: integer
+                            format: int64
+                data:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/GameShort"

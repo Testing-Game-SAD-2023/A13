@@ -1,0 +1,105 @@
+#!/bin/sh
+PERCORSO="$(cd "$(dirname "$0")" && pwd)"
+PERCORSO_PACKAGE=$1
+PERCORSO_TEST=$4
+PERCORSO_CSV=$5
+NOME_CLASSE=$3
+NOME_PACKAGE=$2
+
+echo "percorso package :$PERCORSO_PACKAGE \n"
+echo "nome package :$NOME_PACKAGE \n"
+echo "nome classe :$NOME_CLASSE \n"
+echo "percorso test :$PERCORSO_TEST \n"
+echo "percorso csv :$PERCORSO_CSV\n"
+
+
+cp -n -r $PERCORSO_PACKAGE $PERCORSO/src/main/java
+cd $PERCORSO/test
+mkdir -p $NOME_PACKAGE
+cp -n -r $PERCORSO_TEST $PERCORSO/test/$NOME_PACKAGE
+cd $PERCORSO
+
+cd ..
+
+cp -n evosuite-1.0.6.jar Prototipo2.0
+
+cp -n evosuite-standalone-runtime-1.0.6.jar Prototipo2.0
+
+cd $PERCORSO
+
+java -jar evosuite-1.0.6.jar
+
+cat  >>pom.txt << EOF
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>$NOME_PACKAGE</groupId>
+  <artifactId>$NOME_CLASSE</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>$NOME_CLASSE</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+
+
+EOF
+
+mv pom.txt pom.xml
+
+export EVOSUITE="java -jar $(pwd)/evosuite-1.0.6.jar"
+
+mvn compile
+
+echo "facciamo partire i test"
+
+mvn dependency:copy-dependencies
+
+export CLASSPATH=target/classes:evosuite-standalone-runtime-1.0.6.jar:test:target/dependency/junit-4.13.1.jar:target/dependency/hamcrest-core-1.3.jar
+javac test/$NOME_PACKAGE/*.java
+
+java org.junit.runner.JUnitCore $NOME_PACKAGE.${NOME_CLASSE}_test
+
+sleep 2
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=LINE
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=BRANCH
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=EXCEPTION
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=WEAKMUTATION
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=OUTPUT
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=METHOD
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=METHODNOEXCEPTION
+
+$EVOSUITE -measureCoverage -class $NOME_PACKAGE.$NOME_CLASSE -Djunit=$NOME_PACKAGE.${NOME_CLASSE}_test -projectCP $PERCORSO/target/classes/:test -Dcriterion=CBRANCH
+
+cd $PERCORSO
+
+mv -f evosuite-report/statistics.csv $PERCORSO_CSV
+
+wget http://localhost:3001/api/
+
+rm -r $PERCORSO/test/*
+rm -r $PERCORSO/src/main/java/*
+rm -r $PERCORSO/target
+rm -r $PERCORSO/evosuite-report
+rm $PERCORSO/pom.xml
+rm $PERCORSO/index.html

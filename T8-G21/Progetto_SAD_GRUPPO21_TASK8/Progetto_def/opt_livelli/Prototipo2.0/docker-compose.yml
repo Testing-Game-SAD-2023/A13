@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  t8_generazione:
+    build: ./
+    ports:
+      - 3080:3080
+    networks:
+      - global-network
+    volumes:
+      - VolumeT8:/VolumeT8
+
+networks:
+  global-network:
+    external: true
+
+volumes:
+  VolumeT8:
+    external: true

@@ -1,0 +1,9 @@
+TARGET_CLASS,criterion,Coverage,Total_Goals,Covered_Goals
+calendario.calendario,LINE,1.0,48,48
+calendario.calendario,BRANCH,1.0,87,87
+calendario.calendario,EXCEPTION,1.0,0,0
+calendario.calendario,WEAKMUTATION,0.8846153846153846,104,92
+calendario.calendario,OUTPUT,0.0,3,0
+calendario.calendario,METHOD,0.0,2,0
+calendario.calendario,METHODNOEXCEPTION,0.0,2,0
+calendario.calendario,CBRANCH,1.0,87,87
