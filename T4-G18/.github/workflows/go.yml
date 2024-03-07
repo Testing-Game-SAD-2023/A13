@@ -1,0 +1,90 @@
+name: Golang CI/CD
+
+on:
+  push:
+    branches: [ "master" ]
+    paths-ignore:
+      - '.github/**'
+      - 'README.md'
+      - 'vendor/**'
+      - 'postman/**'
+      - '.postman/**'
+      - Makefile
+      - LICENSE
+      - 'docs/**'
+      
+  pull_request:
+    branches: [ "master" ]
+    paths-ignore:
+      - '.github/**'
+      - 'README.md'
+      - 'vendor/**'
+      - 'postman/**'
+      - '.postman/**'
+      - Makefile
+      - LICENSE
+      - 'docs/**'
+  workflow_dispatch: 
+
+jobs:
+  test:
+    services:
+      postgres:
+        image: postgres:14-alpine3.17
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: 
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    permissions:
+      actions: write
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      name: Checkout
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+ 
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.20.4
+    
+    - name: Unit tests
+      run:  make test
+
+    - name: Run all tests
+      run: make test-integration CI=1 DB_URI=postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable COVER_DIR=$(pwd)/coverage
+
+    - name: Go Coverage Badge 
+      uses: tj-actions/coverage-badge-go@v2
+      with:
+        filename: coverage.out
+
+    - name: Verify Changed files
+      uses: tj-actions/verify-changed-files@v12
+      id: verify-changed-files
+      with:
+          files: README.md
+
+    - name: Commit changes
+      if: steps.verify-changed-files.outputs.files_changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git commit -m "chore: Updated coverage badge."
+
+    - name: Push changes
+      if: steps.verify-changed-files.outputs.files_changed == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ github.token }}
+        branch: ${{ github.head_ref }}

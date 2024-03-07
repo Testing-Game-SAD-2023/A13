@@ -1,0 +1,38 @@
+version: '3.12.12'
+
+services:
+  controller:
+    build: .
+    restart: always
+    expose:
+      - 8080
+    # ports:
+    #   - 8080:8080
+    depends_on:
+      - mongo_db
+    volumes:
+      - ./FilesUpload:/Files-Upload
+      - VolumeT9:/VolumeT9
+      - VolumeT8:/VolumeT8
+    networks:
+      - global-network      
+
+  mongo_db:
+    image: "mongo:6.0.6"
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - global-network
+      
+networks:
+  global-network:
+    external: true
+
+volumes:
+  VolumeT9:
+    external: true
+  VolumeT8:
+    external: true

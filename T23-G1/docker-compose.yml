@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  app:
+    build: .
+    expose:
+      - 8080
+    # ports:
+    #   - "8081:8080"
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:mysql://db:3306/STUDENTSREPO
+    networks:
+      - global-network
+
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: STUDENTSREPO
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - global-network
+  
+networks:
+  global-network:
+    external: true

@@ -1,0 +1,773 @@
+<!-- <!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Home Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+
+<style type="text/css">
+
+@import url("https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900");
+html, body {
+  height: 100%;
+}
+
+h1 {
+
+    font-family: Alegreya Sans, sans-serif;
+	font-size: 100px;
+	text-align: center;
+}
+
+h2 {
+
+	font-size: 70px;
+	text-align: center;
+}
+
+h3 {
+	font-size: 50px;
+	text-align: center;
+}
+
+body {
+  background: beige;
+  font-family: Alegreya Sans, sans-serif;
+}
+
+nav {
+  display: block;
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  transform: translate3d(25px, -25px, 0);
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9);
+}
+nav.open {
+  transform: translate3d(0, 0, 0);
+}
+nav.top-right {
+  top: 0px;
+  right: 0px;
+}
+
+.disc {
+  position: absolute;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  font: 25px Alegreya Sans, sans-serif;
+  line-height: 40px;
+  padding-top: 10px;
+  border-radius: 250px;
+  transform: scale3d(0.5, 0.5, 0.5) rotate3d(0, 0, 1, 190deg);
+  pointer-events: none;
+  opacity: 0;
+  cursor: pointer;
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9), opacity 0.5s;
+}
+.disc div {
+  transform: rotate(180deg);
+}
+.open .disc {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.l1 {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: tomato;
+  transition-delay: 0s;
+}
+.open .l1 {
+  transition-delay: 0s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+.open .l1:hover {
+  background: shade(tomato, 90%);
+  color: tomato;
+  transition-delay: 0s;
+}
+.open .l1:active {
+  background: shade(tomato, 50%);
+  color: tomato;
+}
+.open .l1.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l2 {
+  top: 50px;
+  left: 50px;
+  right: 50px;
+  bottom: 50px;
+  background: #ff7a39;
+  transition-delay: 0.1s;
+}
+.open .l2 {
+  transition-delay: 0.1s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+.open .l2:hover {
+  background: shade(#ff7a39, 90%);
+  color: #ff7a39;
+  transition-delay: 0s;
+}
+.open .l2:active {
+  background: shade(#ff7a39, 50%);
+  color: #ff7a39;
+}
+.open .l2.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l3 {
+  top: 100px;
+  left: 100px;
+  right: 100px;
+  bottom: 100px;
+  background: #ff912b;
+  transition-delay: 0.2s;
+}
+.open .l3 {
+  transition-delay: 0.2s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+.open .l3:hover {
+  background: shade(#ff912b, 90%);
+  color: #ff912b;
+  transition-delay: 0s;
+}
+.open .l3:active {
+  background: shade(#ff912b, 50%);
+  color: #ff912b;
+}
+.open .l3.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l4 {
+  top: 150px;
+  left: 150px;
+  right: 150px;
+  bottom: 150px;
+  background: #ffa91c;
+  transition-delay: 0.3s;
+}
+.open .l4 {
+  transition-delay: 0.3s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+.open .l4:hover {
+  background: shade(#ffa91c, 90%);
+  color: #ffa91c;
+  transition-delay: 0s;
+}
+.open .l4:active {
+  background: shade(#ffa91c, 50%);
+  color: #ffa91c;
+}
+.open .l4.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l5 {
+  top: 200px;
+  left: 200px;
+  right: 200px;
+  bottom: 200px;
+  background: #ffc00e;
+  transition-delay: 0.4s;
+}
+.open .l5 {
+  transition-delay: 0.4s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+.open .l5:hover {
+  background: shade(#ffc00e, 90%);
+  color: #ffc00e;
+  transition-delay: 0s;
+}
+.open .l5:active {
+  background: shade(#ffc00e, 50%);
+  color: #ffc00e;
+}
+.open .l5.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.toggle {
+  line-height: 100px;
+  padding: 0;
+  width: 100px;
+  background: gold;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+.open .toggle {
+  transform: rotate3d(0, 0, 1, 0deg);
+}
+.toggle:hover {
+  background: shade(gold, 90%);
+  text-decoration: underline;
+}
+.toggle:active {
+  background: shade(gold, 50%);
+  color: rgba(255, 215, 0, 0.5);
+  transform: scale(0.9);
+  transition-duration: 0s;
+}
+    </style>
+</head>
+<body>
+<br>
+<br>
+<h1>Home Admin</h1>
+<h2>Welcome</h2>
+<h3>Choose an option</h3>
+
+<nav class="top-right open">
+	<a href = "/player" class="disc l1">
+		
+		<div>Players</div>
+	</a>
+	<a href = "class" class="disc l2">
+		<div>Classes</div>
+	</a>
+	<a class="disc l3">
+		<div>Info</div>
+	</a>
+	<a class="disc l5 toggle">
+		Menu
+	</a>
+</nav>
+
+</body>
+
+<script>
+toggle = document.querySelectorAll(".toggle")[0];
+nav = document.querySelectorAll("nav")[0];
+toggle_open_text = 'Menu';
+toggle_close_text = 'Close';
+
+toggle.addEventListener('click', function() {
+	nav.classList.toggle('open');
+	
+  if (nav.classList.contains('open')) {
+    toggle.innerHTML = toggle_close_text;
+  } else {
+    toggle.innerHTML = toggle_open_text;
+  }
+}, false);
+
+setTimeout(function(){
+	nav.classList.toggle('open');	
+}, 800);
+</script>
+
+</html> -->
+
+<!--MODIFICA (12/02/2024): Restyling pagina-->
+
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+
+<style type="text/css">
+
+/*Stile CSS qui*/
+
+@import url("https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900");
+html, body {
+  height: 100%;
+}
+
+h1 {
+  font-family: Alegreya Sans, sans-serif;
+	font-size: 100px;
+	text-align: center;
+}
+
+h2 {
+	font-size: 70px;
+	text-align: center;
+}
+
+h3 {
+	font-size: 50px;
+	text-align: center;
+}
+
+body {
+  background: beige;
+  font-family: Alegreya Sans, sans-serif;
+}
+
+nav {
+  display: block;
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  transform: translate3d(25px, -25px, 0);
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9);
+}
+
+nav.open {
+  transform: translate3d(0, 0, 0);
+}
+
+nav.top-right {
+  top: 0px;
+  right: 0px;
+}
+
+.disc {
+  position: absolute;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  font: 25px Alegreya Sans, sans-serif;
+  line-height: 40px;
+  padding-top: 10px;
+  border-radius: 250px;
+  transform: scale3d(0.5, 0.5, 0.5) rotate3d(0, 0, 1, 190deg);
+  pointer-events: none;
+  opacity: 0;
+  cursor: pointer;
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9), opacity 0.5s;
+}
+
+.disc div {
+  transform: rotate(180deg);
+}
+
+.open .disc {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.l1 {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: tomato;
+  transition-delay: 0s;
+}
+
+.open .l1 {
+  transition-delay: 0s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+
+}
+.open .l1:hover {
+  /*background: shade(tomato, 90%);*/
+  color: white;
+  transition-delay: 0s;
+  background-color: rgb(255, 22, 84);
+}
+
+.open .l1:active {
+  background: shade(tomato, 50%);
+  color: tomato;
+}
+
+.open .l1.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l2 {
+  top: 50px;
+  left: 50px;
+  right: 50px;
+  bottom: 50px;
+  background: #ff7a39;
+  transition-delay: 0.1s;
+}
+
+.open .l2 {
+  transition-delay: 0.1s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l2:hover {
+  /*background: shade(#ff7a39, 90%);*/
+  /*color: #ff7a39;*/
+  color: rgb(18, 102, 79);
+  transition-delay: 0s;
+  background-color: rgb(243, 255, 189);
+}
+
+.open .l2:active {
+  background: shade(#ff7a39, 50%);
+  color: #ff7a39;
+}
+
+.open .l2.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+
+.l3 {
+  top: 100px;
+  left: 100px;
+  right: 100px;
+  bottom: 100px;
+  background: #ff912b;
+  transition-delay: 0.2s;
+}
+
+.open .l3 {
+  transition-delay: 0.2s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l3:hover {
+  /*background: shade(#ff912b, 90%);*/
+  /*color: #ff912b;*/
+  color: rgb(239, 156, 218);
+  transition-delay: 0s;
+  background-color: rgb(178, 219, 191);
+}
+
+.open .l3:active {
+  background: shade(#ff912b, 50%);
+  color: #ff912b;
+}
+
+.open .l3.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+/*Sfruttiamo lo stile già definito (l4) per caratterizzare il logout*/ 
+.l4 {
+  top: 150px;
+  left: 150px;
+  right: 150px;
+  bottom: 150px;
+  background: #ffa91c;
+  transition-delay: 0.3s;
+}
+
+.open .l4 {
+  transition-delay: 0.3s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l4:hover {
+  /*background: shade(#ffa91c, 90%);*/
+  /*color: #ffa91c;*/
+  color: rgb(219, 153, 90);
+  transition-delay: 0s;
+  background-color: rgb(112, 193, 179);
+}
+
+.open .l4:active {
+  background: shade(#ffa91c, 50%);
+  color: #ffa91c;
+}
+
+.open .l4.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l5 {
+  top: 200px;
+  left: 200px;
+  right: 200px;
+  bottom: 200px;
+  background: #ffc00e;
+  transition-delay: 0.4s;
+}
+
+.open .l5 {
+  transition-delay: 0.4s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l5:hover {
+  /*background: shade(#ffc00e, 90%);*/
+  /*color: #ffc00e;*/
+  color: rgb(219, 153, 90);
+  transition-delay: 0s;
+  background-color: rgb(36, 123, 160);
+}
+
+.open .l5:active {
+  background: shade(#ffc00e, 50%);
+  color: #ffc00e;
+}
+
+.open .l5.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.toggle {
+  line-height: 100px;
+  padding: 0;
+  width: 100px;
+  background: gold;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.open .toggle {
+  transform: rotate3d(0, 0, 1, 0deg);
+}
+
+.toggle:hover {
+  /*background: shade(gold, 90%);*/
+  text-decoration: underline;
+  background-color: rgb(68, 222, 231);
+}
+
+.toggle:active {
+  background: shade(gold, 50%);
+  color: rgba(255, 215, 0, 0.5);
+  transform: scale(0.9);
+  transition-duration: 0s;
+}
+
+/*MODIFICA (12/02/2024) : Aggiunta bottone logout*/
+.logout-admin-container {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+}
+
+.logout-admin-container form {
+    position: relative;
+    display: inline-block;
+}
+
+.logout-admin-container button {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: blueviolet;
+    color: black;
+    font-size: 25px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: Alegreya Sans, sans-serif;
+    text-align: center;
+}
+
+.logout-admin-container button:hover {
+    background-color: green; /* Color shade of green */
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/*MODIIFCA (16/02/2024) : Aggiunta bottone di invito amministratori*/
+.invita-admin-container {
+    position: fixed;
+    top: 80%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+}
+
+.invita-admin-container form {
+    position: relative;
+    display: inline-block;
+}
+
+.invita-admin-container button {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(226, 43, 110);
+    color: black;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: Alegreya Sans, sans-serif;
+    text-align: center;
+}
+
+.invita-admin-container button:hover {
+    background-color: rgb(128, 75, 0); /* Color shade of green */
+    font-weight: bold;
+    text-decoration: underline;
+}
+/*FINE MODIFICA*/
+
+</style>
+</head>
+
+<body>
+<!--Codice HTML qui-->
+<br>
+<br>
+<h1>Home Admin</h1>
+<h2>Welcome</h2>
+<h3>Choose an option</h3>
+
+<nav class="top-right open">
+	<a href = "/player" class="disc l1">
+		<div>Players</div>
+	</a>
+	<a href = "class" class="disc l2">
+		<div>Classes</div>
+	</a>
+  <!--MODIFICA (15/02/2024): Aggiunta pagina di informazioni riguardo tutti gli amministratori del sistema-->
+	<a href = "info" class="disc l3">
+		<div>Info</div>
+	</a>
+  <!--FINE MODIFICA (15/02/2024)-->
+	<a class="disc l5 toggle">
+		Menu
+	</a>
+</nav>
+<!--MODIFICA (12/02/2024): Aggiunta opzione di disconnessione-->
+  
+<div class="logout-admin-container">
+  <button type="button" onclick="Disconnessione()">Logout</button>
+</div>
+
+<!--MODIFICA (16/02/2024) : Aggiunta bottone di invito-->
+
+<div class="invita-admin-container">
+  <button type="button" onclick="Invita()">Invita</button>
+</div>
+
+<!--FINE MODIFICA-->
+</body>
+
+<!--Includi JQuery-->
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+//Script Javascript qui
+
+toggle = document.querySelectorAll(".toggle")[0];
+nav = document.querySelectorAll("nav")[0];
+toggle_open_text = 'Menu';
+toggle_close_text = 'Close';
+
+toggle.addEventListener('click', function() {
+	nav.classList.toggle('open');
+	
+  if (nav.classList.contains('open')) {
+    toggle.innerHTML = toggle_close_text;
+  } else {
+    toggle.innerHTML = toggle_open_text;
+  }
+}, false);
+
+setTimeout(function(){
+	nav.classList.toggle('open');	
+}, 800);
+
+
+function Disconnessione() {
+
+  fetch('/logout_admin', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      
+      //MODIFICA
+      response.text().then(okMessage => {
+        //alert(okMessage);
+        alert("Logout avvenuto con successo, a breve verrai indirizzato nella pagina di login");
+      })
+
+      //FINE MODIFICA
+      window.location.href = "/loginAdmin";
+    }
+    else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      })
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    //Aggiungi qui il codice per gestire gli errori
+  });
+
+
+}
+
+function Invita() {
+
+  fetch('/invite_admins', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      
+      //MODIFICA
+      response.text().then(okMessage => {
+        //alert(okMessage);
+        alert("Verrai reindirizzato alla pagina di invito di nuovi amministratori.");
+      })
+
+      //FINE MODIFICA
+      window.location.href = "/invite_admins";
+    }
+    else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      })
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    //Aggiungi qui il codice per gestire gli errori
+  });
+
+
+}
+
+</script>
+</html>
+

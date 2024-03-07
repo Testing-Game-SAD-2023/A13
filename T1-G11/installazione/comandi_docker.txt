@@ -1,0 +1,21 @@
+docker-compose build
+docker-compose up
+docker-compose up --remove-orphans
+
+use manvsclass
+
+db.createCollection("ClassUT");
+db.createCollection("interaction");
+db.createCollection("Admin");
+db.createCollection("Operation");
+
+db.ClassUT.createIndex({ difficulty: 1 })
+db.Interaction.createIndex({ name: "text", type: 1 })
+db.interaction.createIndex({ name: "text" })
+db.Admin.createIndex({username: 1})
+db.Admin.find({username: "manvsclass"})
+
+
+
+
+

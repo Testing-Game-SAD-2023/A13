@@ -1,0 +1,9 @@
+com\example\db_setup\DbSetupApplication.class
+com\example\db_setup\Authentication\AuthenticatedUserRepository.class
+com\example\db_setup\UserRepository.class
+com\example\db_setup\Authentication\AuthenticatedUser.class
+com\example\db_setup\User.class
+com\example\db_setup\EmailService.class
+com\example\db_setup\Controller.class
+com\example\db_setup\Studies.class
+com\example\db_setup\MyPasswordEncoder.class

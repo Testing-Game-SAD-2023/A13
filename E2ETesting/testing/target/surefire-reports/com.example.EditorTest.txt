@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.example.EditorTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 257.8 s -- in com.example.EditorTest
