@@ -1,7 +1,10 @@
 # Gruppo A13-2024
-Componenti:
+Componente:
 - Caterina Maria Accetto - M63/1117
 
+Il lavoro che andremo ad esporre all'interno della documentazione, muove i suoi primi passi a partire dal progetto: A10-2024,
+e vuole essere solamente una versione migliorativa dei requisiti sviluppati in corrispondenza dei serivizi T1 e T23, 
+di conseguenza rimangono invariate le modalità di installazione così come l'architettura complessiva dell'applicazione.
 # GUIDA ALL'INSTALLAZIONE
 
 ## PASSO 1
@@ -32,3 +35,4 @@ Tali script dovranno essere avviati unicamnete con Docker in esecuzione, altrime
 6) Comandi di inizializzazione del database del task T1
    
 NOTA: il container relativo al Task 9 ("Progetto-SAD-G19-master") si sospenderà autonomamente dopo l'avvio. Esso viene utilizzato solo per "popolare" il volume "VolumeT9" condiviso con il Task 1.
+
