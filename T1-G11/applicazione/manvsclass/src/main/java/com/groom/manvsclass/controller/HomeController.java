@@ -1400,8 +1400,7 @@ public class HomeController {
 		if( !isJwtValid(jwt)){
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Attenzione, non sei loggato");
 		}
-		System.out.println("Token valido (invite_admins)");
-
+		System.out.println("Token valido (invite_admins)"+"\n");
 		
 		//Controlliamo che non esista nel repository un admin con la mail specificata nell'invito
 		Admin admin = srepo.findAdminByEmail(admin1.getEmail());
@@ -1411,27 +1410,34 @@ public class HomeController {
 		}
 		//Creazione nuovo admin
 		//Admin new_admin = new Admin("", "", "", admin1.getEmail(), "");
-		this.userAdmin.setEmail(admin1.getEmail());
+		Admin new_admin = new Admin("default", "default", "default", "default", "default");
+		//this.userAdmin.setEmail(admin1.getEmail());
+		new_admin.setEmail(admin1.getEmail());
 		System.out.println("Nuovo admin creato correttamente");
 		
 		//Generazione token di invito per quella specifica mail
 		System.out.println("Generazione token diinvito...");
-		String invitationToken = generateToken(this.userAdmin);
+		//String invitationToken = generateToken(this.userAdmin);
+		String invitationToken = generateToken(new_admin);
 		System.out.println("invitationToken:" + invitationToken);
 		System.out.println("Token creato correttamente");
-		this.userAdmin.setInvitationToken(invitationToken);
-		System.out.println(this.userAdmin);
+		//this.userAdmin.setInvitationToken(invitationToken);
+		new_admin.setInvitationToken(invitationToken);
+		//System.out.println(this.userAdmin);
+		System.out.println(new_admin);
 		
 
 		//Salvataggio admin nel db
-		Admin savedAdmin = arepo.save(this.userAdmin);
+		//Admin savedAdmin = arepo.save(this.userAdmin);
+		Admin savedAdmin = arepo.save(new_admin);
 		System.out.println("savedAdmin: " + savedAdmin);
 		System.out.println("Amministratore salvato correttamente nel DB");
 		try {
             emailService.sendInvitationToken(savedAdmin.getEmail(), savedAdmin.getInvitationToken());
 			// System.out.println("admin.getEmail"+ savedAdmin.getEmail()+"admin.getResetToken"+ savedAdmin.getResetToken());
 			System.out.println("Mail inviata correttamente all'indirizzo specificato");
-            return ResponseEntity.ok().body(savedAdmin);
+            //return ResponseEntity.ok().body(savedAdmin);
+			return ResponseEntity.ok().body("Invitation token inviato correttamente all'indirizzo:"+ savedAdmin.getEmail());
         } catch (MessagingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nell'invio del messaggio di posta");
         }
@@ -1457,7 +1463,8 @@ public class HomeController {
 		System.out.println("Token invalido, si può procedere alla registrazione tramite invito (login_with_invitation)");
 		
 		//Definizione amministratore
-		Admin admin = srepo.findAdminByEmail(admin1.getEmail());
+		//Admin admin = srepo.findAdminByEmail(admin1.getEmail());
+		Admin admin = arepo.findByEmail(admin1.getEmail()).orElse(null);
 		System.out.println("La mail esiste? (login_with_invitation)");
 
 		if (admin == null) {

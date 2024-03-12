@@ -1,5 +1,6 @@
 package com.groom.manvsclass.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Admin")
@@ -9,6 +10,7 @@ public class Admin {
 	private	String	username;
 
 	//MODIFICA (15/02/2024) : Aggiunta campo email
+	@Id
 	private String email;
 
 	//MODIFICA (15/02/2024) : Aggiunta campo resetToken

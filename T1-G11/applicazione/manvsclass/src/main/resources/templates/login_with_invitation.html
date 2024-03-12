@@ -134,6 +134,10 @@ a:hover {
         <input type="text" class="form-control" id="invitationToken" aria-describedby="classNameHelp" placeholder="*campo obbligatorio">
         </div>
     <div class="mb-3">
+        <label for="nome" class="form-label">Email</label>
+        <input type="text" class="form-control" id="email" aria-describedby="classNameHelp" placeholder="*campo obbligatorio">
+    </div>
+    <div class="mb-3">
         <label for="nome" class="form-label">Nome</label>
         <input type="text" class="form-control" id="nome" aria-describedby="classNameHelp" placeholder="*campo obbligatorio">
     </div>
@@ -184,6 +188,7 @@ function Registrazione_Invito() {
   const cognome = document.getElementById('cognome').value;
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
+  const email = document.getElementById('email').value;
  
   
   const data = {
@@ -192,7 +197,8 @@ function Registrazione_Invito() {
     nome: nome,
     cognome: cognome,
     username: username,
-    password: password
+    password: password,
+    email: email
   };
 
   //MODIFICA (11/02/2024) : Gestione feedback form registrazione
