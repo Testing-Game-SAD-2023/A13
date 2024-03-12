@@ -25,6 +25,20 @@ di deployment, dei componenti, ...
 15. Il sistema, in caso di avvenuta registrazione, deve mostrare a video un feedback, dopodichè, indirizzare l'utente alla pagina di login
 16. Il sistema deve consentire agli utenti di decidere se registrarsi tramite il classico form (e-mail + password) oppure effettuare il social login tramite Facebook e completare in questo modo la procedura di registrazione
 17. l sistema deve essere provvisto di un entry-point, una pagina dove poter smistare gli utenti dell' applicazione in base al ruolo ricoperto ed indirizzarli verso le sezioni dedicate
+
+# PREREQUISITI
+Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
+scaricare, al seguente indirizzo https://git-scm.com/downloads, ed installare, sul proprio computer, Git (per una guida completa all'installazione fare riferimento al seguente indirizzo: https://github.com/git-guides/install-git).
+Una volta aver completato l'installazione, sarà possibile clonare i repository GitHub sulla propria macchina:
+<pre>
+1) Aprire Git Bash (shell di Git)
+2) Navigare verso la cartella all'interno della quale si desidera aggiungere il repository clonato
+3) Andare alla pagina del repository che si intende clonare -> https://github.com/Testing-Game-SAD-2023/A13
+4) Cliccare sul bottone: "< > Code" e copiare l' URL
+    https://github.com/Testing-Game-SAD-2023/A13/blob/main/Documentazione_A13/Immagini_installazione/git_clone.png
+5) Utilizzare il comando: git clone URL COPIATO
+6) Premere invio
+</pre>
 # GUIDA ALL'INSTALLAZIONE
 
 ## PASSO 1
