@@ -90,7 +90,7 @@ Scelta dell'agente (si consiglia Docker).
 Inserire il comando sostituendo il __*token*__ e il __*dominio statico*__ fornito:
 
     docker run --net=host -it -e NGROK_AUTHTOKEN=TOKEN ngrok/ngrok:latest http --domain= DOMINIO 80
-    ![How to set ngrok](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/ngrok.png)
+![How to set ngrok](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/ngrok.png)
 A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comandi.
 
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
