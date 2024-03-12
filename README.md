@@ -87,7 +87,7 @@ Accesso alla Dashboard: https://dashboard.ngrok.com/get-started
 Scelta dell'agente (si consiglia Docker).
 
  __PASSO A.4__:
-Inserire il comando sostituendo il __*token*__ e il __*dominio statico*__ fornito:
+Inserire il comando nel prompt sostituendo il __*token*__ e il __*dominio statico*__ fornito:
 
     docker run --net=host -it -e NGROK_AUTHTOKEN=TOKEN ngrok/ngrok:latest http --domain= DOMINIO 80
 ![How to set ngrok](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/ngrok.png)
