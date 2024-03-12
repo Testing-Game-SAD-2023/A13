@@ -1016,7 +1016,7 @@ public class HomeController {
 
 			System.out.println("Formato email corretto (registraAdmin)");
 			//Controllare che la mail non sia già presente nel DB
-			Admin existingAdmin = srepo.findAdminByEmail(admin1.getEmail());
+			Admin existingAdmin = arepo.findById(admin1.getEmail()).orElse(null);
 
 			if (existingAdmin != null) {
 
@@ -1285,7 +1285,7 @@ public class HomeController {
 		System.out.println("Token valido, si può procedere al cambio password (password_change_admin)");
 		
 		//Definizione amministratore
-		Admin admin = srepo.findAdminByEmail(admin1.getEmail());
+		Admin admin = arepo.findById(admin1.getEmail()).orElse(null);
 		System.out.println("La mail esiste? (password_change_admin)");
 
 		if (admin == null) {
@@ -1347,7 +1347,7 @@ public class HomeController {
 
 		//Definizione amministratore
 		//Controlliamo che esista nel repository un admin con la mail specificata
-		Admin admin = srepo.findAdminByEmail(admin1.getEmail());
+		Admin admin = arepo.findById(admin1.getEmail()).orElse(null);
 		System.out.println("La mail esiste? (password_change_admin)");
 		if (admin == null){
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email non trovata");
@@ -1403,7 +1403,7 @@ public class HomeController {
 		System.out.println("Token valido (invite_admins)"+"\n");
 		
 		//Controlliamo che non esista nel repository un admin con la mail specificata nell'invito
-		Admin admin = srepo.findAdminByEmail(admin1.getEmail());
+		Admin admin = arepo.findById(admin1.getEmail()).orElse(null);
 		System.out.println("La mail esiste? (invite_admins)");
 		if (admin != null){
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email trovata, la persona che stai tentando di invitare è già un amministratore!");
@@ -1463,8 +1463,7 @@ public class HomeController {
 		System.out.println("Token invalido, si può procedere alla registrazione tramite invito (login_with_invitation)");
 		
 		//Definizione amministratore
-		//Admin admin = srepo.findAdminByEmail(admin1.getEmail());
-		Admin admin = arepo.findByEmail(admin1.getEmail()).orElse(null);
+		Admin admin = arepo.findById(admin1.getEmail()).orElse(null);
 		System.out.println("La mail esiste? (login_with_invitation)");
 
 		if (admin == null) {
