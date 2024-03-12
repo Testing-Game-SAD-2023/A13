@@ -56,3 +56,91 @@ Tali script dovranno essere avviati unicamnete con Docker in esecuzione, altrime
    
 NOTA: il container relativo al Task 9 ("Progetto-SAD-G19-master") si sospenderà autonomamente dopo l'avvio. Esso viene utilizzato solo per "popolare" il volume "VolumeT9" condiviso con il Task 1.
 
+# Passi opzionali per esporre l'applicazione su un indirizzo pubblico
+__NB: Ogni lettera rappresenta una soluzione diversa__
+
+# A: Installazione NGROK
+Nel caso sia stato già installato basterà avviare il container e collegarsi all'indirizzo fornito in precedenza
+
+ __PASSO A.1__:
+Registrazione presso il sito: https://ngrok.com/
+
+ __PASSO A.2__:
+Accesso alla Dashboard: https://dashboard.ngrok.com/get-started
+
+ __PASSO A.3__:
+Scelta dell'agente (si consiglia Docker).
+
+ __PASSO A.4__:
+Inserire il comando sostituendo il __*token*__ e il __*dominio statico*__ fornito:
+
+    docker run --net=host -it -e NGROK_AUTHTOKEN=TOKEN ngrok/ngrok:latest http --domain= DOMINIO 80
+    
+A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comandi.
+
+*__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
+
+## Video installazione 
+
+
+https://github.com/Testing-Game-SAD-2023/A10-2024/assets/148564450/0292d839-321f-4172-a044-25648d291753
+
+
+# B: Esposizione localhost tramite Pinggy
+
+__ATTENZIONE__: 
+Si consiglia di non diffondere il link generato da Pinggy poiché all'interno è presente il proprio indirizzo pubblic. 
+UTILE SOLAMENTE IN CASO DI TEST IN AMBIENTE CONTROLLATO!
+
+ __PASSO B.1__:
+Mentre Docker è in esecuzione digitare il seguente comando sul prompt dei comandi:
+
+    ssh -p 443 -R0:localhost:80 -L4300:localhost:4300 a.pinggy.io
+
+ __PASSO B.2__: 
+Per la richiesta della password, dare una stringa vuota.
+Infine compariranno a schermo l'indirizzo pubblico.
+
+
+
+
+# C: Installazione Server Esterno 
+
+
+
+## PASSO C.1 
+Il primo passo è quello di registrarsi presso il sito: https://www.kamatera.com/
+
+## PASSO C.2
+Creare e configurare il server con sistema linux, impostando le specifiche tecniche, si consigliano: 
+CPU:2 
+RAM: 8GB
+Memoria: 40GB
+
+## PASSO C.3
+Scaricare puTTY e collegarsi tramite protocollo SSH sul IP fornito dal Server.
+
+## PASSO C.4 
+All'interno del terminale di puTTY, eseguire i seguenti comandi per clonare la cartella di github, installare docker e l'applicazione web su docker: 
+
+    sudo apt update
+    sudo apt install git
+    git clone https://github.com/Testing-Game-SAD-2023/A10-2024
+    cd ./A10-2024
+    chmod +x installer_docker.sh
+    chmod +x installer-linux-server.sh
+    chmod +x uninstaller.sh
+    ./installer_docker.sh
+    ./installer-linux-server.sh
+
+## PASSO C.5
+L' installazione a questo punto è completata, da linea di comando è possibile vedere se tutti i container sono in stato di RUN con il seguente comando: 
+
+    docker container ls -a
+    
+E farli ripartire tutti con:
+
+    docker restart $(docker ps -q -a)
+
+## PASSO C.6
+Accedendo al indirizzo IP tramite browser sarà possibile utilizzare l'applicazione web tramite indirizzo pubblico
