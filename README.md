@@ -38,7 +38,7 @@ Una volta aver completato l'installazione, sarà possibile clonare i repository 
 5) Utilizzare il comando: git clone URL COPIATO
 6) Premere invio
 </pre>
- https://github.com/Testing-Game-SAD-2023/A13/tree/main/Immagini_installazione
+https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/git_clone.png
 # GUIDA ALL'INSTALLAZIONE
 
 ## PASSO 1
