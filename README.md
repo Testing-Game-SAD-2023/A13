@@ -32,13 +32,15 @@ scaricare, al seguente indirizzo https://git-scm.com/downloads, ed installare, s
 Una volta aver completato l'installazione, sarà possibile clonare i repository GitHub sulla propria macchina:
 <pre>
 1) Aprire Git Bash (shell di Git)
-2) Navigare verso la cartella all'interno della quale si desidera aggiungere il repository clonato
+2) Posizionarsi nella cartella all'interno della quale si desidera aggiungere il repository clonato
 3) Andare alla pagina del repository che si intende clonare -> https://github.com/Testing-Game-SAD-2023/A13
 4) Cliccare sul bottone: "< > Code" e copiare l' URL
 5) Utilizzare il comando: git clone URL COPIATO
 6) Premere invio
 </pre>
+
 https://github.com/Testing-Game-SAD-2023/A13/blob/main/Documentazione_A13/Immagini_installazione/git_clone.png
+
 # GUIDA ALL'INSTALLAZIONE
 
 ## PASSO 1
