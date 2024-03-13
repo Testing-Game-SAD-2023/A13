@@ -71,6 +71,14 @@ Tali script dovranno essere avviati unicamnete con Docker in esecuzione, altrime
    
 NOTA: il container relativo al Task 9 ("Progetto-SAD-G19-master") si sospenderà autonomamente dopo l'avvio. Esso viene utilizzato solo per "popolare" il volume "VolumeT9" condiviso con il Task 1.
 
+# ATTENZIONE
+Nel corso dell'installazione dello script: "installer.bat", è possibile incappare nell'errore:
+    E: invalid operation update
+dovuto al modo in cui Windows e Linux memorizzano i caratteri di fine riga (CRLF Windows mentre LF Linux); per risolvere il problema è indispensabile switchare dalla codifica CRLF -> a quella LF.
+Un modo rapido prevede di effettuare la modifica manualmente utilizzando come editor di testo Notepad++:
+    Edit => EOL Conversion => Unix(LF) dopodichè salvare
+![Errore in fase di installazione](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/errore.png)
+(https://stackoverflow.com/questions/55258430/e-invalid-operation-update-error-while-running-shell-scripts-in-wsl)
 # Passi opzionali per esporre l'applicazione su un indirizzo pubblico
 __NB: Ogni lettera rappresenta una soluzione diversa__
 
@@ -167,4 +175,5 @@ Come prerequisito, è richiesto: di essere in possesso di un account Facebook fu
 (assicurarsi di essersi collegati presso un indirizzo https sicuro e di aver aperto la pagina in incognito),
 cliccare sul pulsante: "Accedi con Facebook", dopodichè inserire le proprie credenziali (e-mail e password); una volta aver
 completato la procedura si verrà automaticamente re-indirizzati all'arena privata di gioco.
+# Video
 https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Social_login.mp4
