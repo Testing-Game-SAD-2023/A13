@@ -73,10 +73,14 @@ NOTA: il container relativo al Task 9 ("Progetto-SAD-G19-master") si sospenderà
 
 # ATTENZIONE
 Nel corso dell'installazione dello script: "installer.bat", è possibile incappare nell'errore:
-    E: invalid operation update
+<pre>
+E: invalid operation update
+</pre>
 dovuto al modo in cui Windows e Linux memorizzano i caratteri di fine riga (CRLF Windows mentre LF Linux); per risolvere il problema è indispensabile switchare dalla codifica CRLF -> a quella LF.
 Un modo rapido prevede di effettuare la modifica manualmente utilizzando come editor di testo Notepad++:
-    Edit => EOL Conversion => Unix(LF) dopodichè salvare
+<pre>
+Edit => EOL Conversion => Unix(LF) dopodichè salvare
+</pre>
 ![Errore in fase di installazione](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/errore.png)
 (https://stackoverflow.com/questions/55258430/e-invalid-operation-update-error-while-running-shell-scripts-in-wsl)
 # Passi opzionali per esporre l'applicazione su un indirizzo pubblico
