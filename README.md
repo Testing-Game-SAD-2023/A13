@@ -159,3 +159,12 @@ E farli ripartire tutti con:
 
 ## PASSO C.6
 Accedendo al indirizzo IP tramite browser sarà possibile utilizzare l'applicazione web tramite indirizzo pubblico
+
+### MODALITA' DI UTILIZZO
+
+## Social login tramite Facebook
+Come prerequisito, è richiesto: di essere in possesso di un account Facebook funzionante. Dalla pagina di login dei players
+(assicurarsi di essersi collegati presso un indirizzo https sicuro e di aver aperto la pagina in incognito),
+cliccare sul pulsante: "Accedi con Facebook", dopodichè inserire le proprie credenziali (e-mail e password); una volta aver
+completato la procedura si verrà automaticamente re-indirizzati all'arena privata di gioco.
+https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Social_login.mp4
