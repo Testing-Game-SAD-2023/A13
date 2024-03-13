@@ -167,4 +167,4 @@ Come prerequisito, è richiesto: di essere in possesso di un account Facebook fu
 (assicurarsi di essersi collegati presso un indirizzo https sicuro e di aver aperto la pagina in incognito),
 cliccare sul pulsante: "Accedi con Facebook", dopodichè inserire le proprie credenziali (e-mail e password); una volta aver
 completato la procedura si verrà automaticamente re-indirizzati all'arena privata di gioco.
-![](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Social_login.mp4)
+![social login video](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Social_login.mp4)
