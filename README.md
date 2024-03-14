@@ -172,17 +172,17 @@ E farli ripartire tutti con:
 ## PASSO C.6
 Accedendo al indirizzo IP tramite browser sarà possibile utilizzare l'applicazione web tramite indirizzo pubblico
 
-### MODALITA' DI UTILIZZO
+# MODALITA' DI UTILIZZO
 
 ## Social login tramite Facebook
 Come prerequisito, è richiesto: di essere in possesso di un account Facebook funzionante. Dalla pagina di login dei players
 (assicurarsi di essersi collegati presso un indirizzo https sicuro e di aver aperto la pagina in incognito),
 cliccare sul pulsante: "Accedi con Facebook", dopodichè inserire le proprie credenziali (e-mail e password); una volta aver
 completato la procedura si verrà automaticamente re-indirizzati all'arena privata di gioco.
-# Video
+### Video
 https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Social_login.mp4
 
-### Configurazione social login
+## Configurazione social login
 Ovviamente, non avendo un dominio unico, bisognerà che ogni utilizzatore di questa versione dell'applicazione, configuri appropriatamente l'SDK di JavaScript per Facebook, in particolare:
 1) dovrà essere in possesso di un account Facebook da sviluppatore (https://developers.facebook.com/) e creare una propria "app", la quale sarà dotata di un certo ID
 ![creazione app](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_1.png)
@@ -212,6 +212,9 @@ __3.3__ modificare lo script alla riga 169 inserendo l'ID della propria app e la
 __4.1__ alla riga 83 inserire il proprio "App Token" individuabile alla seguente pagina: https://developers.facebook.com/tools/accesstoken
 ![aggiornamento Controller.java 1](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_6.png)
 ![aggiornamento Controller.java 2](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_7.png)
+
+5) salvare tutte le modifiche e compilare
+
 ## Invito di nuovi amministratori
 Come prerequisito, bisogna essere correttamente registrati come amministratori. La preocedura di invito si articola nei seguenti step:
 <pre>
@@ -222,5 +225,5 @@ Come prerequisito, bisogna essere correttamente registrati come amministratori. 
 5) una volta completata la procedura di registrazione sarà possibile loggarsi tranquillamente all'interno dell'applicazione (/loginAdmin)
 </pre>
 
-# Video
+### Video
 https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Invito_admins.mp4
