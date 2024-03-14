@@ -185,11 +185,11 @@ https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Social_login.mp
 ## Invito di nuovi amministratori
 Come prerequisito, bisogna essere correttamente registrati come amministratori. La preocedura di invito si articola nei seguenti step:
 <pre>
-1) dalla pagina di login degli admin, autenticarsi inserendo le proprie credenziali definite in fase di registrazione
-2) una volta aver completato la procedura, si verrà re-indirizzati all'area riservata degli admins; cliccare sul bottone: "Invita"
-3) si verrà re-indirizzati all'apposita pagina di invito, inserire nel form la mail dell'utente che si desidera invitare
-4) l'utente destinatario dell'invio, riceverà, all'indirizzo di posta specificato, un token di invito che dovrà copiare (fare molta attenzione a non copiare involontariamente gli spazi) ed inserire all'interno dell'apposita pagina di login (/login_with_invitation) completando i campi del form
-5) una volta completata la procedura di registrazione sarà possibile loggarsi tranquillamente all'interno dell'applicazione
+1) dalla pagina di login degli admin (/loginAdmin), autenticarsi inserendo le proprie credenziali definite in fase di registrazione
+2) una volta aver completato la procedura, si verrà re-indirizzati all'area riservata degli admins (/home_adm); cliccare sul bottone: "Invita"
+3) si verrà re-indirizzati all'apposita pagina di invito (/invite_admins), inserire nel form la mail dell'utente che si desidera invitare
+4) l'utente invitato, riceverà, all'indirizzo di posta specificato, un token di invito che dovrà copiare (fare molta attenzione a non copiare involontariamente gli spazi) ed inserire all'interno dell'apposita pagina di login (/login_with_invitation) completando i campi del form
+5) una volta completata la procedura di registrazione sarà possibile loggarsi tranquillamente all'interno dell'applicazione (/loginAdmin)
 </pre>
 
 # Video
