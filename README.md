@@ -182,6 +182,36 @@ completato la procedura si verrà automaticamente re-indirizzati all'arena priva
 # Video
 https://github.com/Testing-Game-SAD-2023/A13/blob/main/Video_A13/Social_login.mp4
 
+### Configurazione social login
+Ovviamente, non avendo un dominio unico, bisognerà che ogni utilizzatore di questa versione dell'applicazione, configuri appropriatamente l'SDK di JavaScript per Facebook, in particolare:
+1) dovrà essere in possesso di un account Facebook da sviluppatore (https://developers.facebook.com/) e creare una propria "app", la quale sarà dotata di un certo ID
+![creazione app](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_1.png)
+
+2) configurare l'SDK ed inserire negli appositi campi il proprio indirizzo sicuro restituito da ngrok
+![configurazione SDK](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_2.png)
+
+3) modificare opportunamente il file: "login.html" appartenenente alla cartella T23-G1 
+<pre>
+    percorso relativo: T23-G1\src\main\resources\templates\login.html 
+</pre>
+
+__3.1__ alla riga 61, modificare URL inserendo il proprio indirizzo lasciando il resto invariato
+![aggiornamento login.html 1](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_3.png)
+
+__3.2__ modificare la funzione di inizializzazione dell'SDK inserendo l'ID della propria app (riga 119)
+![aggiornamento login.html 2](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_4.png)
+
+__3.3__ modificare lo script alla riga 169 inserendo l'ID della propria app e lasciando il resto invariato (permette di caricare asincronamente il JSSDK)
+![aggiornamento login.html 3](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_5.png)
+
+4) modificare opportunamente il file: "Controller.java" appartenente alla cartella T23-G1
+<pre>
+    percorso relativo: T23-G1\src\main\java\com\example\db_setup\Controller.java 
+</pre>
+
+__4.1__ alla riga 83 inserire il proprio "App Token" individuabile alla seguente pagina: https://developers.facebook.com/tools/accesstoken
+![aggiornamento Controller.java 1](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_6.png)
+![aggiornamento Controller.java 2](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/facebook_7.png)
 ## Invito di nuovi amministratori
 Come prerequisito, bisogna essere correttamente registrati come amministratori. La preocedura di invito si articola nei seguenti step:
 <pre>
