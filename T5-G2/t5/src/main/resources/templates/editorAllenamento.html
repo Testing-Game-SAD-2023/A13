@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <title>Editor di Testo</title>
+    <link rel="stylesheet" th:href="@{./t5/codemirror/lib/codemirror.css}" />
+    <link rel="stylesheet" th:href="@{./t5/codemirror/theme/lucario.css}" />
+    <link rel="stylesheet" th:href="@{./t5/codemirror/addon/fold/foldgutter.css}" />
+
+</head>
+
+<body>
+    <div class="bigcontainer">
+        <div class="container">
+            <div class="editor-bar">
+                <span class="text">Allenamento</span>
+                <div class="image"></div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="container2">
+                <div id="loading-editor" class="loadingOverlay">
+                    <div class="loadingModal">
+                        <p>Caricamento in corso...</p>
+                    </div>
+                </div>
+                <div class="top-bar">
+                    <button class="theme-button" title="Change Theme"></button>
+                    <button class="open-button" title="Open File"></button>
+                    <button class="saveAs-button" title="Save As" onclick="saveCode()"></button>
+                    <button class="undo-button" title="Undo"></button>
+                    <button class="redo-button" title="Redo"></button>
+
+                    <button class="find-button" title="Find" onclick="openSearchModal()"></button>
+                    <div id="searchModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-button" onclick="closeSearchModal()">&times;</span>
+                            <label for="searchTerm">Parola da cercare:</label>
+                            <input type="text" id="searchTerm">
+                            <button id="startSearch" onclick="cercaParola()">Cerca</button>
+                        </div>
+                    </div>
+
+                    <button class="replace-btn" title="Replace" onclick="openReplaceModal()"></button>
+                    <div id="replaceModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-button" onclick="closeReplaceModal()">&times;</span>
+                            <label for="replaceTerm">Parola con cui sostituire:</label>
+                            <input type="text" id="replaceTerm">
+                            <button id="startReplace" class="startReplace">Sostituisci</button>
+                        </div>
+                    </div>
+
+                    <button id="storico" class="storico-button" title="Storico"></button>
+                    <button id="compileButton" class="compile-button" title="Compile"></button>
+                    <button id="allenamentoButton" class="coverage-button" title="Run"></button>
+                    <button id="logout" class="logout-button" title="Logout"></button>
+                </div>
+                <textarea id="editor" name="editor">
+import org.junit.Before;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+//scrivere al posto di "Classe" il nome della classe da testare
+public class TestClasse {
+@BeforeClass
+public static void setUpClass() {
+    // Eseguito una volta prima dell'inizio dei test nella classe
+    // Inizializza risorse condivise o esegui altre operazioni di setup
+}
+                
+@AfterClass
+public static void tearDownClass() {
+    // Eseguito una volta alla fine di tutti i test nella classe
+    // Effettua la pulizia delle risorse condivise o esegui altre operazioni di teardown
+}
+                
+@Before
+public void setUp() {
+    // Eseguito prima di ogni metodo di test
+    // Preparazione dei dati di input specifici per il test
+}
+                
+@After
+public void tearDown() {
+    // Eseguito dopo ogni metodo di test
+    // Pulizia delle risorse o ripristino dello stato iniziale
+}
+                
+@Test
+public void testMetodo() {
+    // Preparazione dei dati di input
+    // Esegui il metodo da testare
+    // Verifica l'output o il comportamento atteso
+    // Utilizza assert per confrontare il risultato atteso con il risultato effettivo
+}
+                
+// Aggiungi altri metodi di test se necessario
+}
+                </textarea>
+            </div>
+            <div class="container2">
+                <div class="top-bar2">
+                    Class Under Test
+                </div>
+                <textarea id="sidebar-textarea"></textarea>
+            </div>
+        </div>
+        <div class="container">
+            <div class="container2">
+                <div class="top-bar2">
+                    Console
+                </div>
+                <div class="console">
+                    <textarea id="console-textarea"></textarea>
+                </div>
+            </div>
+
+            <div class="container2">
+                <div id="loading-result" class="loadingOverlay">
+                    <div class="loadingModal">
+                        <p>Caricamento in corso...</p>
+                    </div>
+                </div>
+                <div class="top-bar2">
+                    Compare results
+                </div>
+                <div class="console">
+                    <textarea id="console-textarea2"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+    <script th:src="@{/t5/codemirror/lib/codemirror.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/mode/clike/clike.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/foldcode.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/search/searchcursor.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/search/search.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/jquery/jquery-3.7.0.com.js}"  th:inline="javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <link th:href="@{./t5/css/editor.css}" rel="stylesheet" />
+    <script th:src="@{/t5/js/commonEditor.js}"></script>
+    <script src="./t5/js/allenamento.js"></script>
+    <script th:src="@{/t5/js/editorAllenamento.js}"></script>
+
+</html>

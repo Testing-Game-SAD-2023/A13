@@ -1,0 +1,59 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile t1",
+            "type": "shell",
+//            "command": "cd T1-G11\\applicazione\\manvsclass; mvn package; docker compose up -d --build"
+            "command": "cd T1-G11\\applicazione\\manvsclass; docker compose up -d --build"
+
+        },
+        {
+            "label": "compile t23",
+            "type": "shell",
+            "command": "cd T23-G1; mvn package; docker compose up -d --build"
+        },
+        {
+            "label": "docker t4",
+            "type": "shell",
+            "command": "cd T4-G18; docker compose up -d --build"
+        },
+        {
+            "label": "compile t5",
+            "type": "shell",
+            "command": "cd T5-G2\\t5; mvn package; docker compose up -d --build"
+        },
+        {
+            "label": "compile t6",
+            "type": "shell",
+            "command": "cd T6-G12\\T6; mvn package; docker compose up -d --build"
+        },
+        {
+            "label": "docker t7",
+            "type": "shell",
+            "command": "cd T7-G31\\RemoteCCC; mvn package; docker compose up -d --build"
+        },
+        {
+            "label": "docker t8",
+            "type": "shell",
+            "command": "cd T8-G21\\Progetto_SAD_GRUPPO21_TASK8\\Progetto_def\\opt_livelli\\Prototipo2.0; docker compose up -d --build"
+        },
+        {
+            "label": "docker t9",
+            "type": "shell",
+            "command": "cd T9-G19\\Progetto-SAD-G19-master; mvn package; docker compose up -d --build"
+        },
+        {
+            "label": "docker api_gateway",
+            "type": "shell",
+            "command": "cd api_gateway; mvn package; docker compose up -d --build"
+        },
+        {
+            "label": "docker ui_gateway",
+            "type": "shell",
+            "command": "cd ui_gateway; mvn package; docker compose up -d --build"
+        }
+    ]
+}

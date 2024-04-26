@@ -128,6 +128,59 @@ Mentre Docker è in esecuzione digitare il seguente comando sul prompt dei coman
 Per la richiesta della password, dare una stringa vuota.
 Infine compariranno a schermo l'indirizzo pubblico.
 
+# Guida alle modifiche al codice
+
+Se è necessario modificare il codice dell'applicazione, seguire attentamente i seguenti passaggi:
+
+1. Recarsi nell'applicazione Docker.
+2. Aprire la sezione relativa ai containers.
+3. Selezionare tutti i containers relativi ai file modificati.
+4. Effettuare la delete di tali containers.
+5. Aprire la sezione images.
+6. Selezionare le immagini relative ai file modificati.
+7. Effettuare l'eliminazione di tali immagini.
+8. Recarsi sull'IDE utilizzato ed aprire il terminale integrato della cartella in cui è presente il file `pom.xml` relativo ai file modificati.
+9. Eseguire il comando `mvn clean package`.
+10. Fare clic sul tasto destro sul file `docker-compose.yml` e selezionare "compose up".
+11. Riavviare i container.
+
+---
+
+# Problematiche di utilizzo
+
+Di seguito sono elencate alcune delle problematiche riscontrate durante l'utilizzo dell'applicazione al fine di agevolarne l'utilizzo per i gruppi successivi.
+
+## Cache del browser
+
+Disattivando la cache del browser, è possibile garantire che ogni modifica apportata al codice sorgente o alle risorse dell'applicazione sia immediatamente visualizzata nel browser. La cache del browser può causare problemi di compatibilità e disattivarla semplifica il processo di debug, consentendo agli sviluppatori di identificare e risolvere rapidamente i bug senza dover preoccuparsi di eventuali caching persistenti che potrebbero mascherare il problema.
+
+## Versione Docker
+
+Durante lo sviluppo dell'applicazione, è emersa una problematica legata alla versione di Docker. È stato osservato che nelle versioni più recenti di Docker, dopo una serie di disinstallazioni e reinstallazioni dell'applicazione, potrebbero verificarsi problemi durante il download quando si avvia il file `installer.bat`. Nel caso in cui si riscontrino errori come quello mostrato nella figura seguente, potrebbe essere necessario disinstallare Docker e utilizzare una versione non successiva alla `4.25.1` evitando così errori nella costruzione dei container.
+
+![Errore Installer.bat](Media/Foto/ErrorInstaller.png)
+
+
+## Porte già in uso
+
+Durante l'avvio dell'applicazione, potrebbe verificarsi un problema in cui alcuni container non si avviano correttamente, mostrando un messaggio di errore relativo alla porta già in uso. Un esempio comune potrebbe riguardare il container T4, poiché la porta 3000 è comunemente utilizzata dal processo `MySQL80`. In questo caso, è necessario aprire la schermata dei servizi attivi su Windows per individuare e terminare il processo che sta attualmente utilizzando la porta in questione. In alternativa, è possibile risolvere questo problema modificando la porta del container in questione per evitare conflitti.
+
+## 502 Bad Gateway
+
+Occasionalmente, anche dopo che tutti i container sono stati avviati con successo, la pagina web potrebbe visualizzare un messaggio di errore del tipo `502 Bad Gateway`. Una possibile ragione dietro questo tipo di errore potrebbe essere correlata alla rapidità con cui si tenta di accedere all'applicazione web subito dopo il riavvio dei container. In questi casi, la piattaforma potrebbe richiedere del tempo per completare il processo di avvio e stabilire la connessione corretta tra i vari componenti dell'applicazione. Attendere alcuni istanti prima di tentare di accedere all'applicazione può spesso risolvere il problema. Tuttavia, se l'errore persiste nonostante l'attesa, è consigliabile effettuare il riavvio di Docker.
+
+# Video Dimostrativi
+
+Di seguito riportiamo i video dimostrativi delle due modalità di gioco attualmente disponibili.
+
+## Funzionamento Modalità "Sfida un Robot"
+
+https://github.com/SimoneRinaldi02/A7-2024-ver2/assets/115701124/89f519e5-796b-4883-8826-681a0980f16e
+
+## Funzionamento Modalità "Allenamento"
+
+https://github.com/SimoneRinaldi02/A7-2024-ver2/assets/115701124/f99ea16d-caf9-451f-9604-99f5ff2b0960
+
 
 
 

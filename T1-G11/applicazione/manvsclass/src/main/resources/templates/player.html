@@ -181,14 +181,8 @@ a:hover {
     // Attendi che entrambe le richieste siano completate
     Promise.all([studentsPromise, gameDataPromise])
         .then(([studentsData, gameData]) => { 
-            //studentsData.sort((a, b) => b.points - a.points);    //rimuovi commento quando il task t4 avrà i punti nel db
-            // Aggiungi un campo 'position' per indicare la posizione in classifica
-            studentsData.forEach((student, index) => {
-                student.position = index + 1;
-                student.points="null"; //da rimuovere quando il task t4 avrà i punti nel db
-            });
 
-            // Creiamo un oggetto per tenere traccia del conteggio e del tempo totale per ogni 'accountId'
+            // Creiamo un oggetto per tenere traccia del conteggio, del tempo totale e dello score per ogni 'accountId'
             const accountStats = {};
 
             // Funzione per calcolare la differenza di tempo in secondi tra due date
@@ -202,35 +196,43 @@ a:hover {
                 return (closedTimestamp - startTimestamp) / 60000; // Ritorna la differenza in minuti
             }
 
-            // Scansioniamo i dati e calcoliamo il conteggio e il tempo totale per ogni 'accountId'
+            // Scansioniamo i dati e calcoliamo il conteggio, il tempo totale e lo score per ogni 'accountId'
             gameData.data.forEach(entry => {
                 const timeDifference = calculateTimeDifference(entry.startedAt, entry.closedAt);
 
                 entry.players.forEach(player => {
                     const accountId = player.accountId;  
 
-                    // Aggiorniamo il conteggio e il tempo totale per ogni 'accountId'
+                    // Aggiorniamo il conteggio, il tempo totale e lo score per ogni 'accountId'
                     if (!accountStats[accountId]) {
-                        accountStats[accountId] = { count: 1, totalTime: timeDifference };
+                        accountStats[accountId] = { count: 1, totalTime: timeDifference, score: entry.score ? entry.score : 0 };
                     } else {
                         accountStats[accountId].count++;
                         accountStats[accountId].totalTime += timeDifference;
+                        accountStats[accountId].score += entry.score ? entry.score : 0;
                     }
                 });
+            });
+
+            // Aggiungiamo un campo 'position' per indicare la posizione in classifica
+            studentsData.forEach((student, index) => {
+                student.position = index + 1;
             });
 
             // Combina le informazioni da studentsData e gameData.data in un'unica array
             const combinedData = studentsData.map(student => {
                 const accountId = student.id;  // Modifica la chiave in base alla tua struttura JSON
-                const stats = accountStats[accountId] || { count: 0, totalTime: 0 };
+                const stats = accountStats[accountId] || { count: 0, totalTime: 0, score: 0 };
 
                 return {
                     ...student,
                     accountId: accountId,
                     count: stats.count,
-                    totalTime: stats.totalTime.toFixed(2)
+                    totalTime: stats.totalTime.toFixed(2),
+                    points: stats.score
                 };
-            });
+            }).sort((a, b) => b.points - a.points)
+            .map((student, index) => ({ ...student, position: index + 1 }));
 
             // Manipola i dati combinati e crea la tabella con DataTables
             const table = $('#studentTable').DataTable({
@@ -244,8 +246,7 @@ a:hover {
                     { data: 'studies' },
                     { data: 'count' },
                     { data: 'totalTime' }
-                ],
-                
+                ]
             });
 
             $("#studentTable").css({"display":"block"});

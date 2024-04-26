@@ -30,52 +30,84 @@ func NewRepository(db *gorm.DB, dataDir string) *Repository {
 }
 
 func (tr *Repository) CreateBulk(r *CreateRequest) ([]Turn, error) {
+
+	//creazione di uno "slice" per memorizzare i turni creati
+	fmt.Println("Creazione di uno slice per memorizzare i turni creati")
 	turns := make([]model.Turn, len(r.Players))
 
+	//avvio di una transazione sul DB
+	fmt.Println("Avvio transazione sul DB...")
+
+		//'tr.db' si riferisce ad un oggetto di connessione al DB all'interno dell'istanza 'Repository'
+		//'.Transaction' è un metodo offerto dalla libreria GORM per avviare una transazione sul DB
 	err := tr.db.Transaction(func(tx *gorm.DB) error {
 		var (
 			err error
 		)
 
-		err = tx.Where(&model.Round{ID: r.RoundId}).
+		// Verifica se esiste un round con l'ID fornito nella richiesta
+		fmt.Println("Esiste un round con l'ID fornito nella richiesta?")
+		err = tx.Where(&model.Round{ID: r.RoundId}).					//Cerca un round dove l'ID corrisponde all'ID fornito nella richiesta r
 			First(&model.Round{}).
 			Error
 		if err != nil {
 			return err
 		}
 
+		// Se il round esiste, stampa il suo ID a video
+		fmt.Println("Round ID:", r.RoundId)
+
+		// Ottieni gli ID dei giocatori corrispondenti agli account ID forniti nella richiesta
 		var ids []int64
 		err = tx.
-			Model(&model.Player{}).
-			Select("id").
-			Where("account_id in ?", r.Players).
-			Find(&ids).
+
+			//Esecuzione della query per ottenere gli ID dei giocatori
+			Model(&model.Player{}).										//si specifica il modello da utilizzare per la query
+			Select("id").												//quale campo selezionare dalla tabella dei giocatori
+			Where("account_id in ?", r.Players).						//trovare i giocatori il cui account_id è incluso nell'elenco r.Players
+			Find(&ids).													//esecuzione query e memorizzazione risultati (gli ID dei giocatori) nella variabile ids
 			Error
 
 		if err != nil {
 			return err
 		}
 
+		// Se il giocatore esiste stampa gli ids
+		fmt.Println("ids: ", ids)
+
+		// Verifica se il numero di ID ottenuti corrisponde al numero di giocatori forniti nella richiesta
+		// e se non ci sono duplicati tra i giocatori forniti
 		if len(ids) != len(r.Players) && !api.Duplicated(r.Players) {
 			return fmt.Errorf("%w: invalid player list", api.ErrInvalidParam)
 		}
 
+		// Creazione dei turni utilizzando gli ID dei giocatori ottenuti
+		fmt.Println("creazione dei turni utilizzando gli ids dei giocatori ottenuti")
 		for i, id := range ids {
 			turns[i] = model.Turn{
 				PlayerID:  id,
+				Order:     r.Order,
 				RoundID:   r.RoundId,
+				Scores:    r.Scores,
 				StartedAt: r.StartedAt,
 				ClosedAt:  r.ClosedAt,
 			}
 		}
 
+		// Creazione dei record dei turni nel database
+		fmt.Println("creazione dei record dei turni nel database")
 		return tx.Create(&turns).Error
 	})
+
+	// Conversione dei turni creati nel formato desiderato per la risposta
+	fmt.Println("conversione dei turni creati nel formato desiderato per la risposta")
 	resp := make([]Turn, len(turns))
 	for i, turn := range turns {
 		resp[i] = fromModel(&turn)
 	}
 
+	// Restituzione della risposta e degli eventuali errori
+	fmt.Println("restituzione della risposta e degli eventuali errori")
 	return resp, api.MakeServiceError(err)
 }
 

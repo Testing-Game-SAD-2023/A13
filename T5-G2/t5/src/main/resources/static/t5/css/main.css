@@ -280,6 +280,10 @@ position: center;
   color: #f5b041;
 }
 
+/*Modifica (05/04): Animazione icone al passaggio del mouse */
+.lista-item:hover i {
+  transform: scale(1.2);    /* Ingrossa l'icona del 20% */
+}
 
 .box_r {
   width: 730px;

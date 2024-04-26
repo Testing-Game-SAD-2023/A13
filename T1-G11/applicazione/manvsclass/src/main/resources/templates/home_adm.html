@@ -286,6 +286,10 @@ setTimeout(function(){
 <!DOCTYPE html>
 <html lang="en" >
 <head>
+
+<!--MODIFICA (17/04/2024) : FontAwesome importa-->
+<script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
+<!--FINE MODIFICA (17/04/2024)-->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Home Admin</title>
@@ -624,12 +628,77 @@ nav.top-right {
     font-weight: bold;
     text-decoration: underline;
 }
+
+/*MODIFICA (17/04): Aggiunta bottone "Scalata" per configurare la nuova modalità di gioco*/
+
+.scalata-button-container {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateY(-50%, -50%);
+    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+  }
+
+.scalata-button-container form {
+    position: relative;
+    display: inline-block;
+}
+
+.scalata-button-container button {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: rgb(157, 180, 171);
+    color: black;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 3s; /* Aggiunto transform 0.3s per animare la rotazione */
+    font-family: Alegreya Sans, sans-serif;
+    text-align: center;
+}
+
+.scalata-button-container button:hover {
+    background-color: rgb(187, 219, 155); /* Color shade of green */
+    font-weight: bold;
+    text-decoration: underline;
+    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
+}
+
+.scalata-button-container button i {
+    font-size: 50px; /* Impostare la dimensione dell'icona */
+    transition: transform 0.5s; /* Aggiunto per animare la rotazione */
+}
+
+.scalata-button-container button:hover i {
+    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
+}
+
+/* .scalata-button-container button::after {
+    content: "\e289"; /* Codice Unicode dell'icona 
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0; /* Icona nascosta di default 
+    transition: opacity 0.3s;
+} */
+
+/* .scalata-button-container button:hover::after {
+    opacity: 1; /* Mostra l'icona al passaggio del mouse 
+} */
+
 /*FINE MODIFICA*/
 
 </style>
 </head>
 
 <body>
+
 <!--Codice HTML qui-->
 <br>
 <br>
@@ -663,6 +732,11 @@ nav.top-right {
 
 <div class="invita-admin-container">
   <button type="button" onclick="Invita()">Invita</button>
+</div>
+
+<!--MODIFICA (17/04/2024) : Aggiunta bottone "Scalata"-->
+<div class="scalata-button-container">
+  <button type="button" onclick="Scalata()"><i class="fas fa-stairs"></i></button>
 </div>
 
 <!--FINE MODIFICA-->
@@ -764,10 +838,41 @@ function Invita() {
     console.error('Error:', error);
     //Aggiungi qui il codice per gestire gli errori
   });
+}
+  //MODIFICA (17/04/2024) : Redirect alla pagina per configurare la nuova modalità di gioco
+function Scalata() {
 
+  fetch('/scalata', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      
+      //MODIFICA
+      response.text().then(okMessage => {
+        //alert(okMessage);
+        alert("Verrai reindirizzato alla pagina di configurazione della nuova modalità di gioco");
+      })
 
+      //FINE MODIFICA
+      window.location.href = "/scalata";
+    }
+    else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      })
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    //Aggiungi qui il codice per gestire gli errori
+  });
 }
 
 </script>
 </html>
-

@@ -85,6 +85,37 @@ form.addEventListener("submit", async (event) => {
   };
 
   try {
+
+    if (nome === '') {
+      alert("Compila il campo Nome!");
+      return;
+    }
+  
+    if (cognome === '') {
+      alert("Compila il campo Cognome!");
+      return;
+    }
+  
+    if (email === '') {
+      alert("Compila il campo Email!");
+      return;
+    }
+  
+    if (password === '') {
+      alert("Compila il campo Password!");
+      return;
+    }
+  
+    if (confermaPassword === '') {
+      alert("Compila il campo Conferma Password!");
+      return;
+    }
+  
+    if (password !== confermaPassword) {
+      alert("Le password non corrispondono!");
+      return;
+    }
+    
     // Use fetch to send form data to the server
     const response = await fetch('/your-register-endpoint', {
       method: 'POST', // or 'PUT' or 'PATCH' depending on your server logic

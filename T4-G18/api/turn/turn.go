@@ -9,7 +9,7 @@ import (
 
 type Turn struct {
 	ID        int64      `json:"id"`
-	IsWinner  bool       `json:"isWinner"`
+	Order     int	     `json:"order"`
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
 	PlayerID  int64      `json:"playerId"`
@@ -20,18 +20,18 @@ type Turn struct {
 }
 type CreateRequest struct {
 	RoundId   int64      `json:"roundId"`
+	Order     int        `json:"order"`
+	Scores    string     `json:"scores"`
 	Players   []string   `json:"players"`
 	StartedAt *time.Time `json:"startedAt,omitempty"`
 	ClosedAt  *time.Time `json:"closedAt,omitempty"`
 }
-
 func (CreateRequest) Validate() error {
 	return nil
 }
 
 type UpdateRequest struct {
 	Scores    string     `json:"scores"`
-	IsWinner  bool       `json:"isWinner"`
 	StartedAt *time.Time `json:"startedAt,omitempty"`
 	ClosedAt  *time.Time `json:"closedAt,omitempty"`
 }
@@ -54,7 +54,7 @@ func (k KeyType) AsInt64() int64 {
 func fromModel(t *model.Turn) Turn {
 	return Turn{
 		ID:        t.ID,
-		IsWinner:  t.IsWinner,
+		Order:     t.Order,
 		Scores:    t.Scores,
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,

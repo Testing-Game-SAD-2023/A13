@@ -6,11 +6,14 @@ import (
 )
 
 type Game struct {
-	CurrentRound int   `gorm:"default:1"`
-	ID           int64 `gorm:"primaryKey;autoIncrement"`
-	Name         string
+	ID           int64 		`gorm:"primaryKey;autoIncrement"`
+	Name         string		`gorm:"default:null"`
+	Username     string		`gorm:"default:null"`
+	CurrentRound int   		`gorm:"default:1"`
 	Description  sql.NullString `gorm:"default:null"`
-	Difficulty   string
+	Difficulty   string		`gorm:"default:null"`
+	Score		 float64	`gorm:"default:0"`
+	IsWinner  	 bool       `gorm:"default:false"`
 	CreatedAt    time.Time  `gorm:"autoCreateTime"`
 	UpdatedAt    time.Time  `gorm:"autoUpdateTime"`
 	StartedAt    *time.Time `gorm:"default:null"`
@@ -66,15 +69,15 @@ func (Round) TableName() string {
 
 type Turn struct {
 	ID        int64      `gorm:"primaryKey;autoIncrement"`
+	Order     int	     `gorm:"not null;default:1"`
 	CreatedAt time.Time  `gorm:"autoCreateTime"`
 	UpdatedAt time.Time  `gorm:"autoUpdateTime"`
 	StartedAt *time.Time `gorm:"default:null"`
 	ClosedAt  *time.Time `gorm:"default:null"`
 	Metadata  Metadata   `gorm:"foreignKey:TurnID;constraint:OnDelete:SET NULL;"`
 	Scores    string     `gorm:"default:null"`
-	IsWinner  bool       `gorm:"default:false"`
-	PlayerID  int64      `gorm:"index:idx_playerturn,unique;not null"`
-	RoundID   int64      `gorm:"index:idx_playerturn,unique;not null"`
+	PlayerID  int64      `gorm:"not null"`
+	RoundID   int64      `gorm:"not null"`
 }
 
 func (Turn) TableName() string {

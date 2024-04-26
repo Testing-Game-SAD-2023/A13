@@ -1,5 +1,7 @@
 package com.g2.Model;
 
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
+
 import java.time.*;
 
 public class Game {
@@ -11,17 +13,19 @@ public class Game {
     private LocalDate data_creazione;
     private String ora_creazione;
     private String classe;
+    private String username;
 
     public void setClasse(String classe) {
         this.classe = classe;
     }
 
-    public Game(int playerId, String description, String name, String difficulty) {
+    public Game(int playerId, String description, String name, String difficulty, String username) {
         this.playerId = playerId;
         this.description = description;
         this.name = name;
         this.difficulty = difficulty;
         this.classe = "";
+        this.username = username;
     }
 
     public int getPlayerId() {
@@ -82,6 +86,14 @@ public class Game {
 
     public String getClasse() {
         return classe;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
 }

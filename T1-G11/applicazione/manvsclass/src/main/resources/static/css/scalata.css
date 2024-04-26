@@ -1,0 +1,20 @@
+body{
+    background-color: #f4f7f6;
+    margin-top:20px;
+    font-family: "Roboto", sans-serif;
+}
+.title-container {
+    text-align: center;
+}
+.info-icon {
+    position: absolute;
+    top: 25px;
+    left: 1000px;
+    font-size: 1.5em;
+    color: #ccc;
+    cursor: pointer;            /*clickable element*/
+}
+.modal-footer {
+    display: flex;
+    justify-content: center;
+}

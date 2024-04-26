@@ -341,7 +341,7 @@ public class HomeController {
 		//FINE MODIFICA (13/02/2024)
 		
 		//FUNZIONANTE
-		System.out.println("Token valido, il player può visualizzare tutte le classi");
+		System.out.println("(/home) visualizzazione delle classi di gioco");
 		List<ClassUT> classi = repo.findAll();
 		return ResponseEntity.ok().body(classi);
 		//FUNZIONANTE
@@ -1546,6 +1546,17 @@ public class HomeController {
 		System.out.println("Registrazione avvenuta con successo!");
 		return ResponseEntity.ok().body(savedAdmin);
 											
+	}
+
+	//MODIFICA (17/04/2024) : Aggiunta pagina di configurazione della nuova modalità di gioco
+	@GetMapping("/scalata")
+	public ModelAndView showGamePageScalata(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+
+		System.out.println("(GET /scalata) Token JWT valido?");
+		if(isJwtValid(jwt)) return new ModelAndView("scalata");
+
+		System.out.println("(GET /scalata) Token JWT invalido");
+        return new ModelAndView("login_admin");
 	}
 	// //MODIFICA (18/02/2024) : Aggiunta menù
     // @GetMapping("/menu")

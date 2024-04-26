@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--Enabling proper responsive behavior-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Game "Scalata" Configuration</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/scalata.css">
+
+    <script src="../static/js/scalata.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!--FontAwesome script embeddings-->
+    <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
+
+    <!-- <style>
+        /* Add your CSS styles here */
+        /* .fa-stairs {
+            color: #B197FC;
+        }
+        .fa-solid.fa-circle.fa-stack-1x {
+            font-size: 1em;
+        }
+        .fa-solid.fa-stairs.fa-stack-2x {
+            font-size: 1em;
+        }
+        .fa-stairs {
+            transition: transform 0.9s ease; /* Add this line to animate the rotation */
+        /* }
+        .fa-circle {
+            color: #FFD43B;
+        }
+        .fa-stack.fa-2x {
+            font-size: 1em;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70px;          /* Adjust this value to control the height of the logo container */
+        /* }
+        .logo-container:hover .fa-stairs {
+            transform: rotate(360deg); /* Add this line to rotate the fa-stairs icon on hover */
+        /* }   */
+        body{
+            background-color: #f4f7f6;
+            margin-top:20px;
+            font-family: "Roboto", sans-serif;
+        }
+        .title-container {
+            text-align: center;
+        }
+        .info-icon {
+            position: absolute;
+            top: 25px;
+            left: 1000px;
+            font-size: 1.5em;
+            color: #ccc;
+            cursor: pointer;            /*clickable element*/
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+        }
+    </style> -->
+    
+</head>
+<body>
+
+    <!--Info icon and modal dialog-->
+    <div class="info-icon" data-toggle="modal" data-target="#infoModal">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="infoModalLabel">Informazioni sulla modalità di gioco</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>La modalità "Scalata", nella sua semplicità, mira a sfidare e mettere sotto pressione gli allievi che si troveranno a dover fronteggiare, in una singola sessione di gioco, un insieme di classi aventi un livello di "difficoltà" crescente.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="title-container">
+        <h1>Configurazione modalità di gioco: "Scalata" <span class="badge text-bg-warning">New</span></h1>
+    </div>
+
+    <!--Explanation-->
+    
+    <p> In questa sezione sarà possibile configurare</p>
+
+    <form action="/scalata" method="post">
+        <label for="rounds">Number of rounds:</label>
+        <input type="number" id="rounds" name="rounds" min="1" required>
+        <br><br>
+        <input type="submit" value="Confirm">
+    </form>
+
+    <h2>Levels</h2>
+    <ul>
+        <!-- Add your level list items here -->
+    </ul>
+
+</body>
+</html>

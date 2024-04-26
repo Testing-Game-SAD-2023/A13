@@ -134,3 +134,42 @@ paths:
           description: Success
         '500':
           description: Internal Server Error
+
+/allenamento:
+  post:
+    summary: Allenamento API
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              testingClassName:
+                type: string
+              testingClassCode:
+                type: string
+              underTestClassName:
+                type: string
+              underTestClassCode:
+                type: string
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                outCompile:
+                  type: string
+                coverage:
+                  type: string
+                robotScore:
+                  type: string
+                score:
+                  type: string
+      '400':
+        description: Bad Request
+      '500':
+        description: Internal Server Error

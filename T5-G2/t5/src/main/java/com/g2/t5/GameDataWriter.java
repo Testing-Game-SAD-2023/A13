@@ -70,17 +70,20 @@ public class GameDataWriter {
 
     // return gameId;
     // }
-    public JSONObject saveGame(Game game) {
+    public JSONObject saveGame(Game game, String username) {
         try {
             String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             JSONObject obj = new JSONObject();
 
+            System.out.println("SONO IN SAVEGAME, GUARDA LO USERNAME : " + game.getUsername());
+
             obj.put("difficulty", game.getDifficulty());
             obj.put("name", game.getName());
             obj.put("description", game.getDescription());
+            obj.put("username", game.getUsername());
             obj.put("startedAt", time);
 
-            JSONArray playersArray = new JSONArray(); 
+            JSONArray playersArray = new JSONArray();
             playersArray.put(String.valueOf(game.getPlayerId()));
 
             obj.put("players", playersArray);
@@ -93,7 +96,7 @@ public class GameDataWriter {
             HttpResponse httpResponse = httpClient.execute(httpPost);
             int statusCode = httpResponse.getStatusLine().getStatusCode();
 
-            if(statusCode > 299) {
+            if (statusCode > 299) {
                 System.err.println(EntityUtils.toString(httpResponse.getEntity()));
                 return null;
             }
@@ -116,8 +119,8 @@ public class GameDataWriter {
 
             httpResponse = httpClient.execute(httpPost);
             statusCode = httpResponse.getStatusLine().getStatusCode();
-            
-            if(statusCode > 299) {
+
+            if (statusCode > 299) {
                 System.err.println(EntityUtils.toString(httpResponse.getEntity()));
                 return null;
             }
@@ -141,8 +144,8 @@ public class GameDataWriter {
 
             httpResponse = httpClient.execute(httpPost);
             statusCode = httpResponse.getStatusLine().getStatusCode();
-            
-            if(statusCode > 299) {
+
+            if (statusCode > 299) {
                 System.err.println(EntityUtils.toString(httpResponse.getEntity()));
                 return null;
             }
@@ -151,7 +154,8 @@ public class GameDataWriter {
             responseBody = EntityUtils.toString(responseEntity);
 
             JSONArray responseArrayObj = new JSONArray(responseBody);
-            Integer turn_id = responseArrayObj.getJSONObject(0).getInt("id"); // salvo il turn id che l'Api mi restituisce
+            Integer turn_id = responseArrayObj.getJSONObject(0).getInt("id"); // salvo il turn id che l'Api mi
+                                                                              // restituisce
 
             JSONObject resp = new JSONObject();
             resp.put("game_id", game_id);

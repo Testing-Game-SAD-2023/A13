@@ -10,12 +10,15 @@ import (
 type Game struct {
 	ID           int64      `json:"id"`
 	CurrentRound int        `json:"currentRound"`
+	Username     string     `json:"username"`
 	Description  string     `json:"description"`
 	Difficulty   string     `json:"difficulty"`
+	Score		 float64	`json:"score"`
 	CreatedAt    time.Time  `json:"createdAt"`
 	UpdatedAt    time.Time  `json:"updatedAt"`
 	StartedAt    *time.Time `json:"startedAt"`
 	ClosedAt     *time.Time `json:"closedAt"`
+	IsWinner  	 bool       `json:"isWinner"`
 	Name         string     `json:"name"`
 	Players      []Player   `json:"players,omitempty"`
 }
@@ -28,6 +31,7 @@ type Player struct {
 type CreateRequest struct {
 	Name        string     `json:"name"`
 	Players     []string   `json:"players"`
+	Username    string     `json:"username"`
 	Description string     `json:"description"`
 	Difficulty  string     `json:"difficulty"`
 	StartedAt   *time.Time `json:"startedAt,omitempty"`
@@ -41,7 +45,10 @@ func (CreateRequest) Validate() error {
 type UpdateRequest struct {
 	CurrentRound int        `json:"currentRound"`
 	Name         string     `json:"name"`
+	Username	 string		`json:"username"`
 	Description  string     `json:"description"`
+	Score		 float64	`json:"score"`
+	IsWinner  	 bool       `json:"isWinner"`
 	StartedAt    *time.Time `json:"startedAt,omitempty"`
 	ClosedAt     *time.Time `json:"closedAt,omitempty"`
 }
@@ -85,11 +92,14 @@ func fromModel(g *model.Game) Game {
 	return Game{
 		ID:           g.ID,
 		CurrentRound: g.CurrentRound,
+		Username:     g.Username,
 		Difficulty:   g.Difficulty,
 		Description:  g.Description.String,
+		Score:   	  g.Score,
 		CreatedAt:    g.CreatedAt,
 		UpdatedAt:    g.UpdatedAt,
 		Name:         g.Name,
+		IsWinner:     g.IsWinner,
 		StartedAt:    g.StartedAt,
 		ClosedAt:     g.ClosedAt,
 		Players:      parsePlayers(g.Players),

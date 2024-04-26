@@ -38,6 +38,10 @@ zuul:
       sensitiveHeaders:
       path: /api/run/**
       url: http://t6-g12-app-1:80/run
+    allenamento-service:
+      sensitiveHeaders:
+      path: /api/allenamento/**
+      url: http://t6-g12-app-1:80/allenamento
     loadingresult-service:
       sensitiveHeaders:
       path: /api/VolumeT8/FolderTreeEvo/**

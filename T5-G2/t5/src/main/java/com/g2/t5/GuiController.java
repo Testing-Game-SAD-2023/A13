@@ -73,9 +73,10 @@ public class GuiController {
         List<String> result = new ArrayList<String>();
 
         int i;
-        for(i = 1; i < 11; i++) {
+        for (i = 1; i < 11; i++) {
             try {
-                restTemplate.getForEntity("http://t4-g18-app-1:3000/robots?testClassId=" + className + "&type=randoop&difficulty="+String.valueOf(i), Object.class);
+                restTemplate.getForEntity("http://t4-g18-app-1:3000/robots?testClassId=" + className
+                        + "&type=randoop&difficulty=" + String.valueOf(i), Object.class);
             } catch (Exception e) {
                 break;
             }
@@ -83,9 +84,10 @@ public class GuiController {
             result.add(String.valueOf(i));
         }
 
-        for(int j = i; j-i+1 < i; j++){
+        for (int j = i; j - i + 1 < i; j++) {
             try { // aggiunto
-                restTemplate.getForEntity("http://t4-g18-app-1:3000/robots?testClassId=" + className + "&type=evosuite&difficulty="+String.valueOf(j-i+1), Object.class);
+                restTemplate.getForEntity("http://t4-g18-app-1:3000/robots?testClassId=" + className
+                        + "&type=evosuite&difficulty=" + String.valueOf(j - i + 1), Object.class);
             } catch (Exception e) {
                 break;
             }
@@ -98,68 +100,31 @@ public class GuiController {
 
     public List<ClassUT> getClasses() {
         ResponseEntity<List<ClassUT>> responseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/home",
-            HttpMethod.GET, null, new ParameterizedTypeReference<List<ClassUT>>() {
-        });
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<ClassUT>>() {
+                });
 
         return responseEntity.getBody();
     }
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+
+        System.out.println("GET /main, scelta della modalità di gioco");
+        
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
         formData.add("jwt", jwt);
 
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData, Boolean.class);
-        System.out.println("isAuthenticated (main):"+ isAuthenticated);
+        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+                Boolean.class);
 
-        if(isAuthenticated == null || !isAuthenticated) return "redirect:/login";
+        if (isAuthenticated == null || !isAuthenticated)
+            return "redirect:/login";
 
         // fileController.listFilesInFolder("/app/AUTName/AUTSourceCode");
         // int size = fileController.getClassSize();
 
-        List<ClassUT> classes = getClasses();
-
-        Map<Integer, String> hashMap = new HashMap<>();
-        Map<Integer, List<MyData>> robotList = new HashMap<>();
-        //Map<Integer, List<String>> evosuiteLevel = new HashMap<>();
-
-        for (int i = 0; i < classes.size(); i++) {
-            String valore = classes.get(i).getName();
-
-            List<String> levels = getLevels(valore);
-            System.out.println(levels);
-
-            List<String> evo = new ArrayList<>(); //aggiunto
-            for(int j = 0; j<levels.size(); j++){ //aggiunto
-                if(j>=levels.size()/2)
-                    evo.add(j,levels.get(j-(levels.size()/2)));
-                else{
-                    evo.add(j,levels.get(j+(levels.size()/2)));
-                }     
-            }
-            System.out.println(evo);
-
-            List<MyData> struttura = new ArrayList<>();
-            
-            for(int j = 0; j<levels.size(); j++){
-                MyData strutt = new MyData(levels.get(j),evo.get(j));
-                struttura.add(j,strutt);
-            }
-            for(int j = 0; j<struttura.size(); j++)  
-                System.out.println(struttura.get(j).getList1());
-            hashMap.put(i, valore);
-            robotList.put(i, struttura);
-            //evosuiteLevel.put(i, evo);
-        }
-
-        model.addAttribute("hashMap", hashMap);
-
-        // hashMap2 = com.g2.Interfaces.t8.RobotList();
-
-        model.addAttribute("hashMap2", robotList);
-
-        //model.addAttribute("evRobot", evosuiteLevel); //aggiunto
         return "main";
+
     }
 
     // @PostMapping("/sendVariable")
@@ -175,14 +140,78 @@ public class GuiController {
     // return ResponseEntity.ok("Dati ricevuti con successo");
     // }
 
+    @GetMapping("/gamemode")
+    public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
+        //MODIFICA (Stiamo controllando la validità dal token JWT)
+        formData.add("jwt", jwt);
+
+        System.out.println("GET /gamemode, scelta della classe e del robot da testare");
+        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+                Boolean.class);
+
+        System.out.println("(/gamemode) Token del player valido?");
+        if (isAuthenticated == null || !isAuthenticated)
+            return "redirect:/login";
+
+            System.out.println("(/gamemode) Token valido: "+ jwt);
+        List<ClassUT> classes = getClasses();
+
+        Map<Integer, String> hashMap = new HashMap<>();
+        Map<Integer, List<MyData>> robotList = new HashMap<>();
+        // Map<Integer, List<String>> evosuiteLevel = new HashMap<>();
+
+        for (int i = 0; i < classes.size(); i++) {
+            String valore = classes.get(i).getName();
+
+            List<String> levels = getLevels(valore);
+            System.out.println(levels);
+
+            List<String> evo = new ArrayList<>(); // aggiunto
+            for (int j = 0; j < levels.size(); j++) { // aggiunto
+                if (j >= levels.size() / 2)
+                    evo.add(j, levels.get(j - (levels.size() / 2)));
+                else {
+                    evo.add(j, levels.get(j + (levels.size() / 2)));
+                }
+            }
+            System.out.println(evo);
+
+            List<MyData> struttura = new ArrayList<>();
+
+            for (int j = 0; j < levels.size(); j++) {
+                MyData strutt = new MyData(levels.get(j), evo.get(j));
+                struttura.add(j, strutt);
+            }
+            for (int j = 0; j < struttura.size(); j++)
+                System.out.println(struttura.get(j).getList1());
+            hashMap.put(i, valore);
+            robotList.put(i, struttura);
+            // evosuiteLevel.put(i, evo);
+        }
+
+        model.addAttribute("hashMap", hashMap);
+
+        // hashMap2 = com.g2.Interfaces.t8.RobotList();
+
+        model.addAttribute("hashMap2", robotList);
+
+        // model.addAttribute("evRobot", evosuiteLevel); //aggiunto
+        return "gamemode";
+
+    }
+
     @GetMapping("/report")
     public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
         formData.add("jwt", jwt);
 
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData, Boolean.class);
+        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+                Boolean.class);
 
-        if(isAuthenticated == null || !isAuthenticated) return "redirect:/login";
+        if (isAuthenticated == null || !isAuthenticated)
+            return "redirect:/login";
         // valueclass = hashMap.get(myClass);
         // valuerobot = hashMap2.get(myRobot);
 
@@ -215,32 +244,37 @@ public class GuiController {
 
     @PostMapping("/save-data")
     public ResponseEntity<String> saveGame(@RequestParam("playerId") int playerId, @RequestParam("robot") String robot,
-            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty, HttpServletRequest request) {
+            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty,
+            @RequestParam("username") String username, HttpServletRequest request) {
 
-                if(!request.getHeader("X-UserID").equals(String.valueOf(playerId))) return ResponseEntity.badRequest().body("Unauthorized");
+        if (!request.getHeader("X-UserID").equals(String.valueOf(playerId)))
+            return ResponseEntity.badRequest().body("Unauthorized");
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-                LocalTime oraCorrente = LocalTime.now();
-                String oraFormattata = oraCorrente.format(formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime oraCorrente = LocalTime.now();
+        String oraFormattata = oraCorrente.format(formatter);
 
-                GameDataWriter gameDataWriter = new GameDataWriter();
-                // g.setGameId(gameDataWriter.getGameId());
-                Game g = new Game(playerId, "descrizione", "nome", difficulty);
-                // g.setPlayerId(pl);
-                // g.setPlayerClass(classe);
-                // g.setRobot(robot);
-                g.setData_creazione(LocalDate.now());
-                g.setOra_creazione(oraFormattata);
-                g.setClasse(classe);
-                // System.out.println(g.getUsername() + " " + g.getGameId());
+        GameDataWriter gameDataWriter = new GameDataWriter();
+        // g.setGameId(gameDataWriter.getGameId());
+        Game g = new Game(playerId, "descrizione", "nome", difficulty, username);
+        // g.setPlayerId(pl);
+        // g.setPlayerClass(classe);
+        // g.setRobot(robot);
+        g.setData_creazione(LocalDate.now());
+        g.setOra_creazione(oraFormattata);
+        g.setClasse(classe);
+        g.setUsername(username);
+        // System.out.println(g.getUsername() + " " + g.getGameId());
 
-                // globalID = g.getGameId();
+        System.out.println("ECCO LO USERNAME : " + username);       //in realtà stampa l'indirizzo e-mail del player...
 
-                JSONObject ids = gameDataWriter.saveGame(g);
+        // globalID = g.getGameId();
 
-                if(ids == null) return ResponseEntity.badRequest().body("Bad Request");
+        JSONObject ids = gameDataWriter.saveGame(g, username);
+        if (ids == null)
+            return ResponseEntity.badRequest().body("Bad Request");
 
-                return ResponseEntity.ok(ids.toString());
+        return ResponseEntity.ok(ids.toString());
     }
 
     // @PostMapping("/download")
@@ -276,15 +310,35 @@ public class GuiController {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
         formData.add("jwt", jwt);
 
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData, Boolean.class);
+        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+                Boolean.class);
 
-        if(isAuthenticated == null || !isAuthenticated) return "redirect:/login";
+        if (isAuthenticated == null || !isAuthenticated)
+            return "redirect:/login";
         // model.addAttribute("robot", valuerobot);
         // model.addAttribute("classe", valueclass);
 
         // model.addAttribute("gameIDj", globalID);
 
         return "editor";
+    }
+
+    @GetMapping("/editorAllenamento")
+    public String editorAllenamentoPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
+        formData.add("jwt", jwt);
+
+        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+                Boolean.class);
+
+        if (isAuthenticated == null || !isAuthenticated)
+            return "redirect:/login";
+        // model.addAttribute("robot", valuerobot);
+        // model.addAttribute("classe", valueclass);
+
+        // model.addAttribute("gameIDj", globalID);
+
+        return "editorAllenamento";
     }
 
 }

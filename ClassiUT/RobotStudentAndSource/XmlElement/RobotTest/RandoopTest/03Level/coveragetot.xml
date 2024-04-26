@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- EMMA v2.0.5312 report, generated Wed Oct 11 15:39:11 GMT 2023 -->
+
+<report>
+  <stats>
+    <packages value="1"/>
+    <classes value="1"/>
+    <methods value="36"/>
+    <srcfiles value="1"/>
+    <srclines value="159"/>
+  </stats>
+  <data>
+    <all name="all classes">
+      <coverage type="class, %" value="100% (1/1)"/>
+      <coverage type="method, %" value="97%  (35/36)"/>
+      <coverage type="block, %" value="86%  (548/637)"/>
+      <coverage type="line, %" value="88%  (140/159)"/>
+
+      <package name="default package">
+        <coverage type="class, %" value="100% (1/1)"/>
+        <coverage type="method, %" value="97%  (35/36)"/>
+        <coverage type="block, %" value="86%  (548/637)"/>
+        <coverage type="line, %" value="88%  (140/159)"/>
+
+        <srcfile name="XmlElement.java">
+          <coverage type="class, %" value="100% (1/1)"/>
+          <coverage type="method, %" value="97%  (35/36)"/>
+          <coverage type="block, %" value="86%  (548/637)"/>
+          <coverage type="line, %" value="88%  (140/159)"/>
+
+          <class name="XmlElement">
+            <coverage type="class, %" value="100% (1/1)"/>
+            <coverage type="method, %" value="97%  (35/36)"/>
+            <coverage type="block, %" value="86%  (548/637)"/>
+            <coverage type="line, %" value="88%  (140/159)"/>
+
+            <method name="removeElement (int): XmlElement">
+              <coverage type="method, %" value="0%   (0/1)"/>
+              <coverage type="block, %" value="0%   (0/6)"/>
+              <coverage type="line, %" value="0%   (0/1)"/>
+            </method>
+            <method name="addSubElement (String): XmlElement">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="31%  (18/58)"/>
+              <coverage type="line, %" value="36%  (5/14)"/>
+            </method>
+            <method name="getElement (String): XmlElement">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="59%  (40/68)"/>
+              <coverage type="line, %" value="62%  (10/16)"/>
+            </method>
+            <method name="clone (): Object">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="77%  (43/56)"/>
+              <coverage type="line, %" value="83%  (10/12)"/>
+            </method>
+            <method name="addAttribute (String, String): Object">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="86%  (12/14)"/>
+              <coverage type="line, %" value="75%  (3/4)"/>
+            </method>
+            <method name="XmlElement (): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (14/14)"/>
+              <coverage type="line, %" value="100% (4/4)"/>
+            </method>
+            <method name="XmlElement (String): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (20/20)"/>
+              <coverage type="line, %" value="100% (6/6)"/>
+            </method>
+            <method name="XmlElement (String, Hashtable): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (14/14)"/>
+              <coverage type="line, %" value="100% (5/5)"/>
+            </method>
+            <method name="XmlElement (String, String): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (20/20)"/>
+              <coverage type="line, %" value="100% (6/6)"/>
+            </method>
+            <method name="addElement (XmlElement): boolean">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (8/8)"/>
+              <coverage type="line, %" value="100% (2/2)"/>
+            </method>
+            <method name="addSubElement (String, String): XmlElement">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (18/18)"/>
+              <coverage type="line, %" value="100% (5/5)"/>
+            </method>
+            <method name="addSubElement (XmlElement): XmlElement">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (10/10)"/>
+              <coverage type="line, %" value="100% (3/3)"/>
+            </method>
+            <method name="append (XmlElement): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (7/7)"/>
+              <coverage type="line, %" value="100% (3/3)"/>
+            </method>
+            <method name="count (): int">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (4/4)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="equals (Object): boolean">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (42/42)"/>
+              <coverage type="line, %" value="100% (8/8)"/>
+            </method>
+            <method name="equals (Object, Object): boolean">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (19/19)"/>
+              <coverage type="line, %" value="100% (6/6)"/>
+            </method>
+            <method name="getAttribute (String): String">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (6/6)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="getAttribute (String, String): String">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (13/13)"/>
+              <coverage type="line, %" value="100% (3/3)"/>
+            </method>
+            <method name="getAttributeNames (): Enumeration">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (4/4)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="getAttributes (): Hashtable">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (3/3)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="getData (): String">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (3/3)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="getElement (int): XmlElement">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (6/6)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="getElements (): List">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (3/3)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="getName (): String">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (3/3)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="getParent (): XmlElement">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (3/3)"/>
+              <coverage type="line, %" value="100% (1/1)"/>
+            </method>
+            <method name="hashCode (): int">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (48/48)"/>
+              <coverage type="line, %" value="100% (10/10)"/>
+            </method>
+            <method name="insertElement (XmlElement, int): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (11/11)"/>
+              <coverage type="line, %" value="100% (4/4)"/>
+            </method>
+            <method name="notifyObservers (): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (5/5)"/>
+              <coverage type="line, %" value="100% (3/3)"/>
+            </method>
+            <method name="printNode (XmlElement, String): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (91/91)"/>
+              <coverage type="line, %" value="100% (14/14)"/>
+            </method>
+            <method name="removeAllElements (): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (4/4)"/>
+              <coverage type="line, %" value="100% (2/2)"/>
+            </method>
+            <method name="removeElement (XmlElement): XmlElement">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (27/27)"/>
+              <coverage type="line, %" value="100% (6/6)"/>
+            </method>
+            <method name="removeFromParent (): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (13/13)"/>
+              <coverage type="line, %" value="100% (5/5)"/>
+            </method>
+            <method name="setAttributes (Hashtable): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (4/4)"/>
+              <coverage type="line, %" value="100% (2/2)"/>
+            </method>
+            <method name="setData (String): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (4/4)"/>
+              <coverage type="line, %" value="100% (2/2)"/>
+            </method>
+            <method name="setName (String): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (4/4)"/>
+              <coverage type="line, %" value="100% (2/2)"/>
+            </method>
+            <method name="setParent (XmlElement): void">
+              <coverage type="method, %" value="100% (1/1)"/>
+              <coverage type="block, %" value="100% (4/4)"/>
+              <coverage type="line, %" value="100% (2/2)"/>
+            </method>
+          </class>
+        </srcfile>
+      </package>
+    </all>
+  </data>
+</report>

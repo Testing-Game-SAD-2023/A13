@@ -825,6 +825,11 @@ paths:
                                 roundId:
                                     type: integer
                                     format: int64
+                                scores:
+                                    type: string
+                                order:
+                                    type: integer
+                                    format: int64
                                 startedAt:
                                     type: string
                                     format: date-time

@@ -1,0 +1,9 @@
+TARGET_CLASS,criterion,Coverage,Total_Goals,Covered_Goals
+mypackage.XmlElement,LINE,0.8238993710691824,159,131
+mypackage.XmlElement,BRANCH,0.7894736842105263,95,75
+mypackage.XmlElement,EXCEPTION,1.0,0,0
+mypackage.XmlElement,WEAKMUTATION,0.5886363636363636,440,259
+mypackage.XmlElement,OUTPUT,0.0,109,0
+mypackage.XmlElement,METHOD,0.0,35,0
+mypackage.XmlElement,METHODNOEXCEPTION,0.0,35,0
+mypackage.XmlElement,CBRANCH,0.7052631578947368,95,67

@@ -1,3 +1,0 @@
-com\example\api_gateway\service\JWTService.class
-com\example\api_gateway\ApiGatewayApplication.class
-com\example\api_gateway\filter\AuthenticationFilter.class

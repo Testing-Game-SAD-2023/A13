@@ -5,8 +5,7 @@
     <title>Editor di Testo</title>
     <link rel="stylesheet" th:href="@{./t5/codemirror/lib/codemirror.css}"/>
     <link rel="stylesheet" th:href="@{./t5/codemirror/theme/lucario.css}"/>
-    <link rel="stylesheet" th:href="@{./t5/codemirror/addon/fold/foldgutter.css}"/>
-    
+    <link rel="stylesheet" th:href="@{./t5/codemirror/addon/fold/foldgutter.css}"/>  
 </head>
 
 <body>
@@ -32,6 +31,7 @@
               <span class="close-button" onclick="closeInfoModal()">&times;</span>
             </div>
           </div>
+          
 
           <button class="theme-button" title="Change Theme"></button>
           <button class="open-button" title="Open File"></button>
@@ -63,10 +63,18 @@
           <button id="storico" class="storico-button" title="Storico"></button> <!--aggiunto-->
           <button id="compileButton" class="compile-button" title="Compile"></button>
           <button id="runButton" class="run-button" title="Play/Submit"></button> <!-- modificato chiamato il pulsante Play/Submit prima era Run -->
-          <button id="coverageButton" class="coverage-button" title="Run"></button> <!-- modificato chiamato il pulsante Run, prima era Run with Jacoco -->
+          <button id="coverageButton" class="coverage-button" title="Coverage"></button> <!-- modificato chiamato il pulsante Coverage, prima era Run -->
           <button id="logout" class="logout-button" title="Logout"></button> <!--aggiunto-->
         </div>
         <textarea id="editor" name="editor">
+/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+Nome: "inserire il proprio nome"
+Cognome: "inserire il proprio cognome"
+Username: username
+UserID: userID
+Date: date
+*/
+
 import org.junit.Before;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -74,7 +82,6 @@ import org.junit.AfterClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-//scrivere al posto di "Classe" il nome della classe da testare
 public class TestClasse {
     @BeforeClass
     public static void setUpClass() {
@@ -162,6 +169,7 @@ public class TestClasse {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <link th:href="@{./t5/css/editor.css}" rel="stylesheet" />
+    <script th:src="@{/t5/js/commonEditor.js}"></script>
     <script th:src="@{/t5/js/editor.js}"></script>
 
 </html>

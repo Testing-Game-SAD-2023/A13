@@ -213,10 +213,12 @@ body {
   z-index: 9999;
   text-align: center;
 }
+
+/*(MODIFICA 23/04/2024) Modal Content */
 .modal2-content {
-  width: 20%;
-  height: 35%;
-  top:22.5%;
+  width: 25%;
+  height: 40%;
+  top: 22.5%; 
   transform: translateY(-50%);
   display: inline-block;
   background-color: #fff;
@@ -238,7 +240,7 @@ body {
 .modal-content {
   width: 20%;
   height: 10%;
-  top:10%;
+  top:50%; 
   transform: translateY(-50%);
   display: inline-block;
   background-color: #fff;
