@@ -6,7 +6,7 @@ REM Installer function for T1-G11
 :function1
 echo "Installing T1-G11"
 cd "./T1-G11/applicazione/manvsclass"
-mvn package || ( echo "Error in T1-G11 installation during mvn package" &&  exit /b 1 )
+call mvn package || ( echo "Error in T1-G11 installation during mvn package" &&  exit /b 1 )
 docker compose up -d --build || ( echo "Error in T1-G11 installation during docker compose up" &&  exit /b 1 )
 exit /b 0
 
@@ -14,7 +14,7 @@ REM Installer function for T23-G1
 :function2
 echo "Installing T23-G1"
 cd "./T23-G1"
-mvn package || ( echo "Error in T23-G1 installation during mvn package" && exit /b 1 )
+call mvn package || ( echo "Error in T23-G1 installation during mvn package" && exit /b 1 )
 docker compose up -d --build || ( echo "Error in T23-G1 installation during docker compose up" && exit /b 1 )
 exit /b 0
 
@@ -29,7 +29,7 @@ REM Installer function for T5-G2
 :function4
 echo "Installing T5-G2"
 cd "./T5-G2/t5"
-mvn package || ( echo "Error in T5-G2 installation during mvn package" && exit /b 1 )
+call mvn package || ( echo "Error in T5-G2 installation during mvn package" && exit /b 1 )
 docker compose up -d --build || ( echo "Error in T5-G2 installation during docker compose up" && exit /b 1 )
 exit /b 0
 
@@ -37,7 +37,7 @@ REM Installer function for T6-G12
 :function5
 echo "Installing T6-G12"
 cd "./T6-G12/T6"
-mvn package || ( echo "Error in T6-G12 installation during mvn package" && exit /b 1 )
+call mvn package || ( echo "Error in T6-G12 installation during mvn package" && exit /b 1 )
 docker compose up -d --build || ( echo "Error in T6-G12 installation during docker compose up" && exit /b 1 )
 exit /b 0
 
@@ -45,7 +45,7 @@ REM Installer function for T7-G31
 :function6
 echo "Installing T7-G31"
 cd "./T7-G31/RemoteCCC"
-mvn package || ( echo "Error in T7-G31 installation during mvn package" && exit /b 1 )
+call mvn package || ( echo "Error in T7-G31 installation during mvn package" && exit /b 1 )
 docker compose up -d --build || ( echo "Error in T7-G31 installation during docker compose up" && exit /b 1 )
 exit /b 0
 
@@ -54,7 +54,7 @@ REM Installer function for T8-G21
 echo "Installing T8-G21"
 cd "./T8-G21/Progetto_SAD_GRUPPO21_TASK8/Progetto_def/opt_livelli/Prototipo2.0"
 cd "Serv"
-mvn package || ( echo "Error in T8-G21 installation during mvn package" && exit /b 1 )
+call mvn package || ( echo "Error in T8-G21 installation during mvn package" && exit /b 1 )
 cd ..
 docker compose up -d --build || ( echo "Error in T8-G21 installation during docker compose up" && exit /b 1 )
 exit /b 0
@@ -63,7 +63,7 @@ REM Installer function for T9-G19
 :function8
 echo "Installing T9-G19"
 cd "./T9-G19\Progetto-SAD-G19-master"
-mvn package || ( echo "Error in T9-G19 installation during mvn package" && exit /b 1 )
+call mvn package || ( echo "Error in T9-G19 installation during mvn package" && exit /b 1 )
 docker compose up -d --build || ( echo "Error in T9-G19 installation during docker compose up" && exit /b 1 )
 exit /b 0
 
@@ -78,7 +78,7 @@ REM Installer function for api_gateway
 :function10
 echo "Installing api_gateway"
 cd "./api_gateway"
-mvn package || ( echo "Error in api_gateway installation during mvn package" && exit /b 1 )
+call mvn package || ( echo "Error in api_gateway installation during mvn package" && exit /b 1 )
 docker compose up -d --build || ( echo "Error in ui_gateway installation during docker compose up" && exit /b 1 )
 exit /b 0
 
