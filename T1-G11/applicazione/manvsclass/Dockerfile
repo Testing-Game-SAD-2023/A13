@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 # FROM openjdk:8-alpine as java8
 
 # FROM openjdk:17-alpine
