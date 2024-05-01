@@ -6,8 +6,8 @@
         {
             "label": "compile t1",
             "type": "shell",
-//            "command": "cd T1-G11\\applicazione\\manvsclass; mvn package; docker compose up -d --build"
-            "command": "cd T1-G11\\applicazione\\manvsclass; docker compose up -d --build"
+            "command": "cd T1-G11\\applicazione\\manvsclass; mvn package; docker compose up -d --build"
+            //"command": "cd T1-G11\\applicazione\\manvsclass; docker compose up -d --build"
 
         },
         {
