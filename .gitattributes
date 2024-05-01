@@ -1,0 +1,2 @@
+# Force all sh file to use lf eol  
+*.sh eol=lf
