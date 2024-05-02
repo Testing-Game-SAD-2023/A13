@@ -150,7 +150,7 @@ compileButton.addEventListener("click", function () {
             // Logica da eseguire in caso di successo
             consoleArea.setValue(response);
             console.log("Richiesta inviata con successo. Risposta del server:", response);
-            alert(" (/sendInfo) Compilazione avvenuta con successo");
+            alert(" (/sendInfo) Visualizza i risultati prodotti dalla compilazione.");
         },
         error: function (xhr, status, error) {
             // Logica da eseguire in caso di errore
