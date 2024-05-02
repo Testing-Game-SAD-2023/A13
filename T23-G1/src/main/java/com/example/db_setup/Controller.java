@@ -236,7 +236,6 @@ public class Controller {
         try {
             response.sendRedirect("/main");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -341,7 +340,6 @@ public class Controller {
                     try {
                         response.sendRedirect("/main");
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                     
@@ -386,7 +384,6 @@ public class Controller {
                     try {
                         response.sendRedirect("/main");
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to confirm your registration");
                     }
                     //FINE MODIFICA

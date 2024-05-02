@@ -100,7 +100,6 @@ public class RobotUtil {
 			linecoverage = linecoverage.split("%", 0)[0];
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -201,7 +200,6 @@ public class RobotUtil {
 			System.out.println("ERRORE CODE: " + exitCode);
 		} catch (InterruptedException e) {
 			System.out.println(e);
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
