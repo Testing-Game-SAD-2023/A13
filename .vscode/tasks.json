@@ -7,9 +7,8 @@
             "label": "compile t1",
             "type": "shell",
             "command": "cd T1-G11\\applicazione\\manvsclass; mvn package; docker compose up -d --build"
-            //"command": "cd T1-G11\\applicazione\\manvsclass; docker compose up -d --build"
-
         },
+
         {
             "label": "compile t23",
             "type": "shell",
@@ -31,7 +30,7 @@
             "command": "cd T6-G12\\T6; mvn package; docker compose up -d --build"
         },
         {
-            "label": "docker t7",
+            "label": "compile t7",
             "type": "shell",
             "command": "cd T7-G31\\RemoteCCC; mvn package; docker compose up -d --build"
         },
@@ -41,17 +40,17 @@
             "command": "cd T8-G21\\Progetto_SAD_GRUPPO21_TASK8\\Progetto_def\\opt_livelli\\Prototipo2.0; docker compose up -d --build"
         },
         {
-            "label": "docker t9",
+            "label": "compile t9",
             "type": "shell",
             "command": "cd T9-G19\\Progetto-SAD-G19-master; mvn package; docker compose up -d --build"
         },
         {
-            "label": "docker api_gateway",
+            "label": "compile api_gateway",
             "type": "shell",
             "command": "cd api_gateway; mvn package; docker compose up -d --build"
         },
         {
-            "label": "docker ui_gateway",
+            "label": "compile ui_gateway",
             "type": "shell",
             "command": "cd ui_gateway; mvn package; docker compose up -d --build"
         }
