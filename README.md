@@ -276,7 +276,7 @@ e.g.:
 // (NEW) coverageFolder = usr_path/ClientProject/timestamp/target/site/jacoco/jacoco.xml
 ```
 # PREREQUISITI
-Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
+1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
 scaricare, al seguente indirizzo https://git-scm.com/downloads, ed installare, sul proprio computer, Git (per una guida completa all'installazione fare riferimento al seguente indirizzo: https://github.com/git-guides/install-git).
 Una volta aver completato l'installazione, sarà possibile clonare i repository GitHub sulla propria macchina:
 <pre>
@@ -289,6 +289,40 @@ Una volta aver completato l'installazione, sarà possibile clonare i repository 
 6) Premere invio
 </pre>
 ![How to clone repository by URL](https://github.com/Testing-Game-SAD-2023/A13/blob/main/Immagini_installazione/git_clone.png)
+
+2. Assicurarsi di avere Java e Maven installati correttamente sulla propria macchina e di aver settato le variabili d'ambiente.
+
+# SPECIFICHE E VERSIONI UTILIZZATE
+```
+Specifiche dispositivo
+----------------------
+Processore      Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz   1.80 GHz
+RAM installata  8,00 GB (7,88 GB utilizzabile)
+----------------------
+Specifiche Windows
+----------------------
+Edizione    Windows 10 Home
+Versione    10.0.19045.4291
+----------------------
+Docker Desktop
+----------------------
+Versione    4.29.0
+----------------------
+Windows Subsystem for Linux
+----------------------
+Versione WSL: 2.0.14.0
+Versione kernel: 5.15.133.1-1
+Versione WSLg: 1.0.59
+Versione MSRDC: 1.2.4677
+Versione Direct3D: 1.611.1-81528511
+Versione DXCore: 10.0.25131.1002-220531-1700.rs-onecore-base2-hyp
+-----------------------
+Maven
+-----------------------
+Versione    3.9.6
+-----------------------   
+```
+
 # GUIDA ALL'INSTALLAZIONE
 
 ## PASSO 1
