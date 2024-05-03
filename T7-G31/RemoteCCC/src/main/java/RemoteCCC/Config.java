@@ -70,35 +70,17 @@ public class Config {
 
     // (OLD VERSION) pathCompiler = usr_path/ClientProject/
     // (NEW VERSION) pathCompiler = usr_path/ClientProject/timestamp/
-    //final static String pathCompiler   = usr_path + sep + "ClientProject" + sep;
-    //private static String pathCompiler   = usr_path + sep + "ClientProject" + sep + timestamp + sep;
 
     // (OLD VERSION) testingClassPath = usr_path/ClientProject/src/test/java/ClientProject/
     // (NEW VERSION) testingClassPath = usr_path/ClientProject/timestamp/src/test/java/ClientProject/
-    //final static String testingClassPath   = usr_path + sep + "ClientProject" +sep + "src" + sep + "test" + sep + "java"+sep +"ClientProject" + sep;
-    //private static String testingClassPath   = usr_path + sep + "ClientProject" +sep + timestamp + sep +"src" + sep + "test" + sep + "java"+sep +"ClientProject" + sep;
-
+   
     // (OLD VERSION) underTestClassPath = usr_path/ClientProject/src/main/java/ClientProject/
     // (NEW VERSION) underTestClassPath = usr_path/ClientProject/timestamp/src/main/java/ClientProject/
-    //final static String underTestClassPath = usr_path + sep + "ClientProject" +  sep + "src" +  sep + "main" +  sep + "java" +  sep + "ClientProject" + sep;
-    //private static String underTestClassPath = usr_path + sep + "ClientProject" +  sep + timestamp + sep + "src" +  sep + "main" +  sep + "java" +  sep + "ClientProject" + sep;
-
-
+    
     // (OLD VERSION) coverageFolder = usr_path/ClientProject/target/site/jacoco/jacoco.xml
     // (NEW VERSION) coverageFolder = usr_path/ClientProject/timestamp/target/site/jacoco/jacoco.xml
-    //final static String coverageFolder = usr_path + sep + "ClientProject" + sep + "target" + sep + "site" + sep + "jacoco" + sep + "jacoco.xml" + sep;
-    //private static String coverageFolder = usr_path + sep + "ClientProject" + sep + timestamp + sep + "target" + sep + "site" + sep + "jacoco" + sep + "jacoco.xml" + sep;
-
-
-    // public static String getTestingClassPath ()   {return testingClassPath;}
-    // public static String getUnderTestClassPath()  {return underTestClassPath; }
-
-    // public static String getpathCompiler(){return pathCompiler;}
+    
     public  String getpackageDeclaretion(){return packageDeclaration;}
-    // public static String getCoverageFolder(){return coverageFolder;}
-
     public  String getUsrPath() {return usr_path;}
     public  String getsep() {return sep;}
-    // public static String getTimestamp() {return timestamp;}
-
 }
