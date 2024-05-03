@@ -58,9 +58,6 @@ public class App {
 
         createDirectoriesAndCopyPom(config);
 
-        //TODO: Non usare la classe Config come classe static
-
-        
         String testingClassName   = request.getTestingClassName();
         String testingClassCode   = request.getTestingClassCode();
 
