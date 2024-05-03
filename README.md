@@ -4,10 +4,12 @@ Componente:
 
 Il lavoro che andremo ad esporre all'interno della documentazione, muove i suoi primi passi a partire dal progetto: A10-2024,
 e vuole essere solamente una versione migliorativa dei requisiti sviluppati in corrispondenza dei serivizi T1 e T23, 
-di conseguenza rimangono invariate le modalità di installazione così come l'architettura complessiva dell'applicazione, diagrammi
-di deployment, dei componenti, ...
+di conseguenza rimane invariata: l'architettura complessiva dell'applicazione, diagrammi
+di deployment, dei componenti, ... .
 
-### REQUISITI SVILUPPATI
+Il progetto è stato ampliato integrando il lavoro svolto dal gruppo A7-2024 che si è occupato: (a) di revisionare la struttura del FileSystem condiviso tra i volumi T8 e T9 optando per utilizzarne uno soltanto (il VolumeT8), (b) del proporre un metodo per il calcolo del punteggio di una partita e (c) di introdurre una nuova modalità di gioco denominata: "Allenamento" nata dalla necessità di offrire ai giocatori la possibilità di migliorare le proprie abilità nella scrittura dei test senza che i punteggi ottenuti influenzino le statistiche dell'account.
+
+### REQUISITI SVILUPPATI (1)
 1. Il sistema, per ogni sessione di autenticazione correttamente effettuata, deve assegnare all'amministratore un token di autenticazione
 2. Il sistema deve implementare un meccanismo che permetta di distinguere gli amministratori, aventi particolari privilegi, dai semplici giocatori
 3. Il sistema deve consentire ai soli utenti aventi specifiche caratteristiche di potersi registrare inserendo: nome, cognome, username, e-mail e password
@@ -24,8 +26,255 @@ di deployment, dei componenti, ...
 14. Il sistema deve implementare un meccanismo che permetta di distinguere gli amministratori del dominio da quelli che sono stati invitati
 15. Il sistema, in caso di avvenuta registrazione, deve mostrare a video un feedback, dopodichè, indirizzare l'utente alla pagina di login
 16. Il sistema deve consentire agli utenti di decidere se registrarsi tramite il classico form (e-mail + password) oppure effettuare il social login tramite Facebook e completare in questo modo la procedura di registrazione
-17. l sistema deve essere provvisto di un entry-point, una pagina dove poter smistare gli utenti dell' applicazione in base al ruolo ricoperto ed indirizzarli verso le sezioni dedicate
+17. il sistema deve essere provvisto di un entry-point, una pagina dove poter smistare gli utenti dell' applicazione in base al ruolo ricoperto ed indirizzarli verso le sezioni dedicate
 
+### REQUISITI SVILUPPATI (2)
+1. la struttura del FileSystem è stata modificata per garantire che ciascun player registrato ed autenticato, caratterizato da un ID univoco, sia dotato di una personale cartella di gioco per memorizzare le partite giocate ed i test ed i risultati prodotti dalla misurazione con il robot, e.g.:
+
+```
+VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/GameXX/RoundXX/...
+```
+2. la funzionalità dello script: **"robot_misurazione_utente.sh"** (task T8) è stata modificata per evitare conflitti tra più giocatori: precedentemente, poichè lo script veniva eseguito sempre nella stessa cartella per tutti gli utilizzatori dell'applicazione, era possibile che i risultati prodotti dalla copertura potessero venir sovrascritti, impedendo la corretta memorizzazione dei risultati per tutti i players; con la nuova modifica, adesso, viene creata una cartella temporanea per EvoSuite (**evosuite-working-dir**) e che, al termine della procedura, verrà cancellata.
+
+3. il template dell'editor di gioco (**editor.js** ed **editor.html**) del task T5 è stato modificato in maniera tale da memorizzare una serie di informazioni di utilità (data, nome della classe da testare ed username del player), le quali verranno "catturate" in automatico alla ricezione della CUT (Class Under Test), e di contatto: i giocatori hanno la possibilità di inserire manualmente il proprio nome ed il cognome all'interno dei campi prestabiliti.
+```html
+/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+Nome: "inserire il proprio nome"
+Cognome: "inserire il proprio cognome"
+Username: username
+UserID: userID
+Date: date
+*/
+```
+4. alla ricezione della CUT, all'interno dell'editor di gioco, non sarà più necessario inserire manualmente il nome della classe da testare preceduto da 'Test', adesso in automatico si andrà a convertire:
+```html
+public class TestClasse in public class Test<CUT ricevuta>
+```
+5. il file di installazione (**installer.bat**) è stato modificato garantendo che prima che i containers vengano creati, si vadano a compilare tutti i files necessari, una procedura di questo tipo è essenziale per assicurarsi che tutte le modifiche apportate all'applicazione vegano correttamente "visualizzate".
+```bat
+@echo off
+
+GOTO :MAIN
+
+REM Installer function for T1-G11
+:function1
+echo "Installing T1-G11"
+cd "./T1-G11/applicazione/manvsclass"
+call mvn package || ( echo "Error in T1-G11 installation during mvn package" &&  exit /b 1 )
+docker compose up -d --build || ( echo "Error in T1-G11 installation during docker compose up" &&  exit /b 1 )
+exit /b 0
+
+REM Installer function for T23-G1
+:function2
+echo "Installing T23-G1"
+cd "./T23-G1"
+call mvn package || ( echo "Error in T23-G1 installation during mvn package" && exit /b 1 )
+docker compose up -d --build || ( echo "Error in T23-G1 installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for T4-G18
+:function3
+echo "Installing T4-G18"
+cd "./T4-G18"
+docker compose up -d --build || ( echo "Error in T4-G18 installation during docker compose up"  && exit /b 1 )
+exit /b 0
+
+REM Installer function for T5-G2
+:function4
+echo "Installing T5-G2"
+cd "./T5-G2/t5"
+call mvn package || ( echo "Error in T5-G2 installation during mvn package" && exit /b 1 )
+docker compose up -d --build || ( echo "Error in T5-G2 installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for T6-G12
+:function5
+echo "Installing T6-G12"
+cd "./T6-G12/T6"
+call mvn package || ( echo "Error in T6-G12 installation during mvn package" && exit /b 1 )
+docker compose up -d --build || ( echo "Error in T6-G12 installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for T7-G31
+:function6
+echo "Installing T7-G31"
+cd "./T7-G31/RemoteCCC"
+call mvn package || ( echo "Error in T7-G31 installation during mvn package" && exit /b 1 )
+docker compose up -d --build || ( echo "Error in T7-G31 installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for T8-G21
+:function7
+echo "Installing T8-G21"
+cd "./T8-G21/Progetto_SAD_GRUPPO21_TASK8/Progetto_def/opt_livelli/Prototipo2.0"
+cd "Serv"
+call mvn package || ( echo "Error in T8-G21 installation during mvn package" && exit /b 1 )
+cd ..
+docker compose up -d --build || ( echo "Error in T8-G21 installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for T9-G19
+:function8
+echo "Installing T9-G19"
+cd "./T9-G19\Progetto-SAD-G19-master"
+call mvn package || ( echo "Error in T9-G19 installation during mvn package" && exit /b 1 )
+docker compose up -d --build || ( echo "Error in T9-G19 installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for ui_gateway
+:function9
+echo "Installing ui_gateway"
+cd "./ui_gateway"
+docker compose up -d --build || ( echo "Error in ui_gateway installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for api_gateway
+:function10
+echo "Installing api_gateway"
+cd "./api_gateway"
+call mvn package || ( echo "Error in api_gateway installation during mvn package" && exit /b 1 )
+docker compose up -d --build || ( echo "Error in ui_gateway installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+
+:MAIN
+REM Avvio dell'installazione
+echo "Installation started"
+
+REM Creazione del volume Docker 'VolumeT9'
+docker volume create VolumeT9 || ( echo "Error in creating the volume T9" && exit /b 1 )
+
+REM Creazione del volume Docker 'VolumeT8'
+docker volume create VolumeT8 || ( echo "Error in creating the volume T8" && exit /b 1 )
+
+REM Creazione della rete Docker 'global-network'
+docker network create global-network || ( echo "Error in creating the network global-network" && exit /b 1 )
+
+for /l %%i in (1,1,10) do (
+
+   pushd .
+   echo "Calling function # %%i:"
+   call :function%%i
+   if errorlevel 1 (
+      echo "Error detected on function %%i, exiting script."
+      exit /b 1
+   )
+   popd
+   echo.
+)
+
+
+REM RunScript.bat
+echo "Executing RunCommands.ps1"
+powershell -ExecutionPolicy Bypass -File RunCommands.ps1
+
+REM Messaggio di completamento dell'installazione
+echo "Installation completed"
+pause
+```
+6. Il workspace è stato ripulito eliminando da GitHub tutti i files generati dalla compilazione (**.gitignore**), in particolare non verranno più "pushati" tutti i files memorizzati all'interno delle cartelle target; in questo modo si semplifica il processo di integrazione e si velocizza la sincronizzazione, non dovendo controllare troppi files da dover "pushare" all'interno del repository condiviso.
+
+7. il DockerFile relativo il container manvsclass (task T1) è stato modificato fissando la versione di Ubuntu da utilizzare alla 22.04 onde evitare problemi legati l'installazione di una serie di librerie necessarie
+```DockerFile
+FROM ubuntu:22.04
+# FROM openjdk:8-alpine as java8
+
+# FROM openjdk:17-alpine
+# COPY --from=java8 /usr/lib/jvm/java-1.8-openjdk /usr/lib/jvm/java-1.8-openjdk
+
+RUN apt-get update && apt-get install -y openjdk-8-jdk bash
+RUN apt-get install -y openssl libncurses5 libstdc++6
+
+# RUN apk update && apk add bash
+# RUN apk add --no-cache openssl ncurses-libs libstdc++
+
+COPY target/manvsclass-0.0.1-SNAPSHOT.jar /app/manvsclass.jar
+COPY installazione.sh /app
+COPY evosuite-1.0.6.jar /app
+COPY evosuite-standalone-runtime-1.0.6.jar /app
+
+WORKDIR /app
+
+RUN bash installazione.sh
+
+#WORKDIR /app
+
+EXPOSE 8080
+CMD ["java","-jar","manvsclass.jar"]
+```
+8. Nel corso dell'installazione dello script **installer.bat** è possibile incappare nell'errore:
+```bash
+=> ERROR [controller 9/9] RUN bash installazione.sh                                                                           3.8s 
+------
+> [controller 9/9] RUN bash installazione.sh:
+0.304
+0.304 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+0.304
+0.304 E: Invalid operation update
+0.350 Reading package lists...
+1.687 Building dependency tree...
+1.955 Reading state information...
+1.978 E: Unable to locate package software-properties-common
+1.980 installazione.sh: line 4: apt-add-repository: command not found
+1.983 E: Invalid operation update
+2.031 Reading package lists...
+3.291 Building dependency tree...
+3.588 Reading state information...
+3.610 E: Unable to locate package nodejs
+3.612 installazione.sh: line 7: $'\r': command not found
+3.613 sleep: invalid time interval '3\r'
+3.613 Try 'sleep --help' for more information.
+3.614 installazione.sh: line 9: $'\r': command not found
+3.614 le versioni di java e javac sono le seguenti, è necessaria la versione 1.8:
+3.614 installazione.sh: line 11: $'\r': command not found
+for java not registered; not settingernative /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+for javac not registered; not settingrnative /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/javac
+3.623 installazione.sh: line 14: $'\r': command not found
+3.629 Unrecognized option: -version
+3.629 Error: Could not create the Java Virtual Machine.
+3.629 Error: A fatal exception has occurred. Program will exit.
+3.782 javac: invalid flag: -version
+3.782 Usage: javac <options> <source files>
+3.782 use -help for a list of possible options
+3.786 installazione.sh: line 17: $'\r': command not found
+3.787 sleep: invalid time interval '2\r'
+3.787 Try 'sleep --help' for more information.
+3.788 installazione.sh: line 19: $'\r': command not found
+3.788 installazione.sh: line 20: $'\r': command not found
+3.789 installazione.sh: line 21: wget: command not found
+3.789 installazione.sh: line 22: $'\r': command not found
+3.790 installazione.sh: line 23: wget: command not found
+3.790 installazione.sh: line 24: $'\r': command not found
+3.791 Error: Unable to access jarfile evosuite-1.0.6.jar
+3.792 installazione.sh: line 26: $'\r': command not found
+3.793 sleep: invalid time interval '2\r'
+3.793 Try 'sleep --help' for more information.
+3.794 installazione.sh: line 28: $'\r': command not found
+3.795 installazione.sh: line 30: $'\r': command not found
+3.796 Error: Unable to access jarfile /app/evosuite-1.0.6.jar
+------
+failed to solve: process "/bin/sh -c bash installazione.sh" did not complete successfully: exit code: 1
+"Error in T1-G11 installation during docker compose up"
+"Error detected on function 1, exiting script."
+```
+dovuto al modo in cui Windows e Linux memorizzano i caratteri di fine riga (CRLF Windows mentre LF Linux); per arginare definitivamente il problema è stato aggiunto i file: **.gitattributes**:
+```bash
+# Force all sh file to use lf eol  
+*.sh eol=lf
+```
+Se il problema dovesse persistere, si rimanda alla lettura della sezioni successive dove viene illustrato una modalità risolutiva più artigianale.
+
+9. il path di compilazione (task T7) è stato modificato in maniera tale che ogni volta che la classe Config (in **Config.java**) viene instanziata, in corrispondenza della chiamata all'API /compile-and-codecoverage, un nuovo timestamp viene generato ed usato per creare dei path unici; al termine della procedura, tali cartelle temporanee verranno rimosse.
+e.g.:
+```java
+//(NEW) pathCompiler = usr_path/ClientProject/timestamp/
+
+//(NEW) testingClassPath = usr_path/ClientProject/timestamp/src/test/java/ClientProject/
+   
+// (NEW) underTestClassPath = usr_path/ClientProject/timestamp/src/main/java/ClientProject/
+    
+// (NEW) coverageFolder = usr_path/ClientProject/timestamp/target/site/jacoco/jacoco.xml
+```
 # PREREQUISITI
 Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
 scaricare, al seguente indirizzo https://git-scm.com/downloads, ed installare, sul proprio computer, Git (per una guida completa all'installazione fare riferimento al seguente indirizzo: https://github.com/git-guides/install-git).
