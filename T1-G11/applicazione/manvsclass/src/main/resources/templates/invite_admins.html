@@ -1,130 +1,15 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
 <meta charset="utf-8">
-<title>documents app - Bootdey.com</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invite admins</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style type="text/css">
-  
-  /*Il mio stile CSS qui*/
-  body{
-    background-color: #f4f7f6;
-    margin-top:20px;
-  }
-
-.file_manager .file a:hover .hover,
-.file_manager .file .file-name small{
-  display: block
-}
-
-.file_manager .file {
-  padding: 0 !important
-}
-
-.file_manager .file .icon{
-  text-align: center
-}
-
-.file_manager .file {
-  position: relative;
-  border-radius: .55rem;
-  overflow: hidden
-}
-
-.file_manager .file .image,
-.file_manager .file .icon {
-  max-height: 180px;
-  overflow: hidden;
-  background-size: cover;
-  background-position: top
-}
-
-.file_manager .file .hover {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  display: none;
-  transition: all 0.2s ease-in-out
-}
-
-.file_manager .file a:hover .hover {
-  transition: all 0.2s ease-in-out
-}
-
-.file_manager .file .icon {
-  padding: 15px 10px;
-  display: table;
-  width: 100%
-}
-
-.file_manager .file .icon i {
-  display: table-cell;
-  font-size: 30px;
-  vertical-align: middle;
-  color: #777;
-  line-height: 100px
-}
-
-.file_manager .file .file-name {
-  padding: 10px;
-  border-top: 1px solid #f7f7f7
-}
-
-.file_manager .file .file-name small .date {
-  float: right
-}
-
-.folder {
-  padding: 20px;
-  display: block;
-  color: #777
-}
-
-@media only screen and (max-width: 992px) {
-  .file_manager .nav-tabs {
-    padding-left: 0;
-    padding-right: 0
-  }
-  .file_manager .nav-tabs .nav-item {
-    display: inline-block
-  }
-}
-
-.card {
-  background: #fff;
-  transition: .5s;
-  border: 0;
-  margin-bottom: 30px;
-  border-radius: .55rem;
-  position: relative;
-  width: 100%;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
-  
-}
-
-a:hover {
-  text-decoration:none;
-}
-
-.login-reset-psw {
-    display: block;
-    margin-top: 40px;
-    text-align: center;
-    font-size: 15px;
-    color: rgb(37, 150, 190);
-}
-
-
-.login-reset-psw:hover {
-  text-decoration: underline;
-  color: rgb(63, 176, 241);
-}
-
-</style>
+<link href="/t1/css/invite_admins.css" rel="stylesheet">
 </head>
-<body>
 
+<body>
 <!--Il mio codice HTML qui-->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
 <div id="main-content" class="file_manager">
@@ -160,51 +45,7 @@ a:hover {
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!--Il mio script Javascript qui-->
-<script type="text/javascript">
-
-//MODIFICA (11/02/2024) : Controllo form login */
-function Invita() {
-
-  const email = document.getElementById('email').value;
-
-  const data = {
-    email: email
-  };
-
-  fetch('/invite_admins', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => {
-    console.log('Response:', response);
-    if(response.status == 200) {
-      
-      //MODIFICA
-      response.text().then(okMessage => {
-        alert(okMessage);
-      })
-
-      //FINE MODIFICA
-      window.location.href = "/home_adm";
-    }
-    else {
-      response.text().then(errorMessage => {
-        alert(errorMessage);
-      })
-    }
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-    //Aggiungi qui il codice per gestire gli errori
-  });
-
-}
-</script>
+<script src="/t1/js/invite_admins.js"></script>
 </body>
+
 </html>
-<!--FINE MODIFICA-->
