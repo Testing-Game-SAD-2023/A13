@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<!--Adding Thymeleaf-->
+<html lang ="en" 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org">
 <head>
     <!--Enabling proper responsive behavior-->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Game "Scalata" Configuration</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" >
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <link rel="stylesheet" href="../static/css/scalata.css">
 
-    <script src="../static/js/scalata.js"></script>
+    <!-- <link rel="stylesheet" href="../static/css/scalata.css" th:href="@{/css/scalata.css}"> -->
+    <link rel="stylesheet" href="/t1/css/scalata.css" >
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -20,57 +25,8 @@
     <!--FontAwesome script embeddings-->
     <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
 
-    <!-- <style>
-        /* Add your CSS styles here */
-        /* .fa-stairs {
-            color: #B197FC;
-        }
-        .fa-solid.fa-circle.fa-stack-1x {
-            font-size: 1em;
-        }
-        .fa-solid.fa-stairs.fa-stack-2x {
-            font-size: 1em;
-        }
-        .fa-stairs {
-            transition: transform 0.9s ease; /* Add this line to animate the rotation */
-        /* }
-        .fa-circle {
-            color: #FFD43B;
-        }
-        .fa-stack.fa-2x {
-            font-size: 1em;
-        }
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 70px;          /* Adjust this value to control the height of the logo container */
-        /* }
-        .logo-container:hover .fa-stairs {
-            transform: rotate(360deg); /* Add this line to rotate the fa-stairs icon on hover */
-        /* }   */
-        body{
-            background-color: #f4f7f6;
-            margin-top:20px;
-            font-family: "Roboto", sans-serif;
-        }
-        .title-container {
-            text-align: center;
-        }
-        .info-icon {
-            position: absolute;
-            top: 25px;
-            left: 1000px;
-            font-size: 1.5em;
-            color: #ccc;
-            cursor: pointer;            /*clickable element*/
-        }
-        .modal-footer {
-            display: flex;
-            justify-content: center;
-        }
-    </style> -->
-    
+    <script type ="text/javascript" src="/t1/js/scalata.js"></script>
+
 </head>
 <body>
 
