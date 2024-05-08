@@ -17,9 +17,10 @@
 	    <maven.compiler.target>1.8</maven.compiler.target>
     	<maven.compiler.source>1.8</maven.compiler.source>
 		<java.version>1.8</java.version>
+        <springsecurity.version>5.1.1.RELEASE</springsecurity.version>
 
-		<!--MODIFICA (11/02/2024): Controlli form registrazione-->
-        <!-- springsecurity.version>5.1.1.RELEASE</springsecurity.version -->
+		<!--MODIFICA (11/02/2024): Eliminazione springsecurity-->
+		
 	</properties>
 	<dependencies>
     	<dependency>
@@ -35,6 +36,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!--MODIFICA (07/05/2024) : Add spring-boot-starter-web-services dependency-->
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+		<!--FINE MODIFICA-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
