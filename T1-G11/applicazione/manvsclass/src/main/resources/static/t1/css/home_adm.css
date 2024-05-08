@@ -1,0 +1,363 @@
+@import url("https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900");
+html, body {
+  height: 100%;
+}
+
+h1 {
+  font-family: Alegreya Sans, sans-serif;
+	font-size: 100px;
+	text-align: center;
+}
+
+h2 {
+	font-size: 70px;
+	text-align: center;
+}
+
+h3 {
+	font-size: 50px;
+	text-align: center;
+}
+
+body {
+  background: beige;
+  font-family: Alegreya Sans, sans-serif;
+}
+
+nav {
+  display: block;
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  transform: translate3d(25px, -25px, 0);
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9);
+}
+
+nav.open {
+  transform: translate3d(0, 0, 0);
+}
+
+nav.top-right {
+  top: 0px;
+  right: 0px;
+}
+
+.disc {
+  position: absolute;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  font: 25px Alegreya Sans, sans-serif;
+  line-height: 40px;
+  padding-top: 10px;
+  border-radius: 250px;
+  transform: scale3d(0.5, 0.5, 0.5) rotate3d(0, 0, 1, 190deg);
+  pointer-events: none;
+  opacity: 0;
+  cursor: pointer;
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9), opacity 0.5s;
+}
+
+.disc div {
+  transform: rotate(180deg);
+}
+
+.open .disc {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.l1 {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: tomato;
+  transition-delay: 0s;
+}
+
+.open .l1 {
+  transition-delay: 0s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+
+}
+.open .l1:hover {
+  color: white;
+  transition-delay: 0s;
+  background-color: rgb(255, 22, 84);
+}
+
+.open .l1:active {
+  background: shade(tomato, 50%);
+  color: tomato;
+}
+
+.open .l1.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l2 {
+  top: 50px;
+  left: 50px;
+  right: 50px;
+  bottom: 50px;
+  background: #ff7a39;
+  transition-delay: 0.1s;
+}
+
+.open .l2 {
+  transition-delay: 0.1s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l2:hover {
+  color: rgb(18, 102, 79);
+  transition-delay: 0s;
+  background-color: rgb(243, 255, 189);
+}
+
+.open .l2:active {
+  background: shade(#ff7a39, 50%);
+  color: #ff7a39;
+}
+
+.open .l2.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l3 {
+  top: 100px;
+  left: 100px;
+  right: 100px;
+  bottom: 100px;
+  background: #ff912b;
+  transition-delay: 0.2s;
+}
+
+.open .l3 {
+  transition-delay: 0.2s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l3:hover {
+  color: rgb(239, 156, 218);
+  transition-delay: 0s;
+  background-color: rgb(178, 219, 191);
+}
+
+.open .l3:active {
+  background: shade(#ff912b, 50%);
+  color: #ff912b;
+}
+
+.open .l3.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+/*Sfruttiamo lo stile già definito (l4) per caratterizzare il logout*/ 
+.l4 {
+  top: 150px;
+  left: 150px;
+  right: 150px;
+  bottom: 150px;
+  background: #ffa91c;
+  transition-delay: 0.3s;
+}
+
+.open .l4 {
+  transition-delay: 0.3s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l4:hover {
+  color: rgb(219, 153, 90);
+  transition-delay: 0s;
+  background-color: rgb(112, 193, 179);
+}
+
+.open .l4:active {
+  background: shade(#ffa91c, 50%);
+  color: #ffa91c;
+}
+
+.open .l4.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.l5 {
+  top: 200px;
+  left: 200px;
+  right: 200px;
+  bottom: 200px;
+  background: #ffc00e;
+  transition-delay: 0.4s;
+}
+
+.open .l5 {
+  transition-delay: 0.4s;
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l5:hover {
+  color: rgb(219, 153, 90);
+  transition-delay: 0s;
+  background-color: rgb(36, 123, 160);
+}
+
+.open .l5:active {
+  background: shade(#ffc00e, 50%);
+  color: #ffc00e;
+}
+
+.open .l5.toggle {
+  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+}
+
+.toggle {
+  line-height: 100px;
+  padding: 0;
+  width: 100px;
+  background: gold;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.open .toggle {
+  transform: rotate3d(0, 0, 1, 0deg);
+}
+
+.toggle:hover {
+  text-decoration: underline;
+  background-color: rgb(68, 222, 231);
+}
+
+.toggle:active {
+  background: shade(gold, 50%);
+  color: rgba(255, 215, 0, 0.5);
+  transform: scale(0.9);
+  transition-duration: 0s;
+}
+
+/*MODIFICA (12/02/2024) : Aggiunta bottone logout*/
+.logout-admin-container {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+}
+
+.logout-admin-container form {
+    position: relative;
+    display: inline-block;
+}
+
+.logout-admin-container button {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: blueviolet;
+    color: black;
+    font-size: 25px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: Alegreya Sans, sans-serif;
+    text-align: center;
+}
+
+.logout-admin-container button:hover {
+    background-color: green; /* Color shade of green */
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/*MODIIFCA (16/02/2024) : Aggiunta bottone di invito amministratori*/
+.invita-admin-container {
+    position: fixed;
+    top: 80%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+}
+
+.invita-admin-container form {
+    position: relative;
+    display: inline-block;
+}
+
+.invita-admin-container button {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(226, 43, 110);
+    color: black;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: Alegreya Sans, sans-serif;
+    text-align: center;
+}
+
+.invita-admin-container button:hover {
+    background-color: rgb(128, 75, 0); /* Color shade of green */
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/*MODIFICA (17/04): Aggiunta bottone "Scalata" per configurare la nuova modalità di gioco*/
+.scalata-button-container {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateY(-50%, -50%);
+    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+  }
+
+.scalata-button-container form {
+    position: relative;
+    display: inline-block;
+}
+
+.scalata-button-container button {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: rgb(157, 180, 171);
+    color: black;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 3s; /* Aggiunto transform 0.3s per animare la rotazione */
+    font-family: Alegreya Sans, sans-serif;
+    text-align: center;
+}
+
+.scalata-button-container button:hover {
+    background-color: rgb(187, 219, 155); /* Color shade of green */
+    font-weight: bold;
+    text-decoration: underline;
+    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
+}
+
+.scalata-button-container button i {
+    font-size: 50px; /* Impostare la dimensione dell'icona */
+    transition: transform 0.5s; /* Aggiunto per animare la rotazione */
+}
+
+.scalata-button-container button:hover i {
+    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
+}
