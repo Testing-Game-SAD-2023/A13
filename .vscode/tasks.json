@@ -4,13 +4,13 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "compile t1",
+            "label": "compile & docker t1",
             "type": "shell",
             "command": "cd T1-G11\\applicazione\\manvsclass; mvn package; docker image prune -f; docker compose up -d --build"
         },
 
         {
-            "label": "compile t23",
+            "label": "compile & docker t23",
             "type": "shell",
             "command": "cd T23-G1; mvn package; docker image prune -f; docker compose up -d --build"
         },
@@ -20,17 +20,17 @@
             "command": "cd T4-G18; docker image prune -f; docker compose up -d --build"
         },
         {
-            "label": "compile t5",
+            "label": "compile & docker t5",
             "type": "shell",
             "command": "cd T5-G2\\t5; mvn package; docker image prune -f; docker compose up -d --build"
         },
         {
-            "label": "compile t6",
+            "label": "compile & docker t6",
             "type": "shell",
             "command": "cd T6-G12\\T6; mvn package; docker image prune -f; docker compose up -d --build"
         },
         {
-            "label": "compile t7",
+            "label": "compile & docker t7",
             "type": "shell",
             "command": "cd T7-G31\\RemoteCCC; mvn package; docker image prune -f; docker compose up -d --build"
         },
@@ -40,19 +40,19 @@
             "command": "cd T8-G21\\Progetto_SAD_GRUPPO21_TASK8\\Progetto_def\\opt_livelli\\Prototipo2.0; docker image prune -f; docker compose up -d --build"
         },
         {
-            "label": "compile t9",
+            "label": "compile & docker t9",
             "type": "shell",
             "command": "cd T9-G19\\Progetto-SAD-G19-master; mvn package; docker image prune -f; docker compose up -d --build"
         },
         {
-            "label": "compile api_gateway",
+            "label": "compile & docker api_gateway",
             "type": "shell",
             "command": "cd api_gateway; mvn package; docker image prune -f; docker compose up -d --build"
         },
         {
-            "label": "compile ui_gateway",
+            "label": "docker ui_gateway",
             "type": "shell",
-            "command": "cd ui_gateway; mvn package; docker image prune -f; docker compose up -d --build"
+            "command": "cd ui_gateway; docker image prune -f; docker compose up -d --build"
         }
     ]
 }
