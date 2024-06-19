@@ -182,6 +182,7 @@ public class Controller {
             emailService.sendMailRegister(email, ID);
             
             //MODIFICA (03/02/2024) : Redirect
+            //Modifica (18/06/2024) : Cambiato il codice per consentire il reindirizzamento
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", "/login_success");    
             return new ResponseEntity<String>(headers,HttpStatus.MOVED_PERMANENTLY);
