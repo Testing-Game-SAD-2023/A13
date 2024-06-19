@@ -4,6 +4,8 @@
 - Andriy Korsun (M63001275)
 - Giuseppe Laterza (M63001411)
 - Luca D’Angelo (M63001453)
+
+
 Questo branch della repository A13 contiene la versione aggiornata della web-app, con una nuova funzionalità che consente agli utenti di autenticarsi utilizzando il loro account Google e correzioni di alcuni bug segnalati.
 
 **Novità Principali**
