@@ -3,6 +3,7 @@
   <head>
     <title>Login Page</title>
     <link rel="stylesheet" th:href="@{/t23/css/login.css}" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
     <meta name="viewport" content="width=device-width">                               <!--MODIFICA: Correct the viewport meta tag (responsive web design and performance improvements)-->
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">   <!--MODIFICA: Forza il web browser a richiedere tutte le risorse del documento in modo sicuro-->
     <meta charset="UTF-8">
@@ -21,7 +22,9 @@
         <!--MODIFICA (18/02/2024) : Aggiunta bottone Menu-->
         <input type="button" value="Home" class="menu-button" onclick="window.location.href='/menu';">
 
-		  <!--<button class="google-login-button">Accedi con Google</button> -->
+        <button type="button" class="google-login-button" onclick="window.location.href='/loginWithGoogle';">
+          <i class="fab fa-google"></i> Accedi con Google
+        </button>
 		<a class="login-signup-now" data-uia="login-signup-now" href="/register">Non sei ancora registrato? Registrati.</a>
     <a class="login-help-link link" target="_self" data-uia="login-help-link" href="/password_reset">Hai dimenticato la password?</a>
       </form>

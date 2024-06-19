@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8">
+    <title>Registrazione</title>
+    <link rel="stylesheet" th:href="@{/t23/css/login_new.css}" />
+    <link rel="stylesheet" th:href="@{/t23/css/register_new.css}"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <script th:src="@{/t23/js/register.js}"></script>
+  </head>
+  <body>
+    <div th:insert="layouts/header-1 :: header"></div>
+    <div class="container">
+      <div class="left-container" style="width:450px;">
+        <h2 style="font-size: 35px;">Hai già un account?</h2>
+        <a href="/loginAdmin" class="button" style="margin-bottom: 10px;">Accedi come Admin</a>
+        <a href="/login" class="button">Accedi come Studente</a>
+        <div class="side-image">
+          <img th:src="@{t23/css/images/register_image.png}" alt="Login Image">
+        </div>
+      </div>
+    <div class="login-box">
+    <h1>Crea un account!</h1>
+    <p>Completa le informazioni qui sotto</p>
+    <form th:action="@{/register}" method="post" >
+      <label for="name">Nome:</label>
+      <input type="text" id="name" name="name" required placeholder="Nome">
+
+      <!--MODIFICA (03/02/2024) : Aggiunta feedback -->
+      <!-- <div id="name_error">Inserire un nome valido</div> -->
+      <label for="surname">Cognome:</label>
+      <input type="text" id="surname" name="surname" required placeholder="Cognome">
+
+      <!--MODIFICA (03/02/2024) : Aggiunta feedback -->
+      <!-- <div id="surname_error">Inserire un cognome valido</div> -->
+      <label for="email">Email:</label>
+      <input type="text" id="email" name="email" required placeholder="Indirizzo e-mail">
+
+       <!--MODIFICA (03/02/2024) : Aggiunta feedback -->
+       <!-- <div id="email_error">Inserire una mail valida</div> -->
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required placeholder="Password">
+
+       <!--MODIFICA (03/02/2024) : Aggiunta feedback -->
+       <!-- <div id="password_error">Inserisci una password valida</div> -->
+      <label for="check_password">Conferma Password:</label>
+      <input type="password" id="check_password" name="check_password" required placeholder="Conferma Password">
+
+       <!--MODIFICA (03/02/2024) : Aggiunta feedback -->
+       <!-- <div id="check_password_error">Confermare la password</div> -->
+      <label for="studies">Corso di studi:</label>
+      <select id="studies" name="studies" placeholder="Corso di studi">
+        <option value="BSc">BSc</option>
+        <option value="MSc">MSc</option>
+        <option value="ALTRO">ALTRO</option>
+      </select>
+      
+      <div class= "g-recaptcha m-3 row justify-content-center" 
+      data-sitekey="6LcZN2QmAAAAACw4po2gr-Efo0k8ubA6cKB_CJxN" style="display:none"></div>
+      
+      <input type="submit" value="Invia" class="submit-button"> 
+      
+    </form>
+
+    	<a class="register-signup-now" data-uia="register-signup-now" href="/login">
+      Sei già registrato? Accedi.</a>
+    </div>
+  </div>
+  <div th:insert="layouts/footer :: footer"></div>
+  </body>
+</html>

@@ -889,11 +889,19 @@ public class HomeController {
 	public	List<ClassUT>	ricercaClasse(@PathVariable String text) {
 	return srepo.findByText(text);
 	}
+
+	@GetMapping("/test")
+	@ResponseBody
+	public String test() {
+		return "test T1";
+	}
 	
 	@GetMapping("/downloadFile/{name}")
 	@ResponseBody
 	public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
+		System.out.println("test");
 	 	List<ClassUT> classe= srepo.findByText(name);
+		System.out.println("File download:");
 		System.out.println(classe.get(0).getcode_Uri());
 	 	return FileDownloadUtil.downloadClassFile(classe.get(0).getcode_Uri());
 	}

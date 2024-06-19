@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu</title>
+<link rel="stylesheet" th:href="@{/t23/css/menu.css}" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo">
+        <img th:src="@{t23/css/images/Federico_II_University_Logo.svg}"></img>
+    </div>
+</header>
+<div class="container">
+  <div class="hero-content">
+    <h1>Esplora il Software Testing ed unisciti alla sfida!</h1>
+    <p>Affina le tue abilità di progettazione dei test. Competi contro i robot Randoop o EvoSuite. Unisciti alla sfida.</p>
+    <a href="/login" class="button-3d">Accesso Utenti</a>
+    <a href="/loginAdmin" class="button-3d adm">Accesso Amministratori</a>
+  </div>
+  <div class="image-container">
+    <img th:src="@{t23/css/images/HeroImageNew.png}" width="650">
+  </div>
+</div>
+<div th:insert="layouts/footer :: footer"></div>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+html, body {
+    font-family: Poppins, sans-serif;
+    color: #0e253bfe;
+    background-color: #f0fdff ;
+    height: 100%;
+    margin: 0;
+  }
+
+  .container {
+    margin-top: 80px;
+    margin: 0 30px;
+    padding: 50px;
+    display: flex;
+    align-items: center;
+  }
+  .hero-content {
+    text-align: left;
+  }
+  .hero-content h1 {
+    font-size: 4.5em;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 50px;
+    font-family: "Fredoka", sans-serif;
+    font-weight: 700;
+  }
+  .hero-content p {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    font-family: 'Quicksand', sans-serif;
+  }
+  .button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    font-size: 1em;
+    text-decoration: none;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .button:hover {
+    background-color: #0056b3;
+  }
+  .image-container{
+    text-align: center;
+  }
+  .header{
+    position: relative;
+    display: flex;
+    flex-basis: 100%;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0e253bfe;
+    color: white;
+    padding: 10px 0;
+    padding: 1.5rem;
+    margin-top: 10px;
+    z-index: 100;
+    top: 0;
+    right: 0;
+    left: 0;
+    min-height: 1.5%;
+    max-height: 40px;
+    border-radius: 70px;
+    margin: 10px 15px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    max-width: 30%;
+}
+
+.logo img {
+    height: 70px;
+    max-width: 100%;
+    filter: brightness(0) invert(1); /* Initially set to white; invert for color change */
+}
+
+.button-3d {
+  display: inline-block;
+  position: relative;
+  border: 0;
+  background: #0DC4D9;
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Quicksand', sans-serif;
+  padding: 1.25em 1.5em;
+  margin: 5px 5px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0,0,0.58,1),
+    background 0.3s cubic-bezier(0,0,0.58,1);
+  cursor: pointer;
+}
+.button-3d:before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0DC4D9;
+  border-radius: inherit;
+  transform: translate3d(0, 0.5em, -1em);
+  transition: transform 0.3s cubic-bezier(0,0,0.58,1);
+}
+.button-3d:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  filter: blur(4px);
+  border-radius: inherit;
+  top: 0;
+  left: 0;
+  transform: translate3d(0, .7em, -1em);
+  transition: transform 0.3s cubic-bezier(0,0,0.58,1);
+}
+.button-3d:hover {
+  transform: translateY(-0.25em);
+}
+.button-3d:hover:before {
+  transform: translate3d(0, 0.75em, -1em);
+}
+.button-3d:hover:after {
+  transform: translate3d(0, 1.05em, -1em);
+}
+.button-3d:active {
+  transform: translate(0, 0.5em);
+}
+.button-3d:active:before,
+.button-3d:active:after {
+  transform: translate3d(0,0,-1em);
+}
+
+.adm{
+  background: #5FD972;
+}
+.adm::before{
+  background: #5FD972;
+
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 20px;
+    background-color: #0e253bfe;
+    color: #ffffff;
+}
+
+.footer-column {
+    font-family: "Quicksand", "serif";
+    flex: 1;
+    min-width: 200px;
+    min-height: 200px;
+    margin: 10px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-items: flex-start;
+}
+
+.footer-column h1{
+    font-family: "Quicksand", "serif";
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+
+.footer-column p, a{
+    font-family: "Quicksand", "serif";
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    transition: 0.3s color;
+}
+
+.footer-column a:hover{
+    color: #007BFF;
+}
+
+.footer-logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+.footer-copyright {
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid #ffffff;
+    padding-top: 10px;
+    margin-top: 20px;
+}
+
+.centered{
+    align-items: center;
+}

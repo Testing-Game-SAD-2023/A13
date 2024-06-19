@@ -32,6 +32,8 @@ public class User {
     //MODIFICA
     public boolean isRegisteredWithFacebook;
     //FINE MODIFICA
+    //MODIFICA 18/06/2024
+    public boolean isRegisteredWithGoogle;
     
     @Enumerated (EnumType.STRING)
     public Studies studies;

@@ -180,3 +180,34 @@ input[type="submit"]:hover {
     text-decoration: underline;
     color: rgb(161, 0, 174);
 }
+
+/*Bottone google*/
+button.google-login-button {
+    margin: 0 auto;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4285f4;
+    color: white;
+    cursor: pointer;
+    outline: 1px #333;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    display: block;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    padding: 20px 50px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: background-color 0.3s;
+}
+
+    button.google-login-button:hover {
+        background-color: #27559f;
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg');
+    }
+button.google-login-button i{
+    margin-right: 10px;
+}

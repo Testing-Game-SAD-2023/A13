@@ -1,0 +1,441 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    /*background-image: url('https://media.licdn.com/dms/image/D4D22AQFv6lqHmb3osQ/feedshare-shrink_800/0/1685964874554?e=1688601600&v=beta&t=lH3d4hmDaW-gCXG6vQ-lTEZCgKBERrL98hD8gvqaN0A');*/
+
+    /*MODIFICA (13/02/2024) : Aggiunta sfondo*/
+    /*background-image: url('./images/login_page_background_yellow.jpg');
+    width: 200px;
+    height: 200px;*/ 
+    /*FINE MODIFICA*/
+    /*background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; */
+    color: #0e253bfe;
+    background-color: #f0fdff ;
+    height: 100%;
+    margin: 0;
+}
+
+.header{
+    position: relative;
+    display: flex;
+    flex-basis: 100%;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0e253bfe;
+    color: white;
+    padding: 10px 0;
+    padding: 1.5rem;
+    z-index: 100;
+    top: 0;
+    right: 0;
+    left: 0;
+    min-height: 1.5%;
+    /*max-height: 40px;*/
+    box-shadow: 0 2px 4px #0006;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    max-width: 30%;
+}
+
+.logo img {
+    height: 70px;
+    max-width: 100%;
+    filter: brightness(0) invert(1); /* Initially set to white; invert for color change */
+}
+
+.nav-data{
+    display: flex;
+    align-items: center;
+    max-width: 70%;
+}
+
+.nav-text{
+    font-family: 'Quicksand', sans-serif;
+    margin-right: 10px;
+}
+
+.container {
+    width: 100%;
+
+    /*MODIFICA (06/02/2024) : Predisposizione aggiunta nuovo bottone*/
+    /*height: 55%;*/            /*Modifica altezza al 70%*/
+    /*FINE MODIFICA*/
+    /*margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    border-radius: 5%;
+    background-color: rgb(255, 255, 255);  
+    border: 2px solid #666;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 2px;*/
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 15%;
+    align-items: flex-start;
+    justify-content: center;
+    /*background-color: #27559f;*/
+}
+
+.left-container{
+    padding: 40px;
+    align-items: center;
+    color: #0e253bfe;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-left: 2rem;
+    width: 373px;
+    z-index: 0;
+}
+
+.left-container h2{
+    font-family: "Fredoka", sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.left-container p{
+    font-family: 'Quicksand', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: .02em;
+    margin-bottom: 1rem;
+    margin-top: 0;
+    text-align: center;
+}
+
+.button {
+    font-family: 'Quicksand', sans-serif;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: 700;
+    border: 2px solid #007BFF;
+    color: #007BFF;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    border-radius: 25px; 
+}
+
+.button:hover {
+    color: #fff;
+    background-color: #007BFF;
+}
+
+.register-button{
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side-image{
+    margin-top: 1.625rem;
+    
+}
+
+.side-image img{
+    width: 340px;
+}
+
+.login-box {
+    /*background-color: #fff;*/
+    padding: 40px;
+    border-radius: 8px;
+    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
+    text-align: left;
+    width: 100%;
+    max-width: 400px;
+}
+
+h1 {
+    /*font-family: 'Roboto', sans-serif;*/
+    font-family: "Fredoka", sans-serif;
+    font-size: 2.5rem;
+    color: #0e253bfe;
+    /*color: rgb(161, 0, 174);*/
+    /*-webkit-text-stroke: 0.5px white;*/       /*Miglioramento leggibilità testo (funzionerà su browser basati su WebKit come Safari e Chrome)*/
+    /*MODIFICA (13/02/2024) : Accortenze grafiche e di compatibilità*/
+    /*text-shadow: 0.5px 0.5px white, -0.5px -0.5px white, 0.5px -0.5px white, -0.5px 0.5px white;*/ 
+    /*Miglioramento leggibilità testo (funzionerà sugli altri browser non basati su WebKit)*/
+    /*FINE MODIFICA*/
+}
+
+label {
+    font-family: 'Quicksand', sans-serif;
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #0e253bfe;
+}
+
+
+input[type="text"],
+input[type="password"], select{
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    width: 95%;
+    /*max-width: 300px;*/
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 5px;
+    border: 1px solid #959595;
+    text-align: center;
+
+}
+
+select{
+    width: 35%;
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+color: #8e8e8e;
+}
+
+input[type="text"]:focus::placeholder,
+input[type="password"]:focus::placeholder {
+color: transparent;
+}
+
+/*
+input[type="submit"] {
+    display: block;
+    margin: 0 auto;
+    background-color: rgb(161, 0, 174);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+        background-color: rgb(219, 0, 118);
+        color: rgb(255, 255, 255);
+}
+
+*/
+
+/*MODIFICA (06/02/2024) : Bottone submit
+.submit-button {
+    display: block;
+    margin: 0 auto;
+    background-color: rgb(161, 0, 174);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: rgb(219, 0, 118);
+    color: rgb(255, 255, 255);
+}*/
+.submit-button {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    color: #fff;
+    background-color: #5FD972;
+    border-radius: 25px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #367f49;
+}
+
+/*MODIFICA (18/02/2024) : Aggiunta bottone Menu*/
+.menu-button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;                       /* Aggiungi un margine sopra i bottoni per separarli */
+    background-color: rgb(161, 0, 174);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.menu-button:hover {
+    background-color: rgb(219, 0, 118);
+    color: rgb(255, 255, 255);
+}
+
+.line-container {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 25px;
+}
+
+.line {
+    flex-grow: 1;
+    border: none;
+    border-top: 3px solid #0e253bfe;
+}
+
+.line-text {
+    padding: 0 10px;
+}
+
+.button-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    gap: 10px;
+}
+
+/*Link "Non sei ancora registrato? Registrati."*/
+.login-signup-now {
+    display: block;
+    margin-top: 40px;
+    text-align: center;
+    font-size: 15px;
+    color: rgb(219, 0, 118);
+}
+
+.login-signup-now:hover {
+    text-decoration: underline;
+    color: rgb(161, 0, 174);
+}
+
+/*Link "Hai dimenticato la password?"*/
+.login-help-link {
+    font-family: 'Quicksand', sans-serif;
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 15px;
+    color: #0e253bfe;
+    text-decoration: none;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.login-help-link:hover {
+    text-decoration: underline;
+    color: #007BFF;
+}
+
+/*Bottone google*/
+button.google-login-button {
+    margin: 0 auto;
+    margin-top: 10px;
+    border-radius: 25px;
+    border: none;
+    background-color: #df3400;
+    color: white;
+    cursor: pointer;
+    outline: 1px #333;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    display: block;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    padding: 10px 13px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: background-color 0.3s;
+}
+
+    button.google-login-button:hover {
+        background-color: #9b2400;
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg');
+    }
+button.google-login-button i{
+    margin-right: 10px;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 20px;
+    background-color: #0e253bfe;
+    color: #ffffff;
+}
+
+.footer-column {
+    font-family: "Quicksand", "serif";
+    flex: 1;
+    min-width: 200px;
+    min-height: 200px;
+    margin: 10px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-items: flex-start;
+}
+
+.footer-column h1{
+    font-family: "Quicksand", "serif";
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+
+.footer-column p, a{
+    font-family: "Quicksand", "serif";
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    transition: 0.3s color;
+}
+
+.footer-column a:hover{
+    color: #007BFF;
+}
+
+.footer-logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+.footer-copyright {
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid #ffffff;
+    padding-top: 10px;
+    margin-top: 20px;
+}
+
+.centered{
+    align-items: center;
+}
