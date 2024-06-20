@@ -45,7 +45,7 @@ Per chiarezza è riportata una lista delle modifiche effettuate sul codice ed i 
 | T23 | Verifica e correzione del processo di registrazione, in particolare la funzione javascript eseguita dalla pagina dopo il submit, corretta gestione e visualizzazione dei messaggi di errore: `register.js`|
 | T23 | Aggiunta del campo `isRegistredWithGoogle` nel DB MySQL. `UserRepository.java`, `User.java`|
 | T23 | Modifica della richiesta POST di `/logout` per consentire la corretta cancellazione di tutti i cookie, della sessione http e del contesto di autenticazione di spring. `Controller.java`|
-| T23 | Aggiunta degli endpoint per gestire il login con Google: `/loginWithGoogle`, controllo della conssessione con il servizio Google `/checkService`, controllo dell'esistenza della sessione `/checkSession. `Controller.java`|
+| T23 | Aggiunta degli endpoint per gestire il login con Google: `/loginWithGoogle`, controllo della conssessione con il servizio Google `/checkService`, controllo dell'esistenza della sessione `/checkSession` in `Controller.java`|
 | ui_gateway | Aggiunti gli endpoint nelle configurazioni: `downloadFile` per manvsclass per il fix del tasto DownloadClasse, `oauth2/authorization/google` e `validateToken` per T23, `register.js`|
 | T5 | Modifica alla funzione `redirectToLogin()` in modo da interfacciarsi correttamente con la POST request di logout definita nel Controller. `main.js`|
 | T6 | Refactoring HTML, CSS e js|
