@@ -9,69 +9,139 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Game "Scalata" Configuration</title>
+    <title>Game Configuration</title>
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" >
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
 
-    <!-- <link rel="stylesheet" href="../static/css/scalata.css" th:href="@{/css/scalata.css}"> -->
     <link rel="stylesheet" href="/t1/css/scalata.css" >
+    <link rel="stylesheet" href="/t1/css/scalata_tour.css" >
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <!--FontAwesome script embeddings-->
     <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 
     <script type ="text/javascript" src="/t1/js/scalata.js"></script>
-
+    <script type ="text/javascript" src="/t1/js/scalata_tour.js"></script>
 </head>
+
 <body>
 
-    <!--Info icon and modal dialog-->
-    <div class="info-icon" data-toggle="modal" data-target="#infoModal">
-        <i class="fas fa-info-circle"></i>
+    <!--Navbar-->
+    <nav class="navbar navbar-dark bg-primary" id="navbar">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-stairs"></i> Modalità "scalata"
+      </a>
+      <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" id="nav-home" href="/home_adm">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="nav-info" href="#" data-toggle="modal" data-target="#gameInfoModal">Game Info</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="nav-add" href="/uploadClasseAndTest">+ Add Class and Test</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="nav-tour" href=#>Inizia il tour</a>
+          </li>
+        </ul>
       </div>
-      <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="infoModalLabel">Informazioni sulla modalità di gioco</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>La modalità "Scalata", nella sua semplicità, mira a sfidare e mettere sotto pressione gli allievi che si troveranno a dover fronteggiare, in una singola sessione di gioco, un insieme di classi aventi un livello di "difficoltà" crescente.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
-            </div>
+    </nav>
+
+    <!--Jumbotron-->
+    <div class="jumbotron jumbotron-fluid" id="my-jumbotron">
+      <div class="container">
+        <h1 class="display-4">Configura la tua "<b>Scalata</b>".</h1>
+        <p class="lead">
+          Ciascuna partita in modalità "Scalata" sarà caratterizzata da un certo numero di "<em>rounds</em>", ovvero di classi da testare e <b>sarai tu</b> a deciderne l'ordine ed il numero!<br>
+          Metti alla prova le capacità di testing dei giocatori realizzando sfide stimolanti ed elettrizzanti.  
+        </p>
+      </div>
+    </div>
+
+    <!--Game Info modal dialog-->
+    <div class="modal fade" id="gameInfoModal" tabindex="-1" role="dialog" aria-labelledby="gameInfoModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="gameInfoModalLabel">Informazioni sulla modalità di gioco</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>La modalità "Scalata", nella sua semplicità, mira a sfidare e mettere sotto pressione gli allievi che si troveranno a dover fronteggiare, in una singola sessione di gioco, un insieme di classi aventi un livello di "difficoltà" crescente.</p>
+          </div>
+          <div class="modal-footer d-flex justify-content-center">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Chiudi</button>
           </div>
         </div>
       </div>
-
-    <div class="title-container">
-        <h1>Configurazione modalità di gioco: "Scalata" <span class="badge text-bg-warning">New</span></h1>
     </div>
 
-    <!--Explanation-->
+    <!--Form-->
+    <div class="form-group">
+
+      <!--viewBox="0 0 1440 320"-->
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 220">
+        <path fill="#c27ebb" fill-opacity="1" d="M0,64L48,90.7C96,117,192,171,288,197.3C384,224,480,224,576,197.3C672,171,768,117,864,80C960,43,1056,21,1152,42.7C1248,64,1344,128,1392,160L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+      </svg>
+      <form class="centered-form">
+        <label for="NameInput">Assegna un nome alla tua "Scalata"</label>
+        <input class="form-control" id="form-name" type="text" placeholder="*campo obbligatorio" style="width: 500px;">
+        <br>
+        <label for="DescriptionInput">Fornisci una descrizione</label>
+        <textarea class="form-control" id="FormControlTextareaDescription" rows="3" style="width: 500px;"></textarea>
+        <br>
+        <label for="rounds" class="form-label">Definisci il numero di rounds</label>
+        <input type="number" id="rounds" name="rounds" min="1" required class="form-control" style="width: 80px;" >
+        <br>
+        <button id="addRoundButton" type="button" class="btn btn-primary btn-sm">Aggiungi</button>
+        <br>
+        <span id="totalClassesText"></span>
+        <span id="totalScalateText"></span>
+      </form>
+      <div id="scalateContainer"></div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 250">
+        <path fill="#e8da9d" fill-opacity="1" d="M0,96L40,122.7C80,149,160,203,240,234.7C320,267,400,277,480,261.3C560,245,640,203,720,165.3C800,128,880,96,960,106.7C1040,117,1120,171,1200,197.3C1280,224,1360,224,1400,224L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path>
+      </svg>
+    </div>
     
-    <p> In questa sezione sarà possibile configurare</p>
 
-    <form action="/scalata" method="post">
-        <label for="rounds">Number of rounds:</label>
-        <input type="number" id="rounds" name="rounds" min="1" required>
-        <br><br>
-        <input type="submit" value="Confirm">
-    </form>
+    <div style="display: flex; justify-content: space-between;">
+      <h2>Seleziona le classi che comporranno la tua "Scalata"</h2>
+      <select id="difficultyFilter" style="margin-left: -50px;">
+        <option value="">Filter by Difficulty</option>
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
+      </select>
+    </div>
+    <br>
+    <br>  
 
-    <h2>Levels</h2>
-    <ul>
-        <!-- Add your level list items here -->
-    </ul>
+    <div id="classUTList" class="row disabled"></div>
+        <!-- Add your class list items here -->
+    <br>
+    <div class="button-container" style="display: flex; justify-content: center; align-items: center;">
+      <button type="button" class="btn btn-secondary btn-lg" id="summaryButton">Riepilogo</button>
+      <img src="/t1/css/Images/Logo 2_ENACTEST.jpg" alt="ENACTEST" style="width: 80px; margin: 0 10px;">
+      <button type="button" class="btn btn-primary btn-lg" id="confirmButton">Conferma</button>
+    </div>
+    <br>
+    <br>
 
 </body>
 </html>

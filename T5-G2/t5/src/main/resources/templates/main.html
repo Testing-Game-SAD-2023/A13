@@ -5,12 +5,18 @@
     <link href="./t5/css/main.css" rel="stylesheet" />
     <link href="./t5/css/main2.css" rel="stylesheet" />
     <link href="./t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="./t5/js/allenamento.js"></script>
-    <script src="./t5/js/main.js"></script>
-
+    
     <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
     <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
+    <!--Modifica (20/05) Adding Sweet Alert-->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!--Modifica (21/05) Adding JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!--Fine Modifica-->
+    
+    <script src="./t5/js/allenamento.js"></script>
+    <script src="./t5/js/main.js"></script>
+    
     <title>Choose your game mode</title>
 </head>
 
@@ -36,7 +42,7 @@
                         il valore degli elementi contenuti nella lista java "classi" -->
                         <span class="spa">
                             <div class="col-md-4">
-                                <button type="button" class ="lista-item my-button" onclick="selectGameMode('Sfida un Robot')"> <i class="fa-solid fa-robot" style="color: #f5b041;"></i>   Sfida un Robot</button>
+                                <button type="button" class ="lista-item my-button" onclick="selectGameMode('Sfida')"> <i class="fa-solid fa-robot" style="color: #f5b041;"></i>   Sfida un Robot</button>
                             </div>
                             <div class="col-md-4">
                                 <button type="button" class ="lista-item my-button" onclick="selectGameMode('Multiplayer')"> <i class="fa-solid fa-user-group" style="color: #f5b041;"></i>   Multiplayer</button>
@@ -44,11 +50,11 @@
                             <div class="col-md-4">
                                 <button type="button" class ="lista-item my-button" onclick="selectGameMode('Allenamento')"> <i class="fa-solid fa-dumbbell" style="color: #f5b041;"></i>   Allenamento</button>
                             </div>
-                            <!--Modifica (05/04): Aggiunta nuova voce all'elenco delle modalità di gioco-->
+                            <!--Modifica (20/05): Aggiunta nuova voce all'elenco delle modalità di gioco-->
                             <div class="col-md-4">
-                                <button type="button" class ="lista-item my-button" onclick="selectGameMode('Apprendimento')"> <i class="fa-regular fa-lightbulb" style="color: #f5b041;"></i>   Apprendimento</button>
+                                <button type="button" class ="lista-item my-button" onclick="selectGameMode('Scalata')"> <i class="fa-solid fa-stairs" style="color: #f5b041;"></i>   Scalata</button>
                             </div>
-                            <!--Fine modifica (05/04)-->
+                            <!--Fine modifica (20/05)-->
                         </span> 
                         </div>
                         <div class="name"></div>

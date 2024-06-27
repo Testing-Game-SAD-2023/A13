@@ -6,6 +6,7 @@ body {
 }
 .bg-custom {
   background-color: #1c1c28;
+  /* background-image: url("/t5/images/gamemode_background.jpg"); */
 }
 .container {
   padding-top: 1%;
@@ -717,4 +718,8 @@ padding-left: 8%;
 
 .hidden {
   display: none;
+}
+.swal-button--confirm {
+  display: block;
+  margin: 0 auto;
 }

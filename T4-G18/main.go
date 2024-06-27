@@ -18,6 +18,7 @@ import (
 	"github.com/alarmfox/game-repository/api/game"
 	"github.com/alarmfox/game-repository/api/robot"
 	"github.com/alarmfox/game-repository/api/round"
+	"github.com/alarmfox/game-repository/api/scalatagame"
 	"github.com/alarmfox/game-repository/api/turn"
 	"github.com/alarmfox/game-repository/limiter"
 	"github.com/alarmfox/game-repository/model"
@@ -99,6 +100,7 @@ func run(ctx context.Context, c Configuration) error {
 		&model.Turn{},
 		&model.Metadata{},
 		&model.PlayerGame{},
+		&model.ScalataGame{},
 		&model.Robot{})
 
 	if err != nil {
@@ -172,6 +174,9 @@ func run(ctx context.Context, c Configuration) error {
 
 			// robot endpoint
 			robotController = robot.NewController(robot.NewRobotStorage(db))
+
+			// scalatagame endpoint
+			scalataController = scalatagame.NewController(scalatagame.NewRepository(db))
 		)
 
 		r.Mount(c.ApiPrefix, setupRoutes(
@@ -179,6 +184,7 @@ func run(ctx context.Context, c Configuration) error {
 			roundController,
 			turnController,
 			robotController,
+			scalataController,
 		))
 	})
 	log.Printf("listening on %s", c.ListenAddress)
@@ -303,7 +309,7 @@ func makeDefaults(c *Configuration) {
 
 }
 
-func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller) *chi.Mux {
+func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
@@ -385,6 +391,26 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 
 		// Delete robots by class id
 		r.Delete("/", api.HandlerFunc(roc.Delete))
+
+	})
+
+	r.Route("/scalates", func(r chi.Router) {
+		//Get scalates
+		r.Get("/{id}", api.HandlerFunc(sgc.FindByID)) // TODO:
+
+		// List scalates
+		r.Get("/", api.HandlerFunc(sgc.List)) // TODO:
+
+		// Create scalates
+		r.With(middleware.AllowContentType("application/json")).
+			Post("/", api.HandlerFunc(sgc.Create))
+
+		// Update scalates
+		r.With(middleware.AllowContentType("application/json")).
+			Put("/{id}", api.HandlerFunc(sgc.Update))
+
+		// Delete game
+		// r.Delete("/{id}", api.HandlerFunc(sgc.Delete)) // TODO:
 
 	})
 

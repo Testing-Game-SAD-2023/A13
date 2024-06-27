@@ -5,7 +5,16 @@
     <title>Editor di Testo</title>
     <link rel="stylesheet" th:href="@{./t5/codemirror/lib/codemirror.css}"/>
     <link rel="stylesheet" th:href="@{./t5/codemirror/theme/lucario.css}"/>
-    <link rel="stylesheet" th:href="@{./t5/codemirror/addon/fold/foldgutter.css}"/>  
+    <link rel="stylesheet" th:href="@{./t5/codemirror/addon/fold/foldgutter.css}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+
+    <link rel="stylesheet" href="/t5/css/editor_tour.css"/>
+    
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="/t5/js/common.js"></script>
+    <script src="/t5/js/editor_tour.js"></script>
+
 </head>
 
 <body>
@@ -25,7 +34,7 @@
           </div>
         </div>
         <div class="top-bar">
-          <button class="user-button" title="Game Info" onclick="openInfoModal()"></button>
+          <button class="user-button" id="user-button" title="Game Info" onclick="openInfoModal()"></button>
           <div id="infoModal" class="modal2">
             <div class="modal2-content">
               <span class="close-button" onclick="closeInfoModal()">&times;</span>
@@ -33,14 +42,14 @@
           </div>
           
 
-          <button class="theme-button" title="Change Theme"></button>
-          <button class="open-button" title="Open File"></button>
+          <button class="theme-button" id="theme-button" title="Change Theme"></button>
+          <button class="open-button" id="open-button" title="Open File"></button>
           <!-- <button id="saveButton" class= "save-button" title="Save"></button> -->
-          <button class="saveAs-button" title="Save As" onclick="saveCode()"></button>
-          <button class="undo-button" title="Undo"></button>
-          <button class="redo-button" title="Redo"></button>
+          <button class="saveAs-button" id="saveAs-button" title="Save As" onclick="saveCode()"></button>
+          <button class="undo-button" id="undo-button" title="Undo"></button>
+          <button class="redo-button" id="redo-button" title="Redo"></button>
 
-          <button class="find-button" title="Find" onclick="openSearchModal()"></button>
+          <button class="find-button" id="find-button" title="Find" onclick="openSearchModal()"></button>
           <div id="searchModal" class="modal">
             <div class="modal-content">
               <span class="close-button" onclick="closeSearchModal()">&times;</span>
@@ -50,7 +59,7 @@
             </div>
           </div>
 
-          <button class="replace-btn" title="Replace" onclick="openReplaceModal()"></button>
+          <button class="replace-btn" id="replace-btn" title="Replace" onclick="openReplaceModal()"></button>
           <div id="replaceModal" class="modal">
             <div class="modal-content">
               <span class="close-button" onclick="closeReplaceModal()">&times;</span>

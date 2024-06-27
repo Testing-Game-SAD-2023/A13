@@ -22,6 +22,10 @@ public class ParseUtil {
 
     public static double calculateScore(int loc, int numTurnsPlayed) {
         double locPerc = ((double) loc) / 100;
-        return ((locPerc - (0.1 * (numTurnsPlayed - 1))) * 100);
+        double s_bonus = 0.1 * (6 - numTurnsPlayed);
+        if (s_bonus <= 0) {
+            s_bonus = 0;
+        }
+        return (locPerc+s_bonus)*100;
     }
 }

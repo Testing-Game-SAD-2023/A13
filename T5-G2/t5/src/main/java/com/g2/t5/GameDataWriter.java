@@ -28,49 +28,15 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.g2.Model.Game;
 
 public class GameDataWriter {
 
     private final HttpClient httpClient = HttpClientBuilder.create().build();
-    // private static String CSV_FILE_PATH =
-    // "/app/AUTName/StudentLogin/GameId/GameData.csv";
-    // private static final String[] CSV_HEADER = { "GameId", "Username",
-    // "PlayerClass", "Robot" };
-    // public long getGameId() {
-    // long gameId = 0;
-
-    // try {
-    // // Crea il Reader per il file CSV
-    // Reader reader = new FileReader(CSV_FILE_PATH);
-
-    // // Crea il CSVParser con il Reader e il formato CSV
-    // CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
-
-    // // Ottieni tutte le righe del file CSV
-    // List<CSVRecord> records = csvParser.getRecords();
-
-    // // Verifica se ci sono righe nel file CSV
-    // if (!records.isEmpty()) {
-    // // Prendi l'ultima riga del file CSV
-    // CSVRecord lastRecord = records.get(records.size() - 1);
-
-    // // Ottieni l'ID dalla prima colonna della riga
-    // gameId = Long.parseLong(lastRecord.get(0));
-    // }
-
-    // // Chiudi il CSVParser e il Reader
-    // csvParser.close();
-    // reader.close();
-    // } catch (IOException e) {
-    // System.err.println("Errore durante la lettura del file CSV: " +
-    // e.getMessage());
-    // }
-
-    // return gameId;
-    // }
-    public JSONObject saveGame(Game game, String username) {
+    
+    public JSONObject saveGame(Game game, String username, Optional<Integer> selectedScalata) {
         try {
             String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             JSONObject obj = new JSONObject();
@@ -82,6 +48,9 @@ public class GameDataWriter {
             obj.put("description", game.getDescription());
             obj.put("username", game.getUsername());
             obj.put("startedAt", time);
+            if(selectedScalata.isPresent()) {
+                obj.put("selectedScalata", selectedScalata.get());
+            }
 
             JSONArray playersArray = new JSONArray();
             playersArray.put(String.valueOf(game.getPlayerId()));
@@ -90,6 +59,7 @@ public class GameDataWriter {
 
             HttpPost httpPost = new HttpPost("http://t4-g18-app-1:3000/games");
             StringEntity jsonEntity = new StringEntity(obj.toString(), ContentType.APPLICATION_JSON);
+            System.out.println("(GameDataWriter) saveGame sending Json to t4: " + obj);
 
             httpPost.setEntity(jsonEntity);
 
@@ -168,32 +138,6 @@ public class GameDataWriter {
             System.err.println(e);
             return null;
         }
-        // try {
-        // // Crea il file CSV se non esiste
-        // File file = new File(CSV_FILE_PATH);
-        // CSV_FILE_PATH = file.getAbsolutePath();
-
-        // // Crea il Writer per il file CSV
-        // Writer writer = new FileWriter(CSV_FILE_PATH, true);
-
-        // // Crea il CSVPrinter con il Writer e il formato CSV
-        // CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
-
-        // // Scrivi i dati dell'oggetto Game come tupla CSV nel file
-        // csvPrinter.printRecord(game.getGameId(), game.getUsername(),
-        // game.getPlayerClass(), game.getRobot(), game.getData_creazione(),
-        // game.getOra_creazione());
-
-        // // Chiudi il CSVPrinter e il Writer
-        // csvPrinter.flush();
-        // csvPrinter.close();
-        // writer.close();
-
-        // System.out.println("L'oggetto Game è stato salvato correttamente nel file
-        // CSV.");
-        // } catch (IOException e) {
-        // System.err.println("Errore durante la scrittura del file CSV: " +
-        // e.getMessage());
-        // }
+        
     }
 }
