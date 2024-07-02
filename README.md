@@ -49,3 +49,8 @@ Per chiarezza è riportata una lista delle modifiche effettuate sul codice ed i 
 | ui_gateway | Aggiunti gli endpoint nelle configurazioni: `downloadFile` per manvsclass per il fix del tasto DownloadClasse, `oauth2/authorization/google` e `validateToken` per T23, `register.js`|
 | T5 | Modifica alla funzione `redirectToLogin()` in modo da interfacciarsi correttamente con la POST request di logout definita nel Controller. `main.js`|
 | T6 | Refactoring HTML, CSS e js|
+
+## Video
+
+https://github.com/Testing-Game-SAD-2023/A13/assets/64073539/2a7d5c4b-1664-4769-8ddd-5ec660634d75
+
