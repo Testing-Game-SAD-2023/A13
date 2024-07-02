@@ -12,8 +12,6 @@ Questo branch della repository A13 contiene la versione aggiornata della web-app
   - **Integrazione del Google Login:** Ora gli utenti possono autenticarsi utilizzando il loro account Google.
   - **Refactoring delle Pagine di Autenticazione:** Le pagine associate all'autenticazione sono state ristrutturate per migliorare la navigabilità, l'usabilità e le prestazioni complessive del processo di login.
   - **Bugfix e Ottimizzazioni:** Sono stati risolti alcuni bug e ottimizzate delle funzionalità per consentire il corretto funzionamento dell'applicazione.
-## Indice
-- [Funzionalità](#Funzionalità)
 
 ## Funzionalità
 Andando nel dettaglio le principali funzionalità e bug affrontati in questa versione sottoforma di task sono:
@@ -50,7 +48,21 @@ Per chiarezza è riportata una lista delle modifiche effettuate sul codice ed i 
 | T5 | Modifica alla funzione `redirectToLogin()` in modo da interfacciarsi correttamente con la POST request di logout definita nel Controller. `main.js`|
 | T6 | Refactoring HTML, CSS e js|
 
-## Video
+## Modalità di utilizzo 
+
+Per poter utilizzare il social login con Google è necessario ottenere le credenziali sviluppatore OAuth2 (Client ID and Client Secret) su Google Cloud Console (https://console.cloud.google.com) per permettere all’applicazione di comunicare con l’API Google.
+
+- Nella sezione 'Credenziali' bisogna creare delle nuove credenziali ID Client OAuth<br>
+
+![Github_1](https://github.com/Testing-Game-SAD-2023/A13/assets/64073539/1416daac-9225-4050-8ce9-bc04db1a3388)
+- Una volta creata l'applicazione è possibile visualizzare il ClientID ed il ClientSecret <br>
+
+![GoogleAPI](https://github.com/Testing-Game-SAD-2023/A13/assets/64073539/ccb62797-2294-4e1e-9c8f-8378aa96fa7e)
+- E' necessario inoltre inserire gli URI di reindirizzamento corretti, nel nostro caso 'http://localhost/login/oauth2/code/google' se si sta utilizzando l'app su Docker mentre 'http://localhost:8080/login/oauth2/code/google' nel caso si sta facendo un test in locale.
+- Una volta ottenute le credenziali, si devono inserire nei campi corrispondenti all'interno del file 'docker-compose.yml' nella cartella del container T23. <br>
+
+![Github2](https://github.com/Testing-Game-SAD-2023/A13/assets/64073539/3bfba838-3e2b-45a4-bd2d-7dc837a1425c)
+## Login con Google video dimostrativo
 
 https://github.com/Testing-Game-SAD-2023/A13/assets/64073539/2a7d5c4b-1664-4769-8ddd-5ec660634d75
 
