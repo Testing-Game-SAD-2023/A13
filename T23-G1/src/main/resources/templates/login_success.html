@@ -6,11 +6,19 @@
     <title>Registration Success</title>
 </head>
 <body>
-
-<div id="success-message">
-    <p>Registrazione avvenuta con successo, tra poco verrai reindirizzato alla pagina di login.</p>
-</div>
-
+    <div th:insert="layouts/header_1 :: header"></div>
+    <div class="container">
+      <div class="left-container">
+        <h2 style="font-size: 35px;">La registrazione è avvenuta con successo!!</h2>
+        <div class="side-image">
+          <img style="width: 250px;" th:src="@{t23/css/images/login_success.png}" alt="Login Image">
+        </div>
+      </div>
+      <div class="login-box">
+        <p>Verrai reindirizzato alla pagina di login</p>
+      </div>
+    </div>
+    <div th:insert="layouts/footer :: footer"></div>
 <script>
     // Wait for 5 seconds and then redirect to /login
     setTimeout(function() {

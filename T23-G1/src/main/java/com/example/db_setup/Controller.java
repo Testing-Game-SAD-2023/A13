@@ -651,7 +651,7 @@ public class Controller {
     }
 
     @GetMapping("/checkSession")
-public ResponseEntity<String> checkSession(HttpServletRequest request) {
+    public ResponseEntity<String> checkSession(HttpServletRequest request) {
     HttpSession session = request.getSession(false);
     if (session != null && !session.isNew()) {
         return ResponseEntity.ok("Session is active");

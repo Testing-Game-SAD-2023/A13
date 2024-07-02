@@ -5,7 +5,10 @@
 
 document.addEventListener('DOMContentLoaded', (event) => {
   const form = document.querySelector("form");
-  console.log(form);
+  if (form) {
+    console.log("Form trovato.");
+    console.log(form);
+  }
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 

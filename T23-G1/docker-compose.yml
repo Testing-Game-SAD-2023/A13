@@ -10,6 +10,8 @@ services:
     depends_on:
       - db
     environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       DB_URL: jdbc:mysql://db:3306/STUDENTSREPO
     networks:
       - global-network

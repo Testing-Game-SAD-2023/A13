@@ -900,11 +900,19 @@ public class HomeController {
 	@ResponseBody
 	public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
 		System.out.println("test");
-	 	List<ClassUT> classe= srepo.findByText(name);
-		System.out.println("File download:");
-		System.out.println(classe.get(0).getcode_Uri());
-	 	return FileDownloadUtil.downloadClassFile(classe.get(0).getcode_Uri());
-	}
+		try{
+			List<ClassUT> classe= srepo.findByText(name);
+			System.out.println("File download:");
+			System.out.println(classe.get(0).getcode_Uri());
+			ResponseEntity file =  FileDownloadUtil.downloadClassFile(classe.get(0).getcode_Uri());
+			return file;
+		}
+		catch(Exception e){
+			System.out.println("Eccezione------------");
+			return new ResponseEntity<>("Cartella non trovata.", HttpStatus.NOT_FOUND);
+			}
+		}
+	 	
 	 
 
 	// @PostMapping("/update/{name}")
