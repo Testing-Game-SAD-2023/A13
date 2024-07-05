@@ -270,7 +270,7 @@ public class MyController {
                 gameScore = Math.round(ParseUtil.calculateScore(userScore, numTurnsPlayed + 1));
             } else {
                 System.out.println("userScore > roboScore");
-                gameScore = Math.round(ParseUtil.calculateScore(userScore, numTurnsPlayed + 1) + 50);
+                gameScore = Math.round(ParseUtil.calculateScore(userScore, numTurnsPlayed + 1));
                 isWinner = true;
             }
 

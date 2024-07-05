@@ -56,6 +56,20 @@ function selectGameMode(mode) {
     // Avvisa l'utente che questa modalità non è ancora disponibile
     swal("Attenzione","La modalità " + mode + " non è ancora disponibile. Arriverà presto!","info");
   }
+  else if (mode === "LeaderboardScalata") {
+
+    // Chiedi conferma all'utente
+    let userConfirmation = confirm("Sei sicuro di voler visualizzare la classifica delle Scalate?");
+    if (userConfirmation) {
+
+      //Redirect
+      window.location.href = "/leaderboardScalata";
+    }
+    else{
+      //Do nothing
+    }
+
+  }
   //MODIFICA (20/05): Redirect alla pagina di selezione delle "Scalate"
   else if (mode === "Scalata") {
 

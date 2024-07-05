@@ -377,8 +377,8 @@ runButton.addEventListener("click", function () {
                             calculateFinalScore(localStorage.getItem("scalataId")).then((data) => { 
                               console.log("calculateFinalScore response: ", data.finalScore);
                               closeScalata(localStorage.getItem("scalataId"), true, data.finalScore, current_round_scalata).then((data) => {
-                                swal("Complimenti!", `Hai completato la scalata!\n${displayRobotPoints}\n A breve verrai reindirizzato alla schermata di selezione della modalità di gioco.`, "success").then((value) => {
-                                  window.location.href = "/main";
+                                swal("Complimenti!", `Hai completato la scalata!\n${displayRobotPoints}\n A breve verrai reindirizzato alla classifica.`, "success").then((value) => {
+                                  window.location.href = "/leaderboardScalata";
                                 });
                               });
                             }).catch((error) => {

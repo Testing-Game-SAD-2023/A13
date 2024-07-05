@@ -7,7 +7,7 @@ import (
 
 type ScalataGame struct {
 	ID           int64      `gorm:"primaryKey;autoIncrement"`
-	PlayerID     int64      `gorm:"not null"`
+	PlayerID     int64      `gorm:"not null"` // This will store the AccountID of the player
 	ScalataName  string     `gorm:"not null"`
 	Games        []Game     `gorm:"foreignKey:ScalataGameID;constraint:OnDelete:CASCADE;"`
 	CreatedAt    time.Time  `gorm:"autoCreateTime"`
@@ -58,13 +58,13 @@ func (PlayerGame) TableName() string {
 }
 
 type Player struct {
-	ID           int64         `gorm:"primaryKey;autoIncrement"`
-	AccountID    string        `gorm:"unique"`
-	CreatedAt    time.Time     `gorm:"autoCreateTime"`
-	UpdatedAt    time.Time     `gorm:"autoUpdateTime"`
-	Turns        []Turn        `gorm:"foreignKey:PlayerID;constraint:OnDelete:SET NULL;"`
-	Games        []Game        `gorm:"many2many:player_games;foreignKey:AccountID;joinForeignKey:PlayerID;"`
-	ScalataGames []ScalataGame `gorm:"foreignKey:PlayerID;constraint:OnDelete:SET NULL;"`
+	ID        int64     `gorm:"primaryKey;autoIncrement"`
+	AccountID string    `gorm:"unique"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	Turns     []Turn    `gorm:"foreignKey:PlayerID;constraint:OnDelete:SET NULL;"`
+	Games     []Game    `gorm:"many2many:player_games;foreignKey:AccountID;joinForeignKey:PlayerID;"`
+	// ScalataGames []ScalataGame `gorm:"foreignKey:PlayerID;constraint:OnDelete:SET NULL;"`
 }
 
 func (Player) TableName() string {
