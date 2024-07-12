@@ -51,6 +51,11 @@ body {
     filter: brightness(0) invert(1); /* Initially set to white; invert for color change */
 }
 
+.enac{
+    height: 90px !important;
+    filter: none !important;
+}
+
 .nav-data{
     display: flex;
     align-items: center;
@@ -363,7 +368,8 @@ button.google-login-button {
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    display: block;
+    display: flex;
+    flex-direction: row;
     font-family: 'Roboto', sans-serif;
     font-size: 1rem;
     padding: 10px 13px;
@@ -426,6 +432,13 @@ button.google-login-button i{
 .footer-logo {
     height: 60px;
     margin-right: 10px;
+}
+
+.lang-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 70px;
 }
 
 .footer-copyright {

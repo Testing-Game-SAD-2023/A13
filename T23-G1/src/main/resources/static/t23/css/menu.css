@@ -68,6 +68,11 @@ html, body {
     margin: 10px 15px;
 }
 
+.enac{
+  height: 90px !important;
+  filter: none !important;
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -79,6 +84,8 @@ html, body {
     max-width: 100%;
     filter: brightness(0) invert(1); /* Initially set to white; invert for color change */
 }
+
+
 
 .button-3d {
   display: inline-block;

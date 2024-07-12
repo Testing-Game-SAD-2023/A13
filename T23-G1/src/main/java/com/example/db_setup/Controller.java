@@ -14,6 +14,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -44,6 +45,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -52,6 +55,8 @@ import org.springframework.ui.ModelMap;
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 import com.example.db_setup.Service.OAuthUserGoogleService;
+import com.example.db_setup.Language.*;
+import org.springframework.web.servlet.LocaleResolver;
 //MODIFICA (Deserializzazione risposta JSON)
 import com.fasterxml.jackson.databind.ObjectMapper;
 //FINE MODIFICA
@@ -664,6 +669,17 @@ public class Controller {
     public String test() {
         return "test T23";
     }
+
+    @PostMapping("/changeLanguage")
+    public String changeLanguage(HttpServletRequest request, @RequestParam("lang") String lang, RedirectAttributes redirectAttributes) {
+    LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+    if (localeResolver != null) {
+        localeResolver.setLocale(request, null, Locale.forLanguageTag(lang));
+    }
+    // Redirect back to the referring page, or to a default page
+    String referer = request.getHeader("Referer");
+    return "redirect:" + (referer != null ? referer : "/");
+}
 
 }
 

@@ -16,13 +16,16 @@
     <div class="logo">
         <img th:src="@{t23/css/images/Federico_II_University_Logo.svg}"></img>
     </div>
+    <div class="logo">
+        <img class="enac" th:src="@{t23/css/images/Logo 1_ENACTEST_horizontal.png}"></img>
+    </div>
 </header>
 <div class="container">
   <div class="hero-content">
-    <h1>Esplora il Software Testing ed unisciti alla sfida!</h1>
-    <p>Affina le tue abilità di progettazione dei test. Competi contro i robot Randoop o EvoSuite. Unisciti alla sfida.</p>
-    <a href="/login" class="button-3d">Accesso Utenti</a>
-    <a href="/loginAdmin" class="button-3d adm">Accesso Amministratori</a>
+    <h1 th:text="#{menu.title}"></h1>
+    <p th:text="#{menu.text}"></p>
+    <a th:text="#{button.student}" href="/login" class="button-3d"></a>
+    <a th:text="#{button.admin}" href="/loginAdmin" class="button-3d adm"></a>
   </div>
   <div class="image-container">
     <img th:src="@{t23/css/images/HeroImageNew.png}" width="650">
