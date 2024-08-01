@@ -1,12 +1,71 @@
 
-# A13-new-feature/bugfix
+# A13-new-language-support
 **Componenti del gruppo**
 - Andriy Korsun (M63001275)
 - Giuseppe Laterza (M63001411)
 - Luca D’Angelo (M63001453)
 
 
-Questo branch della repository A13 contiene la versione aggiornata della web-app, con una nuova funzionalità che consente agli utenti di autenticarsi utilizzando il loro account Google e correzioni di alcuni bug segnalati.
+Questo branch della repository A13 basato sul branch 'new-feature/bugfix' aggiunge il supporto all'internazionalizzazione (i18n) all'applicazione Spring Boot, consentendo all'applicazione di supportare le lingue inglese e italiano. Gli utenti possono passare da una lingua all'altra e le loro preferenze vengono memorizzate tra le sessioni. Tutte le modifiche apportate sono riguardanti unicamente il container **T23** che gestisce i servizi di autenticazione.
+
+## Funzionalità principali
+
+- **Cambio Lingua**: Gli utenti possono passare dall'inglese all'italiano utilizzando i tasti disponibili nel footer delle pagine.
+- **Persistenza della Lingua**: La lingua impostata dall'utente viene memorizzata per persistere tra le sessioni.
+- **Integrazione Thymeleaf**: Viene utilizzato Thymeleaf facilitare la gestione della lingua appropriata.
+
+## Dettagli di implementazione
+Spring Boot supporta nativamente la creazione di applicazioni multilingue. Il framework adatta automaticamente i testi e i messaggi all'utente in base alla lingua e alla regione specificate.
+Per fare ciò bisogna configurare le risorse di lingua, dei file properties, che contengono le traduzioni dei testi. Questi file vengono organizzati per lingua, nel nostro caso 'messages_en.properties' per l'inglese e 'messages_it.properties' per l'italiano.
+Di seguito una lista dei componenti aggiunti per la corretta localizzazione delle pagine.
+- **Locale Resolver**: il `LocaleResolver` è un componente di Spring che determina la lingua corrente dell'applicazione. Configurando un LocaleResolver, è possibile specificare quale lingua utilizzare in base alle preferenze dell'utente.
+- **LocaleChangeInterceptor**: il `LocaleChangeInterceptor` è un componente che rileva le richieste HTTP e cambia la lingua dell'applicazione in base a un parametro specificato nell'URL. Questo consente agli utenti di cambiare la lingua dell'interfaccia utente dinamicamente, ad esempio nel nostro caso con la lingua inglese l'URL sarà `localhost/login?lang=en`.
+
+
+Per la gestione dei testi tradotti nelle pagine web viene utilizzato Thymeleaf. Sono caricati i testi in base alla lingua selezionata dall'utente utilizzando i file di configurazione delle traduzione.
+Nei file'messages_en.properties' e 'messages_it.properties' cono contenute delle coppie chiavi e i valori dei testi tradotti.
+```
+button.register=Registrati
+button.google=Accedi con Google
+button.login=Accedi
+button.log_admin=Accedi come Amministratore
+button.log_student=Accedi come Studente
+login.title=Accesso Studenti
+login.text=Non sei uno studente?
+...
+```
+Nei template Thymeleaf, utilizziamo le chiavi dei messaggi per visualizzare il testo tradotto.
+```html
+<div class="left-container">
+  <h1 th:text="#{login.title}"></h1>
+    <p th:text="#{login.text}"></p>
+      <a th:text="#{button.log_admin}" href="/loginAdmin" class="button"></a>
+        <div class="side-image">
+          <img th:src="@{t23/css/images/logo_blob.png}" alt="Login Image">
+        </div>
+</div>
+```
+Ad esempio, `th:text="#{login.title}"` comunica a Thymeleaf di cercare il valore associato alla chiave `login.title` nel file di risorse corrispondente alla lingua attualmente selezionata. Se la lingua è cambiata, Thymeleaf aggiornerà automaticamente il testo visualizzato con la traduzione appropriata.
+
+Per permettere agli utenti di cambiare la lingua, è stato implementato uno script JavaScript. L'URL della pagina con un parametro che indica la lingua selezionata, e poi ricarica la pagina.
+```javascript
+function changeLanguage(lang) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', lang);
+    window.location.href = url.toString();
+}
+
+document.getElementById('en-flag').addEventListener('click', function() {
+    changeLanguage('en');
+});
+
+document.getElementById('it-flag').addEventListener('click', function() {
+    changeLanguage('it');
+});
+```
+
+
+# A13-newfeature/bugfix
 
 **Novità Principali**
   - **Integrazione del Google Login:** Ora gli utenti possono autenticarsi utilizzando il loro account Google.
