@@ -1,6 +1,6 @@
 // Questa classe è responsabile di gestire le richieste relative all'autenticazione e al login degli utenti.
 // Contiene metodi per mostrare il modulo di login, ottenere le informazioni di accesso, effettuare il login con Google,
-// verificare lo stato di autenticazione dell'utente e gestire il logout.
+// verificare lo stato di autenticazione dell'utente.
 
 package com.example.db_setup;
 
