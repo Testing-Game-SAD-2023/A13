@@ -94,13 +94,13 @@ func run(ctx context.Context, c Configuration) error {
 	}
 
 	err = db.AutoMigrate(
+		&model.ScalataGame{},
 		&model.Game{},
 		&model.Round{},
 		&model.Player{},
 		&model.Turn{},
 		&model.Metadata{},
 		&model.PlayerGame{},
-		&model.ScalataGame{},
 		&model.Robot{})
 
 	if err != nil {
