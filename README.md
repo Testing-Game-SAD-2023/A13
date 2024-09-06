@@ -1,4 +1,3 @@
-Esperimento Pull Request
 
 # Gruppo A13-2024
 Componente:
