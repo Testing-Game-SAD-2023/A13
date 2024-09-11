@@ -49,7 +49,31 @@ import com.g2.t5.MyData;                            // aggiunto
 @Controller
 public class GuiController {
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final String url_authenticate = "http://t23-g1-app-1:8080/validateToken";
+    
+    private Boolean authenticate(String jwt) {
+        // Verifica se il JWT è valido prima di fare la richiesta
+        if (jwt == null || jwt.isEmpty()) {
+            System.out.println("Token JWT non presente o vuoto. Redirigo al login");
+            return false;
+        }
+
+        // Crea il formData con il JWT
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("jwt", jwt);
+
+        try {
+            Boolean isAuthenticated = restTemplate.postForObject(url_authenticate, formData, Boolean.class);
+            if (isAuthenticated == null || !isAuthenticated)
+                return false;
+            return true;
+        } catch (Exception e) {
+            // Gestisci eventuali errori durante la richiesta
+             System.out.println("Errore durante l'autenticazione: " + e.getMessage());
+            return false;
+        }
+    }
 
     @Autowired
     public GuiController(RestTemplate restTemplate) {
@@ -95,40 +119,19 @@ public class GuiController {
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-
-        System.out.println("GET /main, scelta della modalità di gioco");
-        
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-        formData.add("jwt", jwt);
-
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        if (isAuthenticated == null || !isAuthenticated)
-            return "redirect:/login";
-
-        return "main";
-
+        if(authenticate(jwt)){
+            return "main";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-
-        //MODIFICA (Stiamo controllando la validità dal token JWT)
-        formData.add("jwt", jwt);
-
-        System.out.println("GET /gamemode, scelta della classe e del robot da testare");
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        System.out.println("(/gamemode) Token del player valido?");
-        if (isAuthenticated == null || !isAuthenticated)
+        if(!authenticate(jwt)){
             return "redirect:/login";
+        }
 
-            System.out.println("(/gamemode) Token valido: "+ jwt);
         List<ClassUT> classes = getClasses();
-
         Map<Integer, String> hashMap = new HashMap<>();
         Map<Integer, List<MyData>> robotList = new HashMap<>();
         // Map<Integer, List<String>> evosuiteLevel = new HashMap<>();
@@ -175,16 +178,10 @@ public class GuiController {
 
     @GetMapping("/report")
     public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-        formData.add("jwt", jwt);
-
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        if (isAuthenticated == null || !isAuthenticated)
-            return "redirect:/login";
-   
-        return "report";
+        if(authenticate(jwt)){
+            return "report";
+        }
+        return "redirect:/login";
     }
 
     // TODO: Salvataggio della ScalataGiocata
@@ -279,61 +276,35 @@ public class GuiController {
 
     @GetMapping("/editor")
     public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-        formData.add("jwt", jwt);
-
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        if (isAuthenticated == null || !isAuthenticated)
-            return "redirect:/login";
-        // model.addAttribute("robot", valuerobot);
-        // model.addAttribute("classe", valueclass);
-
-        // model.addAttribute("gameIDj", globalID);
-
-        return "editor";
+        if(authenticate(jwt)){
+            return "editor";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/leaderboardScalata")
     public String getLeaderboardScalata(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-        formData.add("jwt", jwt);
-
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        if (isAuthenticated == null || !isAuthenticated)
-            return "redirect:/login";
-
-        return "leaderboardScalata";
+        if(authenticate(jwt)){
+            return "leaderboardScalata";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/editorAllenamento")
     public String editorAllenamentoPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-        formData.add("jwt", jwt);
-
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        if (isAuthenticated == null || !isAuthenticated)
-            return "redirect:/login";
-        // model.addAttribute("robot", valuerobot);
-        // model.addAttribute("classe", valueclass);
-
-        // model.addAttribute("gameIDj", globalID);
-
-        return "editorAllenamento";
+        if(authenticate(jwt)){
+            return "editorAllenamento";
+        }
+        return "redirect:/login";
     }
 
     //MODIFICA (22/05/2024) : Visualizzazione pagina dedicata alla selezione della "Scalata"
     @GetMapping("/gamemode_scalata")
 	public String showScalatAndView(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        /*  stefano: vecchio codice t5
         System.out.println("(GET /gamemode_scalata) get received");
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
         formData.add("jwt", jwt);
-
         Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
                 Boolean.class);
 
@@ -348,8 +319,13 @@ public class GuiController {
             System.out.println("(GET /gamemode_scalata) Token valido.");
             return "gamemode_scalata";
         }
+            */
 
-            
+        //mia versione di prova
+        if(authenticate(jwt)){
+            return "gamemode_scalata";
+        }
+        return "redirect:/login";
 	}
 
 }
