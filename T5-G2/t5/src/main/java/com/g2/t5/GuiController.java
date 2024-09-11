@@ -1,125 +1,46 @@
 package com.g2.t5;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
-import com.g2.Model.Player;
-import com.g2.Model.ScalataGiocata;                 // aggiunto
-import com.g2.t5.MyData;                            // aggiunto
+import com.g2.Model.ScalataGiocata;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @CrossOrigin
 @Controller
 public class GuiController {
 
-    private final RestTemplate restTemplate;
-    private final String url_authenticate = "http://t23-g1-app-1:8080/validateToken";
-    
-    private Boolean authenticate(String jwt) {
-        // Verifica se il JWT è valido prima di fare la richiesta
-        if (jwt == null || jwt.isEmpty()) {
-            System.out.println("Token JWT non presente o vuoto. Redirigo al login");
-            return false;
-        }
-
-        // Crea il formData con il JWT
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("jwt", jwt);
-
-        try {
-            Boolean isAuthenticated = restTemplate.postForObject(url_authenticate, formData, Boolean.class);
-            if (isAuthenticated == null || !isAuthenticated)
-                return false;
-            return true;
-        } catch (Exception e) {
-            // Gestisci eventuali errori durante la richiesta
-             System.out.println("Errore durante l'autenticazione: " + e.getMessage());
-            return false;
-        }
-    }
+    private RestController restController;
 
     @Autowired
     public GuiController(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
-    public List<String> getLevels(String className) {
-        List<String> result = new ArrayList<String>();
-
-        int i;
-        for (i = 1; i < 11; i++) {
-            try {
-                restTemplate.getForEntity("http://t4-g18-app-1:3000/robots?testClassId=" + className
-                        + "&type=randoop&difficulty=" + String.valueOf(i), Object.class);
-            } catch (Exception e) {
-                break;
-            }
-
-            result.add(String.valueOf(i));
-        }
-
-        for (int j = i; j - i + 1 < i; j++) {
-            try { // aggiunto
-                restTemplate.getForEntity("http://t4-g18-app-1:3000/robots?testClassId=" + className
-                        + "&type=evosuite&difficulty=" + String.valueOf(j - i + 1), Object.class);
-            } catch (Exception e) {
-                break;
-            }
-
-            result.add(String.valueOf(j));
-        }
-
-        return result;
-    }
-
-    public List<ClassUT> getClasses() {
-        ResponseEntity<List<ClassUT>> responseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/home",
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<ClassUT>>() {
-                });
-
-        return responseEntity.getBody();
+        this.restController = new RestController(restTemplate);
     }
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(authenticate(jwt)){
+        if(restController.IsAuthenticate(jwt)){
             return "main";
         }
         return "redirect:/login";
@@ -127,11 +48,11 @@ public class GuiController {
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(!authenticate(jwt)){
+        if(!restController.IsAuthenticate(jwt)){
             return "redirect:/login";
         }
 
-        List<ClassUT> classes = getClasses();
+        List<ClassUT> classes = restController.getClasses();
         Map<Integer, String> hashMap = new HashMap<>();
         Map<Integer, List<MyData>> robotList = new HashMap<>();
         // Map<Integer, List<String>> evosuiteLevel = new HashMap<>();
@@ -139,7 +60,7 @@ public class GuiController {
         for (int i = 0; i < classes.size(); i++) {
             String valore = classes.get(i).getName();
 
-            List<String> levels = getLevels(valore);
+            List<String> levels = restController.getLevels(valore);
             System.out.println(levels);
 
             List<String> evo = new ArrayList<>();               // aggiunto
@@ -178,7 +99,7 @@ public class GuiController {
 
     @GetMapping("/report")
     public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(authenticate(jwt)){
+        if(restController.IsAuthenticate(jwt)){
             return "report";
         }
         return "redirect:/login";
@@ -276,7 +197,7 @@ public class GuiController {
 
     @GetMapping("/editor")
     public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(authenticate(jwt)){
+        if(restController.IsAuthenticate(jwt)){
             return "editor";
         }
         return "redirect:/login";
@@ -284,7 +205,7 @@ public class GuiController {
 
     @GetMapping("/leaderboardScalata")
     public String getLeaderboardScalata(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(authenticate(jwt)){
+        if(restController.IsAuthenticate(jwt)){
             return "leaderboardScalata";
         }
         return "redirect:/login";
@@ -292,7 +213,7 @@ public class GuiController {
 
     @GetMapping("/editorAllenamento")
     public String editorAllenamentoPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(authenticate(jwt)){
+        if(restController.IsAuthenticate(jwt)){
             return "editorAllenamento";
         }
         return "redirect:/login";
@@ -305,11 +226,11 @@ public class GuiController {
         System.out.println("(GET /gamemode_scalata) get received");
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
         formData.add("jwt", jwt);
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+        Boolean isIsAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
                 Boolean.class);
 
         System.out.println("(GET /gamemode_scalata) Token del player valido?");
-        if (isAuthenticated == null || !isAuthenticated) {
+        if (isIsAuthenticated == null || !isIsAuthenticated) {
 
             System.out.println("(GET /gamemode_scalata) Token JWT non valido, il player verrà reindirizzato alla pagina di login.");
             return "redirect:/login";
@@ -322,7 +243,7 @@ public class GuiController {
             */
 
         //mia versione di prova
-        if(authenticate(jwt)){
+        if(restController.IsAuthenticate(jwt)){
             return "gamemode_scalata";
         }
         return "redirect:/login";
