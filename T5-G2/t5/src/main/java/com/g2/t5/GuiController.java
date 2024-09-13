@@ -3,7 +3,6 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -18,9 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.Interfaces.T1Service;
-import com.g2.Interfaces.T23Service;
-import com.g2.Interfaces.T4Service;
+import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
 
@@ -30,20 +27,17 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class GuiController {
 
-    private T23Service t23Service;
-    private T4Service  t4Service;
-    private T1Service  t1Service;
+    private final ServiceManager serviceManager;
 
     @Autowired
     public GuiController(RestTemplate restTemplate) {
-        this.t23Service = new T23Service(restTemplate);
-        this.t4Service  = new T4Service(restTemplate);
-        this.t1Service  = new T1Service(restTemplate);
+        this.serviceManager = new ServiceManager(restTemplate);
     }
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(t23Service.GetAuthenticated(jwt)){
+        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
+        if(Auth){
             return "main";
         }
         return "redirect:/login"; 
@@ -51,10 +45,12 @@ public class GuiController {
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(!t23Service.GetAuthenticated(jwt)){
+        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
+        if(!Auth){
             return "redirect:/login"; 
         }
         
+        /* 
         System.out.println("prova robot");
         //List<ClassUT> classes = t1Service.getClasses();
         
@@ -63,13 +59,15 @@ public class GuiController {
 
         //model.addAttribute("hashMap",  classes);
         model.addAttribute("hashMap2", robotList);
+        */
 
         return "gamemode";
     }
 
     @GetMapping("/report")
     public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(t23Service.GetAuthenticated(jwt)){
+        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
+        if(Auth){
             return "report";
         }
         return "redirect:/login"; 
@@ -167,15 +165,17 @@ public class GuiController {
 
     @GetMapping("/editor")
     public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(t23Service.GetAuthenticated(jwt)){
+        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
+        if(Auth){
             return "editor";
         }
-        return "redirect:/login"; 
+        return "redirect:/login";
     }
 
     @GetMapping("/leaderboardScalata")
     public String getLeaderboardScalata(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(t23Service.GetAuthenticated(jwt)){
+        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
+        if(Auth){
             return "leaderboardScalata";
         }
         return "redirect:/login";
@@ -183,10 +183,11 @@ public class GuiController {
 
     @GetMapping("/editorAllenamento")
     public String editorAllenamentoPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(t23Service.GetAuthenticated(jwt)){
+        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
+        if(Auth){
             return "editorAllenamento";
         }
-        return "redirect:/login"; 
+        return "redirect:/login";
     }
 
     //MODIFICA (22/05/2024) : Visualizzazione pagina dedicata alla selezione della "Scalata"
@@ -211,10 +212,11 @@ public class GuiController {
             return "gamemode_scalata";
         }
             */
-        if(t23Service.GetAuthenticated(jwt)){
+        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
+        if(Auth){
             return "gamemode_scalata";
         }
-        return "redirect:/login"; 
+        return "redirect:/login";
         
 	}
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import org.springframework.web.client.RestTemplate;
 
 
-public class T4Service {
+public class T4Service implements ServiceInterface{
     private final RestService restService;
     private static final String BASE_URL = "http://t4-g18-app-1:3000";
 
@@ -16,7 +16,26 @@ public class T4Service {
         this.restService = new RestService(restTemplate, BASE_URL);
     }
 
-    public List<String> getLevels(String className) {
+    
+    @Override
+    public Object handleRequest(String action, Object... params) {
+        switch (action) {
+            case "getLevels" -> {
+                if (params.length != 1) {
+                    throw new IllegalArgumentException("[HANDLEREQUEST] Per 'getLevels' è richiesto 1 parametro.");
+                }
+                if (!(params[0] instanceof String)) {
+                    throw new IllegalArgumentException("[HANDLEREQUEST] Il parametro per 'getLevels' deve essere una stringa.");
+                }
+                return getLevels((String) params[0]);
+            }
+            default -> throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
+        }
+        // Aggiungi altri casi per altre azioni
+    }
+
+
+    private List<String> getLevels(String className) {
         List<String> result = new ArrayList<>();
         List<String> robot_type =  List.of("randoop", "evosuite");
 

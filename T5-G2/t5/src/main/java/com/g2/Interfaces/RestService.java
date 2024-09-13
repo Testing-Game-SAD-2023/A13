@@ -65,7 +65,7 @@ public class RestService{
             throw e;
         }
     }
-    //versione overloaded per gestire liste di classi e altri tipi generici
+    //versione overloaded per gestire liste di classi
     public <R> List<R> CallRestGET(String endpoint, Map<String, String> queryParams, ParameterizedTypeReference<List<R>> responseType) {
         try {
             // Validazione degli input
