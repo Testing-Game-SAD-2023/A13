@@ -2,8 +2,50 @@ package model
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"time"
 )
+
+type categoryAchievement string
+
+const (
+    DAILY_ACCESS categoryAchievement = "DAILY_ACCESS"
+    DAILY_PLAY categoryAchievement = "DAILY_PLAY"
+    WON_GAMES categoryAchievement = "WON_GAMES"
+    WON_GAMES_RANDOOP categoryAchievement = "WON_GAMES_RANDOOP"
+    WON_GAMES_EVOSUITE categoryAchievement = "WON_GAMES_EVOSUITE"
+    SCORE_OBTAINED categoryAchievement = "SCORE_OBTAINED"
+)
+
+func (ca *categoryAchievement) Scan(value interface{}) error {
+    *ca = categoryAchievement(value.([]byte))
+    return nil
+}
+
+func (ca categoryAchievement) Value() (driver.Value, error) {
+    return string(ca), nil
+}
+
+type Achievement struct {
+    ID                 int64       `gorm:"primaryKey;autoIncrement"`   // Achievement ID
+    Name               string      `gorm:"not null"`                   // Achievement name: mandatory
+    Category           categoryAchievement `gorm:"type:categoryAchievement"`
+    ProgressRequired   float64     `gorm:"default:0"`                  // Progress required to obtain the achievement
+}
+
+func (Achievement) TableName() string {
+    return "achievements"
+}
+
+type PlayerHasCategoryAchievement struct {
+    PlayerID            int64      `gorm:"primaryKey;autoIncrement:false"`
+    Category            int64      `gorm:"primaryKey;autoIncrement:false"`
+    ProgressRequired    float64    `gorm:"default:0"`                      // Current progress
+}
+
+func (PlayerHasCategoryAchievement) TableName() string {
+    return "player-has-category-achievement"
+}
 
 type ScalataGame struct {
 	ID           int64      `gorm:"primaryKey;autoIncrement"`

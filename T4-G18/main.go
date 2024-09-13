@@ -19,6 +19,7 @@ import (
 	"github.com/alarmfox/game-repository/api/robot"
 	"github.com/alarmfox/game-repository/api/round"
 	"github.com/alarmfox/game-repository/api/scalatagame"
+	"github.com/alarmfox/game-repository/api/achievement"
 	"github.com/alarmfox/game-repository/api/turn"
 	"github.com/alarmfox/game-repository/limiter"
 	"github.com/alarmfox/game-repository/model"
@@ -101,7 +102,10 @@ func run(ctx context.Context, c Configuration) error {
 		&model.Turn{},
 		&model.Metadata{},
 		&model.PlayerGame{},
-		&model.Robot{})
+		&model.Robot{},
+		&model.Achievement{},
+		&model.PlayerHasCategoryAchievement{},
+	)
 
 	if err != nil {
 		return err
@@ -177,6 +181,9 @@ func run(ctx context.Context, c Configuration) error {
 
 			// scalatagame endpoint
 			scalataController = scalatagame.NewController(scalatagame.NewRepository(db))
+
+            // achievement endpoint
+            achievementController = achievement.NewController(achievement.NewRepository(db))
 		)
 
 		r.Mount(c.ApiPrefix, setupRoutes(
@@ -185,6 +192,7 @@ func run(ctx context.Context, c Configuration) error {
 			turnController,
 			robotController,
 			scalataController,
+			achievementController,
 		))
 	})
 	log.Printf("listening on %s", c.ListenAddress)
@@ -309,7 +317,7 @@ func makeDefaults(c *Configuration) {
 
 }
 
-func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller) *chi.Mux {
+func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, ac *achievement.Controller) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
@@ -413,6 +421,25 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 		// r.Delete("/{id}", api.HandlerFunc(sgc.Delete)) // TODO:
 
 	})
+
+    r.Route("/achievements", func(r chi.Router) {
+        // Get achievement
+        r.Get("/{id}", api.HandlerFunc(ac.FindByID))
+
+        // List achievements
+        // TODO
+
+		// Create achievement
+		r.With(middleware.AllowContentType("application/json")).
+			Post("/", api.HandlerFunc(ac.Create))
+
+		// Update achievement
+		r.With(middleware.AllowContentType("application/json")).
+			Put("/{id}", api.HandlerFunc(ac.Update))
+
+		// Delete achievement
+		r.Delete("/{id}", api.HandlerFunc(ac.Delete))
+    })
 
 	return r
 }
