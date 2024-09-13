@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang = "it" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/t23/css/login_new.css}" />
-    <link rel="stylesheet" th:href="@{/t23/css/mail_register.css}" />
     <title>Registration Success</title>
+    <link rel="stylesheet" th:href="@{/t23/css/login_new.css}" />
 </head>
 <body>
     <div th:insert="layouts/header-1 :: header"></div>
     <div class="container">
       <div class="left-container" style="width: initial;">
-        <h2 style="font-size: 35px;">La registrazione è avvenuta con successo!!</h2>
-        <p>Verrai reindirizzato alla pagina di login</p>
+        <h2 style="font-size: 35px;" th:text="#{success.title}">La registrazione è avvenuta con successo!!</h2>
+        <p th:text="#{success.text}">Verrai reindirizzato alla pagina di login</p>
         <div class="side-image">
           <img style="width: 250px;" th:src="@{t23/css/images/login_success.png}" alt="Login Image">
         </div>
