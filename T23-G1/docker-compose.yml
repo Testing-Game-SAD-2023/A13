@@ -12,7 +12,7 @@ services:
     environment:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      DB_URL: jdbc:mysql://db:3306/STUDENTSREPO
+      DB_URL: jdbc:mysql://db:3306/studentsrepo
     networks:
       - global-network
 
@@ -20,7 +20,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: 'password'
-      MYSQL_DATABASE: STUDENTSREPO
+      MYSQL_DATABASE: studentsrepo
     ports:
       - "3306:3306"
     healthcheck:
