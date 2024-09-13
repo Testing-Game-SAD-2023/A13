@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <link href="./t5/css/main.css" rel="stylesheet" />
+        <link href="./t5/css/main2.css" rel="stylesheet" />
+        <link href="./t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
+
+        <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
+        <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
+        <!--Modifica (20/05) Adding Sweet Alert-->
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <!--Modifica (21/05) Adding JQuery-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!--Fine Modifica-->
+
+        <script src="./t5/js/profile.js"></script>
+
+        <title>Profilo utente</title>
+    </head>
+
+    <body class="bg-custom">
+        <div class="container-fluid">
+            <div class="row">
+                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" >Profilo</p>
+                <div id="topRightContainer">
+                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Profilo</button>
+                    <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <div class="row">
+                        <div class="card" style="width: 100%; margin-left: 10px">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-210">
+                                        <img src="https://api.deepai.org/job-view-file/1369645d-60f1-4c97-bac5-c9b57fa7f1f3/outputs/output.jpg?art-image=true" class="rounded float-start propic" alt="Profile picture">
+                                    </div>
+                                    <div class="col">
+                                        <h4 class="card-title">[Nome utente]</h4>
+                                        <h6 class="card-subtitle mb-2 text-body-secondary">[BSc, MSc, Altro]</h6>
+                                        <hr>
+                                        <p>[Bio]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px">
+                            <div class="card-body">
+                                <h4 class="card-title">Trofei</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card" style="height:92vh">
+                        <div class="card-body">
+                            <h4 class="card-title">Statistiche</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

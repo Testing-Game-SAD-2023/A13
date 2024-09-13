@@ -345,6 +345,11 @@ function redirectToLogin() {
   }
 }
 
+function redirectToUserInfo() {
+  console.log("Redirect to UserInfo");
+  window.location.href = "/profile";
+}
+
 function saveLoginData() {
 
   var username = parseJwt(getCookie("jwt")).sub;

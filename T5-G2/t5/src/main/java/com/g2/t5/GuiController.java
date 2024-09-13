@@ -95,7 +95,6 @@ public class GuiController {
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-
         System.out.println("GET /main, scelta della modalità di gioco");
         
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
@@ -109,6 +108,26 @@ public class GuiController {
 
         return "main";
 
+    }
+
+    @GetMapping("/profile")
+    public String profilePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        System.out.println("Getting into profile...");
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
+        formData.add("jwt", jwt);
+
+        System.out.println("GET /profile, visualizzazione profilo utente");
+        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+                Boolean.class);
+
+        System.out.println("(/gamemode) Token del player valido?");
+        if (isAuthenticated == null || !isAuthenticated)
+            return "redirect:/login";
+
+        System.out.println("(/gamemode) Token valido: "+ jwt);
+
+        return "profile";
     }
 
     @GetMapping("/gamemode")
