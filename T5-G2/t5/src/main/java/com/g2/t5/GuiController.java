@@ -3,10 +3,7 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -21,7 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.Model.ClassUT;
+import com.g2.Interfaces.T1Service;
+import com.g2.Interfaces.T23Service;
+import com.g2.Interfaces.T4Service;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
 
@@ -31,78 +30,49 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class GuiController {
 
-    private RestController restController;
+    private T23Service t23Service;
+    private T4Service  t4Service;
+    private T1Service  t1Service;
 
     @Autowired
     public GuiController(RestTemplate restTemplate) {
-        this.restController = new RestController(restTemplate);
+        this.t23Service = new T23Service(restTemplate);
+        this.t4Service  = new T4Service(restTemplate);
+        this.t1Service  = new T1Service(restTemplate);
     }
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(restController.IsAuthenticate(jwt)){
+        if(t23Service.GetAuthenticated(jwt)){
             return "main";
         }
-        return "redirect:/login";
+        return "redirect:/login"; 
     }
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(!restController.IsAuthenticate(jwt)){
-            return "redirect:/login";
+        if(!t23Service.GetAuthenticated(jwt)){
+            return "redirect:/login"; 
         }
+        
+        System.out.println("prova robot");
+        //List<ClassUT> classes = t1Service.getClasses();
+        
+        List<String>  robotList = t4Service.getLevels("calcolatrice");
+        System.out.println(robotList);
 
-        List<ClassUT> classes = restController.getClasses();
-        Map<Integer, String> hashMap = new HashMap<>();
-        Map<Integer, List<MyData>> robotList = new HashMap<>();
-        // Map<Integer, List<String>> evosuiteLevel = new HashMap<>();
-
-        for (int i = 0; i < classes.size(); i++) {
-            String valore = classes.get(i).getName();
-
-            List<String> levels = restController.getLevels(valore);
-            System.out.println(levels);
-
-            List<String> evo = new ArrayList<>();               // aggiunto
-            for (int j = 0; j < levels.size(); j++) {           // aggiunto
-                if (j >= levels.size() / 2)
-                    evo.add(j, levels.get(j - (levels.size() / 2)));
-                else {
-                    evo.add(j, levels.get(j + (levels.size() / 2)));
-                }
-            }
-            System.out.println(evo);
-
-            List<MyData> struttura = new ArrayList<>();
-
-            for (int j = 0; j < levels.size(); j++) {
-                MyData strutt = new MyData(levels.get(j), evo.get(j));
-                struttura.add(j, strutt);
-            }
-            for (int j = 0; j < struttura.size(); j++)
-                System.out.println(struttura.get(j).getList1());
-            hashMap.put(i, valore);
-            robotList.put(i, struttura);
-            // evosuiteLevel.put(i, evo);
-        }
-
-        model.addAttribute("hashMap", hashMap);
-
-        // hashMap2 = com.g2.Interfaces.t8.RobotList();
-
+        //model.addAttribute("hashMap",  classes);
         model.addAttribute("hashMap2", robotList);
 
-        // model.addAttribute("evRobot", evosuiteLevel); //aggiunto
         return "gamemode";
-
     }
 
     @GetMapping("/report")
     public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(restController.IsAuthenticate(jwt)){
+        if(t23Service.GetAuthenticated(jwt)){
             return "report";
         }
-        return "redirect:/login";
+        return "redirect:/login"; 
     }
 
     // TODO: Salvataggio della ScalataGiocata
@@ -197,15 +167,15 @@ public class GuiController {
 
     @GetMapping("/editor")
     public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(restController.IsAuthenticate(jwt)){
+        if(t23Service.GetAuthenticated(jwt)){
             return "editor";
         }
-        return "redirect:/login";
+        return "redirect:/login"; 
     }
 
     @GetMapping("/leaderboardScalata")
     public String getLeaderboardScalata(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(restController.IsAuthenticate(jwt)){
+        if(t23Service.GetAuthenticated(jwt)){
             return "leaderboardScalata";
         }
         return "redirect:/login";
@@ -213,10 +183,10 @@ public class GuiController {
 
     @GetMapping("/editorAllenamento")
     public String editorAllenamentoPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(restController.IsAuthenticate(jwt)){
+        if(t23Service.GetAuthenticated(jwt)){
             return "editorAllenamento";
         }
-        return "redirect:/login";
+        return "redirect:/login"; 
     }
 
     //MODIFICA (22/05/2024) : Visualizzazione pagina dedicata alla selezione della "Scalata"
@@ -241,12 +211,11 @@ public class GuiController {
             return "gamemode_scalata";
         }
             */
-
-        //mia versione di prova
-        if(restController.IsAuthenticate(jwt)){
+        if(t23Service.GetAuthenticated(jwt)){
             return "gamemode_scalata";
         }
-        return "redirect:/login";
+        return "redirect:/login"; 
+        
 	}
 
 }
