@@ -1,0 +1,84 @@
+.swal-button-container {
+    display: flex;
+    justify-content: center;
+}
+.swal-button {
+    width: 100px;                                   /* Imposta la larghezza dei pulsanti */
+    display: inline-block;                          /* Fa apparire i pulsanti sulla stessa riga*/
+}
+body {
+    font-size: 14px;
+}
+.bg-custom {
+    background-color: #1c1c28;
+}
+.modal-footer {
+    display: flex;
+    justify-content: center;
+}
+.modal-title {
+    color: #ff9b3a; 
+    font-weight: bold;
+    /* text-align: center; */
+}
+.modal-body {
+    color: #000; 
+}
+.modal-backdrop {
+    z-index: -1;
+}
+.jumbotron {
+    background-image: url('/t5/images/gamemode_background.jpg');
+    background-size: cover;             /* This will make sure the image covers the entire jumbotron */
+    background-position: center;        /* This will center the image in the jumbotron */
+    min-height: 300px;
+    border: 3px solid #ff9b3a;
+}
+.title, .subtitle {
+    /* text-align: center; */
+    text-align: left;
+}
+
+/* '#' seleziona elementi in base al suo attributo univoco id
+   '.' Seleziona elementi per class e dunque può essere applicato a più elementi
+*/
+#scalate-container {
+    background-color: rgba(57,57,83,1);             /*Imposta il colore di sfondo del container */
+    color: #C8C7D8;                                 /* Imposta il colore del testo */
+    font-size: 32px;                                  /* Imposta la dimensione del testo */
+
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 392px;
+    height: 440px;  
+}
+#scalate-container button {
+    color: #C8C7D8;                                 /* Imposta il colore del testo */
+    display: block;
+    font-size: 32px;
+}
+#scalate-container button:hover {
+    color: #f5b041;
+    cursor: pointer;
+}
+#scalate-container .badge {
+    margin-right: 20px;
+    font-size: 0.65em;
+    padding: 5px 10px;
+}
+#scalate-container button:focus {
+    outline: none;
+}
+#scalate-container button.active {
+    color: #f018f0;
+    font-weight: bold;
+}
+
+/* Nascondi la barra di scorrimento standard */
+::-webkit-scrollbar {
+    display: none;
+}

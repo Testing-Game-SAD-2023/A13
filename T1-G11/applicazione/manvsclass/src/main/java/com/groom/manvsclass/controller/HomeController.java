@@ -1,6 +1,5 @@
 package com.groom.manvsclass.controller;
 
-
 import java.io.IOException;
 import java.io.File;
 import java.time.Instant;
@@ -29,6 +28,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,10 +44,16 @@ import com.groom.manvsclass.model.filesystem.upload.FileUploadResponse;
 import com.groom.manvsclass.model.filesystem.upload.FileUploadUtil;
 import com.groom.manvsclass.model.filesystem.RobotUtil;
 import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
+
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.interaction;
 import com.groom.manvsclass.model.Operation;
+
+//MODIFICA (14/05/2024) : Importazione delle classi Scalata e ScalataRepository
+import com.groom.manvsclass.model.Scalata;
+import com.groom.manvsclass.model.repository.ScalataRepository;
+
 import com.groom.manvsclass.model.repository.AdminRepository;
 import com.groom.manvsclass.model.repository.ClassRepository;
 import com.groom.manvsclass.model.repository.InteractionRepository;
@@ -91,6 +97,10 @@ public class HomeController {
 	InteractionRepository repo_int;
 	@Autowired
 	OperationRepository orepo;
+
+	//MODIFICA (14/05/2024) : Inizializzazione del repository per le Scalate
+	@Autowired
+	ScalataRepository scalata_repo;
 	
 	@Autowired
     private MongoTemplate mongoTemplate; 
@@ -106,9 +116,6 @@ public class HomeController {
 	//MODIFICA (12/02/2024) : Gestione autenticazione
 	@Autowired
     private AuthenticatedAdminRepository authenticatedAdminRepository;
-
-	//MODIFICA (13/02/2024) : Autenticazione token proveniente players
-	// private RestTemplate restTemplate;
 
 	//MODIFICA (15/02/2024) : Servizio di posta elettronica
 	@Autowired
@@ -139,21 +146,11 @@ public class HomeController {
 		if(isJwtValid(jwt)) return new ModelAndView("home_adm"); 
 		return new ModelAndView("redirect:/loginAdmin"); 
 	}
-	
-	// @GetMapping("/loginAdmin")
-	// public String showLoginAdmin() {
-	// 	return "login_admin";
-	// }
 
 	@GetMapping("/registraAdmin")
 	public String showRegistraAdmin() {
 		return "registraAdmin";
 	}
-
-	// @GetMapping("/modificaClasse")
-	// public String showModificaClasse() {
-	// 	return "modificaClasse";
-	// }
 
 	//MODIFICA (11/02/2024) : Gestione sessione tramite JWT
 	@GetMapping("/modificaClasse")
@@ -197,26 +194,6 @@ public class HomeController {
 	}
 	//FINE MODIFICA
 	
-	// @GetMapping("/uploadClasse")
-	// public String showUploadClasse() {
-	// 	return "uploadClasse";
-	// }
-
-	// @GetMapping("/uploadClasseAndTest")
-	// public String showUploadClasseAndTest() {
-	// 	return "uploadClasseAndTest";
-	// }
-
-	// @GetMapping("/reportClasse")
-	// public String showReportClasse() {
-	// 	return "reportClasse";
-	// }
-
-	// @GetMapping("/Reports")
-	// public String showReports() {
-	// 	return "Reports";
-	// }
-
 	@GetMapping("/interaction")
 	@ResponseBody
 	public	List<interaction>	elencaInt() {
@@ -243,8 +220,6 @@ public class HomeController {
 	public interaction UploadInteraction(@RequestBody interaction interazione) {
 		return repo_int.save(interazione);
 	}
-
-
 
 	public int API_id() {
 	    Random random = new Random();
@@ -316,12 +291,6 @@ public class HomeController {
 	}
 	
 	
-	// @GetMapping("/home")
-	// @ResponseBody
-	// public	List<ClassUT>	elencaClassi() {
-	// 	return repo.findAll();
-	// }
-
 	//MODIFICA (11/02/2024) : Gestione flusso JWT
 
 	@GetMapping("/home")
@@ -464,69 +433,6 @@ public class HomeController {
 		}
 	}
 
-
-	// @PostMapping("/insert")
-	// @ResponseBody
-	// public ClassUT UploadClasse(@RequestBody ClassUT classe) {
-	// 	LocalDate currentDate = LocalDate.now();
-	//     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    //     String data = currentDate.format(formatter);
-    //     Operation operation1= new Operation((int)orepo.count(),userAdmin.getUsername(),classe.getName(),0,data);
-    //     orepo.save(operation1);
-	// 	return repo.save(classe);
-	// }
-
-
-	//FINE MODIFICA
-	
-	// @GetMapping("/orderbydate")
-	// @ResponseBody
-	// public List<ClassUT> ordinaClassi() {
-	// 	return srepo.orderByDate();
-	// }
-
-	// @GetMapping("/orderbyname")
-	// @ResponseBody
-	// public List<ClassUT> ordinaClassiNomi() {
-	// 	return srepo.orderByName();
-	// }
-	
-	// @GetMapping("/Cfilterby/{category}")
-	// @ResponseBody
-	// public List<ClassUT> filtraClassi(@PathVariable String category) {
-	// 	return srepo.filterByCategory(category);
-	// }
-	
-	// @GetMapping("/Cfilterby/{text}/{category}")
-	// @ResponseBody
-	// public	List<ClassUT>	filtraClassi(@PathVariable String text,@PathVariable String category) {
-	// 	return srepo.searchAndFilter(text,category);
-	// }
-	
-	// @GetMapping("/Dfilterby/{difficulty}")
-	// @ResponseBody
-	// public List<ClassUT> elencaClassiD(@PathVariable String difficulty) {
-	// 	return srepo. filterByDifficulty(difficulty);
-	// }
-	
-	// @GetMapping("/Dfilterby/{text}/{difficulty}")
-	// @ResponseBody
-	// public	List<ClassUT>	elencaClassiD(@PathVariable String text,@PathVariable String difficulty) {
-	// 	return srepo.searchAndDFilter(text,difficulty);
-	// }
-	
-
-	// @PostMapping("/insert")
-	// @ResponseBody
-	// public ClassUT UploadClasse(@RequestBody ClassUT classe) {
-	// 	LocalDate currentDate = LocalDate.now();
-	//     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    //     String data = currentDate.format(formatter);
-    //     Operation operation1= new Operation((int)orepo.count(),userAdmin.getUsername(),classe.getName(),0,data);
-    //     orepo.save(operation1);
-	// 	return repo.save(classe);
-	// }
-
 	/**
 	 * @param classFile     file inviato come parte della richiesta multipart
 	 *                      L'interfaccia MultipartFile fornisce i metodi per
@@ -541,7 +447,6 @@ public class HomeController {
 	 //MODIFICA (20/02/2024) : Eliminazione della riga riguardante il caricamento dei relativi test generati dai Robot (ATTENZIONE)
 	@PostMapping("/uploadFile")
 	@ResponseBody
-	//public ResponseEntity<FileUploadResponse> uploadFile(@RequestParam("file") MultipartFile classFile, @RequestParam("model") String model) throws IOException {
 	public ResponseEntity<FileUploadResponse> uploadFile(@RequestParam("file") MultipartFile classFile,
 														 @RequestParam("model") String model, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) throws IOException {
 
@@ -549,6 +454,7 @@ public class HomeController {
 		if (isJwtValid(jwt)) {
 
 			System.out.println("Token valido (uploadFile)");
+
 			//Legge i metadati della classe della parte "model" del body HTTP e li salva in un oggetto ClasseUT
 			ObjectMapper mapper = new ObjectMapper();
 			ClassUT classe = mapper.readValue(model, ClassUT.class);
@@ -596,41 +502,6 @@ public class HomeController {
 		}
 		//FINE MODIFICA
 
-		// //Legge i metadati della classe della parte "model" del body HTTP e li salva in un oggetto ClasseUT
-		// ObjectMapper mapper = new ObjectMapper();
-		// ClassUT classe = mapper.readValue(model, ClassUT.class);
-		
-		// //Salva il nome del file caricato
-		// String fileName = StringUtils.cleanPath(classFile.getOriginalFilename());
-		// long size = classFile.getSize();
-		
-		// //Salva la classe nel filesystem condiviso
-		// FileUploadUtil.saveCLassFile(fileName, classe.getName(), classFile);
-		
-		// //Genera e salva i test nel filesystem condiviso
-		// RobotUtil.generateAndSaveRobots(fileName, classe.getName(), classFile);
-		
-		// //Prepara la risposta per il front-end
-		// FileUploadResponse response = new FileUploadResponse();
-		// response.setFileName(fileName);
-		// response.setSize(size);
-		// response.setDownloadUri("/downloadFile");
-		
-		// //Setta data di caricamento e percorso di download 
-		// classe.setUri("Files-Upload/"+classe.getName()+"/"+fileName);
-		// classe.setDate(today.toString());
-
-		// //Creazione dell'oggetto riguardante l'operazione appena fatta
-		// LocalDate currentDate = LocalDate.now();
-	    // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        // String data = currentDate.format(formatter);
-        // Operation operation1= new Operation((int)orepo.count(),userAdmin.getUsername(),classe.getName(),0,data);
-
-		// //Salva i dati sull'operazione fatta nel database
-        // orepo.save(operation1);
-		// //Salva i dati sullla classe nel database
-		// repo.save(classe);
-		// return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 
 	/**
@@ -646,50 +517,7 @@ public class HomeController {
 	 */
 	@PostMapping("/uploadTest")
     @ResponseBody
-	//public ResponseEntity<FileUploadResponse> uploadTest(@RequestParam("file") MultipartFile classFile, @RequestParam("model") String model, @RequestParam("test") MultipartFile testFile,
-	
-	//														@RequestParam("testEvo") MultipartFile testFileEvo) throws IOException {
-        
-        // //Legge i metadati della classe della parte "model" del body HTTP e li salva in un oggetto ClasseUT
-        // ObjectMapper mapper = new ObjectMapper();
-        // ClassUT classe = mapper.readValue(model, ClassUT.class);
-        
-        // //Salva il nome del file della classe caricato
-        // String fileNameClass = StringUtils.cleanPath(classFile.getOriginalFilename());
-        // long size = classFile.getSize();
-        
-        // //Salva la classe nel filesystem condiviso
-        // FileUploadUtil.saveCLassFile(fileNameClass, classe.getName(), classFile);
-        
-        // //Salva i test nel filesystem condiviso
-        // String fileNameTest = StringUtils.cleanPath(testFile.getOriginalFilename());
-		// String fileNameTestEvo = StringUtils.cleanPath(testFileEvo.getOriginalFilename());
-        // RobotUtil.saveRobots(fileNameClass, fileNameTest,fileNameTestEvo , classe.getName(), classFile ,testFile, testFileEvo);
-
-        // FileUploadResponse response = new FileUploadResponse();
-        // response.setFileName(fileNameClass);
-        // response.setSize(size);
-        // response.setDownloadUri("/downloadFile");
-
-        // //Setta data di caricamento e percorso di download della classe
-        // classe.setUri("Files-Upload/" + classe.getName() + "/" + fileNameClass);
-        // classe.setDate(today.toString());
-        
-        // //Creazione dell'oggetto riguardante l'operazione appena fatta
-        // LocalDate currentDate = LocalDate.now();
-        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        // String data = currentDate.format(formatter);
-        // Operation operation1 = new Operation((int) orepo.count(), userAdmin.getUsername(), classe.getName() + " con Robot", 0, data);
-
-        // //Salva i dati sull'operazione fatta nel database
-        // orepo.save(operation1);
-        // //Salva i dati sulla classe nel database
-        // repo.save(classe);
-        // return new ResponseEntity<>(response, HttpStatus.OK);
-	//}
-
 	//MODIFICA (11/02/2024) : Gestione flusso JWT
-
     public ResponseEntity<FileUploadResponse> uploadTest(@RequestParam("file") MultipartFile classFile, 
 														 @RequestParam("model") String model,
 														 @RequestParam("test") MultipartFile testFile,
@@ -780,21 +608,6 @@ public class HomeController {
 		 }
 	 }
 	 
-	
-	// @PostMapping("/delete/{name}")
-	// @ResponseBody
-	// public ClassUT eliminaClasse(@PathVariable String name) {
-	// 	Query query= new Query(); 
-	//    	query.addCriteria(Criteria.where("name").is(name));
-	//    	this.eliminaFile(name);
-	//    	LocalDate currentDate = LocalDate.now();
-	//     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    //    	String data = currentDate.format(formatter);
-    //    	Operation operation1= new Operation((int)orepo.count(),userAdmin.getUsername(),name,2,data);
-    //    	orepo.save(operation1);
-	//    	return mongoTemplate.findAndRemove(query, ClassUT.class);
-	// }
-
 	@PostMapping("/deleteFile/{fileName}")
 	@ResponseBody
 	public ResponseEntity<String> eliminaFile(@PathVariable String fileName,
@@ -825,65 +638,8 @@ public class HomeController {
 		}
 	}
 
-	// @PostMapping("/deleteFile/{fileName}")
-	// @ResponseBody
-	// public ResponseEntity<String> eliminaFile(@PathVariable String fileName) {
-	// 	String folderPath = "Files-Upload/"+ fileName; 
-	//   	File directoryRandoop = new File("/VolumeT9/app/FolderTree/" + fileName);
-	// 	File directoryEvo = new File("/VolumeT8/FolderTreeEvo/" +  fileName);
-	  
-	// 	File folderToDelete = new File(folderPath);
-	// 	if (folderToDelete.exists() && folderToDelete.isDirectory()) {
-	// 		try {
-	// 			FileUploadUtil.deleteDirectory(folderToDelete);
-	// 			FileUploadUtil.deleteDirectory(directoryRandoop);
-	// 			FileUploadUtil.deleteDirectory(directoryEvo);
-	// 			return new ResponseEntity<>("Cartella eliminata con successo.", HttpStatus.OK);
-	// 		} catch (IOException e) {
-	// 			return new ResponseEntity<>("Impossibile eliminare la cartella.", HttpStatus.INTERNAL_SERVER_ERROR);
-	// 		}
-	// 	} else {
-	// 		return new ResponseEntity<>("Cartella non trovata.", HttpStatus.NOT_FOUND);
-	// 	}
-	//  }
-	    
-	// @GetMapping("/home/{text}")
-	// @ResponseBody
-	// public ResponseEntity<List<ClassUT>> ricercaClasse(@PathVariable String text,
-	// 												   @CookieValue(name = "jwt", required = false) String jwt) {
-	// 	if (isJwtValid(jwt)) {
-
-	// 		System.out.println("Token valido, può ricercare classi dalla /home (/home/{text})");
-	// 		List<ClassUT> classiTrovate = srepo.findByText(text);
-	// 		return ResponseEntity.ok().body(classiTrovate);
-	// 	} else {
-	// 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ritorna 401 Unauthorized
-	// 	}
-	// }
-
-	// @GetMapping("/downloadFile/{name}")
-	// @ResponseBody
-	// public ResponseEntity<?> downloadClasse(@PathVariable("name") String name,
-	// 									    @CookieValue(name = "jwt", required = false) String jwt) throws Exception {
-	// 	if (isJwtValid(jwt)) {
-
-	// 		System.out.println("Token valido (/downloadFile/{name})");
-	// 		List<ClassUT> classe = srepo.findByText(name);
-	// 		if (!classe.isEmpty()) {
-
-	// 			System.out.println("Download classe prescelta (/downloadFile/{name})");
-	// 			return FileDownloadUtil.downloadClassFile(classe.get(0).getcode_Uri());
-	// 		} else {
-	// 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
-	// 		}
-	// 	} else {
-	// 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido");
-	// 	}
-	// }
-
 	//FINE MODIFICA
 
-	
 	@GetMapping("/home/{text}")
 	@ResponseBody
 	public	List<ClassUT>	ricercaClasse(@PathVariable String text) {
@@ -899,6 +655,8 @@ public class HomeController {
 	@GetMapping("/downloadFile/{name}")
 	@ResponseBody
 	public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
+
+		System.out.println("/downloadFile/{name} (HomeController) - name: "+ name);
 		System.out.println("test");
 		try{
 			List<ClassUT> classe= srepo.findByText(name);
@@ -913,32 +671,6 @@ public class HomeController {
 			}
 		}
 	 	
-	 
-
-	// @PostMapping("/update/{name}")
-	// @ResponseBody
-	// public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent) {
-	// 	Query query= new Query();
-		
-	// 	query.addCriteria(Criteria.where("name").is(name));
-	// 	Update update = new Update().set("name", newContent.getName())
-	// 			.set("date", newContent.getDate())
-	// 			.set("difficulty", newContent.getDifficulty())
-	// 			.set("description", newContent.getDescription())
-	// 			.set("category", newContent.getCategory());
-	// 	long modifiedCount = mongoTemplate.updateFirst(query, update, ClassUT.class).getModifiedCount();
-
-	// 	if (modifiedCount > 0) {
-	// 		LocalDate currentDate = LocalDate.now();
-	// 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	// 		String data = currentDate.format(formatter);
-	// 		Operation operation1= new Operation((int)orepo.count(),userAdmin.getUsername(),newContent.getName(),1,data);
-	// 		orepo.save(operation1);
-	// 		return new ResponseEntity<>("Aggiornamento eseguito correttamente.", HttpStatus.OK);
-	// 	} else {
-	// 		return new ResponseEntity<>("Nessuna classe trovata o nessuna modifica effettuata.", HttpStatus.NOT_FOUND);
-	// 	}
-	// }
 
 	//MODIFICA (11/02/2024) : Gestione flusso JWT
 
@@ -1071,18 +803,8 @@ public class HomeController {
 	//FINE MODIFICA
 
 
-	// @PostMapping("/registraAdmin")
-	// @ResponseBody
-	// public Admin registraAdmin(@RequestBody Admin admin1) {
-	// 	//NB:Aggiungere setCognome
-	// 	this.userAdmin.setUsername(admin1.getUsername());
-	// 	this.userAdmin.setPassword(admin1.getPassword());
-	// 	return arepo.save(admin1);
-	// }
-
 	@PostMapping("/loginAdmin")
 	@ResponseBody
-	//public String loginAdmin(@RequestBody Admin admin1, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request, HttpServletResponse response) {
 	public ResponseEntity<String> loginAdmin(@RequestBody Admin admin1, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request, HttpServletResponse response) {
 		//NB: Bisognerebbe controllare in base all'email
 
@@ -1114,6 +836,12 @@ public class HomeController {
 		else {
 				System.out.println("Campi compilati.");
 				Admin admin = srepo.findAdminByUsername(admin1.getUsername());
+
+				// (MODIFICA 14/05/2024) Check if the admin exists with that username
+				if(admin == null) {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errore nella fase di login, admin con username: "+ admin1.getUsername()+ " non trovato nel database, per favore ricontrolla di aver inserito tutti i dati corretti");
+				}
+				//(FINE MODIFICA 14/05/2024)
 				boolean passwordMatches = myPasswordEncoder.matches(admin1.getPassword(), admin.getPassword());
 
 				if ((admin != null) && passwordMatches) { 
@@ -1140,8 +868,8 @@ public class HomeController {
 					return ResponseEntity.ok().body("Autenticazione avvenuta con successo");
 
 				} else {
-						return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errore nella fase di login, per favore ricontrolla di aver inserito tutti i dati corretti");
-					}
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errore nella fase di login, per favore ricontrolla di aver inserito tutti i dati corretti");
+				}
 		}
 		
 	}
@@ -1184,20 +912,6 @@ public class HomeController {
 		return new ModelAndView("login_admin");
 	}
 
-	// @GetMapping("/registraAdmin")
-	// public ModelAndView showRegistrationForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-	// 	if(isJwtValid(jwt)) return new ModelAndView("redirect:/home_adm"); 
-
-	// 	return new ModelAndView("registraAdmin");
-	// }
-	//FINE MODIFICA
-
-	// @GetMapping("/admins/{username}")
-	// @ResponseBody
-	// public Admin getAdminByUsername(@PathVariable String username) {
-	// 	return srepo.findAdminByUsername(username);
-	// }
-
 	@GetMapping("/admins/{username}")
 	@ResponseBody
 	public ResponseEntity<Admin> getAdminByUsername(@PathVariable String username,
@@ -1217,11 +931,6 @@ public class HomeController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ritorna 401 Unauthorized
 		}
 	}
-
-	// @GetMapping("/player")
-	// public String showplayer() {
-	// 	return "player";
-	// }
 
 	//MODIFICA (11/02/2024) : Gestione flusso JWT
 
@@ -1243,11 +952,6 @@ public class HomeController {
 
 	//FINE MODIFICA
 
-	// @GetMapping("class")
-	// public String showclass() {
-	// 	return "class";
-	// }
-
 	//MODIFICA (12/02/2024) : Logout amministratore
     @GetMapping("/logout_admin")
     public ModelAndView logoutAdmin(HttpServletResponse response) {
@@ -1262,11 +966,7 @@ public class HomeController {
     }
 
 	//MODIFICA (15/02/2024) : Elenco di tutti gli amministratori
-	// @GetMapping("/admins_list")
-	// @ResponseBody 						// Questa annotazione indica a Spring di restituire direttamente il risultato come corpo della risposta HTTP
-    // public List<Admin> getAllAdmins() {
-    //     return arepo.findAll();
-    // }
+	
 	//MODIFICA (1/3/2024) : Aggiunto controllo token jwt
 	@GetMapping("/admins_list")
     @ResponseBody
@@ -1574,39 +1274,186 @@ public class HomeController {
 		System.out.println("(GET /scalata) Token JWT invalido");
         return new ModelAndView("login_admin");
 	}
-	// //MODIFICA (18/02/2024) : Aggiunta menù
-    // @GetMapping("/menu")
-    // public ModelAndView showMenuForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
 
-    //     System.out.println("GET (/menu)");
-    //     if(isJwtValid(jwt)) return new ModelAndView("redirect:/loginAdmin"); 
+	//MODIFICA (14/05/2024) : Creazione della propria "Scalata"
+	@PostMapping("/configureScalata")
+	public ResponseEntity<?> uploadScalata(@RequestBody Scalata scalata, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+		
+		// Check JWT token
+		System.out.println("(POST /configureScalata) Token JWT valido?");
+		if(!isJwtValid(jwt)) {
 
-    //     return new ModelAndView("menu");
-    // }
-	//FINE MODIFICA
+			// Invalid token
+			System.out.println("(POST /configureScalata) Token non valido");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /configureScalata) Attenzione, non sei loggato!");
 
-    // @PostMapping("/logout_admin")
-	// @ResponseBody
-    // public ResponseEntity<String> logoutAdmin(@RequestParam("authToken") String authToken, HttpServletResponse response) {
-        
-	// 	System.out.println("PostMapping(\"/logout_admin\")");
-	// 	AuthenticatedAdmin authenticatedAdmin = authenticatedAdminRepository.findByAuthToken(authToken);
-	// 	System.out.println("Admin autenticato?");
-    //     if (authenticatedAdmin == null) {
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Admin non autenticato");
-    //     }
+		} 
 
-    //     Cookie jwtTokenCookie = new Cookie("jwt", null);
-	// 	System.out.println("Logout (POST)");
-    //     jwtTokenCookie.setMaxAge(0);
-    //     response.addCookie(jwtTokenCookie);
+		// Valid Token
+		System.out.println("(POST /configureScalata) Token valido, procedere con la configurazione della propria 'Scalata'.");
 
-    //     authenticatedAdminRepository.delete(authenticatedAdmin);
-    //     return ResponseEntity.ok("Logout avvenuto con successo");
-    // }
-
-	//FINE MODIFICA
-
-
+		Scalata new_scalata = new Scalata();
 	
+		//Set the author of the Scalata
+		new_scalata.setUsername(scalata.getUsername());
+		System.out.println("(POST /configureScalata) autore della 'Scalata' settato: " + new_scalata.getUsername() + "\n");
+
+		//Set the name of the Scalata
+		new_scalata.setScalataName(scalata.getScalataName());
+		System.out.println("(POST /configureScalata) nome della 'Scalata' settato: " + new_scalata.getScalataName() + "\n");
+
+		//Set the description of the Scalata
+		new_scalata.setScalataDescription(scalata.getScalataDescription());
+		System.out.println("(POST /configureScalata) descrizione della 'Scalata' settata: " + new_scalata.getScalataDescription() + "\n");
+
+		//Set the number of rounds
+		new_scalata.setNumberOfRounds(scalata.getNumberOfRounds());
+		System.out.println("(POST /configureScalata) numeri di rounds settati: " + new_scalata.getNumberOfRounds() + "\n");
+
+		//Set the selectedClasses
+		new_scalata.setSelectedClasses(scalata.getSelectedClasses());
+		System.out.println("(POST /configureScalata) classi selezionate appartenenti alla 'Scalata' settate : " + new_scalata.getSelectedClasses() + "\n");
+
+		//Save the new Scalata in the DB
+		scalata_repo.save(new_scalata);
+		System.out.println("(POST /configureScalata) Salvataggio avvenuto correttamente all'interno del DB");
+
+		return ResponseEntity.ok().body(new_scalata);
+
+	}
+
+	//MODIFICA (15/05/2024) : Recupero di tutte le "Scalate" memorizzate nel sistema
+	// TODO: Rimuovere controllo token JWT
+	// @GetMapping("/scalate_list")
+	// @ResponseBody
+	// public ResponseEntity<?> listScalate(@CookieValue(name = "jwt", required = false) String jwt) {
+
+	// 	// Check JWT token
+	// 	System.out.println("(GET /scalate_list) Token JWT valido?");
+	// 	if(!isJwtValid(jwt)) {
+
+	// 		// Invalid token
+	// 		System.out.println("(GET /scalate_list) Token non valido");
+	// 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(GET /scalate_list) Attenzione, non sei loggato!");
+	// 	} 
+
+	// 	// Valid Token
+	// 	System.out.println("(GET /scalate_list) Token valido, procedere con il recupero delle 'Scalate' memorizzate nel sistema.");
+
+	// 	List<Scalata> scalate = scalata_repo.findAll();
+	// 	System.out.println("(GET /scalate_list) Recupero delle 'Scalate' memorizzate nel sistema avvenuto con successo");
+
+	// 	return ResponseEntity.ok().body(scalate);
+	// }
+	@GetMapping("/scalate_list")
+	@ResponseBody
+	public ResponseEntity<?> listScalate() {
+		
+		System.out.println("(GET /scalate_list) Recupero delle 'Scalate' memorizzate nel sistema.");
+
+		List<Scalata> scalate = scalata_repo.findAll();
+		System.out.println("(GET /scalate_list) Recupero delle 'Scalate' memorizzate nel sistema avvenuto con successo");
+
+		return new ResponseEntity<>(scalate, HttpStatus.OK);
+	
+	}
+
+	//MODIFICA (16/05/2024) : Rimozione di una specifica "Scalata" memorizzata nel sistema
+	@DeleteMapping("delete_scalata/{scalataName}")
+	@ResponseBody
+	public ResponseEntity<?> deleteScalataByName (@PathVariable String scalataName, @CookieValue(name = "jwt", required = false) String jwt) {
+		
+		// Check JWT token
+		System.out.println("(DELETE /delete_scalata/{scalataName}) Token JWT valido?");
+		if(!isJwtValid(jwt)) {
+
+			// Invalid token
+			System.out.println("(DELETE /delete_scalata/{scalataName}) Token non valido");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(DELETE /delete_scalata/{scalataName}) Attenzione, non sei loggato!");
+		} 
+
+		// Valid Token
+		System.out.println("(DELETE /delete_scalata/{scalataName}) Token valido, procedere con la rimozione della 'Scalata' memorizzata nel sistema.");
+
+		List<Scalata> scalata = scalata_repo.findByScalataNameContaining(scalataName);
+
+		//Check if the Scalata exists
+		if (scalata.isEmpty()) {
+
+			//Scalata not find
+			System.out.println("(DELETE /delete_scalata/{scalataName}) 'Scalata' con nome: "+ scalataName + "non trovata");
+			return new ResponseEntity<String>("Scalata con nome: " + scalataName +  " non trovata", HttpStatus.NOT_FOUND);
+
+		}
+		else {
+
+			//Delete the Scalata
+			scalata_repo.delete(scalata.get(0));
+			System.out.println("(DELETE /delete_scalata/{scalataName}) Rimozione della 'Scalata' memorizzata nel sistema avvenuta con successo");
+
+			return new ResponseEntity<String>("Scalata con nome: " + scalataName +  " rimossa", HttpStatus.OK);
+		}
+	
+	}
+
+	// //MODIFICA (15/05/2024) : Recupero di una specifica "Scalata" memorizzata nel sistema
+	// @GetMapping("/retrieve_scalata/{scalataName}")
+	// @ResponseBody
+	// public ResponseEntity<?> retrieveScalataByName (@PathVariable String scalataName, @CookieValue(name = "jwt", required = false) String jwt) {
+
+	// 	// Check JWT token
+	// 	System.out.println("(GET retrieve_scalata/{scalataName}) Token JWT valido?");
+	// 	if(!isJwtValid(jwt)) {
+
+	// 		// Invalid token
+	// 		System.out.println("(GET /retrieve_scalata/{scalataName}) Token non valido");
+	// 		return new ResponseEntity<String>("Token non valido", HttpStatus.NOT_FOUND);
+	// 	} 
+
+	// 	// Valid Token
+	// 	System.out.println("(GET /retrieve_scalata/{scalataName}) Token valido, procedere con il recupero della 'Scalata' memorizzata nel sistema.");
+
+	// 	List<Scalata> scalata = scalata_repo.findByScalataNameContaining(scalataName);
+
+	// 	//Check if the Scalata exists
+	// 	if (scalata.isEmpty()) {
+
+	// 		//Scalata not find
+	// 		System.out.println("(GET /retrieve_scalata/{scalataName}) 'Scalata' with name: "+ scalataName + "not find");
+	// 		return new ResponseEntity<String>("Scalata with name: " + scalataName +  "not found", HttpStatus.NOT_FOUND);
+
+	// 	}
+	// 	else {
+
+	// 		System.out.println("(GET /retrieve_scalata/{scalataName}) Recupero della 'Scalata' memorizzata nel sistema avvenuto con successo");
+
+	// 		return new ResponseEntity<>(scalata, HttpStatus.OK);
+	// 	}
+		
+	// }
+
+	@GetMapping("/retrieve_scalata/{scalataName}")
+	@ResponseBody
+	public ResponseEntity<?> retrieveScalataByName (@PathVariable String scalataName) {
+
+		List<Scalata> scalata = scalata_repo.findByScalataNameContaining(scalataName);
+
+		//Check if the Scalata exists
+		if (scalata.isEmpty()) {
+
+			//Scalata not find
+			System.out.println("(GET /retrieve_scalata/{scalataName}) 'Scalata' with name: "+ scalataName + "not find");
+			return new ResponseEntity<String>("Scalata with name: " + scalataName +  "not found", HttpStatus.NOT_FOUND);
+
+		}
+		else {
+
+			System.out.println("(GET /retrieve_scalata/{scalataName}) Recupero della 'Scalata' memorizzata nel sistema avvenuto con successo");
+
+			return new ResponseEntity<>(scalata, HttpStatus.OK);
+		}
+		
+	}
+
+
 }

@@ -17,12 +17,15 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 
 func (gs *Repository) Create(r *CreateRequest) (Game, error) {
+	//fmt.Println("(service.go game) Request received ", r)
 	var (
 		game = model.Game{
-			Name:      r.Name,
-			StartedAt: r.StartedAt,
-			ClosedAt:  r.ClosedAt,
-			Players:   make([]model.Player, len(r.Players)),
+			Name:          r.Name,
+			Difficulty:    r.Difficulty,
+			StartedAt:     r.StartedAt,
+			ClosedAt:      r.ClosedAt,
+			ScalataGameID: r.ScalataGameID,
+			Players:       make([]model.Player, len(r.Players)),
 		}
 	)
 	// detect duplication in player

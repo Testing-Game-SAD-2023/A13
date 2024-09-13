@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
@@ -39,6 +40,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -612,6 +614,12 @@ public class Controller {
     @GetMapping("/students_list")
     public List<User> getAllStudents() {
         return userRepository.findAll();
+    }
+
+    @GetMapping("/students_list/{ID}")
+    @ResponseBody
+    public User getStudent(@PathVariable String ID) {
+        return userRepository.findByID(Integer.parseInt(ID));
     }
 
     

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="/t5/css/leaderboardScalata.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <script src="/t5/jquery/jquery-3.7.0.com.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/t5/js/leaderboardScalata.js"></script>
+</head>
+<body>
+
+    <!--Navbar-->
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;" id="navbar">
+        <a class="navbar-brand" href="#">
+          <i class="fas fa-trophy"></i> LeaderboardScalata
+        </a>
+        <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" id="nav-home" href="/main">Go Back <span class="sr-only">(current)</span></a>
+            </li>
+            <!-- <li class="nav-item active">
+                <a class="nav-link" id="logout-button" href="/login">Logout <span class="sr-only">(current)</span></a>
+              </li> -->
+          </ul>
+        </div>
+      </nav>
+    
+    <!--Jumbotron-->
+    <div class="jumbotron jumbotron-fluid" id="my-jumbotron">
+        <div class="container">
+          <h1 class="display-4">LeaderboardScalate.</h1>
+          <!-- <p class="lead">
+            Ciascuna partita in modalità "Scalata" sarà caratterizzata da un certo numero di "<em>rounds</em>", ovvero di classi da testare e <b>sarai tu</b> a deciderne l'ordine ed il numero!<br>
+            Metti alla prova le capacità di testing dei giocatori realizzando sfide stimolanti ed elettrizzanti.  
+          </p> -->
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="selector">
+            <label for="scalataSelector">Seleziona la Scalata:</label>
+            <select id="scalataSelector">
+                <!-- <option value="partita1">Partita 1</option>
+                <option value="partita2">Partita 2</option> -->
+                <!-- Altri tipi di partite... -->
+                 <!-- La tabella verrà popolata dinamicamente -->
+            </select>
+        </div>
+        <div class="participant">
+            <h2>Classifica personale</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Posizione</th>
+                        <th>Nome</th>
+                        <th>Punteggio</th>
+                        <th>Tempo</th>
+                    </tr>
+                </thead>
+                <tbody id="participantRow">
+                    <!-- La riga del partecipante verrà popolata dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+        <table id="leaderboardTable">
+            <!-- La tabella verrà popolata dinamicamente -->
+        </table>
+    </div>
+</body>
+</html>

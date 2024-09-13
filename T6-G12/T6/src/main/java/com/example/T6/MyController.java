@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -186,7 +187,11 @@ public class MyController {
             String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             double gameScore = 0;
             boolean isWinner = false;
-
+            Enumeration<String> params = request.getParameterNames(); 
+            while(params.hasMoreElements()){
+                String paramName = params.nextElement();
+                System.out.println("(in /run) Request Parameter Name - "+paramName+", Value - "+request.getParameter(paramName));
+            }
             JSONObject obj = new JSONObject();
             obj.put("testingClassName", request.getParameter("testingClassName"));
             obj.put("testingClassCode", request.getParameter("testingClassCode"));
@@ -197,7 +202,7 @@ public class MyController {
 
             httpPost.setEntity(jsonEntity);
 
-            System.out.println("(in /run) esecuzione della richiesta POST presso /compile-and-codecoverage");
+            System.out.println("(in /run) esecuzione della richiesta POST presso /compile-and-codecoverage "+ obj);
             HttpResponse response = httpClient.execute(httpPost);
 
             int statusCode = response.getStatusLine().getStatusCode();
@@ -247,10 +252,10 @@ public class MyController {
             //FINE MODIFICA
 
             // Leggi il contenuto dalla risposta
-            System.out.println("(/run) Lettura contenuto della risposta restituita dalla GET presso /robots");
             entity = response.getEntity();
             responseBody = EntityUtils.toString(entity);
             responseObj = new JSONObject(responseBody);
+            System.out.println("(/run) Lettura contenuto della risposta restituita dalla GET presso /robots" + responseObj);
 
             String score = responseObj.getString("scores");
             Integer roboScore = Integer.parseInt(score);
@@ -258,13 +263,14 @@ public class MyController {
 
             System.out.println("numTurnsPlayed "+ numTurnsPlayed);
             System.out.println("userScore "+ userScore);
+            System.out.println("roboScore "+ roboScore);
 
             if (roboScore > userScore) {
                 System.out.println("roboScore > userScore -> isWinner: "+ isWinner);
                 gameScore = Math.round(ParseUtil.calculateScore(userScore, numTurnsPlayed + 1));
             } else {
                 System.out.println("userScore > roboScore");
-                gameScore = Math.round(ParseUtil.calculateScore(userScore, numTurnsPlayed + 1) + 50);
+                gameScore = Math.round(ParseUtil.calculateScore(userScore, numTurnsPlayed + 1));
                 isWinner = true;
             }
 
@@ -467,6 +473,56 @@ public class MyController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/calculateScalataFinalScore")
+    public ResponseEntity<String> handleCalculateScalataFinalScore(@RequestParam("scalataId") String scalataId) {
+        try {
+            JSONObject resp = new JSONObject();
+            int finalScore = 0;
+            System.out.println("calculateScalataFinalScore, scalataId: "+ scalataId);
+            // Get scalata with all games played
+            URIBuilder builder = new URIBuilder("http://t4-g18-app-1:3000/scalates/" + Integer.parseInt(scalataId));
+            HttpGet get = new HttpGet(builder.build());
+            HttpResponse response = httpClient.execute(get);
+            get.releaseConnection();
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode > 299) {
+                System.out.println("Errore durante la GET in /scalates/{id}");
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity);
+            JSONObject responseObj = new JSONObject(responseBody);
+            JSONArray games = responseObj.getJSONArray("games");
+            // for each game make a get to games/{id} and sum the score
+            for (int i = 0; i < games.length(); i++) {
+                JSONObject game = games.getJSONObject(i);
+                int gameId = game.getInt("id");
+                builder = new URIBuilder("http://t4-g18-app-1:3000/games/" + gameId);
+                get = new HttpGet(builder.build());
+                response = httpClient.execute(get);
+                get.releaseConnection();
+                statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode > 299) {
+                    System.out.println("Errore durante la GET in /games/{id}");
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                entity = response.getEntity();
+                responseBody = EntityUtils.toString(entity);
+                responseObj = new JSONObject(responseBody);
+                finalScore += responseObj.getInt("score");
+            }
+            resp.put("finalScore", finalScore);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            return new ResponseEntity<>(resp.toString(), headers, HttpStatus.OK);
+        } catch (Exception e) {
+            System.err.println(e);
+            return new ResponseEntity<>("Errore durante il calcolo dello score finale per la scalata con id "+scalataId,
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     // FUNZIONE CHE DOVREBBE RICEVERE I RISULTATI DEI ROBOT
     // @GetMapping("/getResultRobot")

@@ -68,10 +68,11 @@ const server = http.createServer((req, res) => {
                 /app+
                 1
             */
+           // slice(5) removes /api/
             var parametri = req.url.slice(5).replace(/\+/g, ' ').split(' ');
             console.log("(prova_esecuzione_parametri4.js) parametri: "+ parametri);
 
-            /* Parameters after splicing the URL string, replacing and splitting it parameters=[arg0,arg1,arg2,arg3]:
+            /* Parameters after splicing the URL string, replacing and splitting it parameters=[arg0,arg1,arg2,arg3,arg4 (optional)]:
                 ['VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java,
                 '/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport',
                 '/app',
@@ -81,12 +82,18 @@ const server = http.createServer((req, res) => {
             /* arg0=sourcecode path of the class to test=classPath=VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java 
             className=name of the class under test=Calcolatrice
             packagePath=path of the directory containing the class file=VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode
-            packageName=name of the directory conatining the class file=CalcolatriceSourceCode
-            arg1=path of directory where the test will be saved=/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport
-            testPath=path of the sourcecode of the test=/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport/TestCalcolatrice.java
+            packageName=name of the directory containing the class file=CalcolatriceSourceCode
+            arg1=path of directory where the test will be saved=
+                modalita sfida:     /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game93/Round93/Turn1/TestReport
+                modalita scalata:   /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Scalata/ScalataName1/Calcolatrice/Game93/Round93/Turn1/TestReport
+
+            testPath=path of the sourcecode of the test=
+                modalita sfia:      /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game93/Round93/Turn1/TestReport/TestCalcolatrice.java
+                modalita scalata:   /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Scalata/ScalataName1/Calcolatrice/Game93/Round93/Turn1/TestReport/TestCalcolatrice.java
+
             arg3=user id of the player=1
             */
-          
+
             // Percorso della classe da testare
             var classPath = parametri[0];
             console.log("classPath: "+ classPath);
@@ -118,17 +125,22 @@ const server = http.createServer((req, res) => {
             // Sourcecode path of the test
             var testPath = packageTestPath + '/Test' + className + '.java';
             console.log("testPath: "+ testPath);
+            
+            console.log("(prova_esecuzione_parametri4.js) parametri.length: " + parametri.length);
 
             console.log("(prova_esecuzione_parametri4.js) Elimina il primo elemento dall'array così da poterlo aggiornare con i parametri sopra descritti");
             parametri.shift();
 
             // TODO: update array 'parametri' with the new (5) values expected by the script: 'robot_misurazione_utente.sh'
             /* After the shifting the array 'parametri' is now:
-            [   '/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport', (arg0)
-                '/app',                                                                                      (arg1)
-                '1']                                                                                         (arg2)          
+            [   '/VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game93/Round93/Turn1/TestReport', (arg0)
+                '/app',                                                                                            (arg1)
+                '1'                                                                                                (arg2)
+            ]                                                                                            
             */
+
             parametri = "/" + packagePath + " " + packageName + " " + className + " " + parametri[0] + " " + parametri[1];
+
             //parametri = "/" + packagePath + " " + packageName + " " + className + " " + testPath + " " + parametri[1];
             console.log("'parametri' updated: "+ parametri);
 
@@ -140,8 +152,8 @@ const server = http.createServer((req, res) => {
             the first student's report.
             */
 
-            /* Example of filePath= /VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport/TestCalcolatrice.java
-            where '/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport/TestCalcolatrice.java' is testPath 
+            /* Example of filePath= /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game93/Round93/Turn1/TestReport/TestCalcolatrice.java
+            where '/VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game93/Round93/Turn1/TestReport/TestCalcolatrice.java' is testPath 
             */
 
             const filePath = testPath;
@@ -156,7 +168,8 @@ const server = http.createServer((req, res) => {
             fs.writeFile(filePath, codiceJava, err => { 
                 if (err) {
                     console.error(err);
-                    res.status(500).send('(prova_esecuzione_parametri4.js) Si è verificato un errore durante il salvataggio del file');
+                    res.statusCode = 500;
+                    res.end('(prova_esecuzione_parametri4.js) Si è verificato un errore durante il salvataggio del file');
                 } else {
 
                     // TODO: robot_misurazione_utente.sh should be executed with the new parameters
@@ -167,29 +180,44 @@ const server = http.createServer((req, res) => {
 
                     console.log("(prova_esecuzione_parametri4.js) Execution of the script: 'robot_misurazione_utente.sh'\n");
                     const command = `sh robot_misurazione_utente.sh ${parametri}`;
+                    
                     exec(command,
                         function (error, stdout, stderr) {
                             if (error !== null) {
                                 console.log(error);
                             } else {
                                 console.log('stdout: ' + stdout);
-                                console.log('stderr: ' + stderr);       
-                               
-                                //Reading the content of a file named 'GameData.csv'= /VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport/GameData.csv
-                                console.log("(prova_esecuzione_parametri4.js) Lettura del file 'GameData.csv'...\n");
-                                const csvContent = fs.readFileSync(packageTestPath + '/GameData.csv', 'utf8');
-                                console.log(csvContent);
-
-                                // Headers configuration of the HTTP response
-                                res.setHeader('Content-Type', 'text/csv');
-                                res.setHeader(
-                                    'Content-Disposition',
-                                    `attachment; filename="${className}.csv"`
-                                );
+                                console.log('stderr: ' + stderr);
                                 
-                                //Send the content of the file as the body of the HTTP response
-                                console.log("(prova_esecuzione_parametri4.js) Invio del contenuto del file come corpo della risposta HTTP");
-                                res.end(csvContent);
+                                //Check if stderr is not empty
+                                if (stderr !== "") {
+
+                                    // ERROR
+                                    res.statusCode = 500;
+                                    res.end(stderr);
+                                    // return res.status(500).send(stderr);
+                                }
+                                else {
+                                    
+                                    //Reading the content of a file named 'GameData.csv'= /VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game93/Round93/Turn1/TestReport/GameData.csv
+                                    console.log("(prova_esecuzione_parametri4.js) Lettura del file 'GameData.csv'...\n");
+                                    const csvContent = fs.readFileSync(packageTestPath + '/GameData.csv', 'utf8');
+                                    console.log(csvContent);
+
+                                    // Headers configuration of the HTTP response
+                                    res.setHeader('Content-Type', 'text/csv');
+                                    res.setHeader(
+                                        'Content-Disposition',
+                                        `attachment; filename="${className}.csv"`
+                                    );
+                                    
+                                    //Send the content of the file as the body of the HTTP response
+                                    console.log("(prova_esecuzione_parametri4.js) Invio del contenuto del file come corpo della risposta HTTP");
+                                    res.end(csvContent);
+
+                                }
+                                
+                                
                             }
                         });
                 }

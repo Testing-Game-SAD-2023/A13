@@ -21,7 +21,7 @@ body {
 .v5_2116 {
   width: 392px;
   height: 440px;
-  background: url("../images/v5_2116.png");
+  background: url("../images/v5_2116.png"); 
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -209,4 +209,9 @@ body {
   background-color: transparent;
   color: #f5b041;
   font-weight: bold;
+}
+
+.swal-button--confirm {
+  display: block;
+  margin: 0 auto;
 }

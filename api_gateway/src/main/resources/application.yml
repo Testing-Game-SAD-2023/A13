@@ -22,6 +22,10 @@ zuul:
       sensitiveHeaders:
       path: /api/receiveClassUnderTest/**
       url: http://t6-g12-app-1:80/receiveClassUnderTest
+    calculateScalataFinalScore-service:
+      sensitiveHeaders:
+      path: /api/calculateScalataFinalScore/**
+      url: http://t6-g12-app-1:80/calculateScalataFinalScore
     sendInfo-service:
       sensitiveHeaders:
       path: /api/sendInfo/**
@@ -30,6 +34,10 @@ zuul:
       sensitiveHeaders:
       path: /api/save-data/**
       url: http://t5-app-1:8080/save-data
+    saveScalata-service:
+      sensitiveHeaders:
+      path: /api/save-scalata/**
+      url: http://t5-app-1:8080/save-scalata
     downloadFile-service:
       sensitiveHeaders:
       path: /api/downloadFile/**

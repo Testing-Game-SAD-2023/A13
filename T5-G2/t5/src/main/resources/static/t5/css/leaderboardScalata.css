@@ -1,0 +1,37 @@
+body {
+    font-family: Arial, sans-serif;
+}
+.container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+.selector {
+    margin: 20px 0;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+th {
+    background-color: #f2f2f2;
+}
+.highlight {
+    background-color: #ffeb3b;
+}
+.jumbotron {
+    background-image: url('/t5/images/leaderboard.jpg'); 
+    background-size: cover;
+    margin-bottom: 0;                   /* Remove the bottom margin */
+}
+h1{
+    color: white;
+}
+body{
+    background-color: #F6F3E4;
+}

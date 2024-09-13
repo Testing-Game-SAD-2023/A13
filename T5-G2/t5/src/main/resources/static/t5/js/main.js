@@ -38,20 +38,76 @@ function selectGameMode(mode) {
   localStorage.setItem("modalita", mode);
 
   // Verifica la modalità selezionata
-  if (mode === "Sfida un Robot" || mode === "Allenamento") {
-    // Redirect alla pagina per giocare con il robot
-    alert("Hai selezionato: ' "+ mode + " ' come modalità di gioco");
-    window.location.href = "/gamemode";
-  } else if (mode === "Multiplayer") {
-    // Avvisa l'utente che questa modalità non è ancora disponibile
-    alert("La modalità " + mode + " non è ancora disponibile. Arriverà presto!");
-  }
-  //MODIFICA (05/04): Redirect alla pagina di apprendimento
-  else if (mode === "Apprendimento") {
 
-    //Redirect
-    alert("Hai selezionato la modalità "+ mode);
-    window.location.href = "/learning";
+  if (mode === "Sfida" || mode === "Allenamento") {
+    
+    // Chiedi conferma all'utente
+    let userConfirmation = confirm("Hai selezionato la modalità " + mode + ". Vuoi continuare?");
+    if (userConfirmation) {
+
+      //Redirect
+      window.location.href = "/gamemode";
+    }
+    else{
+      //Do nothing
+    }
+  } else if (mode === "Multiplayer") {
+
+    // Avvisa l'utente che questa modalità non è ancora disponibile
+    swal("Attenzione","La modalità " + mode + " non è ancora disponibile. Arriverà presto!","info");
+  }
+  else if (mode === "LeaderboardScalata") {
+
+    // Chiedi conferma all'utente
+    let userConfirmation = confirm("Sei sicuro di voler visualizzare la classifica delle Scalate?");
+    if (userConfirmation) {
+
+      //Redirect
+      window.location.href = "/leaderboardScalata";
+    }
+    else{
+      //Do nothing
+    }
+
+  }
+  //MODIFICA (20/05): Redirect alla pagina di selezione delle "Scalate"
+  else if (mode === "Scalata") {
+
+    // Chiedi conferma all'utente
+    confirm("Hai selezionato la modalità " + mode + ". Vuoi continuare?");
+    if (confirm) {
+
+      /* Controllare, prima di re-indirizzare l'utente alla pagina /gamemode_scalata,
+      se siano presenti delle "Scalate" disponibili per la selezione, altrimenti 
+      mostrare a video un messaggio d'errore.
+      Per riuscire nell'intento eseguire una GET all'endpoint /scalate_list del task T1.
+      */
+      $.ajax({
+        url: '/scalate_list',
+        type: 'GET',
+        timeout: 30000,
+        success: function (data, textStatus, xhr) {
+
+          if (data.length > 0) {
+
+            console.log("Nel sistema sono presenti" + data.lenght + " 'Scalate' disponibili.");
+            window.location.href = "/gamemode_scalata";
+
+          } else {
+
+            console.log("Nessuna Scalata disponibile, mostrare messaggio d'errore");
+            swal("Attenzione!","Nessuna 'Scalata' disponibile al momento. Ti preghiamo di selezionare un'altra modalità di gioco.","error");
+          }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.error("Errore durante il recupero delle Scalate:", errorThrown);
+          swal("Errore","Errore durante il recupero delle Scalate","error");
+        }
+      });
+    }
+    else {
+      //Do nothing
+    }
   }
 }
 
@@ -111,25 +167,6 @@ function redirectToPagereport() {
   console.log(difficulty);
   if (classe && robot && difficulty) {
 
-    // $.ajax({
-    //   url: 'http://localhost:8082/sendVariable', // L'URL del tuo endpoint sul server
-    //   type: 'POST', // Metodo HTTP da utilizzare
-    //   data: {
-    //     myVariable: classe,
-    //     myVariable2: robot
-    //   }, // Dati da inviare al server
-    //   success: function (response) {
-    //     console.log('Dati inviati con successo');
-    //     alert("Dati inviati con successo");
-    //     // Gestisci la risposta del server qui
-    //     window.location.href = "/report";
-    //   },
-    //   error: function (error) {
-    //     console.error('Errore nell invio dei dati');
-    //     alert("Dati non inviati con successo");
-    //     // Gestisci l'errore qui
-    //   }
-    // });
     localStorage.setItem("classe", classe);
     localStorage.setItem("robot", robot);
     localStorage.setItem("difficulty", difficulty);
@@ -150,83 +187,108 @@ function redirectToPageGamemode() {
   window.location.href = "/gamemode";
 }
 
+// function redirectToPageeditor() {
 
-// function redirectToPagemainlogin() {
+//   gamemode = localStorage.getItem("modalita");
 
-//   user = document.getElementById("username").value;
-//   password = document.getElementById("password").value;
-// if(user && password ){
-//   alert("Login effettuato con successo");
-//   $.ajax({
-//     url:'http://localhost:8082/login-variabiles',
-//     type: 'POST',
-//     data: { 
-//       var1: user, 
-//       var2: password
-//     },
+//   if (gamemode === "Allenamento") {
+//     let className = localStorage.getItem("classe");
+//     let userId = parseJwt(getCookie("jwt")).userId;
+//     removeAllenamentoFolders(className, userId);
+//     alert("GET /remove-allenamento, cartelle di allenamento rimosse con successo, a breve verrao re-indirizzato all'editorAllenamento");
+//     window.location.href = "/editorAllenamento";
+//     // $.ajax({
+//     //   url: '/remove-allenamento',
+//     //   type: 'GET',
+//     //   timeout: 30000,
+//     //   success: function (data, textStatus, xhr) {
+//     //     console.log("Cartelle di allenamento rimosse con successo");
+//     //     alert("GET /remove-allenamento, cartelle di allenamento rimosse con successo, a breve verrao re-indirizzato all'editorAllenamento");
+//     //     window.location.href = "/editorAllenamento";
+//     //   },
+//     //   error: function (xhr, textStatus, errorThrown) {
+//     //     console.error("Errore durante la rimozione delle cartelle di allenamento:", errorThrown);
+//     //   }
+//     // // });
 
-//   })
+//   } else {
+//     $.ajax({
+//       url: '/api/save-data',
+//       data: {
+//         playerId: parseJwt(getCookie("jwt")).userId,
+//         classe: classe,
+//         robot: robot,
+//         difficulty: difficulty,
+//         username: localStorage.getItem("username")
+//       },
+//       type: 'POST',
+//       traditional: true,
+//       success: function (response) {
+//         localStorage.setItem("gameId", response.game_id);
+//         localStorage.setItem("turnId", response.turn_id);
+//         localStorage.setItem("roundId", response.round_id);
+//         localStorage.setItem("orderTurno", "1");
+//         window.location.href = "/editor";
+//       },
+//       dataType: "json",
+//       error: function (error) {
+//         console.log("Error details:", error);
+//         console.log("USERNAME : ", localStorage.getItem("username"));
+//         console.error('Errore nell invio dei dati');
+//         alert("Dati non inviati con successo. Riprovare");
+//       }
 
-
-//   window.location.href = "/main";
+//     })
+//   }
 // }
-// else{
-//   alert("Inserisci username e password");
-// }
-// }
-
 function redirectToPageeditor() {
 
-  gamemode = localStorage.getItem("modalita");
+  console.log("reidrectToPageeditor() called.");
+  let gamemode = localStorage.getItem("modalita");
 
-  if (gamemode === "Allenamento") {
-    let className = localStorage.getItem("classe");
-    let userId = parseJwt(getCookie("jwt")).userId;
-    removeAllenamentoFolders(className, userId);
-    alert("GET /remove-allenamento, cartelle di allenamento rimosse con successo, a breve verrao re-indirizzato all'editorAllenamento");
-    window.location.href = "/editorAllenamento";
-    // $.ajax({
-    //   url: '/remove-allenamento',
-    //   type: 'GET',
-    //   timeout: 30000,
-    //   success: function (data, textStatus, xhr) {
-    //     console.log("Cartelle di allenamento rimosse con successo");
-    //     alert("GET /remove-allenamento, cartelle di allenamento rimosse con successo, a breve verrao re-indirizzato all'editorAllenamento");
-    //     window.location.href = "/editorAllenamento";
-    //   },
-    //   error: function (xhr, textStatus, errorThrown) {
-    //     console.error("Errore durante la rimozione delle cartelle di allenamento:", errorThrown);
-    //   }
-    // // });
+  switch (gamemode) {
 
-  } else {
-    $.ajax({
-      url: '/api/save-data',
-      data: {
-        playerId: parseJwt(getCookie("jwt")).userId,
-        classe: classe,
-        robot: robot,
-        difficulty: difficulty,
-        username: localStorage.getItem("username")
-      },
-      type: 'POST',
-      traditional: true,
-      success: function (response) {
-        localStorage.setItem("gameId", response.game_id);
-        localStorage.setItem("turnId", response.turn_id);
-        localStorage.setItem("roundId", response.round_id);
-        localStorage.setItem("orderTurno", "1");
-        window.location.href = "/editor";
-      },
-      dataType: "json",
-      error: function (error) {
-        console.log("Error details:", error);
-        console.log("USERNAME : ", localStorage.getItem("username"));
-        console.error('Errore nell invio dei dati');
-        alert("Dati non inviati con successo. Riprovare");
-      }
+    case "Allenamento":
+      let className = localStorage.getItem("classe");
+      let userId = parseJwt(getCookie("jwt")).userId;
+      removeAllenamentoFolders(className, userId);
+      // swal("Successo!", "(GET /remove-allenamento) Cartelle di allenamento rimosse con successo, a breve verrai re-indirizzato all'editorAllenamento", "success");
+      alert("(GET /remove-allenamento) Cartelle di allenamento rimosse con successo, a breve verrai re-indirizzato all'editorAllenamento.");
+      window.location.href = "/editorAllenamento";
+      break;
 
-    })
+    case "Sfida":
+      $.ajax({
+        url: '/api/save-data',
+        data: {
+          playerId: parseJwt(getCookie("jwt")).userId,
+          classe: classe,
+          robot: robot,
+          difficulty: difficulty,
+          username: localStorage.getItem("username")
+        },
+        type: 'POST',
+        traditional: true,
+        success: function (response) {
+          localStorage.setItem("gameId", response.game_id);
+          localStorage.setItem("turnId", response.turn_id);
+          localStorage.setItem("roundId", response.round_id);
+          localStorage.setItem("orderTurno", "1");
+          window.location.href = "/editor";
+        },
+        dataType: "json",
+        error: function (error) {
+          console.log("Error details:", error);
+          console.log("USERNAME : ", localStorage.getItem("username"));
+          console.error('Errore nell\' invio dei dati');
+          // swal("Errore", "Dati non inviati con successo. Riprovare.", "error");
+          alert("Dati non inviati con successo. Riprovare.");
+        }
+      });
+      break;
+    case "Scalata":
+      console.log("Salvataggio dei dati per la Scalata");
+      //TODO:Continuare da qui 
   }
 }
 
@@ -289,12 +351,9 @@ function redirectToLogin() {
 }
 
 function saveLoginData() {
+
   var username = parseJwt(getCookie("jwt")).sub;
-
   username = username.toString();
-
   localStorage.setItem("username", username);
-
-
   console.log("username :", username);
 }

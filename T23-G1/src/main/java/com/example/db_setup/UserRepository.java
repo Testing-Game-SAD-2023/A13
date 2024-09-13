@@ -11,6 +11,7 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     User findByEmail(String email);
     User findByName(String name);
     User findByResetToken(String resetToken);
+    User findByID(Integer ID);
     //MODIFICA
     User findByisRegisteredWithFacebook(boolean isRegisteredWithFacebook);
     //FINE MODIFICA
