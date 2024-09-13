@@ -727,3 +727,7 @@ padding-left: 8%;
   display: block;
   margin: 0 auto;
 }
+.unobtained {
+    filter: grayscale(1);
+    mix-blend-mode: multiply;
+}
