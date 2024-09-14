@@ -1,5 +1,6 @@
 package com.g2.Interfaces;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class ServiceManager {
     private <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
         try {
             return serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
         }
     }
