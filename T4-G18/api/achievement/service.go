@@ -4,6 +4,8 @@ import (
 	"github.com/alarmfox/game-repository/api"
 	"github.com/alarmfox/game-repository/model"
 	"gorm.io/gorm"
+
+	"strconv"
 )
 
 type Repository struct {
@@ -59,6 +61,24 @@ func (gs *Repository) FindAll() ([]Achievement, error) {
 	}
 
     return res, api.MakeServiceError(err)
+}
+
+func (gs *Repository) ProgressJoin(pid int64) ([]AchievementProgress, error) {
+    var achievementProgresses []AchievementProgress
+
+    err := gs.db.
+        Table("achievements").
+        Select("achievements.id, achievements.name, achievements.progress_required, player_has_category_achievement.progress").
+        Joins("left join player_has_category_achievement on player_has_category_achievement.category=achievements.category").
+        Where("player_has_category_achievement.player_id="+strconv.FormatInt(pid, 10)).
+        Scan(&achievementProgresses).
+        Error
+
+    	if err != nil {
+    		return nil, api.MakeServiceError(err)
+    	}
+
+    return achievementProgresses, nil
 }
 
 func (gs *Repository) Delete(id int64) error {

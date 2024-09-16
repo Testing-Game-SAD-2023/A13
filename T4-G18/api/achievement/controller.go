@@ -2,6 +2,7 @@ package achievement
 
 import (
 	"net/http"
+    "fmt"
 
 	"github.com/alarmfox/game-repository/api"
 )
@@ -12,6 +13,7 @@ type Service interface {
 	FindById(id int64) (Achievement, error)
 	Delete(id int64) error
 	Update(id int64, ug *UpdateRequest) (Achievement, error)
+	ProgressJoin(pid int64) ([]AchievementProgress, error)
 }
 
 type Controller struct {
@@ -65,6 +67,23 @@ func (gc *Controller) FindByID(w http.ResponseWriter, r *http.Request) error {
 
 	return api.WriteJson(w, http.StatusOK, g)
 
+}
+
+func (gc *Controller) ProgressJoin(w http.ResponseWriter, r *http.Request) error {
+    fmt.Println("Getting progress...")
+
+    pid, err := api.FromUrlParams[KeyType](r, "pid")
+    if err != nil {
+        return err
+    }
+
+    g, err := gc.service.ProgressJoin(pid.AsInt64())
+
+    if err != nil {
+        return api.MakeHttpError(err)
+    }
+
+    return api.WriteJson(w, http.StatusOK, g)
 }
 
 func (gc *Controller) Delete(w http.ResponseWriter, r *http.Request) error {

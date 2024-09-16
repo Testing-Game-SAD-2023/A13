@@ -13,6 +13,13 @@ type Achievement struct {
     ProgressRequired   float64     `json:"progressRequired"`    // Progress required to obtain the achievement
 }
 
+type AchievementProgress struct {
+    ID                 int64       `json:"id"`
+    Name               string      `json:"name"`
+    ProgressRequired   float64     `json:"progressRequired"`
+    Progress           float64     `json:"progress"`
+}
+
 type CreateRequest struct {
     Name               string      `json:"name"`
     Category           uint8       `json:"category"`

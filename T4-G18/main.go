@@ -434,6 +434,9 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
         // List achievements
         r.Get("/", api.HandlerFunc(ac.FindAll))
 
+        // Get achievements progresses by user
+        r.Get("/progress/{pid}", api.HandlerFunc(ac.ProgressJoin))
+
 		// Create achievement
 		r.With(middleware.AllowContentType("application/json")).
 			Post("/", api.HandlerFunc(ac.Create))

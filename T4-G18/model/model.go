@@ -25,7 +25,7 @@ type PlayerHasCategoryAchievement struct {
 }
 
 func (PlayerHasCategoryAchievement) TableName() string {
-    return "player-has-category-achievement"
+    return "player_has_category_achievement"
 }
 
 type ScalataGame struct {
