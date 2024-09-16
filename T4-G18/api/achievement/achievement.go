@@ -9,13 +9,13 @@ import (
 type Achievement struct {
     ID                 int64       `json:"id"`                  // Achievement ID
     Name               string      `json:"name"`                // Achievement name: mandatory
-    Category           model.categoryAchievement      `json:"category"`
+    Category           uint8       `json:"category"`
     ProgressRequired   float64     `json:"progressRequired"`    // Progress required to obtain the achievement
 }
 
 type CreateRequest struct {
     Name               string      `json:"name"`
-    Category           model.categoryAchievement      `json:"category"`
+    Category           uint8       `json:"category"`
     ProgressRequired   float64     `json:"progressRequired"`
 }
 
@@ -26,7 +26,7 @@ func (CreateRequest) Validate() error {
 type UpdateRequest struct {
     ID                 int64       `json:"id"`
     Name               string      `json:"name"`
-    Category           categoryAchievement      `json:"category"`
+    Category           uint8       `json:"category"`
     ProgressRequired   float64     `json:"progressRequired"`
 }
 

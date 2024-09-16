@@ -20,6 +20,7 @@ import (
 	"github.com/alarmfox/game-repository/api/round"
 	"github.com/alarmfox/game-repository/api/scalatagame"
 	"github.com/alarmfox/game-repository/api/achievement"
+	"github.com/alarmfox/game-repository/api/playerhascategoryachievement"
 	"github.com/alarmfox/game-repository/api/turn"
 	"github.com/alarmfox/game-repository/limiter"
 	"github.com/alarmfox/game-repository/model"
@@ -184,6 +185,9 @@ func run(ctx context.Context, c Configuration) error {
 
             // achievement endpoint
             achievementController = achievement.NewController(achievement.NewRepository(db))
+
+            // phca endpoint
+            phcaController = playerhascategoryachievement.NewController(playerhascategoryachievement.NewRepository(db))
 		)
 
 		r.Mount(c.ApiPrefix, setupRoutes(
@@ -193,6 +197,7 @@ func run(ctx context.Context, c Configuration) error {
 			robotController,
 			scalataController,
 			achievementController,
+			phcaController,
 		))
 	})
 	log.Printf("listening on %s", c.ListenAddress)
@@ -317,7 +322,7 @@ func makeDefaults(c *Configuration) {
 
 }
 
-func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, ac *achievement.Controller) *chi.Mux {
+func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, ac *achievement.Controller, pc *playerhascategoryachievement.Controller) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
@@ -427,7 +432,7 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
         r.Get("/{id}", api.HandlerFunc(ac.FindByID))
 
         // List achievements
-        // TODO
+        r.Get("/", api.HandlerFunc(ac.FindAll))
 
 		// Create achievement
 		r.With(middleware.AllowContentType("application/json")).
@@ -439,6 +444,22 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 
 		// Delete achievement
 		r.Delete("/{id}", api.HandlerFunc(ac.Delete))
+    })
+
+    r.Route("/phca", func(r chi.Router) {
+        // List PHCAs
+        r.Get("/", api.HandlerFunc(pc.FindAll))
+
+		// Create PHCA
+		r.With(middleware.AllowContentType("application/json")).
+			Post("/", api.HandlerFunc(pc.Create))
+
+		// Update achievement
+		r.With(middleware.AllowContentType("application/json")).
+			Put("/{pid}/{category}", api.HandlerFunc(pc.Update))
+
+		// Delete achievement
+		r.Delete("/{pid}/{category}", api.HandlerFunc(pc.Delete))
     })
 
 	return r

@@ -46,6 +46,21 @@ func (gs *Repository) FindById(id int64) (Achievement, error) {
 	return fromModel(&achievement), api.MakeServiceError(err)
 }
 
+func (gs *Repository) FindAll() ([]Achievement, error) {
+    var achievements []model.Achievement
+
+    err := gs.db.
+        Find(&achievements).
+        Error
+
+    res := make([]Achievement, len(achievements))
+	for i, achievement := range achievements {
+		res[i] = fromModel(&achievement)
+	}
+
+    return res, api.MakeServiceError(err)
+}
+
 func (gs *Repository) Delete(id int64) error {
 	db := gs.db.
 		Where(&model.Achievement{ID: id}).

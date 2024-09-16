@@ -1,4 +1,4 @@
-package achievement
+package playerhascategoryachievement
 
 import (
 	"net/http"
@@ -7,11 +7,10 @@ import (
 )
 
 type Service interface {
-	Create(request *CreateRequest) (Achievement, error)
-	FindAll() ([]Achievement, error)
-	FindById(id int64) (Achievement, error)
-	Delete(id int64) error
-	Update(id int64, ug *UpdateRequest) (Achievement, error)
+	Create(request *CreateRequest) (PlayerHasCategoryAchievement, error)
+	FindAll() ([]PlayerHasCategoryAchievement, error)
+	Delete(pid int64, category uint8) error
+	Update(pid int64, category uint8, ug *UpdateRequest) (PlayerHasCategoryAchievement, error)
 }
 
 type Controller struct {
@@ -50,31 +49,20 @@ func (gc *Controller) FindAll(w http.ResponseWriter, r *http.Request) error {
     return api.WriteJson(w, http.StatusOK, g)
 }
 
-func (gc *Controller) FindByID(w http.ResponseWriter, r *http.Request) error {
-
-	id, err := api.FromUrlParams[KeyType](r, "id")
-	if err != nil {
-		return err
-	}
-
-	g, err := gc.service.FindById(id.AsInt64())
-
-	if err != nil {
-		return api.MakeHttpError(err)
-	}
-
-	return api.WriteJson(w, http.StatusOK, g)
-
-}
-
 func (gc *Controller) Delete(w http.ResponseWriter, r *http.Request) error {
 
-	id, err := api.FromUrlParams[KeyType](r, "id")
-	if err != nil {
-		return err
+	pid, errID := api.FromUrlParams[KeyType](r, "pid")
+	category, errCat := api.FromUrlParams[KeyType](r, "category")
+
+	if errID != nil {
+		return errID
 	}
 
-	if err := gc.service.Delete(id.AsInt64()); err != nil {
+    if errCat != nil {
+        return errCat
+    }
+
+	if err := gc.service.Delete(pid.AsInt64(), category.AsUint8()); err != nil {
 		return api.MakeHttpError(err)
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -83,17 +71,23 @@ func (gc *Controller) Delete(w http.ResponseWriter, r *http.Request) error {
 
 func (gc *Controller) Update(w http.ResponseWriter, r *http.Request) error {
 
-	id, err := api.FromUrlParams[KeyType](r, "id")
-	if err != nil {
-		return err
+	pid, errID := api.FromUrlParams[KeyType](r, "pid")
+	category, errCat := api.FromUrlParams[KeyType](r, "category")
+
+	if errID != nil {
+		return errID
 	}
+
+    if errCat != nil {
+        return errCat
+    }
 
 	request, err := api.FromJsonBody[UpdateRequest](r.Body)
 	if err != nil {
 		return err
 	}
 
-	g, err := gc.service.Update(id.AsInt64(), &request)
+	g, err := gc.service.Update(pid.AsInt64(), category.AsUint8(), &request)
 	if err != nil {
 		return api.MakeHttpError(err)
 	}
