@@ -15,22 +15,22 @@ const parseJwt = (token) => {
 
 document.addEventListener("DOMContentLoaded", (e) => {
       var userId = parseJwt(getCookie("jwt")).userId;
-      var apiString = '/students_list/{0}'.replace('{0}', userId);
 
+      var userAPIString = '/students_list/{0}'.replace('{0}', userId);
+
+      // Get user infos
       $.ajax({
-        url: apiString,
+        url: userAPIString,
         type: 'GET',
         timeout: 30000,
         success: function (data, textStatus, xhr) {
-          //console.log(data);
-
           document.getElementById("usernameField").innerText = data.email + " - " + data.name + " " + data.surname;
 
           document.getElementById("studiesField").innerText = data.studies;
         },
         error: function (xhr, textStatus, errorThrown) {
-          console.error("Errore durante il recupero delle Scalate:", errorThrown);
-          swal("Errore","Errore durante il recupero delle Scalate","error");
+          console.error("Errore durante il recupero dei dati utente:", errorThrown);
+          swal("Errore","Errore durante il recupero dei dati utente","error");
         }
       });
 });

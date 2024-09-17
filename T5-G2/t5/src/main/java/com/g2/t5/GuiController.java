@@ -1,5 +1,8 @@
 package com.g2.t5;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.g2.Model.*;
+import com.sun.tools.jconsole.JConsoleContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,24 +29,17 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
-import com.g2.Model.ClassUT;
-import com.g2.Model.Game;
-import com.g2.Model.Player;
-import com.g2.Model.ScalataGiocata;                 // aggiunto
 import com.g2.t5.MyData;                            // aggiunto
+import org.springframework.web.servlet.view.AbstractCachingViewResolver;
 
 @CrossOrigin
 @Controller
@@ -93,6 +89,14 @@ public class GuiController {
         return responseEntity.getBody();
     }
 
+    public List<AchievementProgress> getAchievementProgresses(int playerID) {
+        ResponseEntity<List<AchievementProgress>> responseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/achievements/progress/" + playerID,
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<AchievementProgress>>() {
+                });
+
+        return responseEntity.getBody();
+    }
+
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         System.out.println("GET /main, scelta della modalità di gioco");
@@ -121,11 +125,28 @@ public class GuiController {
         Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
                 Boolean.class);
 
-        System.out.println("(/gamemode) Token del player valido?");
+        System.out.println("(/profile) Token del player valido?");
         if (isAuthenticated == null || !isAuthenticated)
             return "redirect:/login";
 
-        System.out.println("(/gamemode) Token valido: "+ jwt);
+        System.out.println("(/profile) Token valido: "+ jwt);
+
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+
+            int userId = Integer.parseInt(map.get("userId").toString());
+            List<AchievementProgress> achievementProgresses = getAchievementProgresses(userId);
+
+            System.out.println("(/profile) Retrieved achievements: " + achievementProgresses);
+            model.addAttribute("achievementProgresses", achievementProgresses);
+
+        } catch (JsonProcessingException e) {
+            System.out.println("(/profile) Error retrieving achievements: " + e.getMessage());
+        }
 
         return "profile";
     }
@@ -145,7 +166,7 @@ public class GuiController {
         if (isAuthenticated == null || !isAuthenticated)
             return "redirect:/login";
 
-            System.out.println("(/gamemode) Token valido: "+ jwt);
+        System.out.println("(/gamemode) Token valido: "+ jwt);
         List<ClassUT> classes = getClasses();
 
         Map<Integer, String> hashMap = new HashMap<>();

@@ -50,28 +50,18 @@
                             <div class="card-body">
                                 <h4 class="card-title">Trofei</h4>
                                 <hr>
-                                <div style="max-height:50vh; overflow-y: auto">
-                                    <div class="achievement-container" style="overflow: hidden; margin: 2px">
+                                <div style="max-height:44.2vh; overflow-y: auto">
+                                    <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
+                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
                                         <div class="row">
                                             <div class="col-2">
-                                                <img src="./t5/images/sample_badge.png" style="width: 100px; height: 100px">
+                                                <img src="./t5/images/sample_badge.png" style="width: 100px; height: 100px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
                                             </div>
                                             <div class="col">
-                                                <h4>Achievement name</h4>
+                                                <h4 th:text="${element.Name}">Nome achievement</h4>
                                                 <p>Descrizione achievement</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="achievement-container" style="overflow: hidden; margin: 2px">
-                                        <div class="row">
-                                            <div class="col-2">
-                                                <img src="./t5/images/sample_badge.png" class="unobtained" style="width: 100px; height: 100px">
-                                            </div>
-                                            <div class="col">
-                                                <h4>Achievement name</h4>
-                                                <p>Descrizione achievement</p>
-                                                <div class="progress">
-                                                    <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                                <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
+                                                    <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
                                                 </div>
                                             </div>
                                         </div>
