@@ -27,16 +27,13 @@
                 <div class="v5_2090">
                     <div class="v5_2095" >
                         <span class="v5_2096">CHOOSE A CLASS TO TEST</span>
-                        <div class="lista">  
-                        <!-- Creo una lista composta di elementi lista-item che stampano 
-                        il valore degli elementi contenuti nella lista java "classi" -->
-                        <span class="spa">
-                            <button th:each="element: ${classi}" th:id="${element}"  type="button" class ="lista-item my-button"  th:text=${element} 
-                            th:attr="onclick=|Handlebuttonclass('${element}', this)|"></button>
-                        </span> 
-
-                      
-                        </div>
+                        <li class="lista" th:each="item: ${classi}">  
+                            <!-- Creo una lista composta di elementi lista-item che stampano 
+                            il valore degli elementi contenuti nella lista java "classi" -->
+                            <button type="button" class ="lista-item my-button">
+                                [[${item.name}]]
+                            </button>                      
+                        </li>
                         <div class="name"></div>
 
                     </div>
