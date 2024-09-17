@@ -3,7 +3,9 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Interfaces.ServiceManager;
+import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
 
@@ -34,13 +37,23 @@ public class GuiController {
         this.serviceManager = new ServiceManager(restTemplate);
     }
 
+    @GetMapping("/debug")
+    public String debug(Model model){
+        
+        List<String> items = List.of("Elemento 1", "Elemento 2", "Elemento 3", "Elemento 4");
+        model.addAttribute("items", items); 
+        
+        return "debug";
+    }
+
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if(Auth){
-            return "main";
+        if(!Auth){
+           // return "main";
+           return "redirect:/login"; 
         }
-        return "redirect:/login"; 
+        return "main";
     }
 
     @GetMapping("/gamemode")
@@ -50,17 +63,18 @@ public class GuiController {
             return "redirect:/login"; 
         }
         
-        /* 
-        System.out.println("prova robot");
-        //List<ClassUT> classes = t1Service.getClasses();
+        List<ClassUT> classes = (List<ClassUT>) serviceManager.handleRequest("T1", "getClasses");
+        if (classes != null){
+            System.out.println(classes.toString());
+        }else{
+            System.out.println("classe vuota");
+        }
+
+        List<String> names = classes.stream().map(ClassUT::getName)  // Mappa ogni oggetto ClassUT al suo nome
+                            .collect(Collectors.toList());        
         
-        List<String>  robotList = t4Service.getLevels("calcolatrice");
-        System.out.println(robotList);
-
-        //model.addAttribute("hashMap",  classes);
-        model.addAttribute("hashMap2", robotList);
-        */
-
+        model.addAttribute("classi", names);
+        
         return "gamemode";
     }
 

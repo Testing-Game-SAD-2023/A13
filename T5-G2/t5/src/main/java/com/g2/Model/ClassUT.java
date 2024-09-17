@@ -1,15 +1,22 @@
 package com.g2.Model;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ClassUT {
+
+	@JsonProperty("name")
 	private String	name;
+	@JsonProperty("date")
 	private String	date;
+	@JsonProperty("difficulty")
 	private	String	difficulty;
+	@JsonProperty("code_Uri")
 	private String code_Uri;
+	@JsonProperty("description")
 	private	String	description;
+	@JsonProperty("category")
 	private List<String> category;
-	
-	
 	
 	public ClassUT(String name, String date,String description, String difficulty, String code_Uri,List<String> category) {
         this.name = name;
@@ -19,10 +26,8 @@ public class ClassUT {
         this.description=description;
         this.category = category;
     }
-	
-	public ClassUT()
-	{
-		
+	// Costruttore senza argomenti
+	public ClassUT() {
 	}
 	
 	public List<String> getCategory() {
@@ -62,9 +67,6 @@ public class ClassUT {
 	public void setDifficulty(String difficulty) {
 		this.difficulty = difficulty;
 	}
-	
-	
-	
 	
 	@Override
 	public String toString() {

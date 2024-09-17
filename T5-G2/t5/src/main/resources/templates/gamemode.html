@@ -31,7 +31,8 @@
                         <!-- Creo una lista composta di elementi lista-item che stampano 
                         il valore degli elementi contenuti nella lista java "classi" -->
                         <span class="spa">
-                            <button th:each="element: ${hashMap}" th:id="${element.key}"  type="button" class ="lista-item my-button"  th:text=${element.value} th:attr="onclick=|Handlebuttonclass('${element.value}', this)|"></button>
+                            <button th:each="element: ${classi}" th:id="${element}"  type="button" class ="lista-item my-button"  th:text=${element} 
+                            th:attr="onclick=|Handlebuttonclass('${element}', this)|"></button>
                         </span> 
 
                       

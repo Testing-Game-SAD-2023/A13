@@ -28,9 +28,9 @@ public class T1Service implements ServiceInterface{
         // Aggiungi altri casi per altre azioni
     }
 
-
+    //funziona !! Stefano
     private List<ClassUT> getClasses(){
-        final String endpoint = "/orderbyname";
+        final String endpoint = "/home";
         try {
             List<ClassUT> result = restService.CallRestGET(
                 endpoint,
@@ -44,7 +44,4 @@ public class T1Service implements ServiceInterface{
             return null;
         }
     }
-
-
-    
 }

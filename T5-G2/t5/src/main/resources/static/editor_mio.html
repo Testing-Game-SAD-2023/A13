@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark" id="html-root">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,145 +9,67 @@
     
     <!-- code mirror-->
     <!-- CodeMirror CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css"/>
+    <link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css"/>
+    <link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css"/>
 
-<!-- CodeMirror JavaScript -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
-
+    <!-- CodeMirror JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
 
     <style>
-                .no-select {
+        .no-select {
             user-select: none; /* Per browser moderni */
             -webkit-user-select: none; /* Per Safari */
             -moz-user-select: none; /* Per Firefox */
             -ms-user-select: none; /* Per Internet Explorer */
         }
+
+        #myEditor{
+            height: 100%;
+            width: 50%;
+        }
+        #myEditor2{
+            height: 100%;
+        }
     </style>
 </head>
 
-  <body class="bg-dark overflow-y-hidden m-3">
+  <body class="overflow-y-hidden mx-2 mb-5">
 
-    <!-- NAVBAR -->
+    <!-- NAV-->
+    <ul class="nav">
+        <li class="nav-item flex-grow-1">
+            <button type="button" class="btn btn-sm">
+                <i class="bi bi-arrow-90deg-left"></i>
+                Go Back
+            </button>
+        </li>
+        <li class="nav-item">
+            <div class="form-check form-switch mt-1">
+                <label class="form-check-label" for="themeToggle">Mode </label>
+                <input class="form-check-input" type="checkbox" role="switch" id="themeToggle">
+            </div>
+        </li>
+    </ul>
 
     <!-- DASHBOARD -->
     <div class="container-fluid">
         <div class="row">
             <!-- PRIMA COLONNA-->
-            <div class="col">
-            <div class="card d-flex flex-column" id="topcard">
-                <div class="card-header">
-                    <nav class="navbar bg-body-tertiary m-0 p-0">
-                            <span class="navbar-brand lead m-0 p-0">
-                                Edit  
-                            </span> 
-                            <div class="btn-group btn-group">
-                                <button type="button" class="btn btn-sm"> 
-                                    <i class="bi bi-play-fill"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm dropdown-toggle-split m-0" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#">Action</a></li>
-                                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                                    <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#">Separated link</a></li>
-                                </ul>
-                            </div>
-                    </nav>
-                </div>
-                <div class="card-body overflow-y-auto" id="section1">
-                    <textarea id="myEditor"> 
-                    /*Compila i campi "Nome" e "Cognome" con le informazioni richieste
-                        Nome: "inserire il proprio nome"
-                        Cognome: "inserire il proprio cognome"
-                        Username: username
-                        UserID: userID
-                        Date: date
-                        */
-                        
-                        import org.junit.Before;
-                        import org.junit.After;
-                        import org.junit.BeforeClass;
-                        import org.junit.AfterClass;
-                        import org.junit.Test;
-                        import static org.junit.Assert.*;
-                        
-                        public class TestClasse {
-                            @BeforeClass
-                            public static void setUpClass() {
-                                // Eseguito una volta prima dell'inizio dei test nella classe
-                                // Inizializza risorse condivise o esegui altre operazioni di setup
-                            }
-                                        
-                            @AfterClass
-                            public static void tearDownClass() {
-                                // Eseguito una volta alla fine di tutti i test nella classe
-                                // Effettua la pulizia delle risorse condivise o esegui altre operazioni di teardown
-                            }
-                                        
-                            @Before
-                            public void setUp() {
-                                // Eseguito prima di ogni metodo di test
-                                // Preparazione dei dati di input specifici per il test
-                            }
-                                        
-                            @After
-                            public void tearDown() {
-                                // Eseguito dopo ogni metodo di test
-                                // Pulizia delle risorse o ripristino dello stato iniziale
-                            }
-                                        
-                            @Test
-                            public void testMetodo() {
-                                // Preparazione dei dati di input
-                                // Esegui il metodo da testare
-                                // Verifica l'output o il comportamento atteso
-                                // Utilizza assert per confrontare il risultato atteso con il risultato effettivo
-                            }
-                                        
-                            // Aggiungi altri metodi di test se necessario
-                        }
-                    </textarea>
-                </div>
-                <div class="card-header border-top">
-                    <nav class="navbar bg-body-tertiary m-0 p-0">
-                            <span class="navbar-brand lead m-0 p-0">
-                                Console
-                            </span> 
-                            <button type="button" class="btn btn-sm" id="divider"> 
-                                <i class="bi bi-arrows-expand"></i>
-                            </button>
-                    </nav>
-                </div>
-                <div class="card-body overflow-y-auto" id="section2">
-                   
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                    weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                </div>
-                <div class="card-footer text-body-secondary"></div>
-            </div>
-            </div>
-            <!-- SECONDA COLONNA-->
-            <div class="col">
-                <div class="card text-center flex-column h-100">
-                    <div class="card-header">
-                        <nav class="navbar bg-body-tertiary m-0 p-0">
-                                <span class="navbar-brand lead m-0 p-0">
-                                    Class Under Test  
+            <div class="col px-0">
+                <div class="card d-flex flex-column rounded-0" id="topcard">
+                    <!-- EDITOR-->
+                    <div class="card-header p-0">
+                        <nav class="navbar bg-body-tertiary p-2">
+                                <span class="navbar-brand lead my-0 py-0">
+                                    Edit  
                                 </span> 
                                 <div class="btn-group btn-group">
                                     <button type="button" class="btn btn-sm"> 
-                                        <i class="bi bi-play h4"></i>
+                                        <i class="bi bi-play-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm dropdown-toggle dropdown-toggle-split m-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button type="button" class="btn btn-sm dropdown-toggle-split my-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a class="dropdown-item" href="#">Action</a></li>
@@ -156,64 +78,193 @@
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="#">Separated link</a></li>
                                     </ul>
-                                    </div>
+                                </div>
                         </nav>
                     </div>
-                    <div class="card-body overflow-y-scroll">
-                        /*Compila i campi "Nome" e "Cognome" con le informazioni richieste
-                            Nome: "inserire il proprio nome"
-                            Cognome: "inserire il proprio cognome"
-                            Username: username
-                            UserID: userID
-                            Date: date
-                            */
-                            
-                            import org.junit.Before;
-                            import org.junit.After;
-                            import org.junit.BeforeClass;
-                            import org.junit.AfterClass;
-                            import org.junit.Test;
-                            import static org.junit.Assert.*;
-                            
-                            public class TestClasse {
-                                @BeforeClass
-                                public static void setUpClass() {
-                                    // Eseguito una volta prima dell'inizio dei test nella classe
-                                    // Inizializza risorse condivise o esegui altre operazioni di setup
-                                }
-                                            
-                                @AfterClass
-                                public static void tearDownClass() {
-                                    // Eseguito una volta alla fine di tutti i test nella classe
-                                    // Effettua la pulizia delle risorse condivise o esegui altre operazioni di teardown
-                                }
-                                            
-                                @Before
-                                public void setUp() {
-                                    // Eseguito prima di ogni metodo di test
-                                    // Preparazione dei dati di input specifici per il test
-                                }
-                                            
-                                @After
-                                public void tearDown() {
-                                    // Eseguito dopo ogni metodo di test
-                                    // Pulizia delle risorse o ripristino dello stato iniziale
-                                }
-                                            
-                                @Test
-                                public void testMetodo() {
-                                    // Preparazione dei dati di input
-                                    // Esegui il metodo da testare
-                                    // Verifica l'output o il comportamento atteso
-                                    // Utilizza assert per confrontare il risultato atteso con il risultato effettivo
-                                }
-                                            
-                                // Aggiungi altri metodi di test se necessario
-                            }
+                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section1">
+                        <textarea id="myEditor"> 
+/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+Nome: "inserire il proprio nome"
+Cognome: "inserire il proprio cognome"
+Username: username
+UserID: userID
+Date: date
+*/
+
+import org.junit.Before;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class TestClasse {
+    @BeforeClass
+    public static void setUpClass() {
+        // Eseguito una volta prima dell'inizio dei test nella classe
+        // Inizializza risorse condivise 
+        // o esegui altre operazioni di setup
+    }
+                
+    @AfterClass
+    public static void tearDownClass() {
+        // Eseguito una volta alla fine di tutti i test nella classe
+        // Effettua la pulizia delle risorse condivise 
+        // o esegui altre operazioni di teardown
+    }
+                
+    @Before
+    public void setUp() {
+        // Eseguito prima di ogni metodo di test
+        // Preparazione dei dati di input specifici per il test
+    }
+                
+    @After
+    public void tearDown() {
+        // Eseguito dopo ogni metodo di test
+        // Pulizia delle risorse o ripristino dello stato iniziale
+    }
+                
+    @Test
+    public void testMetodo() {
+        // Preparazione dei dati di input
+        // Esegui il metodo da testare
+        // Verifica l'output o il comportamento atteso
+        // Utilizza assert per confrontare il risultato atteso 
+        // con il risultato effettivo
+    }
+                
+    // Aggiungi altri metodi di test se necessario
+}
+                        </textarea>
+                    </div>
+                    <!-- CONSOLE -->
+                    <div class="card-header border-top p-0">
+                        <nav class="navbar bg-body-tertiary p-2">
+                                <span class="navbar-brand lead my-0 py-0">
+                                    Console
+                                </span> 
+                                <button type="button" class="btn btn-sm" id="divider"> 
+                                    <i class="bi bi-arrows-expand"></i>
+                                </button>
+                        </nav>
+                    </div>
+                    <div class="card-body m-0 p-0 overflow-y-auto" id="section2">
+                    
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
                     </div>
                     <div class="card-footer text-body-secondary"></div>
                 </div>
+            </div>
+            <!-- SECONDA COLONNA-->
+            <div class="col px-0">
+                <div class="card rounded-0">
+                    <div class="card-header p-0">
+                        <nav class="navbar bg-body-tertiary p-2">
+                            <span class="navbar-brand lead my-0 py-0 ml-4">
+                                Class Under Test  
+                            </span> 
+                            <div class="btn-group">
+                                <button type="button " class="btn btn-sm btn-success"> 
+                                    <i class="bi bi-play-fill"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm dropdown-toggle-split btn-success" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <form class="px-4 py-3">
+                                      <div class="mb-3">
+                                        <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
+                                        <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
+                                      </div>
+                                      <div class="mb-3">
+                                        <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
+                                      </div>
+                                      <div class="mb-3">
+                                        <div class="form-check">
+                                          <input type="checkbox" class="form-check-input" id="dropdownCheck">
+                                          <label class="form-check-label" for="dropdownCheck">
+                                            Remember me
+                                          </label>
+                                        </div>
+                                      </div>
+                                      <button type="submit" class="btn btn-primary">Sign in</button>
+                                    </form>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">New around here? Sign up</a>
+                                    <a class="dropdown-item" href="#">Forgot password?</a>
+                                  </div>
+                            </div>
+                    </nav>
+                    </div>
+                    <div class="card-body m-0 p-0 overflow-y-hidden">
+                        <textarea id="myEditor2"> 
+/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+Nome: "inserire il proprio nome"
+Cognome: "inserire il proprio cognome"
+Username: username
+UserID: userID
+Date: date
+*/
+
+import org.junit.Before;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class TestClasse {
+@BeforeClass
+public static void setUpClass() {
+    // Eseguito una volta prima dell'inizio dei test nella classe
+    // Inizializza risorse condivise 
+    // o esegui altre operazioni di setup
+}
+            
+@AfterClass
+public static void tearDownClass() {
+    // Eseguito una volta alla fine di tutti i test nella classe
+    // Effettua la pulizia delle risorse condivise 
+    // o esegui altre operazioni di teardown
+}
+            
+@Before
+public void setUp() {
+    // Eseguito prima di ogni metodo di test
+    // Preparazione dei dati di input specifici per il test
+}
+            
+@After
+public void tearDown() {
+    // Eseguito dopo ogni metodo di test
+    // Pulizia delle risorse o ripristino dello stato iniziale
+}
+            
+@Test
+public void testMetodo() {
+    // Preparazione dei dati di input
+    // Esegui il metodo da testare
+    // Verifica l'output o il comportamento atteso
+    // Utilizza assert per confrontare il risultato atteso 
+    // con il risultato effettivo
+}
+            
+// Aggiungi altri metodi di test se necessario
+}
+                        </textarea>
+                    </div>
+                    <div class="card-footer text-body-secondary"></div>
                 </div>
+            </div>
         </div>
     </div>
 
@@ -221,63 +272,104 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     
+    <script th:src="@{/t5/codemirror/lib/codemirror.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/mode/clike/clike.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/foldcode.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/search/searchcursor.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/search/search.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/jquery/jquery-3.7.0.com.js}"  th:inline="javascript"></script>
+
     <script>
         // Inizializzazione di CodeMirror
-        var editor = CodeMirror.fromTextArea(document.getElementById("myEditor"), {
+        var editor_code = CodeMirror.fromTextArea(document.getElementById("myEditor"), {
           lineNumbers: true,       // Mostra i numeri di riga
           mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-          theme: "dracula",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-          tabSize: 1,              // Dimensione del tab
+          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
+          tabSize: 4,              // Dimensione del tab
           autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
         });
-      </script>
+
+        var editor_code_2 = CodeMirror.fromTextArea(document.getElementById("myEditor2"), {
+          lineNumbers: true,       // Mostra i numeri di riga
+          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
+          tabSize: 4,              // Dimensione del tab
+          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
+        });
+
+        const divider = document.getElementById('divider');
+        const section1 = document.getElementById('section1');
+        const section2 = document.getElementById('section2');
+        const container = document.getElementById('topcard');
+        let isDragging = false;
+
+        // Imposta l'altezza del container all'altezza del viewport
+        function setContainerHeight() {
+            container.style.height = (window.innerHeight - 30)+ 'px';
+            editor_code.setSize(null, (window.innerHeight - 30)+ 'px');
+            editor_code_2.setSize(null, (window.innerHeight - 95.5)+ 'px');
+        }
+
+        // Inizializza l'altezza del container
+        setContainerHeight();
+
+        // Aggiungi un event listener per ridimensionare la finestra
+        window.addEventListener('resize', setContainerHeight);
+
+        // Aggiungi event listener per il mouse down (quando si inizia a trascinare)
+        divider.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            document.body.style.cursor = 'grabbing'; // Mostra la mano chiusa durante il trascinamento
+            container.classList.add('no-select'); // Disabilita la selezione del testo
+        });
+
+        // Event listener per il movimento del mouse
+        document.addEventListener('mousemove', function (e) {
+            if (!isDragging) return; // Se non si sta trascinando, non fare nulla
+
+            // Calcola la nuova altezza della prima sezione
+            const containerRect = container.getBoundingClientRect();
+            const offsetY = e.clientY - containerRect.top;
+
+            // Imposta la nuova altezza per la prima sezione
+            section1.style.height = `${offsetY}px`;
+            editor_code.setSize(null, `${offsetY}px`);
+            // Imposta l'altezza per la seconda sezione basata sull'altezza del contenitore - offsetY
+            section2.style.height = `${containerRect.height - offsetY}px`; // -10 per l'altezza della divider
+        });
+
+        // Event listener per il rilascio del mouse (fine del trascinamento)
+        document.addEventListener('mouseup', function () {
+            isDragging = false; // Interrompe il ridimensionamento
+            document.body.style.cursor = 'default'; // Ripristina il cursore predefinito
+            container.classList.remove('no-select'); // Riabilita la selezione del testo
+        });
     
-    <script>
- const divider = document.getElementById('divider');
-    const section1 = document.getElementById('section1');
-    const section2 = document.getElementById('section2');
-    const container = document.getElementById('topcard');
-    let isDragging = false;
+        // Funzione per cambiare il tema
+        function toggleTheme() {
+            const htmlElement = document.getElementById("html-root");
+            const checkbox = document.getElementById("themeToggle");
 
-    // Imposta l'altezza del container all'altezza del viewport
-    function setContainerHeight() {
-        container.style.height = (window.innerHeight - 30)+ 'px';
-    }
+            if (checkbox.checked) {
+                htmlElement.setAttribute("data-bs-theme", "dark");
+                editor_code.setOption("theme", "material-darker");
+                editor_code_2.setOption("theme", "material-darker");
+            } else {
+                htmlElement.setAttribute("data-bs-theme", "light");
+                editor_code.setOption("theme", "eclipse");
+                editor_code_2.setOption("theme", "eclipse");
+            }
+        }
 
-    // Inizializza l'altezza del container
-    setContainerHeight();
-
-    // Aggiungi un event listener per ridimensionare la finestra
-    window.addEventListener('resize', setContainerHeight);
-
-    // Aggiungi event listener per il mouse down (quando si inizia a trascinare)
-    divider.addEventListener('mousedown', function (e) {
-        isDragging = true;
-        document.body.style.cursor = 'grabbing'; // Mostra la mano chiusa durante il trascinamento
-        container.classList.add('no-select'); // Disabilita la selezione del testo
-    });
-
-    // Event listener per il movimento del mouse
-    document.addEventListener('mousemove', function (e) {
-        if (!isDragging) return; // Se non si sta trascinando, non fare nulla
-
-        // Calcola la nuova altezza della prima sezione
-        const containerRect = container.getBoundingClientRect();
-        const offsetY = e.clientY - containerRect.top;
-
-        // Imposta la nuova altezza per la prima sezione
-        section1.style.height = `${offsetY}px`;
-
-        // Imposta l'altezza per la seconda sezione basata sull'altezza del contenitore - offsetY
-        section2.style.height = `${containerRect.height - offsetY - 10}px`; // -10 per l'altezza della divider
-    });
-
-    // Event listener per il rilascio del mouse (fine del trascinamento)
-    document.addEventListener('mouseup', function () {
-        isDragging = false; // Interrompe il ridimensionamento
-        document.body.style.cursor = 'default'; // Ripristina il cursore predefinito
-        container.classList.remove('no-select'); // Riabilita la selezione del testo
-    });
+        // Assegna l'evento al cambio di stato del checkbox
+        document.getElementById("themeToggle").addEventListener("change", toggleTheme);
+    
     </script>
 </body>
 </html>
