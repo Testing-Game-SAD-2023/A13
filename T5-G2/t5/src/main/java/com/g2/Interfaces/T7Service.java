@@ -31,7 +31,6 @@ public class T7Service implements ServiceInterface{
         // Aggiungi altri casi per altre azioni
     }
 
-
     //T7 espone solo questo servizio, codice rubato un po' da T6
     /* Compilazione dei due files Java ricevuti in ingresso(codice prodotto
         dal giocatore e test prodotti dal robot),e restituzione dei risultati di copertura prodotti da JaCoCo  */

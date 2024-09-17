@@ -6,8 +6,6 @@ services:
     restart: always
     expose:
       - 8080
-    # ports:
-    #   - 8082:8080
     networks:
       - global-network
 

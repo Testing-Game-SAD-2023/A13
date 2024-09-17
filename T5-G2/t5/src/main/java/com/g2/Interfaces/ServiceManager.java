@@ -12,32 +12,35 @@ import org.springframework.web.client.RestTemplate;
 public class ServiceManager {
 
     private final Map<String, ServiceInterface> services = new HashMap<>();
+    private final ServiceManagerLogger logger;
 
-    // Costruttore per configurare e istanziare i servizi con RestTemplate
     @Autowired
     public ServiceManager(RestTemplate restTemplate) {
+        this.logger = new ServiceManagerLogger();
         services.put("T1", createService(T1Service.class, restTemplate));
         services.put("T23", createService(T23Service.class, restTemplate));
         services.put("T4", createService(T4Service.class, restTemplate));
         services.put("T7", createService(T7Service.class, restTemplate));
-        // Aggiungi altri servizi se necessario
     }
 
-    // Metodo per creare l'istanza del servizio utilizzando il costruttore con RestTemplate
     private <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
         try {
-            return serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
+            T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
+            logger.logMessagge("ServiceCreation", serviceClass.getSimpleName());
+            return service;
         } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+            logger.logMessagge("Errore nella creazione del servizio: " + serviceClass.getName(), e);
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
         }
     }
 
-    // Metodo per gestire le richieste
     public Object handleRequest(String serviceName, String action, Object... params) {
         ServiceInterface service = services.get(serviceName);
         if (service == null) {
+            logger.logMessagge("ServiceNotFound", serviceName);
             throw new IllegalArgumentException("Servizio non trovato: " + serviceName);
         }
+        logger.logMessagge("HandleRequest", serviceName, action);
         return service.handleRequest(action, params);
     }
 }

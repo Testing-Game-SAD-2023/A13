@@ -1,0 +1,17 @@
+2024-09-17 12:03:08 - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/stefa/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/stefa/.m2/repository/org/json/json/20230227/json-20230227.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2024-09-17 12:03:08 - Starting T5ApplicationTests using Java 22.0.2 with PID 19344 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
+2024-09-17 12:03:08 - No active profile set, falling back to 1 default profile: "default"
+2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-17 12:03:11 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-17 12:03:11 - Started T5ApplicationTests in 4.048 seconds (process running for 5.774)
