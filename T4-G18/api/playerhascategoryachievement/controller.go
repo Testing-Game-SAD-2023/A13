@@ -8,6 +8,7 @@ import (
 
 type Service interface {
 	Create(request *CreateRequest) (PlayerHasCategoryAchievement, error)
+	FindByPID(pid int64) ([]PlayerHasCategoryAchievement, error)
 	FindAll() ([]PlayerHasCategoryAchievement, error)
 	Delete(pid int64, category uint8) error
 	Update(pid int64, category uint8, ug *UpdateRequest) (PlayerHasCategoryAchievement, error)
@@ -41,6 +42,22 @@ func (gc *Controller) Create(w http.ResponseWriter, r *http.Request) error {
 
 func (gc *Controller) FindAll(w http.ResponseWriter, r *http.Request) error {
     g, err := gc.service.FindAll()
+
+    if err != nil {
+        return api.MakeHttpError(err)
+    }
+
+    return api.WriteJson(w, http.StatusOK, g)
+}
+
+func (gc *Controller) FindByPID(w http.ResponseWriter, r *http.Request) error {
+    pid, errID := api.FromUrlParams[KeyType](r, "pid")
+
+    if errID != nil {
+        return errID
+    }
+
+    g, err := gc.service.FindByPID(pid.AsInt64())
 
     if err != nil {
         return api.MakeHttpError(err)

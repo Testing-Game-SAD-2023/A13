@@ -98,7 +98,11 @@
    			<artifactId>mongo-java-driver</artifactId>
     		<version>3.8.2</version> <!-- Aggiorna alla versione più recente -->
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
 		
     
 

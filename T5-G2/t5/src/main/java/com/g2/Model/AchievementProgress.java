@@ -1,13 +1,13 @@
 package com.g2.Model;
 
 public class AchievementProgress {
-    public int ID;
+    public String ID;
 
-    public int getID() {
+    public String getID() {
         return ID;
     }
 
-    public void setID(int ID) {
+    public void setID(String ID) {
         this.ID = ID;
     }
 
@@ -19,6 +19,16 @@ public class AchievementProgress {
 
     public void setName(String name) {
         Name = name;
+    }
+
+    public String Description;
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String description) {
+        Description = description;
     }
 
     public float ProgressRequired;
@@ -41,10 +51,11 @@ public class AchievementProgress {
         Progress = progress;
     }
 
-    public AchievementProgress(int id, String name, float progressRequired, float progress)
+    public AchievementProgress(String id, String name, String description, float progressRequired, float progress)
     {
         this.ID = id;
         this.Name = name;
+        this.Description = description;
         this.ProgressRequired = progressRequired;
         this.Progress = progress;
     }
@@ -57,10 +68,11 @@ public class AchievementProgress {
     @Override
     public String toString() {
         return "AchievementProgress{" +
-                "\n   ID:" + ID +
-                "\n   Name:" + Name +
-                "\n   ProgressRequired:" + ProgressRequired +
-                "\n   Progress:" + Progress +
-                "\n}";
+                "ID='" + ID + '\'' +
+                ", Name='" + Name + '\'' +
+                ", Description='" + Description + '\'' +
+                ", ProgressRequired=" + ProgressRequired +
+                ", Progress=" + Progress +
+                '}';
     }
 }

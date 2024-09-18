@@ -90,11 +90,30 @@ public class GuiController {
     }
 
     public List<AchievementProgress> getAchievementProgresses(int playerID) {
-        ResponseEntity<List<AchievementProgress>> responseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/achievements/progress/" + playerID,
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<AchievementProgress>>() {
+        ResponseEntity<List<Achievement>> achievementResponseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/achievements/list",
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<Achievement>>() {
                 });
 
-        return responseEntity.getBody();
+        ResponseEntity<List<CategoryProgress>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/phca/" + playerID,
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<CategoryProgress>>() {
+                });
+
+        List<Achievement> achievementList = achievementResponseEntity.getBody();
+        List<CategoryProgress> categoryProgressList = progressesResponseEntity.getBody();
+
+        List<AchievementProgress> achievementProgresses = new ArrayList<>();
+
+        System.out.println(achievementList);
+        System.out.println(categoryProgressList);
+
+        for (Achievement a : achievementList)
+        {
+            List<CategoryProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.Category == a.getCategory()).collect(Collectors.toList());
+            for (CategoryProgress c : filteredList)
+                achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
+        }
+
+        return achievementProgresses;
     }
 
     @GetMapping("/main")

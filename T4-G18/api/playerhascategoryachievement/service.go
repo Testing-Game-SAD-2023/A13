@@ -51,6 +51,22 @@ func (gs *Repository) FindAll() ([]PlayerHasCategoryAchievement, error) {
     return res, api.MakeServiceError(err)
 }
 
+func (gs *Repository) FindByPID(pid int64) ([]PlayerHasCategoryAchievement, error) {
+    var phcas []model.PlayerHasCategoryAchievement
+
+    err := gs.db.
+        Where(&model.PlayerHasCategoryAchievement{PlayerID: pid}).
+        Find(&phcas).
+        Error
+
+    res := make([]PlayerHasCategoryAchievement, len(phcas))
+	for i, phca := range phcas {
+		res[i] = fromModel(&phca)
+	}
+
+    return res, api.MakeServiceError(err)
+}
+
 func (gs *Repository) Delete(pid int64, category uint8) error {
 	db := gs.db.
 		Where(&model.PlayerHasCategoryAchievement{PlayerID: pid, Category: category}).

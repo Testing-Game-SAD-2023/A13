@@ -7,17 +7,6 @@ import (
 )
 
 
-type Achievement struct {
-    ID                 int64       `gorm:"primaryKey;autoIncrement"`   // Achievement ID
-    Name               string      `gorm:"not null"`                   // Achievement name: mandatory
-    Category           uint8       `gorm:"not null; default:0"`        // Achievement category
-    ProgressRequired   float64     `gorm:"default:0"`                  // Progress required to obtain the achievement
-}
-
-func (Achievement) TableName() string {
-    return "achievements"
-}
-
 type PlayerHasCategoryAchievement struct {
     PlayerID            int64      `gorm:"primaryKey;autoIncrement:false"`
     Category            uint8      `gorm:"primaryKey;autoIncrement:false"`
