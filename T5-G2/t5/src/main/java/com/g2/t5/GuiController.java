@@ -116,7 +116,6 @@ public class GuiController {
 
     @GetMapping("/profile")
     public String profilePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        System.out.println("Getting into profile...");
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 
         formData.add("jwt", jwt);
