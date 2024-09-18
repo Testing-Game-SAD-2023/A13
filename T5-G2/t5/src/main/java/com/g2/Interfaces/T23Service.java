@@ -28,8 +28,7 @@ public class T23Service implements ServiceInterface{
         }
         // Aggiungi altri casi per altre azioni
     }
-
-
+    
     private Boolean GetAuthenticated(String jwt){
         // Verifica se il JWT è valido prima di fare la richiesta
         final String endpoint = "/validateToken";

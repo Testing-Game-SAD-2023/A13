@@ -102,7 +102,9 @@ public class Controller {
                                             @RequestParam("password") String password,
                                             @RequestParam("check_password") String check_password,
                                             @RequestParam("studies") Studies studies,
-                                            @RequestParam("g-recaptcha-response") String gRecaptchaResponse, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+                                            @RequestParam("g-recaptcha-response") String gRecaptchaResponse, 
+                                            @CookieValue(name = "jwt", required = false) String jwt, 
+                                            HttpServletRequest request) {
         
         if(isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
@@ -569,6 +571,7 @@ public class Controller {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
         return new ModelAndView("login_success");
     }
+    
     //MODIFICA (18/02/2024) : Aggiunta menù
     @GetMapping("/menu")
     public ModelAndView showMenuForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {

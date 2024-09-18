@@ -3,13 +3,21 @@ package com.g2.Components;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.g2.Interfaces.ServiceManager;
+
 public class TurnBasedGameComponent extends PageComponent {
+
+    // Definizione degli stati del gioco
+    private enum GameState {
+        START, PLAYING, END_TURN, GAME_OVER
+    }
 
     private final ServiceManager serviceManager;
     private final int maxTurns;
     private int currentTurn;
     private int playerWins;
     private int botWins;
+    private GameState currentState;
 
     // Costruttore
     public TurnBasedGameComponent(ServiceManager serviceManager, int maxTurns) {
@@ -18,8 +26,10 @@ public class TurnBasedGameComponent extends PageComponent {
         this.currentTurn = 0;
         this.playerWins = 0;
         this.botWins = 0;
+        this.currentState = GameState.START; // Stato iniziale
     }
 
+    // qui aggiustare con Model/game fatto dal t5 questo deve fornire solo le info per la pagina web non tutte quelle della classe
     @Override
     public Map<String, Object> getModel() {
         Map<String, Object> model = new HashMap<>();
@@ -32,22 +42,41 @@ public class TurnBasedGameComponent extends PageComponent {
         return model;
     }
 
-    // Metodo per processare un turno
+    // Metodo per processare un turno in base allo stato corrente
+    // con l'override posso definire altri tipi di giochi 
     public void playTurn() {
-        if (currentTurn < maxTurns) {
-            currentTurn++;
+        switch (currentState) {
+            case START -> // Inizia il gioco, passa allo stato di gioco attivo
+                currentState = GameState.PLAYING;
 
-            // Simula il risultato del turno (puoi sostituire con la logica del tuo gioco)
-            boolean playerWon = simulateTurnResult();
-            if (playerWon) {
-                playerWins++;
-            } else {
-                botWins++;
+            case PLAYING -> {
+                // Simula il round (turno completo di giocatore e bot)
+                boolean playerWon = PlayTurn();
+                if (playerWon) {
+                    playerWins++;
+                } else {
+                    botWins++;
+                }
+                currentState = GameState.END_TURN;
+            }
+
+            case END_TURN -> {
+                // Aggiorna il turno corrente e controlla se il gioco è finito
+                currentTurn++;
+                if (currentTurn >= maxTurns) {
+                    currentState = GameState.GAME_OVER;
+                } else {
+                    currentState = GameState.PLAYING; // Continua il gioco
+                }
+            }
+
+            case GAME_OVER -> {
             }
         }
+        // Il gioco è finito, non fare nulla
     }
 
-    // Metodo per determinare chi ha vinto la partita alla fine dei turni
+    // Metodo per determinare chi ha vinto la partita
     private String determineWinner() {
         if (currentTurn < maxTurns) {
             return "In corso";
@@ -61,9 +90,9 @@ public class TurnBasedGameComponent extends PageComponent {
         }
     }
 
-    // Simula il risultato di un turno (logica del gioco)
-    private boolean simulateTurnResult() {
-        // Simula il risultato casuale di un turno, potrebbe essere migliorato con una logica più complessa
+    // Simula il risultato di un turno
+    private boolean PlayTurn() {
         return Math.random() > 0.5;
     }
+
 }
