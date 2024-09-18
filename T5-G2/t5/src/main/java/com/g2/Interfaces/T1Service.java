@@ -1,5 +1,7 @@
 package com.g2.Interfaces;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +25,12 @@ public class T1Service implements ServiceInterface{
                 }
                 return getClasses();
             }
+            case "getClassUnderTest" -> {
+                if(params.length !=1){
+                    throw new IllegalArgumentException("[HANDLEREQUEST] Per 'getClasses' è richiesto 1 parametri.");
+                }
+                return getClassUnderTest((String)params[0]);
+            }
             default -> throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
         }
         // Aggiungi altri casi per altre azioni
@@ -40,24 +48,26 @@ public class T1Service implements ServiceInterface{
             return result;
         } catch (RuntimeException e) {
             // Gestisci eventuali errori durante la richiesta
-            System.out.println("Errore getClasses: " + e.getMessage());
-            return null;
+            throw new IllegalArgumentException("[HANDLEREQUEST] Erroe  getClasses" + e);
         }
     }
 
     private ClassUT getClassUnderTest(String nomeCUT){
-        final String endpoint = "/downloadFile";
+        final String endpoint = "/downloadFile/";
+
+        Map<String, String> params = new HashMap<>();
+        params.put("name", nomeCUT);
+
         try {
             ClassUT result = restService.CallRestGET(
                 endpoint,
-                nomeCUT, 
-                class.ClassUT
+                params, 
+                ClassUT.class
             );
             return result;
         } catch (RuntimeException e) {
             // Gestisci eventuali errori durante la richiesta
-            System.out.println("Errore getClasses: " + e.getMessage());
-            return null;
+            throw new IllegalArgumentException("[HANDLEREQUEST] Erroe  getClassUnderTest" + e);
         }
     }
 }

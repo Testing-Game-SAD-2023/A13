@@ -3,7 +3,6 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.Components.PageBuilder;
-import com.g2.Components.TextComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
@@ -59,29 +56,16 @@ public class GuiController {
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-       
+        /* questo funziona non elimanre 
         TextComponent testo_prova = new TextComponent(serviceManager, "T1", "getClasses", "classi");
         PageBuilder   gamemode    = new PageBuilder(serviceManager, Arrays.asList(testo_prova));
         return gamemode.handlePageRequest(model, "gamemode", jwt);
-       /* 
-        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if(!Auth){
-            return "redirect:/login"; 
-        }
-        
-        List<ClassUT> classes = (List<ClassUT>) serviceManager.handleRequest("T1", "getClasses");
-        if (classes != null){
-            System.out.println(classes.toString());
-        }else{
-            System.out.println("classe vuota");
-        }
+        */
 
-        List<String> names = classes.stream().map(ClassUT::getName)  // Mappa ogni oggetto ClassUT al suo nome
-                            .collect(Collectors.toList());        
-        
-        model.addAttribute("classi", names);
-        
-        return "gamemode"; */
+        Object result = serviceManager.handleRequest("T1", "getClassUnderTest", "calcolatrice");
+        model.addAttribute("result", result);
+
+        return "gamemode";
     }
 
     @GetMapping("/report")
@@ -240,4 +224,6 @@ public class GuiController {
         
 	}
 
+
+    
 }

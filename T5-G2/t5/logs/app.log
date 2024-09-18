@@ -1,4 +1,4 @@
-2024-09-17 12:03:08 - 
+2024-09-18 12:51:29 - 
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -7,15 +7,15 @@ Found multiple occurrences of org.json.JSONObject on the class path:
 
 You may wish to exclude one of them to ensure predictable runtime behavior
 
-2024-09-17 12:03:08 - Starting T5ApplicationTests using Java 22.0.2 with PID 19344 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
-2024-09-17 12:03:08 - No active profile set, falling back to 1 default profile: "default"
-2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T1Service
-2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T23Service
-2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T4Service
-2024-09-17 12:03:10 - [SERVICE CREATION] Creazione del servizio: T7Service
-2024-09-17 12:03:11 - Exposing 1 endpoint(s) beneath base path '/actuator'
-2024-09-17 12:03:11 - Started T5ApplicationTests in 4.048 seconds (process running for 5.774)
-2024-09-17 15:56:02 - 
+2024-09-18 12:51:29 - Starting T5ApplicationTests using Java 22.0.2 with PID 18396 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
+2024-09-18 12:51:29 - No active profile set, falling back to 1 default profile: "default"
+2024-09-18 12:51:31 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-18 12:51:31 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-18 12:51:31 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-18 12:51:31 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-18 12:51:32 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-18 12:51:32 - Started T5ApplicationTests in 3.665 seconds (process running for 5.351)
+2024-09-18 13:05:02 - 
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -24,15 +24,15 @@ Found multiple occurrences of org.json.JSONObject on the class path:
 
 You may wish to exclude one of them to ensure predictable runtime behavior
 
-2024-09-17 15:56:02 - Starting T5ApplicationTests using Java 22.0.2 with PID 19196 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
-2024-09-17 15:56:02 - No active profile set, falling back to 1 default profile: "default"
-2024-09-17 15:56:03 - [SERVICE CREATION] Creazione del servizio: T1Service
-2024-09-17 15:56:03 - [SERVICE CREATION] Creazione del servizio: T23Service
-2024-09-17 15:56:03 - [SERVICE CREATION] Creazione del servizio: T4Service
-2024-09-17 15:56:03 - [SERVICE CREATION] Creazione del servizio: T7Service
-2024-09-17 15:56:05 - Exposing 1 endpoint(s) beneath base path '/actuator'
-2024-09-17 15:56:05 - Started T5ApplicationTests in 4.303 seconds (process running for 6.067)
-2024-09-17 16:03:26 - 
+2024-09-18 13:05:02 - Starting T5ApplicationTests using Java 22.0.2 with PID 19160 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
+2024-09-18 13:05:02 - No active profile set, falling back to 1 default profile: "default"
+2024-09-18 13:05:03 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-18 13:05:03 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-18 13:05:03 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-18 13:05:03 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-18 13:05:05 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-18 13:05:05 - Started T5ApplicationTests in 3.969 seconds (process running for 5.667)
+2024-09-18 13:22:30 - 
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -41,15 +41,15 @@ Found multiple occurrences of org.json.JSONObject on the class path:
 
 You may wish to exclude one of them to ensure predictable runtime behavior
 
-2024-09-17 16:03:26 - Starting T5ApplicationTests using Java 22.0.2 with PID 17156 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
-2024-09-17 16:03:26 - No active profile set, falling back to 1 default profile: "default"
-2024-09-17 16:03:30 - [SERVICE CREATION] Creazione del servizio: T1Service
-2024-09-17 16:03:30 - [SERVICE CREATION] Creazione del servizio: T23Service
-2024-09-17 16:03:30 - [SERVICE CREATION] Creazione del servizio: T4Service
-2024-09-17 16:03:30 - [SERVICE CREATION] Creazione del servizio: T7Service
-2024-09-17 16:03:32 - Exposing 1 endpoint(s) beneath base path '/actuator'
-2024-09-17 16:03:32 - Started T5ApplicationTests in 8.35 seconds (process running for 13.646)
-2024-09-17 16:09:46 - 
+2024-09-18 13:22:30 - Starting T5ApplicationTests using Java 22.0.2 with PID 17084 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
+2024-09-18 13:22:30 - No active profile set, falling back to 1 default profile: "default"
+2024-09-18 13:22:32 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-18 13:22:32 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-18 13:22:32 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-18 13:22:32 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-18 13:22:33 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-18 13:22:33 - Started T5ApplicationTests in 3.674 seconds (process running for 5.233)
+2024-09-18 13:45:05 - 
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -58,15 +58,15 @@ Found multiple occurrences of org.json.JSONObject on the class path:
 
 You may wish to exclude one of them to ensure predictable runtime behavior
 
-2024-09-17 16:09:46 - Starting T5ApplicationTests using Java 22.0.2 with PID 14104 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
-2024-09-17 16:09:46 - No active profile set, falling back to 1 default profile: "default"
-2024-09-17 16:09:48 - [SERVICE CREATION] Creazione del servizio: T1Service
-2024-09-17 16:09:48 - [SERVICE CREATION] Creazione del servizio: T23Service
-2024-09-17 16:09:48 - [SERVICE CREATION] Creazione del servizio: T4Service
-2024-09-17 16:09:48 - [SERVICE CREATION] Creazione del servizio: T7Service
-2024-09-17 16:09:49 - Exposing 1 endpoint(s) beneath base path '/actuator'
-2024-09-17 16:09:49 - Started T5ApplicationTests in 3.913 seconds (process running for 5.693)
-2024-09-17 16:18:29 - 
+2024-09-18 13:45:05 - Starting T5ApplicationTests using Java 22.0.2 with PID 11032 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
+2024-09-18 13:45:05 - No active profile set, falling back to 1 default profile: "default"
+2024-09-18 13:45:07 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-18 13:45:07 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-18 13:45:07 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-18 13:45:07 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-18 13:45:08 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-18 13:45:08 - Started T5ApplicationTests in 3.562 seconds (process running for 5.103)
+2024-09-18 13:52:08 - 
 
 Found multiple occurrences of org.json.JSONObject on the class path:
 
@@ -75,11 +75,28 @@ Found multiple occurrences of org.json.JSONObject on the class path:
 
 You may wish to exclude one of them to ensure predictable runtime behavior
 
-2024-09-17 16:18:29 - Starting T5ApplicationTests using Java 22.0.2 with PID 8392 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
-2024-09-17 16:18:29 - No active profile set, falling back to 1 default profile: "default"
-2024-09-17 16:18:31 - [SERVICE CREATION] Creazione del servizio: T1Service
-2024-09-17 16:18:31 - [SERVICE CREATION] Creazione del servizio: T23Service
-2024-09-17 16:18:31 - [SERVICE CREATION] Creazione del servizio: T4Service
-2024-09-17 16:18:31 - [SERVICE CREATION] Creazione del servizio: T7Service
-2024-09-17 16:18:32 - Exposing 1 endpoint(s) beneath base path '/actuator'
-2024-09-17 16:18:32 - Started T5ApplicationTests in 4.453 seconds (process running for 6.413)
+2024-09-18 13:52:09 - Starting T5ApplicationTests using Java 22.0.2 with PID 8924 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
+2024-09-18 13:52:09 - No active profile set, falling back to 1 default profile: "default"
+2024-09-18 13:52:10 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-18 13:52:10 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-18 13:52:10 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-18 13:52:10 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-18 13:52:12 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-18 13:52:12 - Started T5ApplicationTests in 3.746 seconds (process running for 5.29)
+2024-09-18 16:09:16 - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/stefa/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/stefa/.m2/repository/org/json/json/20230227/json-20230227.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2024-09-18 16:09:16 - Starting T5ApplicationTests using Java 22.0.2 with PID 18624 (started by stefa in C:\Users\stefa\Desktop\Progetto_SAD\A13-ver2\T5-G2\t5)
+2024-09-18 16:09:16 - No active profile set, falling back to 1 default profile: "default"
+2024-09-18 16:09:20 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-18 16:09:20 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-18 16:09:20 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-18 16:09:20 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-18 16:09:22 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-18 16:09:22 - Started T5ApplicationTests in 7.157 seconds (process running for 10.749)

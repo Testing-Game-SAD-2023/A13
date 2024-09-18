@@ -35,7 +35,9 @@ public class RestService{
                 builder.queryParam(param.getKey(), param.getValue());
             }
         }
-        return builder.build().toUriString();
+        String url = builder.build().toUriString();
+        System.out.println(url);
+        return url;
     }
 
     public <R> R CallRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
@@ -59,10 +61,10 @@ public class RestService{
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             // Gestione delle eccezioni HTTP specifiche per errori client o server
-            throw e; // Puoi rilanciare l'eccezione o gestirla diversamente
+            throw new RestClientException("Chiamata GET fallita con stato: " + e);
         } catch (RestClientException | IllegalArgumentException e) {
             // Gestione generica degli errori REST (es. timeout, connessione fallita)
-            throw e;
+            throw new RestClientException("Chiamata GET fallita con stato: " + e);
         }
     }
     //versione overloaded per gestire liste di classi
@@ -85,15 +87,15 @@ public class RestService{
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RestClientException("Chiamata GET fallita con stato: " + response.getStatusCode());
+                throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + response.getStatusCode());
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             // Gestione delle eccezioni HTTP specifiche
-            throw e; // Rilancia l'eccezione per una gestione superiore
+            throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
         } catch (RestClientException | IllegalArgumentException e) {
             // Gestione generica degli errori REST
-            throw e;
+            throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
         }        
     }
 
@@ -122,12 +124,12 @@ public class RestService{
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RestClientException("Chiamata POST fallita con stato: " + response.getStatusCode());
+                throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
             }
 
         } catch (RestClientException | IllegalArgumentException e) {
             // Gestione degli errori REST (es. timeout, connessione fallita, ecc.)
-            throw e;
+            throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + e);
         }
     }
 }

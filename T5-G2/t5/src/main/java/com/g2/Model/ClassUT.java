@@ -86,7 +86,4 @@ public class ClassUT {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-
-	    
 }

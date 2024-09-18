@@ -27,13 +27,9 @@
                 <div class="v5_2090">
                     <div class="v5_2095" >
                         <span class="v5_2096">CHOOSE A CLASS TO TEST</span>
-                        <li class="lista" th:each="item: ${classi}">  
-                            <!-- Creo una lista composta di elementi lista-item che stampano 
-                            il valore degli elementi contenuti nella lista java "classi" -->
-                            <button type="button" class ="lista-item my-button">
-                                [[${item.name}]]
-                            </button>                      
-                        </li>
+                            <p>Nome: <span th:text="${result.name}"></span></p>
+                            <p>Età: <span th:text="${result.date}"></span></p>
+                            <p>Età: <span th:text="${result.difficulty}"></span></p>
                         <div class="name"></div>
 
                     </div>
