@@ -60,18 +60,18 @@
     		<artifactId>commons-csv</artifactId>
     		<version>1.9.0</version>
 		</dependency>		
-		<dependency> <groupId>org.json</groupId> <artifactId>json</artifactId> <version>20230227</version> </dependency>
+		<dependency> 
+			<groupId>org.json</groupId> 
+			<artifactId>json</artifactId> 
+			<version>20230227</version> 
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
-	<!--<resources>
-        <resource>
-            <directory>${project.basedir}/src/main/resources</directory>
-          <includes>
-                <include>FolderTree/**</includ
-            </includes>
-        </resource>
-    </resources> --> 
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", (e) => {
   document.getElementById("usernameField").innerText = parseJwt(getCookie("jwt")).sub;
 });
 
+
+
 function selectGameMode(mode) {
   console.log("Modalità selezionata:", mode);
   localStorage.setItem("modalita", mode);
@@ -346,7 +348,6 @@ function redirectToLogin() {
 }
 
 function saveLoginData() {
-
   var username = parseJwt(getCookie("jwt")).sub;
   username = username.toString();
   localStorage.setItem("username", username);

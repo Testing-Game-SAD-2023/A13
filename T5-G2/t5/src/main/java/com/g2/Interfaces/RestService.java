@@ -98,7 +98,7 @@ public class RestService{
             throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
         }        
     }
-
+ 
     public <R> R CallRestPost(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
         try {
             // Validazione degli input

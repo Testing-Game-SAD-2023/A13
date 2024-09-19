@@ -1,16 +1,16 @@
 package com.g2.Interfaces;
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Model.ClassUT;
+import com.g2.Model.Player;
 
 public class T1Service implements ServiceInterface{
     private final RestService restService;
-    private static final String BASE_URL = "http://manvsclass-controller-1:8080/";
+    private static final String BASE_URL = "http://manvsclass-controller-1:8080";
 
     public T1Service(RestTemplate restTemplate){
         this.restService = new RestService(restTemplate, BASE_URL);
@@ -35,7 +35,6 @@ public class T1Service implements ServiceInterface{
         }
         // Aggiungi altri casi per altre azioni
     }
-
     //funziona !! Stefano
     private List<ClassUT> getClasses(){
         final String endpoint = "/home";
@@ -52,22 +51,37 @@ public class T1Service implements ServiceInterface{
         }
     }
 
-    private ClassUT getClassUnderTest(String nomeCUT){
-        final String endpoint = "/downloadFile/";
-
-        Map<String, String> params = new HashMap<>();
-        params.put("name", nomeCUT);
-
+    //non funziona, mistero della fede
+    private String getClassUnderTest(String nomeCUT){
+        //Stefano: i deficienti hanno definito un api senza parametri 
+        //quindi devo costruire a mano un URL con questa struttura
+        final String endpoint = "/api/downloadFile/" + nomeCUT;
         try {
-            ClassUT result = restService.CallRestGET(
+            byte[] result = restService.CallRestGET(
                 endpoint,
-                params, 
-                ClassUT.class
+                null,
+                byte[].class
             );
-            return result;
+
+            String String_class = new String(result, StandardCharsets.UTF_8);
+            System.out.println(String_class);
+            return removeBOM(String_class);
         } catch (RuntimeException e) {
             // Gestisci eventuali errori durante la richiesta
-            throw new IllegalArgumentException("[HANDLEREQUEST] Erroe  getClassUnderTest" + e);
+            throw new IllegalArgumentException("[HANDLEREQUEST] Errore  getClassUnderTest" + e);
         }
     }
+
+    //DUMMY
+    private List<Player> getPlayer(){
+        return null;
+    }
+
+    private String removeBOM(String str) {
+        if (str != null && str.startsWith("\uFEFF")) {
+            return str.substring(1);
+        }
+        return str;
+    }
+
 }
