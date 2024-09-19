@@ -63,21 +63,39 @@
                         <nav class="navbar bg-body-tertiary p-2">
                                 <span class="navbar-brand lead my-0 py-0">
                                     Edit  
-                                </span> 
-                                <div class="btn-group btn-group">
-                                    <button type="button" class="btn btn-sm"> 
-                                        <i class="bi bi-play-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm dropdown-toggle-split my-0" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="#">Separated link</a></li>
-                                    </ul>
+                                </span>
+                                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                    <!-- TASTI UNDO -->
+                                    <div class="btn-group me-2">
+                                        <button type="button" class="btn btn-sm"> 
+                                            <i class="bi bi-arrow-90deg-left"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm"> 
+                                            <i class="bi bi-arrow-90deg-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm"> 
+                                            <i class="bi bi-file-earmark-arrow-down-fill"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm"> 
+                                            <i class="bi bi-forward-fill"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm dropdown-toggle-split my-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><button class="dropdown-item" type="button">
+                                                    <i class="bi bi-search"></i> Cerca
+                                                </button>
+                                            </li>
+                                            <li><button class="dropdown-item" type="button">
+                                                <i class="bi bi-info-circle"></i> Info
+                                                </button>
+                                            </li>
+                                            
+                                        </ul>
+                                    </div>
                                 </div>
                         </nav>
                     </div>
@@ -175,91 +193,11 @@ public class TestClasse {
                                 <button type="button " class="btn btn-sm btn-success"> 
                                     <i class="bi bi-play-fill"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm dropdown-toggle-split btn-success" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <form class="px-4 py-3">
-                                      <div class="mb-3">
-                                        <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-                                        <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
-                                      </div>
-                                      <div class="mb-3">
-                                        <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
-                                      </div>
-                                      <div class="mb-3">
-                                        <div class="form-check">
-                                          <input type="checkbox" class="form-check-input" id="dropdownCheck">
-                                          <label class="form-check-label" for="dropdownCheck">
-                                            Remember me
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <button type="submit" class="btn btn-primary">Sign in</button>
-                                    </form>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="#">New around here? Sign up</a>
-                                    <a class="dropdown-item" href="#">Forgot password?</a>
-                                  </div>
                             </div>
                     </nav>
                     </div>
                     <div class="card-body m-0 p-0 overflow-y-hidden">
-                        <textarea id="myEditor2"> 
-/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
-Nome: "inserire il proprio nome"
-Cognome: "inserire il proprio cognome"
-Username: username
-UserID: userID
-Date: date
-*/
-
-import org.junit.Before;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.AfterClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-public class TestClasse {
-@BeforeClass
-public static void setUpClass() {
-    // Eseguito una volta prima dell'inizio dei test nella classe
-    // Inizializza risorse condivise 
-    // o esegui altre operazioni di setup
-}
-            
-@AfterClass
-public static void tearDownClass() {
-    // Eseguito una volta alla fine di tutti i test nella classe
-    // Effettua la pulizia delle risorse condivise 
-    // o esegui altre operazioni di teardown
-}
-            
-@Before
-public void setUp() {
-    // Eseguito prima di ogni metodo di test
-    // Preparazione dei dati di input specifici per il test
-}
-            
-@After
-public void tearDown() {
-    // Eseguito dopo ogni metodo di test
-    // Pulizia delle risorse o ripristino dello stato iniziale
-}
-            
-@Test
-public void testMetodo() {
-    // Preparazione dei dati di input
-    // Esegui il metodo da testare
-    // Verifica l'output o il comportamento atteso
-    // Utilizza assert per confrontare il risultato atteso 
-    // con il risultato effettivo
-}
-            
-// Aggiungi altri metodi di test se necessario
-}
+                        <textarea id="myEditor2" th:text="${classeUT}"> 
                         </textarea>
                     </div>
                     <div class="card-footer text-body-secondary"></div>

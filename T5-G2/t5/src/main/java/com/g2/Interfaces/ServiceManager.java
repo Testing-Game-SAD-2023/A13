@@ -40,7 +40,13 @@ public class ServiceManager {
             logger.logMessagge("ServiceNotFound", serviceName);
             throw new IllegalArgumentException("Servizio non trovato: " + serviceName);
         }
-        logger.logMessagge("HandleRequest", serviceName, action);
-        return service.handleRequest(action, params);
+        try{
+            logger.logMessagge("HandleRequest", serviceName, action);
+            return service.handleRequest(action, params);
+        }catch (Exception e){
+            logger.logMessagge("Errore", e);
+            return null;
+        }
     }
+
 }
