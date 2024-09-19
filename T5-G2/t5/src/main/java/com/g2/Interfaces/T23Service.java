@@ -1,53 +1,66 @@
 package com.g2.Interfaces;
 
+import java.util.List;
+
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-public class T23Service implements ServiceInterface{
-    private final RestService restService;
+import com.g2.Model.User;
+
+public class T23Service extends BaseService {
+
     private static final String BASE_URL = "http://t23-g1-app-1:8080";
 
-    public T23Service(RestTemplate restTemplate){
-        this.restService = new RestService(restTemplate, BASE_URL);
+    public T23Service(RestTemplate restTemplate) {
+        super(restTemplate, BASE_URL);
+
+        // Registrazione delle azioni
+        registerAction("GetAuthenticated", new ServiceActionDefinition(
+            params -> GetAuthenticated((String) params[0]),
+            String.class
+        ));
+
+        registerAction("GetUsers", new ServiceActionDefinition(
+            params ->  GetUsers(),
+            new Class<?>[0]
+        ));
     }
 
-    @Override
-    public Object handleRequest(String action, Object... params) {
-        switch (action) {
-            case "GetAuthenticated" -> {
-                if (params.length != 1) {
-                    throw new IllegalArgumentException("[HANDLEREQUEST] Per 'GetAuthenticated' è richiesto 1 parametro.");
-                }
-                if (!(params[0] instanceof String)) {
-                    throw new IllegalArgumentException("[HANDLEREQUEST] Il parametro per 'GetAuthenticated' deve essere una stringa.");
-                }
-                return (boolean) GetAuthenticated((String) params[0]);
-            }
-            default -> throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
-        }
-        // Aggiungi altri casi per altre azioni
-    }
-    
-    private Boolean GetAuthenticated(String jwt){
-        // Verifica se il JWT è valido prima di fare la richiesta
+    // Metodo per l'autenticazione
+    private Boolean GetAuthenticated(String jwt) {
         final String endpoint = "/validateToken";
 
+        // Verifica se il JWT è valido prima di fare la richiesta
         if (jwt == null || jwt.isEmpty()) {
-            System.out.println("Token JWT non presente o vuoto.");
+            System.out.println("[GETAUTHENTICATED] Token JWT non presente o vuoto.");
             return false;
         }
 
         try {
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
             formData.add("jwt", jwt);
-            Boolean isIsAuthenticated = restService.CallRestPost(endpoint, formData, null, Boolean.class);    
-            return (isIsAuthenticated != null && isIsAuthenticated);
+
+            // Chiamata POST utilizzando il metodo della classe base
+            Boolean isAuthenticated = callRestPost(endpoint, formData, null, Boolean.class);
+            return isAuthenticated != null && isAuthenticated;
         } catch (Exception e) {
-            // Gestisci eventuali errori durante la richiesta
-            System.out.println("Errore durante l'autenticazione: " + e.getMessage());
+            // Gestione degli errori durante la richiesta
+            System.out.println("[GETAUTHENTICATED] Errore durante l'autenticazione: " + e.getMessage());
             return false;
         }
     }
 
+    // Metodo per ottenere la lista degli utenti
+    private List<User> GetUsers() {
+        final String endpoint = "/students_list";
+        try {
+            // Chiamata GET utilizzando il metodo della classe base per ottenere una lista di utenti
+            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
+        } catch (RuntimeException e) {
+            // Gestione degli errori durante la richiesta
+            throw new IllegalArgumentException("[GETUSERS] Errore durante il recupero degli utenti: " + e.getMessage());
+        }
+    }
 }

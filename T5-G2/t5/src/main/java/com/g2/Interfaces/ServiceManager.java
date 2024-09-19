@@ -1,3 +1,4 @@
+// ServiceManager.java
 package com.g2.Interfaces;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,12 +18,22 @@ public class ServiceManager {
     @Autowired
     public ServiceManager(RestTemplate restTemplate) {
         this.logger = new ServiceManagerLogger();
-        services.put("T1", createService(T1Service.class, restTemplate));
-        services.put("T23", createService(T23Service.class, restTemplate));
-        services.put("T4", createService(T4Service.class, restTemplate));
-        services.put("T7", createService(T7Service.class, restTemplate));
+        // Registrazione dinamica dei servizi
+        registerService("T1", T1Service.class, restTemplate);
+        registerService("T23", T23Service.class, restTemplate);
+        registerService("T4", T4Service.class, restTemplate);
+        registerService("T7", T7Service.class, restTemplate);
     }
 
+    // Metodo helper per registrare i servizi
+    private <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
+        T service = createService(serviceClass, restTemplate);
+        if (service != null) {
+            services.put(serviceName, service);
+        }
+    }
+
+    // Metodo per la creazione di un servizio
     private <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
         try {
             T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
@@ -34,19 +45,19 @@ public class ServiceManager {
         }
     }
 
+    // Metodo per gestire le richieste
     public Object handleRequest(String serviceName, String action, Object... params) {
         ServiceInterface service = services.get(serviceName);
         if (service == null) {
             logger.logMessagge("ServiceNotFound", serviceName);
             throw new IllegalArgumentException("Servizio non trovato: " + serviceName);
         }
-        try{
+        try {
             logger.logMessagge("HandleRequest", serviceName, action);
             return service.handleRequest(action, params);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.logMessagge("Errore", e);
             return null;
         }
     }
-
 }
