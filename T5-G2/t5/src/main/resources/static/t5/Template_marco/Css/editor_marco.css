@@ -1,0 +1,104 @@
+body {
+    background: linear-gradient(135deg, #2f4f4f, #4b5358, #6c757d, #343a40);
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    color: #ffffff; /* Colore del testo principale per la modalità scura */
+}
+
+.container-fluid {
+    margin-top: 2rem;
+}
+
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    background-color: #212529; /* Colore di sfondo delle card */
+}
+
+.card-header, .card-footer {
+    background-color: #343a40; /* Colore di sfondo delle intestazioni e del piè di pagina */
+    border-bottom: 1px solid #495057; /* Colore del bordo */
+    color: #ffffff; /* Colore del testo */
+}
+
+.card-body {
+    background: #0c0d0e; /* Colore di sfondo del corpo delle card */
+    border-radius: 0.5rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 90px); /* Adjust as needed */
+    color: #ffffff; /* Colore del testo */
+}
+
+.navbar {
+    background-color: #343a40; /* Colore di sfondo della navbar */
+    color: #ffffff; /* Colore del testo */
+    border-bottom: 1px solid #495057;
+}
+
+.navbar-brand {
+    color: #ffffff; /* Colore del testo della marca */
+    font-weight: 700;
+}
+
+.btn-group .btn {
+    border: none;
+}
+
+.btn-custom {
+    background: linear-gradient(45deg, #030303, #323638);
+    color: #ffffff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-custom:hover {
+    background: linear-gradient(45deg, #4b5358, #6c757d);
+}
+
+.text-custom {
+    color: #ffffff; /* Colore del testo personalizzato */
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.text-custom:hover {
+    color: #ffffff;
+}
+
+.dropdown-menu {
+    background-color: #323638;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-item {
+    color: #ffffff; /* Colore del testo nel menu a discesa */
+}
+
+.dropdown-item:hover {
+    background-color: #343a40;
+}
+
+#divider {
+    border: none;
+    background: #4b5358;
+    color: #ffffff; /* Colore del testo del divider */
+}
+
+textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    background-color: #0c0d0e;
+    color: #ffffff; /* Colore del testo nell'editor */
+    font-family: monospace;
+    font-size: 1rem; /* Dimensione del testo per migliorare la leggibilità */
+}

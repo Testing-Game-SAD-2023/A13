@@ -1,0 +1,61 @@
+body {
+    background: linear-gradient(135deg, #2f4f4f, #4b5358, #6c757d, #343a40);
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    margin-bottom: 2rem;
+    background-color: transparent; /* Barra trasparente per il contrasto */
+    border-bottom: 1px solid #e0e0e0; /* Aggiunge un bordo inferiore per maggiore definizione */
+}
+
+.navbar-nav .nav-link {
+    color: #fff; /* Colore del testo a bianco */
+}
+
+.navbar-nav .nav-link.active {
+    color: #fff; /* Colore per la voce di menu attiva */
+    font-weight: 700;
+}
+
+.profile-container {
+    background: rgba(255, 255, 255, 0.9); /* Bianco con trasparenza */
+    border-radius: 0.5rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+    max-width: 600px;
+    margin: 5rem auto 0; /* Imposta il margine superiore e orizzontale automaticamente */
+}
+
+.profile-container .form-control {
+    background-color: #fff; /* Imposta lo sfondo dei campi a bianco */
+    color: #000; /* Imposta il colore del testo a nero */
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+}
+
+.text-custom {
+    color: #284c73;
+    font-weight: 700;
+}
+
+.form-label {
+    color: #333;
+}
+
+.btn-custom {
+    background: linear-gradient(45deg, #2c3e50, #34495e);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-custom:hover {
+    background: linear-gradient(45deg, #253e58, #2c3e50);
+}

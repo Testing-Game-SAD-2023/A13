@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark" id="html-root">
+    
+    <head th:include="fragments/header :: header">
+        <link rel="stylesheet" href="../css/Edit_profile_marco.css">  
+    </head>
+
+<body>
+    <!-- NAV -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <!-- Profile Page -->
+    <div class="container">
+        <div class="profile-container">
+            <div class="text-center mb-4">
+                <h3 class="text-custom">The honored One</h3>
+            </div>
+            <form>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome:</label>
+                    <input type="text" id="name" class="form-control" value="   " readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="surname" class="form-label">Cognome:</label>
+                    <input type="text" id="surname" class="form-control" value="   " readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="dob" class="form-label">Date of Birth:</label>
+                    <input type="text" id="dob" class="form-control" value="   " readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="gender" class="form-label">Gender:</label>
+                    <input type="text" id="gender" class="form-control" value="    " readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" class="form-control" value="   " readonly>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="edit.html" class="btn btn-custom w-100">Edit Profile</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>

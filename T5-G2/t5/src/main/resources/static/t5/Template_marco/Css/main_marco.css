@@ -1,0 +1,69 @@
+body {
+    background: linear-gradient(135deg, #2f4f4f, #4b5358, #6c757d, #343a40);
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* PER HEADER */
+
+.card-header {
+background: linear-gradient(45deg, #0d0d0d, #1a1a1a); /* Gradiente quasi nero */
+border-radius: 0.5rem;
+box-shadow: 0 6px 12px rgba(0, 0, 0, 0.9); /* Ombra molto marcata per un contrasto netto */
+color: white;
+letter-spacing: 0.05rem;
+border: 3px solid #121212; /* Bordo molto scuro per un contrasto elevato */
+}
+
+.card-header:hover {
+background: linear-gradient(45deg, #1a1a1a, #333333); /* Gradiente scuro e leggermente più chiaro al passaggio del mouse */
+border-color: #1e1e1e; /* Colore del bordo scuro al passaggio del mouse per contrasto */
+}
+
+/* PER I BADGE */
+
+.badge-custom {
+background: linear-gradient(135deg, #2f4f4f, #4b5358, #6c757d, #343a40);
+color: white;
+border-radius: 0.25rem;
+padding: 0.5rem 1rem;
+font-weight: bold;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+display: inline-flex;
+align-items: center;
+text-align: center;
+margin: 0.25rem;
+}
+
+.badge-custom:hover {
+background: linear-gradient(135deg, #343a40, #4b5358, #6c757d, #2f4f4f);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* PER I PULSANTI */
+
+.btn-custom {
+background: linear-gradient(135deg, #1a1a1a, #333, #4d4d4d, #1a1a1a); /* Gradiente scuro */
+color: white; /* Colore del testo */
+border: none; /* Rimuove il bordo predefinito */
+border-radius: 50px; /* Bordo arrotondato per pillole */
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Ombra più marcata */
+font-family: 'Poppins', sans-serif; /* Font personalizzato */
+font-weight: bold; /* Testo in grassetto */
+padding: 0.5rem 2rem; /* Spaziatura interna */
+transition: background 0.3s, box-shadow 0.3s; /* Transizione per effetto hover */
+}
+
+.btn-custom:hover {
+background: linear-gradient(135deg, #333, #1a1a1a, #4d4d4d, #333); /* Gradiente invertito */
+box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6); /* Ombra più marcata al passaggio del mouse */
+}
+
+.btn-custom i {
+color: #e0e0e0; /* Colore dell'icona */
+}

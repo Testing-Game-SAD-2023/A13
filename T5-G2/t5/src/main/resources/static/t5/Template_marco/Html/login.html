@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark" id="html-root">
+    
+    <head th:include="fragments/header :: header">
+        <link rel="stylesheet" href="../css/login_marco.css">  
+    </head>
+
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h3 class="text-center text-custom">Login Form</h3>
+            <form action="" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username:</label>
+                    <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-custom w-100">Submit</button>
+                <div class="text-center mt-3">
+                    <a href="#" class="text-custom">Forgot your password?</a>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="#" class="text-custom">Register here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>
