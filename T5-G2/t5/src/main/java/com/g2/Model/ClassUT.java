@@ -27,8 +27,7 @@ public class ClassUT {
         this.category = category;
     }
 	// Costruttore senza argomenti
-	public ClassUT() {
-	}
+	public ClassUT() {}
 	
 	public List<String> getCategory() {
         return category;

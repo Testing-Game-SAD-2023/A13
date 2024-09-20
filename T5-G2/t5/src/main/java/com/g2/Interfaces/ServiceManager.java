@@ -57,7 +57,7 @@ public class ServiceManager {
             return service.handleRequest(action, params);
         } catch (Exception e) {
             logger.logMessagge("Errore", e);
-            return null;
+            throw new IllegalArgumentException("[HANDLE REQUEST]: " + e );
         }
     }
 }

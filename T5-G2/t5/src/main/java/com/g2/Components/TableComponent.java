@@ -6,18 +6,17 @@ import java.util.Map;
 
 import com.g2.Interfaces.ServiceManager;
 
-public class LeaderboardComponent extends PageComponent {
+
+public class TableComponent extends PageComponent {
 
     private final ServiceManager serviceManager;
-    private final String serviceName;
-    private final String action;
+    private final String serviceName = "T23";
+    private final String action      = "GetUsers";
     private final String thymeleafField;
 
     // Costruttore
-    public LeaderboardComponent(ServiceManager serviceManager, String serviceName, String action, String thymeleafField) {
+    public TableComponent(ServiceManager serviceManager, String thymeleafField) {
         this.serviceManager = serviceManager;
-        this.serviceName = serviceName;
-        this.action = action;
         this.thymeleafField = thymeleafField;
     }
 

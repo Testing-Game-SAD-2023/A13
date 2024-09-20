@@ -1,19 +1,111 @@
 <!doctype html>
-<html lang="en">
- <head th:replace="fragments/header :: header">
-
-  <body class="bg-dark p-3">
+<html lang="en" data-bs-theme="dark" id="html-root" xmlns:th="http://thymeleaf.org">
+    <head th:replace="fragments/header :: header">
+    <body>
 
     <div th:replace="fragments/navbar :: navbar"></div>
+    <!-- NAV-->
+    <div th:fragment="navbar" class="container-fluid border-bottom border-opacity-75">
+        <ul class="nav justify-content-center nav-underline sticky-top">
+            <li class="nav-item">
+                <a class="nav-link active text-light" aria-current="page" href="#">  
+                    <i class="bi bi-house-fill"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-light" href="#">  
+                    <i class="bi bi-person-fill"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-light" href="#"> 
+                    <i class="bi bi-globe"></i> Global   
+                </a>    
+            </li>
+        </ul>
+    </div>
 
-    <!-- LEADERBOARD -->
-    <div class="alert alert-primary" role="alert">
-        A simple primary alert—check it out!
-    </div>
-    <div class="alert alert-primary" role="alert">
-        A simple primary alert—check it out!
-    </div>
-   
-    <div th:replace="fragments/footer :: footer"></div>
-    </body>
+
+    <!-- LEADERBOARD-->
+        <div class="container">
+
+            <h1 class="display-2 mt-2">
+                LeaderBoard Modalità
+            </h1>
+
+            <div class="container-fluid">
+                <!-- content -->
+                <div class="row mt-5 my-3">
+                    <div class="card col border-primary mr-3">
+                        <div class="card-body row p-0">
+                            <div class="col text-center py-4">
+                                <i class="bi bi-brightness-high-fill display-5 text-primary"></i>
+                            </div>
+                            <div class="col text-start">
+                                <p>
+                                    <h5> 1012 </h5> 
+                                    <h5> Masters </h5>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card col border-danger mx-3">
+                        <div class="card-body row p-0">
+                            <div class="col text-center py-3">
+                                <i class="bi bi-brightness-low-fill display-5 text-danger"></i>
+                            </div>
+                            <div class="col text-start">
+                                <p>
+                                    <h5> 1012 </h5> 
+                                    <h5> Experts </h5>
+                                </p>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card col border-warning ml-3">
+                        <div class="card-body row p-0">
+                            <div class="col text-center py-4">
+                                <i class="bi bi-brightness-alt-low-fill display-5 text-warning"></i>
+                            </div>
+                            <div class="col text-start">
+                                <p>
+                                    <h5> 105 </h5> 
+                                    <h5> Novices </h5>
+                                </p>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div>
+                <table class="table table-striped" data-toggle="table" data-search="true">
+                    <thead class="">
+                    <tr>
+                        <th scope="col" data-sortable="true">Rank  </th>
+                        <th scope="col" data-sortable="true">First </th>
+                        <th scope="col" data-sortable="true">Last  </th>
+                        <th scope="col" data-sortable="true" data-searchable="false">Points</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-group-divider  overflow-y-scroll">
+                        <tr th:each="player : ${listaPlayers}">
+                            <td th:text="${player.name}"></td>
+                            <td th:text="${player.surname}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/bootstrap-table.min.js"></script>
+</body>
 </html>

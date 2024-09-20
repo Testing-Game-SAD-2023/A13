@@ -1,5 +1,6 @@
 package com.g2.Components;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,15 +12,20 @@ import com.g2.Interfaces.ServiceManager;
 
 public class PageBuilder {
      private final ServiceManager serviceManager;
-     private final List<PageComponent> pageComponents;
+     private List<PageComponent> pageComponents;
 
     @Autowired
     public PageBuilder(ServiceManager serviceManager, List<PageComponent> pageComponents) {
-        this.serviceManager = serviceManager;
+        this.serviceManager  = serviceManager;
         this.pageComponents  = pageComponents;
     }
 
-    // Metodo principale per gestire una richiesta di pagina
+    public PageBuilder(ServiceManager serviceManager){
+        this.serviceManager = serviceManager;
+        this.pageComponents = new ArrayList<>(); 
+    }
+
+    // Metodo principale flusso per una richiesta di pagina
     public String handlePageRequest(Model model_html, String pageName, String jwt) {
         if (!authenticateUser(jwt)) {
             //se non sono autenticato viene renderizzato al login
@@ -35,6 +41,9 @@ public class PageBuilder {
         return pageName;
     }
 
+    public void AttachComponents(List<PageComponent> pageComponents){
+        this.pageComponents.addAll(pageComponents);
+    }
     // Metodo per autenticare l'utente utilizzando ServiceManager
     private boolean authenticateUser(String jwt) {
         return (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
@@ -54,5 +63,7 @@ public class PageBuilder {
         }
         return combinedModel;
     }
+
+    
 
 }

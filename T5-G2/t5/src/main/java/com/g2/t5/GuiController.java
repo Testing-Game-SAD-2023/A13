@@ -3,6 +3,7 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Components.PageBuilder;
+import com.g2.Components.PageComponent;
+import com.g2.Components.TableComponent;
 import com.g2.Components.TextComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
@@ -61,8 +64,12 @@ public class GuiController {
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        TextComponent testo_prova = new TextComponent(serviceManager, "T1", "getClasses", "classi");
-        PageBuilder   gamemode    = new PageBuilder(serviceManager, Arrays.asList(testo_prova));
+
+        PageBuilder   gamemode    = new PageBuilder(serviceManager);
+        List<PageComponent> components = new ArrayList<>();
+        components.add(new TextComponent(serviceManager, "T1", "getClasses", "classi"));
+        gamemode.AttachComponents(components);
+
         return gamemode.handlePageRequest(model, "gamemode", jwt);
     }
 
@@ -71,6 +78,13 @@ public class GuiController {
         TextComponent testo_CUT = new TextComponent(serviceManager, "T1", "getClassUnderTest", "classeUT", "classe");
         PageBuilder   editor      = new PageBuilder(serviceManager, Arrays.asList(testo_CUT));
         return editor.handlePageRequest(model, "editor", jwt);
+    }
+
+    @GetMapping("/leaderboard")
+    public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt){
+        TableComponent table       = new TableComponent(serviceManager, "listaPlayers");
+        PageBuilder    leaderboard = new PageBuilder(serviceManager, Arrays.asList(table));
+        return leaderboard.handlePageRequest(model, "leaderboard", jwt);
     }
 
     @GetMapping("/report")
