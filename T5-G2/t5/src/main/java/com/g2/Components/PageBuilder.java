@@ -31,11 +31,11 @@ public class PageBuilder {
             //se non sono autenticato viene renderizzato al login
             return "redirect:/login"; 
         }
-
         // Costruisci la mappa combinata dei dati dei componenti
-        Map<String, Object> combinedModel  = build();
-        model_html.addAllAttributes(combinedModel);
-
+        if(pageComponents != null){
+            Map<String, Object> combinedModel  = build();
+            model_html.addAllAttributes(combinedModel);
+        }
         // Istanzia e gestisce i componenti della pagina
         // restituisco il nome del template da usare
         return pageName;

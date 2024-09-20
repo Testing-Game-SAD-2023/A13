@@ -9,10 +9,14 @@ public class ServiceActionDefinition {
 
     public ServiceActionDefinition(Function<Object[], Object> function, Class<?>... parameterTypes) {
         this.function = function;
-        this.parameterTypes = parameterTypes;
+        this.parameterTypes = parameterTypes != null ? parameterTypes : new Class<?>[0];
     }
 
     public Object execute(Object[] params) {
+        // Se params è nullo, assegniamo un array vuoto per la validazione
+        if (params == null) {
+            params = new Object[0];
+        }
         validateParameters(params);
         return function.apply(params);
     }

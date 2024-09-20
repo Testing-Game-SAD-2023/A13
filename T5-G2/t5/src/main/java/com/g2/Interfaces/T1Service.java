@@ -14,8 +14,7 @@ public class T1Service extends BaseService {
 
         // Registrazione delle azioni
         registerAction("getClasses", new ServiceActionDefinition(
-            params -> getClasses(),
-            new Class<?>[0] //metodo non accetta parametri
+            params -> getClasses()  //Metodo senza argomenti
         ));
 
         registerAction("getClassUnderTest", new ServiceActionDefinition(

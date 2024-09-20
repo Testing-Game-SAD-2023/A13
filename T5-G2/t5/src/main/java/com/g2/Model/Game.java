@@ -1,8 +1,5 @@
 package com.g2.Model;
-
-import org.springframework.beans.factory.config.CustomScopeConfigurer;
-
-import java.time.*;
+import java.time.LocalDate;
 
 public class Game {
     private int playerId;

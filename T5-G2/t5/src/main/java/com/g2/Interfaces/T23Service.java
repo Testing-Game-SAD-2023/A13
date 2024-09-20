@@ -23,8 +23,7 @@ public class T23Service extends BaseService {
         ));
 
         registerAction("GetUsers", new ServiceActionDefinition(
-            params ->  GetUsers(),
-            new Class<?>[0]
+            params ->  GetUsers()  //metodo senza parametri
         ));
     }
 

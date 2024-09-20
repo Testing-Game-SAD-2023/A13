@@ -97,9 +97,10 @@
             <div class="col-md-6 custom-column">
                 <div class="p-3">
                     <h4 class="text-custom">CHOOSE A CLASS TO TEST</h4>
-                    <p>Nome: <span th:text="${result.name}"></span></p>
-                    <p>Età: <span th:text="${result.date}"></span></p>
-                    <p>Difficoltà: <span th:text="${result.difficulty}"></span></p>
+                    <ul class="list-group">
+                        <!-- Thymeleaf List -->
+                        <li class="list-group-item" th:each="item : ${classeUT}" th:text="${item.name}"></li>
+                    </ul>
                 </div>
             </div>
 

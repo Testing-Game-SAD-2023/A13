@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.g2.Components.PageBuilder;
 import com.g2.Components.TableComponent;
+import com.g2.Components.TextComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
@@ -32,12 +33,10 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GuiController {
 
     private final ServiceManager serviceManager;
-    private final RestTemplate restTemplate; 
 
     @Autowired
     public GuiController(RestTemplate restTemplate) {
         this.serviceManager = new ServiceManager(restTemplate);
-        this.restTemplate = restTemplate;
     }
 
     @GetMapping("/debug")
@@ -51,40 +50,29 @@ public class GuiController {
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if(!Auth){
-           // return "main";
-           return "redirect:/login"; 
-        }
-        return "main";
+        PageBuilder main = new PageBuilder(serviceManager, null);
+        return main.handlePageRequest(model, "main", jwt);
     }
 
-    /* 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-
-        PageBuilder   gamemode    = new PageBuilder(serviceManager);
-        List<PageComponent> components = new ArrayList<>();
-        components.add(new TextComponent(serviceManager, "T1", "getClasses", "classi"));
-        gamemode.AttachComponents(components);
-
+        TextComponent Class_list = new TextComponent(serviceManager, "T1", "getClasses", "classi");
+        PageBuilder   gamemode    = new PageBuilder(serviceManager, Arrays.asList(Class_list));
         return gamemode.handlePageRequest(model, "gamemode", jwt);
-    }
+    } 
         
-
-    @GetMapping("/gamemode")
+    @GetMapping("/editor")
     public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        TextComponent testo_CUT = new TextComponent(serviceManager, "T1", "getClassUnderTest", "classeUT", "classe");
+        TextComponent testo_CUT = new TextComponent(serviceManager, "T1", "getClassUnderTest", "classeUT", "Calcolatrice");
         PageBuilder   editor      = new PageBuilder(serviceManager, Arrays.asList(testo_CUT));
         return editor.handlePageRequest(model, "gamemode", jwt);
     }
-    */
     
-    @GetMapping("/gamemode")
+    @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt){
         TableComponent table       = new TableComponent(serviceManager, "listaPlayers");
         PageBuilder    leaderboard = new PageBuilder(serviceManager, Arrays.asList(table));
-        return leaderboard.handlePageRequest(model, "gamemode", jwt);
+        return leaderboard.handlePageRequest(model, "leaderboard", jwt);
     }
 
     @GetMapping("/report")

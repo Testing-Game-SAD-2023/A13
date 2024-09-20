@@ -56,8 +56,8 @@ public class ServiceManager {
             logger.logMessagge("HandleRequest", serviceName, action);
             return service.handleRequest(action, params);
         } catch (Exception e) {
-            logger.logMessagge("Errore", e);
-            throw new IllegalArgumentException("[HANDLE REQUEST]: " + e );
+            logger.logMessagge("[HANDLE REQUEST]" + serviceName + ": ", e);
+            return null; //se c'è un errore nel servizio lo segnalo e poi introduco al livello successivo una gestione del null
         }
     }
 }
