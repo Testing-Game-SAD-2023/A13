@@ -45,7 +45,9 @@
     "dependencies": {},
     "devDependencies": {}
   },
-  "dependencies": {},
+  "dependencies": {
+    "codemirror": "file:"
+  },
   "publishConfig": {
     "tag": "version5"
   }
