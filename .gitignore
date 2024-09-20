@@ -75,3 +75,5 @@ build/
 *.pptx
 
 T5-G2/t5/logs/app.log
+**/target/
+**/logs/

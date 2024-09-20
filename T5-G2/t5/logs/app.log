@@ -15,6 +15,42 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 2024-09-20 09:56:13 - [SERVICE CREATION] Creazione del servizio: T7Service
 2024-09-20 09:56:14 - Exposing 1 endpoint(s) beneath base path '/actuator'
 2024-09-20 09:56:14 - Started T5ApplicationTests in 3.662 seconds (process running for 5.219)
+<<<<<<< HEAD
+2024-09-20 11:10:05 - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/Utente/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/Utente/.m2/repository/org/json/json/20230227/json-20230227.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2024-09-20 11:10:05 - Starting T5ApplicationTests using Java 17.0.9 with PID 7212 (started by Utente in C:\Users\Utente\Desktop\ProgettoSAD\A13-ver2\T5-G2\t5)
+2024-09-20 11:10:05 - No active profile set, falling back to 1 default profile: "default"
+2024-09-20 11:10:10 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-20 11:10:10 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-20 11:10:10 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-20 11:10:10 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-20 11:10:14 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-20 11:10:14 - Started T5ApplicationTests in 10.939 seconds (process running for 16.371)
+2024-09-20 11:34:58 - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/C:/Users/Utente/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/C:/Users/Utente/.m2/repository/org/json/json/20230227/json-20230227.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2024-09-20 11:34:58 - Starting T5ApplicationTests using Java 17.0.9 with PID 8388 (started by Utente in C:\Users\Utente\Desktop\ProgettoSAD\A13-ver2\T5-G2\t5)
+2024-09-20 11:34:58 - No active profile set, falling back to 1 default profile: "default"
+2024-09-20 11:35:05 - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-09-20 11:35:05 - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-09-20 11:35:05 - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-09-20 11:35:05 - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-09-20 11:35:11 - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-09-20 11:35:12 - Started T5ApplicationTests in 14.783 seconds (process running for 18.522)
+=======
 2024-09-20 10:08:36 - 
 
 Found multiple occurrences of org.json.JSONObject on the class path:
