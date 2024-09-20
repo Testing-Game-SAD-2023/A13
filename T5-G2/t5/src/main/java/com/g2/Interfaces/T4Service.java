@@ -5,14 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 public class T4Service extends BaseService {
 
-<<<<<<< HEAD
     // Costante che definisce l'URL di base per le richieste REST
     private static final String BASE_URL = "http://t4-g18-app-1:3000";
 
@@ -41,27 +37,10 @@ public class T4Service extends BaseService {
      * associati.
      * 
      */
-=======
-public class T4Service extends BaseService{
-    private static final String BASE_URL = "http://t4-g18-app-1:3000";
-
-    public T4Service(RestTemplate restTemplate){
-        super(restTemplate, BASE_URL);
-
-        // Registrazione delle azioni
-        registerAction("getLevels", new ServiceActionDefinition(
-            params -> getLevels((String) params[0]),
-            String.class
-        ));
-    }
-
-    // BHOOOOO
->>>>>>> f201c3b82bca43847d7b8553fb0e924e383c83a5
     private List<String> getLevels(String className) {
         // Inizializzazione di una lista per conservare i risultati
         List<String> result = new ArrayList<>();
 
-<<<<<<< HEAD
         // Definizione dei tipi di robot che verranno utilizzati nella chiamata
         List<String> robot_type = List.of("randoop", "evosuite");
 
@@ -86,26 +65,12 @@ public class T4Service extends BaseService{
                     // Se la risposta non è nulla, aggiungi il livello corrente alla lista dei
                     // risultati
                     if (response != null) {
-=======
-        for (int i = 0; i < 11; i++){
-            for(String robot_string: robot_type){
-                try{
-                    // Stefano: Ancora non mi è chiaro perchè fanno così, 
-                    // credo che non esista una vera e propria REST API per avere i robots
-                    Map<String, String> formData =  new HashMap<>();
-                    formData.put("testClassId", className);
-                    formData.put("type", robot_string);
-                    formData.put("difficulty", String.valueOf(i));
-     
-                    String response = callRestGET("/robots", formData, String.class);
-                    if (response != null){
->>>>>>> f201c3b82bca43847d7b8553fb0e924e383c83a5
                         result.add(String.valueOf(i));
                     }
                 } catch (Exception e) {
                     // Gestione delle eccezioni, lancia un'eccezione personalizzata in caso di
                     // errore
-                    throw new IllegalArgumentException("Errore getLevels: " + e.getMessage());
+                    break;
                 }
             }
         }

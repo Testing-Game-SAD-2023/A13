@@ -56,7 +56,7 @@ public class GuiController {
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        TextComponent Class_list = new TextComponent(serviceManager, "T1", "getClasses", "classi");
+        TextComponent Class_list  = new TextComponent(serviceManager, "T1", "getClasses", "classeUT");
         PageBuilder   gamemode    = new PageBuilder(serviceManager, Arrays.asList(Class_list));
         return gamemode.handlePageRequest(model, "gamemode", jwt);
     } 
@@ -65,7 +65,7 @@ public class GuiController {
     public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         TextComponent testo_CUT = new TextComponent(serviceManager, "T1", "getClassUnderTest", "classeUT", "Calcolatrice");
         PageBuilder   editor      = new PageBuilder(serviceManager, Arrays.asList(testo_CUT));
-        return editor.handlePageRequest(model, "gamemode", jwt);
+        return editor.handlePageRequest(model, "editor", jwt);
     }
     
     @GetMapping("/leaderboard")

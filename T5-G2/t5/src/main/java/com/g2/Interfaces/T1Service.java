@@ -26,12 +26,21 @@ public class T1Service extends BaseService {
     // Metodi effettivi
 
     private List<ClassUT> getClasses() {
-        return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {});
+        try{
+            return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {});
+        }catch(Exception e){
+            throw new IllegalArgumentException("GetClasses fallimento errore:" + e.getMessage());
+        }
+        
     }
 
     private String getClassUnderTest(String nomeCUT) {
-        byte[] result = callRestGET("/api/downloadFile/" + nomeCUT, null, byte[].class);
-        return removeBOM(convertToString(result));
+        try{
+            byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
+            return removeBOM(convertToString(result));
+        }catch(Exception e){
+            throw new IllegalArgumentException("getClassUnderTest fallimento errore:" + e.getMessage());
+        }
     }
 
 }
