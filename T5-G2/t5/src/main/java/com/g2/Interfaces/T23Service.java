@@ -47,8 +47,7 @@ public class T23Service extends BaseService {
             return isAuthenticated != null && isAuthenticated;
         } catch (Exception e) {
             // Gestione degli errori durante la richiesta
-            System.out.println("[GETAUTHENTICATED] Errore durante l'autenticazione: " + e.getMessage());
-            return false;
+            throw new IllegalArgumentException("[GETAUTHENTICATED] Errore durante l'autenticazione: " + e.getMessage());
         }
     }
 

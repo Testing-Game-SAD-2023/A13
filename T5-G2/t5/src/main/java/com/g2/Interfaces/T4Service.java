@@ -8,30 +8,17 @@ import java.util.Map;
 import org.springframework.web.client.RestTemplate;
 
 
-public class T4Service implements ServiceInterface{
-    private final RestService restService;
+public class T4Service extends BaseService{
     private static final String BASE_URL = "http://t4-g18-app-1:3000";
 
     public T4Service(RestTemplate restTemplate){
-        this.restService = new RestService(restTemplate, BASE_URL);
-    }
+        super(restTemplate, BASE_URL);
 
-    
-    @Override
-    public Object handleRequest(String action, Object... params) {
-        switch (action) {
-            case "getLevels" -> {
-                if (params.length != 1) {
-                    throw new IllegalArgumentException("[HANDLEREQUEST] Per 'getLevels' è richiesto 1 parametro.");
-                }
-                if (!(params[0] instanceof String)) {
-                    throw new IllegalArgumentException("[HANDLEREQUEST] Il parametro per 'getLevels' deve essere una stringa.");
-                }
-                return getLevels((String) params[0]);
-            }
-            default -> throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
-        }
-        // Aggiungi altri casi per altre azioni
+        // Registrazione delle azioni
+        registerAction("getLevels", new ServiceActionDefinition(
+            params -> getLevels((String) params[0]),
+            String.class
+        ));
     }
 
     // BHOOOOO
@@ -49,7 +36,7 @@ public class T4Service implements ServiceInterface{
                     formData.put("type", robot_string);
                     formData.put("difficulty", String.valueOf(i));
      
-                    String response = restService.CallRestGET("/robots", formData, String.class);
+                    String response = callRestGET("/robots", formData, String.class);
                     if (response != null){
                         result.add(String.valueOf(i));
                     }

@@ -15,7 +15,7 @@ public class T1Service extends BaseService {
         // Registrazione delle azioni
         registerAction("getClasses", new ServiceActionDefinition(
             params -> getClasses(),
-            new Class<?>[0]
+            new Class<?>[0] //metodo non accetta parametri
         ));
 
         registerAction("getClassUnderTest", new ServiceActionDefinition(
@@ -34,4 +34,5 @@ public class T1Service extends BaseService {
         byte[] result = callRestGET("/api/downloadFile/" + nomeCUT, null, byte[].class);
         return removeBOM(convertToString(result));
     }
+
 }

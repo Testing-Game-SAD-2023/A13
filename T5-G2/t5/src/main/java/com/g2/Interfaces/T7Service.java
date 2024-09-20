@@ -5,30 +5,17 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-public class T7Service implements ServiceInterface{
-    private final RestService restService;
+public class T7Service extends BaseService{
     private static final String BASE_URL = "http://remoteccc-app-1:1234";
 
     public T7Service(RestTemplate restTemplate){
-        this.restService = new RestService(restTemplate, BASE_URL);
-    }
+        super(restTemplate, BASE_URL);
 
-    @Override
-    public Object handleRequest(String action, Object... params) {
-        switch (action) {
-            case "compile-and-codecoverage" -> {
-                if (params.length != 4) {
-                    throw new IllegalArgumentException("[HANDLEREQUEST] Per 'compile-and-codecoverage' sono richiesti 4 parametri.");
-                }
-                if (!(params[0] instanceof String) | !(params[1] instanceof String)
-                        | !(params[2] instanceof String) | !(params[3] instanceof String)) {
-                    throw new IllegalArgumentException("[HANDLEREQUEST] I parametri per 'compile-and-codecoverage' devono essere una stringa.");
-                }
-                return CompileCoverage((String) params[0], (String)params[1], (String)params[2], (String)params[3]);
-            }
-            default -> throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
-        }
-        // Aggiungi altri casi per altre azioni
+        // Registrazione delle azioni
+        registerAction("CompileCoverage", new ServiceActionDefinition(
+            params -> CompileCoverage((String)params[0], (String)params[1], (String)params[2], (String)params[3]),
+            String.class, String.class, String.class, String.class
+        ));
     }
 
     //T7 espone solo questo servizio, codice preso da T6 e rifatto 
@@ -47,7 +34,7 @@ public class T7Service implements ServiceInterface{
             formData.add("underTestClassCode", underTestClassCode);
 
             // Utilizza la classe RestService per eseguire la chiamata POST
-            String out_string = restService.CallRestPost(endpoint, formData, null, String.class);
+            String out_string = callRestPost(endpoint, formData, null, String.class);
 
             // Ritorna la risposta
             return out_string;
