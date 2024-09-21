@@ -131,6 +131,48 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
+    // Metodo per chiamate PUT
+    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
+        try {
+            if (endpoint == null || endpoint.isEmpty()) {
+                throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+            }
+            if (formData == null) {
+                throw new IllegalArgumentException("formData non può essere nullo");
+            }
+            String url = buildUri(endpoint, queryParams);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "application/x-www-form-urlencoded");
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
+            ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else {
+                throw new RestClientException("[CallRestPut] Chiamata PUT fallita con stato: " + response.getStatusCode());
+            }
+        } catch (RestClientException | IllegalArgumentException e) {
+            throw new RestClientException("[CallRestPut] Chiamata PUT fallita con stato: " + e);
+        }
+    }
+
+    // Metodo per chiamate DELETE
+    protected void callRestDelete(String endpoint, Map<String, String> queryParams) {
+        try {
+            if (endpoint == null || endpoint.isEmpty()) {
+                throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+            }
+            String url = buildUri(endpoint, queryParams);
+            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new RestClientException("[CallRestDelete] Chiamata DELETE fallita con stato: " + response.getStatusCode());
+            }
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            throw new RestClientException("[CallRestDelete] Chiamata DELETE fallita con stato: " + e);
+        } catch (RestClientException | IllegalArgumentException e) {
+            throw new RestClientException("[CallRestDelete] Chiamata DELETE fallita con stato: " + e);
+        }
+    }
+
     //Metodi di utilità 
     // Metodo di supporto per convertire il contenuto in stringa
     protected String convertToString(byte[] content) {

@@ -67,6 +67,15 @@ public class GuiController {
         PageBuilder   editor      = new PageBuilder(serviceManager, Arrays.asList(testo_CUT));
         return editor.handlePageRequest(model, "editor", jwt);
     }
+
+    /*
+     *     @GetMapping("/login")
+    public ModelAndView showLoginForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
+
+        return new ModelAndView("login");
+    }
+     */
     
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt){
