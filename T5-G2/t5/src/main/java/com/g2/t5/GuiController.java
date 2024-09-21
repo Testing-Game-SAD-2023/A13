@@ -48,8 +48,6 @@ public class GuiController {
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        //PageBuilder main = new PageBuilder(serviceManager, null);
-        //return main.handlePageRequest(model, "main", jwt);
         PageBuilder main = new PageBuilder(serviceManager, "main", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
@@ -85,17 +83,19 @@ public class GuiController {
     
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt){
-        /* 
-        TableComponent table       = new TableComponent(serviceManager, "listaPlayers");
-        PageBuilder    leaderboard = new PageBuilder(serviceManager, Arrays.asList(table));
-        return leaderboard.handlePageRequest(model, "leaderboard", jwt);
-        */
         PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
         ServiceObjectComponent lista_utenti = new ServiceObjectComponent(serviceManager, "listaPlayers", 
                                                                             "T23", "GetUsers");
         leaderboard.setPageComponents(lista_utenti);
         leaderboard.SetAuth(jwt);
         return leaderboard.handlePageRequest();
+    }
+
+    @GetMapping("/edit_profile")
+    public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt){
+        PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
+        main.SetAuth(jwt); 
+        return main.handlePageRequest();
     }
 
     @GetMapping("/report")

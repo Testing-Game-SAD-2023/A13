@@ -7,11 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceManagerLogger {
 
-    private final Logger logger;
-
-    public ServiceManagerLogger(){
-        this.logger = LoggerFactory.getLogger(ServiceManagerLogger.class);
-    }
+    private static final Logger logger = LoggerFactory.getLogger(ServiceManagerLogger.class);
 
     private void logServiceCreation(String serviceName) {
         logger.info("[SERVICE CREATION] Creazione del servizio: {}", serviceName);
