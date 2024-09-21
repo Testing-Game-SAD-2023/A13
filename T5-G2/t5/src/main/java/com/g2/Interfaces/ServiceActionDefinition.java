@@ -12,7 +12,7 @@ public class ServiceActionDefinition {
         this.parameterTypes = parameterTypes != null ? parameterTypes : new Class<?>[0];
     }
 
-    public Object execute(Object[] params) {
+    public Object execute(Object[] params){
         // Se params è nullo, assegniamo un array vuoto per la validazione
         if (params == null) {
             params = new Object[0];

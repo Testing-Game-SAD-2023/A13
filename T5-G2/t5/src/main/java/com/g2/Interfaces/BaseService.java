@@ -36,14 +36,18 @@ public abstract class BaseService implements ServiceInterface {
 
     @Override
     public Object handleRequest(String action, Object... params) {
-        ServiceActionDefinition actionDefinition = actions.get(action);
+        try {
+            ServiceActionDefinition actionDefinition = actions.get(action);
 
-        if (actionDefinition == null) {
-            throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
+            if (actionDefinition == null) {
+                throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
+            }
+    
+            // Esegui la funzione associata all'azione con i parametri validati
+            return actionDefinition.execute(params);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
-
-        // Esegui la funzione associata all'azione con i parametri validati
-        return actionDefinition.execute(params);
     }
 
     // Metodi per le chiamate REST 
