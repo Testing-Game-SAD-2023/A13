@@ -3,7 +3,6 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Components.PageBuilder;
-import com.g2.Components.TableComponent;
-import com.g2.Components.TextComponent;
+import com.g2.Components.ServiceObjectComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
@@ -50,22 +48,30 @@ public class GuiController {
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder main = new PageBuilder(serviceManager, null);
-        return main.handlePageRequest(model, "main", jwt);
+        //PageBuilder main = new PageBuilder(serviceManager, null);
+        //return main.handlePageRequest(model, "main", jwt);
+        PageBuilder main = new PageBuilder(serviceManager, "main", model);
+        main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
+        return main.handlePageRequest();
     }
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        TextComponent Class_list  = new TextComponent(serviceManager, "T1", "getClasses", "classeUT");
-        PageBuilder   gamemode    = new PageBuilder(serviceManager, Arrays.asList(Class_list));
-        return gamemode.handlePageRequest(model, "gamemode", jwt);
+        PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);        
+        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "ClasseUT", "T1", "getClasses");
+        gamemode.setPageComponents(lista_classi);
+        gamemode.SetAuth(jwt);
+        return gamemode.handlePageRequest();
     } 
         
     @GetMapping("/editor")
     public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        TextComponent testo_CUT = new TextComponent(serviceManager, "T1", "getClassUnderTest", "classeUT", "Calcolatrice");
-        PageBuilder   editor      = new PageBuilder(serviceManager, Arrays.asList(testo_CUT));
-        return editor.handlePageRequest(model, "editor", jwt);
+        PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
+        ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT", 
+                                            "T1", "getClassUnderTest", "Calcolatrice");
+        editor.setPageComponents(ClasseUT);
+        editor.SetAuth(jwt);
+        return editor.handlePageRequest();
     }
 
     /*
@@ -79,9 +85,17 @@ public class GuiController {
     
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt){
+        /* 
         TableComponent table       = new TableComponent(serviceManager, "listaPlayers");
         PageBuilder    leaderboard = new PageBuilder(serviceManager, Arrays.asList(table));
         return leaderboard.handlePageRequest(model, "leaderboard", jwt);
+        */
+        PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
+        ServiceObjectComponent lista_utenti = new ServiceObjectComponent(serviceManager, "listaPlayers", 
+                                                                            "T23", "GetUsers");
+        leaderboard.setPageComponents(lista_utenti);
+        leaderboard.SetAuth(jwt);
+        return leaderboard.handlePageRequest();
     }
 
     @GetMapping("/report")
