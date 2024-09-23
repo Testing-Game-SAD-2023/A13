@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import com.g2.Model.Game;
 
 public class T4Service extends BaseService {
 
@@ -25,7 +29,28 @@ public class T4Service extends BaseService {
                 // parametro di tipo String
                 params -> getLevels((String) params[0]),
                 // L'azione è definita per accettare un parametro di tipo String
-                String.class));
+                String.class
+        ));
+
+        registerAction("CreateGame", new ServiceActionDefinition(
+            params -> CreateGame((Game) params[0], (String) params[1]),
+             Game.class, String.class
+        ));
+
+        registerAction("CreateRound", new ServiceActionDefinition(
+            params -> CreateRound((String) params[0], (String) params[1], (String) params[2]), 
+            String.class, String.class, String.class
+        ));
+
+        registerAction("CreateTurn", new ServiceActionDefinition(
+            params -> CreateTurn((String)params[0], (String)params[1], (String)params[2]), 
+            String.class, String.class, String.class
+        ));
+
+        registerAction("CreateScalata", new ServiceActionDefinition(
+            params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]), 
+            String.class, String.class, String.class, String.class
+        ));
     }
 
     /**
@@ -78,4 +103,67 @@ public class T4Service extends BaseService {
         // Ritorna la lista dei livelli trovati
         return result;
     }
+
+    private String CreateGame(Game game, String Time){
+        final String endpoint = "/games";
+        //String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("difficulty", game.getDifficulty());
+        formData.add("name", game.getName());
+        formData.add("description", game.getDescription());
+        formData.add("username", game.getUsername());
+        formData.add("startedAt", Time);
+        try{
+            String respose = callRestPost(endpoint, formData, null, String.class);
+            return respose; 
+        }catch(Exception e){
+            throw new IllegalArgumentException("[CreateGame] Errore creazione partita: " + e.getMessage());
+        }
+    }
+
+    private String CreateRound(String game_id, String ClasseUT, String Time){
+        final String endpoint = "/rounds";
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("gameId", game_id);
+        formData.add("testClassId", ClasseUT);
+        formData.add("startedAt", Time);
+        try {
+            String respose = callRestPost(endpoint, formData, null, String.class);
+            return respose; 
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[CreateTurn] Errore creazione turno: " + e.getMessage());
+        }
+    }
+    
+    private String CreateTurn(String Player_id, String Round_id, String Time){
+        final String endpoint = "/turns";
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("players", Player_id);
+        formData.add("roundId", Round_id);
+        formData.add("startedAt", Time);
+        try {
+            String respose = callRestPost(endpoint, formData, null, String.class);
+            return respose; 
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[CreateTurn] Errore creazione turno: " + e.getMessage());
+        }
+    }
+
+    //Questa chiamata non è documentata nel materiale di caterina
+    private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date){
+        final String endpoint = "/turns";
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("playerID", player_id);
+        formData.add("scalataName", scalata_name);
+        formData.add("creationTime", creation_Time);
+        formData.add("creationDate", creation_date);
+
+        try {
+            String respose = callRestPost(endpoint, formData, null, String.class);
+            return respose; 
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[CreateTurn] Errore creazione scalata: " + e.getMessage());
+        }
+    }
+
 }

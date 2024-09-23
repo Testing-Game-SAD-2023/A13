@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark" id="html-root">
-  <head th:include="fragments/header :: header">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PROVA 2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <!-- code mirror-->
     <!-- CodeMirror CSS -->
     <link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css"/>
@@ -24,7 +30,6 @@
         }
         #myEditor2{
             height: 100%;
-            width: 50%;
         }
     </style>
 </head>
@@ -145,13 +150,15 @@ public class TestClasse {
                         </nav>
                     </div>
                     <div class="card-body m-0 p-0 overflow-y-auto" id="section2">
-                        <textarea id="console_1" > 
-                            ewknconeccowec
-                            cdniewnioc
-                            cwienwnioew
-                            cinwoinwecncenoieoeioewio
-                            ciiwceiweioweoie
-                        </textarea>
+                    
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
                     </div>
                     <div class="card-footer text-body-secondary"></div>
                 </div>
@@ -168,11 +175,70 @@ public class TestClasse {
                                 <button type="button " class="btn btn-sm btn-success"> 
                                     <i class="bi bi-play-fill"></i>
                                 </button>
+                                <button type="button" class="btn btn-sm dropdown-toggle-split btn-success" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <form class="px-4 py-3">
+                                      <div class="mb-3">
+                                        <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
+                                        <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
+                                      </div>
+                                      <div class="mb-3">
+                                        <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
+                                      </div>
+                                      <div class="mb-3">
+                                        <div class="form-check">
+                                          <input type="checkbox" class="form-check-input" id="dropdownCheck">
+                                          <label class="form-check-label" for="dropdownCheck">
+                                            Remember me
+                                          </label>
+                                        </div>
+                                      </div>
+                                      <button type="submit" class="btn btn-primary">Sign in</button>
+                                    </form>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#">New around here? Sign up</a>
+                                    <a class="dropdown-item" href="#">Forgot password?</a>
+                                  </div>
                             </div>
-                        </nav>
+                    </nav>
                     </div>
                     <div class="card-body m-0 p-0 overflow-y-hidden">
                         <textarea id="myEditor2" th:text="${classeUT}"> 
+                        </textarea>
+                    </div>
+                    <div class="card-footer text-body-secondary"></div>
+                </div>
+            </div>
+            <div class="col px-0">
+                <div class="card d-flex flex-column rounded-0" id="topcard">
+                    <!-- EDITOR-->
+                    <div class="card-header p-0">
+                        <nav class="navbar bg-body-tertiary p-2">
+                                <span class="navbar-brand lead my-0 py-0">
+                                    Edit  
+                                </span> 
+                                <div class="btn-group btn-group">
+                                    <button type="button" class="btn btn-sm"> 
+                                        <i class="bi bi-play-fill"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm dropdown-toggle-split my-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#">Action</a></li>
+                                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                        </nav>
+                    </div>
+                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section3">
+                        <textarea id="myEditor3"> 
                         </textarea>
                     </div>
                     <!-- CONSOLE -->
@@ -186,14 +252,16 @@ public class TestClasse {
                                 </button>
                         </nav>
                     </div>
-                    <div class="card-body m-0 p-0 overflow-y-auto" id="section2">        
-                        <textarea id="console_2" > 
-                            ewknconeccowec
-                            cdniewnioc
-                            cwienwnioew
-                            cinwoinwecncenoieoeioewio
-                            ciiwceiweioweoie
-                        </textarea>
+                    <div class="card-body m-0 p-0 overflow-y-auto" id="section4">
+                    
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
                     </div>
                     <div class="card-footer text-body-secondary"></div>
                 </div>
@@ -201,125 +269,108 @@ public class TestClasse {
         </div>
     </div>
 
-    <!-- FOOTER-->
-     <div th:include="fragments/footer :: footer">
-        <script th:src="@{/t5/codemirror/lib/codemirror.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/mode/clike/clike.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/fold/foldcode.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/search/searchcursor.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/codemirror/addon/search/search.js}"th:inline="javascript"></script>
-        <script th:src="@{/t5/jquery/jquery-3.7.0.com.js}"  th:inline="javascript"></script>
+    <!-- SCRIPTS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    
+    <script th:src="@{/t5/codemirror/lib/codemirror.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/mode/clike/clike.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/foldcode.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/search/searchcursor.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/codemirror/addon/search/search.js}"th:inline="javascript"></script>
+    <script th:src="@{/t5/jquery/jquery-3.7.0.com.js}"  th:inline="javascript"></script>
 
-        <script>
-            // Inizializzazione di CodeMirror
-            var editor_code = CodeMirror.fromTextArea(document.getElementById("myEditor"), {
-            lineNumbers: true,       // Mostra i numeri di riga
-            mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-            theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-            tabSize: 4,              // Dimensione del tab
-            autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-            });
+    <script>
+        // Inizializzazione di CodeMirror
+        var editor_code = CodeMirror.fromTextArea(document.getElementById("myEditor"), {
+          lineNumbers: true,       // Mostra i numeri di riga
+          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
+          tabSize: 4,              // Dimensione del tab
+          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
+        });
 
-            var editor_code_2 = CodeMirror.fromTextArea(document.getElementById("myEditor2"), {
-            lineNumbers: true,       // Mostra i numeri di riga
-            mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-            theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-            tabSize: 4,              // Dimensione del tab
-            autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-            });
+        var editor_code_2 = CodeMirror.fromTextArea(document.getElementById("myEditor2"), {
+          lineNumbers: true,       // Mostra i numeri di riga
+          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
+          tabSize: 4,              // Dimensione del tab
+          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
+        });
 
-            var editor_code_3 = CodeMirror.fromTextArea(document.getElementById("console_1"), {
-            lineNumbers: true,       // Mostra i numeri di riga
-            mode: "bash",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-            theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-            readOnly: true, // Rende l'editor non editabile
-            tabSize: 4,              // Dimensione del tab
-            autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-            });
+        const divider = document.getElementById('divider');
+        const section1 = document.getElementById('section1');
+        const section2 = document.getElementById('section2');
+        const container = document.getElementById('topcard');
+        let isDragging = false;
 
-            var editor_code_3 = CodeMirror.fromTextArea(document.getElementById("console_2"), {
-            lineNumbers: true,       // Mostra i numeri di riga
-            mode: "bash",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-            theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-            readOnly: true, // Rende l'editor non editabile
-            tabSize: 4,              // Dimensione del tab
-            autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-            });
+        // Imposta l'altezza del container all'altezza del viewport
+        function setContainerHeight() {
+            container.style.height = (window.innerHeight - 30)+ 'px';
+            editor_code.setSize(null, (window.innerHeight - 30)+ 'px');
+            editor_code_2.setSize(null, (window.innerHeight - 95.5)+ 'px');
+        }
 
-            const divider = document.getElementById('divider');
-            const section1 = document.getElementById('section1');
-            const section2 = document.getElementById('section2');
-            const container = document.getElementById('topcard');
-            let isDragging = false;
+        // Inizializza l'altezza del container
+        setContainerHeight();
 
-            // Imposta l'altezza del container all'altezza del viewport
-            function setContainerHeight() {
-                container.style.height = (window.innerHeight - 30)+ 'px';
-                editor_code.setSize(null, (window.innerHeight - 30)+ 'px');
-                editor_code_2.setSize(null, (window.innerHeight - 95.5)+ 'px');
+        // Aggiungi un event listener per ridimensionare la finestra
+        window.addEventListener('resize', setContainerHeight);
+
+        // Aggiungi event listener per il mouse down (quando si inizia a trascinare)
+        divider.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            document.body.style.cursor = 'grabbing'; // Mostra la mano chiusa durante il trascinamento
+            container.classList.add('no-select'); // Disabilita la selezione del testo
+        });
+
+        // Event listener per il movimento del mouse
+        document.addEventListener('mousemove', function (e) {
+            if (!isDragging) return; // Se non si sta trascinando, non fare nulla
+
+            // Calcola la nuova altezza della prima sezione
+            const containerRect = container.getBoundingClientRect();
+            const offsetY = e.clientY - containerRect.top;
+
+            // Imposta la nuova altezza per la prima sezione
+            section1.style.height = `${offsetY}px`;
+            editor_code.setSize(null, `${offsetY}px`);
+            // Imposta l'altezza per la seconda sezione basata sull'altezza del contenitore - offsetY
+            section2.style.height = `${containerRect.height - offsetY}px`; // -10 per l'altezza della divider
+        });
+
+        // Event listener per il rilascio del mouse (fine del trascinamento)
+        document.addEventListener('mouseup', function () {
+            isDragging = false; // Interrompe il ridimensionamento
+            document.body.style.cursor = 'default'; // Ripristina il cursore predefinito
+            container.classList.remove('no-select'); // Riabilita la selezione del testo
+        });
+    
+        // Funzione per cambiare il tema
+        function toggleTheme() {
+            const htmlElement = document.getElementById("html-root");
+            const checkbox = document.getElementById("themeToggle");
+
+            if (checkbox.checked) {
+                htmlElement.setAttribute("data-bs-theme", "dark");
+                editor_code.setOption("theme", "material-darker");
+                editor_code_2.setOption("theme", "material-darker");
+            } else {
+                htmlElement.setAttribute("data-bs-theme", "light");
+                editor_code.setOption("theme", "eclipse");
+                editor_code_2.setOption("theme", "eclipse");
             }
+        }
 
-            // Inizializza l'altezza del container
-            setContainerHeight();
-
-            // Aggiungi un event listener per ridimensionare la finestra
-            window.addEventListener('resize', setContainerHeight);
-
-            // Aggiungi event listener per il mouse down (quando si inizia a trascinare)
-            divider.addEventListener('mousedown', function (e) {
-                isDragging = true;
-                document.body.style.cursor = 'grabbing'; // Mostra la mano chiusa durante il trascinamento
-                container.classList.add('no-select'); // Disabilita la selezione del testo
-            });
-
-            // Event listener per il movimento del mouse
-            document.addEventListener('mousemove', function (e) {
-                if (!isDragging) return; // Se non si sta trascinando, non fare nulla
-
-                // Calcola la nuova altezza della prima sezione
-                const containerRect = container.getBoundingClientRect();
-                const offsetY = e.clientY - containerRect.top;
-
-                // Imposta la nuova altezza per la prima sezione
-                section1.style.height = `${offsetY}px`;
-                editor_code.setSize(null, `${offsetY}px`);
-                // Imposta l'altezza per la seconda sezione basata sull'altezza del contenitore - offsetY
-                section2.style.height = `${containerRect.height - offsetY}px`; // -10 per l'altezza della divider
-            });
-
-            // Event listener per il rilascio del mouse (fine del trascinamento)
-            document.addEventListener('mouseup', function () {
-                isDragging = false; // Interrompe il ridimensionamento
-                document.body.style.cursor = 'default'; // Ripristina il cursore predefinito
-                container.classList.remove('no-select'); // Riabilita la selezione del testo
-            });
-        
-            // Funzione per cambiare il tema
-            function toggleTheme() {
-                const htmlElement = document.getElementById("html-root");
-                const checkbox = document.getElementById("themeToggle");
-
-                if (checkbox.checked) {
-                    htmlElement.setAttribute("data-bs-theme", "dark");
-                    editor_code.setOption("theme", "material-darker");
-                    editor_code_2.setOption("theme", "material-darker");
-                } else {
-                    htmlElement.setAttribute("data-bs-theme", "light");
-                    editor_code.setOption("theme", "eclipse");
-                    editor_code_2.setOption("theme", "eclipse");
-                }
-            }
-
-            // Assegna l'evento al cambio di stato del checkbox
-            document.getElementById("themeToggle").addEventListener("change", toggleTheme);
-        
-        </script>
-    </div>
+        // Assegna l'evento al cambio di stato del checkbox
+        document.getElementById("themeToggle").addEventListener("change", toggleTheme);
+    
+    </script>
 </body>
 </html>
