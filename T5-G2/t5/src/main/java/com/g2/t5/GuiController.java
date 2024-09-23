@@ -18,11 +18,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
+import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.ServiceObjectComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
+import com.g2.Model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -94,6 +96,12 @@ public class GuiController {
     @GetMapping("/edit_profile")
     public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt){
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
+
+        User player_placeholder = new User((long)1, "placeholder", "placeholder", "email", "password",
+        true, "studies", "resetToke");
+
+        GenericObjectComponent<User> player = new GenericObjectComponent<>("player", player_placeholder);
+        main.setPageComponents(player);
         main.SetAuth(jwt); 
         return main.handlePageRequest();
     }
