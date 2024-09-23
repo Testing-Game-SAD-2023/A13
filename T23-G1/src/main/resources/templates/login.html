@@ -1,181 +1,154 @@
 <!DOCTYPE html>
-<html lang = "it" xmlns:th="http://www.thymeleaf.org">
-  <head>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <title>Login Page</title>
-    <link rel="stylesheet" th:href="@{/t23/css/login.css}" />
-    <meta name="viewport" content="width=device-width">                               <!--MODIFICA: Correct the viewport meta tag (responsive web design and performance improvements)-->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">   <!--MODIFICA: Forza il web browser a richiedere tutte le risorse del documento in modo sicuro-->
-    <meta charset="UTF-8">
-    <!--FINE MODIFICA-->
-
-  </head>
-  <body>
-    <div class="container">
-      <h1>LOGIN</h1>
-      <form th:action="@{/login}" method="post">
-      <form>
-        <input type="text" id="email" name="email" placeholder="Indirizzo email" autocomplete="on">
-        <input type="password" id="password" name="password" placeholder="Password" autocomplete="off">
-        <!--Primo bottone ('Accedi')-->
-        <input type="submit" value="Accedi" class="submit-button">
-        <!--MODIFICA (18/02/2024) : Aggiunta bottone Menu-->
-        <input type="button" value="Home" class="menu-button" onclick="window.location.href='/menu';">
-
-		  <!--<button class="google-login-button">Accedi con Google</button> -->
-		<a class="login-signup-now" data-uia="login-signup-now" href="/register">Non sei ancora registrato? Registrati.</a>
-    <a class="login-help-link link" target="_self" data-uia="login-help-link" href="/password_reset">Hai dimenticato la password?</a>
-      </form>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     
-      <!--MODIFICA (05/02/2024) : Social login con Facebook-->
-      
-      <p>Oppure:</p>
-      
-        <p id="profile"></p>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2f4f4f, #4b5358, #6c757d, #343a40);
+            background-attachment: fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
 
-      <script>
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 0.5rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            max-width: 500px;
+            margin: auto;
+            margin-top: 5rem;
+        }
 
-          //statusChangeCallback() viene chiamata con i risultati restituiti da FB.getLoginStatus().
-          function statusChangeCallback(response) {
-            console.log('statusChangeCallback');
-            console.log(response);
-            
-            //Siamo loggati?
-            if(response.status==='connected') {
+        .text-custom {
+            color: #284c73;
+            font-weight: 700;
+        }
 
-              const access_token = response.authResponse.accessToken;
+        .form-label {
+            color: #333;
+        }
 
-              //Richiesta all'API per recuperare email e nome
-              FB.api('/me', {fields: 'name, email'}, function(response) {
-                               //document.getElementById("profile").innerHTML = "Good to see you, " + response.name + ". i see your email address is " + response.email
-                               console.log(JSON.stringify(response));
+        .form-control {
+            border-radius: 0.5rem;
+            border: 1px solid #ced4da;
+        }
 
-                               //Invio dati back-end (POST): accessToken + email + nome
-                               //Dati da inviare nella richiesta POST (da convertire in formato JSON)
-                               const data = {
-                                email: response.email,
-                                nome: response.name,
-                                access_token: access_token
-                              };
+        .btn-custom {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
 
-                              // Costruzione URL che includa i parametri di interesse (nome, email ed access_token)
-                              const url = `https://blindly-harmless-oarfish.ngrok-free.app/login_with_facebook?nome=${data.nome}&email=${data.email}&access_token=${data.access_token}`
+        .text-custom:hover {
+            color: #253e58;
+        }
+    </style>
+</head>
 
-                              //Configuraazione della richiesta
-                              const options = {
-                                method: 'POST',
-                                headers: {
-                                  'Content-Type': 'application/json'            // Specifica il tipo di contenuto come JSON
-                                },
-                                redirect: 'follow'                              // Segui il reindirizzamento
-                              };
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h3 class="text-center text-custom">Login Form</h3>
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Indirizzo email:</label>
+                    <input type="text" id="email" name="email" class="form-control" placeholder="Indirizzo email" autocomplete="on" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" autocomplete="off" required>
+                </div>
+                <button type="submit" class="btn btn-custom w-100">Accedi</button>
+                <div class="text-center mt-3">
+                    <input type="button" value="Home" class="btn btn-link text-custom" onclick="window.location.href='/menu';">
+                </div>
+                <div class="text-center mt-3">
+                    <a class="login-signup-now text-custom" href="/register">Non sei ancora registrato? Registrati.</a>
+                </div>
+                <div class="text-center mt-3">
+                    <a class="login-help-link text-custom" href="/password_reset">Hai dimenticato la password?</a>
+                </div>
+            </form>
+    
+            <p class="text-center mt-4">Oppure:</p>
+            <div class="text-center">
+                <div id="fb-root"></div>
+                <div class="fb-login-button" onlogin="checkLoginState()" data-width="" data-size="large" data-button-type="login_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="true" scope="public_profile,email"></div>
+            </div>
+        </div>
+    </div>
+    
 
-                              // Esecuzione della richiesta POST utilizzando la fetch()
-                              fetch(url, options)
-                                .then(response => {
-                                  if (!response.ok) {
-                                    throw new Error('Errore nella richiesta POST');
-                                  }
-                                  location.reload()
-                                })
-                                .catch(error => {
-                                  console.error('Si è verificato un errore:', error);
-                                });
-                           });
-
-            }  
-          }
-
-          //L'oggetto risposta viene restituito con un campo 'status' che permette
-            //all'applicazione di conoscere lo stato corrente del login di una persona,
-            // if(response.status === 'connected') {
-            //    Utente loggato nella web-app e su Facebook
-            //                       ...
-            //} else {
-            //    Utente non loggato nella web-app oppure lo stato è sconosciuto
-            //    document.getElementById('status').innerHTML = 'Per favore loggati nella web-app.';
-            //}
-
-          //La funzione checkLoginState() viene invocata non appena viene cliccato
-          //il bottone: "Accedi con Facebook"
-          function checkLoginState() {
-            FB.getLoginStatus(function(response) {
-              statusChangeCallback(response);
-            });
-          }
-
-         //Aggiungere l'SDK di Facebook per Javascript
-         (function(d, s, id){
-                               var js, fjs = d.getElementsByTagName(s)[0];
-                               if (d.getElementById(id)) {return;}
-                               js = d.createElement(s); js.id = id;
-                               js.src = "https://connect.facebook.net/it-IT/sdk.js";        //Impostazione lingua italiana 'it-IT'
-                               fjs.parentNode.insertBefore(js, fjs);
-                             }(document, 'script', 'facebook-jssdk')
-         );
-                            
-         window.fbAsyncInit = function() {
-            //Inizializzazione dell'SDK
+    <script>
+        // Inizializzazione dell'SDK di Facebook
+        window.fbAsyncInit = function() {
             FB.init({
-                      appId            : '689086720098849', //ID della propria applicazione
-                      xfbml            : false,             //analisi DOM per trovare ed inizializzare qualsiasi plug-in social usando XFBML
-                      cookie           : true,
-                      version          : 'v19.0'            //versione del Graph API
-                    });
+                appId: '689086720098849', // ID della tua applicazione
+                xfbml: true,
+                version: 'v19.0'
+            });
 
-            //Una volta aver inizializzato l'SDK per Javascript, verrà chiamata
-            //FB.getLoginStatus() per recuperare lo stato della persona che sta
-            //attualmente visitando la web-app nel browser; verrà restituito
-            //uno dei seguenti tre possibili stati:
-            //
-            // 1. Loggato nella web-app ('connected')
-            // 2. Loggato su Facebook ma non sulla web-app ('not_authorized')
-            // 3. Non loggato su Facebook, non si sa se l'Utente sia loggato sulla web-app oppure no. ('unknown')
-            //
-            //Questi tre casi verranno gestiti nella funzione di callback
-
+            // Controlla lo stato di login al caricamento
             FB.getLoginStatus(function(response) {
-              statusChangeCallback(response);
-              console.log(response.authResponse.accessToken);   
-            });
-
-            FB.AppEvents.logPageView();
-
-            //Se l'Utente è già loggato su Facebook, e probabilmente lo sarà se utilizza cookies, automaticamente verranno
-            //recuperate le seguenti informazioni: nome, indirizzo email e le informazioni inerenti il profilo pubblico
-            FB.login(function(response) {
-                      if (response.authResponse) {
-                           console.log('Welcome!  Fetching your information.... ');
-                           //console.log(response.authResponse.accessToken);
-
-                           //Recupero nome ed email tramite GET all'API di Facebook
-                           FB.api('/me', {fields: 'name, email'}, function(response) {
-                               document.getElementById("profile").innerHTML = "Good to see you, " + response.name + ". i see your email address is " + response.email
-                               console.log(JSON.stringify(response));
-                           });
-                      } else { 
-                            //Se l'Utente non si è ancora loggato, apparirà una finestra di dialogo che richiederà le autorizzazioni per recuperare l'email e le informazioni
-                            //riguardanti il profilo pubblico
-                           console.log('User cancelled login or did not fully authorize.'); }
-            });
-
-            FB.logout(function(response) {
-              //Utente sloggato e ricaricamento della pagina
-              location.reload();
+                statusChangeCallback(response);
             });
         };
 
-      </script>
-      <div id="fb-root"></div>
-      <script async defer crossorigin="anonymous" src="https://connect.facebook.net/it_IT/sdk.js#xfbml=1&version=v19.0&appId=689086720098849" nonce="wbjdNY5p"></script>
-      <div class="fb-login-button" onlogin="checkLoginState()" data-width="" data-size="medium" data-button-type="login_with" data-layout="" data-auto-logout-link="true" data-use-continue-as="true" scope="public_profile,email"></div>
+        // Carica SDK di Facebook
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/it-IT/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
 
-      <!-- data-use-continue-as="true": Abilita la funzionalità "Continua come {name}" -->
-      <!--data-auto-logout-link="true" : Se abilitato, il pulsante diventerà il pulsante 'Esci' quando l'utente ha effettuato l'accesso-->
-      <!--data-size: Opzioni delle dimensioni per il pulsante (small,medium e large)-->
-      <!--button_type: Parametro che permette di specificare i pulsanti 'Continua con Facebook' o 'Accedi con Facebook' (continue_with, login_with)-->
-      <!--data-layout : Forma del pulsante Accedi (default, rounded)-->
-      <!--scope: Informazioni a cui può avere accesso-->
+        // Callback per il login
+        function statusChangeCallback(response) {
+            if (response.status === 'connected') {
+                const access_token = response.authResponse.accessToken;
+                FB.api('/me', { fields: 'name,email' }, function(response) {
+                    console.log('Welcome!  Fetching your information.... ', response);
+                    // Invio dati back-end
+                    const data = {
+                        email: response.email,
+                        nome: response.name,
+                        access_token: access_token
+                    };
+                    // Esegui richiesta POST
+                    fetch(`https://your-backend-url/login_with_facebook`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    }).then(res => {
+                        if (!res.ok) throw new Error('Errore nella richiesta POST');
+                        location.reload();
+                    }).catch(error => console.error('Si è verificato un errore:', error));
+                });
+            }
+        }
 
-    </div>
-  </body>
+        // Funzione per controllare il login
+        function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        }
+    </script>
+</body>
 </html>
