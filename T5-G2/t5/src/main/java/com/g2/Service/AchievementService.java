@@ -1,9 +1,6 @@
 package com.g2.Service;
 
-import com.g2.Model.Achievement;
-import com.g2.Model.AchievementProgress;
-import com.g2.Model.CategoryProgress;
-import com.g2.Model.Game;
+import com.g2.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -11,11 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class AchievementService {
@@ -26,49 +19,64 @@ public class AchievementService {
         this.restTemplate = restTemplate;
     }
 
+    Map<String, Integer> GamemodeToInt = Map.ofEntries(
+        Map.entry("Games-Total" , 1),
+        Map.entry("Games-Robot-Randoop" , 2),
+        Map.entry("Games-Robot-Evosuite" , 3),
+        Map.entry("Games-Multiplayer" , 4),
+        Map.entry("Games-Training" , 5),
+        Map.entry("Games-Scalata" , 6),
+        Map.entry("Scores-Robot-Randoop" , 7),
+        Map.entry("Scores-Robot-Evosuite" , 8),
+        Map.entry("Scores-Multiplayer" , 9),
+        Map.entry("Scores-Training" , 10),
+        Map.entry("Scores-Scalata" , 11)
+    );
+
     /**
      * @param playerID
      * @return a list of achievements obtained after this update.
      */
     public List<Achievement> updateProgressByPlayer(int playerID) {
-        // Global progress updater. It should get:
-        // 1. Number of total games by the player (played + won)
-        // 2. Number of games of the player by gamemodes: (played + won)
-        //      a. Robot game (for every robot)
-        //      b. Multiplayer game
-        //      c. Training
-        //      d. Scalata game
-        // 3. Same as 2 but with score
-
         List<Achievement> obtainedAchievements = new ArrayList<>();
 
-        ResponseEntity<List<Game>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/games/player/" + playerID,
+        ResponseEntity<List<Game>> gamesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/games/player/" + playerID,
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 });
 
-        List<String> gamemodes = Arrays.asList("Robot-Randoop", "Robot-Evosuite", "Multiplayer", "Training", "Scalata-Game");
+        List<String> gamemodes = Arrays.asList("Robot-Randoop", "Robot-Evosuite", "Multiplayer", "Training", "Scalata");
 
         //System.out.println(progressesResponseEntity.getBody());
-        List<Game> gamesList = progressesResponseEntity.getBody();
+        List<Game> gamesList = gamesResponseEntity.getBody();
 
-        System.out.println("Total games played: " + gamesList.size());
+        int totalGamesCount = gamesList.size();
 
-        double globalScore = gamesList.stream().mapToDouble(Game::getScore).sum();
-        System.out.println("Total score (useless): " + globalScore);
-
-        for (String gm : gamemodes)
-            System.out.println("Games played of gamemode " + gm + ": " + gamesList.stream().filter(l -> Objects.equals(l.getDescription(), "Robot")).count());
+        setProgress(playerID, GamemodeToInt.get("Games-Total"), totalGamesCount);
 
         for (String gm : gamemodes) {
-            double scoreSum = gamesList.stream().filter(l -> Objects.equals(l.getDescription(), "Robot")).mapToDouble(Game::getScore).sum();
-            System.out.println("Score obtained by gamemode " + gm + ": " + scoreSum);
+            int gamemodeGamesCount = (int) gamesList.stream().filter(l -> Objects.equals(l.getDescription(), gm)).count();
+            int category = GamemodeToInt.get("Games-" + gm);
+
+            setProgress(playerID, category, gamemodeGamesCount);
         }
 
-        return  obtainedAchievements;
+        for (String gm : gamemodes) {
+            float scoreSum = (float) gamesList.stream().filter(l -> Objects.equals(l.getDescription(), gm)).mapToDouble(Game::getScore).sum();
+            int category = GamemodeToInt.get("Scores-" + gm);
+
+            setProgress(playerID, category, scoreSum);
+        }
+
+        List<AchievementProgress> achievementProgresses = getProgressesByPlayer(playerID);
+
+        // filter out all the achievements already obtained, and return the others
+
+        return obtainedAchievements;
     }
 
-    private void setProgress(int playerID, int category) {
-        // TODO: set current progress by pid and category
+    private void setProgress(int playerID, int category, float progress) {
+        restTemplate.put("http://t4-g18-app-1:3000/phca/" + playerID + "/" + category,
+                new StatisticProgress(playerID, category, progress));
     }
 
     public List<AchievementProgress> getProgressesByPlayer(int playerID) {
@@ -90,6 +98,9 @@ public class AchievementService {
             List<CategoryProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.Category == a.getCategory()).toList();
             for (CategoryProgress c : filteredList)
                 achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
+
+            if (filteredList.size() == 0) // if there is no progress recorded, just put progress 0
+                achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), 0));
         }
 
         return achievementProgresses;

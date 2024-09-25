@@ -83,11 +83,11 @@ func (gs *Repository) Delete(pid int64, statistic uint8) error {
 func (gs *Repository) Update(pid int64, statistic uint8, r *UpdateRequest) (PlayerHasCategoryAchievement, error) {
 
 	var (
-		phca model.PlayerHasCategoryAchievement = model.PlayerHasCategoryAchievement{PlayerID: pid, Category: statistic}
+		phca model.PlayerHasCategoryAchievement = model.PlayerHasCategoryAchievement{PlayerID: pid, Category: statistic, Progress: r.Progress}
 		err         error
 	)
 
-	err = gs.db.Model(&phca).Updates(r).Error
+	err = gs.db.Save(&phca).Error
 	if err != nil {
 		return PlayerHasCategoryAchievement{}, api.MakeServiceError(err)
 	}
