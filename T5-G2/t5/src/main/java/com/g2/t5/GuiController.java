@@ -3,7 +3,6 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -39,15 +38,6 @@ public class GuiController {
         this.serviceManager = new ServiceManager(restTemplate);
     }
 
-    @GetMapping("/debug")
-    public String debug(Model model){
-        
-        List<String> items = List.of("Elemento 1", "Elemento 2", "Elemento 3", "Elemento 4");
-        model.addAttribute("items", items); 
-        
-        return "debug";
-    }
-
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "main", model);
@@ -56,7 +46,8 @@ public class GuiController {
     }
 
     @GetMapping("/gamemode")
-    public String gamemodePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+    public String gamemodePage(Model model, 
+                               @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);        
         ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "ClasseUT", "T1", "getClasses");
         gamemode.setPageComponents(lista_classi);
@@ -65,10 +56,13 @@ public class GuiController {
     } 
         
     @GetMapping("/editor")
-    public String editorPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+    public String editorPage(Model model, 
+                             @CookieValue(name = "jwt", required = false) String jwt,
+                             @RequestParam("testingClassName")   String testingClassName) {
+
         PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
         ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT", 
-                                            "T1", "getClassUnderTest", "Calcolatrice");
+                                            "T1", "getClassUnderTest", testingClassName);
         editor.setPageComponents(ClasseUT);
         editor.SetAuth(jwt);
         return editor.handlePageRequest();

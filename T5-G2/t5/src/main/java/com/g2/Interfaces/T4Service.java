@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Model.Game;
 
+@Service
 public class T4Service extends BaseService {
 
     // Costante che definisce l'URL di base per le richieste REST
@@ -33,8 +35,8 @@ public class T4Service extends BaseService {
         ));
 
         registerAction("CreateGame", new ServiceActionDefinition(
-            params -> CreateGame((Game) params[0], (String) params[1]),
-             Game.class, String.class
+            params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3], (String) params[4]),
+            String.class, String.class, String.class, String.class, String.class
         ));
 
         registerAction("CreateRound", new ServiceActionDefinition(
@@ -42,8 +44,18 @@ public class T4Service extends BaseService {
             String.class, String.class, String.class
         ));
 
+        registerAction("EndRound", new ServiceActionDefinition(
+            params -> EndRound((String) params[0], (String) params[1]), 
+            String.class, String.class
+        ));
+
         registerAction("CreateTurn", new ServiceActionDefinition(
             params -> CreateTurn((String)params[0], (String)params[1], (String)params[2]), 
+            String.class, String.class, String.class
+        ));
+
+        registerAction("EndTurn", new ServiceActionDefinition(
+            params -> EndTurn((String)params[0], (String)params[1], (String)params[2]), 
             String.class, String.class, String.class
         ));
 
@@ -51,8 +63,27 @@ public class T4Service extends BaseService {
             params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]), 
             String.class, String.class, String.class, String.class
         ));
+
+        registerAction("GetRisultati", new ServiceActionDefinition(
+            params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
+            String.class, String.class, String.class
+        ));
     }
 
+    // usa /robots per ottenere dati 
+    private String GetRisultati(String className, String robot_type, String difficulty){
+        try {
+            Map<String, String> formData = new HashMap<>();
+            formData.put("testClassId", className);          // Nome della classe
+            formData.put("type", robot_type);               // Tipo di robot
+            formData.put("difficulty", difficulty);        // Livello di difficoltà corrente
+
+            String response = callRestGET("/robots", formData, String.class);
+            return response;
+        } catch (Exception e) {
+            return "errore GetRisultati";
+        }
+    }
     /**
      * Metodo che invia richieste per ottenere diversi "livelli" (levels) in base al
      * nome della classe.
@@ -104,20 +135,20 @@ public class T4Service extends BaseService {
         return result;
     }
 
-    private String CreateGame(Game game, String Time){
+    private String CreateGame(String Time, String difficulty, String name, String description, String username){
         final String endpoint = "/games";
         //String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("difficulty", game.getDifficulty());
-        formData.add("name", game.getName());
-        formData.add("description", game.getDescription());
-        formData.add("username", game.getUsername());
+        formData.add("difficulty", difficulty);
+        formData.add("name", name);
+        formData.add("description", description);
+        formData.add("username", username);
         formData.add("startedAt", Time);
         try{
             String respose = callRestPost(endpoint, formData, null, String.class);
             return respose; 
         }catch(Exception e){
-            throw new IllegalArgumentException("[CreateGame] Errore creazione partita: " + e.getMessage());
+            throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
         }
     }
 
@@ -131,10 +162,23 @@ public class T4Service extends BaseService {
             String respose = callRestPost(endpoint, formData, null, String.class);
             return respose; 
         } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateTurn] Errore creazione turno: " + e.getMessage());
+            throw new IllegalArgumentException("[CreateRound]: " + e.getMessage());
         }
     }
     
+    private String EndRound(String Time, String roundId){
+        //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
+        final String endpoint = "rounds/" + roundId;
+        try {
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+            formData.add("closedAt", Time);
+            String response = callRestPut(endpoint, formData, null, String.class);
+            return response;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[EndRound]: " + e.getMessage());
+        }
+    }
+
     private String CreateTurn(String Player_id, String Round_id, String Time){
         final String endpoint = "/turns";
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -145,7 +189,22 @@ public class T4Service extends BaseService {
             String respose = callRestPost(endpoint, formData, null, String.class);
             return respose; 
         } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateTurn] Errore creazione turno: " + e.getMessage());
+            throw new IllegalArgumentException("[CreateTurn]: " + e.getMessage());
+        }
+    }
+
+    private String EndTurn(String user_score, String Time, String turnId){
+        //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
+        final String endpoint = "turns/" + turnId;
+        try {
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+            formData.add("scores", user_score);
+            formData.add("closedAt", Time);
+
+            String response = callRestPut(endpoint, formData, null, String.class);
+            return response;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[EndTurn]: " + e.getMessage());
         }
     }
 
@@ -162,8 +221,7 @@ public class T4Service extends BaseService {
             String respose = callRestPost(endpoint, formData, null, String.class);
             return respose; 
         } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateTurn] Errore creazione scalata: " + e.getMessage());
+            throw new IllegalArgumentException("[CreateScalata]: " + e.getMessage());
         }
     }
-
 }

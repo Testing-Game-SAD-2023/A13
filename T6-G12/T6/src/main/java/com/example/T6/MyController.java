@@ -52,6 +52,7 @@ public class MyController {
         return "index";
     }
 
+    //Stefano: questo sostituito 
     @GetMapping("/receiveClassUnderTest")
     public ResponseEntity<String> receiveClassUnderTest(
             @RequestParam("idUtente") String idUtente,
@@ -346,7 +347,8 @@ public class MyController {
                 System.out.println("Errore durante la PUT in /rounds/{id}");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            // chiusura gioco
+
+            // chiusura gioco STEFANO QUA TI SEI FERMATO
             System.out.println("(/run) Aggiornamento e chiusura della partita...");
             httpPut = new HttpPut("http://t4-g18-app-1:3000/games/" + String.valueOf(request.getParameter("gameId")));
 

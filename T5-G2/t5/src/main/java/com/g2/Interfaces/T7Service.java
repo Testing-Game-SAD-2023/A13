@@ -1,10 +1,12 @@
 package com.g2.Interfaces;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+@Service
 public class T7Service extends BaseService {
 
     private static final String BASE_URL = "http://remoteccc-app-1:1234";

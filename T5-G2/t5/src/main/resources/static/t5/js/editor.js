@@ -45,7 +45,6 @@ $(document).ready(function () {
   //Redirect to /main page if some parameters are missing
   if (idUtente == null || idPartita == null || idTurno == null || nameCUT == null || robotScelto == null || difficolta == null) window.location.href = "/main";
   
-
   $.ajax({
     url: "/api/receiveClassUnderTest",
     type: "GET",
@@ -95,7 +94,6 @@ $(document).ready(function () {
       alert("Classe: "+nameCUT+".java ricevuta con successo");
     },
     error: function () {
-
       // Gestione dell'errore
       console.log("Errore durante la ricezione del file "+ nameCUT+".java");
     }
@@ -350,17 +348,17 @@ runButton.addEventListener("click", function () {
                     console.log('Terzo elemento della seconda riga:', terzoElemento);
                     
                     displayRobotPoints = `Esito Risultati (percentuale di linee coperte)
-                  Il tuo punteggio EvoSuite: ${terzoElemento}% LOC
-                  Il tuo punteggio Jacoco: ${response.score.toString()}% LOC
-                  Il punteggio del robot: ${response.robotScore.toString()}% LOC
-                  Informazioni aggiuntive di copertura:
-                  Il tuo punteggio EvoSuite: ${terzoElemento1}% Branch
-                  Il tuo punteggio EvoSuite: ${terzoElemento2}% Exception
-                  Il tuo punteggio EvoSuite: ${terzoElemento3}% WeakMutation
-                  Il tuo punteggio EvoSuite: ${terzoElemento4}% Output
-                  Il tuo punteggio EvoSuite: ${terzoElemento5}% Method
-                  Il tuo punteggio EvoSuite: ${terzoElemento6}% MethodNoException
-                  Il tuo punteggio EvoSuite: ${terzoElemento7}% CBranch`
+                                          Il tuo punteggio EvoSuite: ${terzoElemento}% LOC
+                                          Il tuo punteggio Jacoco: ${response.score.toString()}% LOC
+                                          Il punteggio del robot: ${response.robotScore.toString()}% LOC
+                                          Informazioni aggiuntive di copertura:
+                                          Il tuo punteggio EvoSuite: ${terzoElemento1}% Branch
+                                          Il tuo punteggio EvoSuite: ${terzoElemento2}% Exception
+                                          Il tuo punteggio EvoSuite: ${terzoElemento3}% WeakMutation
+                                          Il tuo punteggio EvoSuite: ${terzoElemento4}% Output
+                                          Il tuo punteggio EvoSuite: ${terzoElemento5}% Method
+                                          Il tuo punteggio EvoSuite: ${terzoElemento6}% MethodNoException
+                                          Il tuo punteggio EvoSuite: ${terzoElemento7}% CBranch`
                     consoleArea2.setValue(displayRobotPoints);
                   
                     // scalata mode handling
@@ -424,14 +422,12 @@ runButton.addEventListener("click", function () {
                             swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
                           });
                         }
-                      } 
-                      else {
+                      } else {
                         //Game mode is "Sfida"
                         console.log("Game mode is 'Sfida'");
                         // Do nothing
                       }
-                    }
-                    catch (error) {
+                    } catch (error) {
                       console.log("Error:", error);
                       swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
                     }
@@ -764,4 +760,3 @@ window.onbeforeunload = function() {
 var robot = "[[${robot}]]";
 var username = "[[${username}]]";
 var gameIDJ = "[[${gameIDj}]]";
-

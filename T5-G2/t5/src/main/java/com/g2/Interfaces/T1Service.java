@@ -1,10 +1,15 @@
 package com.g2.Interfaces;
 
 import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
+
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+
 import com.g2.Model.ClassUT;
 
+@Service
 public class T1Service extends BaseService {
 
     private static final String BASE_URL = "http://manvsclass-controller-1:8080";

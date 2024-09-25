@@ -164,61 +164,13 @@ public class TestClasse {
                 </div>
             </div>
             <!-- SECONDA COLONNA-->
-            <div class="col px-0">
-                <div class="card rounded-0">
-                    <div class="card-header p-0">
-                        <nav class="navbar bg-body-tertiary p-2">
-                            <span class="navbar-brand lead my-0 py-0 ml-4">
-                                Class Under Test  
-                            </span> 
-                            <div class="btn-group">
-                                <button type="button " class="btn btn-sm btn-success"> 
-                                    <i class="bi bi-play-fill"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm dropdown-toggle-split btn-success" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end">
-                                    <form class="px-4 py-3">
-                                      <div class="mb-3">
-                                        <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-                                        <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
-                                      </div>
-                                      <div class="mb-3">
-                                        <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
-                                      </div>
-                                      <div class="mb-3">
-                                        <div class="form-check">
-                                          <input type="checkbox" class="form-check-input" id="dropdownCheck">
-                                          <label class="form-check-label" for="dropdownCheck">
-                                            Remember me
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <button type="submit" class="btn btn-primary">Sign in</button>
-                                    </form>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="#">New around here? Sign up</a>
-                                    <a class="dropdown-item" href="#">Forgot password?</a>
-                                  </div>
-                            </div>
-                    </nav>
-                    </div>
-                    <div class="card-body m-0 p-0 overflow-y-hidden">
-                        <textarea id="myEditor2" th:text="${classeUT}"> 
-                        </textarea>
-                    </div>
-                    <div class="card-footer text-body-secondary"></div>
-                </div>
-            </div>
-            <div class="col px-0">
+            <div class="col px-0"></div>
                 <div class="card d-flex flex-column rounded-0" id="topcard">
-                    <!-- EDITOR-->
+                    <!-- CLASS UNDER TEST-->
                     <div class="card-header p-0">
                         <nav class="navbar bg-body-tertiary p-2">
                                 <span class="navbar-brand lead my-0 py-0">
-                                    Edit  
+                                    Class Under Test  
                                 </span> 
                                 <div class="btn-group btn-group">
                                     <button type="button" class="btn btn-sm"> 
@@ -237,22 +189,22 @@ public class TestClasse {
                                 </div>
                         </nav>
                     </div>
-                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section3">
-                        <textarea id="myEditor3"> 
+                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section1">
+                        <textarea id="myEditor2" th:text="${classeUT}"> 
                         </textarea>
                     </div>
                     <!-- CONSOLE -->
                     <div class="card-header border-top p-0">
                         <nav class="navbar bg-body-tertiary p-2">
                                 <span class="navbar-brand lead my-0 py-0">
-                                    Console
+                                    Compare Result
                                 </span> 
                                 <button type="button" class="btn btn-sm" id="divider"> 
                                     <i class="bi bi-arrows-expand"></i>
                                 </button>
                         </nav>
                     </div>
-                    <div class="card-body m-0 p-0 overflow-y-auto" id="section4">
+                    <div class="card-body m-0 p-0 overflow-y-auto" id="section2">
                     
                         weuefdquiwehoiqdwehuwefqjiodshioweewjids
                         weuefdquiwehoiqdwehuwefqjiodshioweewjids

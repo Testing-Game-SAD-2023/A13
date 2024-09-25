@@ -19,17 +19,23 @@ public class ServiceManager {
     public ServiceManager(RestTemplate restTemplate) {
         this.logger = new ServiceManagerLogger();
         // Registrazione dinamica dei servizi
-        registerService("T1", T1Service.class, restTemplate);
+        registerService("T1", T1Service.class,   restTemplate);
         registerService("T23", T23Service.class, restTemplate);
-        registerService("T4", T4Service.class, restTemplate);
-        registerService("T7", T7Service.class, restTemplate);
+        registerService("T4", T4Service.class,   restTemplate);
+        registerService("T7", T7Service.class,   restTemplate);
     }
 
     // Metodo helper per registrare i servizi
     private <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
+        if (!ServiceInterface.class.isAssignableFrom(serviceClass)) {
+            throw new IllegalArgumentException("La classe: " + serviceName + " deve implementare la ServiceInterface");
+        }
+        //creo il servizio da registrare nel manager
         T service = createService(serviceClass, restTemplate);
         if (service != null) {
             services.put(serviceName, service);
+        }else{
+            throw new IllegalArgumentException("Errore nell'instanziare il servizio: " + serviceName + "è nullo");
         }
     }
 
@@ -39,7 +45,7 @@ public class ServiceManager {
             T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
             logger.logMessagge("ServiceCreation", serviceClass.getSimpleName());
             return service;
-        } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             logger.logMessagge("Errore nella creazione del servizio: " + serviceClass.getName(), e);
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
         }
@@ -56,7 +62,7 @@ public class ServiceManager {
             logger.logMessagge("HandleRequest", serviceName, action);
             return service.handleRequest(action, params);
         } catch (Exception e) {
-            logger.logMessagge("[HANDLE REQUEST GAY]" + serviceName + ": ", e);
+            logger.logMessagge("[HANDLE REQUEST]" + serviceName + ": ", e);
             return null; //se c'è un errore nel servizio lo segnalo e poi introduco al livello successivo una gestione del null
         }
     }

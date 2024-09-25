@@ -9,12 +9,12 @@ async function createGame(robot, classe, difficulty, scalataId, username) {
         $.ajax({
             url: '/api/save-data',
             data: {
-            playerId: parseJwt(getCookie("jwt")).userId,
-            classe: classe,
-            robot: robot,
-            difficulty: difficulty,
-            selectedScalata: scalataId,
-            username: parseJwt(getCookie("jwt")).sub
+                playerId: parseJwt(getCookie("jwt")).userId,
+                classe: classe,
+                robot: robot,
+                difficulty: difficulty,
+                selectedScalata: scalataId,
+                username: parseJwt(getCookie("jwt")).sub
             },
             type: 'POST',
             traditional: true,
