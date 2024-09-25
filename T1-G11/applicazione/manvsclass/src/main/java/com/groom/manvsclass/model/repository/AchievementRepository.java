@@ -10,5 +10,5 @@ public interface AchievementRepository extends MongoRepository<Achievement, Stri
 
     List<Achievement> findByDescriptionContaining(String description);
 
-    List<Achievement> findByCategory(int category);
+    List<Achievement> findByStatistic(int statistic);
 }

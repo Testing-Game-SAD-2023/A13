@@ -8,13 +8,13 @@ import (
 
 type PlayerHasCategoryAchievement struct {
     PlayerID            int64      `json:"playerId"`
-    Category            uint8      `json:"category"`
+    Category            uint8      `json:"statistic"`
     Progress            float64    `json:"progress"`
 }
 
 type CreateRequest struct {
     PlayerID           int64       `json:"playerId"`
-    Category           uint8       `json:"category"`
+    Category           uint8       `json:"statistic"`
     Progress           float64     `json:"progress"`
 }
 
@@ -24,7 +24,7 @@ func (CreateRequest) Validate() error {
 
 type UpdateRequest struct {
     PlayerID           int64       `json:"playerId"`
-    Category           uint8       `json:"category"`
+    Category           uint8       `json:"statistic"`
     Progress           float64     `json:"progress"`
 }
 

@@ -322,8 +322,11 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
 
 	r.Route("/games", func(r chi.Router) {
-		//Get game
+		// Get game
 		r.Get("/{id}", api.HandlerFunc(gc.FindByID))
+
+		// Get games by player id
+		r.Get("/player/{pid}", api.HandlerFunc(gc.FindByPID))
 
 		// List games
 		r.Get("/", api.HandlerFunc(gc.List))
@@ -434,10 +437,10 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 
 		// Update achievement
 		r.With(middleware.AllowContentType("application/json")).
-			Put("/{pid}/{category}", api.HandlerFunc(pc.Update))
+			Put("/{pid}/{statistic}", api.HandlerFunc(pc.Update))
 
 		// Delete achievement
-		r.Delete("/{pid}/{category}", api.HandlerFunc(pc.Delete))
+		r.Delete("/{pid}/{statistic}", api.HandlerFunc(pc.Delete))
     })
 
 	return r

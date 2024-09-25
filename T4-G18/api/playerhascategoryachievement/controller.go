@@ -10,8 +10,8 @@ type Service interface {
 	Create(request *CreateRequest) (PlayerHasCategoryAchievement, error)
 	FindByPID(pid int64) ([]PlayerHasCategoryAchievement, error)
 	FindAll() ([]PlayerHasCategoryAchievement, error)
-	Delete(pid int64, category uint8) error
-	Update(pid int64, category uint8, ug *UpdateRequest) (PlayerHasCategoryAchievement, error)
+	Delete(pid int64, statistic uint8) error
+	Update(pid int64, statistic uint8, ug *UpdateRequest) (PlayerHasCategoryAchievement, error)
 }
 
 type Controller struct {
@@ -69,7 +69,7 @@ func (gc *Controller) FindByPID(w http.ResponseWriter, r *http.Request) error {
 func (gc *Controller) Delete(w http.ResponseWriter, r *http.Request) error {
 
 	pid, errID := api.FromUrlParams[KeyType](r, "pid")
-	category, errCat := api.FromUrlParams[KeyType](r, "category")
+	statistic, errCat := api.FromUrlParams[KeyType](r, "statistic")
 
 	if errID != nil {
 		return errID
@@ -79,7 +79,7 @@ func (gc *Controller) Delete(w http.ResponseWriter, r *http.Request) error {
         return errCat
     }
 
-	if err := gc.service.Delete(pid.AsInt64(), category.AsUint8()); err != nil {
+	if err := gc.service.Delete(pid.AsInt64(), statistic.AsUint8()); err != nil {
 		return api.MakeHttpError(err)
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -89,7 +89,7 @@ func (gc *Controller) Delete(w http.ResponseWriter, r *http.Request) error {
 func (gc *Controller) Update(w http.ResponseWriter, r *http.Request) error {
 
 	pid, errID := api.FromUrlParams[KeyType](r, "pid")
-	category, errCat := api.FromUrlParams[KeyType](r, "category")
+	statistic, errCat := api.FromUrlParams[KeyType](r, "statistic")
 
 	if errID != nil {
 		return errID
@@ -104,7 +104,7 @@ func (gc *Controller) Update(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	g, err := gc.service.Update(pid.AsInt64(), category.AsUint8(), &request)
+	g, err := gc.service.Update(pid.AsInt64(), statistic.AsUint8(), &request)
 	if err != nil {
 		return api.MakeHttpError(err)
 	}

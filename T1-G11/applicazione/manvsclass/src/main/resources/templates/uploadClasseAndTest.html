@@ -255,7 +255,7 @@ a:hover {
       const difficulty = document.getElementById('difficulty').value;
       const code_Uri = "" ;
       const description = document.getElementById('description').value;
-      const category = [
+      const statistic = [
         document.getElementById('category1').value,
         document.getElementById('category2').value,
         document.getElementById('category3').value
@@ -280,7 +280,7 @@ a:hover {
         difficulty: difficulty,
         code_Uri: code_Uri,
         description: description,
-        category: category
+        statistic: statistic
       }));
       formData.append('test', test);
       formData.append('testEvo', testEvo);

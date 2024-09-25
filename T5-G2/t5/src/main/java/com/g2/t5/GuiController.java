@@ -2,6 +2,7 @@ package com.g2.t5;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.g2.Model.*;
+import com.g2.Service.AchievementService;
 import com.sun.tools.jconsole.JConsoleContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +45,9 @@ import org.springframework.web.servlet.view.AbstractCachingViewResolver;
 @CrossOrigin
 @Controller
 public class GuiController {
+
+    @Autowired
+    private AchievementService achievementService;
 
     private RestTemplate restTemplate;
 
@@ -89,33 +93,6 @@ public class GuiController {
         return responseEntity.getBody();
     }
 
-    public List<AchievementProgress> getAchievementProgresses(int playerID) {
-        ResponseEntity<List<Achievement>> achievementResponseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/achievements/list",
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<Achievement>>() {
-                });
-
-        ResponseEntity<List<CategoryProgress>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/phca/" + playerID,
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<CategoryProgress>>() {
-                });
-
-        List<Achievement> achievementList = achievementResponseEntity.getBody();
-        List<CategoryProgress> categoryProgressList = progressesResponseEntity.getBody();
-
-        List<AchievementProgress> achievementProgresses = new ArrayList<>();
-
-        System.out.println(achievementList);
-        System.out.println(categoryProgressList);
-
-        for (Achievement a : achievementList)
-        {
-            List<CategoryProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.Category == a.getCategory()).collect(Collectors.toList());
-            for (CategoryProgress c : filteredList)
-                achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
-        }
-
-        return achievementProgresses;
-    }
-
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         System.out.println("GET /main, scelta della modalità di gioco");
@@ -128,6 +105,8 @@ public class GuiController {
 
         if (isAuthenticated == null || !isAuthenticated)
             return "redirect:/login";
+
+        achievementService.updateProgressByPlayer(1);
 
         return "main";
 
@@ -157,7 +136,7 @@ public class GuiController {
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
 
             int userId = Integer.parseInt(map.get("userId").toString());
-            List<AchievementProgress> achievementProgresses = getAchievementProgresses(userId);
+            List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
 
             //System.out.println("(/profile) Retrieved achievements: " + achievementProgresses);
             model.addAttribute("achievementProgresses", achievementProgresses);
@@ -325,6 +304,9 @@ public class GuiController {
         // System.out.println(g.getUsername() + " " + g.getGameId());
 
         System.out.println("ECCO LO USERNAME : " + username);       //in realtà stampa l'indirizzo e-mail del player...
+
+        System.out.println("Checking achievements...");
+        achievementService.updateProgressByPlayer(playerId);
 
         // globalID = g.getGameId();
 

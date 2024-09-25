@@ -67,9 +67,9 @@ func (gs *Repository) FindByPID(pid int64) ([]PlayerHasCategoryAchievement, erro
     return res, api.MakeServiceError(err)
 }
 
-func (gs *Repository) Delete(pid int64, category uint8) error {
+func (gs *Repository) Delete(pid int64, statistic uint8) error {
 	db := gs.db.
-		Where(&model.PlayerHasCategoryAchievement{PlayerID: pid, Category: category}).
+		Where(&model.PlayerHasCategoryAchievement{PlayerID: pid, Category: statistic}).
 		Delete(&model.PlayerHasCategoryAchievement{})
 
 	if db.Error != nil {
@@ -80,10 +80,10 @@ func (gs *Repository) Delete(pid int64, category uint8) error {
 	return nil
 }
 
-func (gs *Repository) Update(pid int64, category uint8, r *UpdateRequest) (PlayerHasCategoryAchievement, error) {
+func (gs *Repository) Update(pid int64, statistic uint8, r *UpdateRequest) (PlayerHasCategoryAchievement, error) {
 
 	var (
-		phca model.PlayerHasCategoryAchievement = model.PlayerHasCategoryAchievement{PlayerID: pid, Category: category}
+		phca model.PlayerHasCategoryAchievement = model.PlayerHasCategoryAchievement{PlayerID: pid, Category: statistic}
 		err         error
 	)
 
