@@ -4,7 +4,7 @@
 <body>
     <!-- NAV -->
     <div th:replace="fragments/navbar :: navbar"></div>
-
+    
     <!-- LEADERBOARD-->
     <div class="container">
 
@@ -79,10 +79,10 @@
                 </tr>
                 </thead>
                 <tbody class="table-group-divider  overflow-y-scroll">
-                    <tr th:each="player : ${listaPlayers}">
+                    <!-- <tr th:each="player : ${listaPlayers}">
                         <td th:text="${player.name}"></td>
                         <td th:text="${player.surname}"></td>
-                    </tr>
+                    </tr>-->
                 </tbody>
             </table>
         </div>

@@ -6,7 +6,7 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 0;
-    color: #ffffff; /* Colore del testo principale per la modalità scura */
+    color: #ffffff; /* Colore del testo principale per la modalitÃ  scura */
 }
 
 .container-fluid {
@@ -20,7 +20,7 @@ body {
 }
 
 .card-header, .card-footer {
-    background-color: #343a40; /* Colore di sfondo delle intestazioni e del piè di pagina */
+    background-color: #343a40; /* Colore di sfondo delle intestazioni e del piÃ¨ di pagina */
     border-bottom: 1px solid #495057; /* Colore del bordo */
     color: #ffffff; /* Colore del testo */
 }
@@ -100,5 +100,5 @@ textarea {
     background-color: #0c0d0e;
     color: #ffffff; /* Colore del testo nell'editor */
     font-family: monospace;
-    font-size: 1rem; /* Dimensione del testo per migliorare la leggibilità */
+    font-size: 1rem; /* Dimensione del testo per migliorare la leggibilitÃ  */
 }
