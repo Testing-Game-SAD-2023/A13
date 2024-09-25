@@ -12,6 +12,7 @@ public class TurnBasedGameLogic extends GameLogic {
     private int currentTurn;
     private int userScore;
     private int robotScore;
+    private int totalTurns = 10;
 
     public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT) {
         super(serviceManager, PlayerID, ClasseUT);

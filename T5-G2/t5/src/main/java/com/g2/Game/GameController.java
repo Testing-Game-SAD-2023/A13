@@ -69,8 +69,10 @@ public class GameController {
         }
     }
 
-    private int GetUserScore(String testingClassName, String testingClassCode,
-                                String underTestClassName, String underTestClassCode){
+    private int GetUserScore(String testingClassName, String testingClassCode, String underTestClassName){
+
+        //Prendo underTestClassCode dal task T1
+        String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest", underTestClassName);
 
         String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage", 
         testingClassName, testingClassCode,underTestClassName, underTestClassCode);
@@ -92,18 +94,23 @@ public class GameController {
         //come sopra devo capire come convertire la risposta bene
         //Integer roboScore = Integer.parseInt(response_T4);
         //int numTurnsPlayed = Integer.parseInt(request.getParameter("order"));
-        return "prova";
+        return 10;
     }
     
     
     @PostMapping("/StartGame")
-    public ResponseEntity<String> StartGame(){
+    public ResponseEntity<String> StartGame(@RequestParam("playerID")           String playerId,
+                                            @RequestParam("type_robot")         String type_robot,
+                                            @RequestParam("difficulty")         String difficulty,
+                                            @RequestParam("gamemode")           String gamemode, 
+                                            @RequestParam("underTestClassName") String underTestClassName){
         GameLogic gameLogic = activeGames.get(playerId);
         if(gameLogic == null){
             //Creo la nuova partita 
             gameLogic = new TurnBasedGameLogic(this.serviceManager, playerId, underTestClassName); 
-            activeGames.put(playerID, gameLogic);
+            activeGames.put(playerId, gameLogic);
         }
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/run") 
@@ -121,7 +128,7 @@ public class GameController {
             String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             GameLogic gameLogic = activeGames.get(playerId);
 
-            int UserScore  = GetUserScore(testingClassName, testingClassCode, underTestClassName, underTestClassCode);
+            int UserScore  = GetUserScore(testingClassName, testingClassCode, underTestClassName);
             int RobotScore = GetRobotScore(testClassId, type, difficulty);
             gameLogic.playTurn(UserScore, RobotScore);
 
