@@ -424,6 +424,7 @@ public class MyController {
             JSONObject responseObj = new JSONObject(responseBody);
             String xml_string = responseObj.getString("coverage");
             String outCompile = responseObj.getString("outCompile");
+            
             int userScore = ParseUtil.LineCoverage(xml_string);
             System.out.println(" (/allenamento) Punteggio dell'utente, userScore = "+ userScore);
 

@@ -27,7 +27,7 @@ public class ServiceManagerLogger {
     }
 
     //log in tutte le altre occasioni 
-    public void logMessagge(String Case, String serviceName, String... params){
+    public void logMessagge(String Case, String serviceName, String... params) {
         switch (Case) {
             case "ServiceCreation" -> {
                 logServiceCreation(serviceName);

@@ -42,7 +42,7 @@ public abstract class BaseService implements ServiceInterface {
             if (actionDefinition == null) {
                 throw new IllegalArgumentException("[HANDLEREQUEST] Azione non riconosciuta: " + action);
             }
-    
+
             // Esegui la funzione associata all'azione con i parametri validati
             return actionDefinition.execute(params);
         } catch (Exception e) {
@@ -176,7 +176,9 @@ public abstract class BaseService implements ServiceInterface {
     //Metodi di utilità 
     // Metodo di supporto per convertire il contenuto in stringa
     protected String convertToString(byte[] content) {
-        if (content == null) return null;
+        if (content == null) {
+            return null;
+        }
         return new String(content, StandardCharsets.UTF_8);
     }
 

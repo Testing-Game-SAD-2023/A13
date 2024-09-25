@@ -14,8 +14,9 @@ public class TurnBasedGameLogic extends GameLogic {
     private int robotScore;
     private int totalTurns = 10;
 
-    public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT) {
-        super(serviceManager, PlayerID, ClasseUT);
+    public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
+            String type_robot, String difficulty) {
+        super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty);
         this.currentTurn = 0;
         this.currentState = GameState.START; // Imposta lo stato iniziale
     }
@@ -41,14 +42,13 @@ public class TurnBasedGameLogic extends GameLogic {
                 }
             }
             case GAME_OVER -> {
-                if(robotScore > userScore){
+                if (robotScore > userScore) {
                     System.out.println("The game is already over, ROBOT win");
-                }else{
+                } else {
                     System.out.println("The game is already over, USER win");
                 }
                 //qua devo mettere la chiusura del gioco e del round
                 EndRound(Time);
-                EndGame(); 
             }
             default -> {
                 throw new IllegalStateException("Unexpected state: " + currentState);
@@ -57,8 +57,13 @@ public class TurnBasedGameLogic extends GameLogic {
     }
 
     @Override
-    public Boolean isGameOver() {
+    public Boolean isGameEnd() {
         return GameState.GAME_OVER == currentState;
+    }
+
+    @Override
+    public int GetScore(int coverage) {
+        return coverage;
     }
 
 }

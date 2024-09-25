@@ -10,8 +10,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.Model.Game;
-
 @Service
 public class T4Service extends BaseService {
 
@@ -35,43 +33,43 @@ public class T4Service extends BaseService {
         ));
 
         registerAction("CreateGame", new ServiceActionDefinition(
-            params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3], (String) params[4]),
-            String.class, String.class, String.class, String.class, String.class
+                params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3], (String) params[4]),
+                String.class, String.class, String.class, String.class, String.class
         ));
 
         registerAction("CreateRound", new ServiceActionDefinition(
-            params -> CreateRound((String) params[0], (String) params[1], (String) params[2]), 
-            String.class, String.class, String.class
+                params -> CreateRound((String) params[0], (String) params[1], (String) params[2]),
+                String.class, String.class, String.class
         ));
 
         registerAction("EndRound", new ServiceActionDefinition(
-            params -> EndRound((String) params[0], (String) params[1]), 
-            String.class, String.class
+                params -> EndRound((String) params[0], (String) params[1]),
+                String.class, String.class
         ));
 
         registerAction("CreateTurn", new ServiceActionDefinition(
-            params -> CreateTurn((String)params[0], (String)params[1], (String)params[2]), 
-            String.class, String.class, String.class
+                params -> CreateTurn((String) params[0], (String) params[1], (String) params[2]),
+                String.class, String.class, String.class
         ));
 
         registerAction("EndTurn", new ServiceActionDefinition(
-            params -> EndTurn((String)params[0], (String)params[1], (String)params[2]), 
-            String.class, String.class, String.class
+                params -> EndTurn((String) params[0], (String) params[1], (String) params[2]),
+                String.class, String.class, String.class
         ));
 
         registerAction("CreateScalata", new ServiceActionDefinition(
-            params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]), 
-            String.class, String.class, String.class, String.class
+                params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]),
+                String.class, String.class, String.class, String.class
         ));
 
         registerAction("GetRisultati", new ServiceActionDefinition(
-            params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
-            String.class, String.class, String.class
+                params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
+                String.class, String.class, String.class
         ));
     }
 
     // usa /robots per ottenere dati 
-    private String GetRisultati(String className, String robot_type, String difficulty){
+    private String GetRisultati(String className, String robot_type, String difficulty) {
         try {
             Map<String, String> formData = new HashMap<>();
             formData.put("testClassId", className);          // Nome della classe
@@ -84,14 +82,13 @@ public class T4Service extends BaseService {
             return "errore GetRisultati";
         }
     }
+
     /**
-     * Metodo che invia richieste per ottenere diversi "livelli" (levels) in base al
-     * nome della classe.
-     * Per ogni livello (da 0 a 10) e per ciascun tipo di robot ("randoop",
-     * "evosuite"),
-     * viene effettuata una chiamata REST per verificare la presenza di dati
-     * associati.
-     * 
+     * Metodo che invia richieste per ottenere diversi "livelli" (levels) in
+     * base al nome della classe. Per ogni livello (da 0 a 10) e per ciascun
+     * tipo di robot ("randoop", "evosuite"), viene effettuata una chiamata REST
+     * per verificare la presenza di dati associati.
+     *
      */
     private List<String> getLevels(String className) {
         // Inizializzazione di una lista per conservare i risultati
@@ -135,7 +132,7 @@ public class T4Service extends BaseService {
         return result;
     }
 
-    private String CreateGame(String Time, String difficulty, String name, String description, String username){
+    private String CreateGame(String Time, String difficulty, String name, String description, String username) {
         final String endpoint = "/games";
         //String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -144,15 +141,15 @@ public class T4Service extends BaseService {
         formData.add("description", description);
         formData.add("username", username);
         formData.add("startedAt", Time);
-        try{
+        try {
             String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose; 
-        }catch(Exception e){
+            return respose;
+        } catch (Exception e) {
             throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
         }
     }
 
-    private String CreateRound(String game_id, String ClasseUT, String Time){
+    private String CreateRound(String game_id, String ClasseUT, String Time) {
         final String endpoint = "/rounds";
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("gameId", game_id);
@@ -160,13 +157,13 @@ public class T4Service extends BaseService {
         formData.add("startedAt", Time);
         try {
             String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose; 
+            return respose;
         } catch (Exception e) {
             throw new IllegalArgumentException("[CreateRound]: " + e.getMessage());
         }
     }
-    
-    private String EndRound(String Time, String roundId){
+
+    private String EndRound(String Time, String roundId) {
         //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "rounds/" + roundId;
         try {
@@ -179,7 +176,7 @@ public class T4Service extends BaseService {
         }
     }
 
-    private String CreateTurn(String Player_id, String Round_id, String Time){
+    private String CreateTurn(String Player_id, String Round_id, String Time) {
         final String endpoint = "/turns";
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("players", Player_id);
@@ -187,13 +184,13 @@ public class T4Service extends BaseService {
         formData.add("startedAt", Time);
         try {
             String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose; 
+            return respose;
         } catch (Exception e) {
             throw new IllegalArgumentException("[CreateTurn]: " + e.getMessage());
         }
     }
 
-    private String EndTurn(String user_score, String Time, String turnId){
+    private String EndTurn(String user_score, String Time, String turnId) {
         //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "turns/" + turnId;
         try {
@@ -209,7 +206,7 @@ public class T4Service extends BaseService {
     }
 
     //Questa chiamata non è documentata nel materiale di caterina
-    private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date){
+    private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date) {
         final String endpoint = "/turns";
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("playerID", player_id);
@@ -219,7 +216,7 @@ public class T4Service extends BaseService {
 
         try {
             String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose; 
+            return respose;
         } catch (Exception e) {
             throw new IllegalArgumentException("[CreateScalata]: " + e.getMessage());
         }

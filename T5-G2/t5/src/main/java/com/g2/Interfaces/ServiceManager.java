@@ -19,10 +19,10 @@ public class ServiceManager {
     public ServiceManager(RestTemplate restTemplate) {
         this.logger = new ServiceManagerLogger();
         // Registrazione dinamica dei servizi
-        registerService("T1", T1Service.class,   restTemplate);
+        registerService("T1", T1Service.class, restTemplate);
         registerService("T23", T23Service.class, restTemplate);
-        registerService("T4", T4Service.class,   restTemplate);
-        registerService("T7", T7Service.class,   restTemplate);
+        registerService("T4", T4Service.class, restTemplate);
+        registerService("T7", T7Service.class, restTemplate);
     }
 
     // Metodo helper per registrare i servizi
@@ -34,7 +34,7 @@ public class ServiceManager {
         T service = createService(serviceClass, restTemplate);
         if (service != null) {
             services.put(serviceName, service);
-        }else{
+        } else {
             throw new IllegalArgumentException("Errore nell'instanziare il servizio: " + serviceName + "è nullo");
         }
     }

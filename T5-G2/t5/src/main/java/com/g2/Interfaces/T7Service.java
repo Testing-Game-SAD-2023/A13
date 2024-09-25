@@ -33,7 +33,7 @@ public class T7Service extends BaseService {
     private String CompileCoverage(String testingClassName, String testingClassCode,
             String underTestClassName, String underTestClassCode) {
         final String endpoint = "/compile-and-codecoverage"; // Definisce l'endpoint per l'API di compilazione e analisi
-                                                             // della copertura del codice
+        // della copertura del codice
         try {
             // Creazione del formData con i parametri della richiesta POST
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();

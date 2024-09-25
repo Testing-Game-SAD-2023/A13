@@ -20,12 +20,12 @@ public class T23Service extends BaseService {
 
         // Registrazione delle azioni
         registerAction("GetAuthenticated", new ServiceActionDefinition(
-            params -> GetAuthenticated((String) params[0]),
-            String.class
+                params -> GetAuthenticated((String) params[0]),
+                String.class
         ));
 
         registerAction("GetUsers", new ServiceActionDefinition(
-            params ->  GetUsers()  //metodo senza parametri
+                params -> GetUsers() //metodo senza parametri
         ));
     }
 
@@ -57,7 +57,8 @@ public class T23Service extends BaseService {
         final String endpoint = "/students_list";
         try {
             // Chiamata GET utilizzando il metodo della classe base per ottenere una lista di utenti
-            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
+            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {
+            });
         } catch (RuntimeException e) {
             // Gestione degli errori durante la richiesta
             throw new IllegalArgumentException("[GETUSERS] Errore durante il recupero degli utenti: " + e.getMessage());
