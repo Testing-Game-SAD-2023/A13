@@ -82,7 +82,7 @@
                         </nav>
                     </div>
                     <div class="card-body m-0 p-0 overflow-y-hidden" id="section1">
-                        <textarea id="myEditor"> 
+                        <textarea id="Editor_utente"> 
 /*Compila i campi "Nome" e "Cognome" con le informazioni richieste
 Nome: "inserire il proprio nome"
 Cognome: "inserire il proprio cognome"
@@ -150,21 +150,14 @@ public class TestClasse {
                         </nav>
                     </div>
                     <div class="card-body m-0 p-0 overflow-y-auto" id="section2">
-                    
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                        <textarea id="Console_utente"> 
+                        </textarea>
                     </div>
                     <div class="card-footer text-body-secondary"></div>
                 </div>
             </div>
             <!-- SECONDA COLONNA-->
-            <div class="col px-0"></div>
+            <div class="col px-0">
                 <div class="card d-flex flex-column rounded-0" id="topcard">
                     <!-- CLASS UNDER TEST-->
                     <div class="card-header p-0">
@@ -189,8 +182,8 @@ public class TestClasse {
                                 </div>
                         </nav>
                     </div>
-                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section1">
-                        <textarea id="myEditor2" th:text="${classeUT}"> 
+                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section3">
+                        <textarea id="Editor_Robot" th:text="${classeUT}"> 
                         </textarea>
                     </div>
                     <!-- CONSOLE -->
@@ -204,16 +197,9 @@ public class TestClasse {
                                 </button>
                         </nav>
                     </div>
-                    <div class="card-body m-0 p-0 overflow-y-auto" id="section2">
-                    
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
-                        weuefdquiwehoiqdwehuwefqjiodshioweewjids
+                    <div class="card-body m-0 p-0 overflow-y-auto" id="section4">
+                        <textarea id="Console_Robot">
+                        </textarea>
                     </div>
                     <div class="card-footer text-body-secondary"></div>
                 </div>
@@ -240,7 +226,7 @@ public class TestClasse {
 
     <script>
         // Inizializzazione di CodeMirror
-        var editor_code = CodeMirror.fromTextArea(document.getElementById("myEditor"), {
+        var editor_utente = CodeMirror.fromTextArea(document.getElementById("Editor_utente"), {
           lineNumbers: true,       // Mostra i numeri di riga
           mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
           theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
@@ -248,11 +234,30 @@ public class TestClasse {
           autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
         });
 
-        var editor_code_2 = CodeMirror.fromTextArea(document.getElementById("myEditor2"), {
+        var editor_robot = CodeMirror.fromTextArea(document.getElementById("Editor_Robot"), {
           lineNumbers: true,       // Mostra i numeri di riga
           mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
           theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
           tabSize: 4,              // Dimensione del tab
+          readOnly: true,
+          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
+        });
+
+        var console_utente = CodeMirror.fromTextArea(document.getElementById("Console_utente"), {
+          lineNumbers: true,       // Mostra i numeri di riga
+          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
+          tabSize: 4,              // Dimensione del tab
+          readOnly: true,
+          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
+        });
+
+        var console_robot = CodeMirror.fromTextArea(document.getElementById("Console_Robot"), {
+          lineNumbers: true,       // Mostra i numeri di riga
+          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
+          tabSize: 4,              // Dimensione del tab
+          readOnly: true,
           autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
         });
 
@@ -265,8 +270,8 @@ public class TestClasse {
         // Imposta l'altezza del container all'altezza del viewport
         function setContainerHeight() {
             container.style.height = (window.innerHeight - 30)+ 'px';
-            editor_code.setSize(null, (window.innerHeight - 30)+ 'px');
-            editor_code_2.setSize(null, (window.innerHeight - 95.5)+ 'px');
+            editor_utente.setSize(null, (window.innerHeight - 30)+ 'px');
+            editor_robot.setSize(null, (window.innerHeight - 95.5)+ 'px');
         }
 
         // Inizializza l'altezza del container
@@ -292,7 +297,7 @@ public class TestClasse {
 
             // Imposta la nuova altezza per la prima sezione
             section1.style.height = `${offsetY}px`;
-            editor_code.setSize(null, `${offsetY}px`);
+            editor_utente.setSize(null, `${offsetY}px`);
             // Imposta l'altezza per la seconda sezione basata sull'altezza del contenitore - offsetY
             section2.style.height = `${containerRect.height - offsetY}px`; // -10 per l'altezza della divider
         });

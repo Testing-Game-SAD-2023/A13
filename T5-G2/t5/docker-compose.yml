@@ -8,6 +8,8 @@ services:
       - 8080
     networks:
       - global-network
+    volumes:
+      - /logs:/logs  # Monta la directory dei log sul tuo host
 
 networks:
   global-network:

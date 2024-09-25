@@ -45,6 +45,7 @@ $(document).ready(function () {
   //Redirect to /main page if some parameters are missing
   if (idUtente == null || idPartita == null || idTurno == null || nameCUT == null || robotScelto == null || difficolta == null) window.location.href = "/main";
   
+
   $.ajax({
     url: "/api/receiveClassUnderTest",
     type: "GET",
@@ -94,6 +95,7 @@ $(document).ready(function () {
       alert("Classe: "+nameCUT+".java ricevuta con successo");
     },
     error: function () {
+
       // Gestione dell'errore
       console.log("Errore durante la ricezione del file "+ nameCUT+".java");
     }
@@ -137,34 +139,7 @@ storico.addEventListener("click", function () {
         }
 
         try {
-          var test = null;
-          if (localStorage.getItem("modalita") === "Scalata") {
-            test = '/tests/VolumeT8/FolderTreeEvo/' +
-                    '/StudentLogin'+
-                    '/Player' + localStorage.getItem("playerId") +
-                    '/'+ localStorage.getItem("modalita") +
-                    '/' + localStorage.getItem("SelectedScalata") + localStorage.getItem("scalataId") +
-                    '/' + localStorage.getItem("classe") + 
-                    '/Game' + localStorage.getItem("gameId") + 
-                    '/Round' + localStorage.getItem("roundId") + 
-                    '/Turn' + orderTurno + 
-                    '/TestReport' +
-                    '/Test' + localStorage.getItem("classe") + ".java";
-          } else if (localStorage.getItem("modalita") === "Sfida") {
-            test = '/tests/VolumeT8/FolderTreeEvo/' +
-                    '/StudentLogin'+
-                    '/Player' + localStorage.getItem("playerId") +
-                    '/'+ localStorage.getItem("modalita") +
-                    '/'+ localStorage.getItem("classe") + 
-                    '/Game' + localStorage.getItem("gameId") + 
-                    '/Round' + localStorage.getItem("roundId") + 
-                    '/Turn' + orderTurno + 
-                    '/TestReport' +
-                    '/Test' + localStorage.getItem("classe") + ".java";
-          } else {
-            console.log("Error: mode not found");
-            window.location.href = "/main";
-          }
+          test = generaPercorsoTest(orderTurno);
           let response = await $.ajax({
 
             //TODO: Change the path to the correct one
@@ -211,7 +186,7 @@ runButton.addEventListener("click", function () {
       formData.append("testingClassCode", editor.getValue());
       formData.append("underTestClassName", localStorage.getItem("classe") + ".java");            // e.g Calcolatrice.java
       formData.append("underTestClassCode", sidebarEditor.getValue());
-
+      formData.append("className", localStorage.getItem("classe"))
       formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
       formData.append("turnId", localStorage.getItem("turnId"));
       formData.append("roundId", localStorage.getItem("roundId"));
@@ -258,46 +233,7 @@ runButton.addEventListener("click", function () {
           }
           orderTurno++;
 
-          // e.g VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java
-          var classe = 'VolumeT8/FolderTreeEvo/' + localStorage.getItem("classe") + 
-                        '/' + localStorage.getItem("classe") + 'SourceCode' +
-                        '/' + localStorage.getItem("classe") + '.java';
-
-          //  TODO:  This path is used also from task t8, so if change, check also t8
-          // /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game1/Round1/Turn1/TestReport
-          // /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Scalata/Scalata1/Calcolatrice/Game1/Round1/Turn1/TestReport
-          if (localStorage.getItem("modalita") === "Scalata") {
-            test = '/VolumeT8/FolderTreeEvo/StudentLogin' +
-                    '/Player' + localStorage.getItem("playerId") +
-                    '/'+ localStorage.getItem("modalita") +
-                    '/' + localStorage.getItem("SelectedScalata") + localStorage.getItem("scalataId") +
-                    '/' + localStorage.getItem("classe") + 
-                    '/Game' + localStorage.getItem("gameId") + 
-                    '/Round' + localStorage.getItem("roundId") + 
-                    '/Turn' + orderTurno + 
-                    '/TestReport';
-          } else if (localStorage.getItem("modalita") === "Sfida") {
-            test = '/VolumeT8/FolderTreeEvo/StudentLogin' +
-                    '/Player' + localStorage.getItem("playerId") +
-                    '/'+ localStorage.getItem("modalita") +
-                    '/' + localStorage.getItem("classe") +
-                    '/Game' + localStorage.getItem("gameId") + 
-                    '/Round' + localStorage.getItem("roundId") + 
-                    '/Turn' + orderTurno + 
-                    '/TestReport';
-          } else {
-            console.log("Error: mode not found");
-            window.location.href = "/main";
-          }
-          // added to window.onbeforeunload to remove it only when the window is closed
-          // localStorage.setItem("gameId", null); 
-
-          // Definisci il percorso dell'API per il task T8 (prova_esecuzione_parametri4.js)
-          var apiBaseUrl = '/api/';
-
-          // Concatena il percorso della classe al percorso dell'API
-          // example /api/VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java+/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Game39/Round39/Turn1/TestReport+/app+playerId
-          var url = apiBaseUrl + classe + '+' + test + '+/app' + '+' + localStorage.getItem("playerId");
+          url = createApiUrl(formData, orderTurno);
           console.log('URL post on: '+url);
 
           const javaCode = editor.getValue();                               // Code of the test class
@@ -317,50 +253,12 @@ runButton.addEventListener("click", function () {
               var displayRobotPoints = "";
 
               if (csvContent) {
-                // Dividi il contenuto CSV in righe separate
-                var lines = csvContent.split('\n');
-                if (lines.length > 1) {
+                
+                document.getElementById('loading-result').style.display = 'none';
+                displayRobotPoints = getConsoleTextRun(csvContent, response.score.toString(), response.robotScore.toString());
 
-                  // Dividi la seconda riga in elementi separati da virgole
-                  var secondRowElements = lines[1].split(',');
-                  var terzoRowElements = lines[2].split(',');
-                  var quartoRowElements = lines[3].split(',');
-                  var quintoRowElements = lines[4].split(',');
-                  var sestoRowElements = lines[5].split(',');
-                  var settimoRowElements = lines[6].split(',');
-                  var ottavoRowElements = lines[7].split(',');
-                  var nonoRowElements = lines[8].split(',');
-
-                  if (secondRowElements.length > 2) {
-
-                    // Estrai il terzo elemento (indice 2) della seconda riga
-                    var terzoElemento = parseInt(secondRowElements[2] * 100);
-                    var terzoElemento1 = parseInt(terzoRowElements[2] * 100);
-                    var terzoElemento2 = parseInt(quartoRowElements[2] * 100);
-                    var terzoElemento3 = parseInt(quintoRowElements[2] * 100);
-                    var terzoElemento4 = parseInt(sestoRowElements[2] * 100);
-                    var terzoElemento5 = parseInt(settimoRowElements[2] * 100);
-                    var terzoElemento6 = parseInt(ottavoRowElements[2] * 100);
-                    var terzoElemento7 = parseInt(nonoRowElements[2] * 100);
-
-                    document.getElementById('loading-result').style.display = 'none';
-
-                    console.log('Terzo elemento della seconda riga:', terzoElemento);
-                    
-                    displayRobotPoints = `Esito Risultati (percentuale di linee coperte)
-                                          Il tuo punteggio EvoSuite: ${terzoElemento}% LOC
-                                          Il tuo punteggio Jacoco: ${response.score.toString()}% LOC
-                                          Il punteggio del robot: ${response.robotScore.toString()}% LOC
-                                          Informazioni aggiuntive di copertura:
-                                          Il tuo punteggio EvoSuite: ${terzoElemento1}% Branch
-                                          Il tuo punteggio EvoSuite: ${terzoElemento2}% Exception
-                                          Il tuo punteggio EvoSuite: ${terzoElemento3}% WeakMutation
-                                          Il tuo punteggio EvoSuite: ${terzoElemento4}% Output
-                                          Il tuo punteggio EvoSuite: ${terzoElemento5}% Method
-                                          Il tuo punteggio EvoSuite: ${terzoElemento6}% MethodNoException
-                                          Il tuo punteggio EvoSuite: ${terzoElemento7}% CBranch`
                     consoleArea2.setValue(displayRobotPoints);
-                  
+
                     // scalata mode handling
                     try {
                       // Check if the game mode is "Scalata"
@@ -422,18 +320,18 @@ runButton.addEventListener("click", function () {
                             swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
                           });
                         }
-                      } else {
+                      } 
+                      else {
                         //Game mode is "Sfida"
                         console.log("Game mode is 'Sfida'");
                         // Do nothing
                       }
-                    } catch (error) {
+                    }
+                    catch (error) {
                       console.log("Error:", error);
                       swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
                     }
                   }
-                }
-              }
             },
             error: function (xhr, textStatus, error) {
 
@@ -465,12 +363,16 @@ function processJaCoCoReport() {
   formData.append("testingClassCode", editor.getValue());
   formData.append("underTestClassName", localStorage.getItem("classe") + ".java");            // e.g Calcolatrice.java
   formData.append("underTestClassCode", sidebarEditor.getValue());
-  formData.append("className", localStorage.getItem("classe"));                             // e.g Calcolatrice
-
+  formData.append("className", localStorage.getItem("classe"))
   formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
   formData.append("turnId", localStorage.getItem("turnId"));
   formData.append("roundId", localStorage.getItem("roundId"));
   formData.append("gameId", localStorage.getItem("gameId"));
+  formData.append("difficulty", localStorage.getItem("difficulty"));
+  formData.append("type", localStorage.getItem("robot"));                                     // modificato
+  formData.append("order", orderTurno);
+  formData.append("username", localStorage.getItem("username"));
+  formData.append("testClassId", localStorage.getItem("classe"));
 
 
   document.getElementById('loading-editor').style.display = 'block';
@@ -498,44 +400,7 @@ function processJaCoCoReport() {
   });
   orderTurno++;
 
-  // e.g VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java
-  var classe = 'VolumeT8/FolderTreeEvo/' + formData.get("className") + 
-                '/' + formData.get("className") + 'SourceCode' +
-                '/' + formData.get("underTestClassName");
-  
-  // TODO: This path is used also from task t8, so if change, check also t8
-  // e.g. /VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game1/Round1/Turn1/TestReport
-  var test = null;
-  if (localStorage.getItem("modalita") === "Scalata") {
-    test = '/VolumeT8/FolderTreeEvo/StudentLogin' +
-            '/Player' + localStorage.getItem("playerId") +
-            '/'+ localStorage.getItem("modalita") +
-            '/' + localStorage.getItem('SelectedScalata') + localStorage.getItem("scalataId") +
-            '/' + localStorage.getItem("classe") + 
-            '/Game' + localStorage.getItem("gameId") + 
-            '/Round' + localStorage.getItem("roundId") + 
-            '/Turn' + orderTurno + 
-            '/TestReport';
-  } else if (localStorage.getItem("modalita") === "Sfida") {
-    test = '/VolumeT8/FolderTreeEvo/StudentLogin' +
-            '/Player' + localStorage.getItem("playerId") +
-            '/'+ localStorage.getItem("modalita") +
-            '/' + localStorage.getItem("classe") +  
-            '/Game' + localStorage.getItem("gameId") + 
-            '/Round' + localStorage.getItem("roundId") + 
-            '/Turn' + orderTurno + 
-            '/TestReport';
-  } else {
-    console.log("Error: mode not found");
-    window.location.href = "/main";
-  }
-
-  // Definisci il percorso dell'API
-  var apiBaseUrl = '/api/';
-
-  // Concatena il percorso della classe al percorso dell'API
-  // e.g /api/VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java+/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game39/Round39/Turn1/TestReport+/app
-  var url = apiBaseUrl + classe + '+' + test + '+/app' + '+' + formData.get("playerId");
+  url = createApiUrl(formData,orderTurno)
 
   const javaCode = editor.getValue();                       // code of the test class
   // locGiocatore = 0;
@@ -553,49 +418,11 @@ function processJaCoCoReport() {
 
       var csvContent = data;
       console.log(csvContent);
+      
+      var displayCoveragePoints = "";
 
-      // Dividi il contenuto CSV in righe separate
-      var lines = csvContent.split('\n');
-
-      if (lines.length > 1) {
-
-        // Dividi la seconda riga in elementi separati da virgole
-        var secondRowElements = lines[1].split(',');
-        var terzoRowElements = lines[2].split(',');
-        var quartoRowElements = lines[3].split(',');
-        var quintoRowElements = lines[4].split(',');
-        var sestoRowElements = lines[5].split(',');
-        var settimoRowElements = lines[6].split(',');
-        var ottavoRowElements = lines[7].split(',');
-        var nonoRowElements = lines[8].split(',');
-
-        if (secondRowElements.length > 2) {
-
-          // Estrai il terzo elemento (indice 2) della seconda riga
-          var terzoElemento = parseInt(secondRowElements[2] * 100);
-          var terzoElemento1 = parseInt(terzoRowElements[2] * 100);
-          var terzoElemento2 = parseInt(quartoRowElements[2] * 100);
-          var terzoElemento3 = parseInt(quintoRowElements[2] * 100);
-          var terzoElemento4 = parseInt(sestoRowElements[2] * 100);
-          var terzoElemento5 = parseInt(settimoRowElements[2] * 100);
-          var terzoElemento6 = parseInt(ottavoRowElements[2] * 100);
-          var terzoElemento7 = parseInt(nonoRowElements[2] * 100);
-
-          locGiocatore = terzoElemento;
-          console.log('Terzo elemento della seconda riga:', locGiocatore);
-
-          consoleArea.setValue(`Esito Risultati (percentuale di linee coperte)
-    Il tuo punteggio: ${locGiocatore}% LOC
-    Informazioni aggiuntive di copertura:
-    Il tuo punteggio EvoSuite: ${terzoElemento1}% Branch
-    Il tuo punteggio EvoSuite: ${terzoElemento2}% Exception
-    Il tuo punteggio EvoSuite: ${terzoElemento3}% WeakMutation
-    Il tuo punteggio EvoSuite: ${terzoElemento4}% Output
-    Il tuo punteggio EvoSuite: ${terzoElemento5}% Method
-    Il tuo punteggio EvoSuite: ${terzoElemento6}% MethodNoException
-    Il tuo punteggio EvoSuite: ${terzoElemento7}% CBranch`);
-        }
-      };
+      displayCoveragePoints = getConsoleTextCoverage(csvContent);
+      consoleArea.setValue(displayCoveragePoints);
 
       console.log("Player: " + [parseJwt(getCookie("jwt")).userId]);
       console.log("turnId: " + orderTurno);
@@ -760,3 +587,4 @@ window.onbeforeunload = function() {
 var robot = "[[${robot}]]";
 var username = "[[${username}]]";
 var gameIDJ = "[[${gameIDj}]]";
+
