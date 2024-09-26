@@ -37,6 +37,11 @@ public class T4Service extends BaseService {
                 String.class, String.class, String.class, String.class, String.class
         ));
 
+        registerAction("EndGame", new ServiceActionDefinition(
+            params -> EndGame((String) params[0], (String) params[1], (String) params[2], (int) params[3], (Boolean) params[4]),
+            String.class, String.class, String.class, int.class, Boolean.class
+        ));
+
         registerAction("CreateRound", new ServiceActionDefinition(
                 params -> CreateRound((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class
@@ -141,6 +146,21 @@ public class T4Service extends BaseService {
         formData.add("description", description);
         formData.add("username", username);
         formData.add("startedAt", Time);
+        try {
+            String respose = callRestPost(endpoint, formData, null, String.class);
+            return respose;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
+        }
+    }
+
+    private String EndGame(String gameid, String username, String closedAt, int Score, Boolean isWinner){
+        final String endpoint = "/games/" + gameid;
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("closedAt", closedAt);
+        formData.add("username", username);
+        formData.add("score", Integer.toString(Score));
+        formData.add("isWinner", isWinner ? "true" : "false");
         try {
             String respose = callRestPost(endpoint, formData, null, String.class);
             return respose;

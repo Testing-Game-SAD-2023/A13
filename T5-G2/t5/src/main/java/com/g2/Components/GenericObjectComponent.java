@@ -10,7 +10,6 @@ public class GenericObjectComponent {
 
     // Mappa per memorizzare i dati del modello
     protected Map<String, Object> Model;
-
     /**
      * Costruttore per creare un componente con un oggetto e una chiave
      * specificata.
@@ -18,8 +17,8 @@ public class GenericObjectComponent {
      * @param key la chiave per inserire l'oggetto nel modello.
      * @param object l'oggetto da inserire nel modello.
      */
-    public GenericObjectComponent() {
-        this.Model = new HashMap<>();
+    public GenericObjectComponent(String key, Object object) {
+        this.Model.put(key, object);
     }
 
     /**

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -23,7 +24,7 @@ public class PageBuilder {
     * in termini di redirect 
      */
     private final Map<String, String> errorPageMap = new HashMap<>();
-    // Manager dei servizi, annotato come non utilizzato nel codice
+    // Manager dei servizi,
     private final ServiceManager serviceManager;
     // Modello per il rendering della pagina
     private final Model model_html;
@@ -54,14 +55,14 @@ public class PageBuilder {
     }
 
     // Metodo per eseguire la logica di tutti i componenti
-    private String executeComponentsLogic() {
+    private Optional<String> executeComponentsLogic() {
         for (GenericLogicComponent Component : LogicComponents) {
             if (!Component.executeLogic()) {
                 System.out.println("Logica fallita per il componente: " + Component.getClass().getSimpleName());
-                return Component.getErrorCode(); // Restituisce il codice di errore
+                return Optional.of(Component.getErrorCode()); //Restituisce il codice d'errore
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     // Metodo per costruire la mappa combinata dei dati per il modello
@@ -87,21 +88,23 @@ public class PageBuilder {
 
     // Questo metodo serve per attivare l'autenticazione per la pagina
     public void SetAuth(String jwt) {
-        setLogicComponents(new AuthComponent(this.serviceManager, jwt));
+        if (serviceManager != null){
+            setLogicComponents(new AuthComponent(serviceManager, jwt));
+        }        
     }
 
     // Metodo principale flusso per una richiesta di pagina
     // Esegue la logica di ogni componente, poi elabora i dati da inserire nel template
     public String handlePageRequest() {
-        if (LogicComponents != null || LogicComponents.isEmpty()) {
+        if (LogicComponents != null && !LogicComponents.isEmpty()) {
             // Esegui la logica di tutti i componenti
-            String ErrorCode = executeComponentsLogic();
-            if (ErrorCode != null) {
+            Optional<String> ErrorCode = executeComponentsLogic();
+            if (ErrorCode.isPresent()) {
                 // Ottieni la pagina di errore dalla mappa, oppure usa la pagina di default
-                return errorPageMap.getOrDefault(ErrorCode, errorPageMap.get("default"));
+                return errorPageMap.getOrDefault(ErrorCode.get(), errorPageMap.get("default"));
             }
         }
-        if (ObjectComponents != null || ObjectComponents.isEmpty()) {
+        if (ObjectComponents != null && !ObjectComponents.isEmpty()) {
             // Costruisci la mappa combinata dei dati dei componenti
             Map<String, Object> combinedModel = buildModel();
             model_html.addAllAttributes(combinedModel);
@@ -118,7 +121,7 @@ public class PageBuilder {
     //Qui setto il comportamento Standard agli errori 
     private void setStandardErrorPage() {
         errorPageMap.put("Auth_error", "redirect:/login");
-        errorPageMap.put("default", "Generic_error_code_1");
+        errorPageMap.put("default", "redirect:/error");
     }
 
     public List<GenericLogicComponent> getLogicComponents() {

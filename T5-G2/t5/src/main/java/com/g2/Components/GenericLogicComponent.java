@@ -1,7 +1,6 @@
 package com.g2.Components;
 
 public abstract class GenericLogicComponent {
-
     /**
      * Questo metodo esegue la logica del componente nel modo in cui è stata
      * definita quindi se restituisce True non ci sono stati problemi, nel caso
@@ -21,4 +20,8 @@ public abstract class GenericLogicComponent {
      */
     public abstract String getErrorCode();
 
+    /**
+     * L'error code deve essere una stringa eplicitamente definita nella classe 
+     */
+    protected String ErrorCode;
 }

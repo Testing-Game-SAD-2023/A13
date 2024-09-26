@@ -39,48 +39,6 @@ public class GameController {
         this.activeGames = new HashMap<>();
     }
 
-    //Refactor del vecchio GameDataWriter e metodo saveGame, in effetti più che salvarlo lo stiamo creando
-    //farne una classe separata con un solo metodo e poi chiamarla nel GUIcontroller era un po' inutile 
-    private Map<String, String> CreateGame(String Time,
-            String ClasseUT, String player_id, String difficulty, String name, String description, String username) {
-        try {
-            //questo è l'ordine delle cose, non cambiarlo 
-            //Creo un game 
-            String game_id = (String) serviceManager.handleRequest("T4", "CreateGame", Time, difficulty, name, description, username);
-            //Creo un round  
-            String round_id = (String) serviceManager.handleRequest("T4", "CreateRound", game_id, ClasseUT, Time);
-            //CReo un turno 
-            String turn_id = (String) serviceManager.handleRequest("T4", "CreateTurn", player_id, round_id, Time);
-
-            //incapsulo i 3 id 
-            Map<String, String> return_data = new HashMap<>();
-            return_data.put("game_id", game_id);
-            return_data.put("round_id", round_id);
-            return_data.put("turn_id", turn_id);
-            return return_data;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    //in maniera analoga qui ho fatto refactor del save scalata e della classe ScalataDataWriter
-    private String CreateScalata(String player_id, String Scalata_name) {
-        try {
-            // Recupero della data e dell'ora di inizio associata alla ScalataGiocata
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            LocalTime currentHour = LocalTime.now();
-            LocalDate currentDate = LocalDate.now();
-            String creation_Time = currentHour.format(formatter);
-            String creation_date = currentDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-
-            String scalata_id = (String) serviceManager.handleRequest("T4", "CreateScalata",
-                    player_id, Scalata_name, creation_Time, creation_date);
-            return scalata_id;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassName) {
         try {
             //Prendo underTestClassCode dal task T1
@@ -197,7 +155,7 @@ public class GameController {
             @RequestParam("testClassId") String testClassId,
             @RequestParam("playerID") String playerId) {
         try {
-            String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+            //String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             //retrive gioco attivo
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
@@ -210,6 +168,7 @@ public class GameController {
             //aggiorno il turno
             int LineCov = LineCoverage(UserData.get("coverage"));
             int user_score = gameLogic.GetScore(LineCov);
+           
             gameLogic.playTurn(user_score, RobotScore);
 
             if (gameLogic.isGameEnd()) {

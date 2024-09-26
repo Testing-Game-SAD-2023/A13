@@ -12,8 +12,7 @@ public class ServiceLogicComponent extends GenericLogicComponent {
     private final String action;
     protected ServiceManager serviceManager;
     private final Object[] params;
-    //non usare questo valore di default, devi specializzare il componente 
-    private String ErrorCode = "Generic_error_code_1";
+    protected String ErrorCode = "Service_Logic_error_1";
 
     /**
      * Costruttore per il componente.
@@ -56,7 +55,8 @@ public class ServiceLogicComponent extends GenericLogicComponent {
         return ErrorCode;
     }
 
-    public void SetErrorCode(String ErrorCode) {
+    public void setErrorCode(String ErrorCode) {
         this.ErrorCode = ErrorCode;
     }
+
 }

@@ -3,6 +3,7 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
+import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.ServiceObjectComponent;
 import com.g2.Interfaces.ServiceManager;
@@ -48,8 +50,15 @@ public class GuiController {
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam("mode") String mode) {
         PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
-        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "ClasseUT", "T1", "getClasses");
+        
+        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "ClasseUT", "T1", "getClasses");        
         gamemode.setObjectComponents(lista_classi);
+
+        List<String> list_robot = List.of("Randoop", "EvoSuite");
+        GenericObjectComponent lista_robot = new GenericObjectComponent("lista_robot", list_robot);
+        gamemode.setObjectComponents(lista_robot);
+
+
         gamemode.SetAuth(jwt);
         return gamemode.handlePageRequest();
     }

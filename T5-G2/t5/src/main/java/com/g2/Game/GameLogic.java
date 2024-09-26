@@ -34,7 +34,7 @@ public abstract class GameLogic {
 
     //Metodi base 
     protected void CreateGame(String Time) {
-        this.GameID = (String) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", "description", "username");
+        this.GameID = (String) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", "description", this.PlayerID);
         this.RoundID = (String) serviceManager.handleRequest("T4", "CreateRound", this.GameID, ClasseUT, Time);
     }
 
@@ -47,6 +47,11 @@ public abstract class GameLogic {
 
     protected void EndRound(String Time) {
         this.serviceManager.handleRequest("T4", "EndRound", Time, this.RoundID);
+    }
+
+    protected void EndGame(String Time, int Score, Boolean isWinner){
+        this.serviceManager.handleRequest("T4","EndGame",
+            this.GameID, this.PlayerID, Time, Score, isWinner);
     }
 
     public String getGameID() {
