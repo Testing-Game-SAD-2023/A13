@@ -42,14 +42,22 @@ public class ServiceObjectComponent extends GenericObjectComponent {
         this.modelKey = modelKey;
         this.params = null;
     }
-
+    //getter e setter
     /**
      * Esegue la logica per recuperare l'oggetto dal servizio e inserirlo nel
      * modello.
      *
      */
+
     @Override
     public Map<String, Object> getModel() {
+        if (Model.isEmpty() || Model == null) {
+            setObject();
+        } 
+        return this.Model;
+    } 
+
+    public void setObject(){
         try {
             // Recupera l'oggetto dal servizio utilizzando il ServiceManager
             Object object = serviceManager.handleRequest(serviceName, action, params);
@@ -60,15 +68,13 @@ public class ServiceObjectComponent extends GenericObjectComponent {
                 // Logica in caso di oggetto nullo (può essere personalizzata)
                 this.Model.put(modelKey, "Object not found");
             }
-            return this.Model;
         } catch (Exception e) {
             // Gestione dell'eccezione, ad esempio log dell'errore
             System.err.println("Errore durante il recupero dell'oggetto dal servizio: " + e.getMessage());
-            return null;
         }
     }
 
-    //getter e setter
+
     public String getModelKey() {
         return modelKey;
     }

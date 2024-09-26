@@ -29,7 +29,7 @@ public class GenericObjectComponent {
      * @return una mappa contenente la chiave e l'oggetto inseriti.
      */
     public Map<String, Object> getModel() {
-        if (Model.isEmpty()) {
+        if (Model.isEmpty() || Model == null) {
             return null;
         } else {
             return this.Model;
