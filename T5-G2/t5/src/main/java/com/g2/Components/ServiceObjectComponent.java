@@ -5,11 +5,10 @@ import java.util.Map;
 import com.g2.Interfaces.ServiceManager;
 
 /**
- * Componente che utilizza il ServiceManager per recuperare un oggetto da un servizio
- * e inserirlo nel modello.
- * @param <T> il tipo dell'oggetto da recuperare e inserire nel modello.
+ * Componente che utilizza il ServiceManager per recuperare un oggetto da un
+ * servizio e inserirlo nel modello.
  */
-public class ServiceObjectComponent extends PageComponentBase {
+public class ServiceObjectComponent extends GenericObjectComponent {
 
     private final String serviceName;
     private final String action;
@@ -19,7 +18,7 @@ public class ServiceObjectComponent extends PageComponentBase {
 
     /**
      * Costruttore per il componente.
-     * 
+     *
      * @param serviceManager il ServiceManager per gestire la richiesta.
      * @param serviceName il nome del servizio da cui recuperare l'oggetto.
      * @param action l'azione da eseguire sul servizio per ottenere l'oggetto.
@@ -43,35 +42,28 @@ public class ServiceObjectComponent extends PageComponentBase {
     }
 
     /**
-     * Esegue la logica per recuperare l'oggetto dal servizio e inserirlo nel modello.
-     * 
-     * @return true se l'oggetto è stato recuperato e inserito correttamente, altrimenti false.
+     * Esegue la logica per recuperare l'oggetto dal servizio e inserirlo nel
+     * modello.
+     *
      */
     @Override
-    public boolean executeLogic() {
+    public Map<String, Object> getModel() {
         try {
             // Recupera l'oggetto dal servizio utilizzando il ServiceManager
             Object object = serviceManager.handleRequest(serviceName, action, params);
-
             if (object != null) {
                 // Inserisce l'oggetto nel modello con la chiave specificata
-                addModelAttribute(modelKey, object);
-                return true;
+                this.Model.put(modelKey, object);
             } else {
                 // Logica in caso di oggetto nullo (può essere personalizzata)
-                addModelAttribute(modelKey, "Object not found");
-                return false;
+                this.Model.put(modelKey, "Object not found");
             }
+            return this.Model;
         } catch (Exception e) {
             // Gestione dell'eccezione, ad esempio log dell'errore
             System.err.println("Errore durante il recupero dell'oggetto dal servizio: " + e.getMessage());
-            return false;
+            return null;
         }
-    }
-
-    @Override
-    public Map<String, Object> getModel() {
-        return super.getModel();
     }
 
     //getter e setter
