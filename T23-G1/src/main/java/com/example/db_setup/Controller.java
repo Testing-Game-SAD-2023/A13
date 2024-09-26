@@ -14,6 +14,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,10 +47,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+
 
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
-
+import com.example.db_setup.Service.OAuthUserGoogleService;
+import com.example.db_setup.Language.*;
+import org.springframework.web.servlet.LocaleResolver;
 //MODIFICA (Deserializzazione risposta JSON)
 import com.fasterxml.jackson.databind.ObjectMapper;
 //FINE MODIFICA
@@ -63,6 +74,10 @@ public class Controller {
 
     @Autowired
     private MyPasswordEncoder myPasswordEncoder;
+    // Modifica 16/05/2024
+    // Questo è un servizio che gestisce le operazioni relative a Google OAuth2, potrebbe non servire, è solo per testare
+    @Autowired
+    private OAuthUserGoogleService oAuthUserGoogleService;
 
     @Autowired
     private EmailService emailService;
@@ -102,9 +117,7 @@ public class Controller {
                                             @RequestParam("password") String password,
                                             @RequestParam("check_password") String check_password,
                                             @RequestParam("studies") Studies studies,
-                                            @RequestParam("g-recaptcha-response") String gRecaptchaResponse, 
-                                            @CookieValue(name = "jwt", required = false) String jwt, 
-                                            HttpServletRequest request) {
+                                            @RequestParam("g-recaptcha-response") String gRecaptchaResponse, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
         
         if(isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
@@ -176,9 +189,10 @@ public class Controller {
             emailService.sendMailRegister(email, ID);
             
             //MODIFICA (03/02/2024) : Redirect
+            //Modifica (18/06/2024) : Cambiato il codice per consentire il reindirizzamento
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", "/login_success");    
-            return new ResponseEntity<String>(headers,HttpStatus.FOUND);
+            return new ResponseEntity<String>(headers,HttpStatus.MOVED_PERMANENTLY);
             //FINE MODIFICA
 
             //return ResponseEntity.ok("Registration completed successfully!");
@@ -424,6 +438,7 @@ public class Controller {
     // Logout
     @GetMapping("/logout")
     public ModelAndView logout(HttpServletResponse response) {
+        System.out.println("-----------------LOGOUT------------------");
         Cookie jwtTokenCookie = new Cookie("jwt", null);
         jwtTokenCookie.setMaxAge(0);
         response.addCookie(jwtTokenCookie);
@@ -432,7 +447,7 @@ public class Controller {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestParam("authToken") String authToken, HttpServletResponse response) {
+    public ResponseEntity<String> logout(@RequestParam("authToken") String authToken, HttpServletResponse response, HttpServletRequest request) {
         AuthenticatedUser authenticatedUser = authenticatedUserRepository.findByAuthToken(authToken);
         System.out.println("POST logout called, token removed");
 
@@ -444,7 +459,19 @@ public class Controller {
         jwtTokenCookie.setMaxAge(0);
         response.addCookie(jwtTokenCookie);
 
+        // Delete JSESSIONID cookie
+        Cookie jsessionidCookie = new Cookie("JSESSIONID", null);
+        jsessionidCookie.setMaxAge(0);
+        response.addCookie(jsessionidCookie);
+
         authenticatedUserRepository.delete(authenticatedUser);
+        //Modifica 18/05/2024: Cancellazione dei cookie e del contesto di autenticazione di spring
+        SecurityContextHolder.clearContext();
+        HttpSession session= request.getSession(false);
+        if(session != null) {
+            session.invalidate();
+        }
+        
         return ResponseEntity.ok("Logout successful");
     }
 
@@ -562,7 +589,7 @@ public class Controller {
     public ModelAndView showRegistrationForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
 
-        return new ModelAndView("register");
+        return new ModelAndView("register_new");
     }
 
     //MODIFICA (03/02/2024) : Feedback registrazione avvenuta con successo + redirect alla pagina di /login
@@ -579,7 +606,7 @@ public class Controller {
         System.out.println("GET (/menu)");
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/login"); 
 
-        return new ModelAndView("menu");
+        return new ModelAndView("menu_new");
     }
     //FINE MODIFICA
 
@@ -587,7 +614,7 @@ public class Controller {
     public ModelAndView showLoginForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
 
-        return new ModelAndView("login");
+        return new ModelAndView("login_new");
     }
 
     @GetMapping("/students_list")
@@ -606,7 +633,7 @@ public class Controller {
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
         
-        return new ModelAndView("password_reset");
+        return new ModelAndView("password_reset_new");
     }
 
     
@@ -623,7 +650,45 @@ public class Controller {
 
         return new ModelAndView("mail_register");
     }
+    //Modifica 16/05/2024: Aggiunta login con Google
 
+    // Questo metodo reindirizza l'utente alla pagina di autorizzazione di Google per il login
+    @GetMapping("/loginWithGoogle")
+    public void loginWithGoogle(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/oauth2/authorization/google");
+    }
+    
+    @GetMapping("/checkService")
+    @ResponseBody
+    public String checkService() {
+        return (oAuthUserGoogleService != null) ? "Service is defined" : "Service is not defined";
+    }
+
+    @GetMapping("/checkSession")
+    public ResponseEntity<String> checkSession(HttpServletRequest request) {
+    HttpSession session = request.getSession(false);
+    if (session != null && !session.isNew()) {
+        return ResponseEntity.ok("Session is active");
+    } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Session is not active");
+    }
+}
+    @GetMapping("/test_prova")
+    @ResponseBody
+    public String test() {
+        return "test T23";
+    }
+
+    @PostMapping("/changeLanguage")
+    public String changeLanguage(HttpServletRequest request, @RequestParam("lang") String lang, RedirectAttributes redirectAttributes) {
+    LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+    if (localeResolver != null) {
+        localeResolver.setLocale(request, null, Locale.forLanguageTag(lang));
+    }
+    // Redirect back to the referring page, or to a default page
+    String referer = request.getHeader("Referer");
+    return "redirect:" + (referer != null ? referer : "/");
+}
 
 }
 

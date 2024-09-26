@@ -326,10 +326,15 @@ function downloadFile() {
   }
 }
 
+
 function redirectToLogin() {
   if (confirm("Sei sicuro di voler effettuare il logout?")) {
-    fetch('/logout', {
-      method: 'GET',
+    const jwt = getCookie('jwt');
+    console.log("jwt token: ");
+    console.log(jwt);
+    fetch(`/logout?authToken=${encodeURIComponent(jwt)}`, {
+      method: 'POST',
+      //body: JSON.stringify({ authToken: jwt }),
     })
       .then(response => {
         if (!response.ok) {
