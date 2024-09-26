@@ -18,7 +18,9 @@ public class GenericObjectComponent {
      * @param object l'oggetto da inserire nel modello.
      */
     public GenericObjectComponent(String key, Object object) {
-        this.Model.put(key, object);
+        if(key != null && object != null){
+            this.Model.put(key, object);
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ public class ServiceObjectComponent extends GenericObjectComponent {
      * @param params eventuali parametri per l'azione del servizio.
      */
     public ServiceObjectComponent(ServiceManager serviceManager, String modelKey, String serviceName, String action, Object... params) {
+        super(null, null);
         this.serviceManager = serviceManager;
         this.serviceName = serviceName;
         this.action = action;
@@ -34,6 +35,7 @@ public class ServiceObjectComponent extends GenericObjectComponent {
     }
 
     public ServiceObjectComponent(ServiceManager serviceManager, String modelKey, String serviceName, String action) {
+        super(null, null);
         this.serviceManager = serviceManager;
         this.serviceName = serviceName;
         this.action = action;
