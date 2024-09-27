@@ -10,11 +10,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -48,7 +48,11 @@ public class GameController {
             String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage",
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode);
 
+            System.out.println(response_T7);
+
             JSONObject responseObj = new JSONObject(response_T7);
+            System.out.println(responseObj);
+
             String xml_string = responseObj.getString("coverage");
             String outCompile = responseObj.getString("outCompile");
 
@@ -70,9 +74,9 @@ public class GameController {
         }
     }
 
-    private int GetRobotScore(String testClassId, String robot_type, String difficulty) {
+    private int GetRobotScore(String testClass, String robot_type, String difficulty) {
         String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
-                testClassId, robot_type, difficulty);
+                testClass, robot_type, difficulty);
         return Integer.parseInt(response_T4);
     }
 
@@ -123,11 +127,11 @@ public class GameController {
     }
 
     @PostMapping("/StartGame")
-    public ResponseEntity<String> StartGame(@RequestBody String playerID,
-            @RequestBody String type_robot,
-            @RequestBody String difficulty,
-            @RequestBody String mode,
-            @RequestBody String underTestClassName) {
+    public ResponseEntity<String> StartGame(@RequestParam String playerID,
+                                            @RequestParam String type_robot,
+                                            @RequestParam String difficulty,
+                                            @RequestParam String mode,
+                                            @RequestParam String underTestClassName) {
 
         try {
             GameLogic gameLogic = activeGames.get(playerID);
@@ -149,24 +153,26 @@ public class GameController {
         return activeGames;
     }
 
-    @PostMapping("/run")
-    public ResponseEntity<String> Runner(@RequestParam("testingClassName") String testingClassName,
-            @RequestParam("testingClassCode") String testingClassCode,
-            @RequestParam("testClassId") String testClassId,
-            @RequestParam("playerID") String playerId,
-            @RequestParam("isGameEnd") Boolean isGameEnd) {
+    @PostMapping(value = "/run", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
+                                         @RequestParam("playerId") String playerId,
+                                         @RequestParam("isGameEnd") Boolean isGameEnd) {
 
         try {
             //String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             //retrive gioco attivo
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
-                //qua errore 
+                return createErrorResponse("[/Run] errore non esiste partita");
             }
+            //Preparazione dati per i task 
+            String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
+            String underTestClassName = gameLogic.getClasseUT() + ".java";
+
             //Calcolo dati utente
             Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT());
             //Calcolo punteggio robot
-            int RobotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
+            int RobotScore = GetRobotScore(underTestClassName, gameLogic.getType_robot(), gameLogic.getDifficulty());
             //aggiorno il turno
             int LineCov = LineCoverage(UserData.get("coverage"));
             int user_score = gameLogic.GetScore(LineCov);
