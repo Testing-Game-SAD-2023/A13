@@ -9,7 +9,7 @@ import java.util.Map;
 public class GenericObjectComponent {
 
     // Mappa per memorizzare i dati del modello
-    protected Map<String, Object> Model;
+    protected Map<String, Object> Model = new HashMap<>();
     /**
      * Costruttore per creare un componente con un oggetto e una chiave
      * specificata.
@@ -29,11 +29,7 @@ public class GenericObjectComponent {
      * @return una mappa contenente la chiave e l'oggetto inseriti.
      */
     public Map<String, Object> getModel() {
-        if (Model.isEmpty()) {
-            return null;
-        } else {
-            return this.Model;
-        }
+        return this.Model;
     }
 
     /**

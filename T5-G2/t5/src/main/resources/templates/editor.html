@@ -1,88 +1,111 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="dark" id="html-root">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PROVA 2</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
-    <!-- code mirror-->
-    <!-- CodeMirror CSS -->
-    <link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css"/>
-    <link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css"/>
-    <link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css"/>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Editor</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+		/>
 
-    <!-- CodeMirror JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+		<!-- code mirror-->
+		<!-- CodeMirror CSS -->
+		<link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
+		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
+		<link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css" />
 
-    <style>
-        .no-select {
-            user-select: none; /* Per browser moderni */
-            -webkit-user-select: none; /* Per Safari */
-            -moz-user-select: none; /* Per Firefox */
-            -ms-user-select: none; /* Per Internet Explorer */
-        }
+		<!-- CodeMirror JavaScript -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
 
-        #Editor_utente{
-            height: 100%;
-            width: 50%;
-        }
-        #Editor_Robot{
-            height: 100%;
-        }
-    </style>
-</head>
+		<style>
+			.no-select {
+				user-select: none; /* Per browser moderni */
+				-webkit-user-select: none; /* Per Safari */
+				-moz-user-select: none; /* Per Firefox */
+				-ms-user-select: none; /* Per Internet Explorer */
+			}
 
-  <body class="overflow-y-hidden mx-2 mb-5">
+			#Section_utente {
+				height: 100%;
+				width: 50%;
+			}
+			#section_UT {
+				height: 100%;
+			}
+		</style>
+	</head>
 
-    <!-- NAV-->
-    <ul class="nav">
-        <li class="nav-item flex-grow-1">
-            <button type="button" class="btn btn-sm">
-                <i class="bi bi-arrow-90deg-left"></i>
-                Go Back
-            </button>
-        </li>
-        <li class="nav-item">
-            <div class="form-check form-switch mt-1">
-                <label class="form-check-label" for="themeToggle">Mode </label>
-                <input class="form-check-input" type="checkbox" role="switch" id="themeToggle">
-            </div>
-        </li>
-    </ul>
+	<body class="overflow-y-hidden mx-2 mb-5">
+		<!-- NAV-->
+		<ul class="nav">
+			<li class="nav-item flex-grow-1">
+				<button type="button" class="btn btn-sm">
+					<i class="bi bi-arrow-90deg-left"></i>
+					Go Back
+				</button>
+			</li>
+			<li class="nav-item">
+				<div class="form-check form-switch mt-1">
+					<label class="form-check-label" for="themeToggle">Mode </label>
+					<input
+						class="form-check-input"
+						type="checkbox"
+						role="switch"
+						id="themeToggle"
+					/>
+				</div>
+			</li>
+		</ul>
 
-    <!-- DASHBOARD -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- PRIMA COLONNA-->
-            <div class="col px-0">
-                <div class="card d-flex flex-column rounded-0" id="topcard">
-                    <!-- EDITOR-->
-                    <div class="card-header p-0">
-                        <nav class="navbar bg-body-tertiary p-2">
-                                <span class="navbar-brand lead my-0 py-0">
-                                    Edit  
-                                </span> 
-                                <div class="btn-group btn-group">
-                                    <button type="button" class="btn btn-sm"> 
-                                        <i class="bi bi-play-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm dropdown-toggle-split my-0" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="#">Separated link</a></li>
-                                    </ul>
-                                </div>
-                        </nav>
-                    </div>
-                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section1">
-                        <textarea id="Editor_utente"> 
+		<!-- DASHBOARD -->
+		<div class="container-fluid">
+			<div class="row">
+				<!-- PRIMA COLONNA-->
+				<div class="col px-0">
+					<div class="card d-flex flex-column rounded-0" id="card_user">
+						<!-- EDITOR-->
+						<div class="card-header p-0">
+							<nav class="navbar bg-body-tertiary p-2">
+								<span class="navbar-brand lead my-0 py-0"> Edit </span>
+								<div class="btn-group btn-group">
+									<button type="button" class="btn btn-sm" id="runButton">
+										<i class="bi bi-play-fill"></i>
+									</button>
+									<button
+										type="button"
+										class="btn btn-sm dropdown-toggle-split my-0"
+										data-bs-toggle="dropdown"
+										aria-expanded="false"
+									>
+										<i class="bi bi-three-dots-vertical"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li>
+											<button id="storico">Storico</button>
+										</li>
+										<li>
+											<button id="">Prova</button>
+										</li>
+										<li>
+											<a class="dropdown-item" href="#">Separated link</a>
+										</li>
+									</ul>
+								</div>
+							</nav>
+						</div>
+						<div
+							class="card-body m-0 p-0 overflow-y-hidden"
+							id="section_editor"
+						>
+							<textarea id="Editor_utente">
+ 
 /*Compila i campi "Nome" e "Cognome" con le informazioni richieste
 Nome: "inserire il proprio nome"
 Cognome: "inserire il proprio cognome"
@@ -136,198 +159,293 @@ public class TestClasse {
                 
     // Aggiungi altri metodi di test se necessario
 }
-                        </textarea>
-                    </div>
-                    <!-- CONSOLE -->
-                    <div class="card-header border-top p-0">
-                        <nav class="navbar bg-body-tertiary p-2">
-                                <span class="navbar-brand lead my-0 py-0">
-                                    Console
-                                </span> 
-                                <button type="button" class="btn btn-sm" id="divider"> 
-                                    <i class="bi bi-arrows-expand"></i>
-                                </button>
-                        </nav>
-                    </div>
-                    <div class="card-body m-0 p-0 overflow-y-auto" id="section2">
-                        <textarea id="Console_utente"> 
-                        </textarea>
-                    </div>
-                    <div class="card-footer text-body-secondary"></div>
-                </div>
-            </div>
-            <!-- SECONDA COLONNA-->
-            <div class="col px-0">
-                <div class="card d-flex flex-column rounded-0">
-                    <!-- CLASS UNDER TEST-->
-                    <div class="card-header p-0">
-                        <nav class="navbar bg-body-tertiary p-2">
-                                <span class="navbar-brand lead my-0 py-0">
-                                    Class Under Test  
-                                </span> 
-                                <div class="btn-group btn-group">
-                                    <button type="button" class="btn btn-sm"> 
-                                        <i class="bi bi-play-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm dropdown-toggle-split my-0" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="#">Separated link</a></li>
-                                    </ul>
-                                </div>
-                        </nav>
-                    </div>
-                    <div class="card-body m-0 p-0 overflow-y-hidden" id="section3">
-                        <textarea id="Editor_Robot" th:text="${classeUT}"> 
-                        </textarea>
-                    </div>
-                    <!-- COMPARE RESULT -->
-                    <div class="card-header border-top p-0">
-                        <nav class="navbar bg-body-tertiary p-2">
-                                <span class="navbar-brand lead my-0 py-0">
-                                    Compare Result
-                                </span> 
-                                <button type="button" class="btn btn-sm" id="divider2"> 
-                                    <i class="bi bi-arrows-expand"></i>
-                                </button>
-                        </nav>
-                    </div>
-                    <div class="card-body m-0 p-0 overflow-y-auto" id="section4">
-                        <textarea id="Console_Robot">
-                        </textarea>
-                    </div>
-                    <div class="card-footer text-body-secondary"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+                        </textarea
+							>
+						</div>
+						<!-- CONSOLE -->
+						<div class="card-header border-top p-0">
+							<nav class="navbar bg-body-tertiary p-2">
+								<span class="navbar-brand lead my-0 py-0"> Console </span>
+								<button type="button" class="btn btn-sm" id="divider_Console">
+									<i class="bi bi-arrows-expand"></i>
+								</button>
+							</nav>
+						</div>
+						<div class="card-body m-0 p-0 overflow-y-auto" id="section_console">
+							<textarea id="Console_utente"> </textarea>
+						</div>
+						<div class="card-footer text-body-secondary"></div>
+					</div>
+				</div>
+				<!-- SECONDA COLONNA-->
+				<div class="col px-0">
+					<div class="card d-flex flex-column rounded-0" id="card_robot">
+						<!-- CLASS UNDER TEST-->
+						<div class="card-header p-0">
+							<nav class="navbar bg-body-tertiary p-2">
+								<span class="navbar-brand lead my-0 py-0">
+									Class Under Test
+								</span>
+								<div class="btn-group btn-group">
+									<button type="button" class="btn btn-sm" id="coverageButton">
+										<i class="bi bi-play-fill"></i>
+									</button>
+									<button
+										type="button"
+										class="btn btn-sm dropdown-toggle-split my-0"
+										data-bs-toggle="dropdown"
+										aria-expanded="false"
+									>
+										<i class="bi bi-three-dots-vertical"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a class="dropdown-item" href="#">Action</a></li>
+										<li>
+											<a class="dropdown-item" href="#">Another action</a>
+										</li>
+										<li>
+											<a class="dropdown-item" href="#">Something else here</a>
+										</li>
+										<li><hr class="dropdown-divider" /></li>
+										<li>
+											<a class="dropdown-item" href="#">Separated link</a>
+										</li>
+									</ul>
+								</div>
+							</nav>
+						</div>
+						<div class="card-body m-0 p-0 overflow-y-hidden" id="section_UT">
+							<textarea id="Editor_Robot" th:text="${classeUT}"> </textarea>
+						</div>
+						<!-- COMPARE RESULT -->
+						<div class="card-header border-top p-0">
+							<nav class="navbar bg-body-tertiary p-2">
+								<span class="navbar-brand lead my-0 py-0">
+									Compare Result
+								</span>
+								<button type="button" class="btn btn-sm" id="divider_result">
+									<i class="bi bi-arrows-expand"></i>
+								</button>
+							</nav>
+						</div>
+						<div class="card-body m-0 p-0 overflow-y-auto" id="section_result">
+							<textarea id="Console_Robot"> </textarea>
+						</div>
+						<div class="card-footer text-body-secondary"></div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <!-- SCRIPTS-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    
-    <script th:src="@{/t5/codemirror/lib/codemirror.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/mode/clike/clike.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/fold/foldcode.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/search/searchcursor.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/codemirror/addon/search/search.js}"th:inline="javascript"></script>
-    <script th:src="@{/t5/jquery/jquery-3.7.0.com.js}"  th:inline="javascript"></script>
+		<!-- SCRIPTS-->
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+			integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+			crossorigin="anonymous"
+		></script>
 
-    <script>
-        // Inizializzazione di CodeMirror
-        var editor_utente = CodeMirror.fromTextArea(document.getElementById("Editor_utente"), {
-          lineNumbers: true,       // Mostra i numeri di riga
-          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-          tabSize: 4,              // Dimensione del tab
-          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-        });
+		<script
+			th:src="@{/t5/codemirror/lib/codemirror.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/mode/clike/clike.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/foldcode.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/search/searchcursor.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/search/search.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/jquery/jquery-3.7.0.com.js}"
+			th:inline="javascript"
+		></script>
 
-        var editor_robot = CodeMirror.fromTextArea(document.getElementById("Editor_Robot"), {
-          lineNumbers: true,       // Mostra i numeri di riga
-          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-          tabSize: 4,              // Dimensione del tab
-          readOnly: true,
-          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-        });
+		<script>
+			// Inizializzazione di CodeMirror
+			var editor_utente = CodeMirror.fromTextArea(
+				document.getElementById("Editor_utente"),
+				{
+					lineNumbers: true, // Mostra i numeri di riga
+					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+					tabSize: 4, // Dimensione del tab
+					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+				}
+			);
+			var editor_robot = CodeMirror.fromTextArea(
+				document.getElementById("Editor_Robot"),
+				{
+					lineNumbers: true, // Mostra i numeri di riga
+					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+					tabSize: 4, // Dimensione del tab
+					readOnly: true,
+					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+				}
+			);
+			var console_utente = CodeMirror.fromTextArea(
+				document.getElementById("Console_utente"),
+				{
+					lineNumbers: true, // Mostra i numeri di riga
+					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+					tabSize: 4, // Dimensione del tab
+					readOnly: true,
+					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+				}
+			);
+			var console_robot = CodeMirror.fromTextArea(
+				document.getElementById("Console_Robot"),
+				{
+					lineNumbers: true, // Mostra i numeri di riga
+					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+					tabSize: 4, // Dimensione del tab
+					readOnly: true,
+					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+				}
+			);
 
-        var console_utente = CodeMirror.fromTextArea(document.getElementById("Console_utente"), {
-          lineNumbers: true,       // Mostra i numeri di riga
-          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-          tabSize: 4,              // Dimensione del tab
-          readOnly: true,
-          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-        });
+			function enableResizing(container, divider, section1, section2, editor) {
+				let isDragging = false;
 
-        var console_robot = CodeMirror.fromTextArea(document.getElementById("Console_Robot"), {
-          lineNumbers: true,       // Mostra i numeri di riga
-          mode: "javascript",      // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-          theme: "material-darker",        // Tema opzionale, puoi rimuoverlo o cambiarlo
-          tabSize: 4,              // Dimensione del tab
-          readOnly: true,
-          autoCloseBrackets: true  // Chiude automaticamente parentesi e virgolette
-        });
+				// Aggiungi event listener per il mouse down (quando si inizia a trascinare)
+				divider.addEventListener("mousedown", function (e) {
+					isDragging = true;
+					document.body.style.cursor = "grabbing"; // Mostra la mano chiusa durante il trascinamento
+					container.classList.add("no-select"); // Disabilita la selezione del testo
+				});
 
-        const divider = document.getElementById('divider');
-        const section1 = document.getElementById('section1');
-        const section2 = document.getElementById('section2');
-        const container = document.getElementById('topcard');
-        let isDragging = false;
+				// Event listener per il movimento del mouse
+				container.addEventListener("mousemove", function (e) {
+					if (!isDragging) return; // Se non si sta trascinando, non fare nulla
 
-        // Imposta l'altezza del container all'altezza del viewport
-        function setContainerHeight() {
-            container.style.height = (window.innerHeight - 30)+ 'px';
-            editor_utente.setSize(null, (window.innerHeight - 30)+ 'px');
-            editor_robot.setSize(null, (window.innerHeight - 95.5)+ 'px');
-        }
+					// Calcola la nuova altezza della prima sezione
+					const containerRect = container.getBoundingClientRect();
+					const offsetY = e.clientY - containerRect.top;
 
-        // Inizializza l'altezza del container
-        setContainerHeight();
+					// Imposta la nuova altezza per la prima sezione
+					section1.style.height = `${offsetY}px`;
 
-        // Aggiungi un event listener per ridimensionare la finestra
-        window.addEventListener('resize', setContainerHeight);
+					// Se c'è un editor associato, ridimensiona anche l'editor
+					if (editor) {
+						editor.setSize(null, `${offsetY}px`);
+					}
 
-        // Aggiungi event listener per il mouse down (quando si inizia a trascinare)
-        divider.addEventListener('mousedown', function (e) {
-            isDragging = true;
-            document.body.style.cursor = 'grabbing'; // Mostra la mano chiusa durante il trascinamento
-            container.classList.add('no-select'); // Disabilita la selezione del testo
-        });
+					// Imposta l'altezza per la seconda sezione
+					section2.style.height = `${containerRect.height - offsetY}px`;
+				});
 
-        // Event listener per il movimento del mouse
-        divider.addEventListener('mousemove', function (e) {
-            if (!isDragging) return; // Se non si sta trascinando, non fare nulla
+				// Event listener per il rilascio del mouse (fine del trascinamento)
+				document.addEventListener("mouseup", function () {
+					if (isDragging) {
+						isDragging = false;
+						document.body.style.cursor = "default"; // Ripristina il cursore predefinito
+						container.classList.remove("no-select"); // Riabilita la selezione del testo
+					}
+				});
+			}
 
-            // Calcola la nuova altezza della prima sezione
-            const containerRect = container.getBoundingClientRect();
-            const offsetY = e.clientY - containerRect.top;
+			const divider_Console = document.getElementById("divider_Console");
+			const divider_result = document.getElementById("divider_result");
 
-            // Imposta la nuova altezza per la prima sezione
-            section1.style.height = `${offsetY}px`;
-            editor_utente.setSize(null, `${offsetY}px`);
-            // Imposta l'altezza per la seconda sezione basata sull'altezza del contenitore - offsetY
-            section2.style.height = `${containerRect.height - offsetY}px`; // -10 per l'altezza della divider
-        });
+			const section_editor = document.getElementById("section_editor");
+			const section_console = document.getElementById("section_console");
+			const section_UT = document.getElementById("section_UT");
+			const section_result = document.getElementById("section_result");
 
-        // Event listener per il rilascio del mouse (fine del trascinamento)
-        divider.addEventListener('mouseup', function () {
-            isDragging = false; // Interrompe il ridimensionamento
-            document.body.style.cursor = 'default'; // Ripristina il cursore predefinito
-            container.classList.remove('no-select'); // Riabilita la selezione del testo
-        });
-    
-        // Funzione per cambiare il tema
-        function toggleTheme() {
-            const htmlElement = document.getElementById("html-root");
-            const checkbox = document.getElementById("themeToggle");
+			const container_user = document.getElementById("card_user");
+			const container_robot = document.getElementById("card_robot");
 
-            if (checkbox.checked) {
-                htmlElement.setAttribute("data-bs-theme", "dark");
-                editor_utente.setOption("theme", "material-darker");
-                editor_robot.setOption("theme", "material-darker");
-            } else {
-                htmlElement.setAttribute("data-bs-theme", "light");
-                editor_utente.setOption("theme", "eclipse");
-                editor_robot.setOption("theme", "eclipse");
-            }
-        }
+			let isDragging = false;
 
-        // Assegna l'evento al cambio di stato del checkbox
-        document.getElementById("themeToggle").addEventListener("change", toggleTheme);
-    
-    </script>
-</body>
+			// Imposta l'altezza del container all'altezza del viewport
+			function setContainerHeight() {
+				container_user.style.height = window.innerHeight - 30 + "px";
+				container_robot.style.height = window.innerHeight - 30 + "px";
+				editor_utente.setSize(null, window.innerHeight - 30 + "px");
+				editor_robot.setSize(null, window.innerHeight - 30 + "px");
+			}
+
+			// Inizializza l'altezza del container
+			setContainerHeight();
+			// Aggiungi un event listener per ridimensionare la finestra
+			window.addEventListener("resize", setContainerHeight);
+
+			enableResizing(
+				container_user,
+				divider_Console,
+				section_editor,
+				section_console,
+				editor_utente
+			);
+			enableResizing(
+				container_robot,
+				divider_result,
+				section_UT,
+				section_result,
+				editor_robot
+			);
+
+			// Funzione per cambiare il tema
+			function toggleTheme() {
+				const htmlElement = document.getElementById("html-root");
+				const checkbox = document.getElementById("themeToggle");
+
+				if (checkbox.checked) {
+					htmlElement.setAttribute("data-bs-theme", "dark");
+					editor_utente.setOption("theme", "material-darker");
+					editor_robot.setOption("theme", "material-darker");
+				} else {
+					htmlElement.setAttribute("data-bs-theme", "light");
+					editor_utente.setOption("theme", "eclipse");
+					editor_robot.setOption("theme", "eclipse");
+				}
+			}
+			// Assegna l'evento al cambio di stato del checkbox
+			document
+				.getElementById("themeToggle")
+				.addEventListener("change", toggleTheme);
+		</script>
+		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
+		<script th:src="@{/t5/js/editor.js}" th:inline="javascript"></script>
+	</body>
 </html>

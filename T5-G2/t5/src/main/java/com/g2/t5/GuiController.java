@@ -3,6 +3,7 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,15 +50,18 @@ public class GuiController {
     public String gamemodePage(Model model,
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam("mode") String mode) {
+       
         PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
-        
-        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "ClasseUT", "T1", "getClasses");        
+    
+        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
         gamemode.setObjectComponents(lista_classi);
 
-        List<String> list_robot = List.of("Randoop", "EvoSuite");
+        List<String> list_robot = new ArrayList<>();
+        // Aggiungere elementi alla lista
+        list_robot.add("Randoop");
+        list_robot.add("EvoSuite");
         GenericObjectComponent lista_robot = new GenericObjectComponent("lista_robot", list_robot);
         gamemode.setObjectComponents(lista_robot);
-
 
         gamemode.SetAuth(jwt);
         return gamemode.handlePageRequest();
@@ -84,6 +88,7 @@ public class GuiController {
         return new ModelAndView("login");
     }
      */
+    
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);

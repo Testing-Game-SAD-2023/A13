@@ -50,8 +50,7 @@ public abstract class GameLogic {
     }
 
     protected void EndGame(String Time, int Score, Boolean isWinner){
-        this.serviceManager.handleRequest("T4","EndGame",
-            this.GameID, this.PlayerID, Time, Score, isWinner);
+        this.serviceManager.handleRequest("T4","EndGame", this.GameID, this.PlayerID, Time, Score, isWinner);
     }
 
     public String getGameID() {

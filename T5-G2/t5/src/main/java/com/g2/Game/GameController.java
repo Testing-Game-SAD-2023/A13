@@ -1,11 +1,6 @@
 package com.g2.Game;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +23,7 @@ import org.w3c.dom.NodeList;
 import com.g2.Interfaces.ServiceManager;
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
+@CrossOrigin
 @RestController
 public class GameController {
 
@@ -74,11 +71,7 @@ public class GameController {
     private int GetRobotScore(String testClassId, String robot_type, String difficulty) {
         String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
                 testClassId, robot_type, difficulty);
-
-        //come sopra devo capire come convertire la risposta bene
-        //Integer roboScore = Integer.parseInt(response_T4);
-        //int numTurnsPlayed = Integer.parseInt(request.getParameter("order"));
-        return 10;
+        return Integer.parseInt(response_T4);
     }
 
     public int LineCoverage(String cov) {
@@ -153,7 +146,8 @@ public class GameController {
     public ResponseEntity<String> Runner(@RequestParam("testingClassName") String testingClassName,
             @RequestParam("testingClassCode") String testingClassCode,
             @RequestParam("testClassId") String testClassId,
-            @RequestParam("playerID") String playerId) {
+            @RequestParam("playerID") String playerId,
+            @RequestParam("isGameEnd") Boolean isGameEnd) {
         try {
             //String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             //retrive gioco attivo
@@ -168,15 +162,18 @@ public class GameController {
             //aggiorno il turno
             int LineCov = LineCoverage(UserData.get("coverage"));
             int user_score = gameLogic.GetScore(LineCov);
-           
+
             gameLogic.playTurn(user_score, RobotScore);
 
-            if (gameLogic.isGameEnd()) {
+            if (isGameEnd) {
                 //Qua partita finita quindi lo segnalo
+                gameLogic.EndRound(playerId);
+                gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
                 return createResponseRun(UserData, RobotScore, user_score, true);
             } else {
                 return createResponseRun(UserData, RobotScore, user_score, false);
             }
+
         } catch (Exception e) {
             return createErrorResponse("[/RUN]" + e.getMessage());
         }

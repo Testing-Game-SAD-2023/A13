@@ -32,7 +32,11 @@ const data = {
 	mode: localStorage.getItem("modalita"),
 	underTestClassName: localStorage.getItem("underTestClassName")
 };
-await startGame(data);
+
+$(document).ready(function () {
+	startGame(data);
+});
+
 current_round_scalata = localStorage.getItem("current_round_scalata");
 total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
 
