@@ -12,7 +12,9 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -121,18 +123,18 @@ public class GameController {
     }
 
     @PostMapping("/StartGame")
-    public ResponseEntity<String> StartGame(@RequestParam("playerID") String playerId,
-            @RequestParam("type_robot") String type_robot,
-            @RequestParam("difficulty") String difficulty,
-            @RequestParam("mode") String mode,
-            @RequestParam("underTestClassName") String underTestClassName) {
+    public ResponseEntity<String> StartGame(@RequestBody String playerID,
+            @RequestBody String type_robot,
+            @RequestBody String difficulty,
+            @RequestBody String mode,
+            @RequestBody String underTestClassName) {
 
         try {
-            GameLogic gameLogic = activeGames.get(playerId);
+            GameLogic gameLogic = activeGames.get(playerID);
             if (gameLogic == null) {
                 //Creo la nuova partita 
-                gameLogic = new TurnBasedGameLogic(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
-                activeGames.put(playerId, gameLogic);
+                gameLogic = new TurnBasedGameLogic(this.serviceManager, playerID, underTestClassName, type_robot, difficulty);
+                activeGames.put(playerID, gameLogic);
                 return ResponseEntity.ok().build();
             } else {
                 return createErrorResponse("[/StartGame] errore esiste già la partita");
@@ -142,12 +144,18 @@ public class GameController {
         }
     }
 
+    @GetMapping("/StartGame")
+    public Map<String, GameLogic> GetGame() {
+        return activeGames;
+    }
+
     @PostMapping("/run")
     public ResponseEntity<String> Runner(@RequestParam("testingClassName") String testingClassName,
             @RequestParam("testingClassCode") String testingClassCode,
             @RequestParam("testClassId") String testClassId,
             @RequestParam("playerID") String playerId,
             @RequestParam("isGameEnd") Boolean isGameEnd) {
+
         try {
             //String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             //retrive gioco attivo
