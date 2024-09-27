@@ -33,6 +33,8 @@ const data = {
 	underTestClassName: localStorage.getItem("underTestClassName")
 };
 await startGame(data);
+current_round_scalata = localStorage.getItem("current_round_scalata");
+total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
 
 // Elemento per il tasto storico
 const storico = document.getElementById("storico");
@@ -80,8 +82,15 @@ runButton.addEventListener("click", async function () {
 		const javaCode = editor.getValue();
 		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "json");
 
-		consoleArea2.setValue(getConsoleTextRun(csvContent, gameScore, robotScore));
-		handleScalataMode();
+		displayRobotPoints = getConsoleTextRun(csvContent, gameScore, robotScore);
+		consoleArea2.setValue(displayRobotPoints);
+
+		if (localStorage.getItem("modalita") === "Scalata") {
+			console.log("Game mode is 'Scalata'");
+			controlloScalata(win, current_round_scalata, total_rounds_scalata, displayRobotPoints);
+		} else {
+			console.log("Game mode is 'Sfida'");
+		}
 	} catch (error) {
 		swal(
 			"Errore",

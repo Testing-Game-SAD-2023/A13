@@ -206,15 +206,6 @@ function showGameResult(isWin, gameScore) {
     }
 }
 
-// Funzione per gestire la modalità di gioco "Scalata"
-function handleScalataMode() {
-    if (localStorage.getItem("modalita") === "Scalata") {
-        controlloScalata();
-    } else {
-        console.log("Game mode is 'Sfida'");
-    }
-}
-
 // Funzione generalizzata per eseguire richieste AJAX (supporta POST e GET)
 async function ajaxRequest(url, method = "POST", data = null, isJson = true, dataType = "json") {
     try {
@@ -235,7 +226,7 @@ async function ajaxRequest(url, method = "POST", data = null, isJson = true, dat
     }
 }
 
-function controlloScalata() {
+function controlloScalata(iswin, current_round_scalata, total_rounds_scalata, displayRobotPoints) {
 	// Check if the player has won the round
 	if (isWin) {
 		/*The player has won the round, check if the player has 
