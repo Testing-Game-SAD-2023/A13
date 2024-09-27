@@ -98,7 +98,7 @@ function getConsoleTextRun(data, punteggioJacoco, punteggioRobot) {
 async function startGame(data) {
     try {
         // Utilizziamo la funzione ajaxRequest per la chiamata POST
-        const response = await ajaxRequest("/StartGame", "POST", data, true, "json");
+        const response = await ajaxRequest("/StartGame", "POST", data, false, "json");
 
         console.log("Partita iniziata con successo:", response);
     } catch (error) {
