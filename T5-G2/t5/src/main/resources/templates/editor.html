@@ -32,12 +32,13 @@
 				-ms-user-select: none; /* Per Internet Explorer */
 			}
 
-			#Section_utente {
+			#section_editor {
 				height: 100%;
-				width: 50%;
+				width: 100%;
 			}
 			#section_UT {
 				height: 100%;
+				width: 100%;
 			}
 		</style>
 	</head>
@@ -104,8 +105,10 @@
 							class="card-body m-0 p-0 overflow-y-hidden"
 							id="section_editor"
 						>
+						<div class="spinner-border" role="status" aria-hidden="false" id="loading">
+							<span class="visually-hidden">Loading...</span>
+						</div>
 							<textarea id="Editor_utente">
- 
 /*Compila i campi "Nome" e "Cognome" con le informazioni richieste
 Nome: "inserire il proprio nome"
 Cognome: "inserire il proprio cognome"

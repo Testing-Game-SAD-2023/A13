@@ -10,11 +10,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -127,18 +127,18 @@ public class GameController {
     }
 
     @PostMapping("/StartGame")
-    public ResponseEntity<String> StartGame(@RequestParam String playerID,
+    public ResponseEntity<String> StartGame(@RequestParam String playerId,
                                             @RequestParam String type_robot,
                                             @RequestParam String difficulty,
                                             @RequestParam String mode,
                                             @RequestParam String underTestClassName) {
 
         try {
-            GameLogic gameLogic = activeGames.get(playerID);
+            GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
                 //Creo la nuova partita 
-                gameLogic = new TurnBasedGameLogic(this.serviceManager, playerID, underTestClassName, type_robot, difficulty);
-                activeGames.put(playerID, gameLogic);
+                gameLogic = new TurnBasedGameLogic(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
+                activeGames.put(playerId, gameLogic);
                 return ResponseEntity.ok().build();
             } else {
                 return createErrorResponse("[/StartGame] errore esiste già la partita");
@@ -153,8 +153,8 @@ public class GameController {
         return activeGames;
     }
 
-    @PostMapping(value = "/run", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
+    @PostMapping(value = "/run")
+    public ResponseEntity<String> Runner(@RequestBody String testingClassCode,
                                          @RequestParam("playerId") String playerId,
                                          @RequestParam("isGameEnd") Boolean isGameEnd) {
 
@@ -167,7 +167,10 @@ public class GameController {
             }
             //Preparazione dati per i task 
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
-            String underTestClassName = gameLogic.getClasseUT() + ".java";
+            String underTestClassName= gameLogic.getClasseUT() + ".java";
+
+            System.out.println(testingClassName);
+            System.out.println(underTestClassName);
 
             //Calcolo dati utente
             Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT());
