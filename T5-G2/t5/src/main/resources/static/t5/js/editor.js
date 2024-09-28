@@ -63,10 +63,14 @@ const runButton = document.getElementById("runButton");
 
 // Funzione principale per la gestione del click del pulsante
 runButton.addEventListener("click", async function () {
-	toggleLoading(true);
+	//toggleLoading(true);
 
 	try {
 		const formData = getFormData();
+		formData.append("isGameEnd", true);
+		for (let [key, value] of formData.entries()) {
+			console.log(key, value);
+		}
 
 		// Prima richiesta AJAX per eseguire il test
 		const response = await ajaxRequest("/run", "POST",formData, false, "json");
@@ -82,7 +86,7 @@ runButton.addEventListener("click", async function () {
 		console.log("URL post on: " + url);
 
 		// Seconda richiesta AJAX per inviare il codice di test
-		toggleLoading(false);
+		//toggleLoading(false);
 		const javaCode = editor.getValue();
 		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "json");
 
@@ -102,7 +106,7 @@ runButton.addEventListener("click", async function () {
 			"error"
 		);
 	} finally {
-		toggleLoading(false);
+		//toggleLoading(false);
 	}
 });
 

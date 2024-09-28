@@ -98,7 +98,7 @@ function getConsoleTextRun(data, punteggioJacoco, punteggioRobot) {
 async function startGame(data) {
     try {
         // Utilizziamo la funzione ajaxRequest per la chiamata POST
-        const response = await ajaxRequest("/StartGame", "POST", data, false, "json");
+        const response = await ajaxRequest("/StartGame", "POST", data, true, "text");
 
         console.log("Partita iniziata con successo:", response);
     } catch (error) {
@@ -177,12 +177,12 @@ function showAlert(message) {
 // Funzione per ottenere i dati del form da inviare
 function getFormData() {
     const formData = new FormData();
-    const className = localStorage.getItem("classe");
+    const className = localStorage.getItem("underTestClassName");
     
     formData.append("testingClassName", `Test${className}.java`);
-    formData.append("testingClassCode", editor.getValue());
+    formData.append("testingClassCode", editor_utente.getValue());
     formData.append("underTestClassName", `${className}.java`);
-    formData.append("underTestClassCode", sidebarEditor.getValue());
+    formData.append("underTestClassCode", editor_robot.getValue());
     formData.append("className", className);
     formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
     formData.append("turnId", localStorage.getItem("turnId"));
@@ -206,16 +206,15 @@ function showGameResult(isWin, gameScore) {
     }
 }
 
-// Funzione generalizzata per eseguire richieste AJAX (supporta POST e GET)
 async function ajaxRequest(url, method = "POST", data = null, isJson = true, dataType = "json") {
     try {
         const options = {
             url: url,
-            type: method, // Metodo dinamico (POST o GET)
+            type: method,
             dataType: dataType,
-            processData: !isJson, // Se non è JSON, permette a jQuery di convertire i dati
-            contentType: isJson ? "application/json" : false,
-            data: isJson && data ? JSON.stringify(data) : data, // Converte in JSON se necessario
+            processData: isJson, // Set to true to encode data properly
+            contentType: isJson ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
+            data: isJson && data ? $.param(data) : data, // Convert data to URL-encoded string
         };
 
         const response = await $.ajax(options);
