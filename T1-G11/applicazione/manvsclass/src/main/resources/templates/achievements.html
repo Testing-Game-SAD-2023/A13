@@ -140,7 +140,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Category</th>
+                    <th>Statistic</th>
                     <th>Progress required</th>
                 </tr>
                 </thead>
@@ -164,9 +164,9 @@
                     </div>
                     <label for="achievementCategory">Category</label>
                     <select class="form-control" id="achievementCategory" name="statistic">
-                        <option>0</option>
-                        <option>1</option>
-                        <option>2</option>
+                        <option th:each="i : ${#numbers.sequence( 1, 20, 1)}">
+                            <p th:text="${ i }"></p>
+                        </option>
                     </select>
                     <div class="form-group">
                         <label for="achievementProgressRequired">Progress required</label>

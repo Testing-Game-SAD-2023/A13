@@ -305,14 +305,14 @@ public class GuiController {
 
         System.out.println("ECCO LO USERNAME : " + username);       //in realtà stampa l'indirizzo e-mail del player...
 
-        System.out.println("Checking achievements...");
-        achievementService.updateProgressByPlayer(playerId);
-
         // globalID = g.getGameId();
 
         JSONObject ids = gameDataWriter.saveGame(g, username, selectedScalata);
         if (ids == null)
             return ResponseEntity.badRequest().body("Bad Request");
+
+        System.out.println("Checking achievements...");
+        achievementService.updateProgressByPlayer(playerId);
 
         return ResponseEntity.ok(ids.toString());
     }

@@ -2,12 +2,12 @@ package com.g2.Model;
 
 public class StatisticProgress {
     private Integer PlayerID;
-    private int Category;
+    private int Statistic;
     private float Progress;
 
-    public StatisticProgress(Integer playerID, int category, float progress) {
+    public StatisticProgress(Integer playerID, int statistic, float progress) {
         PlayerID = playerID;
-        Category = category;
+        Statistic = statistic;
         Progress = progress;
     }
 
@@ -23,12 +23,12 @@ public class StatisticProgress {
         PlayerID = playerID;
     }
 
-    public int getCategory() {
-        return Category;
+    public int getStatistic() {
+        return Statistic;
     }
 
-    public void setCategory(int category) {
-        Category = category;
+    public void setStatistic(int category) {
+        Statistic = category;
     }
 
     public float getProgress() {
@@ -43,7 +43,7 @@ public class StatisticProgress {
     public String toString() {
         return "StatisticProgress{" +
                 "PlayerID=" + PlayerID +
-                ", Category=" + Category +
+                ", Statistic=" + Statistic +
                 ", Progress=" + Progress +
                 '}';
     }

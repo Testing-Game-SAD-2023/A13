@@ -37,9 +37,7 @@ public class AchievementService {
      * @param playerID
      * @return a list of achievements obtained after this update.
      */
-    public List<Achievement> updateProgressByPlayer(int playerID) {
-        List<Achievement> obtainedAchievements = new ArrayList<>();
-
+    public List<AchievementProgress> updateProgressByPlayer(int playerID) {
         ResponseEntity<List<Game>> gamesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/games/player/" + playerID,
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 });
@@ -48,6 +46,8 @@ public class AchievementService {
 
         //System.out.println(progressesResponseEntity.getBody());
         List<Game> gamesList = gamesResponseEntity.getBody();
+
+        List<AchievementProgress> achievementProgressesPrevious = getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList();
 
         int totalGamesCount = gamesList.size();
 
@@ -67,10 +67,12 @@ public class AchievementService {
             setProgress(playerID, category, scoreSum);
         }
 
-        List<AchievementProgress> achievementProgresses = getProgressesByPlayer(playerID);
+        List<AchievementProgress> obtainedAchievements = new ArrayList<>(getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList());
 
         // filter out all the achievements already obtained, and return the others
+        obtainedAchievements.removeIf(x -> achievementProgressesPrevious.stream().anyMatch(y -> y.ID.equals(x.ID)));
 
+        System.out.println("Obtained achievements: " + obtainedAchievements);
         return obtainedAchievements;
     }
 
@@ -84,19 +86,20 @@ public class AchievementService {
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 });
 
-        ResponseEntity<List<CategoryProgress>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/phca/" + playerID,
+        ResponseEntity<List<StatisticProgress>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/phca/" + playerID,
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 });
 
         List<Achievement> achievementList = achievementResponseEntity.getBody();
-        List<CategoryProgress> categoryProgressList = progressesResponseEntity.getBody();
+        List<StatisticProgress> categoryProgressList = progressesResponseEntity.getBody();
 
         List<AchievementProgress> achievementProgresses = new ArrayList<>();
 
         for (Achievement a : achievementList)
         {
-            List<CategoryProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.Category == a.getCategory()).toList();
-            for (CategoryProgress c : filteredList)
+            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.getStatistic() == a.getStatistic()).toList();
+
+            for (StatisticProgress c : filteredList)
                 achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
 
             if (filteredList.size() == 0) // if there is no progress recorded, just put progress 0

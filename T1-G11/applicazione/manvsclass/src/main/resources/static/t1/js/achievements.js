@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
               columns: [
                   { data: 'name' },
                   { data: 'description' },
-                  { data: 'category' },
+                  { data: 'statistic' },
                   { data: 'progressRequired' }
               ]
           });
