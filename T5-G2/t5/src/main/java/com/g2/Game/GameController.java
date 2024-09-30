@@ -10,11 +10,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -38,23 +38,27 @@ public class GameController {
         this.activeGames = new HashMap<>();
     }
 
-    private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassName) {
+    private Map<String, String> GetUserData(String testingClassName, String testingClassCode,String underTestClassNameNoJava, String underTestClassName) {
         try {
             //Prendo underTestClassCode dal task T1
             String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest",
-                    underTestClassName);
+            underTestClassNameNoJava);
 
+            System.out.println("underTestClassCode: "+underTestClassCode);
+
+            
             //Chiato T7 per valutare coverage e userscore
             String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage",
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode);
 
-            System.out.println(response_T7);
+            System.out.println("response_T7 :"+response_T7);
 
             JSONObject responseObj = new JSONObject(response_T7);
             System.out.println(responseObj);
 
             String xml_string = responseObj.getString("coverage");
             String outCompile = responseObj.getString("outCompile");
+            System.out.println("outCompile: "+ outCompile);
 
             if (xml_string == null || xml_string.isEmpty()) {
                 System.out.println("Valore 'coverage' non valido.");
@@ -77,7 +81,10 @@ public class GameController {
     private int GetRobotScore(String testClass, String robot_type, String difficulty) {
         String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
                 testClass, robot_type, difficulty);
-        return Integer.parseInt(response_T4);
+
+        JSONObject jsonObject = new JSONObject(response_T4);
+        //anche se scritto al plurale scores è un solo punteggio, cioè quello del robot
+        return jsonObject.getInt("scores");
     }
 
     public int LineCoverage(String cov) {
@@ -153,8 +160,8 @@ public class GameController {
         return activeGames;
     }
 
-    @PostMapping(value = "/run")
-    public ResponseEntity<String> Runner(@RequestBody String testingClassCode,
+    @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
                                          @RequestParam("playerId") String playerId,
                                          @RequestParam("isGameEnd") Boolean isGameEnd) {
 
@@ -173,11 +180,14 @@ public class GameController {
             System.out.println(underTestClassName);
 
             //Calcolo dati utente
-            Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT());
+            Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(),underTestClassName);
+            System.out.println(UserData);
             //Calcolo punteggio robot
-            int RobotScore = GetRobotScore(underTestClassName, gameLogic.getType_robot(), gameLogic.getDifficulty());
+            int RobotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
+            System.out.println("RobotScore: "+RobotScore);
             //aggiorno il turno
             int LineCov = LineCoverage(UserData.get("coverage"));
+            System.out.println("LineCov: "+LineCov);
             int user_score = gameLogic.GetScore(LineCov);
 
             gameLogic.playTurn(user_score, RobotScore);

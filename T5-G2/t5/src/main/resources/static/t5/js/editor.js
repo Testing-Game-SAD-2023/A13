@@ -23,10 +23,11 @@ var orderTurno = 0;
 var perc_robot = "0"; // percentuale di copertura del robot scelto
 var gameScore = 0;
 var locGiocatore = 0;
+var currentDate = new Date();
 
 //chiamata a /StartGame
 const data = {
-	playerID: String(parseJwt(getCookie("jwt")).userId),
+	playerId: String(parseJwt(getCookie("jwt")).userId),
 	type_robot: localStorage.getItem("robot"),
 	difficulty: localStorage.getItem("difficulty"),
 	mode: localStorage.getItem("modalita"),
@@ -35,6 +36,47 @@ const data = {
 
 $(document).ready(function () {
 	startGame(data);
+
+	// Format date to dd/mm/yyyy
+	const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}/${String(currentDate.getMonth() + 1).padStart(2, '0')}/${currentDate.getFullYear()}`;
+	console.log("formattedDate:", formattedDate);
+
+	// Obtain the content of the textarea
+	const textareaContent = document.getElementById("Editor_utente").value;
+
+	// Get player details
+	const jwtData = parseJwt(getCookie("jwt"));
+	const username = jwtData.sub;
+	const userId = jwtData.userId;
+
+	// Create a function to handle multiple replacements
+	const replacePlaceholders = (content, replacements) => {
+		for (const [placeholder, value] of Object.entries(replacements)) {
+			content = content.replace(new RegExp(placeholder, 'g'), value);
+		}
+		return content;
+	};
+
+	className = localStorage.getItem("underTestClassName");
+	var testClassName = "Test" + className;
+
+	// Define replacements
+	const replacements = {
+		"TestClasse": testClassName,
+		"username": username,
+		"userID": userId,
+		"date": formattedDate
+	};
+
+	
+
+	// Perform replacements
+	const newContent = replacePlaceholders(textareaContent, replacements);
+	console.log("newContent \n\n", newContent);
+
+	// Set the new content to the textarea
+	document.getElementById("Editor_utente").value = newContent;
+	editor_utente.setValue(newContent);
 });
 
 current_round_scalata = localStorage.getItem("current_round_scalata");
@@ -67,7 +109,7 @@ runButton.addEventListener("click", async function () {
 
 	try {
 		const formData = getFormData();
-		formData.append("isGameEnd", true);
+		formData.append("isGameEnd", false);
 		for (let [key, value] of formData.entries()) {
 			console.log(key, value);
 		}
