@@ -1,11 +1,6 @@
 package com.g2.Game;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +10,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +25,7 @@ import org.w3c.dom.NodeList;
 import com.g2.Interfaces.ServiceManager;
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
+@CrossOrigin
 @RestController
 public class GameController {
 
@@ -39,61 +38,27 @@ public class GameController {
         this.activeGames = new HashMap<>();
     }
 
-    //Refactor del vecchio GameDataWriter e metodo saveGame, in effetti più che salvarlo lo stiamo creando
-    //farne una classe separata con un solo metodo e poi chiamarla nel GUIcontroller era un po' inutile 
-    private Map<String, String> CreateGame(String Time,
-            String ClasseUT, String player_id, String difficulty, String name, String description, String username) {
-        try {
-            //questo è l'ordine delle cose, non cambiarlo 
-            //Creo un game 
-            String game_id = (String) serviceManager.handleRequest("T4", "CreateGame", Time, difficulty, name, description, username);
-            //Creo un round  
-            String round_id = (String) serviceManager.handleRequest("T4", "CreateRound", game_id, ClasseUT, Time);
-            //CReo un turno 
-            String turn_id = (String) serviceManager.handleRequest("T4", "CreateTurn", player_id, round_id, Time);
-
-            //incapsulo i 3 id 
-            Map<String, String> return_data = new HashMap<>();
-            return_data.put("game_id", game_id);
-            return_data.put("round_id", round_id);
-            return_data.put("turn_id", turn_id);
-            return return_data;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    //in maniera analoga qui ho fatto refactor del save scalata e della classe ScalataDataWriter
-    private String CreateScalata(String player_id, String Scalata_name) {
-        try {
-            // Recupero della data e dell'ora di inizio associata alla ScalataGiocata
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            LocalTime currentHour = LocalTime.now();
-            LocalDate currentDate = LocalDate.now();
-            String creation_Time = currentHour.format(formatter);
-            String creation_date = currentDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-
-            String scalata_id = (String) serviceManager.handleRequest("T4", "CreateScalata",
-                    player_id, Scalata_name, creation_Time, creation_date);
-            return scalata_id;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassName) {
+    private Map<String, String> GetUserData(String testingClassName, String testingClassCode,String underTestClassNameNoJava, String underTestClassName) {
         try {
             //Prendo underTestClassCode dal task T1
             String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest",
-                    underTestClassName);
+            underTestClassNameNoJava);
 
+            System.out.println("underTestClassCode: "+underTestClassCode);
+
+            
             //Chiato T7 per valutare coverage e userscore
             String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage",
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode);
 
+            System.out.println("response_T7 :"+response_T7);
+
             JSONObject responseObj = new JSONObject(response_T7);
+            System.out.println(responseObj);
+
             String xml_string = responseObj.getString("coverage");
             String outCompile = responseObj.getString("outCompile");
+            System.out.println("outCompile: "+ outCompile);
 
             if (xml_string == null || xml_string.isEmpty()) {
                 System.out.println("Valore 'coverage' non valido.");
@@ -113,14 +78,13 @@ public class GameController {
         }
     }
 
-    private int GetRobotScore(String testClassId, String robot_type, String difficulty) {
+    private int GetRobotScore(String testClass, String robot_type, String difficulty) {
         String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
-                testClassId, robot_type, difficulty);
+                testClass, robot_type, difficulty);
 
-        //come sopra devo capire come convertire la risposta bene
-        //Integer roboScore = Integer.parseInt(response_T4);
-        //int numTurnsPlayed = Integer.parseInt(request.getParameter("order"));
-        return 10;
+        JSONObject jsonObject = new JSONObject(response_T4);
+        //anche se scritto al plurale scores è un solo punteggio, cioè quello del robot
+        return jsonObject.getInt("scores");
     }
 
     public int LineCoverage(String cov) {
@@ -170,11 +134,11 @@ public class GameController {
     }
 
     @PostMapping("/StartGame")
-    public ResponseEntity<String> StartGame(@RequestParam("playerID") String playerId,
-            @RequestParam("type_robot") String type_robot,
-            @RequestParam("difficulty") String difficulty,
-            @RequestParam("mode") String mode,
-            @RequestParam("underTestClassName") String underTestClassName) {
+    public ResponseEntity<String> StartGame(@RequestParam String playerId,
+                                            @RequestParam String type_robot,
+                                            @RequestParam String difficulty,
+                                            @RequestParam String mode,
+                                            @RequestParam String underTestClassName) {
 
         try {
             GameLogic gameLogic = activeGames.get(playerId);
@@ -191,33 +155,52 @@ public class GameController {
         }
     }
 
-    @PostMapping("/run")
-    public ResponseEntity<String> Runner(@RequestParam("testingClassName") String testingClassName,
-            @RequestParam("testingClassCode") String testingClassCode,
-            @RequestParam("testClassId") String testClassId,
-            @RequestParam("playerID") String playerId) {
+    @GetMapping("/StartGame")
+    public Map<String, GameLogic> GetGame() {
+        return activeGames;
+    }
+
+    @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
+                                         @RequestParam("playerId") String playerId,
+                                         @RequestParam("isGameEnd") Boolean isGameEnd) {
+
         try {
-            String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+            //String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             //retrive gioco attivo
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
-                //qua errore 
+                return createErrorResponse("[/Run] errore non esiste partita");
             }
+            //Preparazione dati per i task 
+            String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
+            String underTestClassName= gameLogic.getClasseUT() + ".java";
+
+            System.out.println(testingClassName);
+            System.out.println(underTestClassName);
+
             //Calcolo dati utente
-            Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT());
+            Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(),underTestClassName);
+            System.out.println(UserData);
             //Calcolo punteggio robot
             int RobotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
+            System.out.println("RobotScore: "+RobotScore);
             //aggiorno il turno
             int LineCov = LineCoverage(UserData.get("coverage"));
+            System.out.println("LineCov: "+LineCov);
             int user_score = gameLogic.GetScore(LineCov);
+
             gameLogic.playTurn(user_score, RobotScore);
 
-            if (gameLogic.isGameEnd()) {
+            if (isGameEnd) {
                 //Qua partita finita quindi lo segnalo
+                gameLogic.EndRound(playerId);
+                gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
                 return createResponseRun(UserData, RobotScore, user_score, true);
             } else {
                 return createResponseRun(UserData, RobotScore, user_score, false);
             }
+
         } catch (Exception e) {
             return createErrorResponse("[/RUN]" + e.getMessage());
         }

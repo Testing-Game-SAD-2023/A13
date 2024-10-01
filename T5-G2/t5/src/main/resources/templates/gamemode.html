@@ -27,56 +27,92 @@
         </div>
     
         <div class="text-center mb-4">
-            <h3 id="selectedMode" class="text-custom">Modalità Selezionata: </h3>
+            <h3 id="selectedMode" class="text-custom">Modalità Selezionata:</h3>
         </div>
 
-        <div class="row">
-            <div class="col-md-6 custom-column">
-                <div class="p-3">
-                    <h4 class="text-custom">CHOOSE A CLASS TO TEST</h4>
-                    <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-action">Calcolatrice</button>
-                        <button type="button" class="list-group-item list-group-item-action">Calcolatrice 1</button>
-                        <button type="button" class="list-group-item list-group-item-action">Calcolatrice 2</button>
-                      </div>
+        <div class="container mt-5">
+            <h2>Seleziona un'opzione</h2>
+            <form>
+                <div class="form-group">
+                    <label for="select1">Seleziona la Classe UT:</label>
+                    <select class="form-control" id="select_class">
+                        <option value="">Seleziona un'opzione</option>
+                        <th:block th:each="option : ${lista_classi}">
+                            <option th:value="${option.name}" th:text="${option.name}"></option>
+                        </th:block>
+                    </select>
                 </div>
-            </div>
-
-            <div class="col-md-6 custom-column">
-                <div class="p-3">
-                    <h4 class="text-custom">CHOOSE A ROBOT TO FIGHT</h4>
-                    <div class="list-group">
-                        <button type="button" class="list-group-item list-group-item-action">Randoop</button>
-                        <button type="button" class="list-group-item list-group-item-action">EvoSuite</button>
-                      </div>
+    
+                <div class="form-group">
+                    <label for="select2">Seleziona il Robot:</label>
+                    <select class="form-control" id="select_robot">
+                        <option value="">Seleziona un'opzione</option>
+                        <th:block th:each="option : ${lista_robot}">
+                            <option th:value="${option}" th:text="${option}"></option>
+                        </th:block>
+                    </select>
                 </div>
-            </div>
-        </div>
 
-        <div class="div_buttons_main">
-            <button id="downloadButton" type="button" class="btn btn-custom" onclick="downloadFile()">Download</button>
-            <button type="button" class="btn btn-custom" onclick="redirectToPagemain(); saveLoginData()">Go Back</button>
-            <button type="button" class="btn btn-custom" onclick="redirectToPagereport(); saveLoginData()">Submit</button>
+                <div class="form-group">
+                    <label for="select2">Seleziona la difficoltà:</label>
+                    <select class="form-control" id="select_diff">
+                        <option value="">Seleziona un'opzione</option>
+                        <option value="1">Easy</option>
+                        <option value="2">Medium</option>
+                        <option value="3">Hard</option>
+                    </select>
+                </div>
+
+               <div class="form-group pt-2">
+                    <a id="link_editor" class="btn btn-primary" href="#" role="button">Link</a>
+                </div>
+
+            </form>
         </div>
     </div>
 
     <script>
-        // Funzione per ottenere il valore del parametro 'mode' dalla URL
-        function getModeFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('mode');
+        // Funzione per ottenere i parametri dall'URL
+        function getParameterByName(name) {
+            const url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&'); // Escape special characters
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null; // Parametro non trovato
+            if (!results[2]) return ''; // Parametro presente ma senza valore
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
 
-        // Funzione per visualizzare la modalità selezionata nell'intestazione
-        function displaySelectedMode() {
-            const selectedMode = getModeFromURL();
-            if (selectedMode) {
-                document.getElementById('selectedMode').textContent = "Modalità Selezionata: " + selectedMode;
+        // Ottieni il parametro "mode" dall'URL e aggiornalo nell'elemento
+        window.addEventListener('load', function() {
+            const mode = getParameterByName('mode');
+            if (mode) {
+                document.getElementById('selectedMode').textContent += ' ' + mode.replace(/[^a-zA-Z0-9\s]/g, ' '); // Aggiungi il valore al testo
             }
+            localStorage.setItem('modalita', mode);
+        });
+
+        // Funzione per salvare i valori nel localStorage
+        function saveToLocalStorage() {
+            const select1Value = document.getElementById('select_class').value;
+            const select2Value = document.getElementById('select_robot').value;
+            const select3Value = document.getElementById('select_diff').value;
+
+            // Salva i valori nel localStorage
+            localStorage.setItem('underTestClassName', select1Value);
+            localStorage.setItem('robot', select2Value);
+            localStorage.setItem('difficulty', select3Value);
+
+            // Seleziona l'elemento <a> tramite l'ID
+            let link = document.getElementById("link_editor");
+            // Imposta l'attributo href
+            link.setAttribute("href", "/editor?ClassUT=" + select1Value);
         }
 
-        // Chiamata alla funzione per visualizzare la modalità selezionata
-        displaySelectedMode();
+        // Aggiungi gli event listener per salvare i valori quando cambia la selezione
+        document.getElementById('select_class').addEventListener('change', saveToLocalStorage);
+        document.getElementById('select_robot').addEventListener('change', saveToLocalStorage);
+        document.getElementById('select_diff').addEventListener('change', saveToLocalStorage);
     </script>
 
 </body>

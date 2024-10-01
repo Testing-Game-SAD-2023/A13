@@ -3,6 +3,8 @@ package com.g2.t5;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -23,7 +25,6 @@ import com.g2.Components.ServiceObjectComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
-import com.g2.Model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -47,10 +48,21 @@ public class GuiController {
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model,
-            @CookieValue(name = "jwt", required = false) String jwt) {
+            @CookieValue(name = "jwt", required = false) String jwt,
+            @RequestParam("mode") String mode) {
+       
         PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
-        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "ClasseUT", "T1", "getClasses");
-        gamemode.setPageComponents(lista_classi);
+    
+        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
+        gamemode.setObjectComponents(lista_classi);
+
+        List<String> list_robot = new ArrayList<>();
+        // Aggiungere elementi alla lista
+        list_robot.add("Randoop");
+        list_robot.add("EvoSuite");
+        GenericObjectComponent lista_robot = new GenericObjectComponent("lista_robot", list_robot);
+        gamemode.setObjectComponents(lista_robot);
+
         gamemode.SetAuth(jwt);
         return gamemode.handlePageRequest();
     }
@@ -63,7 +75,7 @@ public class GuiController {
         PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
         ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT",
                 "T1", "getClassUnderTest", ClassUT);
-        editor.setPageComponents(ClasseUT);
+        editor.setObjectComponents(ClasseUT);
         editor.SetAuth(jwt);
         return editor.handlePageRequest();
     }
@@ -76,12 +88,13 @@ public class GuiController {
         return new ModelAndView("login");
     }
      */
+    
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
         ServiceObjectComponent lista_utenti = new ServiceObjectComponent(serviceManager, "listaPlayers",
                 "T23", "GetUsers");
-        leaderboard.setPageComponents(lista_utenti);
+        leaderboard.setObjectComponents(lista_utenti);
         leaderboard.SetAuth(jwt);
         return leaderboard.handlePageRequest();
     }
@@ -90,11 +103,13 @@ public class GuiController {
     public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
 
+        /* 
         User player_placeholder = new User((long) 1, "placeholder", "placeholder", "email", "password",
                 true, "studies", "resetToke");
 
-        GenericObjectComponent<User> player = new GenericObjectComponent<>("player", player_placeholder);
-        main.setPageComponents(player);
+        GenericObjectComponent player = new GenericObjectComponent("player", player_placeholder);
+        main.setObjectComponents(player);
+        */
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }

@@ -49,6 +49,7 @@ public class TurnBasedGameLogic extends GameLogic {
                 }
                 //qua devo mettere la chiusura del gioco e del round
                 EndRound(Time);
+                EndGame(Time, userScore, userScore>robotScore);
             }
             default -> {
                 throw new IllegalStateException("Unexpected state: " + currentState);
@@ -63,7 +64,18 @@ public class TurnBasedGameLogic extends GameLogic {
 
     @Override
     public int GetScore(int coverage) {
-        return coverage;
+        // Se loc è 0, il punteggio è sempre 0
+        if (coverage == 0) {
+            return 0;
+        }
+
+        // Calcolo della percentuale della posizione
+        double locPerc = ((double) coverage) / 100;
+        // Penalità crescente per ogni turno aggiuntivo
+        double penaltyFactor = Math.pow(0.9, currentTurn);
+        // Calcolo del punteggio
+        double score = locPerc * 100 * penaltyFactor;
+        return (int) Math.ceil(score);
     }
 
 }

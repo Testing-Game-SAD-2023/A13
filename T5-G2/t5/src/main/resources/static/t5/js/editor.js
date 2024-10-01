@@ -1,590 +1,278 @@
-var turno = 0;                  // numero di turni giocati fino ad ora
+const getCookie = (name) => {
+	const value = `; ${document.cookie}`;
+	const parts = value.split(`; ${name}=`);
+	if (parts.length === 2) return parts.pop().split(";").shift();
+	return null;
+};
 
-var current_round_scalata = 0;          // round corrente
-var total_rounds_scalata = 0;   // numero totale di rounds
+const parseJwt = (token) => {
+	try {
+		return JSON.parse(atob(token.split(".")[1]));
+	} catch (e) {
+		return null;
+	}
+};
+
+//Variabili varie
+var turno = 0; // numero di turni giocati fino ad ora
+var current_round_scalata = 0; // round corrente
+var total_rounds_scalata = 0; // numero totale di rounds
 var selectedScalata = "";
-
-var isWin = false;              // flag per indicare se il giocatore ha vinto o perso
+var isWin = false; // flag per indicare se il giocatore ha vinto o perso
 var orderTurno = 0;
-var perc_robot = '0';           // percentuale di copertura del robot scelto
+var perc_robot = "0"; // percentuale di copertura del robot scelto
 var gameScore = 0;
 var locGiocatore = 0;
-
-// (MODIFICA 23/04/2024) Get actual date
 var currentDate = new Date();
 
-//Riceeiving the game info from the server
+//chiamata a /StartGame
+const data = {
+	playerId: String(parseJwt(getCookie("jwt")).userId),
+	type_robot: localStorage.getItem("robot"),
+	difficulty: localStorage.getItem("difficulty"),
+	mode: localStorage.getItem("modalita"),
+	underTestClassName: localStorage.getItem("underTestClassName")
+};
+
 $(document).ready(function () {
-  
-  current_round_scalata = localStorage.getItem("current_round_scalata");
-  total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
-  selectedScalata = localStorage.getItem("scalata_name");
+	startGame(data);
 
-  var idUtente = parseJwt(getCookie("jwt")).userId;
-  var idPartita = localStorage.getItem("gameId");       // set by <task x> at the start of the game
-  var idTurno = localStorage.getItem("turnId");
-  var nameCUT = localStorage.getItem("classe");
-  var robotScelto = localStorage.getItem("robot");
-  var difficolta = localStorage.getItem("difficulty");
-  var scalataID = localStorage.getItem("scalataId");
-  localStorage.setItem("playerId", idUtente);
-  // (MODIFICA 23/04/2024) Define test class name
-  var testClassName = "Test" + nameCUT;
+	// Format date to dd/mm/yyyy
+	const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}/${String(currentDate.getMonth() + 1).padStart(2, '0')}/${currentDate.getFullYear()}`;
+	console.log("formattedDate:", formattedDate);
 
-  console.log("idUtente: " + idUtente);
-  console.log("idPartita: " + idPartita);
-  console.log("idTurno: " + idTurno);
-  console.log("nameCUT: " + nameCUT);
-  console.log("robotScelto: " + robotScelto);
-  console.log("difficolta: " + difficolta);
+	// Obtain the content of the textarea
+	const textareaContent = document.getElementById("Editor_utente").value;
 
-  console.log("current_round_scalata: " + current_round_scalata);
-  console.log("total_rounds_scalata: " + total_rounds_scalata);
-  console.log("scalata_name: " + selectedScalata);
+	// Get player details
+	const jwtData = parseJwt(getCookie("jwt"));
+	const username = jwtData.sub;
+	const userId = jwtData.userId;
 
-  //Redirect to /main page if some parameters are missing
-  if (idUtente == null || idPartita == null || idTurno == null || nameCUT == null || robotScelto == null || difficolta == null) window.location.href = "/main";
-  
+	// Create a function to handle multiple replacements
+	const replacePlaceholders = (content, replacements) => {
+		for (const [placeholder, value] of Object.entries(replacements)) {
+			content = content.replace(new RegExp(placeholder, 'g'), value);
+		}
+		return content;
+	};
 
-  $.ajax({
-    url: "/api/receiveClassUnderTest",
-    type: "GET",
-    data: {
-      idUtente: idUtente,
-      idPartita: idPartita,
-      idTurno: idTurno,
-      nomeCUT: nameCUT,
-      robotScelto: robotScelto,
-      difficolta: difficolta
-    },
-    dataType: "text",
-    success: function (response) {
+	className = localStorage.getItem("underTestClassName");
+	var testClassName = "Test" + className;
 
-      // Ricezione avvenuta con successo
-      // console.log(response);
-      console.log(nameCUT+"SourceCode \n\n\n"+JSON.parse(response).class);
-      sidebarEditor.setValue(JSON.parse(response).class);
+	// Define replacements
+	const replacements = {
+		"TestClasse": testClassName,
+		"username": username,
+		"userID": userId,
+		"date": formattedDate
+	};
 
-      //MODIFICA (23/04/2024)  
-      //Format date to dd/mm/yyyy
-      var formattedDate = currentDate.getDate() + "/" + (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear();
-      console.log("formattedDate: "+formattedDate);
+	
 
-      //Obtain the content of the textarea
-      var textareaContent = document.getElementById("editor").value;
-      
-      //Substitute "TestClasse" with the name of the CUT already received
-      var newContent = textareaContent.replace("TestClasse", testClassName);
+	// Perform replacements
+	const newContent = replacePlaceholders(textareaContent, replacements);
+	console.log("newContent \n\n", newContent);
 
-      //Substitute "username" with the username of the player
-      newContent = newContent.replace("username", parseJwt(getCookie("jwt")).sub);
-
-      //Substitute "userID" with the ID of the player
-      newContent = newContent.replace("userID", parseJwt(getCookie("jwt")).userId);
-
-      //Substitute "date" with the current date
-      newContent = newContent.replace("date", formattedDate);
-
-      console.log("newContent \n\n"+newContent);
-
-      //Set the new content to the textarea
-      document.getElementById("editor").value = newContent;
-      editor.setValue(newContent);
-      //FINE MODIFICA (23/04/2024)
-
-      alert("Classe: "+nameCUT+".java ricevuta con successo");
-    },
-    error: function () {
-
-      // Gestione dell'errore
-      console.log("Errore durante la ricezione del file "+ nameCUT+".java");
-    }
-  });
+	// Set the new content to the textarea
+	document.getElementById("Editor_utente").value = newContent;
+	editor_utente.setValue(newContent);
 });
 
-//TASTO STORICO
-var storico = document.getElementById("storico");
+current_round_scalata = localStorage.getItem("current_round_scalata");
+total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
+
+// Elemento per il tasto storico
+const storico = document.getElementById("storico");
+
+// Aggiungere l'event listener per il tasto "storico"
 storico.addEventListener("click", function () {
+	toggleLoading(true);
 
-  document.getElementById('loading-editor').style.display = 'block';
-  if (orderTurno == 0) {
-
-    alert("Non esiste ancora uno storico dei test");
-    document.getElementById('loading-editor').style.display = 'none';
-
-  } else if (localStorage.getItem("gameId") === "null") {
-
-    alert("Impossibile accedere allo storico. La partita è terminata");
-    document.getElementById('loading-editor').style.display = 'none';
-
-  } else {
-
-    document.getElementById('loading-editor').style.display = 'none';
-    var dastampare = "";
-    async function fetchTurns() {
-      for (var i = orderTurno; i >= 1; i--) {
-
-        try {
-          let response = await $.ajax({
-            url: "/turns/" + (parseInt(localStorage.getItem("turnId")) - i + 1).toString(),
-            method: 'GET',
-            dataType: 'json',
-          });
-
-          dastampare += "Turno " + Math.abs(i - orderTurno - 1).toString() + "\n" + "Percentuale di copertura ottenuta: " + response.scores + "\n";
-          console.log("response.scores: "+response.scores);
-
-        } catch (error) {
-          console.error('Error:', error);
-        }
-
-        try {
-          test = generaPercorsoTest(orderTurno);
-          let response = await $.ajax({
-
-            //TODO: Change the path to the correct one
-            //e.g. /tests/VolumeT8/FolderTreeEvo/Calcolatrice/StudentLogin/Player1/Game109/Round109/Turn1/TestReport/TestCalcolatrice.java
-            //url: "/tests/Game" + localStorage.getItem("gameId") + '/Round' + localStorage.getItem("roundId") + '/Turn' + Math.abs(i - orderTurno - 1).toString() + '/' + localStorage.getItem("classe"),
-            url: test,
-            method: 'GET',
-            dataType: 'text',
-          });
-
-          dastampare += "Codice di test sottoposto al tentativo " + Math.abs(i - orderTurno - 1).toString() + ":\n" + response + "\n\n";
-
-        } catch (error) {
-          console.error('Error:', error);
-        }
-        // Printing separator
-        dastampare += "-----------------------------------------------------------------------------\n\n";
-      }
-      consoleArea.setValue(dastampare);
-      console.log(dastampare);
-    }
-    fetchTurns(orderTurno);
-  }
+	// Verificare se esiste uno storico
+	if (orderTurno === 0) {
+		showAlert("Non esiste ancora uno storico dei test");
+	} else if (localStorage.getItem("gameId") === "null") {
+		showAlert("Impossibile accedere allo storico. La partita è terminata");
+	} else {
+		toggleLoading(false);
+		fetchTurns();
+	}
 });
 
-// TASTO PLAY/SUBMIT
-var runButton = document.getElementById("runButton");
-runButton.addEventListener("click", function () {
+// Elemento del pulsante "Play/Submit"
+const runButton = document.getElementById("runButton");
 
-  document.getElementById('loading-editor').style.display = 'block';
-  $(document).ready(function () {
+// Funzione principale per la gestione del click del pulsante
+runButton.addEventListener("click", async function () {
+	//toggleLoading(true);
 
-    //Check if the game is over
-    if (localStorage.getItem("gameId") == "null") {                     
-      document.getElementById('loading-editor').style.display = 'none';
-      // alert("Impossibile effettuare un nuovo tentativo: La partita è già terminata.");
-      swal("Errore", "Impossibile effettuare un nuovo tentativo: la partita è già terminata.", "error");
+	try {
+		const formData = getFormData();
+		formData.append("isGameEnd", false);
+		for (let [key, value] of formData.entries()) {
+			console.log(key, value);
+		}
 
-    } else {
+		// Prima richiesta AJAX per eseguire il test
+		const response = await ajaxRequest("/run", "POST",formData, false, "json");
 
-      // var risp;                                                                                    // saving the response
-      var formData = new FormData();
-      formData.append("testingClassName", "Test" + localStorage.getItem("classe") + ".java");     // e.g TestCalcolatrice.java
-      formData.append("testingClassCode", editor.getValue());
-      formData.append("underTestClassName", localStorage.getItem("classe") + ".java");            // e.g Calcolatrice.java
-      formData.append("underTestClassCode", sidebarEditor.getValue());
-      formData.append("className", localStorage.getItem("classe"))
-      formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
-      formData.append("turnId", localStorage.getItem("turnId"));
-      formData.append("roundId", localStorage.getItem("roundId"));
-      formData.append("gameId", localStorage.getItem("gameId"));
-      formData.append("difficulty", localStorage.getItem("difficulty"));
-      formData.append("type", localStorage.getItem("robot"));                                     // modificato
-      formData.append("order", orderTurno);
-      formData.append("username", localStorage.getItem("username"));
-      formData.append("testClassId", localStorage.getItem("classe"));
+		const { robotScore, gameScore, outCompile, coverage, win } = response;
+		consoleArea.setValue(outCompile);
+		highlightCodeCoverage($.parseXML(coverage));
 
-      $.ajax({
-        url: "/api/run", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        success: function (response) {
+		showGameResult(win, gameScore);
+		orderTurno++;
 
-          console.log(response);
-          // risp = response;                            
+		const url = createApiUrl(formData, orderTurno);
+		console.log("URL post on: " + url);
 
-          perc_robot = response.robotScore.toString();
-          gameScore = response.gameScore.toString();
+		// Seconda richiesta AJAX per inviare il codice di test
+		//toggleLoading(false);
+		const javaCode = editor.getValue();
+		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "json");
 
-          consoleArea.setValue(response.outCompile);
-          highlightCodeCoverage($.parseXML(response.coverage));
-          document.getElementById('loading-editor').style.display = 'none';
+		displayRobotPoints = getConsoleTextRun(csvContent, gameScore, robotScore);
+		consoleArea2.setValue(displayRobotPoints);
 
-          // Check if the player has won
-
-          if (response.win == true) {
-
-            // alert("Hai vinto! Punteggio: " + gameScore);
-            swal("Complimenti!", "Hai vinto! Ecco il tuo punteggio: " + gameScore, "success");
-            turno++;                                      // Increment the number of turns played so far
-            isWin = true;
-          }
-          else {
-
-            // alert("Hai perso! Punteggio: " + gameScore);
-            swal("Peccato!", "Hai perso! Ecco il tuo punteggio: " + gameScore, "error");
-            turno++;
-          }
-          orderTurno++;
-
-          url = createApiUrl(formData, orderTurno);
-          console.log('URL post on: '+url);
-
-          const javaCode = editor.getValue();                               // Code of the test class
-          document.getElementById('loading-result').style.display = 'block';
-          $.ajax({
-            url: url,
-            type: 'POST',
-            data: javaCode,
-            timeout: 3000000,
-            processData: false,
-            contentType: false,
-            success: function (data, textStatus, xhr) {
-
-              var csvContent = data;
-              console.log(csvContent);
-
-              var displayRobotPoints = "";
-
-              if (csvContent) {
-                
-                document.getElementById('loading-result').style.display = 'none';
-                displayRobotPoints = getConsoleTextRun(csvContent, response.score.toString(), response.robotScore.toString());
-
-                    consoleArea2.setValue(displayRobotPoints);
-
-                    // scalata mode handling
-                    try {
-                      // Check if the game mode is "Scalata"
-                      if (localStorage.getItem("modalita") === "Scalata") {
-                        // Check if the player has won the round
-                        if (isWin) {
-                          /*The player has won the round, check if the player has 
-                          completed the Scalata (current_round_scalata == total_rounds_scalata)
-                          */
-                          if(current_round_scalata == total_rounds_scalata) {
-                            // alert("Hai completato la scalata!");
-                            calculateFinalScore(localStorage.getItem("scalataId")).then((data) => { 
-                              console.log("calculateFinalScore response: ", data.finalScore);
-                              closeScalata(localStorage.getItem("scalataId"), true, data.finalScore, current_round_scalata).then((data) => {
-                                swal("Complimenti!", `Hai completato la scalata!\n${displayRobotPoints}\n A breve verrai reindirizzato alla classifica.`, "success").then((value) => {
-                                  window.location.href = "/leaderboardScalata";
-                                });
-                              });
-                            }).catch((error) => {
-                              console.log("Error:", error);
-                              swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
-                            });
-                          }
-                          else {
-                            //The player has completed the round, not the Scalata
-                            swal("Complimenti!", `Hai completato il round ${current_round_scalata}/${total_rounds_scalata}!\n${displayRobotPoints}`, "success").then((value) => {
-                              current_round_scalata++;
-                              localStorage.setItem("current_round_scalata", current_round_scalata);
-                              classe = getScalataClasse(current_round_scalata-1, localStorage.getItem("scalata_classes"));
-                              localStorage.setItem("classe", classe);
-                              console.log("[editor.js] classes in scalata: "+localStorage.getItem("scalata_classes")+"\n\
-                                        selected class: "+classe);
-                              incrementScalataRound(localStorage.getItem("scalataId"), current_round_scalata).then((data) => {
-                                console.log("[editor.js] Creating new game for next round in scalata with parameters: \
-                                  Robot: evosuite\n\
-                                  Classe: "+classe+"\n\
-                                  Difficulty: 1\n\
-                                  ScalataId: "+localStorage.getItem("scalataId")+"\n\
-                                  Username: "+localStorage.getItem("username")+".");
-                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username")).then((data) => {
-                                  console.log(data);
-                                  window.location.href = "/editor";
-                                });
-                              }).catch((error) => {
-                                console.log("Error:", error);
-                                swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
-                              });
-                            });
-                          }
-                        }
-                        else { //The player has lost the round
-                          closeScalata(localStorage.getItem("scalataId"), false, 0, current_round_scalata).then((data) => {
-                            console.log("Close Scalata response: ", data);
-                            swal("Peccato!", `Hai perso al round ${current_round_scalata}/${total_rounds_scalata} della scalata, la prossima volta andrà meglio!\n${displayRobotPoints}`, "error").then((value) => {
-                              window.location.href = "/main";
-                            });
-                          }).catch((error) => {
-                            console.log("Error:", error);
-                            swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
-                          });
-                        }
-                      } 
-                      else {
-                        //Game mode is "Sfida"
-                        console.log("Game mode is 'Sfida'");
-                        // Do nothing
-                      }
-                    }
-                    catch (error) {
-                      console.log("Error:", error);
-                      swal("Errore!", "Si è verificato un errore durante il recupero dei dati. Riprovare.", "error");
-                    }
-                  }
-            },
-            error: function (xhr, textStatus, error) {
-
-              document.getElementById('loading-editor').style.display = 'none';
-              console.log('Si è verificato un errore:', error);
-            }
-          });
-        },
-        error: function () {
-
-          document.getElementById('loading-editor').style.display = 'none';
-          // alert("Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!");
-          swal("Errore", "Si è verificato un errore.\nAssicurati prima che la compilazione vada a buon fine!", "error");
-        }
-      });
-    }
-  });
+		if (localStorage.getItem("modalita") === "Scalata") {
+			console.log("Game mode is 'Scalata'");
+			controlloScalata(win, current_round_scalata, total_rounds_scalata, displayRobotPoints);
+		} else {
+			console.log("Game mode is 'Sfida'");
+		}
+	} catch (error) {
+		swal(
+			"Errore",
+			"Si è verificato un errore durante l'esecuzione. Riprovare.",
+			"error"
+		);
+	} finally {
+		//toggleLoading(false);
+	}
 });
 
 // TASTO RUN (COVERAGE)
 var coverageButton = document.getElementById("coverageButton");
-coverageButton.addEventListener("click", processJaCoCoReport);
+coverageButton.addEventListener("click", async function () {
+	const formData = getFormData();
+	toggleLoading(true);
 
-function processJaCoCoReport() {
+	try {
+		urlJacoco = "http://remoteccc-app-1:1234/compile-and-codecoverage";
+		// Richiesta per ottenere il report di JaCoCo
+		const reportContent = await ajaxRequest(urlJacoco, "POST", formData, false, "xml");
+		console.log("(POST /getJaCoCoReport)", reportContent);
+		highlightCodeCoverage(reportContent);
 
-  // Effettua una richiesta al tuo controller Spring per ottenere il file di output di JaCoCo
-  var formData = new FormData();
-  formData.append("testingClassName", "Test" + localStorage.getItem("classe") + ".java");     // e.g TestCalcolatrice.java
-  formData.append("testingClassCode", editor.getValue());
-  formData.append("underTestClassName", localStorage.getItem("classe") + ".java");            // e.g Calcolatrice.java
-  formData.append("underTestClassCode", sidebarEditor.getValue());
-  formData.append("className", localStorage.getItem("classe"))
-  formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
-  formData.append("turnId", localStorage.getItem("turnId"));
-  formData.append("roundId", localStorage.getItem("roundId"));
-  formData.append("gameId", localStorage.getItem("gameId"));
-  formData.append("difficulty", localStorage.getItem("difficulty"));
-  formData.append("type", localStorage.getItem("robot"));                                     // modificato
-  formData.append("order", orderTurno);
-  formData.append("username", localStorage.getItem("username"));
-  formData.append("testClassId", localStorage.getItem("classe"));
+		orderTurno++;
+		const url = createApiUrl(formData, orderTurno);
+		const javaCode = editor.getValue();
 
+		// Richiesta per inviare il codice di test
+		toggleLoading(false);
+		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "text");
+		consoleArea.setValue(getConsoleTextCoverage(csvContent));
 
-  document.getElementById('loading-editor').style.display = 'block';
-  $.ajax({
-    url: "/api/getJaCoCoReport",
-    type: "POST",
-    data: formData,
-    processData: false,
-    contentType: false,
-    dataType: "xml",                                                  //potrebbe essere anche giusto leggere da un file xml di report di JaCoCo
-    success: function (reportContent) {
-
-      document.getElementById('loading-editor').style.display = 'none';
-      console.log("(POST /getJaCoCoReport)"+ reportContent);
-      // Una volta ricevuto il file di output di JaCoCo, elabora il contenuto
-      highlightCodeCoverage(reportContent);
-      
-    },
-    error: function () {
-
-      document.getElementById('loading-editor').style.display = 'none';
-      alert("Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!");
-      console.log("Errore durante il recupero del file di output di JaCoCo.");
-    }
-  });
-  orderTurno++;
-
-  url = createApiUrl(formData,orderTurno)
-
-  const javaCode = editor.getValue();                       // code of the test class
-  // locGiocatore = 0;
-
-  $.ajax({
-    url: url,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain'
-    },
-    data: javaCode,
-    timeout: 300000,
-    processData: false,
-    success: function (data, textStatus, xhr) {
-
-      var csvContent = data;
-      console.log(csvContent);
-      
-      var displayCoveragePoints = "";
-
-      displayCoveragePoints = getConsoleTextCoverage(csvContent);
-      consoleArea.setValue(displayCoveragePoints);
-
-      console.log("Player: " + [parseJwt(getCookie("jwt")).userId]);
-      console.log("turnId: " + orderTurno);
-      console.log("roundId: " + localStorage.getItem("roundId"));
-
-      // If is the first turn, we need to make a POST request
-      if (orderTurno == 1) {
-
-        // ID del turno da aggiornare
-        var turnId = localStorage.getItem("turnId");
-
-        // Dati da inviare per l'aggiornamento del turno
-        var updateData = {
-          scores: locGiocatore.toString(),
-          startedAt: new Date().toISOString(),
-          closedAt: new Date().toISOString()
-        };
-
-        // Effettua la richiesta PUT
-        $.ajax({
-          url: "/turns/" + turnId,
-          type: 'PUT',
-          contentType: "application/json",
-          data: JSON.stringify(updateData),
-          dataType: "json",
-          success: function (response) {
-
-            console.log("Turno aggiornato con successo:", response);
-            // Esegui azioni aggiuntive dopo l'aggiornamento del turno
-          },
-          error: function (error) {
-
-            console.error('Errore durante l\'aggiornamento del turno:', error);
-            // Gestisci l'errore di aggiornamento del turno
-          }
-        });
-        // altrimenti effettuiamo una post
-      } else {
-
-        console.log("orderTurno"+orderTurno);
-
-        $.ajax({
-          url: "/turns",
-          type: 'POST',
-          contentType: "application/json",
-          data: JSON.stringify({
-
-            "players": [String(parseJwt(getCookie("jwt")).userId)],
-            "order": orderTurno,
-            "roundId": parseInt(localStorage.getItem("roundId")),
-            "scores": locGiocatore.toString(),
-            "startedAt": new Date().toISOString(),
-            "closedAt": new Date().toISOString()                    // Get current date and time in ISO 8601 format
-          }),
-          dataType: "json",
-          success: function (response) {
-
-            console.log("(POST /turns) Success:", response);
-            localStorage.setItem("turnId", response[0].id.toString());
-            turno++;                                              // incremento il numero di turno giocati fino ad ora
-            // window.location.href = "/editor";
-          },
-          error: function (error) {
-
-            console.error('(POST /turns) Error:', error);
-            alert("Dati non inviati con successo. Riprova");
-          }
-        });
-      }
-    },
-    error: function (xhr, textStatus, error) {
-
-      console.log('Si è verificato un errore:', error);
-    }
-  });
-}
+		const turnId = localStorage.getItem("turnId");
+		await updateOrCreateTurn(turnId, locGiocatore, orderTurno);
+	} catch (error) {
+		toggleLoading(false);
+		alert(
+			"Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!"
+		);
+		console.error(
+			"Errore durante il recupero del file di output di JaCoCo o la gestione del turno:",
+			error
+		);
+	} finally {
+		toggleLoading(false);
+	}
+});
 
 // GAME INFO BUTTON
 function openInfoModal() {
+	// Open the modal
+	var infoModal = document.getElementById("infoModal");
 
-  // Open the modal
-  var infoModal = document.getElementById("infoModal");
-
-  /* Set the display property of the modal to "block" to make it visible
+	/* Set the display property of the modal to "block" to make it visible
   if it was previously hidden
   */
-  infoModal.style.display = "block";
+	infoModal.style.display = "block";
 
-  //Get a reference to the modal2-content element
-  var modal2Content = document.querySelector("#infoModal .modal2-content");
+	//Get a reference to the modal2-content element
+	var modal2Content = document.querySelector("#infoModal .modal2-content");
 
-  //Retrieve the gameID from the local storage
-  var gameIDj = localStorage.getItem("gameId");
+	//Retrieve the gameID from the local storage
+	var gameIDj = localStorage.getItem("gameId");
 
-  // Seleziona tutti gli elementi figli tranne il primo (che è il pulsante per chiudere il modale)
-  var childrenToRemove = Array.from(modal2Content.children).slice(1);
+	// Seleziona tutti gli elementi figli tranne il primo (che è il pulsante per chiudere il modale)
+	var childrenToRemove = Array.from(modal2Content.children).slice(1);
 
-  // Rimuovi tutti gli elementi figli eccetto il primo
-  childrenToRemove.forEach(child => {
-    modal2Content.removeChild(child);
-  });
+	// Rimuovi tutti gli elementi figli eccetto il primo
+	childrenToRemove.forEach((child) => {
+		modal2Content.removeChild(child);
+	});
 
-  // Aggiungi il titolo
-  var titleElement = document.createElement("h2");
-  titleElement.classList.add("modal2-title");
-  titleElement.textContent = "GAME INFO";
-  modal2Content.appendChild(titleElement);
+	// Aggiungi il titolo
+	var titleElement = document.createElement("h2");
+	titleElement.classList.add("modal2-title");
+	titleElement.textContent = "GAME INFO";
+	modal2Content.appendChild(titleElement);
 
-  if (gameIDj != "null") {
+	if (gameIDj != "null") {
+		// Aggiungi i campi aggiornati
+		var idUtenteElement = document.createElement("p");
+		var usernamej = parseJwt(getCookie("jwt")).userId;
+		idUtenteElement.textContent = "UserID: " + usernamej;
+		modal2Content.appendChild(idUtenteElement);
 
-    // Aggiungi i campi aggiornati
-    var idUtenteElement = document.createElement("p");
-    var usernamej = parseJwt(getCookie("jwt")).userId;
-    idUtenteElement.textContent = "UserID: " + usernamej;
-    modal2Content.appendChild(idUtenteElement);
-    
-    var usernameElement = document.createElement("p");
-    var username = parseJwt(getCookie("jwt")).sub.toString();
-    usernameElement.textContent = "Username: " + username;
-    modal2Content.appendChild(usernameElement);
+		var usernameElement = document.createElement("p");
+		var username = parseJwt(getCookie("jwt")).sub.toString();
+		usernameElement.textContent = "Username: " + username;
+		modal2Content.appendChild(usernameElement);
 
-    var idPartitaElement = document.createElement("p");
-    idPartitaElement.textContent = "GameID: " + gameIDj;
-    modal2Content.appendChild(idPartitaElement);
+		var idPartitaElement = document.createElement("p");
+		idPartitaElement.textContent = "GameID: " + gameIDj;
+		modal2Content.appendChild(idPartitaElement);
 
-    // (MODIFICA 23/04/2024): Add the name of the CUT
-    var CUTName = document.createElement("p");
-    CUTName.textContent = "Class Under Test: " + localStorage.getItem("classe");
-    modal2Content.appendChild(CUTName);
+		// (MODIFICA 23/04/2024): Add the name of the CUT
+		var CUTName = document.createElement("p");
+		CUTName.textContent = "Class Under Test: " + localStorage.getItem("classe");
+		modal2Content.appendChild(CUTName);
 
-    var idTurnoElement = document.createElement("p");
-    var turnoIDj = orderTurno + 1;
-    idTurnoElement.textContent = "Turno: " + turnoIDj;
-    modal2Content.appendChild(idTurnoElement);
+		var idTurnoElement = document.createElement("p");
+		var turnoIDj = orderTurno + 1;
+		idTurnoElement.textContent = "Turno: " + turnoIDj;
+		modal2Content.appendChild(idTurnoElement);
 
-    var robotSceltoElement = document.createElement("p");
-    var robotj = localStorage.getItem("robot");
-    robotSceltoElement.textContent = "Robot:" + robotj;
-    modal2Content.appendChild(robotSceltoElement);
+		var robotSceltoElement = document.createElement("p");
+		var robotj = localStorage.getItem("robot");
+		robotSceltoElement.textContent = "Robot:" + robotj;
+		modal2Content.appendChild(robotSceltoElement);
 
-    var difficoltaElement = document.createElement("p");
-    difficoltaElement.textContent = "Livello:" + localStorage.getItem("difficulty");
-    modal2Content.appendChild(difficoltaElement);
-  }
+		var difficoltaElement = document.createElement("p");
+		difficoltaElement.textContent =
+			"Livello:" + localStorage.getItem("difficulty");
+		modal2Content.appendChild(difficoltaElement);
+	}
 }
 function closeInfoModal() {
-  var infoModal = document.getElementById("infoModal");
-  infoModal.style.display = "none";
+	var infoModal = document.getElementById("infoModal");
+	infoModal.style.display = "none";
 }
 
-window.onbeforeunload = function() {
-  if (localStorage.getItem("modalita") !== "Scalata") {
-    localStorage.setItem("gameId", null);
-    localStorage.setItem("turnId", null);
-    localStorage.setItem("classe", null);
-    localStorage.setItem("robot", null);
-    localStorage.setItem("difficulty", null);
-  }
-}
+window.onbeforeunload = function () {
+	if (localStorage.getItem("modalita") !== "Scalata") {
+		localStorage.setItem("gameId", null);
+		localStorage.setItem("turnId", null);
+		localStorage.setItem("classe", null);
+		localStorage.setItem("robot", null);
+		localStorage.setItem("difficulty", null);
+	}
+};
 
 //codice custom per l'integrabilità con thymeleaf
 var robot = "[[${robot}]]";
 var username = "[[${username}]]";
 var gameIDJ = "[[${gameIDj}]]";
-
