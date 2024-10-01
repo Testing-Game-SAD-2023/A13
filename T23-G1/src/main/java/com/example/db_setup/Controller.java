@@ -116,8 +116,7 @@ public class Controller {
                                             @RequestParam("email") String email,
                                             @RequestParam("password") String password,
                                             @RequestParam("check_password") String check_password,
-                                            @RequestParam("studies") Studies studies,
-                                            @RequestParam("g-recaptcha-response") String gRecaptchaResponse, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+                                            @RequestParam("studies") Studies studies, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
         
         if(isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
