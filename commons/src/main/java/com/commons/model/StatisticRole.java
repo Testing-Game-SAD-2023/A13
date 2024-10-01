@@ -1,4 +1,4 @@
-package com.groom.manvsclass.model;
+package com.commons.model;
 
 public enum StatisticRole {
     GamesPlayed,

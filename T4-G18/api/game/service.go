@@ -28,6 +28,7 @@ func (gs *Repository) Create(r *CreateRequest) (Game, error) {
 			ClosedAt:      r.ClosedAt,
 			ScalataGameID: r.ScalataGameID,
 			Players:       make([]model.Player, len(r.Players)),
+			Description:   r.Description,
 		}
 	)
 	// detect duplication in player

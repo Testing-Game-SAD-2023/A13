@@ -1,8 +1,7 @@
-package com.groom.manvsclass.model;
+package com.commons.model;
 
 public enum Gamemode {
     All,
-    Standard,
     Robot,
     Multiplayer,
     Training,

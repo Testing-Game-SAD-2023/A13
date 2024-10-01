@@ -1,5 +1,7 @@
 package com.groom.manvsclass.model;
 
+import com.commons.model.Gamemode;
+import com.commons.model.StatisticRole;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 

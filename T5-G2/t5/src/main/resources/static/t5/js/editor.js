@@ -402,7 +402,7 @@ runButton.addEventListener("click", function () {
                                   Difficulty: 1\n\
                                   ScalataId: "+localStorage.getItem("scalataId")+"\n\
                                   Username: "+localStorage.getItem("username")+".");
-                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username")).then((data) => {
+                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username"), "Scalata").then((data) => {
                                   console.log(data);
                                   window.location.href = "/editor";
                                 });

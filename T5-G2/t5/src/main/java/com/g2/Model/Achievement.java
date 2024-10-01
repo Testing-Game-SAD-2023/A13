@@ -48,8 +48,8 @@ public class Achievement {
         return statistic;
     }
 
-    public void setStatistic(int category) {
-        this.statistic = category;
+    public void setStatistic(int statistic) {
+        this.statistic = statistic;
     }
 
     public float getProgressRequired() {

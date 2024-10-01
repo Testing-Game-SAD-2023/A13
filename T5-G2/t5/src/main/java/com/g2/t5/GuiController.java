@@ -281,7 +281,7 @@ public class GuiController {
 
     @PostMapping("/save-data")
     public ResponseEntity<String> saveGame(@RequestParam("playerId") int playerId, @RequestParam("robot") String robot,
-            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty,
+            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty, @RequestParam("gamemode") String gamemode,
             @RequestParam("username") String username, @RequestParam("selectedScalata") Optional<Integer> selectedScalata, HttpServletRequest request) {
 
         if (!request.getHeader("X-UserID").equals(String.valueOf(playerId)))
@@ -293,7 +293,7 @@ public class GuiController {
 
         GameDataWriter gameDataWriter = new GameDataWriter();
         // g.setGameId(gameDataWriter.getGameId());
-        Game g = new Game(playerId, "descrizione", "nome", difficulty, username);
+        Game g = new Game(playerId, gamemode, "nome", difficulty, username);
         // g.setPlayerId(pl);
         // g.setPlayerClass(classe);
         // g.setRobot(robot);

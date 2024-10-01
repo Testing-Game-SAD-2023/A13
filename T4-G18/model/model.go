@@ -40,7 +40,7 @@ type Game struct {
 	Name          string         `gorm:"default:null"`
 	Username      string         `gorm:"default:null"`
 	CurrentRound  int            `gorm:"default:1"`
-	Description   sql.NullString `gorm:"default:null"`
+	Description   string         `gorm:"default:null"`
 	Difficulty    string         `gorm:"default:null"`
 	Score         float64        `gorm:"default:0"`
 	IsWinner      bool           `gorm:"default:false"`

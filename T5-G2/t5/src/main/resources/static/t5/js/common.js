@@ -3,7 +3,7 @@ function getScalataClasse(roundId, scalateJsonArray) {
     return JSON.parse(scalateJsonArray)[roundId];
 }
 
-async function createGame(robot, classe, difficulty, scalataId, username) {
+async function createGame(robot, classe, difficulty, scalataId, username, gamemode) {
     console.log("[createGame] robot: ", robot, " classe: ", classe, " difficulty: ", difficulty, " scalataId: ", scalataId, " username: ", username);
     return new Promise((resolve, reject) => { 
         $.ajax({
@@ -14,6 +14,7 @@ async function createGame(robot, classe, difficulty, scalataId, username) {
             robot: robot,
             difficulty: difficulty,
             selectedScalata: scalataId,
+            gamemode: gamemode,
             username: parseJwt(getCookie("jwt")).sub
             },
             type: 'POST',
