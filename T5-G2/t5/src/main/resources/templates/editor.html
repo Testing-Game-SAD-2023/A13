@@ -33,12 +33,21 @@
 			}
 
 			#section_editor {
-				height: 100%;
-				width: 100%;
+				height: calc(100vh - 100px); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+				overflow-y: auto;
 			}
+			
 			#section_UT {
-				height: 100%;
-				width: 100%;
+				height: calc(100vh - 100px); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+				overflow-y: auto;
+			}
+
+			#Console_utente{
+				flex-grow: 1; /* La textarea occupa lo spazio rimanente */
+			}
+
+			#Console_Robot{
+				flex-grow: 1; /* La textarea occupa lo spazio rimanente */
 			}
 		</style>
 	</head>
@@ -75,9 +84,24 @@
 						<div class="card-header p-0">
 							<nav class="navbar bg-body-tertiary p-2">
 								<span class="navbar-brand lead my-0 py-0"> Edit </span>
-								<div class="btn-group btn-group">
-									<button type="button" class="btn btn-sm" id="runButton">
-										<i class="bi bi-play-fill"></i>
+								<div class="">
+									<button class="btn btn-primary" type="button" id="runButton">
+										<div id="loading_run">
+											<span
+												class="spinner-border spinner-border-sm"
+												aria-hidden="true"
+												style="display: none"
+											></span>
+											<span role="status" style="display: none"
+												>Loading...</span
+											>
+											<i
+												id="loading_icon_1"
+												class="bi bi-play-fill"
+												aria-hidden="true"
+											></i>
+											<!-- Icona nascosta -->
+										</div>
 									</button>
 									<button
 										type="button"
@@ -89,10 +113,10 @@
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
-											<button id="storico">Storico</button>
+											<button class="btn" id="storico">Storico</button>
 										</li>
 										<li>
-											<button id="">Prova</button>
+											<button class="btn" id="">Prova</button>
 										</li>
 										<li>
 											<a class="dropdown-item" href="#">Separated link</a>
@@ -105,9 +129,6 @@
 							class="card-body m-0 p-0 overflow-y-hidden"
 							id="section_editor"
 						>
-						<div class="spinner-border" role="status" aria-hidden="false" id="loading">
-							<span class="visually-hidden">Loading...</span>
-						</div>
 							<textarea id="Editor_utente">
 /*Compila i campi "Nome" e "Cognome" con le informazioni richieste
 Nome: "inserire il proprio nome"
@@ -186,34 +207,26 @@ public class TestClasse {
 						<!-- CLASS UNDER TEST-->
 						<div class="card-header p-0">
 							<nav class="navbar bg-body-tertiary p-2">
-								<span class="navbar-brand lead my-0 py-0">
-									Class Under Test
-								</span>
-								<div class="btn-group btn-group">
-									<button type="button" class="btn btn-sm" id="coverageButton">
-										<i class="bi bi-play-fill"></i>
+								<span class="navbar-brand lead my-0 py-0">Class Under Test</span>
+								<div class="">
+									<button class="btn btn-primary" type="button" id="runButton">
+										<div id="loading_run">
+											<span
+												class="spinner-border spinner-border-sm"
+												aria-hidden="true"
+												style="display: none"
+											></span>
+											<span role="status" style="display: none"
+												>Loading...</span
+											>
+											<i
+												id="loading_icon_1"
+												class="bi bi-play-fill"
+												aria-hidden="true"
+											></i>
+											<!-- Icona nascosta -->
+										</div>
 									</button>
-									<button
-										type="button"
-										class="btn btn-sm dropdown-toggle-split my-0"
-										data-bs-toggle="dropdown"
-										aria-expanded="false"
-									>
-										<i class="bi bi-three-dots-vertical"></i>
-									</button>
-									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a class="dropdown-item" href="#">Action</a></li>
-										<li>
-											<a class="dropdown-item" href="#">Another action</a>
-										</li>
-										<li>
-											<a class="dropdown-item" href="#">Something else here</a>
-										</li>
-										<li><hr class="dropdown-divider" /></li>
-										<li>
-											<a class="dropdown-item" href="#">Separated link</a>
-										</li>
-									</ul>
 								</div>
 							</nav>
 						</div>
@@ -347,7 +360,7 @@ public class TestClasse {
 				}
 			);
 
-			function enableResizing(container, divider, section1, section2, editor) {
+			function enableResizing(container, divider, section1, section2) {
 				let isDragging = false;
 
 				// Aggiungi event listener per il mouse down (quando si inizia a trascinare)
@@ -368,13 +381,8 @@ public class TestClasse {
 					// Imposta la nuova altezza per la prima sezione
 					section1.style.height = `${offsetY}px`;
 
-					// Se c'è un editor associato, ridimensiona anche l'editor
-					if (editor) {
-						editor.setSize(null, `${offsetY}px`);
-					}
-
 					// Imposta l'altezza per la seconda sezione
-					section2.style.height = `${containerRect.height - offsetY}px`;
+					section2.style.height = `${containerRect.height - offsetY - 10}px`;
 				});
 
 				// Event listener per il rilascio del mouse (fine del trascinamento)
@@ -417,15 +425,13 @@ public class TestClasse {
 				container_user,
 				divider_Console,
 				section_editor,
-				section_console,
-				editor_utente
+				section_console
 			);
 			enableResizing(
 				container_robot,
 				divider_result,
 				section_UT,
-				section_result,
-				editor_robot
+				section_result
 			);
 
 			// Funzione per cambiare il tema
@@ -447,8 +453,16 @@ public class TestClasse {
 			document
 				.getElementById("themeToggle")
 				.addEventListener("change", toggleTheme);
+
+				function setEditorSize() {
+					editor_robot.setSize(null, container_robot.clientHeight + "px");
+					editor_utente.setSize(null, container_user.clientHeight + "px")
+				}
+				window.addEventListener("resize", setEditorSize);
 		</script>
+		<script th:src="@{/t5/js/common.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/editor.js}" th:inline="javascript"></script>
+		<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	</body>
 </html>

@@ -8,7 +8,7 @@ function createApiUrl(formData, orderTurno) {
 	const classePath = `VolumeT8/FolderTreeEvo/${className}/${className}SourceCode/${underTestClassName}`;
 
 	// Ottiene il percorso del test generato
-	const testPath = generaPercorsoTest(orderTurno);
+	const testPath = generaPercorsoTest(orderTurno, formData);
 
 	// Costruisce l'URL dell'API
 	const apiUrl = `/api/${classePath}+${testPath}+/app+${playerId}`;
@@ -17,12 +17,12 @@ function createApiUrl(formData, orderTurno) {
 }
 
 // Funzione per generare il percorso del test
-function generaPercorsoTest(orderTurno) {
+function generaPercorsoTest(orderTurno, formData) {
 	const modalita = localStorage.getItem("modalita");
-	const playerId = localStorage.getItem("playerId");
-	const gameId = localStorage.getItem("gameId");
-	const roundId = localStorage.getItem("roundId");
-	const classeLocal = localStorage.getItem("classe");
+	const playerId = formData.get("playerId");
+	const gameId = formData.get("gameId");
+	const roundId = formData.get("roundId");
+	const classeLocal = formData.get("className");
 
 	// Verifica la modalità e costruisce il percorso appropriato
 	if (modalita === "Scalata" || modalita === "Sfida") {
@@ -46,7 +46,8 @@ function extractThirdColumn(csvContent) {
 	const rows = csvContent.split("\n"); // Divide le righe
 	const thirdColumnValues = [];
 
-	rows.forEach((row) => {
+	// Inizia il ciclo dalla seconda riga (indice 1)
+	rows.slice(1).forEach((row) => {
 		const cells = row.split(","); // Divide le celle
 		if (cells.length >= 3) {
 			thirdColumnValues.push(cells[2]); // Aggiunge la terza colonna
@@ -161,11 +162,30 @@ async function fetchTestCode(testPath, i) {
     }
 }
 
-// Funzione per mostrare o nascondere il caricamento
-function toggleLoading(show) {
-	document.getElementById("loading-editor").style.display = show
-		? "block"
-		: "none";
+function toggleLoading(showSpinner, divId, buttonId) {
+    const divElement = document.getElementById(divId);
+	const button =  document.getElementById(buttonId);
+
+    if (!divElement) {
+        console.error(`Elemento con ID "${divId}" non trovato.`);
+        return;
+    }
+
+    const spinner = divElement.querySelector('.spinner-border');
+    const statusText = divElement.querySelector('[role="status"]');
+    const icon = divElement.querySelector('i');
+
+    if (showSpinner) {
+        spinner.style.display = 'inline-block'; // Mostra lo spinner
+        statusText.style.display = 'inline';    // Mostra il testo "Loading..."
+        icon.style.display = 'none';             // Nascondi l'icona
+		button.disabled = true;
+    } else {
+        spinner.style.display = 'none';          // Nascondi lo spinner
+        statusText.style.display = 'none';       // Nascondi il testo "Loading..."
+        icon.style.display = 'inline-block';     // Mostra l'icona
+		button.disabled = false;
+    }
 }
 
 // Funzione per mostrare un messaggio di alert e nascondere il caricamento
@@ -174,20 +194,51 @@ function showAlert(message) {
 	toggleLoading(false);
 }
 
+function highlightCodeCoverage(reportContent) {
+    // Analizza il contenuto del file di output di JaCoCo per individuare le righe coperte, non coperte e parzialmente coperte
+    // Applica lo stile appropriato alle righe del tuo editor
+
+    var coveredLines = [];
+    var uncoveredLines = [];
+    var partiallyCoveredLines = [];
+
+    reportContent.querySelectorAll("line").forEach(function (line) {
+        if (line.getAttribute("mi") == 0) coveredLines.push(line.getAttribute("nr"));
+        else if (line.getAttribute("cb") / (line.getAttribute("mb") + line.getAttribute("cb")) == (2 / 4)) partiallyCoveredLines.push(line.getAttribute("nr"));
+        else uncoveredLines.push(line.getAttribute("nr"));
+    });
+
+    coveredLines.forEach(function (lineNumber) {
+        editor_robot.removeLineClass(lineNumber - 2, "background", "uncovered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "background", "partially-covered-line");
+        editor_robot.addLineClass(lineNumber - 2, "background", "covered-line");
+    });
+
+    uncoveredLines.forEach(function (lineNumber) {
+        editor_robot.removeLineClass(lineNumber - 2, "background", "covered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "background", "partially-covered-line");
+        editor_robot.addLineClass(lineNumber - 2, "background", "uncovered-line");
+    });
+
+    partiallyCoveredLines.forEach(function (lineNumber) {
+        editor_robot.removeLineClass(lineNumber - 2, "background", "uncovered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "background", "covered-line");
+        editor_robot.addLineClass(lineNumber - 2, "background", "partially-covered-line");
+    });
+}
+
 // Funzione per ottenere i dati del form da inviare
 function getFormData() {
     const formData = new FormData();
     const className = localStorage.getItem("underTestClassName");
     
-    formData.append("testingClassName", `Test${className}.java`);
+    //formData.append("testingClassName", `Test${className}.java`);
     formData.append("testingClassCode", editor_utente.getValue());
     formData.append("underTestClassName", `${className}.java`);
     formData.append("underTestClassCode", editor_robot.getValue());
     formData.append("className", className);
     formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
     formData.append("turnId", localStorage.getItem("turnId"));
-    formData.append("roundId", localStorage.getItem("roundId"));
-    formData.append("gameId", localStorage.getItem("gameId"));
     formData.append("difficulty", localStorage.getItem("difficulty"));
     formData.append("type", localStorage.getItem("robot"));
     formData.append("order", orderTurno);

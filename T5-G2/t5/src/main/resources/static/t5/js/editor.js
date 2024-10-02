@@ -18,10 +18,10 @@ var turno = 0; // numero di turni giocati fino ad ora
 var current_round_scalata = 0; // round corrente
 var total_rounds_scalata = 0; // numero totale di rounds
 var selectedScalata = "";
-var isWin = false; // flag per indicare se il giocatore ha vinto o perso
+var iGameover = false; // flag per indicare se il giocatore ha vinto o perso
 var orderTurno = 0;
 var perc_robot = "0"; // percentuale di copertura del robot scelto
-var gameScore = 0;
+var userScore = 0;
 var locGiocatore = 0;
 var currentDate = new Date();
 
@@ -31,14 +31,20 @@ const data = {
 	type_robot: localStorage.getItem("robot"),
 	difficulty: localStorage.getItem("difficulty"),
 	mode: localStorage.getItem("modalita"),
-	underTestClassName: localStorage.getItem("underTestClassName")
+	underTestClassName: localStorage.getItem("underTestClassName"),
 };
 
 $(document).ready(function () {
 	startGame(data);
 
 	// Format date to dd/mm/yyyy
-	const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}/${String(currentDate.getMonth() + 1).padStart(2, '0')}/${currentDate.getFullYear()}`;
+	const formattedDate = `${String(currentDate.getDate()).padStart(
+		2,
+		"0"
+	)}/${String(currentDate.getMonth() + 1).padStart(
+		2,
+		"0"
+	)}/${currentDate.getFullYear()}`;
 	console.log("formattedDate:", formattedDate);
 
 	// Obtain the content of the textarea
@@ -52,7 +58,7 @@ $(document).ready(function () {
 	// Create a function to handle multiple replacements
 	const replacePlaceholders = (content, replacements) => {
 		for (const [placeholder, value] of Object.entries(replacements)) {
-			content = content.replace(new RegExp(placeholder, 'g'), value);
+			content = content.replace(new RegExp(placeholder, "g"), value);
 		}
 		return content;
 	};
@@ -62,13 +68,11 @@ $(document).ready(function () {
 
 	// Define replacements
 	const replacements = {
-		"TestClasse": testClassName,
-		"username": username,
-		"userID": userId,
-		"date": formattedDate
+		TestClasse: testClassName,
+		username: username,
+		userID: userId,
+		date: formattedDate,
 	};
-
-	
 
 	// Perform replacements
 	const newContent = replacePlaceholders(textareaContent, replacements);
@@ -105,7 +109,7 @@ const runButton = document.getElementById("runButton");
 
 // Funzione principale per la gestione del click del pulsante
 runButton.addEventListener("click", async function () {
-	//toggleLoading(true);
+	toggleLoading(true, "loading_run", "runButton");
 
 	try {
 		const formData = getFormData();
@@ -115,40 +119,42 @@ runButton.addEventListener("click", async function () {
 		}
 
 		// Prima richiesta AJAX per eseguire il test
-		const response = await ajaxRequest("/run", "POST",formData, false, "json");
+		const response = await ajaxRequest("/run", "POST", formData, false, "json");
+		console.log(response);
+		const { robotScore, userScore, outCompile, coverage, GameOver, gameId, roundId } = response;
+		formData.append("gameId", gameId);
+		formData.append("roundId", roundId);
 
-		const { robotScore, gameScore, outCompile, coverage, win } = response;
-		consoleArea.setValue(outCompile);
+		console_utente.setValue(outCompile);
 		highlightCodeCoverage($.parseXML(coverage));
-
-		showGameResult(win, gameScore);
+		
+		showGameResult(GameOver, userScore);
 		orderTurno++;
 
 		const url = createApiUrl(formData, orderTurno);
 		console.log("URL post on: " + url);
 
 		// Seconda richiesta AJAX per inviare il codice di test
-		//toggleLoading(false);
-		const javaCode = editor.getValue();
-		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "json");
+		const csvContent = await ajaxRequest(url, "POST", formData.get("testingClassCode"), false, "text");
 
-		displayRobotPoints = getConsoleTextRun(csvContent, gameScore, robotScore);
-		consoleArea2.setValue(displayRobotPoints);
+		displayRobotPoints = getConsoleTextRun(csvContent, userScore, robotScore);
+		console_robot.setValue(displayRobotPoints);
 
 		if (localStorage.getItem("modalita") === "Scalata") {
 			console.log("Game mode is 'Scalata'");
-			controlloScalata(win, current_round_scalata, total_rounds_scalata, displayRobotPoints);
+			controlloScalata(
+				GameOver,
+				current_round_scalata,
+				total_rounds_scalata,
+				displayRobotPoints
+			);
 		} else {
 			console.log("Game mode is 'Sfida'");
 		}
 	} catch (error) {
-		swal(
-			"Errore",
-			"Si è verificato un errore durante l'esecuzione. Riprovare.",
-			"error"
-		);
+		swal(error.message);
 	} finally {
-		//toggleLoading(false);
+		toggleLoading(false, "loading_run", "runButton");
 	}
 });
 
@@ -156,12 +162,18 @@ runButton.addEventListener("click", async function () {
 var coverageButton = document.getElementById("coverageButton");
 coverageButton.addEventListener("click", async function () {
 	const formData = getFormData();
-	toggleLoading(true);
+	//toggleLoading(true);
 
 	try {
 		urlJacoco = "http://remoteccc-app-1:1234/compile-and-codecoverage";
 		// Richiesta per ottenere il report di JaCoCo
-		const reportContent = await ajaxRequest(urlJacoco, "POST", formData, false, "xml");
+		const reportContent = await ajaxRequest(
+			urlJacoco,
+			"POST",
+			formData,
+			false,
+			"xml"
+		);
 		console.log("(POST /getJaCoCoReport)", reportContent);
 		highlightCodeCoverage(reportContent);
 
@@ -170,14 +182,14 @@ coverageButton.addEventListener("click", async function () {
 		const javaCode = editor.getValue();
 
 		// Richiesta per inviare il codice di test
-		toggleLoading(false);
-		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "text");
-		consoleArea.setValue(getConsoleTextCoverage(csvContent));
+		//toggleLoading(false);
+		const csvContent = await ajaxRequest(url, "POST", javaCode, false, "text");
+		console_utente.setValue(getConsoleTextCoverage(csvContent));
 
 		const turnId = localStorage.getItem("turnId");
 		await updateOrCreateTurn(turnId, locGiocatore, orderTurno);
 	} catch (error) {
-		toggleLoading(false);
+		//toggleLoading(false);
 		alert(
 			"Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!"
 		);
@@ -186,7 +198,7 @@ coverageButton.addEventListener("click", async function () {
 			error
 		);
 	} finally {
-		toggleLoading(false);
+		//toggleLoading(false);
 	}
 });
 
@@ -261,7 +273,6 @@ function closeInfoModal() {
 	var infoModal = document.getElementById("infoModal");
 	infoModal.style.display = "none";
 }
-
 window.onbeforeunload = function () {
 	if (localStorage.getItem("modalita") !== "Scalata") {
 		localStorage.setItem("gameId", null);
