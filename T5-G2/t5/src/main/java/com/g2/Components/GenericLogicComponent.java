@@ -21,7 +21,7 @@ public abstract class GenericLogicComponent {
     public abstract String getErrorCode();
 
     /**
-     * L'error code deve essere una stringa eplicitamente definita nella classe 
+     * L'error code deve essere una stringa esplicitamente definita nella classe 
      */
     protected String ErrorCode;
 }

@@ -1,14 +1,16 @@
 package com.g2.Game;
 
-import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import com.g2.Interfaces.ServiceManager;
 
@@ -32,40 +31,36 @@ public class GameController {
     //Gestisco qui tutti i giochi aperti 
     private final Map<String, GameLogic> activeGames;
     private final ServiceManager serviceManager;
+    //Logger 
+    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(RestTemplate restTemplate) {
         this.serviceManager = new ServiceManager(restTemplate);
         this.activeGames = new HashMap<>();
     }
 
-    private Map<String, String> GetUserData(String testingClassName, String testingClassCode,String underTestClassNameNoJava, String underTestClassName) {
+    private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
         try {
             //Prendo underTestClassCode dal task T1
             String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest",
-            underTestClassNameNoJava);
+                    underTestClassNameNoJava);
 
-            System.out.println("underTestClassCode: "+underTestClassCode);
+            logger.info("[GAMECONTROLLER] GetUserData - underTestClassCode: {}", underTestClassCode);
 
-            
             //Chiato T7 per valutare coverage e userscore
             String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage",
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode);
 
-            System.out.println("response_T7 :"+response_T7);
-
             JSONObject responseObj = new JSONObject(response_T7);
-            System.out.println(responseObj);
-
             String xml_string = responseObj.getString("coverage");
             String outCompile = responseObj.getString("outCompile");
-            System.out.println("outCompile: "+ outCompile);
 
             if (xml_string == null || xml_string.isEmpty()) {
-                System.out.println("Valore 'coverage' non valido.");
+                logger.error("[GAMECONTROLLER] GetUserData: Valore 'coverage' non valido.");
             }
 
             if (outCompile == null || outCompile.isEmpty()) {
-                System.out.println("Valore 'outCompile' non valido.");
+                logger.error("[GAMECONTROLLER] GetUserData: Valore 'outCompile' non valido.");
             }
 
             Map<String, String> return_data = new HashMap<>();
@@ -73,84 +68,75 @@ public class GameController {
             return_data.put("outCompile", outCompile);
             return return_data;
         } catch (JSONException e) {
-            System.out.println("Errore nella lettura del JSON: " + e.getMessage());
+            logger.error("[GAMECONTROLLER] GetUserData: Errore nella lettura del JSON", e);
             return null;
         }
     }
 
     private int GetRobotScore(String testClass, String robot_type, String difficulty) {
-        String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
-                testClass, robot_type, difficulty);
+        try {
+            String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
+                    testClass, robot_type, difficulty);
 
-        JSONObject jsonObject = new JSONObject(response_T4);
-        //anche se scritto al plurale scores è un solo punteggio, cioè quello del robot
-        return jsonObject.getInt("scores");
+            JSONObject jsonObject = new JSONObject(response_T4);
+            //anche se scritto al plurale scores è un solo punteggio, cioè quello del robot
+            return jsonObject.getInt("scores");
+        } catch (Exception e) {
+            logger.error("[GAMECONTROLLER] GetRobotScore:", e);
+            return 0;
+        }
     }
 
     public int LineCoverage(String cov) {
         try {
-            // Creazione del DocumentBuilderFactory
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            // Creazione del DocumentBuilder
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            // Parsing della stringa XML in un documento
-            Document doc = builder.parse(new ByteArrayInputStream(cov.getBytes()));
+            // Parsing del documento XML con Jsoup
+            Document doc = Jsoup.parse(cov, "", Parser.xmlParser());
 
-            // Ricerca di tutti gli elementi "counter"
-            NodeList counters = doc.getElementsByTagName("counter");
-            Element line = null;
+            // Selezione dell'elemento counter di tipo "LINE"
+            Element line = doc.selectFirst("report > counter[type=LINE]");
 
-            // Itera attraverso tutti gli elementi "counter"
-            for (int i = 0; i < counters.getLength(); i++) {
-                Element counter = (Element) counters.item(i);
-                // Controlla se il tipo è "LINE"
-                if ("LINE".equals(counter.getAttribute("type"))) {
-                    line = counter;
-                    break;
-                }
-            }
-
-            // Se non è stato trovato un elemento di tipo "LINE"
+            // Verifica se l'elemento è stato trovato
             if (line == null) {
-                throw new IllegalArgumentException("L'elemento counter di tipo LINE non è stato trovato nel documento XML.");
+                throw new IllegalArgumentException("Elemento 'counter' di tipo 'LINE' non trovato nel documento XML.");
             }
 
-            // Lettura degli attributi "covered" e "missed"
-            String coveredStr = line.getAttribute("covered");
-            String missedStr = line.getAttribute("missed");
-
-            // Conversione degli attributi da String a int
-            int covered = Integer.parseInt(coveredStr);
-            int missed = Integer.parseInt(missedStr);
+            // Lettura degli attributi "covered" e "missed" e calcolo della percentuale di copertura
+            int covered = Integer.parseInt(line.attr("covered"));
+            int missed = Integer.parseInt(line.attr("missed"));
 
             // Calcolo della percentuale di copertura
             return 100 * covered / (covered + missed);
-
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Gli attributi covered e missed devono essere numeri interi validi.", e);
+            logger.error("[GAMECONTROLLER] LineCoverage:", e);
+            throw new IllegalArgumentException("Gli attributi 'covered' e 'missed' devono essere numeri interi validi.", e);
         } catch (Exception e) {
+            logger.error("[GAMECONTROLLER] LineCoverage:", e);
             throw new RuntimeException("Errore durante l'elaborazione del documento XML.", e);
         }
     }
 
     @PostMapping("/StartGame")
     public ResponseEntity<String> StartGame(@RequestParam String playerId,
-                                            @RequestParam String type_robot,
-                                            @RequestParam String difficulty,
-                                            @RequestParam String mode,
-                                            @RequestParam String underTestClassName) {
+            @RequestParam String type_robot,
+            @RequestParam String difficulty,
+            @RequestParam String mode,
+            @RequestParam String underTestClassName) {
 
         try {
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
                 //Creo la nuova partita 
                 gameLogic = new TurnBasedGameLogic(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
+                //gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
+                logger.info("[GAMECONTROLLER] /StartGame Partita creata con successo.");
                 return ResponseEntity.ok().build();
             } else {
+                logger.error("[GAMECONTROLLER] /StartGame errore esiste già la partita");
                 return createErrorResponse("[/StartGame] errore esiste già la partita");
             }
         } catch (Exception e) {
+            logger.error("[GAMECONTROLLER] /StartGame errore: ", e);
             return createErrorResponse("[/StartGame]" + e.getMessage());
         }
     }
@@ -162,58 +148,65 @@ public class GameController {
 
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
-                                         @RequestParam("playerId") String playerId,
-                                         @RequestParam("isGameEnd") Boolean isGameEnd) {
+            @RequestParam("playerId") String playerId,
+            @RequestParam("isGameEnd") Boolean isGameEnd) {
 
         try {
             //String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             //retrive gioco attivo
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
-                return createErrorResponse("[/Run] errore non esiste partita");
+                logger.error("[GAMECONTROLLER] /run: errore non esiste partita");
             }
+
             //Preparazione dati per i task 
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
-            String underTestClassName= gameLogic.getClasseUT() + ".java";
+            String underTestClassName = gameLogic.getClasseUT() + ".java";
 
-            System.out.println(testingClassName);
-            System.out.println(underTestClassName);
+            logger.info("[GAMECONTROLLER] /run: {}", testingClassName);
+            logger.info("[GAMECONTROLLER] /run: {}", underTestClassName);
 
             //Calcolo dati utente
-            Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(),underTestClassName);
-            System.out.println(UserData);
+            Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(), underTestClassName);
+            //logger.info("[GAMECONTROLLER] /run: UserData {}", UserData);
             //Calcolo punteggio robot
             int RobotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
-            System.out.println("RobotScore: "+RobotScore);
+            logger.info("[GAMECONTROLLER] /run: RobotScore {}", RobotScore);
             //aggiorno il turno
             int LineCov = LineCoverage(UserData.get("coverage"));
-            System.out.println("LineCov: "+LineCov);
+            logger.info("[GAMECONTROLLER] /run: LineCov {}", LineCov);
+            //Crea lo score per l'utente in base al gioco
             int user_score = gameLogic.GetScore(LineCov);
+            logger.info("[GAMECONTROLLER] /run: user_score {}", user_score);
 
+            //Salvo i dati del turno appena giocato
             gameLogic.playTurn(user_score, RobotScore);
 
-            if (isGameEnd) {
+            if (isGameEnd || gameLogic.isGameEnd()) {
                 //Qua partita finita quindi lo segnalo
-                gameLogic.EndRound(playerId);
-                gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
+                //gameLogic.EndRound(playerId);
+                //gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
+                logger.info("[GAMECONTROLLER] /run: risposta inviata");
                 return createResponseRun(UserData, RobotScore, user_score, true);
             } else {
+                logger.info("[GAMECONTROLLER] /run: risposta inviata");
                 return createResponseRun(UserData, RobotScore, user_score, false);
             }
-
         } catch (Exception e) {
+            logger.error("[GAMECONTROLLER] /run: errore non esiste partita", e);
             return createErrorResponse("[/RUN]" + e.getMessage());
         }
     }
 
     //metodo di supporto per creare la risposta di /run
-    private ResponseEntity<String> createResponseRun(Map<String, String> userData, int robotScore, int userScore, boolean gameOver) {
+    private ResponseEntity<String> createResponseRun(Map<String, String> userData, int robotScore, 
+    int userScore, boolean gameOver) {
         JSONObject result = new JSONObject();
         result.put("outCompile", userData.get("outCompile"));
-        result.put("coverage", userData.get("coverage"));
+        result.put("coverage",   userData.get("coverage"));
         result.put("robotScore", robotScore);
-        result.put("userScore", userScore);
-        result.put("GameOver", gameOver);
+        result.put("userScore",  userScore);
+        result.put("GameOver",   gameOver);
         return ResponseEntity
                 .status(HttpStatus.OK) // Codice di stato HTTP 200
                 .header("Content-Type", "application/json") // Imposta l'intestazione Content-Type

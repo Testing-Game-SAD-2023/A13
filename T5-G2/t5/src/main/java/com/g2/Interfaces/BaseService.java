@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -107,8 +109,18 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
-    // Metodo per chiamate POST
-    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
+    //Metodo per chiaamare POST senza specificare content type -> default application/x-www-form-urlencoded 
+    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
+            Map<String, String> queryParams,
+            Class<R> responseType) {
+
+        return callRestPost(endpoint, formData, queryParams, null, responseType);
+    }
+
+    // Metodo per chiamate POST con content type a application/x-www-form-urlencoded 
+    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
+            Map<String, String> queryParams, Map<String, String> customHeaders,
+            Class<R> responseType) {
         try {
             if (endpoint == null || endpoint.isEmpty()) {
                 throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
@@ -117,17 +129,69 @@ public abstract class BaseService implements ServiceInterface {
                 throw new IllegalArgumentException("formData non può essere nullo");
             }
             String url = buildUri(endpoint, queryParams);
+
+            // Imposta gli header, incluso il Content-Type di default
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Type", "application/x-www-form-urlencoded");
+            // Aggiunge gli header personalizzati
+            if (customHeaders != null) {
+                customHeaders.forEach(headers::add);
+            }
+            // Imposta il content type a application/x-www-form-urlencoded se non specificato
+            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            }
+
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
+
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
                 throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
             }
         } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + e);
+            throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
+        }
+    }
+
+    //metodo per chiamare POST con content type a application/json
+    protected <R> R callRestPost(String endpoint, JSONObject jsonObject,
+            Map<String, String> queryParams, Map<String, String> customHeaders,
+            Class<R> responseType) {
+        try {
+            if (endpoint == null || endpoint.isEmpty()) {
+                throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+            }
+            if (jsonObject == null) {
+                throw new IllegalArgumentException("Il body JSON non può essere nullo");
+            }
+
+            // Conversione del JSONObject in stringa
+            String jsonBody = jsonObject.toString();
+
+            String url = buildUri(endpoint, queryParams);
+            HttpHeaders headers = new HttpHeaders();
+
+            // Aggiunge gli header personalizzati
+            if (customHeaders != null) {
+                customHeaders.forEach(headers::add);
+            }
+
+            // Imposta il content type a application/json se non specificato
+            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                headers.setContentType(MediaType.APPLICATION_JSON);
+            }
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+            ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else {
+                throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
+            }
+        } catch (RestClientException | IllegalArgumentException e) {
+            throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
         }
     }
 

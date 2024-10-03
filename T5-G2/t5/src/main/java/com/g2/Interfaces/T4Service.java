@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -38,28 +40,28 @@ public class T4Service extends BaseService {
         ));
 
         registerAction("EndGame", new ServiceActionDefinition(
-            params -> EndGame((String) params[0], (String) params[1], (String) params[2], (int) params[3], (Boolean) params[4]),
-            String.class, String.class, String.class, int.class, Boolean.class
+            params -> EndGame((int) params[0], (String) params[1], (String) params[2], (int) params[3], (Boolean) params[4]),
+            Integer.class, String.class, String.class, int.class, Boolean.class
         ));
 
         registerAction("CreateRound", new ServiceActionDefinition(
-                params -> CreateRound((String) params[0], (String) params[1], (String) params[2]),
-                String.class, String.class, String.class
+                params -> CreateRound((int) params[0], (String) params[1], (String) params[2]),
+                Integer.class, String.class, String.class
         ));
 
         registerAction("EndRound", new ServiceActionDefinition(
-                params -> EndRound((String) params[0], (String) params[1]),
-                String.class, String.class
+                params -> EndRound((String) params[0], (int) params[1]),
+                String.class, Integer.class
         ));
 
         registerAction("CreateTurn", new ServiceActionDefinition(
-                params -> CreateTurn((String) params[0], (String) params[1], (String) params[2]),
-                String.class, String.class, String.class
+                params -> CreateTurn((String) params[0], (int) params[1], (String) params[2]),
+                String.class, Integer.class, String.class
         ));
 
         registerAction("EndTurn", new ServiceActionDefinition(
-                params -> EndTurn((String) params[0], (String) params[1], (String) params[2]),
-                String.class, String.class, String.class
+                params -> EndTurn((String) params[0], (String) params[1], (int) params[2]),
+                String.class, String.class, Integer.class
         ));
 
         registerAction("CreateScalata", new ServiceActionDefinition(
@@ -137,25 +139,28 @@ public class T4Service extends BaseService {
         return result;
     }
 
-    private String CreateGame(String Time, String difficulty, String name, String description, String username) {
+    private int CreateGame(String Time, String difficulty, String name, String description, String username) {
         final String endpoint = "/games";
-        //String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("difficulty", difficulty);
-        formData.add("name", name);
-        formData.add("description", description);
-        formData.add("username", username);
-        formData.add("startedAt", Time);
+        JSONObject obj = new JSONObject();
+        obj.put("difficulty", difficulty);
+        obj.put("name", name);
+        obj.put("description", description);
+        obj.put("username", username);
+        obj.put("startedAt", Time);
         try {
-            String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose;
+            //Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio parse per avere l'id
+            String respose = callRestPost(endpoint, obj, null, null,String.class);
+            // Parsing della stringa JSON
+            JSONObject jsonObject = new JSONObject(respose);
+            // Estrazione del valore di id
+            return jsonObject.getInt("id");
         } catch (Exception e) {
             throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
         }
     }
 
-    private String EndGame(String gameid, String username, String closedAt, int Score, Boolean isWinner){
-        final String endpoint = "/games/" + gameid;
+    private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner){
+        final String endpoint = "/games/" + String.valueOf(gameid);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("closedAt", closedAt);
         formData.add("username", username);
@@ -169,23 +174,26 @@ public class T4Service extends BaseService {
         }
     }
 
-    private String CreateRound(String game_id, String ClasseUT, String Time) {
+    private int CreateRound(int game_id, String ClasseUT, String Time) {
         final String endpoint = "/rounds";
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("gameId", game_id);
-        formData.add("testClassId", ClasseUT);
-        formData.add("startedAt", Time);
+        JSONObject obj = new JSONObject();
+        obj.put("gameId", game_id);
+        obj.put("testClassId", ClasseUT);
+        obj.put("startedAt", Time);
         try {
-            String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose;
+            String respose = callRestPost(endpoint, obj, null, null, String.class);
+            // Parsing della stringa JSON
+            JSONObject jsonObject = new JSONObject(respose);
+            // Estrazione del valore di id
+            return jsonObject.getInt("id");
         } catch (Exception e) {
             throw new IllegalArgumentException("[CreateRound]: " + e.getMessage());
         }
     }
 
-    private String EndRound(String Time, String roundId) {
+    private String EndRound(String Time, int roundId) {
         //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
-        final String endpoint = "rounds/" + roundId;
+        final String endpoint = "rounds/" + String.valueOf(roundId);
         try {
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
             formData.add("closedAt", Time);
@@ -196,28 +204,29 @@ public class T4Service extends BaseService {
         }
     }
 
-    private String CreateTurn(String Player_id, String Round_id, String Time) {
+    private String CreateTurn(String Player_id, int Round_id, String Time) {
         final String endpoint = "/turns";
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("players", Player_id);
-        formData.add("roundId", Round_id);
-        formData.add("startedAt", Time);
+        JSONObject obj = new JSONObject();
+        JSONArray playersArray = new JSONArray();
+        playersArray.put(Player_id);
+        obj.put("players", playersArray);
+        obj.put("roundId", Round_id);
+        obj.put("startedAt", Time);
         try {
-            String respose = callRestPost(endpoint, formData, null, String.class);
+            String respose = callRestPost(endpoint, obj, null, null, String.class);
             return respose;
         } catch (Exception e) {
             throw new IllegalArgumentException("[CreateTurn]: " + e.getMessage());
         }
     }
 
-    private String EndTurn(String user_score, String Time, String turnId) {
+    private String EndTurn(String user_score, String Time, int turnId) {
         //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
-        final String endpoint = "turns/" + turnId;
+        final String endpoint = "turns/" + String.valueOf(turnId);
         try {
             MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
             formData.add("scores", user_score);
             formData.add("closedAt", Time);
-
             String response = callRestPut(endpoint, formData, null, String.class);
             return response;
         } catch (Exception e) {

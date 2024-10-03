@@ -114,8 +114,14 @@ public class PageBuilder {
     }
 
     // Metodo per permettere la personalizzazione della mappa
+    // il metodo put di una HashMap sovrascrive il valore associato a
+    // una chiave esistente se la chiave è già presente nella mappa.
     public void setErrorPage(String errorCode, String pageName) {
         errorPageMap.put(errorCode, pageName);
+    }
+    //overload nel caso in cui l'utente fornisce una lista intera 
+    public void setErrorPage(Map<String, String> userErrorPageMap) {
+        errorPageMap.putAll(userErrorPageMap);
     }
 
     //Qui setto il comportamento Standard agli errori 

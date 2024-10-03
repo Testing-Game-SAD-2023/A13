@@ -4,10 +4,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.springframework.boot.SpringApplication;
-
-import RemoteCCC.App.App;
-
 /*
  Objective: Each time the Config class is loaded, a new timestamp is generated and used
  to create unique paths for compiling, testing, and coverage
@@ -37,6 +33,7 @@ public class Config {
         }
         return timestamp;
     }
+    //Stefano: Questo non fa niente è un errore.
     public static String setTimestamp(){
         return timestamp = null;
     }
@@ -63,10 +60,10 @@ public class Config {
         return usr_path + sep + "ClientProject" + sep + timestamp + sep + "target" + sep + "site" + sep + "jacoco" + sep + "jacoco.xml" + sep;
     }
 
-    public  String retrievePathCompiler() {return getPathCompiler();}
-    public  String retrieveTestingClassPath() {return getTestingClassPath();}
+    public  String retrievePathCompiler()       {return getPathCompiler();}
+    public  String retrieveTestingClassPath()   {return getTestingClassPath();}
     public  String retrieveUnderTestClassPath() {return getUnderTestClassPath();}
-    public  String retrieveCoverageFolder() {return getcoverageFolderPath();}
+    public  String retrieveCoverageFolder()     {return getcoverageFolderPath();}
 
     // (OLD VERSION) pathCompiler = usr_path/ClientProject/
     // (NEW VERSION) pathCompiler = usr_path/ClientProject/timestamp/

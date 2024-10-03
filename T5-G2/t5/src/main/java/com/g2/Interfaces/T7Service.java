@@ -1,18 +1,12 @@
 package com.g2.Interfaces;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-
 
 @Service
 public class T7Service extends BaseService {
@@ -42,25 +36,23 @@ public class T7Service extends BaseService {
             String underTestClassName, String underTestClassCode) {
         final String endpoint = "/compile-and-codecoverage"; // Definisce l'endpoint per l'API di compilazione e analisi
         // della copertura del codice
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()){
-            HttpPost httpPost = new HttpPost(BASE_URL + endpoint);
-            // Creazione del formData con i parametri della richiesta POST
+        try{
+            // Creazione del json con i parametri della richiesta POST
             JSONObject obj = new JSONObject();
             obj.put("testingClassName", testingClassName);
             obj.put("testingClassCode", testingClassCode);
             obj.put("underTestClassName", underTestClassName);
             obj.put("underTestClassCode", underTestClassCode);
-            StringEntity jsonEntity = new StringEntity(obj.toString(), ContentType.APPLICATION_JSON);
-            httpPost.setEntity(jsonEntity);
-            HttpResponse response = httpClient.execute(httpPost);
-            String responseBody = EntityUtils.toString(response.getEntity());
-            // Ritorna la risposta ottenuta dalla chiamata REST
-            return responseBody;
+
+            Map<String, String> customHeaders = new HashMap<>();
+            customHeaders.put("Content-Type", "application/json");
+            String respose = callRestPost(endpoint, obj, null, customHeaders,String.class);
+            return respose;
         } catch (RestClientException e) {
             // Gestione degli errori durante la chiamata
             // Gestione delle eccezioni in caso di errore nella chiamata REST
             throw new IllegalArgumentException("Errore durante la chiamata POST: " + e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException("Errore durante la chiamata POST: " + e.getMessage());
         }
     }

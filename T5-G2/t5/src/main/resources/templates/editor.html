@@ -40,6 +40,11 @@
 				height: 100%;
 				width: 100%;
 			}
+
+			.highlight {
+				background-color: yellow;
+				color: black;
+			}
 		</style>
 	</head>
 
@@ -47,10 +52,10 @@
 		<!-- NAV-->
 		<ul class="nav">
 			<li class="nav-item flex-grow-1">
-				<button type="button" class="btn btn-sm">
+				<a href="" class="btn btn-sm" tabindex="-1" role="button" aria-disabled="true" id="GoBack">
 					<i class="bi bi-arrow-90deg-left"></i>
 					Go Back
-				</button>
+				</a>
 			</li>
 			<li class="nav-item">
 				<div class="form-check form-switch mt-1">
@@ -70,34 +75,192 @@
 			<div class="row">
 				<!-- PRIMA COLONNA-->
 				<div class="col px-0">
-					<div class="card d-flex flex-column rounded-0" id="card_user">
+					<div class="card rounded-0" id="card_user">
 						<!-- EDITOR-->
 						<div class="card-header p-0">
 							<nav class="navbar bg-body-tertiary p-2">
 								<span class="navbar-brand lead my-0 py-0"> Edit </span>
-								<div class="btn-group btn-group">
-									<button type="button" class="btn btn-sm" id="runButton">
-										<i class="bi bi-play-fill"></i>
+								<div class="">
+									<button type="button" class="btn" id="undo-button">
+										<i class="bi bi-arrow-90deg-left"></i>
 									</button>
+									<button type="button" class="btn" id="redo-button">
+										<i class="bi bi-arrow-90deg-right"></i>
+									</button>
+									<button class="btn btn-primary" type="button" id="runButton">
+										<div id="loading_run">
+											<span
+												class="spinner-border spinner-border-sm"
+												aria-hidden="true"
+												style="display: none"
+											></span>
+											<i
+												id="loading_icon_1"
+												class="bi bi-play-fill"
+												aria-hidden="true"
+											></i>
+											<span role="status">Play</span>
+											<!-- Icona nascosta -->
+										</div>
+									</button>
+									<!-- Opzioni -->
 									<button
 										type="button"
 										class="btn btn-sm dropdown-toggle-split my-0"
 										data-bs-toggle="dropdown"
 										aria-expanded="false"
+										data-bs-auto-close="outside"
+										aria-haspopup="true"
 									>
 										<i class="bi bi-three-dots-vertical"></i>
 									</button>
-									<ul class="dropdown-menu dropdown-menu-end">
-										<li>
-											<button id="storico">Storico</button>
-										</li>
-										<li>
-											<button id="">Prova</button>
-										</li>
-										<li>
-											<a class="dropdown-item" href="#">Separated link</a>
-										</li>
-									</ul>
+									<!-- MENU OPZIONI -->
+									<div
+										class="dropdown-menu shadow dropdown-menu-end"
+										aria-labelledby="navbarDropdownMenuLink"
+									>
+										<div class="container-fluid">
+											<div class="tab-content" id="myTabContent">
+												<!-- MENU -->
+												<div
+													class="tab-pane fade show active"
+													id="paneA"
+													role="tabpanel"
+													aria-labelledby="pane-A"
+												>
+													<div class="list-group list-group-flush">
+														<button
+															type="button"
+															onclick="showTabPane('paneB')"
+															class="list-group-item list-group-item-action"
+															aria-current="true"
+														>
+															<i class="bi bi-clock-history"></i>
+															Storico
+														</button>
+														<button
+															type="button"
+															onclick="showTabPane('paneC')"
+															class="list-group-item list-group-item-action"
+														>
+															<i class="bi bi-upload"></i> Upload
+														</button>
+														<button
+															type="button" id="DownloadButton"
+															class="list-group-item list-group-item-action"
+														>
+														<i class="bi bi-download"></i> Download
+														</button>
+														<button
+															type="button"
+															onclick="showTabPane('paneD')"
+															class="list-group-item list-group-item-action"
+														>
+															<i class="bi bi-search"></i> Cerca
+														</button>
+														
+													</div>
+												</div>
+												<!-- STORICO-->
+												<div
+													class="tab-pane fade overflow-y-auto"
+													id="paneB"
+													role="tabpanel"
+													aria-labelledby="pane-B"
+												>
+													<button
+														type="button"
+														onclick="showTabPane('paneA')"
+														class="list-group-item list-group-item-action mb-2"
+													>
+														<i class="bi bi-arrow-left"></i>
+														<span class="lead text-center">Storico</span>
+													</button>
+													<ol
+														id ="storico_list"
+														class="list-group list-group-flush list-group-numbered overflow-auto border-top"
+														style="max-height: 150px"
+													>
+														
+													</ol>
+												</div>
+												<!-- UPLOAD -->
+												<div
+													class="tab-pane fade"
+													id="paneC"
+													role="tabpanel"
+													aria-labelledby="pane-C"
+												>
+													<button
+														type="button"
+														onclick="showTabPane('paneA')"
+														class="list-group-item list-group-item-action mb-2"
+													>
+														<i class="bi bi-arrow-left"></i>
+														<span class="lead text-center">Upload</span>
+													</button>
+													<input
+														class="container-fluid form-control"
+														id="fileInput"
+														type="file"
+													/>
+												</div>
+												<!-- SEARCH -->
+												<div
+													class="tab-pane fade"
+													id="paneD"
+													role="tabpanel"
+													aria-labelledby="pane-D"
+												>
+													<button
+														type="button"
+														onclick="showTabPane('paneA')"
+														class="list-group-item list-group-item-action mb-2"
+													>
+														<i class="bi bi-arrow-left"></i>
+														<span class="lead text-center"
+															>Cerca e Sostituisci</span
+														>
+													</button>
+													<div class="input-group mb-3">
+														<button
+															class="btn btn-primary"
+															type="button"
+															id="searchButton"
+														>
+															<i class="bi bi-search"></i>
+														</button>
+														<input
+															type="text" id="searchTerm"
+															class="form-control border-secondary"
+															placeholder="Cerca"
+															aria-label="Cerca"
+															aria-describedby="basic-addon1"
+														/>
+														<span class="position-absolute top-50 end-0 translate-middle 
+														badge rounded-pill bg-danger" id="SearchItems" style="display:none">
+														</span>
+													</div>
+													<div class="input-group mb-2">
+														<button
+															class="btn btn-secondary"
+															type="button"
+															id="startReplace"
+														>
+															<i class="bi bi-arrow-left-right"></i>
+														</button>
+														<input
+															type="text" id="replaceTerm"
+															class="form-control border-secondary"
+															placeholder="Sostituisci"
+															aria-label="Sostituisci"
+															aria-describedby="basic-addon1"
+														/>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</nav>
 						</div>
@@ -105,64 +268,64 @@
 							class="card-body m-0 p-0 overflow-y-hidden"
 							id="section_editor"
 						>
-						<div class="spinner-border" role="status" aria-hidden="false" id="loading">
-							<span class="visually-hidden">Loading...</span>
-						</div>
 							<textarea id="Editor_utente">
-/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
-Nome: "inserire il proprio nome"
-Cognome: "inserire il proprio cognome"
-Username: username
-UserID: userID
-Date: date
-*/
+	/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+	Nome: "inserire il proprio nome"
+	Cognome: "inserire il proprio cognome"
+	Username: username
+	UserID: userID
+	Date: date
+	*/
 
-import org.junit.Before;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.AfterClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+	import org.junit.Before;
+	import org.junit.After;
+	import org.junit.BeforeClass;
+	import org.junit.AfterClass;
+	import org.junit.Test;
+	import static org.junit.Assert.*;
 
-public class TestClasse {
-    @BeforeClass
-    public static void setUpClass() {
-        // Eseguito una volta prima dell'inizio dei test nella classe
-        // Inizializza risorse condivise 
-        // o esegui altre operazioni di setup
-    }
-                
-    @AfterClass
-    public static void tearDownClass() {
-        // Eseguito una volta alla fine di tutti i test nella classe
-        // Effettua la pulizia delle risorse condivise 
-        // o esegui altre operazioni di teardown
-    }
-                
-    @Before
-    public void setUp() {
-        // Eseguito prima di ogni metodo di test
-        // Preparazione dei dati di input specifici per il test
-    }
-                
-    @After
-    public void tearDown() {
-        // Eseguito dopo ogni metodo di test
-        // Pulizia delle risorse o ripristino dello stato iniziale
-    }
-                
-    @Test
-    public void testMetodo() {
-        // Preparazione dei dati di input
-        // Esegui il metodo da testare
-        // Verifica l'output o il comportamento atteso
-        // Utilizza assert per confrontare il risultato atteso 
-        // con il risultato effettivo
-    }
-                
-    // Aggiungi altri metodi di test se necessario
-}
-                        </textarea
+	public class TestClasse {
+		@BeforeClass
+		public static void setUpClass() {
+			// Eseguito una volta prima dell'inizio dei test nella classe
+			// Inizializza risorse condivise 
+			// o esegui altre operazioni di setup
+		}
+					
+		@AfterClass
+		public static void tearDownClass() {
+			// Eseguito una volta alla fine di tutti i test nella classe
+			// Effettua la pulizia delle risorse condivise 
+			// o esegui altre operazioni di teardown
+		}
+					
+		@Before
+		public void setUp() {
+			// Eseguito prima di ogni metodo di test
+			// Preparazione dei dati di input specifici per il test
+		}
+					
+		@After
+		public void tearDown() {
+			// Eseguito dopo ogni metodo di test
+			// Pulizia delle risorse o ripristino dello stato iniziale
+		}
+					
+		@Test
+		public void testMetodo() {
+			// Preparazione dei dati di input
+			// Esegui il metodo da testare
+			// Verifica l'output o il comportamento atteso
+			// Utilizza assert per confrontare il risultato atteso 
+			// con il risultato effettivo
+		}
+					
+		// Aggiungi altri metodi di test se necessario
+	}
+
+
+
+							</textarea
 							>
 						</div>
 						<!-- CONSOLE -->
@@ -174,15 +337,13 @@ public class TestClasse {
 								</button>
 							</nav>
 						</div>
-						<div class="card-body m-0 p-0 overflow-y-auto" id="section_console">
-							<textarea id="Console_utente"> </textarea>
-						</div>
+						<textarea class="card-body" id="Console_utente"> </textarea>
 						<div class="card-footer text-body-secondary"></div>
 					</div>
 				</div>
 				<!-- SECONDA COLONNA-->
 				<div class="col px-0">
-					<div class="card d-flex flex-column rounded-0" id="card_robot">
+					<div class="card rounded-0" id="card_robot">
 						<!-- CLASS UNDER TEST-->
 						<div class="card-header p-0">
 							<nav class="navbar bg-body-tertiary p-2">
@@ -302,153 +463,184 @@ public class TestClasse {
 		></script>
 
 		<script>
-			// Inizializzazione di CodeMirror
-			var editor_utente = CodeMirror.fromTextArea(
-				document.getElementById("Editor_utente"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
-			var editor_robot = CodeMirror.fromTextArea(
-				document.getElementById("Editor_Robot"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
-			var console_utente = CodeMirror.fromTextArea(
-				document.getElementById("Console_utente"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
-			var console_robot = CodeMirror.fromTextArea(
-				document.getElementById("Console_Robot"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
+						// Inizializzazione di CodeMirror
+						var editor_utente = CodeMirror.fromTextArea(
+							document.getElementById("Editor_utente"),
+							{
+								lineNumbers: true, // Mostra i numeri di riga
+								mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+								theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+								tabSize: 4, // Dimensione del tab
+								autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+							}
+						);
+						var editor_robot = CodeMirror.fromTextArea(
+							document.getElementById("Editor_Robot"),
+							{
+								lineNumbers: true, // Mostra i numeri di riga
+								mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+								theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+								tabSize: 4, // Dimensione del tab
+								readOnly: true,
+								autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+							}
+						);
+						var console_utente = CodeMirror.fromTextArea(
+							document.getElementById("Console_utente"),
+							{
+								lineNumbers: true, // Mostra i numeri di riga
+								mode: "bash", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+								theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+								tabSize: 4, // Dimensione del tab
+								readOnly: true,
+								autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+							}
+						);
+						var console_robot = CodeMirror.fromTextArea(
+							document.getElementById("Console_Robot"),
+							{
+								lineNumbers: true, // Mostra i numeri di riga
+								mode: "bash", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+								theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
+								tabSize: 4, // Dimensione del tab
+								readOnly: true,
+								autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
+							}
+						);
 
-			function enableResizing(container, divider, section1, section2, editor) {
-				let isDragging = false;
+						//abilitare o disabilitare il folding del codice
+						editor_utente.on('click', function (cm, event) {
+							var gutterWidth = cm.getGutterElement().offsetWidth;
+							var gutterClick = event.clientX - gutterWidth;
+							if (gutterClick >= (gutterWidth - 10)) {
+								var gutterHeight = cm.defaultTextHeight() * cm.lineCount();
+								var line = cm.lineAtHeight(event.clientY + cm.getScrollInfo().top, "client");
+								var linePos = cm.charCoords({ line: line, ch: 0 }, "local").y;
+								var arrowPos = linePos + cm.defaultTextHeight() / 2;
+								var arrowSize = cm.defaultCharWidth();
+								if (event.clientX >= gutterWidth && event.clientX <= gutterWidth + arrowSize &&
+									event.clientY >= arrowPos - arrowSize && event.clientY <= arrowPos + arrowSize) {
+									cm.foldCode(line);
+								}
+							}
+						});
 
-				// Aggiungi event listener per il mouse down (quando si inizia a trascinare)
-				divider.addEventListener("mousedown", function (e) {
-					isDragging = true;
-					document.body.style.cursor = "grabbing"; // Mostra la mano chiusa durante il trascinamento
-					container.classList.add("no-select"); // Disabilita la selezione del testo
-				});
+						function enableResizing(container, divider, section1, section2, editor) {
+							let isDragging = false;
 
-				// Event listener per il movimento del mouse
-				container.addEventListener("mousemove", function (e) {
-					if (!isDragging) return; // Se non si sta trascinando, non fare nulla
+							// Aggiungi event listener per il mouse down (quando si inizia a trascinare)
+							divider.addEventListener("mousedown", function (e) {
+								isDragging = true;
+								document.body.style.cursor = "grabbing"; // Mostra la mano chiusa durante il trascinamento
+								container.classList.add("no-select"); // Disabilita la selezione del testo
+							});
 
-					// Calcola la nuova altezza della prima sezione
-					const containerRect = container.getBoundingClientRect();
-					const offsetY = e.clientY - containerRect.top;
+							// Event listener per il movimento del mouse
+							container.addEventListener("mousemove", function (e) {
+								if (!isDragging) return; // Se non si sta trascinando, non fare nulla
 
-					// Imposta la nuova altezza per la prima sezione
-					section1.style.height = `${offsetY}px`;
+								// Calcola la nuova altezza della prima sezione
+								const containerRect = container.getBoundingClientRect();
+								const offsetY = e.clientY - containerRect.top;
 
-					// Se c'è un editor associato, ridimensiona anche l'editor
-					if (editor) {
-						editor.setSize(null, `${offsetY}px`);
-					}
+								// Imposta la nuova altezza per la prima sezione
+								section1.style.height = `${offsetY}px`;
 
-					// Imposta l'altezza per la seconda sezione
-					section2.style.height = `${containerRect.height - offsetY}px`;
-				});
+								// Se c'è un editor associato, ridimensiona anche l'editor
+								if (editor) {
+									editor.setSize(null, `${offsetY}px`);
+								}
 
-				// Event listener per il rilascio del mouse (fine del trascinamento)
-				document.addEventListener("mouseup", function () {
-					if (isDragging) {
-						isDragging = false;
-						document.body.style.cursor = "default"; // Ripristina il cursore predefinito
-						container.classList.remove("no-select"); // Riabilita la selezione del testo
-					}
-				});
-			}
+								// Imposta l'altezza per la seconda sezione
+								section2.style.height = `${containerRect.height - offsetY}px`;
+							});
 
-			const divider_Console = document.getElementById("divider_Console");
-			const divider_result = document.getElementById("divider_result");
+							// Event listener per il rilascio del mouse (fine del trascinamento)
+							document.addEventListener("mouseup", function () {
+								if (isDragging) {
+									isDragging = false;
+									document.body.style.cursor = "default"; // Ripristina il cursore predefinito
+									container.classList.remove("no-select"); // Riabilita la selezione del testo
+								}
+							});
+						}
 
-			const section_editor = document.getElementById("section_editor");
-			const section_console = document.getElementById("section_console");
-			const section_UT = document.getElementById("section_UT");
-			const section_result = document.getElementById("section_result");
+						const divider_Console = document.getElementById("divider_Console");
+						const divider_result = document.getElementById("divider_result");
 
-			const container_user = document.getElementById("card_user");
-			const container_robot = document.getElementById("card_robot");
+						const section_editor = document.getElementById("section_editor");
+						const section_console = document.getElementById("section_console");
 
-			let isDragging = false;
+						const section_UT = document.getElementById("section_UT");
+						const section_result = document.getElementById("section_result");
+						const container_user = document.getElementById("card_user");
+						const container_robot = document.getElementById("card_robot");
 
-			// Imposta l'altezza del container all'altezza del viewport
-			function setContainerHeight() {
-				container_user.style.height = window.innerHeight - 30 + "px";
-				container_robot.style.height = window.innerHeight - 30 + "px";
-				editor_utente.setSize(null, window.innerHeight - 30 + "px");
-				editor_robot.setSize(null, window.innerHeight - 30 + "px");
-			}
+						let isDragging = false;
 
-			// Inizializza l'altezza del container
-			setContainerHeight();
-			// Aggiungi un event listener per ridimensionare la finestra
-			window.addEventListener("resize", setContainerHeight);
+						// Imposta l'altezza del container all'altezza del viewport
+						function setContainerHeight() {
+							container_user.style.height = window.innerHeight + "px";
+							container_robot.style.height = window.innerHeight + "px";
+							editor_utente.setSize(null, window.innerHeight + "px");
+							editor_robot.setSize(null, window.innerHeight + "px");
+						}
 
-			enableResizing(
-				container_user,
-				divider_Console,
-				section_editor,
-				section_console,
-				editor_utente
-			);
-			enableResizing(
-				container_robot,
-				divider_result,
-				section_UT,
-				section_result,
-				editor_robot
-			);
+						// Inizializza l'altezza del container
+						setContainerHeight();
+						// Aggiungi un event listener per ridimensionare la finestra
+						window.addEventListener("resize", setContainerHeight);
 
-			// Funzione per cambiare il tema
-			function toggleTheme() {
-				const htmlElement = document.getElementById("html-root");
-				const checkbox = document.getElementById("themeToggle");
+						enableResizing(
+							container_user,
+							divider_Console,
+							editor_utente,
+							Console_utente,
+							editor_utente
+						);
+						enableResizing(
+							container_robot,
+							divider_result,
+							section_UT,
+							section_result,
+							editor_robot
+						);
 
-				if (checkbox.checked) {
-					htmlElement.setAttribute("data-bs-theme", "dark");
-					editor_utente.setOption("theme", "material-darker");
-					editor_robot.setOption("theme", "material-darker");
-				} else {
-					htmlElement.setAttribute("data-bs-theme", "light");
-					editor_utente.setOption("theme", "eclipse");
-					editor_robot.setOption("theme", "eclipse");
-				}
-			}
-			// Assegna l'evento al cambio di stato del checkbox
-			document
-				.getElementById("themeToggle")
-				.addEventListener("change", toggleTheme);
+						// Funzione per cambiare il tema
+						function toggleTheme() {
+							const htmlElement = document.getElementById("html-root");
+							const checkbox = document.getElementById("themeToggle");
+
+							if (checkbox.checked) {
+								htmlElement.setAttribute("data-bs-theme", "dark");
+								editor_utente.setOption("theme", "material-darker");
+								editor_robot.setOption("theme", "material-darker");
+							} else {
+								htmlElement.setAttribute("data-bs-theme", "light");
+								editor_utente.setOption("theme", "eclipse");
+								editor_robot.setOption("theme", "eclipse");
+							}
+						}
+						// Assegna l'evento al cambio di stato del checkbox
+						document
+							.getElementById("themeToggle")
+							.addEventListener("change", toggleTheme);
+
+							//funzione menu
+						function showTabPane(paneId) {
+							// Nascondi tutte le tab pane attive
+							var tabPanes = document.querySelectorAll('.tab-pane');
+							tabPanes.forEach(function(tabPane) {
+								tabPane.classList.remove('show', 'active');
+							});
+
+							// Mostra solo la tab pane richiesta
+							var activePane = document.getElementById(paneId);
+							activePane.classList.add('show', 'active');
+						}
 		</script>
 		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/editor.js}" th:inline="javascript"></script>
+		<script th:src="@{/t5/js/commonEditor.js}" th:inline="javascript"></script>
 	</body>
 </html>

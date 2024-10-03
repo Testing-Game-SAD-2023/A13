@@ -18,10 +18,10 @@ var turno = 0; // numero di turni giocati fino ad ora
 var current_round_scalata = 0; // round corrente
 var total_rounds_scalata = 0; // numero totale di rounds
 var selectedScalata = "";
-var isWin = false; // flag per indicare se il giocatore ha vinto o perso
+var iGameover = false; // flag per indicare se il giocatore ha vinto o perso
 var orderTurno = 0;
 var perc_robot = "0"; // percentuale di copertura del robot scelto
-var gameScore = 0;
+var userScore = 0;
 var locGiocatore = 0;
 var currentDate = new Date();
 
@@ -68,8 +68,6 @@ $(document).ready(function () {
 		"date": formattedDate
 	};
 
-	
-
 	// Perform replacements
 	const newContent = replacePlaceholders(textareaContent, replacements);
 	console.log("newContent \n\n", newContent);
@@ -82,30 +80,34 @@ $(document).ready(function () {
 current_round_scalata = localStorage.getItem("current_round_scalata");
 total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
 
-// Elemento per il tasto storico
-const storico = document.getElementById("storico");
+//Funzione per aggiungere un elemento allo storico 
+function addStorico(score, covValue) {
+    var list = document.getElementById("storico_list"); // Seleziona la lista
 
-// Aggiungere l'event listener per il tasto "storico"
-storico.addEventListener("click", function () {
-	toggleLoading(true);
+    // Crea un nuovo elemento <li> con la struttura specificata
+    var newItem = document.createElement("li");
+    newItem.className = "list-group-item d-flex justify-content-between align-items-start";
 
-	// Verificare se esiste uno storico
-	if (orderTurno === 0) {
-		showAlert("Non esiste ancora uno storico dei test");
-	} else if (localStorage.getItem("gameId") === "null") {
-		showAlert("Impossibile accedere allo storico. La partita è terminata");
-	} else {
-		toggleLoading(false);
-		fetchTurns();
-	}
-});
+    // Imposta il contenuto HTML del nuovo elemento
+    newItem.innerHTML = `
+        <div class="ms-2 me-auto">
+            <div class="fw-bold">
+                Punteggio
+                <span class="badge text-bg-primary rounded-pill">${score}</span>
+            </div>
+            <small>%COV:${covValue}</small>
+        </div>
+    `;
+
+    // Aggiunge il nuovo elemento alla lista
+    list.appendChild(newItem);
+}
 
 // Elemento del pulsante "Play/Submit"
 const runButton = document.getElementById("runButton");
-
 // Funzione principale per la gestione del click del pulsante
 runButton.addEventListener("click", async function () {
-	//toggleLoading(true);
+	toggleLoading(true, "loading_run", "runButton");
 
 	try {
 		const formData = getFormData();
@@ -116,39 +118,37 @@ runButton.addEventListener("click", async function () {
 
 		// Prima richiesta AJAX per eseguire il test
 		const response = await ajaxRequest("/run", "POST",formData, false, "json");
-
-		const { robotScore, gameScore, outCompile, coverage, win } = response;
+		console.log(response)
+		const { robotScore, userScore, outCompile, coverage, Gameover} = response;
 		consoleArea.setValue(outCompile);
 		highlightCodeCoverage($.parseXML(coverage));
-
-		showGameResult(win, gameScore);
+		
 		orderTurno++;
 
 		const url = createApiUrl(formData, orderTurno);
 		console.log("URL post on: " + url);
 
 		// Seconda richiesta AJAX per inviare il codice di test
-		//toggleLoading(false);
 		const javaCode = editor.getValue();
 		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "json");
 
-		displayRobotPoints = getConsoleTextRun(csvContent, gameScore, robotScore);
+		displayRobotPoints = getConsoleTextRun(csvContent, userScore, robotScore);
+		var valori_csv = extractThirdColumn(csvContent);
+		addStorico(userScore, valori_csv[0]);
 		consoleArea2.setValue(displayRobotPoints);
 
 		if (localStorage.getItem("modalita") === "Scalata") {
 			console.log("Game mode is 'Scalata'");
-			controlloScalata(win, current_round_scalata, total_rounds_scalata, displayRobotPoints);
+			controlloScalata(Gameover, current_round_scalata, total_rounds_scalata, displayRobotPoints);
 		} else {
 			console.log("Game mode is 'Sfida'");
 		}
 	} catch (error) {
 		swal(
-			"Errore",
-			"Si è verificato un errore durante l'esecuzione. Riprovare.",
-			"error"
+			error.message
 		);
 	} finally {
-		//toggleLoading(false);
+		toggleLoading(false, "loading_run", "runButton");
 	}
 });
 
@@ -156,7 +156,7 @@ runButton.addEventListener("click", async function () {
 var coverageButton = document.getElementById("coverageButton");
 coverageButton.addEventListener("click", async function () {
 	const formData = getFormData();
-	toggleLoading(true);
+	//toggleLoading(true);
 
 	try {
 		urlJacoco = "http://remoteccc-app-1:1234/compile-and-codecoverage";
@@ -170,14 +170,14 @@ coverageButton.addEventListener("click", async function () {
 		const javaCode = editor.getValue();
 
 		// Richiesta per inviare il codice di test
-		toggleLoading(false);
+		//toggleLoading(false);
 		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "text");
 		consoleArea.setValue(getConsoleTextCoverage(csvContent));
 
 		const turnId = localStorage.getItem("turnId");
 		await updateOrCreateTurn(turnId, locGiocatore, orderTurno);
 	} catch (error) {
-		toggleLoading(false);
+		//toggleLoading(false);
 		alert(
 			"Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!"
 		);
@@ -186,83 +186,11 @@ coverageButton.addEventListener("click", async function () {
 			error
 		);
 	} finally {
-		toggleLoading(false);
+		//toggleLoading(false);
 	}
 });
 
-// GAME INFO BUTTON
-function openInfoModal() {
-	// Open the modal
-	var infoModal = document.getElementById("infoModal");
-
-	/* Set the display property of the modal to "block" to make it visible
-  if it was previously hidden
-  */
-	infoModal.style.display = "block";
-
-	//Get a reference to the modal2-content element
-	var modal2Content = document.querySelector("#infoModal .modal2-content");
-
-	//Retrieve the gameID from the local storage
-	var gameIDj = localStorage.getItem("gameId");
-
-	// Seleziona tutti gli elementi figli tranne il primo (che è il pulsante per chiudere il modale)
-	var childrenToRemove = Array.from(modal2Content.children).slice(1);
-
-	// Rimuovi tutti gli elementi figli eccetto il primo
-	childrenToRemove.forEach((child) => {
-		modal2Content.removeChild(child);
-	});
-
-	// Aggiungi il titolo
-	var titleElement = document.createElement("h2");
-	titleElement.classList.add("modal2-title");
-	titleElement.textContent = "GAME INFO";
-	modal2Content.appendChild(titleElement);
-
-	if (gameIDj != "null") {
-		// Aggiungi i campi aggiornati
-		var idUtenteElement = document.createElement("p");
-		var usernamej = parseJwt(getCookie("jwt")).userId;
-		idUtenteElement.textContent = "UserID: " + usernamej;
-		modal2Content.appendChild(idUtenteElement);
-
-		var usernameElement = document.createElement("p");
-		var username = parseJwt(getCookie("jwt")).sub.toString();
-		usernameElement.textContent = "Username: " + username;
-		modal2Content.appendChild(usernameElement);
-
-		var idPartitaElement = document.createElement("p");
-		idPartitaElement.textContent = "GameID: " + gameIDj;
-		modal2Content.appendChild(idPartitaElement);
-
-		// (MODIFICA 23/04/2024): Add the name of the CUT
-		var CUTName = document.createElement("p");
-		CUTName.textContent = "Class Under Test: " + localStorage.getItem("classe");
-		modal2Content.appendChild(CUTName);
-
-		var idTurnoElement = document.createElement("p");
-		var turnoIDj = orderTurno + 1;
-		idTurnoElement.textContent = "Turno: " + turnoIDj;
-		modal2Content.appendChild(idTurnoElement);
-
-		var robotSceltoElement = document.createElement("p");
-		var robotj = localStorage.getItem("robot");
-		robotSceltoElement.textContent = "Robot:" + robotj;
-		modal2Content.appendChild(robotSceltoElement);
-
-		var difficoltaElement = document.createElement("p");
-		difficoltaElement.textContent =
-			"Livello:" + localStorage.getItem("difficulty");
-		modal2Content.appendChild(difficoltaElement);
-	}
-}
-function closeInfoModal() {
-	var infoModal = document.getElementById("infoModal");
-	infoModal.style.display = "none";
-}
-
-window.onbeforeunload = function () {
+Gameoverdow.onbeforeunload = function () {
 	if (localStorage.getItem("modalita") !== "Scalata") {
 		localStorage.setItem("gameId", null);
 		localStorage.setItem("turnId", null);

@@ -18,10 +18,10 @@ function createApiUrl(formData, orderTurno) {
 
 // Funzione per generare il percorso del test
 function generaPercorsoTest(orderTurno) {
-	const modalita = localStorage.getItem("modalita");
-	const playerId = localStorage.getItem("playerId");
-	const gameId = localStorage.getItem("gameId");
-	const roundId = localStorage.getItem("roundId");
+	const modalita    = localStorage.getItem("modalita");
+	const playerId    = localStorage.getItem("playerId");
+	const gameId      = localStorage.getItem("gameId");
+	const roundId     = localStorage.getItem("roundId");
 	const classeLocal = localStorage.getItem("classe");
 
 	// Verifica la modalità e costruisce il percorso appropriato
@@ -56,11 +56,41 @@ function extractThirdColumn(csvContent) {
 	return thirdColumnValues;
 }
 
-function getConsoleTextCoverage(data) {
-	var valori_csv = extractThirdColumn(data);
+you_win = `
+_____.___.              
+\__  |   | ____  __ __  
+ /   |   |/  _ \|  |  \ 
+ \____   (  <_> )  |  / 
+ / ______|\____/|____/  
+ \/                     
+ __      __.__          
+/  \    /  \__| ____    
+\   \/\/   /  |/    \   
+ \        /|  |   |  \  
+  \__/\  / |__|___|  /  
+       \/          \/   
+`;
 
+you_lose = `
+_____.___.                
+\__  |   | ____  __ __    
+ /   |   |/  _ \|  |  \   
+ \____   (  <_> )  |  /   
+ / ______|\____/|____/    
+ \/                       
+.__                       
+|  |   ____  ______ ____  
+|  |  /  _ \/  ___// __ \ 
+|  |_(  <_> )___ \\  ___/ 
+|____/\____/____  >\___  >
+                \/     \/ 
+`;
+
+function getConsoleTextCoverage(data, gameScore) {
+	var valori_csv = extractThirdColumn(data);
 	var consoleText = `Esito Risultati (percentuale di linee coperte)
-                      Il tuo punteggio: ${valori_csv[0]}% LOC
+                      Il tuo punteggio: ${gameScore}pt
+					  la tua coverage: ${valori_csv[0]}% LOC
                       Informazioni aggiuntive di copertura:
                       Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
                       Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
@@ -74,13 +104,14 @@ function getConsoleTextCoverage(data) {
 	return consoleText;
 }
 
-function getConsoleTextRun(data, punteggioJacoco, punteggioRobot) {
+function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
 	var valori_csv = extractThirdColumn(data);
-
-	var consoleText = `Esito Risultati (percentuale di linee coperte)
+	var consoleText = (punteggioRobot > gameScore) ? you_lose : you_win;
+	consoleText =       consoleText + '\n' +
+					   `Esito Risultati (percentuale di linee coperte)
                         Il tuo punteggio EvoSuite: ${valori_csv[0]}% LOC
-                        Il tuo punteggio Jacoco: ${punteggioJacoco}% LOC
-                        Il punteggio del robot: ${punteggioRobot}% LOC
+                        Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
+                        Il punteggio del robot:    ${punteggioRobot}% LOC
                         Informazioni aggiuntive di copertura:
                         Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
                         Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
@@ -106,46 +137,6 @@ async function startGame(data) {
     }
 }
 
-// Funzione principale per la gestione dello storico dei turni
-async function fetchTurns() {
-	let output = "";
-
-	for (let i = orderTurno; i >= 1; i--) {
-		const turnId = (
-			parseInt(localStorage.getItem("turnId")) -
-			i +
-			1
-		).toString();
-		output += await fetchTurnData(turnId, i);
-
-		const testPath = generaPercorsoTest(orderTurno);
-		output += await fetchTestCode(testPath, i);
-
-		// Separatore tra i turni
-		output +=
-			"-----------------------------------------------------------------------------\n\n";
-	}
-
-	// Impostare il risultato nella console
-	consoleArea.setValue(output);
-	console.log(output);
-}
-
-// Funzione per ottenere i dati di un turno
-async function fetchTurnData(turnId, i) {
-	try {
-        const url = `/turns/${turnId}`;
-        
-        // Utilizziamo la funzione ajaxRequest per eseguire una chiamata GET
-        const response = await ajaxRequest(url, "GET", null, false, "json");
-
-        return `Turno ${Math.abs(i - orderTurno - 1)}\nPercentuale di copertura ottenuta: ${response.scores}\n`;
-    } catch (error) {
-        console.error("Error fetching turn data:", error);
-        return "";
-    }
-}
-
 // Funzione per ottenere il codice di test di un turno utilizzando ajaxRequest
 async function fetchTestCode(testPath, i) {
     try {
@@ -161,17 +152,30 @@ async function fetchTestCode(testPath, i) {
     }
 }
 
-// Funzione per mostrare o nascondere il caricamento
-function toggleLoading(show) {
-	document.getElementById("loading-editor").style.display = show
-		? "block"
-		: "none";
-}
+function toggleLoading(showSpinner, divId, buttonId) {
+    const divElement = document.getElementById(divId);
+	const button =  document.getElementById(buttonId);
 
-// Funzione per mostrare un messaggio di alert e nascondere il caricamento
-function showAlert(message) {
-	alert(message);
-	toggleLoading(false);
+    if (!divElement) {
+        console.error(`Elemento con ID "${divId}" non trovato.`);
+        return;
+    }
+
+    const spinner = divElement.querySelector('.spinner-border');
+    const statusText = divElement.querySelector('[role="status"]');
+    const icon = divElement.querySelector('i');
+
+    if (showSpinner) {
+        spinner.style.display = 'inline-block'; // Mostra lo spinner
+        statusText.innerText  = 'Loading...';    // Mostra il testo "Loading..."
+        icon.style.display = 'none';             // Nascondi l'icona
+		button.disabled = true;
+    } else {
+        spinner.style.display = 'none';          // Nascondi lo spinner
+        statusText.innerText  = 'Play';       // Nascondi il testo "Loading..."
+        icon.style.display = 'inline-block';     // Mostra l'icona
+		button.disabled = false;
+    }
 }
 
 // Funzione per ottenere i dati del form da inviare
@@ -195,15 +199,6 @@ function getFormData() {
     formData.append("testClassId", className);
 
     return formData;
-}
-
-// Funzione per mostrare messaggi di vittoria o sconfitta
-function showGameResult(isWin, gameScore) {
-    if (isWin) {
-        swal("Complimenti!", `Hai vinto! Ecco il tuo punteggio: ${gameScore}`, "success");
-    } else {
-        swal("Peccato!", `Hai perso! Ecco il tuo punteggio: ${gameScore}`, "error");
-    }
 }
 
 async function ajaxRequest(url, method = "POST", data = null, isJson = true, dataType = "json") {

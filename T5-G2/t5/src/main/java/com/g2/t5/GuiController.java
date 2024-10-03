@@ -79,15 +79,6 @@ public class GuiController {
         editor.SetAuth(jwt);
         return editor.handlePageRequest();
     }
-
-    /*
-     *     @GetMapping("/login")
-    public ModelAndView showLoginForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
-
-        return new ModelAndView("login");
-    }
-     */
     
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {

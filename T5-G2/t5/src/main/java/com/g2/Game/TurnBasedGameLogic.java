@@ -15,7 +15,7 @@ public class TurnBasedGameLogic extends GameLogic {
     private int totalTurns = 10;
 
     public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
-            String type_robot, String difficulty) {
+                                String type_robot, String difficulty) {
         super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty);
         this.currentTurn = 0;
         this.currentState = GameState.START; // Imposta lo stato iniziale
@@ -27,7 +27,7 @@ public class TurnBasedGameLogic extends GameLogic {
         switch (currentState) {
             case START -> {
                 //Creo partita
-                CreateGame(Time);
+                CreateGame();
                 currentState = GameState.PLAYING;
                 System.out.println("Game Started! Good luck!");
             }
