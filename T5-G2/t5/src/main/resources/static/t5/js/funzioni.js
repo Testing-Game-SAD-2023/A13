@@ -209,21 +209,21 @@ function highlightCodeCoverage(reportContent) {
     });
 
     coveredLines.forEach(function (lineNumber) {
-        editor_robot.removeLineClass(lineNumber - 2, "background", "uncovered-line");
-        editor_robot.removeLineClass(lineNumber - 2, "background", "partially-covered-line");
-        editor_robot.addLineClass(lineNumber - 2, "background", "covered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+        editor_robot.addLineClass(lineNumber - 2, "wrap", "covered-line");
     });
 
     uncoveredLines.forEach(function (lineNumber) {
-        editor_robot.removeLineClass(lineNumber - 2, "background", "covered-line");
-        editor_robot.removeLineClass(lineNumber - 2, "background", "partially-covered-line");
-        editor_robot.addLineClass(lineNumber - 2, "background", "uncovered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+        editor_robot.addLineClass(lineNumber - 2, "wrap", "uncovered-line");
     });
 
     partiallyCoveredLines.forEach(function (lineNumber) {
-        editor_robot.removeLineClass(lineNumber - 2, "background", "uncovered-line");
-        editor_robot.removeLineClass(lineNumber - 2, "background", "covered-line");
-        editor_robot.addLineClass(lineNumber - 2, "background", "partially-covered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+        editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+        editor_robot.addLineClass(lineNumber - 2, "wrap", "partially-covered-line");
     });
 }
 

@@ -31,24 +31,46 @@
 				-moz-user-select: none; /* Per Firefox */
 				-ms-user-select: none; /* Per Internet Explorer */
 			}
+			.CodeMirror {
+				height: 100%; /* Assicura che l'editor utilizzi il 100% dello spazio disponibile */
+			}
+			.covered-line {
+				background-color: #c8e6c9; /* Colore di sfondo per le righe coperte */
+				color: black !important;
+			}
+			.uncovered-line {
+				background-color: #ffcdd2; /* Colore di sfondo per le righe non coperte */
+				color: black !important;
+			}
+			.partially-covered-line {
+				background-color: #ffecb3; /* Colore di sfondo per le righe parzialmente coperte */
+				color: black !important;
+			}
+
+			#container-fluid {
+				display: flex;
+				flex-direction: row;
+				width: 100vw; /* Occupa tutta la larghezza della viewport */
+				height: 100vh; /* Occupa tutta l'altezza della viewport */
+				overflow: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
+			}
+
+			#card_user, #card_robot {
+				height: 100vh;
+        		width: 49.3vw;
+				flex-grow: 0; /* Disabilita la crescita del container */
+				flex-shrink: 0; /* Disabilita il restringimento del container */
+				overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
+			}
 
 			#section_editor {
-				height: calc(100vh - 100px); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
-				overflow-y: auto;
+				height: calc(100vh - 250px); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
 			}
 			
 			#section_UT {
-				height: calc(100vh - 100px); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
-				overflow-y: auto;
+				height: calc(100vh - 250px); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
 			}
 
-			#Console_utente{
-				flex-grow: 1; /* La textarea occupa lo spazio rimanente */
-			}
-
-			#Console_Robot{
-				flex-grow: 1; /* La textarea occupa lo spazio rimanente */
-			}
 		</style>
 	</head>
 
@@ -126,7 +148,7 @@
 							</nav>
 						</div>
 						<div
-							class="card-body m-0 p-0 overflow-y-hidden"
+							class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
 							id="section_editor"
 						>
 							<textarea id="Editor_utente">
@@ -195,7 +217,7 @@ public class TestClasse {
 								</button>
 							</nav>
 						</div>
-						<div class="card-body m-0 p-0 overflow-y-auto" id="section_console">
+						<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_console">
 							<textarea id="Console_utente"> </textarea>
 						</div>
 						<div class="card-footer text-body-secondary"></div>
@@ -230,7 +252,7 @@ public class TestClasse {
 								</div>
 							</nav>
 						</div>
-						<div class="card-body m-0 p-0 overflow-y-hidden" id="section_UT">
+						<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_UT">
 							<textarea id="Editor_Robot" th:text="${classeUT}"> </textarea>
 						</div>
 						<!-- COMPARE RESULT -->
@@ -244,7 +266,7 @@ public class TestClasse {
 								</button>
 							</nav>
 						</div>
-						<div class="card-body m-0 p-0 overflow-y-auto" id="section_result">
+						<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_result">
 							<textarea id="Console_Robot"> </textarea>
 						</div>
 						<div class="card-footer text-body-secondary"></div>
@@ -360,6 +382,19 @@ public class TestClasse {
 				}
 			);
 
+			const divider_Console = document.getElementById("divider_Console");
+			const divider_result = document.getElementById("divider_result");
+
+			const section_editor = document.getElementById("section_editor");
+			const section_console = document.getElementById("section_console");
+			const section_UT = document.getElementById("section_UT");
+			const section_result = document.getElementById("section_result");
+
+			const container_user = document.getElementById("card_user");
+			const container_robot = document.getElementById("card_robot");
+
+			let isDragging = false;
+
 			function enableResizing(container, divider, section1, section2) {
 				let isDragging = false;
 
@@ -395,31 +430,19 @@ public class TestClasse {
 				});
 			}
 
-			const divider_Console = document.getElementById("divider_Console");
-			const divider_result = document.getElementById("divider_result");
+			// Imposta l'altezza del container all'altezza del viewport in modo dinamico
+			function setEditorSize() {
+				const availableHeightUser = container_user.clientHeight; // Altezza del container utente
+				const availableHeightRobot = container_robot.clientHeigh; // Altezza del container robot
 
-			const section_editor = document.getElementById("section_editor");
-			const section_console = document.getElementById("section_console");
-			const section_UT = document.getElementById("section_UT");
-			const section_result = document.getElementById("section_result");
-
-			const container_user = document.getElementById("card_user");
-			const container_robot = document.getElementById("card_robot");
-
-			let isDragging = false;
-
-			// Imposta l'altezza del container all'altezza del viewport
-			function setContainerHeight() {
-				container_user.style.height = window.innerHeight - 30 + "px";
-				container_robot.style.height = window.innerHeight - 30 + "px";
-				editor_utente.setSize(null, window.innerHeight - 30 + "px");
-				editor_robot.setSize(null, window.innerHeight - 30 + "px");
+				// Imposta l'altezza degli editor in base all'altezza del container disponibile
+				editor_utente.setSize(null, availableHeightUser + "px");
+				editor_robot.setSize(null, availableHeightRobot + "px");
 			}
-
-			// Inizializza l'altezza del container
-			setContainerHeight();
-			// Aggiungi un event listener per ridimensionare la finestra
-			window.addEventListener("resize", setContainerHeight);
+			
+			window.addEventListener("resize", function () {
+				setEditorSize(); // Mantieni l'altezza degli editor sincronizzata con l'altezza del container
+			});
 
 			enableResizing(
 				container_user,
@@ -439,26 +462,42 @@ public class TestClasse {
 				const htmlElement = document.getElementById("html-root");
 				const checkbox = document.getElementById("themeToggle");
 
-				if (checkbox.checked) {
-					htmlElement.setAttribute("data-bs-theme", "dark");
-					editor_utente.setOption("theme", "material-darker");
-					editor_robot.setOption("theme", "material-darker");
-				} else {
-					htmlElement.setAttribute("data-bs-theme", "light");
-					editor_utente.setOption("theme", "eclipse");
-					editor_robot.setOption("theme", "eclipse");
-				}
+				// Ottieni tutti gli editor e console
+				const editors = [editor_utente, console_utente, editor_robot, console_robot];
+
+				// Imposta un fade out
+				editors.forEach(editor => {
+					editor.getWrapperElement().style.transition = 'opacity 0.6s ease';
+					editor.getWrapperElement().style.opacity = 0; // Fai svanire l'editor
+				});
+
+				// Cambiamo il tema visivamente
+				setTimeout(() => {
+					if (checkbox.checked) {
+						// Tema chiaro
+						htmlElement.setAttribute("data-bs-theme", "light");
+						editors.forEach(editor => {
+							editor.setOption("theme", "material-ocean");
+						});
+					} else {
+						// Tema scuro
+						htmlElement.setAttribute("data-bs-theme", "dark");
+						editors.forEach(editor => {
+							editor.setOption("theme", "material-darker");
+						});
+					}
+
+					// Dopo che il tema è cambiato, riporta l'opacità a 1 per il fade in
+					editors.forEach(editor => {
+						editor.getWrapperElement().style.transition = 'opacity 0.6s ease';
+						editor.getWrapperElement().style.opacity = 1; // Fai riapparire l'editor
+					});
+				}, 500); // Tempo per il fade out prima di cambiare il tema
 			}
 			// Assegna l'evento al cambio di stato del checkbox
 			document
 				.getElementById("themeToggle")
 				.addEventListener("change", toggleTheme);
-
-				function setEditorSize() {
-					editor_robot.setSize(null, container_robot.clientHeight + "px");
-					editor_utente.setSize(null, container_user.clientHeight + "px")
-				}
-				window.addEventListener("resize", setEditorSize);
 		</script>
 		<script th:src="@{/t5/js/common.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
