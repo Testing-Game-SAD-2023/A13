@@ -31,14 +31,20 @@ const data = {
 	type_robot: localStorage.getItem("robot"),
 	difficulty: localStorage.getItem("difficulty"),
 	mode: localStorage.getItem("modalita"),
-	underTestClassName: localStorage.getItem("underTestClassName")
+	underTestClassName: localStorage.getItem("underTestClassName"),
 };
 
 $(document).ready(function () {
 	startGame(data);
 
 	// Format date to dd/mm/yyyy
-	const formattedDate = `${String(currentDate.getDate()).padStart(2, '0')}/${String(currentDate.getMonth() + 1).padStart(2, '0')}/${currentDate.getFullYear()}`;
+	const formattedDate = `${String(currentDate.getDate()).padStart(
+		2,
+		"0"
+	)}/${String(currentDate.getMonth() + 1).padStart(
+		2,
+		"0"
+	)}/${currentDate.getFullYear()}`;
 	console.log("formattedDate:", formattedDate);
 
 	// Obtain the content of the textarea
@@ -52,7 +58,7 @@ $(document).ready(function () {
 	// Create a function to handle multiple replacements
 	const replacePlaceholders = (content, replacements) => {
 		for (const [placeholder, value] of Object.entries(replacements)) {
-			content = content.replace(new RegExp(placeholder, 'g'), value);
+			content = content.replace(new RegExp(placeholder, "g"), value);
 		}
 		return content;
 	};
@@ -62,10 +68,10 @@ $(document).ready(function () {
 
 	// Define replacements
 	const replacements = {
-		"TestClasse": testClassName,
-		"username": username,
-		"userID": userId,
-		"date": formattedDate
+		TestClasse: testClassName,
+		username: username,
+		userID: userId,
+		date: formattedDate,
 	};
 
 	// Perform replacements
@@ -80,16 +86,17 @@ $(document).ready(function () {
 current_round_scalata = localStorage.getItem("current_round_scalata");
 total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
 
-//Funzione per aggiungere un elemento allo storico 
+//Funzione per aggiungere un elemento allo storico
 function addStorico(score, covValue) {
-    var list = document.getElementById("storico_list"); // Seleziona la lista
+	var list = document.getElementById("storico_list"); // Seleziona la lista
 
-    // Crea un nuovo elemento <li> con la struttura specificata
-    var newItem = document.createElement("li");
-    newItem.className = "list-group-item d-flex justify-content-between align-items-start";
+	// Crea un nuovo elemento <li> con la struttura specificata
+	var newItem = document.createElement("li");
+	newItem.className =
+		"list-group-item d-flex justify-content-between align-items-start";
 
-    // Imposta il contenuto HTML del nuovo elemento
-    newItem.innerHTML = `
+	// Imposta il contenuto HTML del nuovo elemento
+	newItem.innerHTML = `
         <div class="ms-2 me-auto">
             <div class="fw-bold">
                 Punteggio
@@ -99,8 +106,8 @@ function addStorico(score, covValue) {
         </div>
     `;
 
-    // Aggiunge il nuovo elemento alla lista
-    list.appendChild(newItem);
+	// Aggiunge il nuovo elemento alla lista
+	list.appendChild(newItem);
 }
 
 // Elemento del pulsante "Play/Submit"
@@ -117,36 +124,54 @@ runButton.addEventListener("click", async function () {
 		}
 
 		// Prima richiesta AJAX per eseguire il test
-		const response = await ajaxRequest("/run", "POST",formData, false, "json");
-		console.log(response)
-		const { robotScore, userScore, outCompile, coverage, Gameover} = response;
-		consoleArea.setValue(outCompile);
+		const response = await ajaxRequest("/run", "POST", formData, false, "json");
+		console.log(response);
+		const {
+			robotScore,
+			userScore,
+			outCompile,
+			coverage,
+			GameOver,
+			gameId,
+			roundId,
+		} = response;
+		formData.append("gameId", gameId);
+		formData.append("roundId", roundId);
+
+		console_utente.setValue(outCompile);
 		highlightCodeCoverage($.parseXML(coverage));
-		
+
 		orderTurno++;
 
 		const url = createApiUrl(formData, orderTurno);
 		console.log("URL post on: " + url);
 
 		// Seconda richiesta AJAX per inviare il codice di test
-		const javaCode = editor.getValue();
-		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "json");
-
-		displayRobotPoints = getConsoleTextRun(csvContent, userScore, robotScore);
+		const csvContent = await ajaxRequest(
+			url,
+			"POST",
+			formData.get("testingClassCode"),
+			false,
+			"text"
+		);
 		var valori_csv = extractThirdColumn(csvContent);
 		addStorico(userScore, valori_csv[0]);
-		consoleArea2.setValue(displayRobotPoints);
+		displayRobotPoints = getConsoleTextRun(csvContent, userScore, robotScore);
+		console_robot.setValue(displayRobotPoints);
 
 		if (localStorage.getItem("modalita") === "Scalata") {
 			console.log("Game mode is 'Scalata'");
-			controlloScalata(Gameover, current_round_scalata, total_rounds_scalata, displayRobotPoints);
+			controlloScalata(
+				GameOver,
+				current_round_scalata,
+				total_rounds_scalata,
+				displayRobotPoints
+			);
 		} else {
 			console.log("Game mode is 'Sfida'");
 		}
 	} catch (error) {
-		swal(
-			error.message
-		);
+		swal(error.message);
 	} finally {
 		toggleLoading(false, "loading_run", "runButton");
 	}
@@ -161,7 +186,13 @@ coverageButton.addEventListener("click", async function () {
 	try {
 		urlJacoco = "http://remoteccc-app-1:1234/compile-and-codecoverage";
 		// Richiesta per ottenere il report di JaCoCo
-		const reportContent = await ajaxRequest(urlJacoco, "POST", formData, false, "xml");
+		const reportContent = await ajaxRequest(
+			urlJacoco,
+			"POST",
+			formData,
+			false,
+			"xml"
+		);
 		console.log("(POST /getJaCoCoReport)", reportContent);
 		highlightCodeCoverage(reportContent);
 
@@ -171,8 +202,8 @@ coverageButton.addEventListener("click", async function () {
 
 		// Richiesta per inviare il codice di test
 		//toggleLoading(false);
-		const csvContent = await ajaxRequest(url, "POST",javaCode, false, "text");
-		consoleArea.setValue(getConsoleTextCoverage(csvContent));
+		const csvContent = await ajaxRequest(url, "POST", javaCode, false, "text");
+		console_utente.setValue(getConsoleTextCoverage(csvContent));
 
 		const turnId = localStorage.getItem("turnId");
 		await updateOrCreateTurn(turnId, locGiocatore, orderTurno);
