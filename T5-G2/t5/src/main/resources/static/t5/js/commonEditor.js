@@ -138,6 +138,67 @@ document.querySelector("#redo-button").addEventListener("click", function () {
 	editor_utente.redo();
 });
 
+//AGGIUNTA A STORICO
+function addStorico(score, covValue) {
+	var list = document.getElementById("storico_list"); // Seleziona la lista
+
+	    // Verifica se esiste un placeholder e lo rimuove al primo inserimento
+	var placeholder = document.getElementById("placeholder-item");
+	if (placeholder) {
+		placeholder.remove();
+	}
+
+	// Crea un nuovo elemento <li> con la struttura specificata
+	var newItem = document.createElement("li");
+	newItem.className =
+		"list-group-item d-flex justify-content-between align-items-start";
+
+	// Imposta il contenuto HTML del nuovo elemento
+	newItem.innerHTML = `
+		<div class="ms-2 me-auto">
+			<div class="fw-bold">Punteggio </div>
+			<small>%COV: ${covValue}</small>
+		</div>
+		<span class="badge text-bg-primary rounded-pill">${score}</span>
+	`;
+
+	// Aggiunge il nuovo elemento alla lista
+	list.appendChild(newItem);
+}
+
+//TASTO INFO
+document.addEventListener("DOMContentLoaded", function () {
+	// Seleziona il bottone popover
+	var popoverButton = document.getElementById("popover_info");
+	var messaggio =
+		"Classe UT: " +
+		localStorage.getItem("underTestClassName") +
+		" \n Difficoltà: " +
+		localStorage.getItem("difficulty") +
+		"\n Robot: " +
+		localStorage.getItem("robot");
+	
+	var popover = new bootstrap.Popover(popoverButton, {
+		content: messaggio,  	  // Usa il contenuto dal localStorage
+		trigger: 'hover',         // Mostra il popover al passaggio del mouse (puoi cambiare con 'click' o 'focus')
+		html: true                // Se vuoi abilitare contenuti HTML nel popover
+	});
+
+	// Se vuoi visualizzarlo subito, puoi farlo chiamando popover.show()
+	popover.show();
+});
+
+
+function openModalWithText(text_title, text_content) {
+	document.getElementById('Modal_title').innerText = text_title;
+	// Imposta il testo nel corpo del modal
+	document.getElementById('Modal_body').innerText = text_content;
+	// Ottieni il modal
+	var modal = new bootstrap.Modal(document.getElementById('Modal'));
+	// Mostra il modal
+	modal.show();
+}
+  
 function autocomplete(cm, options) {
 	var startTag = options.startTag || ".";
 	var suggestionList = options.suggestionList || [];

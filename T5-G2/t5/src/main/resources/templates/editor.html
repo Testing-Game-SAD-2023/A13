@@ -120,14 +120,20 @@
 							<nav class="navbar bg-body-tertiary p-2">
 								<span class="navbar-brand lead my-0 py-0"> Edit </span>
 								<div class="">
+									<!-- UNDO e REDO -->
 									<button type="button" class="btn" id="undo-button">
 										<i class="bi bi-arrow-90deg-left"></i>
 									</button>
 									<button type="button" class="btn" id="redo-button">
 										<i class="bi bi-arrow-90deg-right"></i>
 									</button>
-									<button class="btn btn-primary" type="button" id="runButton">
-										<div id="loading_run">
+									<!-- COVERAGE -->
+									<button
+										class="btn btn-primary"
+										type="button"
+										id="coverageButton"
+									>
+										<div id="loading_cov">
 											<span
 												class="spinner-border spinner-border-sm"
 												aria-hidden="true"
@@ -142,9 +148,10 @@
 											<!-- Icona nascosta -->
 										</div>
 									</button>
-									<!-- Opzioni -->
+									<!-- MENU BUTTON -->
 									<button
 										type="button"
+										id="utente_menu"
 										class="btn btn-sm dropdown-toggle-split my-0"
 										data-bs-toggle="dropdown"
 										aria-expanded="false"
@@ -157,8 +164,9 @@
 									<div
 										class="dropdown-menu shadow dropdown-menu-end"
 										aria-labelledby="navbarDropdownMenuLink"
+										style="width: 400px;"
 									>
-										<div class="container-fluid">
+										<div class="container-fluid p-0">
 											<div class="tab-content" id="myTabContent">
 												<!-- MENU -->
 												<div
@@ -167,6 +175,12 @@
 													role="tabpanel"
 													aria-labelledby="pane-A"
 												>
+													<ol class="breadcrumb m-0 px-2">
+														<li class="breadcrumb-item"> 
+															<Strong>Menu</Strong>
+														</li>
+														<li class="breadcrumb-item active" aria-current="page">CTRL+D</li>
+												  	</ol>
 													<div class="list-group list-group-flush">
 														<button
 															type="button"
@@ -202,19 +216,20 @@
 												</div>
 												<!-- STORICO-->
 												<div
-													class="tab-pane fade overflow-y-auto"
+													class="tab-pane fade overflow-y-auto "
 													id="paneB"
 													role="tabpanel"
 													aria-labelledby="pane-B"
 												>
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item list-group-item-action mb-2"
-													>
-														<i class="bi bi-arrow-left"></i>
-														<span class="lead text-center">Storico</span>
-													</button>
+													<div class="d-flex">
+														<button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
+															<i class="bi bi-arrow-left"></i>
+														</button>
+														<ol class="breadcrumb m-0 px-2">
+															<li class="breadcrumb-item">Menu</li>
+															<li class="breadcrumb-item active" aria-current="page">Storico</li>
+														</ol>
+													</div>
 													<ol
 														id="storico_list"
 														class="list-group list-group-flush list-group-numbered overflow-auto border-top"
@@ -239,14 +254,15 @@
 													role="tabpanel"
 													aria-labelledby="pane-C"
 												>
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item list-group-item-action mb-2"
-													>
+												<div class="d-flex">
+													<button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
 														<i class="bi bi-arrow-left"></i>
-														<span class="lead text-center">Upload</span>
 													</button>
+													<ol class="breadcrumb m-0 px-2">
+														<li class="breadcrumb-item">Menu</li>
+														<li class="breadcrumb-item active" aria-current="page">Upload</li>
+													</ol>
+												</div>
 													<input
 														class="container-fluid form-control"
 														id="fileInput"
@@ -260,17 +276,16 @@
 													role="tabpanel"
 													aria-labelledby="pane-D"
 												>
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item list-group-item-action mb-2"
-													>
+												<div class="d-flex">
+													<button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
 														<i class="bi bi-arrow-left"></i>
-														<span class="lead text-center"
-															>Cerca e Sostituisci</span
-														>
 													</button>
-													<div class="input-group mb-3">
+													<ol class="breadcrumb m-0 px-2">
+														<li class="breadcrumb-item">Menu</li>
+														<li class="breadcrumb-item active" aria-current="page">Cerca&Sostituisci</li>
+													</ol>
+												</div>
+													<div class="input-group mb-3 px-2">
 														<button
 															class="btn btn-primary"
 															type="button"
@@ -293,7 +308,7 @@
 														>
 														</span>
 													</div>
-													<div class="input-group mb-2">
+													<div class="input-group mb-2 px-2">
 														<button
 															class="btn btn-primary"
 															type="button"
@@ -409,6 +424,7 @@
 									Class Under Test
 								</span>
 								<div class="">
+									<!-- INFO BUTTON -->
 									<span
 										class="d-inline-block"
 										tabindex="0"
@@ -421,9 +437,9 @@
 									>
 										<i class="bi bi-info-circle"></i>
 									</span>
-
-									<button class="btn btn-primary" type="button" id="coverageButton">
-										<div id="loading_cov">
+									<!-- SUBMIT /RUN -->
+									<button class="btn btn-success" type="button" id="runButton">
+										<div id="loading_run">
 											<span
 												class="spinner-border spinner-border-sm"
 												aria-hidden="true"
@@ -450,9 +466,7 @@
 						<!-- COMPARE RESULT -->
 						<div class="card-header border-top p-0">
 							<nav class="navbar bg-body-tertiary p-2">
-								<span class="navbar-brand lead my-0 py-0">
-									Compare Result
-								</span>
+								<span class="navbar-brand lead my-0 py-0"> Results </span>
 								<button type="button" class="btn btn-sm" id="divider_result">
 									<i class="bi bi-arrows-expand"></i>
 								</button>
@@ -470,6 +484,26 @@
 			</div>
 		</div>
 
+		<!-- Modal -->
+		<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h1 class="modal-title fs-5" id="Modal_title">
+					Modal title
+				</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="Modal_body">
+				...
+				</div>
+				<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+			</div>
+		</div>
+
 		<!-- SCRIPTS-->
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -481,7 +515,6 @@
 			integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
 			crossorigin="anonymous"
 		></script>
-
 		<script
 			th:src="@{/t5/codemirror/lib/codemirror.js}"
 			th:inline="javascript"
@@ -537,21 +570,21 @@
 				document.getElementById("Editor_utente"),
 				{
 					lineNumbers: true, // Mostra i numeri di riga
-					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+					mode: "java", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
 					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
 					tabSize: 4, // Dimensione del tab
 					matchBrackets: true,
 					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
 					foldGutter: true, // Abilita il gutter per il folding
-			        gutters: ["CodeMirror-foldgutter"], // Aggiungi il gutter per il folding
-			        lineWrapping: true // Abilita il wrapping delle righe
+					gutters: ["CodeMirror-foldgutter"], // Aggiungi il gutter per il folding
+					lineWrapping: true, // Abilita il wrapping delle righe
 				}
 			);
 			var editor_robot = CodeMirror.fromTextArea(
 				document.getElementById("Editor_Robot"),
 				{
 					lineNumbers: true, // Mostra i numeri di riga
-					mode: "javascript", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
+					mode: "java", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
 					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
 					tabSize: 4, // Dimensione del tab
 					readOnly: true,
@@ -589,18 +622,18 @@
 			const container_user = document.getElementById("card_user");
 			const container_robot = document.getElementById("card_robot");
 
-			 // Abilita il folding del codice
-			editor_utente.on("gutterClick", function(cm, line, gutter, event) {
-						// Verifica se il gutter è quello del folding
-						if (gutter === "CodeMirror-foldgutter") {
-							var fold = cm.getLineHandle(line);
-							if (fold && fold.folded) {
-								cm.foldCode(line, null); // Espandi
-							} else {
-								cm.foldCode(line, null); // Collassa
-							}
-						}
-					});
+			// Abilita il folding del codice
+			editor_utente.on("gutterClick", function (cm, line, gutter, event) {
+				// Verifica se il gutter è quello del folding
+				if (gutter === "CodeMirror-foldgutter") {
+					var fold = cm.getLineHandle(line);
+					if (fold && fold.folded) {
+						cm.foldCode(line, null); // Espandi
+					} else {
+						cm.foldCode(line, null); // Collassa
+					}
+				}
+			});
 
 			function enableResizing(container, divider, section1, section2) {
 				let isDragging = false;
@@ -726,6 +759,30 @@
 				var activePane = document.getElementById(paneId);
 				activePane.classList.add("show", "active");
 			}
+
+			// Gestione dell'evento keydown per aprire e chiudere il dropdown
+			document.addEventListener("keydown", function (event) {
+				if (event.ctrlKey && event.key === "d") {
+					// Combinazione di tasti Ctrl + D
+					event.preventDefault(); // Evita comportamenti predefiniti (ad es. segnalibri nel browser)
+
+					// Ottieni l'elemento del bottone del dropdown
+					var dropdownButton = document.getElementById("utente_menu");
+
+					// Crea o recupera l'istanza del dropdown di Bootstrap
+					var dropdownInstance = bootstrap.Dropdown.getInstance(dropdownButton);
+					if (!dropdownInstance) {
+						dropdownInstance = new bootstrap.Dropdown(dropdownButton);
+					}
+
+					// Verifica lo stato corrente e alterna tra aprire e chiudere
+					if (dropdownButton.getAttribute("aria-expanded") === "true") {
+						dropdownInstance.hide(); // Chiudi il dropdown se è aperto
+					} else {
+						dropdownInstance.show(); // Apri il dropdown se è chiuso
+					}
+				}
+			});
 		</script>
 		<script th:src="@{/t5/codemirror/mode/clike/clike.js}"></script>
 		<script th:src="@{/t5/js/common.js}" th:inline="javascript"></script>
