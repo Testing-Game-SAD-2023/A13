@@ -86,34 +86,6 @@ $(document).ready(function () {
 current_round_scalata = localStorage.getItem("current_round_scalata");
 total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
 
-//Funzione per aggiungere un elemento allo storico
-function addStorico(score, covValue) {
-	var list = document.getElementById("storico_list"); // Seleziona la lista
-
-	    // Verifica se esiste un placeholder e lo rimuove al primo inserimento
-	var placeholder = document.getElementById("placeholder-item");
-	if (placeholder) {
-		placeholder.remove();
-	}
-
-	// Crea un nuovo elemento <li> con la struttura specificata
-	var newItem = document.createElement("li");
-	newItem.className =
-		"list-group-item d-flex justify-content-between align-items-start";
-
-	// Imposta il contenuto HTML del nuovo elemento
-	newItem.innerHTML = `
-		<div class="ms-2 me-auto">
-			<div class="fw-bold">Punteggio </div>
-			<small>%COV: ${covValue}</small>
-		</div>
-		<span class="badge text-bg-primary rounded-pill">${score}</span>
-	`;
-
-	// Aggiunge il nuovo elemento alla lista
-	list.appendChild(newItem);
-}
-
 // Elemento del pulsante "Play/Submit"
 const runButton = document.getElementById("runButton");
 // Funzione principale per la gestione del click del pulsante
@@ -121,6 +93,89 @@ runButton.addEventListener("click", async function () {
 	toggleLoading(true, "loading_run", "runButton");
 
 	try {
+		console.log("AVVIATA SUBMIT");
+		const formData = getFormData();
+		//qui l'utente fa submit quindi decide di chiudere il gioco
+		formData.append("isGameEnd", true);
+		for (let [key, value] of formData.entries()) {
+			console.log(key, value);
+		}
+
+		// Prima richiesta AJAX per eseguire il test
+		const response = await ajaxRequest("/run", "POST", formData, false, "json");
+		console.log(response);
+		const {
+			robotScore,
+			userScore,
+			outCompile,
+			coverage,
+			GameOver,
+			gameId,
+			roundId,
+		} = response;
+		formData.append("gameId", gameId);
+		formData.append("roundId", roundId);
+
+		console_utente.setValue(outCompile);
+
+		if (coverage == null || coverage === "") {
+			getConsoleTextError();
+		} else {
+			highlightCodeCoverage($.parseXML(coverage));
+
+			orderTurno++;
+
+			const url = createApiUrl(formData, orderTurno);
+			console.log("URL post on: " + url);
+
+			// Seconda richiesta AJAX per inviare il codice di test
+			const csvContent = await ajaxRequest(
+				url,
+				"POST",
+				formData.get("testingClassCode"),
+				false,
+				"text"
+			);
+			var valori_csv = extractThirdColumn(csvContent);
+			addStorico(userScore, valori_csv[0]);
+			displayRobotPoints = getConsoleTextRun(
+				csvContent,
+				0,
+				robotScore,
+				userScore
+			);
+			console_robot.setValue(displayRobotPoints);
+
+			console.log("punteggio robot: " + robotScore);
+			console.log("punteggio utente: " + userScore);
+
+			if (localStorage.getItem("modalita") === "Scalata") {
+				console.log("Game mode is 'Scalata'");
+				controlloScalata(
+					GameOver,
+					current_round_scalata,
+					total_rounds_scalata,
+					displayRobotPoints
+				);
+			} else {
+				console.log("Game mode is 'Sfida'");
+			}
+		}
+	} catch (error) {
+		openModalWithText('Errore!',error.message);
+	} finally {
+		toggleLoading(false, "loading_run", "runButton");
+	}
+});
+
+// TASTO RUN (COVERAGE)
+var coverageButton = document.getElementById("coverageButton");
+coverageButton.addEventListener("click", async function () {
+	const formData = getFormData();
+	toggleLoading(true, "loading_cov", "coverageButton");
+
+	try {
+		console.log("AVVIATA COVERAGE");
 		const formData = getFormData();
 		formData.append("isGameEnd", false);
 		for (let [key, value] of formData.entries()) {
@@ -143,85 +198,34 @@ runButton.addEventListener("click", async function () {
 		formData.append("roundId", roundId);
 
 		console_utente.setValue(outCompile);
-		highlightCodeCoverage($.parseXML(coverage));
 
-		orderTurno++;
-
-		const url = createApiUrl(formData, orderTurno);
-		console.log("URL post on: " + url);
-
-		// Seconda richiesta AJAX per inviare il codice di test
-		const csvContent = await ajaxRequest(
-			url,
-			"POST",
-			formData.get("testingClassCode"),
-			false,
-			"text"
-		);
-		var valori_csv = extractThirdColumn(csvContent);
-		addStorico(userScore, valori_csv[0]);
-		displayRobotPoints = getConsoleTextRun(csvContent, 0, robotScore, userScore)
-		console_robot.setValue(displayRobotPoints);
-
-		console.log("punteggio robot: "  + robotScore);
-		console.log("punteggio utente: " + userScore);
-
-		if (localStorage.getItem("modalita") === "Scalata") {
-			console.log("Game mode is 'Scalata'");
-			controlloScalata(
-				GameOver,
-				current_round_scalata,
-				total_rounds_scalata,
-				displayRobotPoints
-			);
+		if (coverage == null || coverage === "") {
+			// Errori di compilazione
+			getConsoleTextError();
 		} else {
-			console.log("Game mode is 'Sfida'");
+			highlightCodeCoverage($.parseXML(coverage));
+			orderTurno++;
+			const url = createApiUrl(formData, orderTurno);
+			console.log("URL post on: " + url);
+			// Seconda richiesta AJAX per inviare il codice di test
+			const csvContent = await ajaxRequest(
+				url,
+				"POST",
+				formData.get("testingClassCode"),
+				false,
+				"text"
+			);
+			var valori_csv = extractThirdColumn(csvContent);
+			addStorico(userScore, valori_csv[0]);
+			displayUserPoints = getConsoleTextCoverage(csvContent, userScore);
+			console_robot.setValue(displayUserPoints);
 		}
 	} catch (error) {
-		swal(error.message);
+		error_message = 'Errore durante il recupero del file di output di JaCoCo o la gestione del turno:' + error; 
+		openModalWithText('Errore!',error_message);
+		console.error(error_message);
 	} finally {
-		toggleLoading(false, "loading_run", "runButton");
-	}
-});
-
-// TASTO RUN (COVERAGE)
-var coverageButton = document.getElementById("coverageButton");
-coverageButton.addEventListener("click", async function () {
-	const formData = getFormData();
-	toggleLoading(true, "loading_cov", "coverageButton");
-
-	try {
-		urlJacoco = "http://remoteccc-app-1:1234/compile-and-codecoverage";
-		// Richiesta per ottenere il report di JaCoCo
-		const reportContent = await ajaxRequest(
-			urlJacoco,
-			"POST",
-			formData,
-			false,
-			"xml"
-		);
-		console.log("(POST /getJaCoCoReport)", reportContent);
-		highlightCodeCoverage(reportContent);
-
-		orderTurno++;
-		const url = createApiUrl(formData, orderTurno);
-
-		// Richiesta per inviare il codice di test
-		const csvContent = await ajaxRequest(url, "POST", formData.get("testingClassCode"), false, "text");
-		console_utente.setValue(getConsoleTextCoverage(csvContent));
-
-		const turnId = localStorage.getItem("turnId");
-		await updateOrCreateTurn(turnId, locGiocatore, orderTurno);
-	} catch (error) {
-		alert(
-			"Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!"
-		);
-		console.error(
-			"Errore durante il recupero del file di output di JaCoCo o la gestione del turno:",
-			error
-		);
-	} finally {
-		toggleLoading(true, "loading_cov", "coverageButton");
+		toggleLoading(false, "loading_cov", "coverageButton");
 	}
 });
 

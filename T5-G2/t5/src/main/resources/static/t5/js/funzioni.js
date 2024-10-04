@@ -57,29 +57,6 @@ function extractThirdColumn(csvContent) {
 	return thirdColumnValues;
 }
 
-//INFO
-document.addEventListener("DOMContentLoaded", function () {
-	// Seleziona il bottone popover
-	var popoverButton = document.getElementById("popover_info");
-
-	// Inizializza il popover
-	var popover = new bootstrap.Popover(popoverButton);
-
-	var messaggio =
-		"Classe UT: " +
-		localStorage.getItem("underTestClassName") +
-		" \n Difficoltà: " +
-		localStorage.getItem("difficulty") +
-		"\n Robot: " +
-		localStorage.getItem("robot");
-
-	// Imposta il contenuto del popover
-	popoverButton.setAttribute("data-bs-content", messaggio);
-
-	// Se vuoi visualizzarlo subito, puoi farlo chiamando popover.show()
-	// popover.show();
-});
-
 you_win = `
 __     ______  _    _  __          _______ _   _ 
 \\ \\   / / __ \\| |  | | \\ \\        / /_   _| \\ | |
@@ -98,19 +75,37 @@ __     ______  _    _   _      ____   _____ ______
    |_|  \\____/ \\____/  |______\\____/|_____/|______|
 `;
 
+var error = `
+______ _____  _____   ____   _____  
+|  ____|  __ \|  __ \ / __ \ / ____| 
+| |__  | |__) | |__) | |  | | (___   
+|  __| |  _  /|  _  /| |  | |\___ \  
+| |____| | \ \| | \ \| |__| |____) | 
+|______|_|  \_\_|  \_\\____/|_____/  
+`;
+
 function getConsoleTextCoverage(data, gameScore) {
 	var valori_csv = extractThirdColumn(data);
-	var consoleText = `----------------------------------------------------------------------------------
-						Il tuo punteggio: ${gameScore}pt
-						la tua coverage: ${valori_csv[0]}% LOC
-						Informazioni aggiuntive di copertura:
-						Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
-						Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
-						Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
-						Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
-						Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
-						Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
-						Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
+	var consoleText = 
+`============================== Results ===============================
+Il tuo punteggio: ${gameScore}pt
+----------------------------------------------------------------------
+la tua coverage:  ${valori_csv[0]}% LOC
+============================== Coverage ===============================
+Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch
+======================================================================`;
 
 	// Restituisce il testo generato
 	return consoleText;
@@ -120,24 +115,39 @@ function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
 	var valori_csv = extractThirdColumn(data);
 	var consoleText2 = punteggioRobot >= gameScore ? you_lose : you_win;
 	consoleText =
+`===================================================================== \n` +
 		consoleText2 +
 		"\n" +
-		`-------------------------------------------------------------------------------------
-		Il tuo punteggio: ${gameScore}pt
-		la tua coverage:  ${valori_csv[0]}% LOC
-		Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
-		Il punteggio del robot:    ${punteggioRobot}% LOC
-		Informazioni aggiuntive di copertura:
-		Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
-		Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
-		Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
-		Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
-		Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
-		Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
-		Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
+`============================== Results ===============================
+Il tuo punteggio: ${gameScore}pt
+----------------------------------------------------------------------
+la tua coverage:  ${valori_csv[0]}% LOC
+----------------------------------------------------------------------
+Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
+----------------------------------------------------------------------
+Il punteggio del robot:    ${punteggioRobot}% LOC
+============================== Coverage ===============================
+Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch
+======================================================================`;
 
 	// Restituisce il testo generato
 	return consoleText;
+}
+
+function getConsoleTextError(){
+	return error + "\n Ci sono stati errori di compilazione, controlla la console !";
 }
 
 // Funzione per avviare il gioco utilizzando ajaxRequest
