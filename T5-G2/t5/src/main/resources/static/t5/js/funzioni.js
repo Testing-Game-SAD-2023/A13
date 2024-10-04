@@ -107,7 +107,7 @@ function getConsoleTextCoverage(data, gameScore) {
 
 function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
 	var valori_csv = extractThirdColumn(data);
-	var consoleText = punteggioRobot > gameScore ? you_lose : you_win;
+	var consoleText = punteggioRobot > punteggioJacoco ? you_lose : you_win;
 	consoleText =
 		consoleText +
 		"\n" +

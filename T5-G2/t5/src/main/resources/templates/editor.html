@@ -401,8 +401,8 @@
 									>Class Under Test</span
 								>
 								<div class="">
-									<button class="btn btn-primary" type="button" id="runButton">
-										<div id="loading_run">
+									<button class="btn btn-primary" type="button" id="coverageButton">
+										<div id="loading_cov">
 											<span
 												class="spinner-border spinner-border-sm"
 												aria-hidden="true"
@@ -680,13 +680,15 @@
 						// Tema chiaro
 						htmlElement.setAttribute("data-bs-theme", "light");
 						editors.forEach((editor) => {
-							editor.setOption("theme", "material-ocean");
+							editor.setOption("theme", "eclipse");
+							editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
 						});
 					} else {
 						// Tema scuro
 						htmlElement.setAttribute("data-bs-theme", "dark");
 						editors.forEach((editor) => {
 							editor.setOption("theme", "material-darker");
+							editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
 						});
 					}
 
@@ -697,6 +699,7 @@
 					});
 				}, 500); // Tempo per il fade out prima di cambiare il tema
 			}
+			toggleTheme();
 			// Assegna l'evento al cambio di stato del checkbox
 			document
 				.getElementById("themeToggle")
@@ -715,6 +718,7 @@
 				activePane.classList.add("show", "active");
 			}
 		</script>
+		<script th:src="@{/t5/codemirror/mode/clike/clike.js}"></script>
 		<script th:src="@{/t5/js/common.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/editor.js}" th:inline="javascript"></script>
