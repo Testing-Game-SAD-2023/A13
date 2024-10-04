@@ -188,7 +188,7 @@ runButton.addEventListener("click", async function () {
 var coverageButton = document.getElementById("coverageButton");
 coverageButton.addEventListener("click", async function () {
 	const formData = getFormData();
-	//toggleLoading(true);
+	toggleLoading(true, "loading_cov", "coverageButton");
 
 	try {
 		urlJacoco = "http://remoteccc-app-1:1234/compile-and-codecoverage";
@@ -205,17 +205,14 @@ coverageButton.addEventListener("click", async function () {
 
 		orderTurno++;
 		const url = createApiUrl(formData, orderTurno);
-		const javaCode = editor.getValue();
 
 		// Richiesta per inviare il codice di test
-		//toggleLoading(false);
-		const csvContent = await ajaxRequest(url, "POST", javaCode, false, "text");
+		const csvContent = await ajaxRequest(url, "POST", formData.get("testingClassCode"), false, "text");
 		console_utente.setValue(getConsoleTextCoverage(csvContent));
 
 		const turnId = localStorage.getItem("turnId");
 		await updateOrCreateTurn(turnId, locGiocatore, orderTurno);
 	} catch (error) {
-		//toggleLoading(false);
 		alert(
 			"Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!"
 		);
@@ -224,7 +221,7 @@ coverageButton.addEventListener("click", async function () {
 			error
 		);
 	} finally {
-		//toggleLoading(false);
+		toggleLoading(true, "loading_cov", "coverageButton");
 	}
 });
 
