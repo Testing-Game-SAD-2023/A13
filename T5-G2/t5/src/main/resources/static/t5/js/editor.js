@@ -90,6 +90,12 @@ total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
 function addStorico(score, covValue) {
 	var list = document.getElementById("storico_list"); // Seleziona la lista
 
+	    // Verifica se esiste un placeholder e lo rimuove al primo inserimento
+	var placeholder = document.getElementById("placeholder-item");
+	if (placeholder) {
+		placeholder.remove();
+	}
+
 	// Crea un nuovo elemento <li> con la struttura specificata
 	var newItem = document.createElement("li");
 	newItem.className =
@@ -97,14 +103,12 @@ function addStorico(score, covValue) {
 
 	// Imposta il contenuto HTML del nuovo elemento
 	newItem.innerHTML = `
-        <div class="ms-2 me-auto">
-            <div class="fw-bold">
-                Punteggio
-                <span class="badge text-bg-primary rounded-pill">${score}</span>
-            </div>
-            <small>%COV:${covValue}</small>
-        </div>
-    `;
+		<div class="ms-2 me-auto">
+			<div class="fw-bold">Punteggio </div>
+			<small>%COV: ${covValue}</small>
+		</div>
+		<span class="badge text-bg-primary rounded-pill">${score}</span>
+	`;
 
 	// Aggiunge il nuovo elemento alla lista
 	list.appendChild(newItem);
@@ -156,8 +160,11 @@ runButton.addEventListener("click", async function () {
 		);
 		var valori_csv = extractThirdColumn(csvContent);
 		addStorico(userScore, valori_csv[0]);
-		displayRobotPoints = getConsoleTextRun(csvContent, userScore, robotScore);
+		displayRobotPoints = getConsoleTextRun(csvContent, 0, robotScore, userScore)
 		console_robot.setValue(displayRobotPoints);
+
+		console.log("punteggio robot: "  + robotScore);
+		console.log("punteggio utente: " + userScore);
 
 		if (localStorage.getItem("modalita") === "Scalata") {
 			console.log("Game mode is 'Scalata'");

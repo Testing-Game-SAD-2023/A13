@@ -57,49 +57,60 @@ function extractThirdColumn(csvContent) {
 	return thirdColumnValues;
 }
 
+//INFO
+document.addEventListener("DOMContentLoaded", function () {
+	// Seleziona il bottone popover
+	var popoverButton = document.getElementById("popover_info");
+
+	// Inizializza il popover
+	var popover = new bootstrap.Popover(popoverButton);
+
+	var messaggio =
+		"Classe UT: " +
+		localStorage.getItem("underTestClassName") +
+		" \n Difficoltà: " +
+		localStorage.getItem("difficulty") +
+		"\n Robot: " +
+		localStorage.getItem("robot");
+
+	// Imposta il contenuto del popover
+	popoverButton.setAttribute("data-bs-content", messaggio);
+
+	// Se vuoi visualizzarlo subito, puoi farlo chiamando popover.show()
+	// popover.show();
+});
+
 you_win = `
-_____.___.              
-\__  |   | ____  __ __  
- /   |   |/  _ \|  |  \ 
- \____   (  <_> )  |  / 
- / ______|\____/|____/  
- \/                     
- __      __.__          
-/  \    /  \__| ____    
-\   \/\/   /  |/    \   
- \        /|  |   |  \  
-  \__/\  / |__|___|  /  
-       \/          \/   
+__     ______  _    _  __          _______ _   _ 
+\\ \\   / / __ \\| |  | | \\ \\        / /_   _| \\ | |
+ \\ \\_/ / |  | | |  | |  \\ \\  /\\  / /  | | |  \\| |
+  \\   /| |  | | |  | |   \\ \\/  \\/ /   | | | . \` |
+   | | | |__| | |__| |    \\  /\\  /   _| |_| |\\  |
+   |_|  \\____/ \\____/      \\/  \\/   |_____|_| \\_|
 `;
 
-you_lose = `
-_____.___.                
-\__  |   | ____  __ __    
- /   |   |/  _ \|  |  \   
- \____   (  <_> )  |  /   
- / ______|\____/|____/    
- \/                       
-.__                       
-|  |   ____  ______ ____  
-|  |  /  _ \/  ___// __ \ 
-|  |_(  <_> )___ \\  ___/ 
-|____/\____/____  >\___  >
-                \/     \/ 
+var you_lose = `
+__     ______  _    _   _      ____   _____ ______ 
+\\ \\   / / __ \\| |  | | | |    / __ \\ / ____|  ____|
+ \\ \\_/ / |  | | |  | | | |   | |  | | (___ | |__   
+  \\   /| |  | | |  | | | |   | |  | |\\___ \\|  __|  
+   | | | |__| | |__| | | |___| |__| |____) | |____ 
+   |_|  \\____/ \\____/  |______\\____/|_____/|______|
 `;
 
 function getConsoleTextCoverage(data, gameScore) {
 	var valori_csv = extractThirdColumn(data);
-	var consoleText = `Esito Risultati (percentuale di linee coperte)
-                      Il tuo punteggio: ${gameScore}pt
-					  la tua coverage: ${valori_csv[0]}% LOC
-                      Informazioni aggiuntive di copertura:
-                      Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
-                      Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
-                      Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
-                      Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
-                      Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
-                      Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
-                      Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
+	var consoleText = `----------------------------------------------------------------------------------
+						Il tuo punteggio: ${gameScore}pt
+						la tua coverage: ${valori_csv[0]}% LOC
+						Informazioni aggiuntive di copertura:
+						Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
+						Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
+						Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
+						Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
+						Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
+						Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
+						Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
 
 	// Restituisce il testo generato
 	return consoleText;
@@ -107,22 +118,23 @@ function getConsoleTextCoverage(data, gameScore) {
 
 function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
 	var valori_csv = extractThirdColumn(data);
-	var consoleText = punteggioRobot > gameScore ? you_lose : you_win;
+	var consoleText2 = punteggioRobot >= gameScore ? you_lose : you_win;
 	consoleText =
-		consoleText +
+		consoleText2 +
 		"\n" +
-		`Esito Risultati (percentuale di linee coperte)
-                        Il tuo punteggio EvoSuite: ${valori_csv[0]}% LOC
-                        Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
-                        Il punteggio del robot:    ${punteggioRobot}% LOC
-                        Informazioni aggiuntive di copertura:
-                        Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
-                        Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
-                        Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
-                        Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
-                        Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
-                        Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
-                        Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
+		`-------------------------------------------------------------------------------------
+		Il tuo punteggio: ${gameScore}pt
+		la tua coverage:  ${valori_csv[0]}% LOC
+		Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
+		Il punteggio del robot:    ${punteggioRobot}% LOC
+		Informazioni aggiuntive di copertura:
+		Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
+		Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
+		Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
+		Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
+		Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
+		Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
+		Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
 
 	// Restituisce il testo generato
 	return consoleText;
@@ -143,21 +155,6 @@ async function startGame(data) {
 		console.log("Partita iniziata con successo:", response);
 	} catch (error) {
 		console.error("Errore durante l'avvio della partita:", error);
-	}
-}
-
-// Funzione per ottenere il codice di test di un turno utilizzando ajaxRequest
-async function fetchTestCode(testPath, i) {
-	try {
-		// Utilizziamo la funzione ajaxRequest per eseguire una chiamata GET
-		const response = await ajaxRequest(testPath, "GET", null, false, "text");
-
-		return `Codice di test sottoposto al tentativo ${Math.abs(
-			i - orderTurno - 1
-		)}:\n${response}\n\n`;
-	} catch (error) {
-		console.error("Error fetching test code:", error);
-		return "";
 	}
 }
 
@@ -251,7 +248,6 @@ function getFormData() {
 	formData.append("order", orderTurno);
 	formData.append("username", localStorage.getItem("username"));
 	formData.append("testClassId", className);
-
 	return formData;
 }
 

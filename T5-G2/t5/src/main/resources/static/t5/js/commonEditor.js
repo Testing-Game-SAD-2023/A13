@@ -57,7 +57,7 @@ document
 var GoBack = document.getElementById("GoBack");
 GoBack.addEventListener("click", function () {
 	if (confirm("Sei sicuro di voler tornare indietro?")) {
-		window.location.href = "redirect::/main";
+		window.location.href = "/main";
 	}
 });
 
