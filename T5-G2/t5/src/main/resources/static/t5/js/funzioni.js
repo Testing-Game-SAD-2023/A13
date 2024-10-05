@@ -90,21 +90,21 @@ function getConsoleTextCoverage(data, gameScore) {
 `============================== Results ===============================
 Il tuo punteggio: ${gameScore}pt
 ----------------------------------------------------------------------
-la tua coverage:  ${valori_csv[0]}% LOC
+la tua coverage:  ${valori_csv[0]*100}% LOC
 ============================== Coverage ===============================
-Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
+Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
+Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
+Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
+Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
+Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
+Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch
+Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato
@@ -113,7 +113,7 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch
 
 function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
 	var valori_csv = extractThirdColumn(data);
-	var consoleText2 = punteggioRobot >= gameScore ? you_lose : you_win;
+	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
 	consoleText =
 `===================================================================== \n` +
 		consoleText2 +
@@ -121,25 +121,25 @@ function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
 `============================== Results ===============================
 Il tuo punteggio: ${gameScore}pt
 ----------------------------------------------------------------------
-la tua coverage:  ${valori_csv[0]}% LOC
+la tua coverage:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
 Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
 ----------------------------------------------------------------------
 Il punteggio del robot:    ${punteggioRobot}% LOC
 ============================== Coverage ===============================
-Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
+Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
+Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
+Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
+Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
+Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
+Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch
+Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato

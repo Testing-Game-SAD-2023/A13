@@ -91,7 +91,6 @@ const runButton = document.getElementById("runButton");
 // Funzione principale per la gestione del click del pulsante
 runButton.addEventListener("click", async function () {
 	toggleLoading(true, "loading_run", "runButton");
-
 	try {
 		console.log("AVVIATA SUBMIT");
 		const formData = getFormData();
@@ -162,6 +161,7 @@ runButton.addEventListener("click", async function () {
 			}
 		}
 	} catch (error) {
+		getConsoleTextError();
 		openModalWithText('Errore!',error.message);
 	} finally {
 		toggleLoading(false, "loading_run", "runButton");
@@ -173,7 +173,6 @@ var coverageButton = document.getElementById("coverageButton");
 coverageButton.addEventListener("click", async function () {
 	const formData = getFormData();
 	toggleLoading(true, "loading_cov", "coverageButton");
-
 	try {
 		console.log("AVVIATA COVERAGE");
 		const formData = getFormData();
@@ -181,7 +180,6 @@ coverageButton.addEventListener("click", async function () {
 		for (let [key, value] of formData.entries()) {
 			console.log(key, value);
 		}
-
 		// Prima richiesta AJAX per eseguire il test
 		const response = await ajaxRequest("/run", "POST", formData, false, "json");
 		console.log(response);
@@ -196,9 +194,7 @@ coverageButton.addEventListener("click", async function () {
 		} = response;
 		formData.append("gameId", gameId);
 		formData.append("roundId", roundId);
-
 		console_utente.setValue(outCompile);
-
 		if (coverage == null || coverage === "") {
 			// Errori di compilazione
 			getConsoleTextError();
@@ -224,6 +220,7 @@ coverageButton.addEventListener("click", async function () {
 		error_message = 'Errore durante il recupero del file di output di JaCoCo o la gestione del turno:' + error; 
 		openModalWithText('Errore!',error_message);
 		console.error(error_message);
+		getConsoleTextError();
 	} finally {
 		toggleLoading(false, "loading_cov", "coverageButton");
 	}

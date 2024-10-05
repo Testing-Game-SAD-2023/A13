@@ -44,7 +44,7 @@
 				color: black !important;
 			}
 
-			#container-fluid {
+			#dashboard {
 				display: flex;
 				flex-direction: row;
 				width: 100vw; /* Occupa tutta la larghezza della viewport */
@@ -52,10 +52,12 @@
 				overflow: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
 			}
 
+			/* #f07178 cm-variable #C792EA cm-keyword #FFCB6B*/
+
 			#card_user,
 			#card_robot {
 				height: 95vh;
-				width: 49.3vw;
+				width: 50vw;
 				flex-grow: 0; /* Disabilita la crescita del container */
 				flex-shrink: 0; /* Disabilita il restringimento del container */
 				overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
@@ -110,7 +112,7 @@
 		</ul>
 
 		<!-- DASHBOARD -->
-		<div class="container-fluid">
+		<div class="container-fluid" id="dashboard">
 			<div class="row">
 				<!-- PRIMA COLONNA-->
 				<div class="col px-0">
@@ -210,7 +212,7 @@
 															onclick="showTabPane('paneD')"
 															class="list-group-item list-group-item-action"
 														>
-															<i class="bi bi-search"></i> Cerca
+															<i class="bi bi-search"></i> Cerca&Sostituisci
 														</button>
 													</div>
 												</div>
@@ -299,7 +301,6 @@
 															class="form-control border-secondary"
 															placeholder="Cerca"
 															aria-label="Cerca"
-															aria-describedby="basic-addon1"
 														/>
 														<span
 															class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger"
@@ -322,7 +323,6 @@
 															class="form-control border-secondary"
 															placeholder="Sostituisci"
 															aria-label="Sostituisci"
-															aria-describedby="basic-addon1"
 														/>
 													</div>
 												</div>
@@ -400,9 +400,14 @@
 						<div class="card-header border-top p-0">
 							<nav class="navbar bg-body-tertiary p-2">
 								<span class="navbar-brand lead my-0 py-0"> Console </span>
-								<button type="button" class="btn btn-sm" id="divider_Console">
-									<i class="bi bi-arrows-expand"></i>
-								</button>
+								<div>
+									<button type="button" class="btn btn-sm" id="close_console_utente">
+										<i class="bi bi-arrow-bar-down"></i>
+									</button>
+									<button type="button" class="btn btn-sm" id="divider_Console">
+										<i class="bi bi-arrows-expand"></i>
+									</button>
+								</div>
 							</nav>
 						</div>
 						<div
@@ -467,9 +472,14 @@
 						<div class="card-header border-top p-0">
 							<nav class="navbar bg-body-tertiary p-2">
 								<span class="navbar-brand lead my-0 py-0"> Results </span>
-								<button type="button" class="btn btn-sm" id="divider_result">
-									<i class="bi bi-arrows-expand"></i>
-								</button>
+								<div>
+									<button type="button" class="btn btn-sm" id="close_console_result">
+										<i class="bi bi-arrow-bar-down"></i>
+									</button>
+									<button type="button" class="btn btn-sm" id="divider_result">
+										<i class="bi bi-arrows-expand"></i>
+									</button>
+								</div>
 							</nav>
 						</div>
 						<div
@@ -505,6 +515,9 @@
 		</div>
 
 		<!-- SCRIPTS-->
+		<script 
+			src="https://cdnjs.cloudflare.com/ajax/libs/driver.js/0.9.8/driver.min.js"
+		></script>
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
 			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -635,7 +648,7 @@
 				}
 			});
 
-			function enableResizing(container, divider, section1, section2) {
+			function enableResizing(container, divider, section1, section2, close_button) {
 				let isDragging = false;
 
 				// Aggiungi event listener per il mouse down (quando si inizia a trascinare)
@@ -668,6 +681,15 @@
 						container.classList.remove("no-select"); // Riabilita la selezione del testo
 					}
 				});
+			
+				// Funzione per chiudere totalmente la sezione
+				close_button.addEventListener("click", function () {
+					const iconElement = close_button.querySelector('i');
+					if(section2.style.height != "0"){
+						section2.style.height = "0"; // Imposta l'altezza della seconda sezione a 0
+						section1.style.height = `${container.clientHeight}px`; // Opzionale: imposta la prima sezione per occupare tutta l'altezza
+					}
+				});
 			}
 
 			// Imposta l'altezza del container all'altezza del viewport in modo dinamico
@@ -688,13 +710,15 @@
 				container_user,
 				divider_Console,
 				section_editor,
-				section_console
+				section_console,
+				close_console_utente
 			);
 			enableResizing(
 				container_robot,
 				divider_result,
 				section_UT,
-				section_result
+				section_result, 
+				close_console_result
 			);
 
 			// Funzione per cambiare il tema
@@ -789,6 +813,6 @@
 		<script th:src="@{/t5/js/commonEditor.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/editor.js}" th:inline="javascript"></script>
-		<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+		<script th:src="@{/t5/js/editor_tour.js}" th:inline="javascript"></script>
 	</body>
 </html>

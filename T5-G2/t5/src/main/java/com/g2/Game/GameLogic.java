@@ -43,9 +43,9 @@ public abstract class GameLogic {
 
     protected void CreateTurn(String Time, int userScore) {
         //Apro un nuovo turno
-        //this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
         //Chiudo il turno 
-        //serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
+        serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
     }
 
     protected void EndRound(String Time) {

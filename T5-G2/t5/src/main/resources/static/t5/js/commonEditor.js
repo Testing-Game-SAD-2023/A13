@@ -171,21 +171,15 @@ document.addEventListener("DOMContentLoaded", function () {
 	// Seleziona il bottone popover
 	var popoverButton = document.getElementById("popover_info");
 	var messaggio =
-		"Classe UT: " +
-		localStorage.getItem("underTestClassName") +
-		" \n Difficoltà: " +
-		localStorage.getItem("difficulty") +
-		"\n Robot: " +
-		localStorage.getItem("robot");
+		"Classe UT: "  + 	localStorage.getItem("underTestClassName") + "<br>" +
+		"Difficoltà: " + 	localStorage.getItem("difficulty") + "<br>" +
+		"Robot: " 	   +	localStorage.getItem("robot");
 	
 	var popover = new bootstrap.Popover(popoverButton, {
 		content: messaggio,  	  // Usa il contenuto dal localStorage
-		trigger: 'hover',         // Mostra il popover al passaggio del mouse (puoi cambiare con 'click' o 'focus')
+		trigger: 'click',         // Mostra il popover al passaggio del mouse (puoi cambiare con 'click' o 'focus')
 		html: true                // Se vuoi abilitare contenuti HTML nel popover
 	});
-
-	// Se vuoi visualizzarlo subito, puoi farlo chiamando popover.show()
-	popover.show();
 });
 
 

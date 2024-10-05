@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.g2.Game.GameController.GameFactoryFunction;
 import com.g2.Interfaces.ServiceManager;
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
@@ -30,6 +31,7 @@ public class GameController {
 
     //Gestisco qui tutti i giochi aperti 
     private final Map<String, GameLogic> activeGames;
+    private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
     //Logger 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
@@ -37,7 +39,25 @@ public class GameController {
     public GameController(RestTemplate restTemplate) {
         this.serviceManager = new ServiceManager(restTemplate);
         this.activeGames = new HashMap<>();
+        this.gameRegistry = new HashMap<>();
+        registerGames();
     }
+
+    @FunctionalInterface
+    interface GameFactoryFunction {
+        GameLogic create(ServiceManager serviceManager, 
+                            String playerId, String underTestClassName, 
+                            String type_robot, String difficulty);
+    }
+
+    // Registra i tipi di giochi con il loro costruttore
+    private void registerGames() {
+        //Attenzione le chiavi sono CaseSensitive
+        gameRegistry.put("Sfida", (sm, playerId, underTestClassName, type_robot, difficulty) -> 
+            new TurnBasedGameLogic(sm, playerId, underTestClassName, type_robot, difficulty));
+        // Aggiungi altri giochi qui
+    }
+
 
     private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
         try {
@@ -117,16 +137,21 @@ public class GameController {
 
     @PostMapping("/StartGame")
     public ResponseEntity<String> StartGame(@RequestParam String playerId,
-            @RequestParam String type_robot,
-            @RequestParam String difficulty,
-            @RequestParam String mode,
-            @RequestParam String underTestClassName) {
+                                            @RequestParam String type_robot,
+                                            @RequestParam String difficulty,
+                                            @RequestParam String mode,
+                                            @RequestParam String underTestClassName) {
 
         try {
+            GameFactoryFunction gameConstructor = gameRegistry.get(mode);
+            if (gameConstructor == null){
+                logger.error("[GAMECONTROLLER] /StartGame errore modalità non esiste/non registrata");
+                return createErrorResponse("[/StartGame] errore modalità non esiste/non registrata");
+            }
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
                 //Creo la nuova partita 
-                gameLogic = new TurnBasedGameLogic(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
                 //gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER] /StartGame Partita creata con successo.");
