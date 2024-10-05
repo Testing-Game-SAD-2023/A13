@@ -171,7 +171,7 @@ function pressedSubmit() {
                             })
                             .then( () => {
                                 console.log(data);
-                                window.location.href = "/editor";
+                                window.location.href = "editor_old";
                             })
                             .catch((error) => {
                                 console.log("error: "+ error);
