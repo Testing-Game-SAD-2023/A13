@@ -16,10 +16,11 @@
 		<div th:replace="fragments/navbar :: navbar"></div>
 
 		<div class="container-fluid mt-3">
-			<div class="row justify-content-center">
+			<div class="row justify-content-center row-cols-3">
+				<div class="col"></div>
 				<div class="col">
 					<div class="card">
-						<h5 class="card-header" id="selectedMode">Modalità</h5>
+						<h5 class="card-header text-center" id="selectedMode">Modalità</h5>
 						<div class="card-body">
 							<!-- Form di selezione -->
 								<div class="row">
@@ -30,7 +31,7 @@
 										<form>
 											<!-- Selezione Classe UT -->
 											<div class="form-group mb-3">
-												<label for="select_class">Seleziona la Classe UT:</label>
+												<label for="select_class">Seleziona la Classe da Testare:</label>
 												<select class="form-control" id="select_class">
 													<option value="">Seleziona un'opzione</option>
 													<th:block th:each="option : ${lista_classi}">
@@ -79,18 +80,11 @@
 											</div>
 										</form>
 									</div>
-									<div clasS="col">
-										<p>
-
-Se vuoi affinare le tue abilità e goderti una sfida rapida, questa modalità è l'ideale per te. In pochi minuti, ti troverai immerso in un match avvincente contro due avversari predeterminati, perfetto per testare nuove strategie senza l'impegno di una serie lunga. Puoi perfezionare le tue tecniche e sperimentare approcci diversi, il tutto in un ambiente senza pressioni. Questo spazio ti permette di migliorare le tue competenze, preparandoti a sfide più grandi, pur garantendo un'esperienza di gioco completa e appagante, ideale per chi cerca divertimento in tempi brevi o una pausa veloce.
-										</p>
-									</div>
 								</div>
-
-								
 						</div>
 					</div>
 				</div>
+				<div class="col"></div>
 			</div>
 		</div>
 

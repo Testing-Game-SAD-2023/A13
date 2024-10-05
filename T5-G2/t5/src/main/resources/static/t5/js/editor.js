@@ -37,6 +37,12 @@ const data = {
 $(document).ready(function () {
 	startGame(data);
 
+	if(localStorage.getItem("modalita") === "Allenamento"){
+		const runButton = document.getElementById("runButton");
+		runButton.disabled = true;
+		console.log("Sei in allenamento");
+	}
+
 	// Format date to dd/mm/yyyy
 	const formattedDate = `${String(currentDate.getDate()).padStart(
 		2,
@@ -87,7 +93,7 @@ current_round_scalata = localStorage.getItem("current_round_scalata");
 total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
 
 // Elemento del pulsante "Play/Submit"
-const runButton = document.getElementById("runButton");
+var runButton = document.getElementById("runButton");
 // Funzione principale per la gestione del click del pulsante
 runButton.addEventListener("click", async function () {
 	toggleLoading(true, "loading_run", "runButton");
