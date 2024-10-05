@@ -147,6 +147,7 @@ runButton.addEventListener("click", async function () {
 
 			console.log("punteggio robot: " + robotScore);
 			console.log("punteggio utente: " + userScore);
+			var coverageButton = document.getElementById("coverageButton");
 
 			if (localStorage.getItem("modalita") === "Scalata") {
 				console.log("Game mode is 'Scalata'");
@@ -159,6 +160,8 @@ runButton.addEventListener("click", async function () {
 			} else {
 				console.log("Game mode is 'Sfida'");
 			}
+			coverageButton.disabled = true;
+			runButton.disabled = true;
 		}
 	} catch (error) {
 		getConsoleTextError();
@@ -215,6 +218,7 @@ coverageButton.addEventListener("click", async function () {
 			addStorico(userScore, valori_csv[0]);
 			displayUserPoints = getConsoleTextCoverage(csvContent, userScore);
 			console_robot.setValue(displayUserPoints);
+
 		}
 	} catch (error) {
 		error_message = 'Errore durante il recupero del file di output di JaCoCo o la gestione del turno:' + error; 
@@ -226,7 +230,7 @@ coverageButton.addEventListener("click", async function () {
 	}
 });
 
-Gameoverdow.onbeforeunload = function () {
+window.onbeforeunload = function () {
 	if (localStorage.getItem("modalita") !== "Scalata") {
 		localStorage.setItem("gameId", null);
 		localStorage.setItem("turnId", null);

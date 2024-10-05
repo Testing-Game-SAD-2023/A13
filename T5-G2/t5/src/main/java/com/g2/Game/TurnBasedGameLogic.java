@@ -30,7 +30,7 @@ public class TurnBasedGameLogic extends GameLogic {
 
     @Override
     public Boolean isGameEnd() {
-        return true; //il giocatore può fare quanti turni vuole quindi ritorno sempre True
+        return false; //il giocatore può fare quanti turni vuole quindi ritorno sempre True
     }
 
     @Override

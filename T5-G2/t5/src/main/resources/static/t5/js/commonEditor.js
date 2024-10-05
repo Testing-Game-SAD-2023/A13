@@ -53,14 +53,6 @@ document
 	.getElementById("searchTerm")
 	.addEventListener("input", clearSearchHighlights);
 
-//funzione conferma goback
-var GoBack = document.getElementById("GoBack");
-GoBack.addEventListener("click", function () {
-	if (confirm("Sei sicuro di voler tornare indietro?")) {
-		window.location.href = "/main";
-	}
-});
-
 // TASTO COMPILA
 /*
 var compileButton = document.getElementById("compileButton");

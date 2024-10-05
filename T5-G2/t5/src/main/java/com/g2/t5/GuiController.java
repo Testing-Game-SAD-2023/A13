@@ -25,6 +25,7 @@ import com.g2.Components.ServiceObjectComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
+import com.g2.Model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -51,7 +52,7 @@ public class GuiController {
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam("mode") String mode) {
        
-        if("Sfida".equals(mode)){
+        if("Sfida".equals(mode) || "Allenamento".equals(mode)){
             PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
             ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
             gamemode.setObjectComponents(lista_classi);
@@ -99,13 +100,12 @@ public class GuiController {
     public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
 
-        /* 
+        
         User player_placeholder = new User((long) 1, "placeholder", "placeholder", "email", "password",
                 true, "studies", "resetToke");
 
         GenericObjectComponent player = new GenericObjectComponent("player", player_placeholder);
         main.setObjectComponents(player);
-        */
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }

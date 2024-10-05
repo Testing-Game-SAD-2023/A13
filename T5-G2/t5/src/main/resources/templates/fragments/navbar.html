@@ -1,26 +1,43 @@
-<!-- NAVBAR -->
-<div th:fragment="navbar" class="container-fluid border-bottom border-opacity-75 pb-2">
-    <ul class="nav justify-content-center nav-underline sticky-top">
-        <li class="nav-item">
-            <a class="nav-link text-light" href="/main">  
-                <i class="bi bi-house-fill"></i> Home
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-light" href="/edit_profile">  
-                <i class="bi bi-person-fill"></i> Profile
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-light" href="/leaderboard"> 
-                <i class="bi bi-globe"></i> Global   
-            </a>    
-        </li>       
-        <!-- Logout Button (positioned absolutely to the top right) -->
-        <div class="position-absolute" style="top: 10px; right: 20px;">
-            <a class="btn btn-dark btn-sm px-3" href="/logout" style="background-color: #4a4a4a; border: none; font-weight: bold;">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
-        </div>
-    </ul>
-</div>
+<nav th:fragment="navbar" class="navbar bg-body-tertiary">
+	<div class="container-fluid">
+		<a class="navbar-brand"> Home </a>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="/main">Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/leaderboard">LeaderBoard</a>
+				</li>
+			</ul>
+		</div>
+
+		<div class="d-flex">
+			<div class="btn-group">
+				<a class="nav-link text-light mx-2 my-2" href="/edit_profile">
+					<strong id="Username"></strong>
+                    <i class="bi bi-person-circle"></i>
+				</a>
+
+				<button
+					type="button"
+					class="btn dropdown-toggle-split"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+				>
+					<i class="bi bi-three-dots-vertical"></i>
+				</button>
+
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="#"> Voce di prova </a></li>
+					<li><hr class="dropdown-divider" /></li>
+					<li>
+						<a class="dropdown-item" href="/logout">
+							<i class="bi bi-box-arrow-left"></i> Logout
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</nav>

@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -139,8 +138,7 @@ public class GameController {
                                             @RequestParam String type_robot,
                                             @RequestParam String difficulty,
                                             @RequestParam String mode,
-                                            @RequestParam String underTestClassName,
-                                            @RequestBody(required = false) Map<String, Object> optionalParams) {
+                                            @RequestParam String underTestClassName) {
 
         try {
             GameFactoryFunction gameConstructor = gameRegistry.get(mode);
@@ -152,13 +150,6 @@ public class GameController {
             if (gameLogic == null) {
                 //Creo la nuova partita 
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
-
-                // Utilizzo del parametro opzionale se presente
-                if (optionalParams != null && !optionalParams.isEmpty()) {
-                    logger.info("[GAMECONTROLLER] /run: optionalParams {}", optionalParams);
-                    // Puoi gestire i parametri opzionali qui:
-                    //gamelogic.getParams();
-                }
 
                 //gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
@@ -221,6 +212,7 @@ public class GameController {
                     //Qua partita finita quindi lo segnalo
                     //gameLogic.EndRound(playerId);
                     //gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
+                    activeGames.remove(playerId);
                     logger.info("[GAMECONTROLLER] /run: risposta inviata");
                     return createResponseRun(UserData, RobotScore, user_score, true);
                 } else {

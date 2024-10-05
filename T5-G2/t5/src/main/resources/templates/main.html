@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -9,140 +9,154 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <!-- CUSTOM CSS -->
     <link rel="stylesheet" href="/t5/css/main_style.css"/>
-    <title>Game Modes Dashboard</title>
+    <title>Dashboard</title>
 </head>
 
-<body>
+<body >
 
 <!-- NAVBAR -->
 <div th:replace="fragments/navbar :: navbar"></div>
 
-<section class="intro-section container my-5 p-4" style="background-image: url('/t5/images/Background.jpeg'); background-color: rgba(221, 213, 213, 0.584); border-radius: 50px; max-width: 1500px; height: 80vh; position: relative; background-size: cover; background-position: center; background-repeat: no-repeat;">
-    <div class="text-center" style="padding: 20px 40px; position: relative; display: inline-block; background-color: rgba(255, 255, 255, 0.8); border-radius: 20px;">
-        <!-- Titolo al centro -->
-        <h2 class="mb-3" style="font-family: 'Poppins', sans-serif; color: #000; font-weight: bold; font-size: 3rem;">
-            Testing Robot Challenge
-        </h2>
-
-        <!-- Testo di introduzione -->
-        <p style="font-size: 1.1rem; color: #000; line-height: 1.5;">
-            Siamo entusiasti di presentarvi un'esperienza di gioco unica, dove potrete affrontare diverse modalità. 
-            Che siate in vena di una partita veloce, una sfida progressiva o un allenamento per perfezionare le vostre abilità, 
-            c'è una modalità di gioco adatta a voi.Scorrete verso il basso per scegliere la modalità 
-            che preferite e iniziate a giocare subito!
-        </p>
+<div class="row row-cols-1">
+    <div class="container-fluid mb-3">
+        <div class="card text-bg-dark">
+            <img src="/t5/images/Background.jpeg" class="card-img opacity-75" alt="...">
+            <div class="card-img-overlay">
+                <h5 class="card-title display-1 text-center">
+                    Testing Robot Challenge
+                </h5>
+                <p class="card-text">
+                    Siamo entusiasti di presentarvi un'esperienza di gioco unica, dove potrete affrontare diverse modalità. 
+                    Che siate in vena di una partita veloce, una sfida progressiva o un allenamento per perfezionare le vostre abilità, 
+                    c'è una modalità di gioco adatta a voi.Scorrete verso il basso per scegliere la modalità 
+                    che preferite e iniziate a giocare subito!
+                </p>
+            </div>
+        </div>
     </div>
-    
-    <!-- Icona a sinistra della sezione -->
-    <i class="bi bi-controller" style="font-size: 6rem; position: absolute; left: 30px; top: 80%; transform: translateY(-50%); color: #dfeceb;"></i>
-    
-    <!-- Icona a destra della sezione -->
-    <i class="bi bi-trophy" style="font-size: 6rem; position: absolute; right: 30px; top: 80%; transform: translateY(-50%); color: #dfeceb;"></i>
-</section>
 
-<!-- Sezione Modalità di Gioco -->
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <!-- Modalità 1 -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-lg bg-dark text-white"> <!-- Aggiunto bg-dark e text-white -->
-                <img src="/t5/images/Partita_singola.jpeg" class="card-img-top" alt="Immagine Modalità 1">
-                <div class="card-body">
-                    <h3 class="card-title text-center">Partita Singola</h3>
-                    <p>
-                        Vuoi una sfida rapida e coinvolgente? La modalità Partita Singola è perfetta per te! 
-                        Affronta un match unico contro due possibili avversari predeterminati, senza l'impegno di una serie lunga.
-                        Ideale per chi cerca una partita veloce e divertente in qualsiasi momento.
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="badge bg-primary">Veloce</span>
-                            <span class="badge bg-info text-dark">1 vs CPU</span>
-                            <span class="badge bg-primary">Competitiva</span>
-                            <span class="badge bg-info text-dark">A turni</span>
+    <!-- Sezione Modalità di Gioco -->
+    <div class="container-fluid">
+        <div class="row text-center border-top border-opacity-75 mb-3">
+            <h1> Modalità di Gioco</h1>
+        </div>
+
+        <div class="row row-cols-4 g-4 justify-content-center px-4">
+            <!-- Modalità 1 -->
+            <div class="col mb-4 d-flex align-items-stretch">
+                <div class="card shadow-lg bg-dark text-white"> 
+                    <img src="/t5/images/Partita_singola.jpeg" class="card-img-top" alt="Immagine Modalità 1">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Partita Singola</h3>
+                        <p>
+                            Vuoi una sfida rapida e coinvolgente? La modalità Partita Singola è perfetta per te! 
+                            Affronta un match unico contro due possibili avversari predeterminati, senza l'impegno di una serie lunga.
+                            Ideale per chi cerca una partita veloce e divertente in qualsiasi momento.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row  row-cols-2">
+                            <div class="col">
+                                    <span class="badge bg-primary m-1">Veloce</span>
+                                    <span class="badge bg-info text-dark m-1">1 vs CPU</span>
+                                    <span class="badge bg-warning text-dark m-1">Turn</span>
+                            </div>
+                            <div class="col">
+                                <a href="/gamemode?mode=Sfida" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                                    <i class="bi bi-play-fill me-2"></i>
+                                    <span>Play</span>
+                                </a> 
+                            </div>
                         </div>
-                        <a href="/gamemode?mode=Sfida" class="btn-custom btn-lg rounded-pill position-relative">
-                            <i class="bi bi-play-fill me-2"></i>
-                            <span class="fw-bold">Play</span>
-                        </a> 
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Modalità 2 -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-lg bg-dark text-white">
-                <img src="/t5/images/Scalata.jpeg" class="card-img-top" alt="Immagine Modalità 2">
+            <!-- Modalità 2 -->
+            <div class="col mb-4 d-flex align-items-stretch">
+                <div class="card shadow-lg bg-dark text-white">
+                    <img src="/t5/images/Scalata.jpeg" class="card-img-top" alt="Immagine Modalità 2">
 
-                <div class="card-body">
-                    <h3 class="card-title text-center">Scalata</h3>
-                    <p>
-                        Pronto a mettere alla prova le tue capacità in una serie di sfide sempre più difficili? 
-                        La modalità Scalata ti permetterà di affrontare un percorso in cui ogni livello è più impegnativo del precedente.
-                        Salendo in classifica, avrai l'opportunità di dimostrare di essere il migliore!
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="badge bg-primary">Lunga</span>
-                            <span class="badge bg-info text-dark">Progressiva</span>
-                            <span class="badge bg-primary">Competitiva</span>
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Scalata</h3>
+                        <p>
+                            Pronto a mettere alla prova le tue capacità in una serie di sfide sempre più difficili? 
+                            La modalità Scalata ti permetterà di affrontare un percorso in cui ogni livello è più impegnativo del precedente.
+                            Salendo in classifica, avrai l'opportunità di dimostrare di essere il migliore!
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row  row-cols-2">
+                            <div class="col">
+                                    <span class="badge bg-primary">Lunga</span>
+                                    <span class="badge bg-info text-dark">Progressiva</span>
+                                    <span class="badge bg-primary">Competitiva</span>
+                            </div>
+                            <div class="col">
+                                <a href="/gamemode?mode=Scalata" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                                    <i class="bi bi-play-fill me-2"></i>
+                                    <span>Play</span>
+                                </a> 
+                            </div>
                         </div>
-                        <a href="/gamemode?mode=Scalata" class="btn-custom btn-lg rounded-pill position-relative">
-                            <i class="bi bi-play-fill me-2"></i>
-                            <span class="fw-bold">Play</span>
-                        </a>
+                    </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Modalità 3 -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-lg bg-dark text-white">
-                <img src="/t5/images/Allenamento.jpeg" class="card-img-top" alt="Immagine Modalità 3">
-                <div class="card-body">
-                    <h3 class="card-title text-center">Allenamento</h3>
-                    <p>
-                        Hai bisogno di migliorare le tue abilità? Con la modalità Allenamento, puoi esercitarti senza pressioni, perfezionare le tue tecniche e sperimentare strategie.
-                        È lo spazio perfetto per affinare le tue competenze e prepararti a sfide più grandi.
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="badge bg-info text-dark">Pratica</span>
-                            <span class="badge bg-primary">Casual</span>
-                            <span class="badge bg-info text-dark">Veloce</span>
+            <!-- Modalità 3 -->
+            <div class="col mb-4 d-flex align-items-stretch">
+                <div class="card shadow-lg bg-dark text-white">
+                    <img src="/t5/images/Allenamento.jpeg" class="card-img-top" alt="Immagine Modalità 3">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Allenamento</h3>
+                        <p>
+                            Hai bisogno di migliorare le tue abilità? Con la modalità Allenamento, puoi esercitarti senza pressioni, perfezionare le tue tecniche e sperimentare strategie.
+                            È lo spazio perfetto per affinare le tue competenze e prepararti a sfide più grandi.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row  row-cols-2">
+                            <div class="col">
+                                <span class="badge bg-info text-dark">Pratica</span>
+                                <span class="badge bg-primary">Casual</span>
+                                <span class="badge bg-info text-dark">Veloce</span>
+                            </div>
+                            <div class="col">
+                                <a href="/gamemode?mode=Allenamento" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                                    <i class="bi bi-play-fill me-2"></i>
+                                    <span>Play</span>
+                                </a> 
+                            </div>
                         </div>
-                        <a href="/gamemode?mode=Allenamento" class="btn-custom btn-lg rounded-pill position-relative">
-                            <i class="bi bi-play-fill me-2"></i>
-                            <span class="fw-bold">Play</span>
-                        </a>
+                    </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Modalità 4 -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-lg bg-dark text-white">
-                <img src="/t5/images/Multiplayer.jpeg" class="card-img-top" alt="Immagine Modalità 4">
-                <div class="card-body">
-                    <h3 class="card-title text-center">Multiplayer</h3>
-                    <p>
-                        Vuoi sfidare amici o giocatori da tutto il mondo? Nella modalità Multiplayer, puoi competere o collaborare con altri giocatori in tempo reale.
-                        Che tu voglia dimostrare la tua superiorità o fare squadra, questa modalità ti offre un’esperienza sociale e avvincente.
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="badge bg-primary">Online</span>
-                            <span class="badge bg-info text-dark">Social</span>
-                            <span class="badge bg-primary">Competitivo</span>
-                            
+            <!-- Modalità 4 -->
+            <div class="col mb-4 d-flex align-items-stretch">
+                <div class="card shadow-lg bg-dark text-white">
+                    <img src="/t5/images/Multiplayer.jpeg" class="card-img-top" alt="Immagine Modalità 4">
+                    <div class="card-body">
+                        <h3 class="card-title text-center">Multiplayer</h3>
+                        <p>
+                            Vuoi sfidare amici o giocatori da tutto il mondo? Nella modalità Multiplayer, puoi competere o collaborare con altri giocatori in tempo reale.
+                            Che tu voglia dimostrare la tua superiorità o fare squadra, questa modalità ti offre un’esperienza sociale e avvincente.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row  row-cols-2">
+                            <div class="col">
+                                <span class="badge bg-primary">Online</span>
+                                <span class="badge bg-info text-dark">Social</span>
+                                <span class="badge bg-primary">Competitivo</span>
+                            </div>
+                            <div class="col">
+                                <a href="" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                                    <i class="bi bi-play-fill me-2"></i>
+                                    <span>Play</span>
+                                </a> 
+                            </div>
                         </div>
-                        <button class="btn-custom btn-lg rounded-pill position-relative" type="button" data-bs-toggle="modal" data-bs-target="#Alert">
-                            <i class="bi bi-play-fill me-2"></i>
-                            <span class="fw-bold">Play</span>
-                        </button>
                     </div>
                 </div>
             </div>

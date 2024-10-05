@@ -23,7 +23,7 @@
 		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
 		<link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css" />
 		
-
+		<link rel="stylesheet" href="/t5/css/main_style.css" />
 		
 		<style>
 			.no-select {
@@ -56,40 +56,10 @@
 				overflow: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
 			}
 
-			/* # cm-variable #C792EA cm-keyword #FFCB6B*/
-
-			/* Modifica del colore di sfondo e del testo per i bottoni principali */
-			.btn-primary {
-			background-color: #f07178;
-			border-color: #ba585d;
-			color: white;
-			}
-
-			/* Cambia il colore al passaggio del mouse */
-			.btn-primary:hover {
-			background-color: #f07178;
-			border-color: #ba585d;
-			color: #fff;
-			}
-
-			.btn-success {
-			background-color: #FFCB6B;
-			border-color: #e0ad4d;
-			color: white;
-			}
-
-			/* Cambia il colore al passaggio del mouse */
-			.btn-success:hover {
-			background-color: #FFCB6B;
-			border-color: #e0ad4d;
-			color: #fff;
-			}
-
-
 			#card_user,
 			#card_robot {
 				height: 95vh;
-				width: 50vw;
+				width: 49.7vw;
 				flex-grow: 0; /* Disabilita la crescita del container */
 				flex-shrink: 0; /* Disabilita il restringimento del container */
 				overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
@@ -114,26 +84,24 @@
 		</style>
 	</head>
 	
-	<body class="overflow-y-hidden mx-2 mb-5">
-		
+	<body class="overflow-y-hidden overflow-x-hidden px-1">
 		<!-- NAV-->
 		<ul class="nav">
 			<li class="nav-item flex-grow-1">
 				<a
-					href=""
-					class="btn btn-sm"
+					href="/logout"
+					class="btn btn-sm text-light"
 					tabindex="-1"
 					role="button"
 					aria-disabled="true"
-					id="GoBack"
 				>
 					<i class="bi bi-arrow-90deg-left"></i>
-					Go Back
+					Logout
 				</a>
 			</li>
 			<li class="nav-item">
 				<div class="form-check form-switch mt-1">
-					<label class="form-check-label" for="themeToggle">Mode </label>
+					<label class="form-check-label text-light" for="themeToggle"> Mode </label>
 					<input
 						class="form-check-input"
 						type="checkbox"
@@ -464,7 +432,7 @@
 								<div class="">
 									<!-- INFO BUTTON -->
 									<span
-										class="d-inline-block"
+										class="d-inline-block mx-3"
 										tabindex="0"
 										id="popover_info"
 										data-bs-toggle="popover"
@@ -841,7 +809,6 @@
 				}
 			});
 		</script>
-		<script th:src="@{/t5/codemirror/mode/clike/clike.js}"></script>
 		<script th:src="@{/t5/js/common.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/commonEditor.js}" th:inline="javascript"></script>
 		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
