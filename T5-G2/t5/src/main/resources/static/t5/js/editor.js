@@ -226,7 +226,7 @@ coverageButton.addEventListener("click", async function () {
 	}
 });
 
-Gameoverdow.onbeforeunload = function () {
+window.onbeforeunload = function () {
 	if (localStorage.getItem("modalita") !== "Scalata") {
 		localStorage.setItem("gameId", null);
 		localStorage.setItem("turnId", null);
