@@ -51,20 +51,25 @@ public class GuiController {
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam("mode") String mode) {
        
-        PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
-    
-        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
-        gamemode.setObjectComponents(lista_classi);
-
-        List<String> list_robot = new ArrayList<>();
-        // Aggiungere elementi alla lista
-        list_robot.add("Randoop");
-        list_robot.add("EvoSuite");
-        GenericObjectComponent lista_robot = new GenericObjectComponent("lista_robot", list_robot);
-        gamemode.setObjectComponents(lista_robot);
-
-        gamemode.SetAuth(jwt);
-        return gamemode.handlePageRequest();
+        if("Sfida".equals(mode)){
+            PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
+            ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
+            gamemode.setObjectComponents(lista_classi);
+            List<String> list_robot = new ArrayList<>();
+            // Aggiungere elementi alla lista
+            list_robot.add("Randoop");
+            list_robot.add("EvoSuite");
+            GenericObjectComponent lista_robot = new GenericObjectComponent("lista_robot", list_robot);
+            gamemode.setObjectComponents(lista_robot);
+            gamemode.SetAuth(jwt);
+            return gamemode.handlePageRequest();
+        }
+        if("Scalata".equals(mode)){
+            PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode_Scalata", model);
+            gamemode.SetAuth(jwt);
+            return gamemode.handlePageRequest();
+        }
+            return "main";
     }
 
     @GetMapping("/editor")

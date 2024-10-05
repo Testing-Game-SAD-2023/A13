@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -28,7 +29,6 @@ import com.g2.Interfaces.ServiceManager;
 @CrossOrigin
 @RestController
 public class GameController {
-
     //Gestisco qui tutti i giochi aperti 
     private final Map<String, GameLogic> activeGames;
     private final Map<String, GameFactoryFunction> gameRegistry;
@@ -57,7 +57,6 @@ public class GameController {
             new TurnBasedGameLogic(sm, playerId, underTestClassName, type_robot, difficulty));
         // Aggiungi altri giochi qui
     }
-
 
     private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
         try {
@@ -140,7 +139,8 @@ public class GameController {
                                             @RequestParam String type_robot,
                                             @RequestParam String difficulty,
                                             @RequestParam String mode,
-                                            @RequestParam String underTestClassName) {
+                                            @RequestParam String underTestClassName,
+                                            @RequestBody(required = false) Map<String, Object> optionalParams) {
 
         try {
             GameFactoryFunction gameConstructor = gameRegistry.get(mode);
@@ -152,6 +152,14 @@ public class GameController {
             if (gameLogic == null) {
                 //Creo la nuova partita 
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
+
+                // Utilizzo del parametro opzionale se presente
+                if (optionalParams != null && !optionalParams.isEmpty()) {
+                    logger.info("[GAMECONTROLLER] /run: optionalParams {}", optionalParams);
+                    // Puoi gestire i parametri opzionali qui:
+                    //gamelogic.getParams();
+                }
+
                 //gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER] /StartGame Partita creata con successo.");
@@ -182,6 +190,7 @@ public class GameController {
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
                 logger.error("[GAMECONTROLLER] /run: errore non esiste partita");
+                return createErrorResponse("[/RUN] errore non esiste partita");
             }
 
             //Preparazione dati per i task 
@@ -193,29 +202,36 @@ public class GameController {
 
             //Calcolo dati utente
             Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(), underTestClassName);
-            //logger.info("[GAMECONTROLLER] /run: UserData {}", UserData);
             //Calcolo punteggio robot
             int RobotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
             logger.info("[GAMECONTROLLER] /run: RobotScore {}", RobotScore);
-            //aggiorno il turno
-            int LineCov = LineCoverage(UserData.get("coverage"));
-            logger.info("[GAMECONTROLLER] /run: LineCov {}", LineCov);
-            //Crea lo score per l'utente in base al gioco
-            int user_score = gameLogic.GetScore(LineCov);
-            logger.info("[GAMECONTROLLER] /run: user_score {}", user_score);
 
-            //Salvo i dati del turno appena giocato
-            gameLogic.playTurn(user_score, RobotScore);
+            if(UserData.get("coverage") != null && !UserData.get("coverage").isEmpty()){
+                //Non ci sono errori di compilazione
+                //aggiorno il turno
+                int LineCov = LineCoverage(UserData.get("coverage"));
+                logger.info("[GAMECONTROLLER] /run: LineCov {}", LineCov);
+                //Crea lo score per l'utente in base al gioco
+                int user_score = gameLogic.GetScore(LineCov);
+                logger.info("[GAMECONTROLLER] /run: user_score {}", user_score);
+                //Salvo i dati del turno appena giocato
+                gameLogic.playTurn(user_score, RobotScore);
 
-            if (isGameEnd || gameLogic.isGameEnd()) {
-                //Qua partita finita quindi lo segnalo
-                //gameLogic.EndRound(playerId);
-                //gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
-                logger.info("[GAMECONTROLLER] /run: risposta inviata");
-                return createResponseRun(UserData, RobotScore, user_score, true);
-            } else {
-                logger.info("[GAMECONTROLLER] /run: risposta inviata");
-                return createResponseRun(UserData, RobotScore, user_score, false);
+                if (isGameEnd || gameLogic.isGameEnd()) {
+                    //Qua partita finita quindi lo segnalo
+                    //gameLogic.EndRound(playerId);
+                    //gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
+                    logger.info("[GAMECONTROLLER] /run: risposta inviata");
+                    return createResponseRun(UserData, RobotScore, user_score, true);
+                } else {
+                    //Qua partita ancora in corso
+                    logger.info("[GAMECONTROLLER] /run: risposta inviata");
+                    return createResponseRun(UserData, RobotScore, user_score, false);
+                }
+            }else{
+                //Ci sono errori di compilazione
+                logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
+                return createResponseRun(UserData, 0, 0, false);
             }
         } catch (Exception e) {
             logger.error("[GAMECONTROLLER] /run: errore non esiste partita", e);
