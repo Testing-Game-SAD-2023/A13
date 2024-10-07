@@ -49,7 +49,10 @@ public class GameController {
                             String type_robot, String difficulty);
     }
 
-    // Registra i tipi di giochi con il loro costruttore
+    /*
+    *  Registra i tipi di giochi con il loro costruttore, in questo modo non ci si deve preoccupare di instanziarli, viene
+    *  fatto in automatico.
+    */ 
     private void registerGames() {
         //Attenzione le chiavi sono CaseSensitive
         gameRegistry.put("Sfida", (sm, playerId, underTestClassName, type_robot, difficulty) -> 
@@ -57,6 +60,10 @@ public class GameController {
         // Aggiungi altri giochi qui
     }
 
+    /*
+     *  Prendo da t1 la classe UT, poi fornisco al T7 tutto ciò di cui ha bisogno per fare una compilazione
+     *  infine controllo che tutto sia andato a buon fine e fornisco i dati 
+     */
     private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
         try {
             //Prendo underTestClassCode dal task T1
@@ -91,6 +98,9 @@ public class GameController {
         }
     }
 
+    /*
+     *  Sfrutto T4 per avere i risultati dei robot 
+     */
     private int GetRobotScore(String testClass, String robot_type, String difficulty) {
         try {
             String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
@@ -105,6 +115,9 @@ public class GameController {
         }
     }
 
+    /*
+     *  Partendo dai dati dell'utente ottengo la sua percentuale di coverage 
+     */
     public int LineCoverage(String cov) {
         try {
             // Parsing del documento XML con Jsoup
@@ -133,6 +146,9 @@ public class GameController {
         }
     }
 
+    /*
+     *  Chiamata che l'editor fa appena instanzia un nuovo gioco, controllo se la partita quindi esisteva già o meno
+     */
     @PostMapping("/StartGame")
     public ResponseEntity<String> StartGame(@RequestParam String playerId,
                                             @RequestParam String type_robot,
@@ -150,12 +166,12 @@ public class GameController {
             if (gameLogic == null) {
                 //Creo la nuova partita 
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
-
                 //gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER] /StartGame Partita creata con successo.");
                 return ResponseEntity.ok().build();
             } else {
+                //La partita già esiste 
                 logger.error("[GAMECONTROLLER] /StartGame errore esiste già la partita");
                 return createErrorResponse("[/StartGame] errore esiste già la partita");
             }
@@ -165,18 +181,25 @@ public class GameController {
         }
     }
 
+    /*
+     *  chiamata Rest di debug, serve solo per vedere le partite attive 
+     */
     @GetMapping("/StartGame")
     public Map<String, GameLogic> GetGame() {
         return activeGames;
     }
 
+    /*
+     *  Chiamata principale del game engine, l'utente ogni volta può comunicare la sua richiesta di 
+     *  calcolare la coverage/compilazione, il campo isGameEnd è da utilizzato per indicare se è anche un submit e 
+     *  quindi vuole terminare la partita ed ottenere i risultati del robot
+     */
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
             @RequestParam("playerId") String playerId,
             @RequestParam("isGameEnd") Boolean isGameEnd) {
 
         try {
-            //String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             //retrive gioco attivo
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
@@ -184,7 +207,7 @@ public class GameController {
                 return createErrorResponse("[/RUN] errore non esiste partita");
             }
 
-            //Preparazione dati per i task 
+            //Preparazione dati per i task, hanno bisogno di questi nomi in modo preciso e non li calcolano internamente
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
             String underTestClassName = gameLogic.getClasseUT() + ".java";
 
@@ -213,15 +236,15 @@ public class GameController {
                     //gameLogic.EndRound(playerId);
                     //gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
                     activeGames.remove(playerId);
-                    logger.info("[GAMECONTROLLER] /run: risposta inviata");
+                    logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
                     return createResponseRun(UserData, RobotScore, user_score, true);
                 } else {
                     //Qua partita ancora in corso
-                    logger.info("[GAMECONTROLLER] /run: risposta inviata");
+                    logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
                     return createResponseRun(UserData, RobotScore, user_score, false);
                 }
             }else{
-                //Ci sono errori di compilazione
+                //Ci sono errori di compilazione, invio i dati della console, ma impedisco all'utente di fare submit 
                 logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
                 return createResponseRun(UserData, 0, 0, false);
             }
@@ -246,7 +269,7 @@ public class GameController {
                 .body(result.toString());
     }
 
-    // Metodo per creare una risposta di errore
+    // Metodo per creare una risposta di errore di /run
     private ResponseEntity<String> createErrorResponse(String errorMessage) {
         JSONObject error = new JSONObject();
         error.put("error", errorMessage);

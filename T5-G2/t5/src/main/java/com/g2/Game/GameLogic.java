@@ -30,11 +30,23 @@ public abstract class GameLogic {
     }
 
     // Metodi che ogni gioco deve implementare
+    /*
+     * PlayTurn deve aggiornalo lo stato della partita ad ogni turno, il concetto di turno può esser gestito come si vuole
+     */
     public abstract void playTurn(int userScore, int robotScore);
+    /*
+     * Si deve personalizzare la condizione di fine del gioco, in generale l'utente può sempre decretarne la fine tramite l'editor.
+     */
     public abstract Boolean isGameEnd();
+    /*
+     * In base alla modalità va specificato come viene calcolato lo score, solo la COV viene fornita gli altri sono 
+     * parametri interni alla classe di gioco.
+     */
     public abstract int GetScore(int cov);
 
-    //Metodi base 
+    /*
+     * Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
+     */
     protected void CreateGame() {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", "description", this.PlayerID);

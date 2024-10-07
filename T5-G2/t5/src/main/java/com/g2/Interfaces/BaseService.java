@@ -19,6 +19,11 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/*
+ *  Questa è una classe base che implementa l'interfaccia ServiceInterface per il dispatcher ServiceManager
+ *   e ti fornisce svariati metodi che mappano POST, GET, PUT E DELETE, in vari formati e header.
+ *   Attenzione alcune chiamate sono state definite in modo molto rigido, potrebbero quindi non andar bene. 
+ */
 public abstract class BaseService implements ServiceInterface {
 
     protected final RestTemplate restTemplate;
@@ -109,7 +114,7 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
-    //Metodo per chiaamare POST senza specificare content type -> default application/x-www-form-urlencoded 
+    //Metodo per chiamate POST senza specificare content type -> default application/x-www-form-urlencoded 
     protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
             Map<String, String> queryParams,
             Class<R> responseType) {

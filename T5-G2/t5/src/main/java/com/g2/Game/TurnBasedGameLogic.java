@@ -14,6 +14,8 @@ public class TurnBasedGameLogic extends GameLogic {
     private int totalTurns = 10;
     private Boolean GameOVer = false;
 
+
+    //Questa classe si specializza in una partita semplice basata sui turni, prende il nome di Sfida nella UI
     public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
                                 String type_robot, String difficulty) {
         super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty);
@@ -25,12 +27,12 @@ public class TurnBasedGameLogic extends GameLogic {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         currentTurn++;
         //CreateTurn(Time, userScore);
-        System.out.println("Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
+        System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
     }
 
     @Override
     public Boolean isGameEnd() {
-        return false; //il giocatore può fare quanti turni vuole quindi ritorno sempre True
+        return false; //il giocatore può fare quanti turni vuole quindi ritorno sempre false
     }
 
     @Override

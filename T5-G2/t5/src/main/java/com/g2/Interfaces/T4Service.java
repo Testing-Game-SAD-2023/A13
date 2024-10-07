@@ -75,7 +75,7 @@ public class T4Service extends BaseService {
         ));
     }
 
-    // usa /robots per ottenere dati 
+
     private String GetRisultati(String className, String robot_type, String difficulty) {
         try {
             Map<String, String> formData = new HashMap<>();
