@@ -1,6 +1,11 @@
 package com.g2.Service;
 
+import com.commons.model.Gamemode;
+import com.commons.model.Robot;
+import com.commons.model.StatisticRole;
+import com.g2.Interfaces.IStatisticCalculator;
 import com.g2.Model.*;
+import com.g2.factory.StatisticCalculatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -18,6 +23,12 @@ public class AchievementService {
     public AchievementService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
+
+    private List<Statistic> testStatistics = Arrays.asList(
+            new Statistic(1, "Test1", Robot.None, Gamemode.All, StatisticRole.GamesWon),
+            new Statistic(2, "Test2", Robot.None, Gamemode.All, StatisticRole.GamesPlayed),
+            new Statistic(3, "Test3", Robot.None, Gamemode.All, StatisticRole.Score)
+    );
 
     Map<String, Integer> GamemodeToInt = Map.ofEntries(
         Map.entry("Games-Total" , 1),
@@ -48,6 +59,9 @@ public class AchievementService {
         List<Game> gamesList = gamesResponseEntity.getBody();
 
         List<AchievementProgress> achievementProgressesPrevious = getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList();
+
+        for (Statistic statistic : testStatistics)
+            System.out.println("CALCOLATO: " + statistic.calculate(gamesList));
 
         int totalGamesCount = gamesList.size();
 

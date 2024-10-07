@@ -1,0 +1,26 @@
+2024-10-01 12:34:22 [main] INFO  com.g2.t5.T5ApplicationTests - Starting T5ApplicationTests using Java 22.0.2 with PID 3689 (started by heinecantor in /home/heinecantor/Desktop/git/A13/T5-G2/t5)
+2024-10-01 12:34:22 [main] DEBUG com.g2.t5.T5ApplicationTests - Running with Spring Boot v3.1.1, Spring v6.0.10
+2024-10-01 12:34:22 [main] INFO  com.g2.t5.T5ApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-10-01 12:34:23 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-10-01 12:34:23 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-10-01 12:34:23 [main] INFO  com.g2.t5.T5ApplicationTests - Started T5ApplicationTests in 1.321 seconds (process running for 1.876)
+2024-10-01 12:52:30 [main] INFO  com.g2.t5.T5ApplicationTests - Starting T5ApplicationTests using Java 22.0.2 with PID 4544 (started by heinecantor in /home/heinecantor/Desktop/git/A13/T5-G2/t5)
+2024-10-01 12:52:30 [main] DEBUG com.g2.t5.T5ApplicationTests - Running with Spring Boot v3.1.1, Spring v6.0.10
+2024-10-01 12:52:30 [main] INFO  com.g2.t5.T5ApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T1Service
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T23Service
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T4Service
+2024-10-01 12:52:31 [main] INFO  c.g2.Interfaces.ServiceManagerLogger - [SERVICE CREATION] Creazione del servizio: T7Service
+2024-10-01 12:52:31 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-10-01 12:52:31 [main] INFO  com.g2.t5.T5ApplicationTests - Started T5ApplicationTests in 1.319 seconds (process running for 1.858)
