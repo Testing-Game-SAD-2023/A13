@@ -137,9 +137,11 @@ public class GuiController {
 
             int userId = Integer.parseInt(map.get("userId").toString());
             List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
+            List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
 
             //System.out.println("(/profile) Retrieved achievements: " + achievementProgresses);
             model.addAttribute("achievementProgresses", achievementProgresses);
+            model.addAttribute("statisticProgresses", statisticProgresses);
 
         } catch (JsonProcessingException e) {
             System.out.println("(/profile) Error retrieving achievements: " + e.getMessage());

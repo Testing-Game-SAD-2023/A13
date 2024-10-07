@@ -76,6 +76,17 @@
                         <div class="card-body">
                             <h4 class="card-title">Statistiche</h4>
                             <hr>
+                            <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
+                                <!--<div class="col-1">
+                                    I
+                                </div>-->
+                                <div class="col-8" th:text="${element.StatisticID}">
+                                    Nome statistica
+                                </div>
+                                <div class="col text-right" th:text="${element.Progress}">
+                                    1000
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

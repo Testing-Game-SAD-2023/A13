@@ -30,9 +30,9 @@ public class Statistic {
 
     }
 
-    public void setId(int id) {
-        Id = id;
-    }
+    public void setId(int id) { Id = id; }
+
+    public int getID() { return Id; }
 
     public String getName() {
         return name;

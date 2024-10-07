@@ -1,13 +1,18 @@
 package com.g2.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class StatisticProgress {
     private Integer PlayerID;
-    private int Statistic;
+
+    @JsonProperty("statistic")
+    private int StatisticID;
+
     private float Progress;
 
     public StatisticProgress(Integer playerID, int statistic, float progress) {
         PlayerID = playerID;
-        Statistic = statistic;
+        StatisticID = statistic;
         Progress = progress;
     }
 
@@ -23,12 +28,12 @@ public class StatisticProgress {
         PlayerID = playerID;
     }
 
-    public int getStatistic() {
-        return Statistic;
+    public int getStatisticID() {
+        return StatisticID;
     }
 
-    public void setStatistic(int category) {
-        Statistic = category;
+    public void setStatisticID(int category) {
+        StatisticID = category;
     }
 
     public float getProgress() {
@@ -43,7 +48,7 @@ public class StatisticProgress {
     public String toString() {
         return "StatisticProgress{" +
                 "PlayerID=" + PlayerID +
-                ", Statistic=" + Statistic +
+                ", Statistic=" + StatisticID +
                 ", Progress=" + Progress +
                 '}';
     }

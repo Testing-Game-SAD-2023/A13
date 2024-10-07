@@ -30,20 +30,6 @@ public class AchievementService {
             new Statistic(3, "Test3", Robot.None, Gamemode.All, StatisticRole.Score)
     );
 
-    Map<String, Integer> GamemodeToInt = Map.ofEntries(
-        Map.entry("Games-Total" , 1),
-        Map.entry("Games-Robot-Randoop" , 2),
-        Map.entry("Games-Robot-Evosuite" , 3),
-        Map.entry("Games-Multiplayer" , 4),
-        Map.entry("Games-Training" , 5),
-        Map.entry("Games-Scalata" , 6),
-        Map.entry("Scores-Robot-Randoop" , 7),
-        Map.entry("Scores-Robot-Evosuite" , 8),
-        Map.entry("Scores-Multiplayer" , 9),
-        Map.entry("Scores-Training" , 10),
-        Map.entry("Scores-Scalata" , 11)
-    );
-
     /**
      * @param playerID
      * @return a list of achievements obtained after this update.
@@ -53,32 +39,14 @@ public class AchievementService {
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 });
 
-        List<String> gamemodes = Arrays.asList("Robot-Randoop", "Robot-Evosuite", "Multiplayer", "Training", "Scalata");
-
-        //System.out.println(progressesResponseEntity.getBody());
         List<Game> gamesList = gamesResponseEntity.getBody();
 
         List<AchievementProgress> achievementProgressesPrevious = getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList();
 
-        for (Statistic statistic : testStatistics)
-            System.out.println("CALCOLATO: " + statistic.calculate(gamesList));
-
-        int totalGamesCount = gamesList.size();
-
-        setProgress(playerID, GamemodeToInt.get("Games-Total"), totalGamesCount);
-
-        for (String gm : gamemodes) {
-            int gamemodeGamesCount = (int) gamesList.stream().filter(l -> Objects.equals(l.getDescription(), gm)).count();
-            int category = GamemodeToInt.get("Games-" + gm);
-
-            setProgress(playerID, category, gamemodeGamesCount);
-        }
-
-        for (String gm : gamemodes) {
-            float scoreSum = (float) gamesList.stream().filter(l -> Objects.equals(l.getDescription(), gm)).mapToDouble(Game::getScore).sum();
-            int category = GamemodeToInt.get("Scores-" + gm);
-
-            setProgress(playerID, category, scoreSum);
+        for (Statistic statistic : testStatistics) {
+            float statisticValue = statistic.calculate(gamesList);
+            System.out.println("Updated " + statistic.getName() + ": " + statisticValue);
+            setProgress(playerID, statistic.getID(), statisticValue);
         }
 
         List<AchievementProgress> obtainedAchievements = new ArrayList<>(getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList());
@@ -100,18 +68,14 @@ public class AchievementService {
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 });
 
-        ResponseEntity<List<StatisticProgress>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/phca/" + playerID,
-                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                });
-
         List<Achievement> achievementList = achievementResponseEntity.getBody();
-        List<StatisticProgress> categoryProgressList = progressesResponseEntity.getBody();
+        List<StatisticProgress> categoryProgressList = getStatisticsByPlayer(playerID);
 
         List<AchievementProgress> achievementProgresses = new ArrayList<>();
 
         for (Achievement a : achievementList)
         {
-            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.getStatistic() == a.getStatistic()).toList();
+            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.getStatisticID() == a.getStatistic()).toList();
 
             for (StatisticProgress c : filteredList)
                 achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
@@ -121,5 +85,22 @@ public class AchievementService {
         }
 
         return achievementProgresses;
+    }
+
+    public List<StatisticProgress> getStatisticsByPlayer(int playerID) {
+        ResponseEntity<List<StatisticProgress>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/phca/" + playerID,
+                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                });
+
+        List<StatisticProgress> statisticProgresses = progressesResponseEntity.getBody();
+
+        if (statisticProgresses == null)
+            throw new RuntimeException("Errore nel fetch delle statistiche del giocatore.");
+
+        System.out.println(testStatistics);
+        System.out.println(statisticProgresses);
+        statisticProgresses.removeIf(x -> !testStatistics.stream().anyMatch(y -> y.getID() == x.getStatisticID()));
+
+        return statisticProgresses;
     }
 }
