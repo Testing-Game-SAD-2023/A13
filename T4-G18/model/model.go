@@ -9,7 +9,7 @@ import (
 
 type PlayerHasCategoryAchievement struct {
     PlayerID            int64      `gorm:"primaryKey;autoIncrement:false"`
-    Category            uint8      `gorm:"primaryKey;autoIncrement:false"`
+    Category            string     `gorm:"primaryKey;autoIncrement:false"`
     Progress            float64    `gorm:"default:0"`                      // Current progress
 }
 

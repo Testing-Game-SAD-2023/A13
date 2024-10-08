@@ -6,11 +6,11 @@ public class StatisticProgress {
     private Integer PlayerID;
 
     @JsonProperty("statistic")
-    private int StatisticID;
+    private String StatisticID;
 
     private float Progress;
 
-    public StatisticProgress(Integer playerID, int statistic, float progress) {
+    public StatisticProgress(Integer playerID, String statistic, float progress) {
         PlayerID = playerID;
         StatisticID = statistic;
         Progress = progress;
@@ -28,11 +28,11 @@ public class StatisticProgress {
         PlayerID = playerID;
     }
 
-    public int getStatisticID() {
+    public String getStatisticID() {
         return StatisticID;
     }
 
-    public void setStatisticID(int category) {
+    public void setStatisticID(String category) {
         StatisticID = category;
     }
 

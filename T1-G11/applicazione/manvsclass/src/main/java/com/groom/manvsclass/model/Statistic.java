@@ -1,17 +1,20 @@
 package com.groom.manvsclass.model;
 
 import com.commons.model.Gamemode;
+import com.commons.model.Robot;
 import com.commons.model.StatisticRole;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 
 @Document(collection = "statistics")
 public class Statistic {
     @Id
-    private int Id;
+    @GeneratedValue
+    private String id;
 
     private String name;
 
@@ -21,14 +24,17 @@ public class Statistic {
     @Enumerated(EnumType.STRING)
     private Gamemode gamemode;
 
-    private String robot;
+    @Enumerated(EnumType.STRING)
+    private Robot robot;
 
     public Statistic() {
 
     }
 
-    public void setId(int id) {
-        Id = id;
+    public String getId() { return id; }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -47,11 +53,11 @@ public class Statistic {
         this.gamemode = gamemode;
     }
 
-    public String getRobot() {
+    public Robot getRobot() {
         return robot;
     }
 
-    public void setRobot(String robot) {
+    public void setRobot(Robot robot) {
         this.robot = robot;
     }
 
@@ -66,7 +72,7 @@ public class Statistic {
     @Override
     public String toString() {
         return "Statistic{" +
-                "Id=" + Id +
+                "Id=" + id +
                 ", name='" + name + '\'' +
                 ", gamemode='" + gamemode + '\'' +
                 ", robot='" + robot + '\'' +

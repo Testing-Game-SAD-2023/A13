@@ -8,109 +8,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-        <style type="text/css">
-            body{
-        background-color: #f4f7f6;
-        margin-top:20px;
-    }
-    .file_manager .file a:hover .hover,
-    .file_manager .file .file-name small{
-        display: block
-    }
-    .file_manager .file {
-        padding: 0 !important
-    }
-
-    .file_manager .file .icon{
-        text-align: center
-    }
-
-
-    .file_manager .file {
-        position: relative;
-        border-radius: .55rem;
-        overflow: hidden
-    }
-
-    .file_manager .file .image,
-    .file_manager .file .icon {
-        max-height: 180px;
-        overflow: hidden;
-        background-size: cover;
-        background-position: top
-    }
-
-    .file_manager .file .hover {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        display: none;
-        transition: all 0.2s ease-in-out
-    }
-
-    .file_manager .file a:hover .hover {
-        transition: all 0.2s ease-in-out
-    }
-
-    .file_manager .file .icon {
-        padding: 15px 10px;
-        display: table;
-        width: 100%
-    }
-
-    .file_manager .file .icon i {
-        display: table-cell;
-        font-size: 30px;
-        vertical-align: middle;
-        color: #777;
-        line-height: 100px
-    }
-
-    .file_manager .file .file-name {
-        padding: 10px;
-        border-top: 1px solid #f7f7f7
-    }
-
-    .file_manager .file .file-name small .date {
-        float: right
-    }
-
-    .folder {
-        padding: 20px;
-        display: block;
-        color: #777
-    }
-
-    @media only screen and (max-width: 992px) {
-        .file_manager .nav-tabs {
-            padding-left: 0;
-            padding-right: 0
-        }
-        .file_manager .nav-tabs .nav-item {
-            display: inline-block
-        }
-    }
-
-    .card {
-        background: #fff;
-        transition: .5s;
-        border: 0;
-        margin-bottom: 30px;
-        border-radius: .55rem;
-        position: relative;
-        width: 100%;
-        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
-    }
-
-    a:hover {
-        text-decoration:none;
-
-
-    #studentTable {
-        display: none;
-      }
-    }
-        </style>
         <script type="text/javascript" src="/t1/js/achievements.js"></script>
     </head>
     <body>
@@ -129,57 +26,121 @@
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" onclick="showAchievements();">Achievements</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" onclick="showStatistics();">Statistics</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </nav>
 
             <br>
 
-            <h2>Achievements</h2>
+            <div id="achievements-panel">
+                <h2>Achievements</h2>
 
-            <table id="achievementsTable">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Statistic</th>
-                    <th>Progress required</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Gli achievement saranno inseriti qui dinamicamente -->
-                </tbody>
-            </table>
+                <table id="achievementsTable" style="width: 100%">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Statistic</th>
+                        <th>Progress required</th>
+                        <th>Commands</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Gli achievement saranno inseriti qui dinamicamente -->
+                    </tbody>
+                </table>
 
 
-            <div class="row clearfix" id="classut-list"></div>
-            <div class="card">
-                <h3>Create achievement</h3>
-                <form action="/achievements" method="post">
-                    <div class="form-group">
-                        <label for="achievementName">Name</label>
-                        <input type="text" class="form-control" id="achievementName" name="name" placeholder="Achievement name">
-                    </div>
-                    <div class="form-group">
-                        <label for="achievementDescription">Description</label>
-                        <textarea class="form-control" id="achievementDescription" name="description" rows="3" placeholder="Achievement description"></textarea>
-                    </div>
-                    <label for="achievementCategory">Category</label>
-                    <select class="form-control" id="achievementCategory" name="statistic">
-                        <option th:each="i : ${#numbers.sequence( 1, 20, 1)}">
-                            <p th:text="${ i }"></p>
-                        </option>
-                    </select>
-                    <div class="form-group">
-                        <label for="achievementProgressRequired">Progress required</label>
-                        <input type="number" class="form-control" id="achievementProgressRequired" name="progressRequired" placeholder="Achievement progress required">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </form>
+                <div class="row clearfix" id="achievements-list"></div>
+                <div class="card">
+                    <h3>Create achievement</h3>
+                    <form action="/achievements" method="post">
+                        <div class="form-group">
+                            <label for="achievementName">Name</label>
+                            <input type="text" class="form-control" id="achievementName" name="name" placeholder="Achievement name">
+                        </div>
+                        <div class="form-group">
+                            <label for="achievementDescription">Description</label>
+                            <textarea class="form-control" id="achievementDescription" name="description" rows="3" placeholder="Achievement description"></textarea>
+                        </div>
+                        <label for="achievementCategory">Category</label>
+                        <select class="form-control" id="achievementCategory" name="statistic">
+                            <option th:each="statistic: ${statisticsList}" th:value="${statistic.id}" th:text="${statistic.Name}">
+                                STAT
+                            </option>
+                        </select>
+                        <div class="form-group">
+                            <label for="achievementProgressRequired">Progress required</label>
+                            <input type="number" class="form-control" id="achievementProgressRequired" name="progressRequired" placeholder="Achievement progress required">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
             </div>
 
+            <div id="statistics-panel">
+                <h2>Statistics</h2>
+
+                <table id="statisticsTable" style="width: 100%">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Gamemode</th>
+                        <th>Role</th>
+                        <th>Robot</th>
+                        <th>Commands</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Statistiche  -->
+                    </tbody>
+                </table>
+
+                <div class="row clearfix" id="statistics-list"></div>
+                <div class="card">
+                    <h3>Create achievement</h3>
+                    <form action="/statistics" method="post">
+                        <div class="form-group">
+                            <label for="statisticName">Name</label>
+                            <input type="text" class="form-control" id="statisticName" name="name" placeholder="Statistic name">
+                        </div>
+                        <label for="statisticGamemode">Gamemode</label>
+                        <select class="form-control" id="statisticGamemode" name="gamemode">
+                            <option th:each="gamemode: ${gamemodesList}" th:value="${gamemode}" th:text="${gamemode}">
+                                MODE
+                            </option>
+                        </select>
+                        <label for="statisticRole">Role</label>
+                        <select class="form-control" id="statisticRole" name="role">
+                            <option th:each="role: ${rolesList}" th:value="${role}" th:text="${role}">
+                                ROLE
+                            </option>
+                        </select>
+                        <label for="statisticRobot">Robot</label>
+                        <select class="form-control" id="statisticRobot" name="robot">
+                            <option th:each="robot: ${robotsList}" th:value="${robot}" th:text="${robot}">
+                                ROBOT
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
+            </div>
 
             <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
             <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
             <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
             <script type="text/javascript">
 

@@ -12,14 +12,14 @@ public class Achievement {
 
     private String name;
     private String description;
-    private int statistic;
+    private String statistic;
     private float progressRequired;
 
     public Achievement() {
 
     }
 
-    public Achievement(String ID, String name, String description, int statistic, float progressRequired) {
+    public Achievement(String ID, String name, String description, String statistic, float progressRequired) {
         this.ID = ID;
         this.name = name;
         this.description = description;
@@ -51,11 +51,11 @@ public class Achievement {
         this.description = description;
     }
 
-    public int getStatistic() {
+    public String getStatistic() {
         return statistic;
     }
 
-    public void setStatistic(int statistic) {
+    public void setStatistic(String statistic) {
         this.statistic = statistic;
     }
 

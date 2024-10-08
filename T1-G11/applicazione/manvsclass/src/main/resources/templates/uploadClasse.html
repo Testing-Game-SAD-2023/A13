@@ -256,7 +256,7 @@ function uploadFile(event) {
   const difficulty = document.getElementById('difficulty').value;
   const code_Uri = "" ;
   const description = document.getElementById('description').value;
-  const statistic = [
+  const category = [
     document.getElementById('category1').value,
     document.getElementById('category2').value,
     document.getElementById('category3').value
@@ -275,7 +275,7 @@ function uploadFile(event) {
     difficulty: difficulty,
     code_Uri: code_Uri,
     description: description,
-    statistic: statistic
+    category: category
   }));
 
   //Chiamata HTTP alla funzione uploadFile in HomeController con metodo POST e dati del form come body 

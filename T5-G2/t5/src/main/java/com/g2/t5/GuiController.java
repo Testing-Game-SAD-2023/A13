@@ -139,6 +139,8 @@ public class GuiController {
             List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
             List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
 
+            System.out.println("UEUEUE: " + statisticProgresses);
+
             //System.out.println("(/profile) Retrieved achievements: " + achievementProgresses);
             model.addAttribute("achievementProgresses", achievementProgresses);
             model.addAttribute("statisticProgresses", statisticProgresses);

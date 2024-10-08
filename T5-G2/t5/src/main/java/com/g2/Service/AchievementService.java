@@ -24,12 +24,6 @@ public class AchievementService {
         this.restTemplate = restTemplate;
     }
 
-    private List<Statistic> testStatistics = Arrays.asList(
-            new Statistic(1, "Test1", Robot.None, Gamemode.All, StatisticRole.GamesWon),
-            new Statistic(2, "Test2", Robot.None, Gamemode.All, StatisticRole.GamesPlayed),
-            new Statistic(3, "Test3", Robot.None, Gamemode.All, StatisticRole.Score)
-    );
-
     /**
      * @param playerID
      * @return a list of achievements obtained after this update.
@@ -42,8 +36,9 @@ public class AchievementService {
         List<Game> gamesList = gamesResponseEntity.getBody();
 
         List<AchievementProgress> achievementProgressesPrevious = getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList();
+        List<Statistic> statisticList = getStatistics();
 
-        for (Statistic statistic : testStatistics) {
+        for (Statistic statistic : statisticList) {
             float statisticValue = statistic.calculate(gamesList);
             System.out.println("Updated " + statistic.getName() + ": " + statisticValue);
             setProgress(playerID, statistic.getID(), statisticValue);
@@ -58,9 +53,18 @@ public class AchievementService {
         return obtainedAchievements;
     }
 
-    private void setProgress(int playerID, int category, float progress) {
-        restTemplate.put("http://t4-g18-app-1:3000/phca/" + playerID + "/" + category,
-                new StatisticProgress(playerID, category, progress));
+    private List<Statistic> getStatistics() {
+        ResponseEntity<List<Statistic>> statisticsResponseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/statistics/list",
+                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                });
+
+        List<Statistic> statisticList = statisticsResponseEntity.getBody();
+        return statisticList;
+    }
+
+    private void setProgress(int playerID, String statisticID, float progress) {
+        restTemplate.put("http://t4-g18-app-1:3000/phca/" + playerID + "/" + statisticID,
+                new StatisticProgress(playerID, statisticID, progress));
     }
 
     public List<AchievementProgress> getProgressesByPlayer(int playerID) {
@@ -75,7 +79,7 @@ public class AchievementService {
 
         for (Achievement a : achievementList)
         {
-            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.getStatisticID() == a.getStatistic()).toList();
+            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.getStatisticID() == a.getStatisticID()).toList();
 
             for (StatisticProgress c : filteredList)
                 achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
@@ -97,9 +101,11 @@ public class AchievementService {
         if (statisticProgresses == null)
             throw new RuntimeException("Errore nel fetch delle statistiche del giocatore.");
 
-        System.out.println(testStatistics);
+        List<Statistic> statisticList = getStatistics();
+
+        System.out.println(statisticList);
         System.out.println(statisticProgresses);
-        statisticProgresses.removeIf(x -> !testStatistics.stream().anyMatch(y -> y.getID() == x.getStatisticID()));
+        statisticProgresses.removeIf(x -> !statisticList.stream().anyMatch(y -> Objects.equals(y.getID(), x.getStatisticID())));
 
         return statisticProgresses;
     }

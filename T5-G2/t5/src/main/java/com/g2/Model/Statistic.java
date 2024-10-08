@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 public class Statistic {
-    private int Id;
+    private String Id;
 
     private String name;
 
@@ -18,7 +18,7 @@ public class Statistic {
     private Gamemode gamemode;
     private Robot robot;
 
-    public Statistic(int id, String name, Robot robot, Gamemode gamemode, StatisticRole role) {
+    public Statistic(String id, String name, Robot robot, Gamemode gamemode, StatisticRole role) {
         this.robot = robot;
         this.gamemode = gamemode;
         this.role = role;
@@ -30,9 +30,9 @@ public class Statistic {
 
     }
 
-    public void setId(int id) { Id = id; }
+    public void setId(String id) { Id = id; }
 
-    public int getID() { return Id; }
+    public String getID() { return Id; }
 
     public String getName() {
         return name;

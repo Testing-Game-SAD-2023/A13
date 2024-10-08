@@ -5,18 +5,18 @@ public class Achievement {
 
     private String name;
     private String description;
-    private int statistic;
+    private String statisticID;
     private float progressRequired;
 
     public Achievement() {
 
     }
 
-    public Achievement(String ID, String name, String description, int statistic, float progressRequired) {
+    public Achievement(String ID, String name, String description, String statisticID, float progressRequired) {
         this.ID = ID;
         this.name = name;
         this.description = description;
-        this.statistic = statistic;
+        this.statisticID = statisticID;
         this.progressRequired = progressRequired;
     }
 
@@ -44,12 +44,12 @@ public class Achievement {
         this.description = description;
     }
 
-    public int getStatistic() {
-        return statistic;
+    public String getStatisticID() {
+        return statisticID;
     }
 
-    public void setStatistic(int statistic) {
-        this.statistic = statistic;
+    public void setStatistic(String statisticID) {
+        this.statisticID = statisticID;
     }
 
     public float getProgressRequired() {
@@ -66,7 +66,7 @@ public class Achievement {
                 "ID=" + ID +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", statistic=" + statistic +
+                ", statisticID=" + statisticID +
                 ", progressRequired=" + progressRequired +
                 '}';
     }

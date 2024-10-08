@@ -2,24 +2,78 @@ var dominio=location.hostname;
 
 document.addEventListener("DOMContentLoaded", function () {
   const achievementsPromise = fetch('/achievements/list').then(response => response.json());
+  const statisticsPromise = fetch('/statistics/list').then(response => response.json());
 
-  Promise.all([achievementsPromise])
-      .then(([achievementsData]) => {
+  Promise.all([achievementsPromise, statisticsPromise])
+      .then(([achievementsData, statisticsData]) => {
 
-          const table = $('#achievementsTable').DataTable({
+          const achievementsTable = $('#achievementsTable').DataTable({
               data: achievementsData,
               columns: [
                   { data: 'name' },
                   { data: 'description' },
                   { data: 'statistic' },
-                  { data: 'progressRequired' }
+                  { data: 'progressRequired' },
+                  {
+                    "mData": null,
+                    "bSortable": false,
+                    "mRender": function () { return '<a href=#/>' + 'Delete' + '</a>'; }
+                  }
               ]
           });
 
+            const statisticsTable = $('#statisticsTable').DataTable({
+                data: statisticsData,
+                columns: [
+                    { data: 'name' },
+                    { data: 'gamemode' },
+                    { data: 'role' },
+                    { data: 'robot' },
+                    {
+                      "data": "id",
+                      "bSortable": false,
+                      "mRender": function (data, type, row, meta) { return '<button class="btn btn-danger" onclick="deleteStatistic(\'' + data + '\');">' + 'Delete' + '</button>'; }
+                    }
+                ]
+            });
+
           $("#achievementsTable").css({"display":"block"});
-          console.log(achievementsData)
+          $("#statisticsTable").css({"display":"block"});
+
+          document.getElementById("statistics-panel").style.display = 'none';
       })
       .catch(error => {
           console.error('Errore durante la richiesta:', error);
       });
 });
+
+function showStatistics() {
+    document.getElementById("statistics-panel").style.display = 'block';
+    document.getElementById("achievements-panel").style.display = 'none';
+}
+
+function showAchievements() {
+    document.getElementById("statistics-panel").style.display = 'none';
+    document.getElementById("achievements-panel").style.display = 'block';
+}
+
+function deleteStatistic(statID) {
+    swal({
+          title: "Warning",
+          text: "Are you sure you want to delete this statistic?",
+          icon: "warning",
+          buttons: [
+            'No',
+            'Yes'
+          ],
+          dangerMode: true,
+        }).then(function(isConfirm) {
+          if (isConfirm) {
+              fetch('/statistics/' + statID,  {
+                    method: 'DELETE'
+                }).then(() => {
+                    window.location.replace("/achievements");
+                });
+          }
+        })
+}

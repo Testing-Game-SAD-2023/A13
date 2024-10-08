@@ -6,15 +6,16 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.commons.model.Gamemode;
+import com.commons.model.Robot;
+import com.commons.model.StatisticRole;
 import com.groom.manvsclass.model.Achievement;
 import com.groom.manvsclass.model.*;
 import com.groom.manvsclass.model.repository.*;
@@ -88,6 +89,10 @@ public class HomeController {
 	//MODIFICA (18/09/2024) : Inizializzazione del repository per gli Achievement
 	@Autowired
 	AchievementRepository achievementRepository;
+
+	//MODIFICA (07/10/2024) : Inizializzazione del repository per le Statistiche
+	@Autowired
+	StatisticRepository statisticRepository;
 	
 	@Autowired
     private MongoTemplate mongoTemplate; 
@@ -1251,9 +1256,26 @@ public class HomeController {
 	public ModelAndView showAchievementsPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
 
 		System.out.println("(GET /achievements) Token JWT valido?");
-		if(isJwtValid(jwt)) return new ModelAndView("achievements");
+		if(isJwtValid(jwt)) {
+			ModelAndView model = new ModelAndView("achievements");
+
+			List<Gamemode> allGamemodes = Arrays.asList(Gamemode.values());
+			List<StatisticRole> allRoles = Arrays.asList(StatisticRole.values());
+			List<Robot> allRobots = Arrays.asList(Robot.values());
+
+			List<Statistic> allStatistics = statisticRepository.findAll();
+
+			model.addObject("gamemodesList", allGamemodes);
+			model.addObject("rolesList", allRoles);
+			model.addObject("robotsList", allRobots);
+
+			model.addObject("statisticsList", allStatistics);
+
+			return model;
+		}
 
 		System.out.println("(GET /achievements) Token JWT invalido");
+
 		return new ModelAndView("login_admin");
 	}
 
@@ -1284,6 +1306,57 @@ public class HomeController {
 
 		achievementRepository.save(achievement);
 		System.out.println("(POST /createAchievement) Salvataggio avvenuto correttamente all'interno del DB");
+
+		return showAchievementsPage(request, jwt);
+	}
+
+	//MODIFICA (07/10/2024) : Aggiunta API di get per la lista delle statistiche
+	@GetMapping("/statistics/list")
+	@ResponseBody
+	public ResponseEntity<?> listStatistics() {
+		System.out.println("(GET /statistics/list) Recupero delle statistiche memorizzate nel sistema.");
+
+		List<Statistic> statistics = statisticRepository.findAll();
+		System.out.println("(GET /statistics/list) Recupero statistiche avvenuto con successo.");
+
+		return new ResponseEntity<>(statistics, HttpStatus.OK);
+	}
+
+	@PostMapping("/statistics")
+	public Object createStatistic(Statistic statistic, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+		// Check JWT token
+		System.out.println("(POST /createStatistic) Token JWT valido?");
+		if(!isJwtValid(jwt)) {
+			// Invalid token
+			System.out.println("(POST /createStatistic) Token non valido");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /createStatistic) Attenzione, non sei loggato!");
+		}
+
+		// Valid Token
+		System.out.println("(POST /createStatistic) Token valido.");
+
+		statisticRepository.save(statistic);
+		System.out.println("(POST /createStatistic) Salvataggio avvenuto correttamente all'interno del DB");
+
+		return showAchievementsPage(request, jwt);
+	}
+
+	@DeleteMapping("/statistics/{Id}")
+	public Object deleteStatistic(@PathVariable("Id") String Id, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+		// Check JWT token
+		System.out.println("(DELETE /deleteStatistic) Token JWT valido?");
+		if(!isJwtValid(jwt)) {
+			// Invalid token
+			System.out.println("(DELETE /deleteStatistic) Token non valido");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /deleteStatistic) Attenzione, non sei loggato!");
+		}
+
+		// Valid Token
+		System.out.println("(DELETE /deleteStatistic) Token valido.");
+
+		System.out.println("(DELETE /deleteStatistic) Deleting by Id:" + Id + ".");
+		statisticRepository.deleteById(Id);
+		System.out.println("(DELETE /deleteStatistic) Salvataggio avvenuto correttamente all'interno del DB");
 
 		return new ModelAndView("achievements");
 	}
