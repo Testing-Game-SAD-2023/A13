@@ -1,11 +1,28 @@
-<header class="page-header" role="banner">
-    <h1 class="project-name">{{ page.title | default: site.title }}</h1>
-    <h2 class="project-tagline">{{ page.description | default: site.description }}</h2>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page.title }}</title>
+</head>
+<body>
+  <header>
     <nav>
-        <ul>
+      <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/contact/">Contact</a></li>
-        </ul>
+        <li><a href="/about">Chi Siamo</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/contatti">Contatti</a></li>
+      </ul>
     </nav>
-</header>
+  </header>
+
+  <main>
+    {{ content }}
+  </main>
+
+  <footer>
+    <p>© 2024 Il Mio Sito</p>
+  </footer>
+</body>
+</html>
