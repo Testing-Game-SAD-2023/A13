@@ -70,42 +70,6 @@ document
 	.getElementById("searchTerm")
 	.addEventListener("input", clearSearchHighlights);
 
-// TASTO COMPILA
-/*
-var compileButton = document.getElementById("compileButton");
-compileButton.addEventListener("click", function () {
-    // Logica da eseguire quando il pulsante viene cliccato
-    // Ad esempio, esegui una chiamata AJAX al tuo controller Spring per inviare i dati
-    var formData = new FormData();
-    formData.append("testingClassName", "Test" + localStorage.getItem("classe") + ".java");
-    formData.append("testingClassCode", editor_robot.getValue());
-    formData.append("underTestClassName", localStorage.getItem("classe") + ".java");
-    formData.append("underTestClassCode", sidebareditor_robot.getValue());
-
-    document.getElementById('loading-editor_robot').style.display = 'block';
-    $.ajax({
-        url: "/api/sendInfo", //URL del controller Spring
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: "text",
-        success: function (response) {
-            document.getElementById('loading-editor_robot').style.display = 'none';
-            // Logica da eseguire in caso di successo
-            consoleArea.setValue(response);
-            console.log("Richiesta inviata con successo. Risposta del server:", response);
-            alert(" (/sendInfo) Visualizza i risultati prodotti dalla compilazione.");
-        },
-        error: function (xhr, status, error) {
-            // Logica da eseguire in caso di errore
-            document.getElementById('loading-editor_robot').style.display = 'none';
-            alert("Si è verificato un errore!");
-            console.log("Errore durante l'invio della richiesta:", error);
-        }
-    });
-});
-*/
 
 // INPUT FILE
 var fileInput = document.getElementById("fileInput");

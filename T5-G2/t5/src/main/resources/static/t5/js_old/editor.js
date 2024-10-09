@@ -1,20 +1,3 @@
-/*
- *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
-
 var turno = 0;                  // numero di turni giocati fino ad ora
 
 var current_round_scalata = 0;          // round corrente
@@ -215,12 +198,12 @@ storico.addEventListener("click", function () {
 var runButton = document.getElementById("runButton");
 runButton.addEventListener("click", function () {
 
-  document.getElementById('loading-editor').style.display = 'block';
+  //document.getElementById('loading-editor').style.display = 'block';
   $(document).ready(function () {
 
     //Check if the game is over
     if (localStorage.getItem("gameId") == "null") {                     
-      document.getElementById('loading-editor').style.display = 'none';
+      //document.getElementById('loading-editor').style.display = 'none';
       // alert("Impossibile effettuare un nuovo tentativo: La partita è già terminata.");
       swal("Errore", "Impossibile effettuare un nuovo tentativo: la partita è già terminata.", "error");
 
@@ -244,7 +227,7 @@ runButton.addEventListener("click", function () {
       formData.append("testClassId", localStorage.getItem("classe"));
 
       $.ajax({
-        url: "/api/run", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
+        url: "/api/run2", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
         type: "POST",
         data: formData,
         processData: false,
@@ -260,7 +243,7 @@ runButton.addEventListener("click", function () {
 
           consoleArea.setValue(response.outCompile);
           highlightCodeCoverage($.parseXML(response.coverage));
-          document.getElementById('loading-editor').style.display = 'none';
+          //document.getElementById('loading-editor').style.display = 'none';
 
           // Check if the player has won
 
@@ -460,14 +443,14 @@ runButton.addEventListener("click", function () {
             },
             error: function (xhr, textStatus, error) {
 
-              document.getElementById('loading-editor').style.display = 'none';
+              //document.getElementById('loading-editor').style.display = 'none';
               console.log('Si è verificato un errore:', error);
             }
           });
         },
         error: function () {
 
-          document.getElementById('loading-editor').style.display = 'none';
+          //document.getElementById('loading-editor').style.display = 'none';
           // alert("Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!");
           swal("Errore", "Si è verificato un errore.\nAssicurati prima che la compilazione vada a buon fine!", "error");
         }
@@ -496,7 +479,7 @@ function processJaCoCoReport() {
   formData.append("gameId", localStorage.getItem("gameId"));
 
 
-  document.getElementById('loading-editor').style.display = 'block';
+  //document.getElementById('loading-editor').style.display = 'block';
   $.ajax({
     url: "/api/getJaCoCoReport",
     type: "POST",
@@ -506,7 +489,7 @@ function processJaCoCoReport() {
     dataType: "xml",                                                  //potrebbe essere anche giusto leggere da un file xml di report di JaCoCo
     success: function (reportContent) {
 
-      document.getElementById('loading-editor').style.display = 'none';
+      //document.getElementById('loading-editor').style.display = 'none';
       console.log("(POST /getJaCoCoReport)"+ reportContent);
       // Una volta ricevuto il file di output di JaCoCo, elabora il contenuto
       highlightCodeCoverage(reportContent);
@@ -514,7 +497,7 @@ function processJaCoCoReport() {
     },
     error: function () {
 
-      document.getElementById('loading-editor').style.display = 'none';
+      //document.getElementById('loading-editor').style.display = 'none';
       alert("Si è verificato un errore. Assicurati prima che la compilazione vada a buon fine!");
       console.log("Errore durante il recupero del file di output di JaCoCo.");
     }
