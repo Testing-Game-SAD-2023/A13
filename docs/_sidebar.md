@@ -10,7 +10,7 @@
 ** [Robot](/)
 ** [Game](/)
 ** [Punteggio](/)
-** [Achievement](/)
+** [Achievement](/game/achievements)
 
 * **Specifiche tecniche**
 ** [Analisi dei requisiti](/)
@@ -21,7 +21,7 @@
 ** [T1 - Man VS Class](/)
 ** [T2/3 - Autenticazione](/)
 ** [T4 - Game Engine](/)
-** [T5 - User Experience](/)
+** [T5 - User Experience](/task/t5/)
 ** [T6 - Test Editor](/)
 ** [T7 - Compilazione](/)
 ** [T8 - EvoSuite](/)
