@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 var turno = 0;                  // numero di turni giocati fino ad ora
 
 var current_round_scalata = 0;          // round corrente
@@ -103,6 +120,7 @@ $(document).ready(function () {
 });
 
 //TASTO STORICO
+/* 
 var storico = document.getElementById("storico");
 storico.addEventListener("click", function () {
 
@@ -191,6 +209,7 @@ storico.addEventListener("click", function () {
     fetchTurns(orderTurno);
   }
 });
+*/
 
 // TASTO PLAY/SUBMIT
 var runButton = document.getElementById("runButton");
@@ -678,6 +697,7 @@ function processJaCoCoReport() {
 }
 
 // GAME INFO BUTTON
+/*  
 function openInfoModal() {
 
   // Open the modal
@@ -686,6 +706,7 @@ function openInfoModal() {
   /* Set the display property of the modal to "block" to make it visible
   if it was previously hidden
   */
+  /*
   infoModal.style.display = "block";
 
   //Get a reference to the modal2-content element
@@ -745,10 +766,14 @@ function openInfoModal() {
     modal2Content.appendChild(difficoltaElement);
   }
 }
+*/
+/*
 function closeInfoModal() {
   var infoModal = document.getElementById("infoModal");
   infoModal.style.display = "none";
 }
+  */
+
 
 window.onbeforeunload = function() {
   if (localStorage.getItem("modalita") !== "Scalata") {
