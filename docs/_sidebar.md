@@ -18,11 +18,11 @@
 ** [Testing](/)
 
 * **Task**
+** [Struttura dei Task](/task/)
 ** [T1 - Man VS Class](/)
 ** [T2/3 - Autenticazione](/)
 ** [T4 - Game Engine](/)
-** [T5 - User Experience](/task/t5/)
-** [T6 - Test Editor](/)
+** [T5/6 - User Experience](/task/t5/)
 ** [T7 - Compilazione](/)
 ** [T8 - EvoSuite](/)
 ** [T9 - Randoop](/)
