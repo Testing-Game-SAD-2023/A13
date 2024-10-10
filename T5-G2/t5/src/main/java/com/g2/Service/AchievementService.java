@@ -53,7 +53,7 @@ public class AchievementService {
         return obtainedAchievements;
     }
 
-    private List<Statistic> getStatistics() {
+    public List<Statistic> getStatistics() {
         ResponseEntity<List<Statistic>> statisticsResponseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/statistics/list",
                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                 });

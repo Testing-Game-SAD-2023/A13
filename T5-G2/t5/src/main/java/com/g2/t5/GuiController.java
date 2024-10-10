@@ -136,14 +136,20 @@ public class GuiController {
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
 
             int userId = Integer.parseInt(map.get("userId").toString());
+            System.out.println("(/profile) User ID: " + userId);
             List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
             List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
 
-            System.out.println("UEUEUE: " + statisticProgresses);
+            List<Statistic> allStatistics = achievementService.getStatistics();
+            Map<String, Statistic> IdToStatistic = new HashMap<>();
 
-            //System.out.println("(/profile) Retrieved achievements: " + achievementProgresses);
+            for (Statistic stat : allStatistics)
+                IdToStatistic.put(stat.getID(), stat);
+
+            System.out.println("(/profile) Retrieved statistics: " + statisticProgresses);
             model.addAttribute("achievementProgresses", achievementProgresses);
             model.addAttribute("statisticProgresses", statisticProgresses);
+            model.addAttribute("IdToStatistic", IdToStatistic);
 
         } catch (JsonProcessingException e) {
             System.out.println("(/profile) Error retrieving achievements: " + e.getMessage());

@@ -12,7 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
               columns: [
                   { data: 'name' },
                   { data: 'description' },
-                  { data: 'statistic' },
+                  {
+                    "data": 'statistic',
+                    "mRender": function (data) { return statisticsData.find((element) => element.id == data).name }
+                  },
                   { data: 'progressRequired' },
                   {
                     "mData": null,
