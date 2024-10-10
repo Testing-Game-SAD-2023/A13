@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.g2.Game;
 
 import java.time.ZoneOffset;
@@ -8,58 +25,31 @@ import com.g2.Interfaces.ServiceManager;
 
 public class TurnBasedGameLogic extends GameLogic {
 
-    private GameState currentState;
     private int currentTurn;
     private int userScore;
     private int robotScore;
     private int totalTurns = 10;
+    private Boolean GameOVer = false;
 
+
+    //Questa classe si specializza in una partita semplice basata sui turni, prende il nome di Sfida nella UI
     public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
-            String type_robot, String difficulty) {
+                                String type_robot, String difficulty) {
         super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty);
-        this.currentTurn = 0;
-        this.currentState = GameState.START; // Imposta lo stato iniziale
+        currentTurn = 0;
     }
 
     @Override
     public void playTurn(int userScore, int robotScore) {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        switch (currentState) {
-            case START -> {
-                //Creo partita
-                CreateGame(Time);
-                currentState = GameState.PLAYING;
-                System.out.println("Game Started! Good luck!");
-            }
-            case PLAYING -> {
-                currentTurn++;
-                CreateTurn(Time, userScore);
-                System.out.println("Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
-                // Controlla se tutti i turni sono stati giocati
-                if (currentTurn >= totalTurns) {
-                    currentState = GameState.GAME_OVER;
-                    System.out.println("Game Over! ");
-                }
-            }
-            case GAME_OVER -> {
-                if (robotScore > userScore) {
-                    System.out.println("The game is already over, ROBOT win");
-                } else {
-                    System.out.println("The game is already over, USER win");
-                }
-                //qua devo mettere la chiusura del gioco e del round
-                EndRound(Time);
-                EndGame(Time, userScore, userScore>robotScore);
-            }
-            default -> {
-                throw new IllegalStateException("Unexpected state: " + currentState);
-            }
-        }
+        currentTurn++;
+        //CreateTurn(Time, userScore);
+        System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
     }
 
     @Override
     public Boolean isGameEnd() {
-        return GameState.GAME_OVER == currentState;
+        return false; //il giocatore può fare quanti turni vuole quindi ritorno sempre false
     }
 
     @Override

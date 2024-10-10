@@ -14,25 +14,43 @@ document.addEventListener('DOMContentLoaded', (event) => {
         //Define the steps of the tour
         steps: [
             { 
-                element: '#user-button',
+                element: '#runButton',
                 popover: {
-                    title: 'Game Info',
-                    description: 'Cliccando questo bottone, potrai visualizzare le informazioni relative al gioco, come, ad esempio: il tuo ID ed username, la classe da testare, il robot da sfidare e molto altro ancora.',
+                    title: 'Run Button',
+                    description: 'Sei curioso di scoprire chi ha vinto la sfida, se tu oppire il robot? Cliccando questo bottone terminerà la partita e verrà decretato il vincitore.',
                     side: "center",
                     align: 'center' 
                 }
             },
             { 
-                element: '#theme-button',
+                element: '#searchButton',
                 popover: {
-                    title: 'Theme Button',
-                    description: 'Preferisci il tema chiaro oppure quello scuro? Sta a te decidere!',
+                    title: 'Search Button',
+                    description: 'Cerca una parola o una frase all\'interno del tuo codice.',
                     side: "center",
                     align: 'center' 
                 }
             },
             { 
-                element: '#open-button',
+                element: '#coverageButton',
+                popover: {
+                    title: 'Coverage Button',
+                    description: 'Hai compilato il codice? Clicca qui per visualizzare i risultati di copertura. Durante ciascuna partita, potrai cliccare questo bottone quante volte vorrai per controllare i risultati di copertura ottenuti.',
+                    side: "center",
+                    align: 'center' 
+                }
+            },
+            { 
+                element: '#startReplace',
+                popover: {
+                    title: 'Replace Button',
+                    description: 'Sostituisci una parola o una frase all\'interno del tuo codice.',
+                    side: "center",
+                    align: 'center'  
+                }
+            },
+            { 
+                element: '#fileInput',
                 popover: {
                     title: 'Open File Button',
                     description: 'Hai già scritto un test e vuoi caricarlo nella schermata di editing? Niente paura, cliccando questo bottone potrai caricare un file di testo.',
@@ -41,9 +59,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 }
             },
             { 
-                element: '#saveAs-button',
+                element: '#DownloadButton',
                 popover: {
-                    title: 'Save As Button',
+                    title: 'Download Button',
                     description: 'Salva i tuoi tests con un semplice click.',
                     side: "center",
                     align: 'center' 
@@ -68,78 +86,23 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 }
             },
             { 
-                element: '#find-button',
+                element: '#themeToggle',
                 popover: {
-                    title: 'Find Button',
-                    description: 'Cerca una parola o una frase all\'interno del tuo codice.',
+                    title: 'Theme Toggle',
+                    description: 'Preferisci il tema chiaro oppure quello scuro? Sta a te decidere!',
                     side: "center",
                     align: 'center' 
                 }
             },
-            { 
-                element: '#replace-btn',
-                popover: {
-                    title: 'Replace Button',
-                    description: 'Sostituisci una parola o una frase all\'interno del tuo codice.',
-                    side: "center",
-                    align: 'center' 
-                }
-            },
-            { 
-                element: '#storico',
-                popover: {
-                    title: 'Storico Button',
-                    description: 'Visualizza la cronologia dei risultati ottenutim ma ricorda: non potrai visualizzare i risultati se non hai ancora eseguito il test!',
-                    side: "center",
-                    align: 'center' 
-                }
-            },
-            { 
-                element: '#compileButton',
-                popover: {
-                    title: 'Compile Button',
-                    description: 'Hai finito di scrivere il tuo test? Clicca qui per compilare il codice! Durante ciascuna partita, potrai cliccare questo bottone tutte le volte che vorrai compilare nuovo codice.',
-                    side: "center",
-                    align: 'center' 
-                }
-            },
-            { 
-                element: '#coverageButton',
-                popover: {
-                    title: 'Coverage Button',
-                    description: 'Hai compilato il codice? Clicca qui per visualizzare i risultati di copertura. Durante ciascuna partita, potrai cliccare questo bottone quante volte vorrai per controllare i risultati di copertura ottenuti.',
-                    side: "center",
-                    align: 'center' 
-                }
-            },
-            { 
-                element: '#runButton',
-                popover: {
-                    title: 'Run Button',
-                    description: 'Sei curioso di scoprire chi ha vinto la sfida, se tu oppire il robot? Cliccando questo bottone terminerà la partita e verrà decretato il vincitore.',
-                    side: "center",
-                    align: 'center' 
-                }
-            },
-            { 
-                element: '#logout',
-                popover: {
-                    title: 'Logout Button',
-                    description: 'Hai finito di giocare? Clicca qui per tornare alla schermata di login.',
-                    side: "center",
-                    align: 'center' 
-                }
-            },
-
         ]
 
     });
 
     window.onload = function() {
-        if (confirm('Vuoi partecipare al tour guidato?')) {
-
-        // Start the tour if the user accepts
-        driverObj.drive();
+        if (!localStorage.getItem('tourCompleted') && confirm('Vuoi partecipare al tour guidato?')) {
+            // Start the tour if the user accepts
+            driverObj.drive();
+            localStorage.setItem('tourCompleted', true); // Salva che il tour è stato completato
         }
     };
 

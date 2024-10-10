@@ -8,7 +8,7 @@ function createApiUrl(formData, orderTurno) {
 	const classePath = `VolumeT8/FolderTreeEvo/${className}/${className}SourceCode/${underTestClassName}`;
 
 	// Ottiene il percorso del test generato
-	const testPath = generaPercorsoTest(orderTurno);
+	const testPath = generaPercorsoTest(orderTurno, formData);
 
 	// Costruisce l'URL dell'API
 	const apiUrl = `/api/${classePath}+${testPath}+/app+${playerId}`;
@@ -17,12 +17,12 @@ function createApiUrl(formData, orderTurno) {
 }
 
 // Funzione per generare il percorso del test
-function generaPercorsoTest(orderTurno) {
+function generaPercorsoTest(orderTurno, formData) {
 	const modalita = localStorage.getItem("modalita");
-	const playerId = localStorage.getItem("playerId");
-	const gameId = localStorage.getItem("gameId");
-	const roundId = localStorage.getItem("roundId");
-	const classeLocal = localStorage.getItem("classe");
+	const playerId = formData.get("playerId");
+	const gameId = formData.get("gameId");
+	const roundId = formData.get("roundId");
+	const classeLocal = formData.get("className");
 
 	// Verifica la modalità e costruisce il percorso appropriato
 	if (modalita === "Scalata" || modalita === "Sfida") {
@@ -46,7 +46,8 @@ function extractThirdColumn(csvContent) {
 	const rows = csvContent.split("\n"); // Divide le righe
 	const thirdColumnValues = [];
 
-	rows.forEach((row) => {
+	// Inizia il ciclo dalla seconda riga (indice 1)
+	rows.slice(1).forEach((row) => {
 		const cells = row.split(","); // Divide le celle
 		if (cells.length >= 3) {
 			thirdColumnValues.push(cells[2]); // Aggiunge la terza colonna
@@ -56,176 +57,243 @@ function extractThirdColumn(csvContent) {
 	return thirdColumnValues;
 }
 
-function getConsoleTextCoverage(data) {
-	var valori_csv = extractThirdColumn(data);
+you_win = `
+__     ______  _    _  __          _______ _   _ 
+\\ \\   / / __ \\| |  | | \\ \\        / /_   _| \\ | |
+ \\ \\_/ / |  | | |  | |  \\ \\  /\\  / /  | | |  \\| |
+  \\   /| |  | | |  | |   \\ \\/  \\/ /   | | | . \` |
+   | | | |__| | |__| |    \\  /\\  /   _| |_| |\\  |
+   |_|  \\____/ \\____/      \\/  \\/   |_____|_| \\_|
+`;
 
-	var consoleText = `Esito Risultati (percentuale di linee coperte)
-                      Il tuo punteggio: ${valori_csv[0]}% LOC
-                      Informazioni aggiuntive di copertura:
-                      Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
-                      Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
-                      Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
-                      Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
-                      Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
-                      Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
-                      Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
+var you_lose = `
+__     ______  _    _   _      ____   _____ ______ 
+\\ \\   / / __ \\| |  | | | |    / __ \\ / ____|  ____|
+ \\ \\_/ / |  | | |  | | | |   | |  | | (___ | |__   
+  \\   /| |  | | |  | | | |   | |  | |\\___ \\|  __|  
+   | | | |__| | |__| | | |___| |__| |____) | |____ 
+   |_|  \\____/ \\____/  |______\\____/|_____/|______|
+`;
+
+var error = `
+______ _____  _____   ____   _____  
+|  ____|  __ \|  __ \ / __ \ / ____| 
+| |__  | |__) | |__) | |  | | (___   
+|  __| |  _  /|  _  /| |  | |\___ \  
+| |____| | \ \| | \ \| |__| |____) | 
+|______|_|  \_\_|  \_\\____/|_____/  
+`;
+
+function getConsoleTextCoverage(data, gameScore) {
+	var valori_csv = extractThirdColumn(data);
+	var consoleText = 
+`============================== Results ===============================
+Il tuo punteggio: ${gameScore}pt
+----------------------------------------------------------------------
+la tua coverage:  ${valori_csv[0]*100}% LOC
+============================== Coverage ===============================
+Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+======================================================================`;
 
 	// Restituisce il testo generato
 	return consoleText;
 }
 
-function getConsoleTextRun(data, punteggioJacoco, punteggioRobot) {
+function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
 	var valori_csv = extractThirdColumn(data);
-
-	var consoleText = `Esito Risultati (percentuale di linee coperte)
-                        Il tuo punteggio EvoSuite: ${valori_csv[0]}% LOC
-                        Il tuo punteggio Jacoco: ${punteggioJacoco}% LOC
-                        Il punteggio del robot: ${punteggioRobot}% LOC
-                        Informazioni aggiuntive di copertura:
-                        Il tuo punteggio EvoSuite: ${valori_csv[1]}% Branch
-                        Il tuo punteggio EvoSuite: ${valori_csv[2]}% Exception
-                        Il tuo punteggio EvoSuite: ${valori_csv[3]}% WeakMutation
-                        Il tuo punteggio EvoSuite: ${valori_csv[4]}% Output
-                        Il tuo punteggio EvoSuite: ${valori_csv[5]}% Method
-                        Il tuo punteggio EvoSuite: ${valori_csv[6]}% MethodNoException
-                        Il tuo punteggio EvoSuite: ${valori_csv[7]}% CBranch`;
+	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
+	consoleText =
+`===================================================================== \n` +
+		consoleText2 +
+		"\n" +
+`============================== Results ===============================
+Il tuo punteggio: ${gameScore}pt
+----------------------------------------------------------------------
+la tua coverage:  ${valori_csv[0]*100}% LOC
+----------------------------------------------------------------------
+Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
+----------------------------------------------------------------------
+Il punteggio del robot:    ${punteggioRobot}% LOC
+============================== Coverage ===============================
+Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+----------------------------------------------------------------------
+Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+======================================================================`;
 
 	// Restituisce il testo generato
 	return consoleText;
+}
+
+function getConsoleTextError(){
+	return error + "\n Ci sono stati errori di compilazione, controlla la console !";
 }
 
 // Funzione per avviare il gioco utilizzando ajaxRequest
 async function startGame(data) {
-    try {
-        // Utilizziamo la funzione ajaxRequest per la chiamata POST
-        const response = await ajaxRequest("/StartGame", "POST", data, true, "text");
+	try {
+		// Utilizziamo la funzione ajaxRequest per la chiamata POST
+		const response = await ajaxRequest(
+			"/StartGame",
+			"POST",
+			data,
+			true,
+			"text"
+		);
 
-        console.log("Partita iniziata con successo:", response);
-    } catch (error) {
-        console.error("Errore durante l'avvio della partita:", error);
-    }
+		console.log("Partita iniziata con successo:", response);
+	} catch (error) {
+		console.error("Errore durante l'avvio della partita:", error);
+	}
 }
 
-// Funzione principale per la gestione dello storico dei turni
-async function fetchTurns() {
-	let output = "";
+function toggleLoading(showSpinner, divId, buttonId) {
+	const divElement = document.getElementById(divId);
+	const button = document.getElementById(buttonId);
 
-	for (let i = orderTurno; i >= 1; i--) {
-		const turnId = (
-			parseInt(localStorage.getItem("turnId")) -
-			i +
-			1
-		).toString();
-		output += await fetchTurnData(turnId, i);
-
-		const testPath = generaPercorsoTest(orderTurno);
-		output += await fetchTestCode(testPath, i);
-
-		// Separatore tra i turni
-		output +=
-			"-----------------------------------------------------------------------------\n\n";
+	if (!divElement) {
+		console.error(`Elemento con ID "${divId}" non trovato.`);
+		return;
 	}
 
-	// Impostare il risultato nella console
-	consoleArea.setValue(output);
-	console.log(output);
+	const spinner = divElement.querySelector(".spinner-border");
+	const statusText = divElement.querySelector('[role="status"]');
+	const icon = divElement.querySelector("i");
+
+	if (showSpinner) {
+		spinner.style.display = "inline-block"; // Mostra lo spinner
+		statusText.innerText = "Loading..."; // Mostra il testo "Loading..."
+		icon.style.display = "none"; // Nascondi l'icona
+		button.disabled = true;
+	} else {
+		spinner.style.display = "none"; // Nascondi lo spinner
+		statusText.innerText = "Play"; // Nascondi il testo "Loading..."
+		icon.style.display = "inline-block"; // Mostra l'icona
+		button.disabled = false;
+	}
 }
 
-// Funzione per ottenere i dati di un turno
-async function fetchTurnData(turnId, i) {
-	try {
-        const url = `/turns/${turnId}`;
-        
-        // Utilizziamo la funzione ajaxRequest per eseguire una chiamata GET
-        const response = await ajaxRequest(url, "GET", null, false, "json");
+function highlightCodeCoverage(reportContent) {
+	// Analizza il contenuto del file di output di JaCoCo per individuare le righe coperte, non coperte e parzialmente coperte
+	// Applica lo stile appropriato alle righe del tuo editor
 
-        return `Turno ${Math.abs(i - orderTurno - 1)}\nPercentuale di copertura ottenuta: ${response.scores}\n`;
-    } catch (error) {
-        console.error("Error fetching turn data:", error);
-        return "";
-    }
-}
+	var coveredLines = [];
+	var uncoveredLines = [];
+	var partiallyCoveredLines = [];
 
-// Funzione per ottenere il codice di test di un turno utilizzando ajaxRequest
-async function fetchTestCode(testPath, i) {
-    try {
-        // Utilizziamo la funzione ajaxRequest per eseguire una chiamata GET
-        const response = await ajaxRequest(testPath, "GET", null, false, "text");
+	reportContent.querySelectorAll("line").forEach(function (line) {
+		if (line.getAttribute("mi") == 0)
+			coveredLines.push(line.getAttribute("nr"));
+		else if (
+			line.getAttribute("cb") /
+				(line.getAttribute("mb") + line.getAttribute("cb")) ==
+			2 / 4
+		)
+			partiallyCoveredLines.push(line.getAttribute("nr"));
+		else uncoveredLines.push(line.getAttribute("nr"));
+	});
 
-        return `Codice di test sottoposto al tentativo ${Math.abs(
-            i - orderTurno - 1
-        )}:\n${response}\n\n`;
-    } catch (error) {
-        console.error("Error fetching test code:", error);
-        return "";
-    }
-}
+	coveredLines.forEach(function (lineNumber) {
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+		editor_robot.removeLineClass(
+			lineNumber - 2,
+			"wrap",
+			"partially-covered-line"
+		);
+		editor_robot.addLineClass(lineNumber - 2, "wrap", "covered-line");
+	});
 
-// Funzione per mostrare o nascondere il caricamento
-function toggleLoading(show) {
-	document.getElementById("loading-editor").style.display = show
-		? "block"
-		: "none";
-}
+	uncoveredLines.forEach(function (lineNumber) {
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+		editor_robot.removeLineClass(
+			lineNumber - 2,
+			"wrap",
+			"partially-covered-line"
+		);
+		editor_robot.addLineClass(lineNumber - 2, "wrap", "uncovered-line");
+	});
 
-// Funzione per mostrare un messaggio di alert e nascondere il caricamento
-function showAlert(message) {
-	alert(message);
-	toggleLoading(false);
+	partiallyCoveredLines.forEach(function (lineNumber) {
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+		editor_robot.addLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+	});
 }
 
 // Funzione per ottenere i dati del form da inviare
 function getFormData() {
-    const formData = new FormData();
-    const className = localStorage.getItem("underTestClassName");
-    
-    formData.append("testingClassName", `Test${className}.java`);
-    formData.append("testingClassCode", editor_utente.getValue());
-    formData.append("underTestClassName", `${className}.java`);
-    formData.append("underTestClassCode", editor_robot.getValue());
-    formData.append("className", className);
-    formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
-    formData.append("turnId", localStorage.getItem("turnId"));
-    formData.append("roundId", localStorage.getItem("roundId"));
-    formData.append("gameId", localStorage.getItem("gameId"));
-    formData.append("difficulty", localStorage.getItem("difficulty"));
-    formData.append("type", localStorage.getItem("robot"));
-    formData.append("order", orderTurno);
-    formData.append("username", localStorage.getItem("username"));
-    formData.append("testClassId", className);
+	const formData = new FormData();
+	const className = localStorage.getItem("underTestClassName");
 
-    return formData;
+	//formData.append("testingClassName", `Test${className}.java`);
+	formData.append("testingClassCode", editor_utente.getValue());
+	formData.append("underTestClassName", `${className}.java`);
+	formData.append("underTestClassCode", editor_robot.getValue());
+	formData.append("className", className);
+	formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
+	formData.append("turnId", localStorage.getItem("turnId"));
+	formData.append("difficulty", localStorage.getItem("difficulty"));
+	formData.append("type", localStorage.getItem("robot"));
+	formData.append("order", orderTurno);
+	formData.append("username", localStorage.getItem("username"));
+	formData.append("testClassId", className);
+	return formData;
 }
 
-// Funzione per mostrare messaggi di vittoria o sconfitta
-function showGameResult(isWin, gameScore) {
-    if (isWin) {
-        swal("Complimenti!", `Hai vinto! Ecco il tuo punteggio: ${gameScore}`, "success");
-    } else {
-        swal("Peccato!", `Hai perso! Ecco il tuo punteggio: ${gameScore}`, "error");
-    }
+async function ajaxRequest(
+	url,
+	method = "POST",
+	data = null,
+	isJson = true,
+	dataType = "json"
+) {
+	try {
+		const options = {
+			url: url,
+			type: method,
+			dataType: dataType,
+			processData: isJson, // Set to true to encode data properly
+			contentType: isJson
+				? "application/x-www-form-urlencoded; charset=UTF-8"
+				: false,
+			data: isJson && data ? $.param(data) : data, // Convert data to URL-encoded string
+		};
+
+		const response = await $.ajax(options);
+		return response;
+	} catch (error) {
+		console.error("Si è verificato un errore:", error);
+		throw error;
+	}
 }
 
-async function ajaxRequest(url, method = "POST", data = null, isJson = true, dataType = "json") {
-    try {
-        const options = {
-            url: url,
-            type: method,
-            dataType: dataType,
-            processData: isJson, // Set to true to encode data properly
-            contentType: isJson ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
-            data: isJson && data ? $.param(data) : data, // Convert data to URL-encoded string
-        };
-
-        const response = await $.ajax(options);
-        return response;
-    } catch (error) {
-        console.error("Si è verificato un errore:", error);
-        throw error;
-    }
-}
-
-function controlloScalata(iswin, current_round_scalata, total_rounds_scalata, displayRobotPoints) {
+function controlloScalata(
+	iswin,
+	current_round_scalata,
+	total_rounds_scalata,
+	displayRobotPoints
+) {
 	// Check if the player has won the round
 	if (isWin) {
 		/*The player has won the round, check if the player has 

@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.g2.Components;
 
 import java.util.ArrayList;
@@ -5,7 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -14,7 +30,6 @@ import com.g2.Interfaces.ServiceManager;
 
 @Service
 public class PageBuilder {
-
     // Lista di componenti di pagina
     private final List<GenericLogicComponent> LogicComponents;
     private final List<GenericObjectComponent> ObjectComponents;
@@ -31,6 +46,7 @@ public class PageBuilder {
     // Nome della pagina (template) da utilizzare
     private final String PageName;
 
+    //COSTRUTTORI 
     /**
      * @param serviceManager Gestisce la chiamate REST ai vari task
      * @param PageName nome della pagina da implementare
@@ -54,15 +70,19 @@ public class PageBuilder {
         setStandardErrorPage();
     }
 
+    //HANDLE PAGE REQUEST 
     // Metodo per eseguire la logica di tutti i componenti
-    private Optional<String> executeComponentsLogic() {
+    private List<String> executeComponentsLogic() {
+        // Lista per raccogliere eventuali errori
+        List<String> errorCodes = new ArrayList<>(); 
+
         for (GenericLogicComponent Component : LogicComponents) {
             if (!Component.executeLogic()) {
                 System.out.println("Logica fallita per il componente: " + Component.getClass().getSimpleName());
-                return Optional.of(Component.getErrorCode()); //Restituisce il codice d'errore
+                errorCodes.add(Component.getErrorCode()); // Aggiunge il codice d'errore alla lista
             }
         }
-        return Optional.empty();
+        return errorCodes;
     }
 
     // Metodo per costruire la mappa combinata dei dati per il modello
@@ -86,23 +106,15 @@ public class PageBuilder {
         return combinedModel;
     }
 
-    // Questo metodo serve per attivare l'autenticazione per la pagina
-    public void SetAuth(String jwt) {
-        if (serviceManager != null){
-            setLogicComponents(new AuthComponent(serviceManager, jwt));
-        }        
-    }
-
     // Metodo principale flusso per una richiesta di pagina
     // Esegue la logica di ogni componente, poi elabora i dati da inserire nel template
     public String handlePageRequest() {
+        String return_page_error = null;
         if (LogicComponents != null && !LogicComponents.isEmpty()) {
             // Esegui la logica di tutti i componenti
-            Optional<String> ErrorCode = executeComponentsLogic();
-            if (ErrorCode.isPresent()) {
-                // Ottieni la pagina di errore dalla mappa, oppure usa la pagina di default
-                return errorPageMap.getOrDefault(ErrorCode.get(), errorPageMap.get("default"));
-            }
+            List<String> ErrorCode = executeComponentsLogic();
+            // Gestisco le situazioni d'errore
+            return_page_error = ExecuteError(ErrorCode);
         }
         if (ObjectComponents != null && !ObjectComponents.isEmpty()) {
             // Costruisci la mappa combinata dei dati dei componenti
@@ -110,20 +122,46 @@ public class PageBuilder {
             model_html.addAllAttributes(combinedModel);
         }
         // Restituisco il nome del template da usare
+        if(return_page_error != null) return return_page_error;
         return this.PageName;
     }
 
+    //COMPONENTI 
+    // Questo metodo serve per attivare l'autenticazione per la pagina
+    public void SetAuth(String jwt) {
+        if (serviceManager != null){
+            setLogicComponents(new AuthComponent(serviceManager, jwt));
+        }        
+    }
+
+    //CODICI D'ERRORE 
     // Metodo per permettere la personalizzazione della mappa
+    // il metodo put di una HashMap sovrascrive il valore associato a
+    // una chiave esistente se la chiave è già presente nella mappa.
     public void setErrorPage(String errorCode, String pageName) {
         errorPageMap.put(errorCode, pageName);
     }
-
+    //overload nel caso in cui l'utente fornisce una lista intera 
+    public void setErrorPage(Map<String, String> userErrorPageMap) {
+        errorPageMap.putAll(userErrorPageMap);
+    }
     //Qui setto il comportamento Standard agli errori 
     private void setStandardErrorPage() {
         errorPageMap.put("Auth_error", "redirect:/login");
         errorPageMap.put("default", "redirect:/error");
     }
-
+    // Metodo per ottenere i messaggi d'errore basati sui codici d'errore
+    private String ExecuteError(List<String> errorCodes) {
+        if (errorCodes != null && !errorCodes.isEmpty()){
+            for (String errorCode : errorCodes) {
+                // per ora si ferma al primo errore, ma qui posso implementare ogni tipo di logica 
+                // anche in base alla combinazione o if-else
+                return errorPageMap.getOrDefault(errorCode, errorPageMap.get("default"));
+            }
+        }
+        return null;
+    }
+    //GET E SET 
     public List<GenericLogicComponent> getLogicComponents() {
         return new ArrayList<>(LogicComponents); // Ritorna una copia per evitare modifiche esterne
     }

@@ -1,4 +1,25 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.g2.Game;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.g2.Interfaces.ServiceManager;
 
@@ -7,8 +28,8 @@ public abstract class GameLogic {
     private final ServiceManager serviceManager;
 
     //IDs
-    private String GameID;
-    private String RoundID;
+    private int GameID;
+    private int  RoundID;
     private String TurnID;
     private final String PlayerID;
     private final String ClasseUT;
@@ -26,16 +47,27 @@ public abstract class GameLogic {
     }
 
     // Metodi che ogni gioco deve implementare
+    /*
+     * PlayTurn deve aggiornalo lo stato della partita ad ogni turno, il concetto di turno può esser gestito come si vuole
+     */
     public abstract void playTurn(int userScore, int robotScore);
-
+    /*
+     * Si deve personalizzare la condizione di fine del gioco, in generale l'utente può sempre decretarne la fine tramite l'editor.
+     */
     public abstract Boolean isGameEnd();
-
+    /*
+     * In base alla modalità va specificato come viene calcolato lo score, solo la COV viene fornita gli altri sono 
+     * parametri interni alla classe di gioco.
+     */
     public abstract int GetScore(int cov);
 
-    //Metodi base 
-    protected void CreateGame(String Time) {
-        this.GameID = (String) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", "description", this.PlayerID);
-        this.RoundID = (String) serviceManager.handleRequest("T4", "CreateRound", this.GameID, ClasseUT, Time);
+    /*
+     * Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
+     */
+    protected void CreateGame() {
+        String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", "description", this.PlayerID);
+        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time);
     }
 
     protected void CreateTurn(String Time, int userScore) {
@@ -53,24 +85,24 @@ public abstract class GameLogic {
         this.serviceManager.handleRequest("T4","EndGame", this.GameID, this.PlayerID, Time, Score, isWinner);
     }
 
-    public String getGameID() {
-        return GameID;
+    public int getGameID() {
+        return this.GameID;
     }
 
-    public void setGameID(String GameID) {
+    public void setGameID(int GameID) {
         this.GameID = GameID;
     }
 
-    public String getRoundID() {
-        return RoundID;
+    public int getRoundID() {
+        return this.RoundID;
     }
 
-    public void setRoundID(String RoundID) {
+    public void setRoundID(int RoundID) {
         this.RoundID = RoundID;
     }
 
     public String getTurnID() {
-        return TurnID;
+        return this.TurnID;
     }
 
     public void setTurnID(String TurnID) {
@@ -78,15 +110,15 @@ public abstract class GameLogic {
     }
 
     public String getType_robot() {
-        return type_robot;
+        return this.type_robot;
     }
 
     public String getDifficulty() {
-        return difficulty;
+        return this.difficulty;
     }
 
     public String getClasseUT() {
-        return ClasseUT;
+        return this.ClasseUT;
     }
 
 }

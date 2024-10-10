@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.g2.t5;
 
 import java.time.LocalDate;
@@ -25,6 +42,7 @@ import com.g2.Components.ServiceObjectComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
+import com.g2.Model.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -51,20 +69,25 @@ public class GuiController {
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam("mode") String mode) {
        
-        PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
-    
-        ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
-        gamemode.setObjectComponents(lista_classi);
-
-        List<String> list_robot = new ArrayList<>();
-        // Aggiungere elementi alla lista
-        list_robot.add("Randoop");
-        list_robot.add("EvoSuite");
-        GenericObjectComponent lista_robot = new GenericObjectComponent("lista_robot", list_robot);
-        gamemode.setObjectComponents(lista_robot);
-
-        gamemode.SetAuth(jwt);
-        return gamemode.handlePageRequest();
+        if("Sfida".equals(mode) || "Allenamento".equals(mode)){
+            PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
+            ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
+            gamemode.setObjectComponents(lista_classi);
+            List<String> list_robot = new ArrayList<>();
+            // Aggiungere elementi alla lista
+            list_robot.add("Randoop");
+            list_robot.add("EvoSuite");
+            GenericObjectComponent lista_robot = new GenericObjectComponent("lista_robot", list_robot);
+            gamemode.setObjectComponents(lista_robot);
+            gamemode.SetAuth(jwt);
+            return gamemode.handlePageRequest();
+        }
+        if("Scalata".equals(mode)){
+            PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode_scalata", model);
+            gamemode.SetAuth(jwt);
+            return gamemode.handlePageRequest();
+        }
+            return "main";
     }
 
     @GetMapping("/editor")
@@ -79,15 +102,6 @@ public class GuiController {
         editor.SetAuth(jwt);
         return editor.handlePageRequest();
     }
-
-    /*
-     *     @GetMapping("/login")
-    public ModelAndView showLoginForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
-
-        return new ModelAndView("login");
-    }
-     */
     
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -103,13 +117,12 @@ public class GuiController {
     public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
 
-        /* 
+        
         User player_placeholder = new User((long) 1, "placeholder", "placeholder", "email", "password",
                 true, "studies", "resetToke");
 
         GenericObjectComponent player = new GenericObjectComponent("player", player_placeholder);
         main.setObjectComponents(player);
-        */
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }
@@ -260,5 +273,12 @@ public class GuiController {
         }
         return "redirect:/login";
 
+    }
+
+    @GetMapping("/editor_old")
+    public String getEditorOld(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder main = new PageBuilder(serviceManager, "editor_old", model);
+        main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
+        return main.handlePageRequest();
     }
 }

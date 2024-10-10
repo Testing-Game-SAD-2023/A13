@@ -1,8 +1,17 @@
 package RemoteCCC.App;
 
 
-import RemoteCCC.Config;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -12,20 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.File;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-
-import org.apache.commons.io.FileUtils;
+import RemoteCCC.Config;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @ServletComponentScan
@@ -77,11 +73,15 @@ public class App {
         ResponseDTO response = new ResponseDTO();
 
         if(compileExecuteCovarageWithMaven(output_maven, config)){
-            String retXmlJacoco = readFileToString(config.retrieveCoverageFolder());//zipSiteFolderToJSON(Config.getzipSiteFolderJSON()).toString();
-            response.setError(false);
-            response.setoutCompile(output_maven[0]);
-            response.setCoverage(retXmlJacoco);
-
+            try {
+                String retXmlJacoco = readFileToString(config.retrieveCoverageFolder());//zipSiteFolderToJSON(Config.getzipSiteFolderJSON()).toString();
+                response.setError(false);
+                response.setoutCompile(output_maven[0]);
+                response.setCoverage(retXmlJacoco);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+           
         }else
         {
             response.setError(true);
@@ -98,9 +98,14 @@ public class App {
 
  
     private static String readFileToString(String path) throws IOException {
-        byte[] bytes = Files.readAllBytes(Paths.get(path));
-        String contents = new String(bytes);
-        return contents;
+        try {
+            byte[] bytes = Files.readAllBytes(Paths.get(path));
+            String contents = new String(bytes);
+            return contents;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -147,6 +152,7 @@ public class App {
         Process process = processBuilder.start();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
         String line;
         while ((line = reader.readLine()) != null)
             ret[0] += line += "\n";
