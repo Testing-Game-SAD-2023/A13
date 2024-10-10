@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.g2.Interfaces;
 
 import java.nio.charset.StandardCharsets;
@@ -5,10 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,6 +36,11 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/*
+ *  Questa è una classe base che implementa l'interfaccia ServiceInterface per il dispatcher ServiceManager
+ *   e ti fornisce svariati metodi che mappano POST, GET, PUT E DELETE, in vari formati e header.
+ *   Attenzione alcune chiamate sono state definite in modo molto rigido, potrebbero quindi non andar bene. 
+ */
 public abstract class BaseService implements ServiceInterface {
 
     protected final RestTemplate restTemplate;
@@ -107,8 +131,18 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
-    // Metodo per chiamate POST
-    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
+    //Metodo per chiamate POST senza specificare content type -> default application/x-www-form-urlencoded 
+    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
+            Map<String, String> queryParams,
+            Class<R> responseType) {
+
+        return callRestPost(endpoint, formData, queryParams, null, responseType);
+    }
+
+    // Metodo per chiamate POST con content type a application/x-www-form-urlencoded 
+    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
+            Map<String, String> queryParams, Map<String, String> customHeaders,
+            Class<R> responseType) {
         try {
             if (endpoint == null || endpoint.isEmpty()) {
                 throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
@@ -117,17 +151,69 @@ public abstract class BaseService implements ServiceInterface {
                 throw new IllegalArgumentException("formData non può essere nullo");
             }
             String url = buildUri(endpoint, queryParams);
+
+            // Imposta gli header, incluso il Content-Type di default
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Type", "application/x-www-form-urlencoded");
+            // Aggiunge gli header personalizzati
+            if (customHeaders != null) {
+                customHeaders.forEach(headers::add);
+            }
+            // Imposta il content type a application/x-www-form-urlencoded se non specificato
+            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            }
+
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
+
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
                 throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
             }
         } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + e);
+            throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
+        }
+    }
+
+    //metodo per chiamare POST con content type a application/json
+    protected <R> R callRestPost(String endpoint, JSONObject jsonObject,
+            Map<String, String> queryParams, Map<String, String> customHeaders,
+            Class<R> responseType) {
+        try {
+            if (endpoint == null || endpoint.isEmpty()) {
+                throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+            }
+            if (jsonObject == null) {
+                throw new IllegalArgumentException("Il body JSON non può essere nullo");
+            }
+
+            // Conversione del JSONObject in stringa
+            String jsonBody = jsonObject.toString();
+
+            String url = buildUri(endpoint, queryParams);
+            HttpHeaders headers = new HttpHeaders();
+
+            // Aggiunge gli header personalizzati
+            if (customHeaders != null) {
+                customHeaders.forEach(headers::add);
+            }
+
+            // Imposta il content type a application/json se non specificato
+            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                headers.setContentType(MediaType.APPLICATION_JSON);
+            }
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+            ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else {
+                throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
+            }
+        } catch (RestClientException | IllegalArgumentException e) {
+            throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
         }
     }
 

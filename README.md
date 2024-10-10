@@ -1,32 +1,28 @@
-# Gruppo A13-2024
-Componente:
-- Caterina Maria Accetto - M63/1117
+# Gruppo A13-2024 (10/10/2024)
 
-Il lavoro che andremo ad esporre all'interno della documentazione, muove i suoi primi passi a partire dal progetto: A10-2024,
-e vuole essere solamente una versione migliorativa dei requisiti sviluppati in corrispondenza dei serivizi T1 e T23, 
-di conseguenza rimane invariata: l'architettura complessiva dell'applicazione, diagrammi
-di deployment, dei componenti, ... .
+Il nostro team ha lavorato su due task fondamentali per lo sviluppo del front-end del sistema di gioco: Task 5 e Task 6. 
+Il Task 5 riguarda l'interfaccia per l'avvio di una partita, consentendo ai giocatori autenticati di accedere all'area riservata, selezionare i parametri di gioco (come classi e robot caricati dagli amministratori) e avviare una partita nell'arena di gioco. 
+Il Task 6, invece, si occupa dell'interfaccia per giocare una partita, offrendo ai giocatori un editor di test case per scrivere codice Java, richiedere la compilazione, visualizzare i risultati di copertura e confrontare i propri risultati con quelli generati dal robot, decretando così il vincitore.
 
-Il progetto è stato ampliato integrando il lavoro svolto dal gruppo A7-2024 che si è occupato: (a) di revisionare la struttura del FileSystem condiviso tra i volumi T8 e T9 optando per utilizzarne uno soltanto (il VolumeT8), (b) del proporre un metodo per il calcolo del punteggio di una partita e (c) di introdurre una nuova modalità di gioco denominata: "Allenamento" nata dalla necessità di offrire ai giocatori la possibilità di migliorare le proprie abilità nella scrittura dei test senza che i punteggi ottenuti influenzino le statistiche dell'account.
+L'obiettivo iniziale era unificare i due task in un unico front-end. Tuttavia, la scarsa modularità e la complessità del codice esistente ci hanno portato a effettuare un completo refactoring del sistema per migliorarne la manutenibilità e l'efficienza. Abbiamo quindi ristrutturato l'applicazione introducendo tre package principali:
 
-### REQUISITI SVILUPPATI (1)
-1. Il sistema, per ogni sessione di autenticazione correttamente effettuata, deve assegnare all'amministratore un token di autenticazione
-2. Il sistema deve implementare un meccanismo che permetta di distinguere gli amministratori, aventi particolari privilegi, dai semplici giocatori
-3. Il sistema deve consentire ai soli utenti aventi specifiche caratteristiche di potersi registrare inserendo: nome, cognome, username, e-mail e password
-4. Il sistema deve prevedere la possibilità, in fase di registrazione, di ammettere utenti con doppi nomi o, più in generale, con più nomi separati da uno spazio, ad esempio: "Anna Maria"
-5. Il sistema deve prevedere la possibilità, in fase di registrazione,di ammettere utenti con cognomi costituiti da più parole separate da spazi oppure da apostrofi, come nel caso:"Degl'Antoni" 
-6. Il sistema deve, accettare, in fase di registrazione, solamente password lunghe tra gli 8 e i 16 caratteri e che contengano:almeno una lettera maiuscola, una minuscola, un numero ed un carattere speciale
-7. Il sistema, in fase di registrazione, deve implementare una apposita misura di sicurezza che consenta di proteggere le password archiviate all'interno del database le quali dovranno venir crittate mediante un algoritmo di hashing 
-8. Il sistema deve controllare che tutti i campi, negli appositi form di login e di registrazione, vengano compilati e che siano validi,in caso di errore, deve essere visualizzato a video un messaggio di errore
-9. Il sistema deve permettere all'amministratore registrato di effettuare il logout 
-10. Il sistema deve consentire all'amministratore correttamente registrato ed autenticato, di visualizzare, in una apposita sezione dell'area riservata, la lista di tutti gli admin del sistema
-11. Il sistema deve permettere all'amministratore correttamente registrato, di impostare una nuova password nel caso in cui avesse dimenticato la propria
-12. Il sistema deve consentire a tutti gli amministratori correttamente registrati ed autenticati, di invitarne di nuovi, e che non necessariamente rispettano i vincoli richiesti, tramite l'invio, per posta elettronica, di un apposito token
-13. Il sistema deve permettere agli utenti che hanno ricevuto il token di invito per posta, di potersi registrare nel sistema come admin
-14. Il sistema deve implementare un meccanismo che permetta di distinguere gli amministratori del dominio da quelli che sono stati invitati
-15. Il sistema, in caso di avvenuta registrazione, deve mostrare a video un feedback, dopodichè, indirizzare l'utente alla pagina di login
-16. Il sistema deve consentire agli utenti di decidere se registrarsi tramite il classico form (e-mail + password) oppure effettuare il social login tramite Facebook e completare in questo modo la procedura di registrazione
-17. il sistema deve essere provvisto di un entry-point, una pagina dove poter smistare gli utenti dell' applicazione in base al ruolo ricoperto ed indirizzarli verso le sezioni dedicate
+- **Interface**: gestisce l'interazione con i servizi REST, incapsulando completamente la logica di rete e fornendo un dispatcher centralizzato, il Service Manager, per semplificare la gestione delle chiamate, con la sua introduzione è possibile definire e aggiungere facilmente nuovi task al Front-end, introdurre in modo veloce nuove chiamate REST a servizi già presenti, ma anche definire vari modi con cui sfruttare i servizi a disposizione e combinarli in modo semplice.
+
+- **Component**: si occupa della costruzione delle pagine web, basate su componenti modulari che separano chiaramente la logica di business dai dati da visualizzare. I componenti sono disponibili in versioni generiche e integrate con il Service Manager per facilitare l'interoperabilità tra i vari task. In questo modo, è possibile definire una pagina come un insieme di componenti logici (che quindi rappresentano requisiti, prerequisiti o controlli di varia natura) e di componenti oggetto, che rappresentano i dati da inserire nella vista.
+Questa struttura ha trasformato il precedente Gui Controller, che gestiva il 90% delle operazioni, in un controller dedicato al routing e alla gestione delle sessioni, concetti precedentemente assenti.
+ 
+- **Game**: gestisce la logica di gioco, con un controller REST dedicato alla gestione della concorrenza e delle partite attive. Fornisce inoltre una classe GameLogic che consente la definizione delle diverse modalità di gioco. In precedenza introdurre una modalità era enormemente difficile, abbiamo ristrutturato il precedente **GameEngine**, che era frammentato in codice procedurale e ridondante, introducendo un backend robusto e scalabile per gestire facilmente nuove modalità di gioco. L'editor di test case, che prima era rigido e specifico per ogni modalità, è ora neutrale e riutilizzabile.
+
+Oltre alla ristrutturazione del codice, sono stati introdotti diversi miglioramenti, tra cui:
+- Un completo **rifacimento grafico** per migliorare l'esperienza utente,
+- L'introduzione di un sistema di **logging**, che era totalmente assente in entrambi i task, per tracciare meglio le attività e risolvere eventuali problemi,
+- L'introduzione di un'**architettura** per garantire maggiore flessibilità, manutenibilità e modularità, 
+- Il **refactoring** del codice JavaScript alla base del front-end,
+- La risoluzione di bug presenti in vari task, non solo T5 e T6.
+
+Infine, abbiamo creato una **wiki** dettagliata che offre una guida completa su come utilizzare e sfruttare al meglio gli strumenti e le funzionalità del sistema.
+
+---------------------------------------------------
 
 ### REQUISITI SVILUPPATI (2)
 1. la struttura del FileSystem è stata modificata per garantire che ciascun player registrato ed autenticato, caratterizato da un ID univoco, sia dotato di una personale cartella di gioco per memorizzare le partite giocate ed i test ed i risultati prodotti dalla misurazione con il robot, e.g.:

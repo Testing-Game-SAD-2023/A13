@@ -1,0 +1,27 @@
+/* PER I PULSANTI */
+/* Modifica del colore di sfondo e del testo per i bottoni principali */
+.btn-primary, .btn-primary:active, .btn-primary:visited{
+  background-color: #f07178 !important;
+  border-color: #ba585d !important;
+  color: white !important;
+}
+
+/* Cambia il colore al passaggio del mouse */
+.btn-primary:hover {
+  background-color: #f07178 !important;
+  border-color: #ba585d !important;
+  color: #fff !important;
+}
+
+.btn-success, .btn-success:active, .btn-success:visited{
+  background-color: #fdb838 !important;
+  border-color: #e0ad4d !important;
+  color: white !important;
+}
+
+/* Cambia il colore al passaggio del mouse */
+.btn-success:hover {
+  background-color: #fdb838 !important;
+  border-color: #e0ad4d !important;
+  color: #fff !important;
+}
