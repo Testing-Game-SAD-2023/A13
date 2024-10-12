@@ -236,45 +236,6 @@ public class GuiController {
         return "redirect:/login";
     }
 
-    @GetMapping("/editorAllenamento")
-    public String editorAllenamentoPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if (Auth) {
-            return "editorAllenamento";
-        }
-        return "redirect:/login";
-    }
-
-    //MODIFICA (22/05/2024) : Visualizzazione pagina dedicata alla selezione della "Scalata"
-    @GetMapping("/gamemode_scalata")
-    public String showScalatAndView(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        /*  stefano: vecchio codice t5
-        System.out.println("(GET /gamemode_scalata) get received");
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
-        formData.add("jwt", jwt);
-        Boolean isIsAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        System.out.println("(GET /gamemode_scalata) Token del player valido?");
-        if (isIsAuthenticated == null || !isIsAuthenticated) {
-
-            System.out.println("(GET /gamemode_scalata) Token JWT non valido, il player verrà reindirizzato alla pagina di login.");
-            return "redirect:/login";
-        }
-        else {
-
-            System.out.println("(GET /gamemode_scalata) Token valido.");
-            return "gamemode_scalata";
-        }
-         */
-        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if (Auth) {
-            return "gamemode_scalata";
-        }
-        return "redirect:/login";
-
-    }
-
     @GetMapping("/editor_old")
     public String getEditorOld(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "editor_old", model);
