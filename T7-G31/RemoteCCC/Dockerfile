@@ -4,3 +4,6 @@ ARG JAR_FILE=target/RemoteCCC-0.0.1.jar
 COPY ${JAR_FILE} app.jar
 COPY ClientProject ClientProject 
 ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+# Esegui mvn clean install -U per forzare l'aggiornamento delle dipendenze e installare il progetto
+#RUN mvn clean install -U
