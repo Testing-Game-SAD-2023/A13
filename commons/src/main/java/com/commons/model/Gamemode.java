@@ -2,7 +2,7 @@ package com.commons.model;
 
 public enum Gamemode {
     All,
-    Robot,
+    Sfida,
     Multiplayer,
     Training,
     Scalata

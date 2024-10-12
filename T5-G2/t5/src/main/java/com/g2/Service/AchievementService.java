@@ -79,7 +79,7 @@ public class AchievementService {
 
         for (Achievement a : achievementList)
         {
-            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> cat.getStatisticID() == a.getStatisticID()).toList();
+            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> Objects.equals(cat.getStatisticID(), a.getStatisticID())).toList();
 
             for (StatisticProgress c : filteredList)
                 achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
