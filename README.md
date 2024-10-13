@@ -12,6 +12,7 @@ Questa struttura ha trasformato il precedente Gui Controller, che gestiva il 90%
 - **Game**: gestisce la logica di gioco, con un controller REST dedicato alla gestione della concorrenza e delle partite attive. Fornisce inoltre una classe GameLogic che consente la definizione delle diverse modalità di gioco. In precedenza introdurre una modalità era enormemente difficile, abbiamo ristrutturato il precedente **GameEngine**, che era frammentato in codice procedurale e ridondante, introducendo un backend robusto e scalabile per gestire facilmente nuove modalità di gioco. L'editor di test case, che prima era rigido e specifico per ogni modalità, è ora neutrale e riutilizzabile.
 
 Oltre alla ristrutturazione del codice, sono stati introdotti diversi miglioramenti, tra cui:
+- Estensivo miglioramento del task T7 con correzione di bug fix, introduzione della concorrenza e magior robustezza.
 - Un completo **rifacimento grafico** per migliorare l'esperienza utente,
 - L'introduzione di un sistema di **logging**, che era totalmente assente in entrambi i task, per tracciare meglio le attività e risolvere eventuali problemi,
 - L'introduzione di un'**architettura** per garantire maggiore flessibilità, manutenibilità e modularità, 
