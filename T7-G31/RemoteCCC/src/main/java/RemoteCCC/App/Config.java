@@ -26,7 +26,7 @@ public class Config {
     /*
         *  Stefano: queste prima erano variabili statiche, è un errore poiché devo fare multi threading.
      */
-    private final String usrPath = System.getProperty("user.dir");
+    private final String usrPath;
     private String timestamp;
 
     /*
@@ -58,11 +58,12 @@ public class Config {
         *   riducendo la duplicazione del codice e facilitando eventuali modifiche ai percorsi.
      */
     private String buildPath(PathType pathType) {
-        return usrPath + File.separator + timestamp + File.separator + pathType.getPath();
+        return usrPath + timestamp + File.separator + pathType.getPath();
     }
 
     // Constructor
     public Config() {
+        this.usrPath = System.getProperty("user.dir");
         this.timestamp = generateTimestamp();
         System.out.println("[CONFIG] Constructor chiamato timestamp: " + this.timestamp);
     }
@@ -100,7 +101,7 @@ public class Config {
     }
 
     public String getCoverageFolderPath() {
-        return usrPath + File.separator + PathType.ROOT.getPath() + File.separator + timestamp + File.separator + PathType.TARGET_SITE.getPath();
+        return buildPath(PathType.TARGET_SITE);
     }
 
     public String getPackageDeclaration() {
