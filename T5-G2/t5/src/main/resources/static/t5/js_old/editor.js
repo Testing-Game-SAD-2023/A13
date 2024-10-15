@@ -227,7 +227,7 @@ runButton.addEventListener("click", function () {
       formData.append("testClassId", localStorage.getItem("classe"));
 
       $.ajax({
-        url: "/api/run2", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
+        url: "/api/run", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
         type: "POST",
         data: formData,
         processData: false,
@@ -305,7 +305,7 @@ runButton.addEventListener("click", function () {
           console.log('URL post on: '+url);
 
           const javaCode = editor.getValue();                               // Code of the test class
-          document.getElementById('loading-result').style.display = 'block';
+          //document.getElementById('loading-result').style.display = 'block';
           $.ajax({
             url: url,
             type: 'POST',
@@ -347,7 +347,7 @@ runButton.addEventListener("click", function () {
                     var terzoElemento6 = parseInt(ottavoRowElements[2] * 100);
                     var terzoElemento7 = parseInt(nonoRowElements[2] * 100);
 
-                    document.getElementById('loading-result').style.display = 'none';
+                    //document.getElementById('loading-result').style.display = 'none';
 
                     console.log('Terzo elemento della seconda riga:', terzoElemento);
                     
