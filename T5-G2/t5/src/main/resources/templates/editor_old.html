@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" data-bs-theme="dark" id="html-root"> 
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Editor</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+		/>
+		
+		<!-- CodeMirror JavaScript -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+		<!-- code mirror-->
+		<!-- CodeMirror CSS -->
+		<link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
+		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
+		<link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css" />
+		
+		<link rel="stylesheet" href="/t5/css/main_style.css" />
+		
+		<style>
+			.no-select {
+				user-select: none; /* Per browser moderni */
+				-webkit-user-select: none; /* Per Safari */
+				-moz-user-select: none; /* Per Firefox */
+				-ms-user-select: none; /* Per Internet Explorer */
+			}
+			.CodeMirror {
+				height: 100%; /* Assicura che l'editor utilizzi il 100% dello spazio disponibile */
+			}
+			.covered-line {
+				background-color: #c8e6c9; /* Colore di sfondo per le righe coperte */
+				color: black !important;
+			}
+			.uncovered-line {
+				background-color: #ffcdd2; /* Colore di sfondo per le righe non coperte */
+				color: black !important;
+			}
+			.partially-covered-line {
+				background-color: #ffecb3; /* Colore di sfondo per le righe parzialmente coperte */
+				color: black !important;
+			}
+
+			#dashboard {
+				display: flex;
+				flex-direction: row;
+				width: 100vw; /* Occupa tutta la larghezza della viewport */
+				height: 100vh; /* Occupa tutta l'altezza della viewport */
+				overflow: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
+			}
+
+			#card_user,
+			#card_robot {
+				height: 95vh;
+				width: 49.7vw;
+				flex-grow: 0; /* Disabilita la crescita del container */
+				flex-shrink: 0; /* Disabilita il restringimento del container */
+				overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
+			}
+
+			#section_editor {
+				height: calc(
+					100vh - 250px
+				); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+			}
+
+			#section_UT {
+				height: calc(
+					100vh - 250px
+				); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+			}
+
+			.highlight {
+				background-color: yellow;
+				color: black;
+			}
+		</style>
+	</head>
+	
+
+<body class="overflow-y-hidden overflow-x-hidden px-1">
+  <!-- NAV-->
+  <ul class="nav">
+    <li class="nav-item flex-grow-1">
+      <a
+        href="/logout"
+        class="btn btn-sm text-light"
+        tabindex="-1"
+        role="button"
+        aria-disabled="true"
+      >
+        <i class="bi bi-arrow-90deg-left"></i>
+        Logout
+      </a>
+    </li>
+    <li class="nav-item">
+      <div class="form-check form-switch mt-1">
+        <label class="form-check-label text-light" for="themeToggle"> Mode </label>
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="themeToggle"
+        />
+      </div>
+    </li>
+  </ul>
+
+  <!-- DASHBOARD -->
+  <div class="container-fluid" id="dashboard">
+    <div class="row">
+      <!-- PRIMA COLONNA-->
+      <div class="col px-0">
+        <div class="card rounded-0" id="card_user">
+          <!-- EDITOR-->
+          <div class="card-header p-0">
+            <nav class="navbar bg-body-tertiary p-2">
+              <span class="navbar-brand lead my-0 py-0"> Edit </span>
+              <div class="">
+                <!-- UNDO e REDO -->
+                <button type="button" class="btn" id="undo-button">
+                  <i class="bi bi-arrow-90deg-left"></i>
+                </button>
+                <button type="button" class="btn" id="redo-button">
+                  <i class="bi bi-arrow-90deg-right"></i>
+                </button>
+                <!-- COVERAGE -->
+                <button class="btn btn-primary"
+                        type = "button"
+                        id = "compileButton"> Compile
+                </button>
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  id="coverageButton"
+                >
+                  <div id="loading_cov">
+                    <span
+                      class="spinner-border spinner-border-sm"
+                      aria-hidden="true"
+                      style="display: none"
+                    ></span>
+                    <i
+                      id="loading_icon_1"
+                      class="bi bi-play-fill"
+                      aria-hidden="true"
+                    ></i>
+                    <span role="status">Play</span>
+                    <!-- Icona nascosta -->
+                  </div>
+                </button>
+                <!-- MENU BUTTON -->
+                <button
+                  type="button"
+                  id="utente_menu"
+                  class="btn btn-sm dropdown-toggle-split my-0"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  data-bs-auto-close="outside"
+                  aria-haspopup="true"
+                >
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <!-- MENU OPZIONI -->
+                <div
+                  class="dropdown-menu shadow dropdown-menu-end"
+                  aria-labelledby="navbarDropdownMenuLink"
+                  style="width: 400px;"
+                >
+                  <div class="container-fluid p-0">
+                    <div class="tab-content" id="myTabContent">
+                      <!-- MENU -->
+                      <div
+                        class="tab-pane fade show active"
+                        id="paneA"
+                        role="tabpanel"
+                        aria-labelledby="pane-A"
+                      >
+                        <ol class="breadcrumb m-0 px-2">
+                          <li class="breadcrumb-item"> 
+                            <Strong>Menu</Strong>
+                          </li>
+                          <li class="breadcrumb-item active" aria-current="page">CTRL+D</li>
+                          </ol>
+                        <div class="list-group list-group-flush">
+                          <button
+                            type="button"
+                            onclick="showTabPane('paneB')"
+                            class="list-group-item list-group-item-action"
+                            aria-current="true"
+                          >
+                            <i class="bi bi-clock-history"></i>
+                            Storico
+                          </button>
+                          <button
+                            type="button"
+                            onclick="showTabPane('paneC')"
+                            class="list-group-item list-group-item-action"
+                          >
+                            <i class="bi bi-upload"></i> Upload
+                          </button>
+                          <button
+                            type="button"
+                            id="DownloadButton"
+                            class="list-group-item list-group-item-action"
+                          >
+                            <i class="bi bi-download"></i> Download
+                          </button>
+                          <button
+                            type="button"
+                            onclick="showTabPane('paneD')"
+                            class="list-group-item list-group-item-action"
+                          >
+                            <i class="bi bi-search"></i> Cerca&Sostituisci
+                          </button>
+                        </div>
+                      </div>
+                      <!-- STORICO-->
+                      <div
+                        class="tab-pane fade overflow-y-auto "
+                        id="paneB"
+                        role="tabpanel"
+                        aria-labelledby="pane-B"
+                      >
+                        <div class="d-flex">
+                          <button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
+                            <i class="bi bi-arrow-left"></i>
+                          </button>
+                          <ol class="breadcrumb m-0 px-2">
+                            <li class="breadcrumb-item">Menu</li>
+                            <li class="breadcrumb-item active" aria-current="page">Storico</li>
+                          </ol>
+                        </div>
+                        <ol
+                          id="storico_list"
+                          class="list-group list-group-flush list-group-numbered overflow-auto border-top"
+                          style="max-height: 150px"
+                        >
+                          <li
+                            id="placeholder-item"
+                            class="list-group-item d-flex justify-content-between align-items-start"
+                          >
+                            <div class="ms-2 me-auto">
+                              <div class="fw-bold">
+                                Nessun turno presente!
+                              </div>
+                            </div>
+                          </li>
+                        </ol>
+                      </div>
+                      <!-- UPLOAD -->
+                      <div
+                        class="tab-pane fade"
+                        id="paneC"
+                        role="tabpanel"
+                        aria-labelledby="pane-C"
+                      >
+                      <div class="d-flex">
+                        <button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
+                          <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <ol class="breadcrumb m-0 px-2">
+                          <li class="breadcrumb-item">Menu</li>
+                          <li class="breadcrumb-item active" aria-current="page">Upload</li>
+                        </ol>
+                      </div>
+                        <input
+                          class="container-fluid form-control"
+                          id="fileInput"
+                          type="file"
+                        />
+                      </div>
+                      <!-- SEARCH -->
+                      <div
+                        class="tab-pane fade"
+                        id="paneD"
+                        role="tabpanel"
+                        aria-labelledby="pane-D"
+                      >
+                      <div class="d-flex">
+                        <button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
+                          <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <ol class="breadcrumb m-0 px-2">
+                          <li class="breadcrumb-item">Menu</li>
+                          <li class="breadcrumb-item active" aria-current="page">Cerca&Sostituisci</li>
+                        </ol>
+                      </div>
+                        <div class="input-group mb-3 px-2">
+                          <button
+                            class="btn btn-primary"
+                            type="button"
+                            id="searchButton"
+                          >
+                            <i class="bi bi-search"></i>
+                          </button>
+                          <input
+                            type="text"
+                            id="searchTerm"
+                            class="form-control border-secondary"
+                            placeholder="Cerca"
+                            aria-label="Cerca"
+                          />
+                          <span
+                            class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger"
+                            id="SearchItems"
+                            style="display: none"
+                          >
+                          </span>
+                        </div>
+                        <div class="input-group mb-2 px-2">
+                          <button
+                            class="btn btn-primary"
+                            type="button"
+                            id="startReplace"
+                          >
+                            <i class="bi bi-arrow-left-right"></i>
+                          </button>
+                          <input
+                            type="text"
+                            id="replaceTerm"
+                            class="form-control border-secondary"
+                            placeholder="Sostituisci"
+                            aria-label="Sostituisci"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </nav>
+          </div>
+          <div
+            class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+            id="section_editor"
+          >
+            <textarea id="editor">
+/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+Nome: "inserire il proprio nome"
+Cognome: "inserire il proprio cognome"
+Username: username
+UserID: userID
+Date: date
+*/
+
+import org.junit.Before;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class TestClasse {
+  @BeforeClass
+  public static void setUpClass() {
+    // Eseguito una volta prima dell'inizio dei test nella classe
+    // Inizializza risorse condivise 
+    // o esegui altre operazioni di setup
+  }
+        
+  @AfterClass
+  public static void tearDownClass() {
+    // Eseguito una volta alla fine di tutti i test nella classe
+    // Effettua la pulizia delle risorse condivise 
+    // o esegui altre operazioni di teardown
+  }
+        
+  @Before
+  public void setUp() {
+    // Eseguito prima di ogni metodo di test
+    // Preparazione dei dati di input specifici per il test
+  }
+        
+  @After
+  public void tearDown() {
+    // Eseguito dopo ogni metodo di test
+    // Pulizia delle risorse o ripristino dello stato iniziale
+  }
+        
+  @Test
+  public void testMetodo() {
+    // Preparazione dei dati di input
+    // Esegui il metodo da testare
+    // Verifica l'output o il comportamento atteso
+    // Utilizza assert per confrontare il risultato atteso 
+    // con il risultato effettivo
+  }
+        
+  // Aggiungi altri metodi di test se necessario
+}
+
+
+
+            </textarea
+            >
+          </div>
+          <!-- CONSOLE -->
+          <div class="card-header border-top p-0">
+            <nav class="navbar bg-body-tertiary p-2">
+              <span class="navbar-brand lead my-0 py-0"> Console </span>
+              <div>
+                <button type="button" class="btn btn-sm" id="close_console_utente">
+                  <i class="bi bi-arrow-bar-down"></i>
+                </button>
+                <button type="button" class="btn btn-sm" id="divider_Console">
+                  <i class="bi bi-arrows-expand"></i>
+                </button>
+              </div>
+            </nav>
+          </div>
+          <div
+            class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+            id="section_console"
+          >
+            <textarea id="console-textarea"> </textarea>
+          </div>
+          <div class="card-footer text-body-secondary"></div>
+        </div>
+      </div>
+      <!-- SECONDA COLONNA-->
+      <div class="col px-0">
+        <div class="card rounded-0" id="card_robot">
+          <!-- CLASS UNDER TEST-->
+          <div class="card-header p-0">
+            <nav class="navbar bg-body-tertiary p-2">
+              <span class="navbar-brand lead my-0 py-0">
+                Class Under Test
+              </span>
+              <div class="">
+                <!-- INFO BUTTON -->
+                <span
+                  class="d-inline-block mx-3"
+                  tabindex="0"
+                  id="popover_info"
+                  data-bs-toggle="popover"
+                  data-bs-trigger="hover focus"
+                  data-bs-title="Game Info"
+                  data-bs-placement="bottom"
+                  data-bs-content="prova"
+                >
+                  <i class="bi bi-info-circle"></i>
+                </span>
+                <!-- SUBMIT /RUN -->
+                <button class="btn btn-success" type="button" id="runButton">
+                  <div id="loading_run">
+                    <span
+                      class="spinner-border spinner-border-sm"
+                      aria-hidden="true"
+                      style="display: none"
+                    ></span>
+                    <i
+                      id="loading_icon_1"
+                      class="bi bi-play-fill"
+                      aria-hidden="true"
+                    ></i>
+                    <span role="status">Submit</span>
+                    <!-- Icona nascosta -->
+                  </div>
+                </button>
+              </div>
+            </nav>
+          </div>
+          <div
+            class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+            id="section_UT"
+          >
+            <textarea id="sidebar-textarea"> </textarea>
+          </div>
+          <!-- COMPARE RESULT -->
+          <div class="card-header border-top p-0">
+            <nav class="navbar bg-body-tertiary p-2">
+              <span class="navbar-brand lead my-0 py-0"> Results </span>
+              <div>
+                <button type="button" class="btn btn-sm" id="close_console_result">
+                  <i class="bi bi-arrow-bar-down"></i>
+                </button>
+                <button type="button" class="btn btn-sm" id="divider_result">
+                  <i class="bi bi-arrows-expand"></i>
+                </button>
+              </div>
+            </nav>
+          </div>
+          <div
+            class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+            id="section_result"
+          >
+            <textarea id="console-textarea2"> </textarea>
+          </div>
+          <div class="card-footer text-body-secondary"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  		<!-- SCRIPTS-->
+      <script 
+			src="https://cdnjs.cloudflare.com/ajax/libs/driver.js/0.9.8/driver.min.js"
+		></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+			integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+			crossorigin="anonymous"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/lib/codemirror.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/mode/clike/clike.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/foldcode.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/search/searchcursor.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/search/search.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/jquery/jquery-3.7.0.com.js}"
+			th:inline="javascript"
+		></script>
+    
+    <script th:src="@{/t5/js_old/common.js}"></script>
+    <script th:src="@{/t5/js_old/commonEditor.js}"></script>
+    <script th:src="@{/t5/js_old/editor.js}"></script>
+		<script th:src="@{/t5/js/editor_tour.js}" th:inline="javascript"></script> 
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+  </body>
+</html>

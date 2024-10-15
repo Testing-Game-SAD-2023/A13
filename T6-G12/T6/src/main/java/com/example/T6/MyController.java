@@ -170,7 +170,7 @@ public class MyController {
     // }
     // FUNZIONE CHE DOVREBBE RICEVERE I RISULTATI DEI ROBOT
 
-    @PostMapping("/run") // NON ESISTE NESSUN INTERFACCIA VERSO I COMPILATORI DEI ROBOT EVOSUITE E
+    @PostMapping("/run2") // NON ESISTE NESSUN INTERFACCIA VERSO I COMPILATORI DEI ROBOT EVOSUITE E
                          // RANDOOP
     public ResponseEntity<String> runner(HttpServletRequest request) {
         try {
