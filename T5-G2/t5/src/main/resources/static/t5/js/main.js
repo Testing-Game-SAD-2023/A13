@@ -267,7 +267,8 @@ function redirectToPageeditor() {
           classe: classe,
           robot: robot,
           difficulty: difficulty,
-          username: localStorage.getItem("username")
+          username: localStorage.getItem("username"),
+          gamemode: "Sfida"
         },
         type: 'POST',
         traditional: true,
@@ -350,6 +351,11 @@ function redirectToLogin() {
         console.error('Error:', error);
       });
   }
+}
+
+function redirectToUserInfo() {
+  console.log("Redirect to UserInfo");
+  window.location.href = "/profile";
 }
 
 function saveLoginData() {

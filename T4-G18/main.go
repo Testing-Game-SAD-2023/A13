@@ -19,6 +19,7 @@ import (
 	"github.com/alarmfox/game-repository/api/robot"
 	"github.com/alarmfox/game-repository/api/round"
 	"github.com/alarmfox/game-repository/api/scalatagame"
+	"github.com/alarmfox/game-repository/api/playerhascategoryachievement"
 	"github.com/alarmfox/game-repository/api/turn"
 	"github.com/alarmfox/game-repository/limiter"
 	"github.com/alarmfox/game-repository/model"
@@ -101,7 +102,9 @@ func run(ctx context.Context, c Configuration) error {
 		&model.Turn{},
 		&model.Metadata{},
 		&model.PlayerGame{},
-		&model.Robot{})
+		&model.Robot{},
+		&model.PlayerHasCategoryAchievement{},
+	)
 
 	if err != nil {
 		return err
@@ -177,6 +180,9 @@ func run(ctx context.Context, c Configuration) error {
 
 			// scalatagame endpoint
 			scalataController = scalatagame.NewController(scalatagame.NewRepository(db))
+
+            // phca endpoint
+            phcaController = playerhascategoryachievement.NewController(playerhascategoryachievement.NewRepository(db))
 		)
 
 		r.Mount(c.ApiPrefix, setupRoutes(
@@ -185,6 +191,7 @@ func run(ctx context.Context, c Configuration) error {
 			turnController,
 			robotController,
 			scalataController,
+			phcaController,
 		))
 	})
 	log.Printf("listening on %s", c.ListenAddress)
@@ -309,14 +316,17 @@ func makeDefaults(c *Configuration) {
 
 }
 
-func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller) *chi.Mux {
+func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, pc *playerhascategoryachievement.Controller) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
 
 	r.Route("/games", func(r chi.Router) {
-		//Get game
+		// Get game
 		r.Get("/{id}", api.HandlerFunc(gc.FindByID))
+
+		// Get games by player id
+		r.Get("/player/{pid}", api.HandlerFunc(gc.FindByPID))
 
 		// List games
 		r.Get("/", api.HandlerFunc(gc.List))
@@ -413,6 +423,25 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 		// r.Delete("/{id}", api.HandlerFunc(sgc.Delete)) // TODO:
 
 	})
+
+    r.Route("/phca", func(r chi.Router) {
+        // List PHCAs
+        r.Get("/", api.HandlerFunc(pc.FindAll))
+
+        // Get PHCA by Player ID
+        r.Get("/{pid}", api.HandlerFunc(pc.FindByPID))
+
+		// Create PHCA
+		r.With(middleware.AllowContentType("application/json")).
+			Post("/", api.HandlerFunc(pc.Create))
+
+		// Update achievement
+		r.With(middleware.AllowContentType("application/json")).
+			Put("/{pid}/{statistic}", api.HandlerFunc(pc.Update))
+
+		// Delete achievement
+		r.Delete("/{pid}/{statistic}", api.HandlerFunc(pc.Delete))
+    })
 
 	return r
 }

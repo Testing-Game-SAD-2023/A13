@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GuiController {
 
     private final ServiceManager serviceManager;
+    private AchievementService achievementService;
 
     @Autowired
     public GuiController(RestTemplate restTemplate) {
@@ -44,6 +45,52 @@ public class GuiController {
         PageBuilder main = new PageBuilder(serviceManager, "main", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
+    }
+
+    @GetMapping("/profile")
+    public String profilePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
+        formData.add("jwt", jwt);
+
+        System.out.println("GET /profile, visualizzazione profilo utente");
+        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
+                Boolean.class);
+
+        System.out.println("(/profile) Token del player valido?");
+        if (isAuthenticated == null || !isAuthenticated)
+            return "redirect:/login";
+
+        System.out.println("(/profile) Token valido: "+ jwt);
+
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+
+            int userId = Integer.parseInt(map.get("userId").toString());
+            System.out.println("(/profile) User ID: " + userId);
+            List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
+            List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
+
+            List<Statistic> allStatistics = achievementService.getStatistics();
+            Map<String, Statistic> IdToStatistic = new HashMap<>();
+
+            for (Statistic stat : allStatistics)
+                IdToStatistic.put(stat.getID(), stat);
+
+            System.out.println("(/profile) Retrieved statistics: " + statisticProgresses);
+            model.addAttribute("achievementProgresses", achievementProgresses);
+            model.addAttribute("statisticProgresses", statisticProgresses);
+            model.addAttribute("IdToStatistic", IdToStatistic);
+
+        } catch (JsonProcessingException e) {
+            System.out.println("(/profile) Error retrieving achievements: " + e.getMessage());
+        }
+
+        return "profile";
     }
 
     @GetMapping("/gamemode")
@@ -180,7 +227,7 @@ public class GuiController {
 
     @PostMapping("/save-data")
     public ResponseEntity<String> saveGame(@RequestParam("playerId") int playerId, @RequestParam("robot") String robot,
-            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty,
+            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty, @RequestParam("gamemode") String gamemode,
             @RequestParam("username") String username, @RequestParam("selectedScalata") Optional<Integer> selectedScalata, HttpServletRequest request) {
 
         if (!request.getHeader("X-UserID").equals(String.valueOf(playerId))) {
@@ -193,7 +240,7 @@ public class GuiController {
 
         GameDataWriter gameDataWriter = new GameDataWriter();
         // g.setGameId(gameDataWriter.getGameId());
-        Game g = new Game(playerId, "descrizione", "nome", difficulty, username);
+        Game g = new Game(playerId, gamemode, "nome", difficulty, username);
         // g.setPlayerId(pl);
         // g.setPlayerClass(classe);
         // g.setRobot(robot);
@@ -210,6 +257,9 @@ public class GuiController {
         if (ids == null) {
             return ResponseEntity.badRequest().body("Bad Request");
         }
+
+        System.out.println("Checking achievements...");
+        achievementService.updateProgressByPlayer(playerId);
 
         return ResponseEntity.ok(ids.toString());
     }
