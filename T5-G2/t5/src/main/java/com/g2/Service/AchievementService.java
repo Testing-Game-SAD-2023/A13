@@ -1,6 +1,6 @@
-package com.g2.Interfaces;
+package com.g2.Service;
 
-import com.g2.Components.ServiceObjectComponent;
+import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -27,7 +27,7 @@ public class AchievementService {
      * @return a list of achievements obtained after this update.
      */
     public List<AchievementProgress> updateProgressByPlayer(int playerID) {
-        List<Game> gamesList = (List<Game>) serviceManager.handleRequest("T4", "getGames", null);
+        List<Game> gamesList = getGames();
 
         List<AchievementProgress> achievementProgressesPrevious = getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList();
         List<Statistic> statisticList = getStatistics();
@@ -47,26 +47,22 @@ public class AchievementService {
         return obtainedAchievements;
     }
 
-    public List<Statistic> getStatistics() {
-        ResponseEntity<List<Statistic>> statisticsResponseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/statistics/list",
-                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                });
+    private List<Game> getGames() {
+        return (List<Game>) serviceManager.handleRequest("T4", "getGames", null);
+    }
 
-        List<Statistic> statisticList = statisticsResponseEntity.getBody();
-        return statisticList;
+    public List<Statistic> getStatistics() {
+        return (List<Statistic>) serviceManager.handleRequest("T1", "getStatistics", null);
     }
 
     private void setProgress(int playerID, String statisticID, float progress) {
+        //TODO: integrare con Service Manager
         restTemplate.put("http://t4-g18-app-1:3000/phca/" + playerID + "/" + statisticID,
                 new StatisticProgress(playerID, statisticID, progress));
     }
 
     public List<AchievementProgress> getProgressesByPlayer(int playerID) {
-        ResponseEntity<List<Achievement>> achievementResponseEntity = restTemplate.exchange("http://manvsclass-controller-1:8080/achievements/list",
-                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                });
-
-        List<Achievement> achievementList = achievementResponseEntity.getBody();
+        List<Achievement> achievementList = (List<Achievement>) serviceManager.handleRequest("T1", "getAchievements", null);
         List<StatisticProgress> categoryProgressList = getStatisticsByPlayer(playerID);
 
         List<AchievementProgress> achievementProgresses = new ArrayList<>();
@@ -86,11 +82,7 @@ public class AchievementService {
     }
 
     public List<StatisticProgress> getStatisticsByPlayer(int playerID) {
-        ResponseEntity<List<StatisticProgress>> progressesResponseEntity = restTemplate.exchange("http://t4-g18-app-1:3000/phca/" + playerID,
-                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                });
-
-        List<StatisticProgress> statisticProgresses = progressesResponseEntity.getBody();
+        List<StatisticProgress> statisticProgresses = (List<StatisticProgress>) serviceManager.handleRequest("T4", "getStatisticsProgresses", playerID);
 
         if (statisticProgresses == null)
             throw new RuntimeException("Errore nel fetch delle statistiche del giocatore.");

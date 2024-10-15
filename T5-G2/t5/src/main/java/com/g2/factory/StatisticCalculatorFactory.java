@@ -27,7 +27,7 @@ public class StatisticCalculatorFactory {
         IStatisticCalculator calculator = statisticCalculatorMap.get(role);
 
         if (calculator == null)
-            throw new RuntimeException("Unsupported statistic calculator.");
+            throw new RuntimeException("Unsupported statistic calculator: " + role + ". ===MAP: " + statisticCalculatorMap);
 
         return calculator;
     }

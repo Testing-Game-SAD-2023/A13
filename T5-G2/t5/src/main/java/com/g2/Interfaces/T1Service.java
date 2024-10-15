@@ -1,5 +1,8 @@
 package com.g2.Interfaces;
 
+import com.g2.Model.Achievement;
+import com.g2.Model.AchievementProgress;
+import com.g2.Model.Statistic;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -18,6 +21,14 @@ public class T1Service extends BaseService {
         super(restTemplate, BASE_URL);
 
         // Registrazione delle azioni
+        registerAction("getStatistics", new ServiceActionDefinition(
+                params -> getStatistics()
+        ));
+
+        registerAction("getAchievements", new ServiceActionDefinition(
+                params -> getAchievements()
+        ));
+
         registerAction("getClasses", new ServiceActionDefinition(
                 params -> getClasses() //Metodo senza argomenti
         ));
@@ -29,6 +40,24 @@ public class T1Service extends BaseService {
     }
 
     // Metodi effettivi
+    private List<Statistic> getStatistics() {
+        try {
+            return callRestGET("/statistics/list", null, new ParameterizedTypeReference<List<Statistic>>() {
+            });
+        } catch (Exception e) {
+            throw new IllegalArgumentException("getStatistics fallimento errore:" + e.getMessage());
+        }
+    }
+
+    private List<Achievement> getAchievements() {
+        try {
+            return callRestGET("/achievements/list", null, new ParameterizedTypeReference<List<Achievement>>() {
+            });
+        } catch (Exception e) {
+            throw new IllegalArgumentException("getAchievements fallimento errore:" + e.getMessage());
+        }
+    }
+
     private List<ClassUT> getClasses() {
         try {
             return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {
@@ -36,7 +65,6 @@ public class T1Service extends BaseService {
         } catch (Exception e) {
             throw new IllegalArgumentException("GetClasses fallimento errore:" + e.getMessage());
         }
-
     }
 
     private String getClassUnderTest(String nomeCUT) {

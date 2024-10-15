@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.g2.Model.Game;
+import com.g2.Model.StatisticProgress;
+import com.g2.Model.User;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -30,6 +34,15 @@ public class T4Service extends BaseService {
                 params -> getLevels((String) params[0]),
                 // L'azione è definita per accettare un parametro di tipo String
                 String.class
+        ));
+
+        registerAction("getGames", new ServiceActionDefinition(
+                params -> getGames()
+        ));
+
+        registerAction("getStatisticsProgresses", new ServiceActionDefinition(
+                params -> getStatisticsProgresses((int) params[0]),
+                Integer.class
         ));
 
         registerAction("CreateGame", new ServiceActionDefinition(
@@ -71,6 +84,32 @@ public class T4Service extends BaseService {
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class
         ));
+    }
+
+    // usa /games per ottenere una lista di giochi
+    private List<Game> getGames() {
+        final String endpoint = "/games";
+        try {
+            return callRestGET("/games", null, new ParameterizedTypeReference<List<Game>>() {
+            });
+        }
+        catch (RuntimeException e) {
+            // Gestione degli errori durante la richiesta
+            throw new IllegalArgumentException("[GETGAMES] Errore durante il recupero dei giochi: " + e.getMessage());
+        }
+    }
+
+    private List<StatisticProgress> getStatisticsProgresses(int playerID) {
+        try {
+            Map<String, String> formData = new HashMap<>();
+            formData.put("pid", String.valueOf(playerID));
+
+            List<StatisticProgress> response = callRestGET("/phca", formData, new ParameterizedTypeReference<List<StatisticProgress>>() {});
+            return response;
+        } catch (Exception e) {
+            System.out.println("[GETSTATISTICSPROGRESSES] Errore nel prelievo delle statistiche: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     // usa /robots per ottenere dati 

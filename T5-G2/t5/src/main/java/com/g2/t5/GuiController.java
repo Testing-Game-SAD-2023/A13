@@ -1,12 +1,14 @@
 package com.g2.t5;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g2.Model.*;
+import com.g2.Service.AchievementService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,6 @@ import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.ServiceObjectComponent;
 import com.g2.Interfaces.ServiceManager;
-import com.g2.Model.Game;
-import com.g2.Model.ScalataGiocata;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -33,6 +33,8 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GuiController {
 
     private final ServiceManager serviceManager;
+
+    @Autowired
     private AchievementService achievementService;
 
     @Autowired
@@ -44,25 +46,16 @@ public class GuiController {
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "main", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
+        achievementService.updateProgressByPlayer(1);
         return main.handlePageRequest();
     }
 
     @GetMapping("/profile")
     public String profilePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
+        profile.SetAuth(jwt);
 
-        formData.add("jwt", jwt);
-
-        System.out.println("GET /profile, visualizzazione profilo utente");
-        Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData,
-                Boolean.class);
-
-        System.out.println("(/profile) Token del player valido?");
-        if (isAuthenticated == null || !isAuthenticated)
-            return "redirect:/login";
-
-        System.out.println("(/profile) Token valido: "+ jwt);
-
+        // TODO: questa procedura per prelevare l'id utente non è sicura, va fatto un sistema che lo chiede a T23
         byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
         String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
 
@@ -71,7 +64,7 @@ public class GuiController {
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
 
             int userId = Integer.parseInt(map.get("userId").toString());
-            System.out.println("(/profile) User ID: " + userId);
+
             List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
             List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
 
@@ -86,11 +79,20 @@ public class GuiController {
             model.addAttribute("statisticProgresses", statisticProgresses);
             model.addAttribute("IdToStatistic", IdToStatistic);
 
-        } catch (JsonProcessingException e) {
-            System.out.println("(/profile) Error retrieving achievements: " + e.getMessage());
+            GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
+            GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
+            GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
+
+            profile.setObjectComponents(objAchievementProgresses);
+            profile.setObjectComponents(objStatisticProgresses);
+            profile.setObjectComponents(objIdToStatistic);
+        }
+        catch (Exception e)
+        {
+            System.out.println("(/profile) Error requesting profile: " + e.getMessage());
         }
 
-        return "profile";
+        return profile.handlePageRequest();
     }
 
     @GetMapping("/gamemode")

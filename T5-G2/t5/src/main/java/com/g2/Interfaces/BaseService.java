@@ -1,6 +1,7 @@
 package com.g2.Interfaces;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,8 @@ public abstract class BaseService implements ServiceInterface {
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
         } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
+            //throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
+            return new ArrayList<R>();
         }
     }
 
