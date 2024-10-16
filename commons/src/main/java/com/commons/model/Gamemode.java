@@ -4,6 +4,6 @@ public enum Gamemode {
     All,
     Sfida,
     Multiplayer,
-    Training,
+    Allenamento,
     Scalata
 }

@@ -34,8 +34,8 @@ public class TurnBasedGameLogic extends GameLogic {
 
     //Questa classe si specializza in una partita semplice basata sui turni, prende il nome di Sfida nella UI
     public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
-                                String type_robot, String difficulty) {
-        super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty);
+                                String type_robot, String difficulty, String gamemode) {
+        super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty, gamemode);
         currentTurn = 0;
     }
 

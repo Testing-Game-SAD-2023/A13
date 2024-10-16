@@ -1,5 +1,6 @@
 package com.g2.Service;
 
+import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,22 @@ public class AchievementService {
      * @return a list of achievements obtained after this update.
      */
     public List<AchievementProgress> updateProgressByPlayer(int playerID) {
-        List<Game> gamesList = getGames();
+        List<Game> gamesList = getGames(playerID);
 
         List<AchievementProgress> achievementProgressesPrevious = getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList();
         List<Statistic> statisticList = getStatistics();
 
         for (Statistic statistic : statisticList) {
-            float statisticValue = statistic.calculate(gamesList);
+            List<Game> filteredGameList = gamesList;
+
+            if(statistic.getGamemode() != Gamemode.All)
+                filteredGameList = gamesList.stream().filter(game -> Objects.equals(game.getDescription(), statistic.getGamemode().toString())).toList();
+
+            float statisticValue = statistic.calculate(filteredGameList);
+
+            System.out.println("[CALCULATION] Calculating for games: " + filteredGameList);
             System.out.println("Updated " + statistic.getName() + ": " + statisticValue);
+
             setProgress(playerID, statistic.getID(), statisticValue);
         }
 
@@ -47,8 +56,8 @@ public class AchievementService {
         return obtainedAchievements;
     }
 
-    private List<Game> getGames() {
-        return (List<Game>) serviceManager.handleRequest("T4", "getGames", null);
+    private List<Game> getGames(int playerId) {
+        return (List<Game>) serviceManager.handleRequest("T4", "getGames", playerId);
     }
 
     public List<Statistic> getStatistics() {

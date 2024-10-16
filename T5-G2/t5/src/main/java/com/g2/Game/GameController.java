@@ -20,6 +20,7 @@ package com.g2.Game;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.commons.model.Gamemode;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -71,8 +72,8 @@ public class GameController {
     */ 
     private void registerGames() {
         //Attenzione le chiavi sono CaseSensitive
-        gameRegistry.put("Sfida", (sm, playerId, underTestClassName, type_robot, difficulty) -> 
-            new TurnBasedGameLogic(sm, playerId, underTestClassName, type_robot, difficulty));
+        gameRegistry.put(Gamemode.Sfida.toString(), (sm, playerId, underTestClassName, type_robot, difficulty) ->
+            new TurnBasedGameLogic(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Sfida.toString()));
         // Aggiungi altri giochi qui
     }
 
@@ -182,7 +183,7 @@ public class GameController {
             if (gameLogic == null) {
                 //Creo la nuova partita 
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
-                //gameLogic.CreateGame();
+                gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER] /StartGame Partita creata con successo.");
                 return ResponseEntity.ok().build();
@@ -249,8 +250,8 @@ public class GameController {
 
                 if (isGameEnd || gameLogic.isGameEnd()) {
                     //Qua partita finita quindi lo segnalo
-                    //gameLogic.EndRound(playerId);
-                    //gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
+                    gameLogic.EndRound(playerId);
+                    gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
                     activeGames.remove(playerId);
                     logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
                     return createResponseRun(UserData, RobotScore, user_score, true);

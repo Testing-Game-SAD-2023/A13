@@ -56,7 +56,8 @@ public class T4Service extends BaseService {
         ));
 
         registerAction("getGames", new ServiceActionDefinition(
-                params -> getGames()
+                params -> getGames((int) params[0]),
+                Integer.class
         ));
 
         registerAction("getStatisticsProgresses", new ServiceActionDefinition(
@@ -71,7 +72,7 @@ public class T4Service extends BaseService {
 
         registerAction("EndGame", new ServiceActionDefinition(
             params -> EndGame((int) params[0], (String) params[1], (String) params[2], (int) params[3], (Boolean) params[4]),
-            Integer.class, String.class, String.class, int.class, Boolean.class
+            Integer.class, String.class, String.class, Integer.class, Boolean.class
         ));
 
         registerAction("CreateRound", new ServiceActionDefinition(
@@ -106,11 +107,10 @@ public class T4Service extends BaseService {
     }
 
     // usa /games per ottenere una lista di giochi
-    private List<Game> getGames() {
-        final String endpoint = "/games";
+    private List<Game> getGames(int playerId) {
+        final String endpoint = "/games/player/" + playerId;
         try {
-            return callRestGET("/games", null, new ParameterizedTypeReference<List<Game>>() {
-            });
+            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {});
         }
         catch (RuntimeException e) {
             // Gestione degli errori durante la richiesta
@@ -195,14 +195,18 @@ public class T4Service extends BaseService {
         return result;
     }
 
-    private int CreateGame(String Time, String difficulty, String name, String description, String username) {
+    private int CreateGame(String Time, String difficulty, String name, String description, String id) {
         final String endpoint = "/games";
         JSONObject obj = new JSONObject();
         obj.put("difficulty", difficulty);
         obj.put("name", name);
         obj.put("description", description);
-        obj.put("username", username);
         obj.put("startedAt", Time);
+
+        JSONArray playersArray = new JSONArray();
+        playersArray.put(String.valueOf(id));
+
+        obj.put("players", playersArray);
         try {
             //Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio parse per avere l'id
             String respose = callRestPost(endpoint, obj, null, null,String.class);
