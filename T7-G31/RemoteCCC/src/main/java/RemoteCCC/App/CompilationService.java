@@ -145,8 +145,11 @@ public class CompilationService {
             throw new IOException("[Compilation Service] Il file pom.xml non esiste: " + pomFile.getAbsolutePath());
         } else {
             //Col filechannel rende l'operazione atomica
-            try (FileChannel lockChannel = FileChannel.open(lockFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE); FileChannel sourceChannel = FileChannel.open(pomFile.toPath(), StandardOpenOption.READ); FileChannel destChannel = FileChannel.open(destPomFile.toPath(), StandardOpenOption.CREATE,
-                    StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            try (
+                 FileChannel lockChannel   = FileChannel.open(lockFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE); 
+                 FileChannel sourceChannel = FileChannel.open(pomFile.toPath(), StandardOpenOption.READ); 
+                 FileChannel destChannel   = FileChannel.open(destPomFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+                ) {
                 // Acquisisci un lock sul file di lock
                 try (FileLock lock = lockChannel.lock()) {
                     // Acquisisci un lock sul file sorgente per evitare accessi concorrenti
@@ -213,9 +216,9 @@ public class CompilationService {
     private boolean compileExecuteCoverageWithMaven() throws RuntimeException{
         ProcessBuilder processBuilder = new ProcessBuilder("mvn", "clean", "compile", "test");
         processBuilder.directory(new File(config.getPathCompiler()));
-        Process process = null;
         StringBuilder output = new StringBuilder();
         StringBuilder errorOutput = new StringBuilder();
+        Process process = null;
         try {
             // Avvia il processo
             process = processBuilder.start();
@@ -227,10 +230,15 @@ public class CompilationService {
                 process.destroyForcibly(); // Uccidi il processo se supera il timeout
                 throw new RuntimeException("[compileExecuteCoverageWithMaven] Timeout superato. Il processo Maven è stato forzatamente interrotto.");
             }
-            // Aggiungi l'output Maven alla variabile membro
-            this.outputMaven += output.toString();
             // Verifica se il processo è terminato con successo
-            return (process.exitValue()) == 0;
+            if ((process.exitValue()) == 0){
+                // Aggiungi l'output Maven alla variabile membro
+                this.outputMaven += output.toString();
+                return true;
+            } else {
+                this.outputMaven += errorOutput.toString();
+                return false;
+            }
         } catch (IOException e) {
             logger.error("[Compilation Service] [MAVEN] {}", errorOutput);
             throw new RuntimeException("[compileExecuteCoverageWithMaven] Errore di I/O durante l'esecuzione del processo Maven: " + e.getMessage(), e);
@@ -247,8 +255,10 @@ public class CompilationService {
     }
 
     private void readProcessOutput(Process process, StringBuilder output, StringBuilder errorOutput) throws IOException, InterruptedException {
-        try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream())); 
-             BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+        try (
+             BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream())); 
+             BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))
+            ) {
             // Leggi l'output standard
             String line;
             while ((line = outputReader.readLine()) != null) {
