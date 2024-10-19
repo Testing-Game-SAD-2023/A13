@@ -1,8 +1,8 @@
 <html>
     <head>
-        <link href="./t5/css/main.css" rel="stylesheet" />
-        <link href="./t5/css/main2.css" rel="stylesheet" />
-        <link href="./t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="/t5/css/main.css" rel="stylesheet" />
+        <link href="/t5/css/main2.css" rel="stylesheet" />
+        <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
 
         <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
         <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
@@ -12,7 +12,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!--Fine Modifica-->
 
-        <script src="./t5/js/profile.js"></script>
+        <script src="/t5/js/profile.js"></script>
 
         <title>Profilo utente</title>
     </head>
@@ -33,7 +33,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-210">
-                                        <img src="./t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                                        <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
                                     </div>
                                     <div class="col">
                                         <h4 class="card-title" id="usernameField"></h4>
@@ -55,7 +55,7 @@
                                     <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
                                         <div class="row">
                                             <div class="col-2">
-                                                <img src="./t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
                                             </div>
                                             <div class="col">
                                                 <h4 th:text="${element.Name}">Nome achievement</h4>
@@ -92,5 +92,7 @@
                 </div>
             </div>
         </div>
+
+        <span id="user_id" style="display: none;" th:text="${userID}"></span>
     </body>
 </html>

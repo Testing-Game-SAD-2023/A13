@@ -123,7 +123,9 @@ public class T4Service extends BaseService {
             Map<String, String> formData = new HashMap<>();
             formData.put("pid", String.valueOf(playerID));
 
-            List<StatisticProgress> response = callRestGET("/phca", formData, new ParameterizedTypeReference<List<StatisticProgress>>() {});
+            String endpoint = "/phca/" + playerID;
+
+            List<StatisticProgress> response = callRestGET(endpoint, formData, new ParameterizedTypeReference<List<StatisticProgress>>() {});
             return response;
         } catch (Exception e) {
             System.out.println("[GETSTATISTICSPROGRESSES] Errore nel prelievo delle statistiche: " + e.getMessage());

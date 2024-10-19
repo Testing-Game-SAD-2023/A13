@@ -31,11 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Components.GenericObjectComponent;
@@ -71,11 +67,8 @@ public class GuiController {
     }
 
     @GetMapping("/profile")
-    public String profilePage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
-        profile.SetAuth(jwt);
-
-        // TODO: questa procedura per prelevare l'id utente non è sicura, va fatto un sistema che lo chiede a T23
+    public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt)
+    {
         byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
         String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
 
@@ -83,34 +76,44 @@ public class GuiController {
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
 
-            int userId = Integer.parseInt(map.get("userId").toString());
+            String userId = map.get("userId").toString();
 
-            List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
-            List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
-
-            List<Statistic> allStatistics = achievementService.getStatistics();
-            Map<String, Statistic> IdToStatistic = new HashMap<>();
-
-            for (Statistic stat : allStatistics)
-                IdToStatistic.put(stat.getID(), stat);
-
-            System.out.println("(/profile) Retrieved statistics: " + statisticProgresses);
-            model.addAttribute("achievementProgresses", achievementProgresses);
-            model.addAttribute("statisticProgresses", statisticProgresses);
-            model.addAttribute("IdToStatistic", IdToStatistic);
-
-            GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
-            GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
-            GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
-
-            profile.setObjectComponents(objAchievementProgresses);
-            profile.setObjectComponents(objStatisticProgresses);
-            profile.setObjectComponents(objIdToStatistic);
+            return profilePage(model, userId, jwt);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             System.out.println("(/profile) Error requesting profile: " + e.getMessage());
         }
+
+        return "error";
+    }
+
+    @GetMapping("/profile/{playerID}")
+    public String profilePage(Model model,
+                              @PathVariable(value="playerID") String playerID,
+                              @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
+        profile.SetAuth(jwt);
+
+        int userId = Integer.parseInt(playerID);
+
+        List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
+        List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
+
+        List<Statistic> allStatistics = achievementService.getStatistics();
+        Map<String, Statistic> IdToStatistic = new HashMap<>();
+
+        for (Statistic stat : allStatistics)
+            IdToStatistic.put(stat.getID(), stat);
+
+        GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
+        GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
+        GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
+        GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
+
+        profile.setObjectComponents(objAchievementProgresses);
+        profile.setObjectComponents(objStatisticProgresses);
+        profile.setObjectComponents(objIdToStatistic);
+        profile.setObjectComponents(objUserID);
 
         return profile.handlePageRequest();
     }

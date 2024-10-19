@@ -98,9 +98,13 @@ public class AchievementService {
 
         List<Statistic> statisticList = getStatistics();
 
-        System.out.println(statisticList);
-        System.out.println(statisticProgresses);
         statisticProgresses.removeIf(x -> !statisticList.stream().anyMatch(y -> Objects.equals(y.getID(), x.getStatisticID())));
+
+        for (Statistic statistic : statisticList) {
+            // se non c'è il progresso salvato in db, aggiungilo manualmente impostandolo a 0
+            if (!statisticProgresses.stream().anyMatch(progress -> Objects.equals(progress.getStatisticID(), statistic.getID())))
+                statisticProgresses.add(new StatisticProgress(playerID, statistic.getID(), 0));
+        }
 
         return statisticProgresses;
     }

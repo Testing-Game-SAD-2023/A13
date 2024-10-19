@@ -14,7 +14,8 @@ const parseJwt = (token) => {
 };
 
 document.addEventListener("DOMContentLoaded", (e) => {
-      var userId = parseJwt(getCookie("jwt")).userId;
+      var userId = document.getElementById("user_id").innerHTML;
+      console.log(userId)
 
       var userAPIString = '/students_list/{0}'.replace('{0}', userId);
 
