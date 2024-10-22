@@ -62,7 +62,6 @@ public class GuiController {
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "main", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
-        achievementService.updateProgressByPlayer(1);
         return main.handlePageRequest();
     }
 

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.commons.model.Gamemode;
+import com.g2.Service.AchievementService;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -29,6 +30,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,10 @@ public class GameController {
     private final Map<String, GameLogic> activeGames;
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
+
+    @Autowired
+    private AchievementService achievementService;
+
     //Logger 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
@@ -248,18 +254,22 @@ public class GameController {
                 //Salvo i dati del turno appena giocato
                 gameLogic.playTurn(user_score, RobotScore);
 
+                boolean gameOver = false;
+
                 if (isGameEnd || gameLogic.isGameEnd()) {
                     //Qua partita finita quindi lo segnalo
                     gameLogic.EndRound(playerId);
                     gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
                     activeGames.remove(playerId);
                     logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                    return createResponseRun(UserData, RobotScore, user_score, true);
+                    gameOver = true;
                 } else {
                     //Qua partita ancora in corso
                     logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
-                    return createResponseRun(UserData, RobotScore, user_score, false);
                 }
+
+                achievementService.updateProgressByPlayer(Integer.parseInt(playerId));
+                return createResponseRun(UserData, RobotScore, user_score, gameOver);
             }else{
                 //Ci sono errori di compilazione, invio i dati della console, ma impedisco all'utente di fare submit 
                 logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
