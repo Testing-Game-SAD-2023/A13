@@ -430,6 +430,10 @@ Se è necessario modificare il codice dell'applicazione, seguire attentamente i 
 
 Di seguito sono elencate alcune delle problematiche riscontrate durante l'utilizzo dell'applicazione al fine di agevolarne l'utilizzo per i gruppi successivi.
 
+## JAVA_HOME
+In alcuni punti dell'installazione è necessaria una parziale ricompilazione di alcuni componenti Java. A tale scopo è necessario che la variabile d'ambiente JAVA_HOME punti ad una JDK recente. In caso contrario si leggerà un messaggio di errore in fase di installazione del tipo "Check that the JAVA_HOME variable will point to a valid JDK"
+JAVA_HOME può essere settato esternamente a livello della macchina di installazione oppure in una delle prime righe dello script batch di installazione.
+
 ## Cache del browser
 
 Disattivando la cache del browser, è possibile garantire che ogni modifica apportata al codice sorgente o alle risorse dell'applicazione sia immediatamente visualizzata nel browser. La cache del browser può causare problemi di compatibilità e disattivarla semplifica il processo di debug, consentendo agli sviluppatori di identificare e risolvere rapidamente i bug senza dover preoccuparsi di eventuali caching persistenti che potrebbero mascherare il problema.
