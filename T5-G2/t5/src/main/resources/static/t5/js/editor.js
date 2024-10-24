@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 const getCookie = (name) => {
 	const value = `; ${document.cookie}`;
 	const parts = value.split(`; ${name}=`);
@@ -99,6 +116,7 @@ runButton.addEventListener("click", async function () {
 	toggleLoading(true, "loading_run", "runButton");
 	try {
 		console.log("AVVIATA SUBMIT");
+		setStatus("Avvio submit");
 		const formData = getFormData();
 		//qui l'utente fa submit quindi decide di chiudere il gioco
 		formData.append("isGameEnd", true);
@@ -108,6 +126,7 @@ runButton.addEventListener("click", async function () {
 
 		// Prima richiesta AJAX per eseguire il test
 		const response = await ajaxRequest("/run", "POST", formData, false, "json");
+		setStatus("Playing turn");
 		console.log(response);
 		const {
 			robotScore,
@@ -121,11 +140,16 @@ runButton.addEventListener("click", async function () {
 		formData.append("gameId", gameId);
 		formData.append("roundId", roundId);
 
+		setStatus("Getting Results");
+
 		console_utente.setValue(outCompile);
+		parseMavenOutput(outCompile)
 
 		if (coverage == null || coverage === "") {
-			getConsoleTextError();
+			displayUserPoints = getConsoleTextError();
+			console_robot.setValue(displayUserPoints);
 		} else {
+			setStatus(false, "Game end");
 			highlightCodeCoverage($.parseXML(coverage));
 
 			orderTurno++;
@@ -142,7 +166,8 @@ runButton.addEventListener("click", async function () {
 				"text"
 			);
 			var valori_csv = extractThirdColumn(csvContent);
-			addStorico(userScore, valori_csv[0]);
+			addStorico(orderTurno,userScore, valori_csv[0]);
+			viewStorico();
 			displayRobotPoints = getConsoleTextRun(
 				csvContent,
 				0,
@@ -154,22 +179,20 @@ runButton.addEventListener("click", async function () {
 			console.log("punteggio robot: " + robotScore);
 			console.log("punteggio utente: " + userScore);
 			var coverageButton = document.getElementById("coverageButton");
-
-			if (localStorage.getItem("modalita") === "Scalata") {
-				console.log("Game mode is 'Scalata'");
-				controlloScalata(
-					GameOver,
-					current_round_scalata,
-					total_rounds_scalata,
-					displayRobotPoints
-				);
-			} else {
-				console.log("Game mode is 'Sfida'");
-			}
 			coverageButton.disabled = true;
 			runButton.disabled = true;
+			openModalWithText(
+				'Partita Terminata !', 
+				'Hai terminato la tua partita con un punteggio: ' + userScore + "pt.",
+				[
+					{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }
+				]
+			);
+			//Pulisco i dati locali 
+			flush_localStorage();
 		}
 	} catch (error) {
+		setStatus(false, "Error");
 		getConsoleTextError();
 		openModalWithText('Errore!',error.message);
 	} finally {
@@ -184,6 +207,7 @@ coverageButton.addEventListener("click", async function () {
 	toggleLoading(true, "loading_cov", "coverageButton");
 	try {
 		console.log("AVVIATA COVERAGE");
+		setStatus("Avvio Coverage");
 		const formData = getFormData();
 		formData.append("isGameEnd", false);
 		for (let [key, value] of formData.entries()) {
@@ -191,6 +215,7 @@ coverageButton.addEventListener("click", async function () {
 		}
 		// Prima richiesta AJAX per eseguire il test
 		const response = await ajaxRequest("/run", "POST", formData, false, "json");
+		setStatus("Getting Results");
 		console.log(response);
 		const {
 			robotScore,
@@ -204,10 +229,13 @@ coverageButton.addEventListener("click", async function () {
 		formData.append("gameId", gameId);
 		formData.append("roundId", roundId);
 		console_utente.setValue(outCompile);
+		parseMavenOutput(outCompile);
 		if (coverage == null || coverage === "") {
 			// Errori di compilazione
-			getConsoleTextError();
+			displayUserPoints = getConsoleTextError();
+			console_robot.setValue(displayUserPoints);
 		} else {
+			setStatus(false, "Turn ended");
 			highlightCodeCoverage($.parseXML(coverage));
 			orderTurno++;
 			const url = createApiUrl(formData, orderTurno);
@@ -221,16 +249,17 @@ coverageButton.addEventListener("click", async function () {
 				"text"
 			);
 			var valori_csv = extractThirdColumn(csvContent);
-			addStorico(userScore, valori_csv[0]);
+			addStorico(orderTurno, userScore, valori_csv[0]);
+			viewStorico();
 			displayUserPoints = getConsoleTextCoverage(csvContent, userScore);
 			console_robot.setValue(displayUserPoints);
-
 		}
 	} catch (error) {
 		error_message = 'Errore durante il recupero del file di output di JaCoCo o la gestione del turno:' + error; 
 		openModalWithText('Errore!',error_message);
 		console.error(error_message);
 		getConsoleTextError();
+		setStatus(false, "Error");
 	} finally {
 		toggleLoading(false, "loading_cov", "coverageButton");
 	}

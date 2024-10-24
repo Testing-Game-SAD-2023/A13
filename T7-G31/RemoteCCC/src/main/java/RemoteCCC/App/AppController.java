@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RestController
 public class AppController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
 
     @Autowired
     public AppController() {
@@ -61,6 +65,7 @@ public class AppController {
             result.put("error", compilationService.Errors);
             return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "application/json").body(result.toString()); // Imposta l'intestazione Content-Type
         } catch (IOException | InterruptedException | JSONException e) {
+            logger.error("[Compile-and-codecoverage]", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
         }
     }

@@ -230,15 +230,9 @@ public class CompilationService {
                 process.destroyForcibly(); // Uccidi il processo se supera il timeout
                 throw new RuntimeException("[compileExecuteCoverageWithMaven] Timeout superato. Il processo Maven è stato forzatamente interrotto.");
             }
+            this.outputMaven += output.toString();
             // Verifica se il processo è terminato con successo
-            if ((process.exitValue()) == 0){
-                // Aggiungi l'output Maven alla variabile membro
-                this.outputMaven += output.toString();
-                return true;
-            } else {
-                this.outputMaven += errorOutput.toString();
-                return false;
-            }
+            return (process.exitValue()) == 0;
         } catch (IOException e) {
             logger.error("[Compilation Service] [MAVEN] {}", errorOutput);
             throw new RuntimeException("[compileExecuteCoverageWithMaven] Errore di I/O durante l'esecuzione del processo Maven: " + e.getMessage(), e);

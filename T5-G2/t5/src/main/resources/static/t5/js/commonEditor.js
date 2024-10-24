@@ -112,31 +112,64 @@ document.querySelector("#redo-button").addEventListener("click", function () {
 });
 
 //AGGIUNTA A STORICO
-function addStorico(score, covValue) {
-	var list = document.getElementById("storico_list"); // Seleziona la lista
+function viewStorico() {
+    var list = document.getElementById("storico_list"); // Seleziona la lista
+    list.innerHTML = ""; // Pulisce la lista esistente
 
-	    // Verifica se esiste un placeholder e lo rimuove al primo inserimento
-	var placeholder = document.getElementById("placeholder-item");
-	if (placeholder) {
-		placeholder.remove();
-	}
+    // Recupera lo storico dal localStorage
+    const storico = leggiStorico(); // Usa la funzione leggiStorico() per ottenere i dati
 
-	// Crea un nuovo elemento <li> con la struttura specificata
-	var newItem = document.createElement("li");
-	newItem.className =
-		"list-group-item d-flex justify-content-between align-items-start";
+    // Verifica se ci sono elementi nello storico
+    if (storico.length === 0) {
+        return;
+    }
 
-	// Imposta il contenuto HTML del nuovo elemento
-	newItem.innerHTML = `
-		<div class="ms-2 me-auto">
-			<div class="fw-bold">Punteggio </div>
-			<small>%COV: ${covValue}</small>
-		</div>
-		<span class="badge text-bg-primary rounded-pill">${score}</span>
-	`;
+    // Itera attraverso l'array storico e crea gli <li>
+    storico.forEach(item => {
+        var newItem = document.createElement("li");
+        newItem.className = "list-group-item d-flex justify-content-between align-items-start";
+        // Imposta il contenuto HTML del nuovo elemento
+        newItem.innerHTML = `
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">Punteggio</div>
+                <small>%COV: ${item.covValue}</small>
+            </div>
+            <span class="badge text-bg-primary rounded-pill">${item.punteggio}</span>
+        `;
 
-	// Aggiunge il nuovo elemento alla lista
-	list.appendChild(newItem);
+        // Aggiunge il nuovo elemento alla lista
+        list.appendChild(newItem);
+    });
+}
+
+// Funzione per scrivere nel localStorage
+function addStorico(turnoID, punteggio, covValue) {
+    // Ottieni l'attuale storico dal localStorage
+    const storicoJSON = localStorage.getItem("storico");
+    
+    // Converti la stringa JSON in un array, o crea un nuovo array se non esiste
+    const storico = storicoJSON ? JSON.parse(storicoJSON) : [];
+    
+    // Crea un nuovo oggetto da aggiungere
+    const nuovoElemento = {
+        turnoID: turnoID,
+        punteggio: punteggio,
+        covValue: covValue
+    };
+    
+    // Aggiungi il nuovo elemento all'array
+    storico.push(nuovoElemento);
+    
+    // Salva l'array aggiornato nel localStorage
+    localStorage.setItem("storico", JSON.stringify(storico));
+}
+
+// Funzione per leggere dal localStorage
+function leggiStorico() {
+    // Ottieni l'attuale storico dal localStorage
+    const storicoJSON = localStorage.getItem("storico");
+    // Se esiste, convertilo in un array di oggetti, altrimenti restituisci un array vuoto
+    return storicoJSON ? JSON.parse(storicoJSON) : [];
 }
 
 //TASTO INFO
@@ -155,13 +188,118 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 });
 
+//Tasto font size
+document.addEventListener("DOMContentLoaded", function() {
+    const incrementButton = document.getElementById("increment-button");
+    const decrementButton = document.getElementById("decrement-button");
+    const fontSizeInput = document.getElementById("font-size-input");
 
-function openModalWithText(text_title, text_content) {
+    // Recupera gli editor CodeMirror esistenti
+    const editors = [
+        editor_utente,
+        editor_robot,
+		console_utente,
+		console_robot
+    ];
+
+    // Imposta la dimensione del font iniziale
+    let fontSize = parseInt(fontSizeInput.value, 10) || 16; // Valore predefinito se non è impostato
+
+    // Funzione per aggiornare la dimensione del font per tutti gli editor
+    function aggiornaFontSize() {
+        editors.forEach(editor => {
+			const wrapper = editor.getWrapperElement();
+			wrapper.style.fontSize = fontSize + "px"; // Imposta la dimensione del font
+			wrapper.style.lineHeight = (fontSize * 1.5) + "px"; // Imposta l'altezza della linea (1.5 è un esempio di fattore)
+			editor.refresh(); // Ricarica l'editor per applicare le modifiche
+		});
+    }
+
+    // Gestione click per il bottone di incremento
+    incrementButton.addEventListener("click", function() {
+        fontSize++;
+        fontSizeInput.value = fontSize; // Aggiorna il campo input
+        aggiornaFontSize(); // Applica la nuova dimensione del font
+    });
+
+    // Gestione click per il bottone di decremento
+    decrementButton.addEventListener("click", function() {
+        if (fontSize > 1) { // Impedisce di scendere sotto 1px
+            fontSize--;
+            fontSizeInput.value = fontSize; // Aggiorna il campo input
+            aggiornaFontSize(); // Applica la nuova dimensione del font
+        }
+    });
+
+	// Aggiungi un listener all'input per il cambiamento del valore
+	document.getElementById('font-size-input').addEventListener('input', function() {
+		const newFontSize = parseInt(this.value);
+		if (!isNaN(newFontSize) && newFontSize > 0) { // Assicurati che il valore sia un numero valido
+			fontSize = newFontSize;
+			aggiornaFontSize();
+		}
+	});
+
+    // Imposta la dimensione del font iniziale al caricamento della pagina
+    aggiornaFontSize();
+});
+
+// Funzione per salvare il contenuto dell'editor nel localStorage
+function saveToLocalStorage() {
+	const content = editor_utente.getValue();
+	localStorage.setItem('codeMirrorContent', content);
+}
+// Aggiungi un listener per l'evento change
+editor_utente.on('change', saveToLocalStorage); 
+// Carica il contenuto dal localStorage all'avvio
+window.onload = function() {
+	const savedContent = localStorage.getItem('codeMirrorContent');
+	if (savedContent) {
+		editor_utente.setValue(savedContent);
+		document.getElementById('Editor_utente').value = savedContent;
+		editor_utente.refresh(); // Ricarica l'editor per applicare le modifiche
+	}
+};
+
+// modal 
+function openModalWithText(text_title, text_content, buttons = []) {
 	document.getElementById('Modal_title').innerText = text_title;
 	// Imposta il testo nel corpo del modal
 	document.getElementById('Modal_body').innerText = text_content;
+
+	// Pulisci eventuali bottoni esistenti nel footer
+	var modalFooter = document.getElementById('Modal_footer');
+	modalFooter.innerHTML = '';
+
+	// Aggiungi bottoni personalizzati se sono stati forniti
+	if (buttons.length > 0) {
+		buttons.forEach(button => {
+			let btn = document.createElement('a');
+			btn.innerText = button.text;
+			btn.href = button.href;  // Assegna il link al pulsante
+			btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
+			btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
+			modalFooter.appendChild(btn);
+		});
+	}
+
 	// Ottieni il modal
 	var modal = new bootstrap.Modal(document.getElementById('Modal'));
+
 	// Mostra il modal
 	modal.show();
+}
+
+//pulizia local storage a fine partita
+function flush_localStorage(){
+	//Pulisco i dati locali 
+	pulisciLocalStorage("difficulty");
+	pulisciLocalStorage("modalita");
+	pulisciLocalStorage("robot");
+	pulisciLocalStorage("roundId");
+	pulisciLocalStorage("turnId");
+	pulisciLocalStorage("underTestClassName");
+	pulisciLocalStorage("username");
+	pulisciLocalStorage("storico");
+	pulisciLocalStorage("codeMirrorContent");
 }

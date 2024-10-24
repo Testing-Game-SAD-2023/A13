@@ -92,16 +92,18 @@ public class GameController {
             String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage",
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode);
 
+            //Leggo la risposta da T7
             JSONObject responseObj = new JSONObject(response_T7);
-            String xml_string = responseObj.getString("coverage");
-            String outCompile = responseObj.getString("outCompile");
+            // Restituisce null se "coverage" non esiste
+            String xml_string = responseObj.optString("coverage", null); 
+            String outCompile = responseObj.optString("outCompile", null); 
 
             if (xml_string == null || xml_string.isEmpty()) {
-                logger.error("[GAMECONTROLLER] GetUserData: Valore 'coverage' non valido.");
+                logger.error("[GAMECONTROLLER] GetUserData: Valore 'coverage' vuoto/non valido.");
             }
 
             if (outCompile == null || outCompile.isEmpty()) {
-                logger.error("[GAMECONTROLLER] GetUserData: Valore 'outCompile' non valido.");
+                logger.error("[GAMECONTROLLER] GetUserData: Valore 'outCompile' vuoto/non valido.");
             }
 
             Map<String, String> return_data = new HashMap<>();

@@ -164,7 +164,10 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 }
 
 function getConsoleTextError(){
-	return error + "\n Ci sono stati errori di compilazione, controlla la console !";
+	return  `===================================================================== \n` 
+			+ error +  "\n" +
+			`============================== Results =============================== \n
+			Ci sono stati errori di compilazione, controlla la console !`;
 }
 
 // Funzione per avviare il gioco utilizzando ajaxRequest
@@ -182,7 +185,7 @@ async function startGame(data) {
 		console.log("Partita iniziata con successo:", response);
 	} catch (error) {
 		// Assicurati che error sia una stringa prima di usare includes
-		const errorMessage = error.message || error.toString();
+		errorMessage = JSON.stringify(error);
 
 		if (errorMessage.includes("errore esiste già la partita")) {
 			console.log("Il messaggio d'errore indica che esiste già la partita.");
@@ -216,6 +219,32 @@ function toggleLoading(showSpinner, divId, buttonId) {
 		statusText.innerText = "Play"; // Nascondi il testo "Loading..."
 		icon.style.display = "inline-block"; // Mostra l'icona
 		button.disabled = false;
+	}
+}
+
+function setStatus(showSpinner = true,  loadingText) {
+	const divElement = document.getElementById("status_compiler");
+
+	if (!divElement) {
+		console.error(`Elemento con ID "${divId}" non trovato.`);
+		return;
+	}
+
+	const spinner = divElement.querySelector(".spinner-border");
+	const statusText = divElement.querySelector('#status_text');
+	const icon = divElement.querySelector("i");
+
+	// Controlla lo stato attuale dello spinner e inverte la visibilità
+	if (showSpinner) {
+		// Se lo spinner è nascosto o non è stato impostato, mostralo
+		spinner.style.display = "inline-block"; // Mostra lo spinner
+		statusText.innerText = loadingText; // Mostra il testo personalizzato
+		icon.style.display = "none"; // Nascondi l'icona
+	} else {
+		// Se lo spinner è visibile, nascondilo
+		spinner.style.display = "none"; // Nascondi lo spinner
+		statusText.innerText = "Ready"; // Ripristina il testo "Play"
+		icon.style.display = "inline-block"; // Mostra l'icona
 	}
 }
 
@@ -440,4 +469,42 @@ function controlloScalata(
 				);
 			});
 	}
+}
+
+// Funzione per analizzare l'output di Maven
+function parseMavenOutput(output) {
+    const lines = output.split('\n');
+    let results = {
+        errors: 0,
+        warnings: 0
+    };
+
+    lines.forEach(line => {
+        // Regex per contare avvisi
+        const warningMatch = line.match(/^\[INFO\] (\d+) warning/);
+        if (warningMatch) {
+            results.warnings = parseInt(warningMatch[1], 10);
+        }
+
+        // Regex per contare errori
+        const errorMatch = line.match(/^\[INFO\] (\d+) error/);
+        if (errorMatch) {
+            results.errors = parseInt(errorMatch[1], 10);
+        }
+    });
+
+	document.getElementById("error_compiler").textContent = results.errors;
+	document.getElementById("warning_compiler").textContent =  results.warnings;
+    return results;
+}
+
+function pulisciLocalStorage(chiave) {
+    // Controlla se la chiave esiste nel localStorage
+    if (localStorage.getItem(chiave)) {
+        // Rimuovi la chiave dal localStorage
+        localStorage.removeItem(chiave);
+        console.log(`Dati associati a "${chiave}" rimossi dal localStorage.`);
+    } else {
+        console.log(`Nessun dato trovato per la chiave "${chiave}".`);
+    }
 }
