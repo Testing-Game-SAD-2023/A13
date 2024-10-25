@@ -60,12 +60,14 @@
 		
 											<!-- Link editor -->
 											<div class="text-center pt-2">
-												<a
-													id="link_editor"
-													class="btn btn-primary"
-													href="#"
-													role="button"
-												>   Submit </a
+													<a
+														id="link_editor"
+														class="btn btn-primary"
+														href="#"
+														role="button"
+													>   Submit 
+														<i class="bi bi-play-fill"></i> 
+													</a
 												>
 											</div>
 										</form>
@@ -137,26 +139,6 @@
 			function redirectToMain() {
 				window.location.href = "/main";
 			}
-
-			const getCookie = (name) => {
-				const value = `; ${document.cookie}`;
-				const parts = value.split(`; ${name}=`);
-				if (parts.length === 2) return parts.pop().split(";").shift();
-				return null;
-			};
-
-			const parseJwt = (token) => {
-				try {
-					return JSON.parse(atob(token.split(".")[1]));
-				} catch (e) {
-					return null;
-				}
-			};
-
-			const jwtData = parseJwt(getCookie("jwt"));
-			const username = jwtData.sub;
-			const userId = jwtData.userId;
-			document.getElementById("usernameField").textContent = username;
 		</script>
 	</body>
 </html>

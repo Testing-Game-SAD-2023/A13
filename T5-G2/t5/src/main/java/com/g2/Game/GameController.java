@@ -46,6 +46,7 @@ import com.g2.Interfaces.ServiceManager;
 public class GameController {
     //Gestisco qui tutti i giochi aperti 
     private final Map<String, GameLogic> activeGames;
+    
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
     //Logger 
