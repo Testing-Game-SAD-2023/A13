@@ -97,6 +97,7 @@ $(document).ready(function () {
 		date: formattedDate,
 	};
 
+	viewStorico();
 	// Perform replacements
 	const newContent = replacePlaceholders(textareaContent, replacements);
 	console.log("newContent \n\n", newContent);
@@ -265,18 +266,3 @@ coverageButton.addEventListener("click", async function () {
 		toggleLoading(false, "loading_cov", "coverageButton");
 	}
 });
-
-window.onbeforeunload = function () {
-	if (localStorage.getItem("modalita") !== "Scalata") {
-		localStorage.setItem("gameId", null);
-		localStorage.setItem("turnId", null);
-		localStorage.setItem("classe", null);
-		localStorage.setItem("robot", null);
-		localStorage.setItem("difficulty", null);
-	}
-};
-
-//codice custom per l'integrabilità con thymeleaf
-var robot = "[[${robot}]]";
-var username = "[[${username}]]";
-var gameIDJ = "[[${gameIDj}]]";

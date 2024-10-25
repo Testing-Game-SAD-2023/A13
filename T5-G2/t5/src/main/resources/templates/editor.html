@@ -112,8 +112,7 @@
 						</a>
 					</div>
 					<div class="text-center">
-						<a class="navbar-brand">
-							Nome modalità
+						<a class="navbar-brand" id="Nome_modalita">
 						</a>
 					</div>
 						<div>
@@ -801,6 +800,8 @@ public class TestClasse {
 			const container_user = document.getElementById("card_user");
 			const container_robot = document.getElementById("card_robot");
 
+		    const nome_mode = document.getElementById("Nome_modalita").textContent = localStorage.getItem("modalita");
+			
 			// Abilita il folding del codice
 			editor_utente.on("gutterClick", function (cm, line, gutter, event) {
 				// Verifica se il gutter è quello del folding
