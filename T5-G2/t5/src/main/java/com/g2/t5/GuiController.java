@@ -22,6 +22,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
@@ -44,17 +46,35 @@ import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
 import com.g2.Model.User;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @CrossOrigin
 @Controller
 public class GuiController {
 
     private final ServiceManager serviceManager;
+    private final LocaleResolver localeResolver;
 
     @Autowired
-    public GuiController(RestTemplate restTemplate) {
+    public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
         this.serviceManager = new ServiceManager(restTemplate);
+        this.localeResolver = localeResolver;
+    }
+
+    //Gestione lingua 
+    @PostMapping("/changeLanguage")
+    public ResponseEntity<Void> changeLanguage(@RequestParam("lang") String lang, HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = new Cookie("lang", lang);
+        cookie.setMaxAge(3600); // Imposta la durata del cookie a 1 ora
+        cookie.setPath("/"); // Imposta il percorso per il cookie
+        response.addCookie(cookie); // Aggiungi il cookie alla risposta
+
+        Locale locale = new Locale(lang);
+        localeResolver.setLocale(request, response, locale);
+        // Restituisce una risposta vuota con codice di stato 200 OK
+        return ResponseEntity.ok().build(); 
     }
 
     @GetMapping("/main")

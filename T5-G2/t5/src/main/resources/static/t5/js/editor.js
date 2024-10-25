@@ -178,9 +178,7 @@ runButton.addEventListener("click", async function () {
 
 			console.log("punteggio robot: " + robotScore);
 			console.log("punteggio utente: " + userScore);
-			var coverageButton = document.getElementById("coverageButton");
-			coverageButton.disabled = true;
-			runButton.disabled = true;
+
 			openModalWithText(
 				'Partita Terminata !', 
 				'Hai terminato la tua partita con un punteggio: ' + userScore + "pt.",
@@ -197,6 +195,9 @@ runButton.addEventListener("click", async function () {
 		openModalWithText('Errore!',error.message);
 	} finally {
 		toggleLoading(false, "loading_run", "runButton");
+		var coverageButton = document.getElementById("coverageButton");
+		coverageButton.disabled = true;
+		runButton.disabled = true;
 	}
 });
 

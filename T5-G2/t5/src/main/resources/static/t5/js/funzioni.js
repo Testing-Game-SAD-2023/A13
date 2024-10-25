@@ -216,7 +216,7 @@ function toggleLoading(showSpinner, divId, buttonId) {
 		button.disabled = true;
 	} else {
 		spinner.style.display = "none"; // Nascondi lo spinner
-		statusText.innerText = "Play"; // Nascondi il testo "Loading..."
+		statusText.innerText =  statusText.getAttribute('data-title'); // Nascondi il testo "Loading..."
 		icon.style.display = "inline-block"; // Mostra l'icona
 		button.disabled = false;
 	}
