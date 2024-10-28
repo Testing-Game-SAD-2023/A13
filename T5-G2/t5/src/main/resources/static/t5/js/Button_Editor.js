@@ -15,6 +15,11 @@
  *   limitations under the License.
  */
 
+
+/*
+* 	Qui c'è tutta la logica dei bottoni e della GUI
+*/
+
 //TASTO CERCA
 var searchButton = document.getElementById("searchButton");
 searchButton.addEventListener("click", function () {
@@ -56,6 +61,7 @@ startReplaceButton.addEventListener("click", function () {
 		clearSearchHighlights(); // Rimuovi le evidenziazioni dopo la sostituzione
 	}
 });
+
 // Funzione per rimuovere tutte le evidenziazioni precedenti
 function clearSearchHighlights() {
 	var marks = editor_utente.getAllMarks();
@@ -66,9 +72,7 @@ function clearSearchHighlights() {
 	resultSpan.style.display = "none"; // Nasconde lo span
 }
 // Aggiungi evento input per rimuovere le vecchie evidenziazioni quando si inserisce un nuovo termine di ricerca
-document
-	.getElementById("searchTerm")
-	.addEventListener("input", clearSearchHighlights);
+document.getElementById("searchTerm").addEventListener("input", clearSearchHighlights);
 
 
 // INPUT FILE

@@ -90,6 +90,19 @@
 				transition: border-color 3s ease; 
 				border-color: rgba(var(--bs-primary-bg-rgb), var(--bs-border-opacity)) !important;
 			}
+
+			.CodeMirror-gutters .custom-gutter {
+				width: 3px;
+				transition: width 0.3s ease, transform 0.3s ease;
+			}
+
+			.custom-gutter-marker {
+				width: 100%;         /* Riempie il gutter */
+				height: 100%;        /* Altezza del marcatore */
+				text-align: center;
+				color: white;        /* Colore testo del marcatore */
+			}
+
 		</style>
 	</head>
 
@@ -107,8 +120,7 @@
 							role="button"
 							aria-disabled="true"
 						>
-							<i class="bi bi-arrow-90deg-left"></i>
-							<span> Back </span>
+							<i class="bi bi-arrow-90deg-left" th:text="#{indietro}"></i>
 						</a>
 					</div>
 					<div class="text-center">
@@ -169,7 +181,7 @@
 									<!-- Tema -->
 									<a class="list-group-item list-group-item-action p-2" aria-current="true">
 										<div class="d-flex justify-content-between align-baseline">
-											<h6 class="my-1 mx-1">Tema</h6>
+											<h6 class="my-1 mx-1" th:text="#{tema}"> </h6>
 											<div class="form-check form-switch mt-1">
 												<input class="form-check-input" type="checkbox" role="switch" id="chk_theme">
 											</div>
@@ -178,7 +190,7 @@
 									<!-- Font size -->
 									<a class="list-group-item list-group-item-action p-2" aria-current="true">
 										<div class="d-flex gap-5 justify-content-between">
-											<h6 class="my-1 mx-1"> Font Size </h6>
+											<h6 class="my-1 mx-1" th:text="#{grandezza_carattere}"> </h6>
 											<div class="input-group my-2 input-group-sm" >
 												<button class="btn btn-outline-secondary" type="button" id="decrement-button">
 													<i class="bi bi-dash"></i>
@@ -206,7 +218,7 @@
 					<!-- EDITOR-->
 					<div class="card-header p-0">
 						<nav class="navbar bg-body-tertiary p-2">
-							<span class="navbar-brand lead my-0 py-0"> Edit </span>
+							<span class="navbar-brand lead my-0 py-0" th:text="#{modifica}"></span>
 							<div class="">
 								<!-- UNDO e REDO -->
 								<button type="button" class="btn" id="undo-button">
@@ -232,7 +244,7 @@
 											class="bi bi-play-fill"
 											aria-hidden="true"
 										></i>
-										<span role="status" data-title="Play" >Play</span>
+										<span role="status" data-title="Play" th:text="#{tasto_play}"></span>
 										<!-- Icona nascosta -->
 									</div>
 								</button>
@@ -281,8 +293,7 @@
 														class="list-group-item list-group-item-action"
 														aria-current="true"
 													>
-														<i class="bi bi-clock-history"></i>
-														Storico
+														<i class="bi bi-clock-history" th:text="#{storico}"></i>														
 													</button>
 													<button
 														type="button"
@@ -303,7 +314,7 @@
 														onclick="showTabPane('paneD')"
 														class="list-group-item list-group-item-action"
 													>
-														<i class="bi bi-search"></i> Cerca&Sostituisci
+														<i class="bi bi-search" th:text="#{cerca_sostituisci}"></i> 
 													</button>
 												</div>
 											</div>
@@ -326,9 +337,9 @@
 														<li class="breadcrumb-item">Menu</li>
 														<li
 															class="breadcrumb-item active"
-															aria-current="page"
+															aria-current="page" th:text="#{storico}"
 														>
-															Storico
+															
 														</li>
 													</ol>
 												</div>
@@ -342,8 +353,7 @@
 														class="list-group-item d-flex justify-content-between align-items-start"
 													>
 														<div class="ms-2 me-auto">
-															<div class="fw-bold">
-																Nessun turno presente!
+															<div class="fw-bold" th:text="#{no_turni}">
 															</div>
 														</div>
 													</li>
@@ -400,8 +410,8 @@
 														<li
 															class="breadcrumb-item active"
 															aria-current="page"
+															th:text="#{cerca_sostituisci}"
 														>
-															Cerca&Sostituisci
 														</li>
 													</ol>
 												</div>
@@ -552,8 +562,7 @@ public class TestClasse {
 					<!-- CLASS UNDER TEST-->
 					<div class="card-header p-0">
 						<nav class="navbar bg-body-tertiary p-2">
-							<span class="navbar-brand lead my-0 py-0">
-								Class Under Test
+							<span class="navbar-brand lead my-0 py-0" th:text="#{classe_ut}">
 							</span>
 							<div class="">
 								<!-- INFO BUTTON -->
@@ -582,7 +591,7 @@ public class TestClasse {
 											class="bi bi-play-fill"
 											aria-hidden="true"
 										></i>
-										<span role="status" data-title="Submit">Submit</span>
+										<span role="status" data-title="Submit" th:text="#{submit}"></span>
 										<!-- Icona nascosta -->
 									</div>
 								</button>
@@ -599,7 +608,7 @@ public class TestClasse {
 					<div class="card-header border-top p-0">
 						<div id="divider_result" class="border border-3 border-secondary-subtle"></div>
 						<nav class="navbar bg-body-tertiary p-1">
-							<span class="navbar-brand lead my-0 py-0"> Results </span>
+							<span class="navbar-brand lead my-0 py-0" th:text="#{risultati}"> </span>
 							<div>
 								<button
 									type="button"
@@ -631,8 +640,7 @@ public class TestClasse {
 								style="display: none">
 							</div>
 						</small>
-						<small class="pr-2" id="status_text">
-							Ready
+						<small class="pr-2" id="status_text" th:text="#{pronto}">
 						</small>						
 					</div>
 				</div>
@@ -664,18 +672,10 @@ public class TestClasse {
 			</div>
 		</div>
 
-		<!-- SCRIPTS-->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/driver.js/0.9.8/driver.min.js"></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-			integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-			crossorigin="anonymous"
-		></script>
+		<!-- FOOTER -->
+		<div th:replace="fragments/footer :: footer"></div>
+
+		<!-- CODEMIRROR -->
 		<script
 			th:src="@{/t5/codemirror/lib/codemirror.js}"
 			th:inline="javascript"
@@ -720,308 +720,32 @@ public class TestClasse {
 			th:src="@{/t5/codemirror/addon/search/search.js}"
 			th:inline="javascript"
 		></script>
+
+		<!-- FILE JS GUI -->
 		<script
-			th:src="@{/t5/jquery/jquery-3.7.0.com.js}"
+			th:src="@{/t5/js/Var_Editor.js}"
 			th:inline="javascript"
-		></script>
-		
-		<script>
-			document.querySelectorAll('.language_select').forEach(item => {
-				item.addEventListener('click', function() {
-					// Ottieni l'icona SVG dell'elemento cliccato
-					const svgIcon = this.querySelector('svg').outerHTML;
-					
-					// Cambia l'icona del pulsante dropdown con l'icona copiata
-					const icon = document.getElementById('dropdownIcon');
-					icon.innerHTML = svgIcon;
-		
-					// Aggiorna il testo del pulsante con la lingua selezionata
-					const langText = this.querySelector('h6').textContent;
-					icon.setAttribute('aria-label', langText); // Imposta un'etichetta aria per l'accessibilità
-				});
-			});
+		>
 		</script>
-		
-		<script>
-			// Inizializzazione di CodeMirror
-			var editor_utente = CodeMirror.fromTextArea(
-				document.getElementById("Editor_utente"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "java", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					matchBrackets: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-					foldGutter: true, // Abilita il gutter per il folding
-					gutters: ["CodeMirror-foldgutter"], // Aggiungi il gutter per il folding
-					lineWrapping: true, // Abilita il wrapping delle righe
-				}
-			);
-			var editor_robot = CodeMirror.fromTextArea(
-				document.getElementById("Editor_Robot"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "java", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-				}
-			);
-			var console_utente = CodeMirror.fromTextArea(
-				document.getElementById("Console_utente"),
-				{
-					lineNumbers: false, // Mostra i numeri di riga
-					mode: "shell", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
-			var console_robot = CodeMirror.fromTextArea(
-				document.getElementById("Console_Robot"),
-				{
-					lineNumbers: false, // Mostra i numeri di riga
-					mode: "shell", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
-
-			const divider_Console = document.getElementById("divider_Console");
-			const divider_result = document.getElementById("divider_result");
-			const section_editor = document.getElementById("section_editor");
-			const section_console = document.getElementById("section_console");
-			const section_UT = document.getElementById("section_UT");
-			const section_result = document.getElementById("section_result");
-			const container_user = document.getElementById("card_user");
-			const container_robot = document.getElementById("card_robot");
-
-		    const nome_mode = document.getElementById("Nome_modalita").textContent = localStorage.getItem("modalita");
-			
-			// Abilita il folding del codice
-			editor_utente.on("gutterClick", function (cm, line, gutter, event) {
-				// Verifica se il gutter è quello del folding
-				if (gutter === "CodeMirror-foldgutter") {
-					var fold = cm.getLineHandle(line);
-					if (fold && fold.folded) {
-						cm.foldCode(line, null); // Espandi
-					} else {
-						cm.foldCode(line, null); // Collassa
-					}
-				}
-			});
-
-			function enableResizing(
-				container,
-				divider,
-				section1,
-				section2,
-				close_button
-			) {
-				let isDragging = false;
-				let lastHeightSection1 = null;
-				let lastHeightSection2 = null;
-
-				// Aggiungi event listener per il mouse down (quando si inizia a trascinare)
-				divider.addEventListener("mousedown", function (e) {
-					isDragging = true;
-					document.body.style.cursor = "n-resize"; // Mostra la mano chiusa durante il trascinamento
-					container.classList.add("no-select"); // Disabilita la selezione del testo
-				});
-
-				// Event listener per il movimento del mouse
-				container.addEventListener("mousemove", function (e) {
-					if (!isDragging) return; // Se non si sta trascinando, non fare nulla
-
-					// Calcola la nuova altezza della prima sezione
-					const containerRect = container.getBoundingClientRect();
-					const offsetY = e.clientY - containerRect.top;
-
-					// Imposta la nuova altezza per la prima sezione
-					section1.style.height = `${offsetY}px`;
-
-					// Imposta l'altezza per la seconda sezione
-					section2.style.height = `${containerRect.height - offsetY - 10}px`;
-
-					// Aggiorna le ultime altezze
-					lastHeightSection1 = section1.style.height;
-					lastHeightSection2 = section2.style.height;
-				});
-
-				// Event listener per il rilascio del mouse (fine del trascinamento)
-				document.addEventListener("mouseup", function () {
-					if (isDragging) {
-						isDragging = false;
-						document.body.style.cursor = "default"; // Ripristina il cursore predefinito
-						container.classList.remove("no-select"); // Riabilita la selezione del testo
-					}
-				});
-
-				// Funzione per chiudere totalmente la sezione
-				close_button.addEventListener("click", function () {
-					const section2Height = getComputedStyle(section2).height; // Ottiene l'altezza calcolata di section2
-
-					if (lastHeightSection1 === null || lastHeightSection2 === null) {
-						lastHeightSection1 = getComputedStyle(section1).height;
-						lastHeightSection2 = getComputedStyle(section2).height;
-					}
-
-					// Alterna tra le altezze salvate e 0
-					if (section2Height !== "0px") {
-						// Imposta l'altezza della seconda sezione a 0
-						section2.style.height = "0";
-						// La prima sezione occupa tutta l'altezza del contenitore
-						section1.style.height = `${container.clientHeight}px`;
-					} else {
-						// Ripristina l'ultima altezza fissata dall'utente
-						section2.style.height = lastHeightSection2;
-						section1.style.height = lastHeightSection1;
-					}
-				});
-			}
-
-			function toggleIcons(icon1Class, icon2Class, iconElement) {
-					// Controlla quale icona è attualmente presente e toggla
-					if (iconElement.classList.contains(icon1Class)) {
-						iconElement.classList.remove(icon1Class); // Rimuove l'icona 1
-						iconElement.classList.add(icon2Class); // Aggiunge l'icona 2
-					} else {
-						iconElement.classList.add(icon1Class); // Rimuove l'icona 2
-						iconElement.classList.remove(icon2Class); // Aggiunge l'icona 1
-					}
-			}
-
-			// Aggiungi gli event listener ai bottoni
-			document.querySelectorAll(".toggleButton").forEach((button) => {
-				button.addEventListener("click", function () {
-					const icon1Class = this.getAttribute("data-icon1");
-					const icon2Class = this.getAttribute("data-icon2");
-					const iconElement = this.querySelector("i"); // Seleziona l'elemento <i> all'interno del bottone
-					toggleIcons(icon1Class, icon2Class, iconElement);
-				});
-			});
-
-			// Imposta l'altezza del container all'altezza del viewport in modo dinamico
-			function setEditorSize() {
-				const availableHeightUser = container_user.clientHeight; // Altezza del container utente
-				const availableHeightRobot = container_robot.clientHeigh; // Altezza del container robot
-
-				// Imposta l'altezza degli editor in base all'altezza del container disponibile
-				editor_utente.setSize(null, availableHeightUser + "px");
-				editor_robot.setSize(null, availableHeightRobot + "px");
-			}
-
-			window.addEventListener("resize", function () {
-				setEditorSize(); // Mantieni l'altezza degli editor sincronizzata con l'altezza del container
-			});
-
-			enableResizing(
-				container_user,
-				divider_Console,
-				section_editor,
-				section_console,
-				close_console_utente
-			);
-			enableResizing(
-				container_robot,
-				divider_result,
-				section_UT,
-				section_result,
-				close_console_result
-			);
-
-			// Funzione per cambiare il tema
-			const chk = document.getElementById('chk_theme');
-			function toggleTheme() {
-				const htmlElement = document.getElementById("html-root");
-				// Ottieni tutti gli editor e console
-				const editors = [
-					editor_utente,
-					console_utente,
-					editor_robot,
-					console_robot,
-				];
-
-				// Imposta un fade out
-				editors.forEach((editor) => {
-					editor.getWrapperElement().style.transition = "opacity 0.6s ease";
-					editor.getWrapperElement().style.opacity = 0; // Fai svanire l'editor
-				});
-
-				// Cambiamo il tema visivamente
-				setTimeout(() => {
-					if (chk.checked) {
-						// Tema chiaro
-						htmlElement.setAttribute("data-bs-theme", "light");
-						editors.forEach((editor) => {
-							editor.setOption("theme", "eclipse");
-							editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
-						});
-					} else {
-						// Tema scuro
-						htmlElement.setAttribute("data-bs-theme", "dark");
-						editors.forEach((editor) => {
-							editor.setOption("theme", "material-darker");
-							editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
-						});
-					}
-
-					// Dopo che il tema è cambiato, riporta l'opacità a 1 per il fade in
-					editors.forEach((editor) => {
-						editor.getWrapperElement().style.transition = "opacity 0.6s ease";
-						editor.getWrapperElement().style.opacity = 1; // Fai riapparire l'editor
-					});
-				}, 500); // Tempo per il fade out prima di cambiare il tema
-			}
-			chk.addEventListener('change', () => {
-				toggleTheme();
-			});
-
-			//funzione menu
-			function showTabPane(paneId) {
-				// Nascondi tutte le tab pane attive
-				var tabPanes = document.querySelectorAll(".tab-pane");
-				tabPanes.forEach(function (tabPane) {
-					tabPane.classList.remove("show", "active");
-				});
-
-				// Mostra solo la tab pane richiesta
-				var activePane = document.getElementById(paneId);
-				activePane.classList.add("show", "active");
-			}
-
-			// Gestione dell'evento keydown per aprire e chiudere il dropdown
-			document.addEventListener("keydown", function (event) {
-				if (event.ctrlKey && event.key === "d") {
-					// Combinazione di tasti Ctrl + D
-					event.preventDefault(); // Evita comportamenti predefiniti (ad es. segnalibri nel browser)
-
-					// Ottieni l'elemento del bottone del dropdown
-					var dropdownButton = document.getElementById("utente_menu");
-
-					// Crea o recupera l'istanza del dropdown di Bootstrap
-					var dropdownInstance = bootstrap.Dropdown.getInstance(dropdownButton);
-					if (!dropdownInstance) {
-						dropdownInstance = new bootstrap.Dropdown(dropdownButton);
-					}
-
-					// Verifica lo stato corrente e alterna tra aprire e chiudere
-					if (dropdownButton.getAttribute("aria-expanded") === "true") {
-						dropdownInstance.hide(); // Chiudi il dropdown se è aperto
-					} else {
-						dropdownInstance.show(); // Apri il dropdown se è chiuso
-					}
-				}
-			});
+		<script
+			th:src="@{/t5/js/Util_Editor.js}"
+			th:inline="javascript"
+		>
 		</script>
-		<script th:src="@{/t5/js/common.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/commonEditor.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/editor.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/editor_tour.js}" th:inline="javascript"></script>
+		<script
+			th:src="@{/t5/js/REST_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/Button_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/GUI_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
 	</body>
 </html>

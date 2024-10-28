@@ -15,6 +15,11 @@
  *   limitations under the License.
  */
 
+
+/*
+*		QUI CI SONO TUTTE LE FUNZIONI UTILI PER L'EDITOR 
+*/
+
 // Funzione per creare l'URL dell'API
 function createApiUrl(formData, orderTurno) {
 	const className = formData.get("className");
@@ -101,8 +106,7 @@ ______ _____  _____   ____   _____
 |______|_|  \_\_|  \_\\____/|_____/  
 `;
 
-function getConsoleTextCoverage(data, gameScore) {
-	var valori_csv = extractThirdColumn(data);
+function getConsoleTextCoverage(valori_csv, gameScore) {
 	var consoleText = 
 `============================== Results ===============================
 Il tuo punteggio: ${gameScore}pt
@@ -128,8 +132,7 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 	return consoleText;
 }
 
-function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
-	var valori_csv = extractThirdColumn(data);
+function getConsoleTextRun(valori_csv, punteggioJacoco, punteggioRobot, gameScore) {
 	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
 	consoleText =
 `===================================================================== \n` +
@@ -222,30 +225,64 @@ function toggleLoading(showSpinner, divId, buttonId) {
 	}
 }
 
-function setStatus(showSpinner = true,  loadingText) {
-	const divElement = document.getElementById("status_compiler");
+// Definizione degli stati predefiniti
+const statusMessages = {
+	sending:    { showSpinner: true,  text: "Sending Test..."	},
+    loading: 	{ showSpinner: true,  text: "Loading Results..." 	},
+    compiling: 	{ showSpinner: true,  text: "Compiling..."  },
+    ready: 		{ showSpinner: false, text: "Ready" 		},
+    error: 		{ showSpinner: false, text: "Error" 		},
+	turn_end:   { showSpinner: false, text: "Turn Ended" 	},
+	game_end:   { showSpinner: false, text: "Game Ended" 	}
+};
 
-	if (!divElement) {
-		console.error(`Elemento con ID "${divId}" non trovato.`);
-		return;
-	}
+// Funzione per comunicare lo stato in cui si trova l'editor 
+function setStatus(statusName) {
+    const divElement = document.getElementById("status_compiler");
 
-	const spinner = divElement.querySelector(".spinner-border");
-	const statusText = divElement.querySelector('#status_text');
-	const icon = divElement.querySelector("i");
+    if (!divElement) {
+        console.error(`Elemento con ID "status_compiler" non trovato.`);
+        return;
+    }
 
-	// Controlla lo stato attuale dello spinner e inverte la visibilità
-	if (showSpinner) {
-		// Se lo spinner è nascosto o non è stato impostato, mostralo
-		spinner.style.display = "inline-block"; // Mostra lo spinner
-		statusText.innerText = loadingText; // Mostra il testo personalizzato
-		icon.style.display = "none"; // Nascondi l'icona
-	} else {
-		// Se lo spinner è visibile, nascondilo
-		spinner.style.display = "none"; // Nascondi lo spinner
-		statusText.innerText = "Ready"; // Ripristina il testo "Play"
-		icon.style.display = "inline-block"; // Mostra l'icona
-	}
+    const spinner = divElement.querySelector(".spinner-border");
+    const statusText = divElement.querySelector('#status_text');
+    const icon = divElement.querySelector("i");
+
+    // Recupera le impostazioni per lo stato specificato
+    const status = statusMessages[statusName];
+
+    if (!status) {
+        console.error(`Stato "${statusName}" non definito.`);
+        return;
+    }
+
+    // Controlla lo stato attuale dello spinner e inverte la visibilità
+    if (status.showSpinner) {
+        spinner.style.display = "inline-block"; // Mostra lo spinner
+        statusText.innerText = status.text; // Mostra il testo personalizzato
+        icon.style.display = "none"; // Nascondi l'icona
+    } else {
+        spinner.style.display = "none"; // Nascondi lo spinner
+        statusText.innerText = status.text; // Mostra il testo personalizzato
+        icon.style.display = "inline-block"; // Mostra l'icona
+    }
+}
+
+function addCustomMarker(editor, lineNumber, color, text) {
+    const marker = document.createElement("div");
+    marker.className = "custom-marker";
+    marker.style.backgroundColor = color;
+    marker.style.display = "flex";
+    marker.style.alignItems = "center";
+    marker.style.padding = "2px";
+    marker.style.borderRadius = "4px";
+    // Imposta il testo nel marker
+    if (text) {
+        marker.textContent = text; // Imposta il testo desiderato
+    }
+    console.log("addCustom marker at line: " + lineNumber + " with text: " + text);
+    editor.setGutterMarker(lineNumber, "custom-gutter", marker);
 }
 
 function highlightCodeCoverage(reportContent) {
@@ -268,6 +305,7 @@ function highlightCodeCoverage(reportContent) {
 		else uncoveredLines.push(line.getAttribute("nr"));
 	});
 
+	/*
 	coveredLines.forEach(function (lineNumber) {
 		editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
 		editor_robot.removeLineClass(
@@ -276,22 +314,19 @@ function highlightCodeCoverage(reportContent) {
 			"partially-covered-line"
 		);
 		editor_robot.addLineClass(lineNumber - 2, "wrap", "covered-line");
+		addCustomMarker(editor_robot, lineNumber, "green", " ")//carattere spazio vuoto di ascii non levare
+	});
+	*/
+	coveredLines.forEach(function (lineNumber) {
+		addCustomMarker(editor_robot, lineNumber, "green", " ")//carattere spazio vuoto di ascii non levare
 	});
 
 	uncoveredLines.forEach(function (lineNumber) {
-		editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
-		editor_robot.removeLineClass(
-			lineNumber - 2,
-			"wrap",
-			"partially-covered-line"
-		);
-		editor_robot.addLineClass(lineNumber - 2, "wrap", "uncovered-line");
+		addCustomMarker(editor_robot, lineNumber, "red", " ")//carattere spazio vuoto di ascii non levare
 	});
 
 	partiallyCoveredLines.forEach(function (lineNumber) {
-		editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
-		editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
-		editor_robot.addLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+		addCustomMarker(editor_robot, lineNumber, "orange", " ")//carattere spazio vuoto di ascii non levare
 	});
 }
 

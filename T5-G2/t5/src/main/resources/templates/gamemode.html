@@ -28,8 +28,8 @@
 										class="alert alert-warning d-none"
 										role="alert"
 										id="alert_nuova"
+										th:text="#{chiudi_partita}"
 									>
-										Attenzione chiuderai la precedente partita attive!
 									</div>
 									<form>
 										<!-- Selezione Classe UT -->
@@ -82,8 +82,7 @@
 												href="#"
 												role="button"
 											>
-												<i class="bi bi-play-fill"></i>
-												Inizia nuova partita
+												<i class="bi bi-play-fill" th:text="#{inizia_partita}"></i>
 											</a>
 										</div>
 									</form>
@@ -129,8 +128,7 @@
 												class="btn btn-primary"
 												id="new_game"
 											>
-												<i class="bi bi-plus-lg"></i>
-												New Game
+												<i class="bi bi-plus-lg" th:text="#{nuova_partita}"></i>
 											</button>
 										</div>
 										<!-- Link editor -->
@@ -141,8 +139,7 @@
 												role="button"
 												id="Continua"
 											>
-												<i class="bi bi-play-fill"></i>
-												Riprendi Partita
+												<i class="bi bi-play-fill" th:text="#{riprendi_partita}"></i>
 											</a>
 										</div>
 									</div>
