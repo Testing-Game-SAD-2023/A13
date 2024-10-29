@@ -99,6 +99,7 @@ const mode = document.getElementById("Nome_modalita").textContent = localStorage
 //  const status_turn_end:      "Turn Ended" 	
 //  const status_game_end:      "Game Ended" 
 
+
 //  const status_button_coverage gioca 
 //  const status_button_run      submit ?? 
 //  const var_info_ClasseUT      "ClasseUT: "

@@ -181,8 +181,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	// Seleziona il bottone popover
 	var popoverButton = document.getElementById("popover_info");
 	var messaggio =
-		"Classe UT: "  + 	localStorage.getItem("underTestClassName") + "<br>" +
-		"Difficoltà: " + 	localStorage.getItem("difficulty") + "<br>" +
+		 ClasseUT  + 	localStorage.getItem("underTestClassName") + "<br>" +
+		 Difficolta + 	localStorage.getItem("difficulty") + "<br>" +
 		"Robot: " 	   +	localStorage.getItem("robot");
 	
 	var popover = new bootstrap.Popover(popoverButton, {
