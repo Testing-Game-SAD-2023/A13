@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AppController {
 
     private static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
+
+    @Value("${variabile.mvn}")
+    private String mvn_path;
 
     @Autowired
     public AppController() {
@@ -55,8 +59,11 @@ public class AppController {
     public ResponseEntity<String> compileAndTest(@RequestBody RequestDTO request) throws IOException, InterruptedException {
         try {
             // Crea un'istanza del servizio di compilazione e chiama il metodo
-            CompilationService compilationService = new CompilationService(request.getTestingClassName(), request.getTestingClassCode(),
-                    request.getUnderTestClassName(), request.getUnderTestClassCode());
+            CompilationService compilationService = new CompilationService(request.getTestingClassName(), 
+                                                                           request.getTestingClassCode(),
+                                                                           request.getUnderTestClassName(), 
+                                                                           request.getUnderTestClassCode(), 
+                                                                           mvn_path);
 
             compilationService.compileAndTest();
             JSONObject result = new JSONObject();

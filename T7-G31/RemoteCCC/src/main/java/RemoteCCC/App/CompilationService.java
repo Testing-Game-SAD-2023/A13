@@ -36,7 +36,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CompilationService {
     /*
      * Config gestisce i path delle directory e fornisce un id univoco 
@@ -55,17 +57,27 @@ public class CompilationService {
     public String outputMaven;
     public Boolean Errors;
     public String Coverage;
+    /*
+     *  Qui metto il path di maven in base al profilo, 
+     *  in fase di testing ho bisogno di esplicitarlo rispetto a windows
+     */
+    private String mvn_path;
+
     //logger
     private static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
 
     public CompilationService(String testingClassName, String testingClassCode,
-            String underTestClassName, String underTestClassCode) {
+                              String underTestClassName, String underTestClassCode, 
+                              String mvn_path) {
+        
         this.config = new Config();
         this.testingClassName = testingClassName;
         this.testingClassCode = testingClassCode;
         this.underTestClassName = underTestClassName;
         this.underTestClassCode = underTestClassCode;
         this.outputMaven = null;
+        this.mvn_path = mvn_path;
+        
         logger.info("[CompilationService] Servizi creato con successo");
     }
 
@@ -182,6 +194,11 @@ public class CompilationService {
         if (nameclass == null || nameclass.isEmpty()) {
             throw new IllegalArgumentException("[saveCodeToFile] Il nome della classe non può essere nullo o vuoto.");
         }
+
+        if(!nameclass.endsWith(".java")){
+            throw new IllegalArgumentException("[saveCodeToFile] Il nome della classe non ha l'estensione .java");
+        }
+
         if (path == null || path.isEmpty()) {
             throw new IllegalArgumentException("[saveCodeToFile] Il percorso non può essere nullo o vuoto.");
         }
@@ -197,6 +214,7 @@ public class CompilationService {
             // Acquisisci un lock sul file per evitare accessi concorrenti
             try (FileLock lock = channel.lock()) {
                 // Scrivi il codice nel file
+                logger.info("[CompilationService] Ho creato il file " + path + nameclass);
                 ByteBuffer buffer = StandardCharsets.UTF_8.encode(code);
                 channel.write(buffer);
             } catch (OverlappingFileLockException e) {
@@ -214,7 +232,8 @@ public class CompilationService {
     }
 
     private boolean compileExecuteCoverageWithMaven() throws RuntimeException{
-        ProcessBuilder processBuilder = new ProcessBuilder("mvn", "clean", "compile", "test");
+        logger.error(mvn_path);
+        ProcessBuilder processBuilder = new ProcessBuilder(mvn_path, "clean", "compile", "test");
         processBuilder.directory(new File(config.getPathCompiler()));
         StringBuilder output = new StringBuilder();
         StringBuilder errorOutput = new StringBuilder();
