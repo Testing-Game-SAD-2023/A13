@@ -572,7 +572,7 @@ public class TestClasse {
 									id="popover_info"
 									data-bs-toggle="popover"
 									data-bs-trigger="hover focus"
-									data-bs-title="Game Info"
+									data-bs-title="Game info"
 									data-bs-placement="bottom"
 									data-bs-content="prova"
 								>
@@ -674,6 +674,28 @@ public class TestClasse {
 
 		<!-- FOOTER -->
 		<div th:replace="fragments/footer :: footer"></div>
+	
+		<script th:inline="javascript">
+
+		const mode_sfida        = /*[[#{modalità_sfida}]]*/ '';
+		const mode_allenamento  = /*[[#{modalità_allenamento}]]*/ '';
+		const mode_scalata      = /*[[#{modalità_scalata}]]*/ '';
+		const status_sending    = /*[[#{stato_invio}]]*/ '';
+		const status_loading    = /*[[#{stato_caricamento}]]*/ '';
+		const status_compiling  = /*[[#{stato_compilazione}]]*/ '';
+		const status_ready      = /*[[#{stato_pronto}]]*/ '';
+		const status_error      = /*[[#{stato_errore}]]*/ '';
+		const status_turn_end   = /*[[#{stato_turno_finito}]]*/ '';
+		const status_game_end   = /*[[#{stato_partita_finita}]]*/ '';
+		const status_inizia_partita = /*[[#{inizia_partita}]]*/ '';
+		const match_in_corso    = /*[[#{match_in_corso}]]*/ '';
+		const loading           = /*[[#{caricamento}]]*/ '';
+		const ClasseUT           = /*[[#{classe_ut}]]*/ '';		
+		const Difficolta           = /*[[#{gamemode_difficulty}]]*/ '';
+		
+		</script>
+		
+
 
 		<!-- CODEMIRROR -->
 		<script
@@ -747,5 +769,9 @@ public class TestClasse {
 			th:inline="javascript"
 		>
 		</script>
+
+
+
+
 	</body>
 </html>

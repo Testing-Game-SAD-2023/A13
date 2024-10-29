@@ -192,7 +192,7 @@ async function startGame(data) {
 
 		if (errorMessage.includes("errore esiste già la partita")) {
 			console.log("Il messaggio d'errore indica che esiste già la partita.");
-			openModalWithText("Start Game", "Hai già un match in corso!");
+			openModalWithText(status_inizia_partita, match_in_corso);
 		} 
 
 		console.log("[start Game]", errorMessage);
@@ -214,7 +214,7 @@ function toggleLoading(showSpinner, divId, buttonId) {
 
 	if (showSpinner) {
 		spinner.style.display = "inline-block"; // Mostra lo spinner
-		statusText.innerText = "Loading..."; // Mostra il testo "Loading..."
+		statusText.innerText = loading; // Mostra il testo "Loading..."
 		icon.style.display = "none"; // Nascondi l'icona
 		button.disabled = true;
 	} else {
@@ -227,13 +227,13 @@ function toggleLoading(showSpinner, divId, buttonId) {
 
 // Definizione degli stati predefiniti
 const statusMessages = {
-	sending:    { showSpinner: true,  text: "Sending Test..."	},
-    loading: 	{ showSpinner: true,  text: "Loading Results..." 	},
-    compiling: 	{ showSpinner: true,  text: "Compiling..."  },
-    ready: 		{ showSpinner: false, text: "Ready" 		},
-    error: 		{ showSpinner: false, text: "Error" 		},
-	turn_end:   { showSpinner: false, text: "Turn Ended" 	},
-	game_end:   { showSpinner: false, text: "Game Ended" 	}
+	sending:    { showSpinner: true,  text: status_sending	},
+    loading: 	{ showSpinner: true,  text: status_loading  },
+    compiling: 	{ showSpinner: true,  text: status_compiling},
+    ready: 		{ showSpinner: false, text: status_ready 	},
+    error: 		{ showSpinner: false, text: status_error    },
+	turn_end:   { showSpinner: false, text: status_turn_end },
+	game_end:   { showSpinner: false, text: status_game_end }
 };
 
 // Funzione per comunicare lo stato in cui si trova l'editor 
