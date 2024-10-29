@@ -60,7 +60,7 @@ async function handleGameAction(isGameEnd) {
         console_robot.setValue(getConsoleTextError());
         return;
     }
-    highlightCodeCoverage($.parseXML(coverage));
+    highlightCodeCoverage($.parseXML(coverage), editor_robot);
     orderTurno++;
     const url = createApiUrl(formData, orderTurno);
     setStatus("loading");
@@ -87,6 +87,7 @@ async function handleGameAction(isGameEnd) {
         flush_localStorage();
     }
 }
+
 // Documento pronto
 $(document).ready(function () {
     const data = getGameData();
@@ -110,6 +111,10 @@ $(document).ready(function () {
         document.getElementById("Editor_utente").value = newContent;
         editor_utente.setValue(newContent);
 	}
+    const savedStorico = localStorage.getItem('storico');
+    if(savedStorico){
+        viewStorico();
+    }
 });
 // Pulsante "Run/Submit"
 document.getElementById("runButton").addEventListener("click", () => handleGameAction(true));

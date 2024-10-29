@@ -201,248 +201,39 @@
 				<div class="card rounded-0" id="card_user">
 					<!-- EDITOR-->
 					<div class="card-header p-0">
-						<nav class="navbar bg-body-tertiary p-2">
-							<span class="navbar-brand lead my-0 py-0" th:text="#{modifica}"></span>
-							<div class="">
-								<!-- UNDO e REDO -->
-								<button type="button" class="btn" id="undo-button">
-									<i class="bi bi-arrow-90deg-left"></i>
-								</button>
-								<button type="button" class="btn" id="redo-button">
-									<i class="bi bi-arrow-90deg-right"></i>
-								</button>
-								<!-- COVERAGE -->
-								<button
-									class="btn btn-primary"
-									type="button"
-									id="coverageButton"
-								>
-									<div id="loading_cov">
-										<span
-											class="spinner-border spinner-border-sm"
-											aria-hidden="true"
-											style="display: none"
-										></span>
-										<i
-											id="loading_icon_1"
-											class="bi bi-play-fill"
-											aria-hidden="true"
-										></i>
-										<span role="status" data-title="Play" th:text="#{tasto_play}"></span>
-										<!-- Icona nascosta -->
-									</div>
-								</button>
-								<!-- MENU BUTTON -->
-								<button
-									type="button"
-									id="utente_menu"
-									class="btn btn-sm dropdown-toggle-split my-0"
-									data-bs-toggle="dropdown"
-									aria-expanded="false"
-									data-bs-auto-close="outside"
-									aria-haspopup="true"
-								>
-									<i class="bi bi-three-dots-vertical"></i>
-								</button>
-								<!-- MENU OPZIONI -->
-								<div
-									class="dropdown-menu shadow dropdown-menu-end"
-									aria-labelledby="navbarDropdownMenuLink"
-									style="width: 400px"
-								>
-									<div class="container-fluid p-0">
-										<div class="tab-content" id="myTabContent">
-											<!-- MENU -->
-											<div
-												class="tab-pane fade show active"
-												id="paneA"
-												role="tabpanel"
-												aria-labelledby="pane-A"
-											>
-												<ol class="breadcrumb m-0 px-2">
-													<li class="breadcrumb-item">
-														<strong>Menu</strong>
-													</li>
-													<li
-														class="breadcrumb-item active"
-														aria-current="page"
-													>
-														CTRL+D
-													</li>
-												</ol>
-												<div class="list-group list-group-flush">
-													<button
-														type="button"
-														onclick="showTabPane('paneB')"
-														class="list-group-item list-group-item-action"
-														aria-current="true"
-													>
-														<i class="bi bi-clock-history" th:text="#{storico}"></i>														
-													</button>
-													<button
-														type="button"
-														onclick="showTabPane('paneC')"
-														class="list-group-item list-group-item-action"
-													>
-														<i class="bi bi-upload"></i> Upload
-													</button>
-													<button
-														type="button"
-														id="DownloadButton"
-														class="list-group-item list-group-item-action"
-													>
-														<i class="bi bi-download"></i> Download
-													</button>
-													<button
-														type="button"
-														onclick="showTabPane('paneD')"
-														class="list-group-item list-group-item-action"
-													>
-														<i class="bi bi-search" th:text="#{cerca_sostituisci}"></i> 
-													</button>
-												</div>
-											</div>
-											<!-- STORICO-->
-											<div
-												class="tab-pane fade overflow-y-auto"
-												id="paneB"
-												role="tabpanel"
-												aria-labelledby="pane-B"
-											>
-												<div class="d-flex">
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item mb-2 mx-2"
-													>
-														<i class="bi bi-arrow-left"></i>
-													</button>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item">Menu</li>
-														<li
-															class="breadcrumb-item active"
-															aria-current="page" th:text="#{storico}"
-														>
-															
-														</li>
-													</ol>
-												</div>
-												<ol
-													id="storico_list"
-													class="list-group list-group-flush list-group-numbered overflow-auto border-top"
-													style="max-height: 150px"
-												>
-													<li
-														id="placeholder-item"
-														class="list-group-item d-flex justify-content-between align-items-start"
-													>
-														<div class="ms-2 me-auto">
-															<div class="fw-bold" th:text="#{no_turni}">
-															</div>
-														</div>
-													</li>
-												</ol>
-											</div>
-											<!-- UPLOAD -->
-											<div
-												class="tab-pane fade"
-												id="paneC"
-												role="tabpanel"
-												aria-labelledby="pane-C"
-											>
-												<div class="d-flex">
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item mb-2 mx-2"
-													>
-														<i class="bi bi-arrow-left"></i>
-													</button>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item">Menu</li>
-														<li
-															class="breadcrumb-item active"
-															aria-current="page"
-														>
-															Upload
-														</li>
-													</ol>
-												</div>
-												<input
-													class="container-fluid form-control"
-													id="fileInput"
-													type="file"
-												/>
-											</div>
-											<!-- SEARCH -->
-											<div
-												class="tab-pane fade"
-												id="paneD"
-												role="tabpanel"
-												aria-labelledby="pane-D"
-											>
-												<div class="d-flex">
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item mb-2 mx-2"
-													>
-														<i class="bi bi-arrow-left"></i>
-													</button>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item">Menu</li>
-														<li
-															class="breadcrumb-item active"
-															aria-current="page"
-															th:text="#{cerca_sostituisci}"
-														>
-														</li>
-													</ol>
-												</div>
-												<div class="input-group mb-3 px-2">
-													<button
-														class="btn btn-primary"
-														type="button"
-														id="searchButton"
-													>
-														<i class="bi bi-search"></i>
-													</button>
-													<input
-														type="text"
-														id="searchTerm"
-														class="form-control border-secondary"
-														placeholder="Cerca"
-														aria-label="Cerca"
-													/>
-													<span
-														class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger"
-														id="SearchItems"
-														style="display: none"
-													>
-													</span>
-												</div>
-												<div class="input-group mb-2 px-2">
-													<button
-														class="btn btn-primary"
-														type="button"
-														id="startReplace"
-													>
-														<i class="bi bi-arrow-left-right"></i>
-													</button>
-													<input
-														type="text"
-														id="replaceTerm"
-														class="form-control border-secondary"
-														placeholder="Sostituisci"
-														aria-label="Sostituisci"
-													/>
-												</div>
-											</div>
-										</div>
-									</div>
+							<div class="d-flex justify-content-between ps-3 pt-2 bg-body-tertiary">
+								<ul class="nav nav-tabs card-header-tabs">
+									<li class="nav-item">
+										<a class="nav-link active" aria-current="true" href="#">
+											Class UT
+											<i class="bi bi-x"></i>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" href="#">
+											Test 
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link disabled" aria-disabled="true">
+											
+										</a>
+									</li>
+								</ul>		
+								
+								<!-- add button -->
+								<div class="dropdown">
+									<button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+										<i class="bi bi-plus-lg"></i>
+									</button>
+									<ul class="dropdown-menu">
+									  <li><a class="dropdown-item" href="#">Action</a></li>
+									  <li><a class="dropdown-item" href="#">Another action</a></li>
+									  <li><a class="dropdown-item" href="#">Something else here</a></li>
+									</ul>
 								</div>
 							</div>
-						</nav>
+									
 					</div>
 					<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_editor">
 						<textarea id="Editor_utente">
@@ -520,112 +311,56 @@ public class TestClasse {
 							</div>
 						</nav>
 					</div>
-					<div
-						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-						id="section_console"
-					>
-						<textarea id="Console_utente"> </textarea>
+					<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_console">
+							<div class="row row-cols-2">
+								<div class="col-10">
+									<textarea id="Console_utente"> </textarea>
+								</div>
+								<div class="col-2">
+									<ul class="list-group">
+										<li class="list-group-item">An item</li>
+										<li class="list-group-item">A second item</li>
+										<li class="list-group-item">A third item</li>
+										<li class="list-group-item">A fourth item</li>
+										<li class="list-group-item">And a fifth one</li>
+									  </ul>
+								</div>		
+							</div>			
 					</div>
+					<!-- FOOTER -->
 					<div class="card-footer text-body-secondary py-0 px-1">
-						<small class="pl-5">
-							<i class="bi bi-exclamation-triangle-fill"></i> 
-						</small>
-						<small class="pr-2" id="warning_compiler">
-							0
-						</small>						
-						<small class="pr-2">
-							<i class="bi bi-x-circle"></i>
-						</small>
-						<small class="pr-2" id="error_compiler">
-							0
-						</small>
-					</div>
-				</div>
-				<!-- SECONDA COLONNA-->
-				<div class="card rounded-0" id="card_robot">
-					<!-- CLASS UNDER TEST-->
-					<div class="card-header p-0">
-						<nav class="navbar bg-body-tertiary p-2">
-							<span class="navbar-brand lead my-0 py-0" th:text="#{classe_ut}">
-							</span>
+						<div class="d-flex justify-content-between">
 							<div class="">
-								<!-- INFO BUTTON -->
-								<span
-									class="d-inline-block mx-3"
-									tabindex="0"
-									id="popover_info"
-									data-bs-toggle="popover"
-									data-bs-trigger="hover focus"
-									data-bs-title="Game Info"
-									data-bs-placement="bottom"
-									data-bs-content="prova"
-								>
-									<i class="bi bi-info-circle"></i>
-								</span>
-								<!-- SUBMIT /RUN -->
-								<button class="btn btn-success" type="button" id="runButton">
-									<div id="loading_run">
-										<span
-											class="spinner-border spinner-border-sm"
-											aria-hidden="true"
-											style="display: none"
-										></span>
-										<i
-											id="loading_icon_1"
-											class="bi bi-play-fill"
-											aria-hidden="true"
-										></i>
-										<span role="status" data-title="Submit" th:text="#{submit}"></span>
-										<!-- Icona nascosta -->
-									</div>
-								</button>
+								<small class="pl-5">
+									<i class="bi bi-exclamation-triangle-fill"></i> 
+								</small>
+								<small class="pr-2" id="warning_compiler">
+									0
+								</small>						
+								<small class="pr-2">
+									<i class="bi bi-x-circle"></i>
+								</small>
+								<small class="pr-2" id="error_compiler">
+									0
+								</small>
 							</div>
-						</nav>
-					</div>
-					<div
-						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-						id="section_UT"
-					>
-						<textarea id="Editor_Robot" th:text="${classeUT}"> </textarea>
-					</div>
-					<!-- COMPARE RESULT -->
-					<div class="card-header border-top p-0">
-						<div id="divider_result" class="border border-3 border-secondary-subtle"></div>
-						<nav class="navbar bg-body-tertiary p-1">
-							<span class="navbar-brand lead my-0 py-0" th:text="#{risultati}"> </span>
 							<div>
-								<button
-									type="button"
-									class="btn btn-sm toggleButton"
-									id="close_console_result"
-									data-icon1="bi-arrow-bar-down"
-									data-icon2="bi-arrow-bar-up"
-								>
-									<i class="bi bi-arrow-bar-down"></i>
-								</button>
+								<small class="pl-5">
+									<i
+										id="loading_icon_1"
+										class="bi bi-server"
+										aria-hidden="true"
+									></i>
+									<div class="spinner-border spinner-border-sm" role="status" 
+										aria-hidden="true"
+										style="display: none">
+									</div>
+								</small>
+								<small class="pr-2" id="status_text" th:text="#{pronto}">
+								</small>	
 							</div>
-						</nav>
-					</div>
-					<div
-						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-						id="section_result"
-					>
-						<textarea id="Console_Robot"> </textarea>
-					</div>
-					<div class="card-footer text-body-secondary py-0 px-1" id="status_compiler">
-						<small class="pl-5">
-							<i
-								id="loading_icon_1"
-								class="bi bi-server"
-								aria-hidden="true"
-							></i>
-							<div class="spinner-border spinner-border-sm" role="status" 
-								aria-hidden="true"
-								style="display: none">
-							</div>
-						</small>
-						<small class="pr-2" id="status_text" th:text="#{pronto}">
-						</small>						
+						</div>
+						
 					</div>
 				</div>
 			</div>

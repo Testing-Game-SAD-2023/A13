@@ -41,7 +41,6 @@ var editor_robot = CodeMirror.fromTextArea(
         lineNumbers: true, // Mostra i numeri di riga
         mode: "java", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
         theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-        gutters: ["CodeMirror-linenumbers", "custom-gutter"], // Aggiungi il gutter per il folding
         tabSize: 4, // Dimensione del tab
         readOnly: true,
     }
@@ -88,11 +87,9 @@ const close_console_utente  = document.getElementById("close_console_utente");
 */
 
 const mode = document.getElementById("Nome_modalita").textContent = localStorage.getItem("modalita");
-
-
-// const mode_sfida        = /*[[${welcomeMessage}]]*/
-// const mode_allenamento  = /*[[${welcomeMessage}]]*/
-// const mode_scalata      = /*[[${welcomeMessage}]]*/
+// const mode_sfida             = /*[[${welcomeMessage}]]*/
+// const mode_allenamento       = /*[[${welcomeMessage}]]*/
+// const mode_scalata           = /*[[${welcomeMessage}]]*/
 
 //  const status_sending:       "Sending Test..."	
 //  const status_loading: 	    "Loading Results..." 	

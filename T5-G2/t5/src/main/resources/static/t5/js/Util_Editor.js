@@ -269,26 +269,9 @@ function setStatus(statusName) {
     }
 }
 
-function addCustomMarker(editor, lineNumber, color, text) {
-    const marker = document.createElement("div");
-    marker.className = "custom-marker";
-    marker.style.backgroundColor = color;
-    marker.style.display = "flex";
-    marker.style.alignItems = "center";
-    marker.style.padding = "2px";
-    marker.style.borderRadius = "4px";
-    // Imposta il testo nel marker
-    if (text) {
-        marker.textContent = text; // Imposta il testo desiderato
-    }
-    console.log("addCustom marker at line: " + lineNumber + " with text: " + text);
-    editor.setGutterMarker(lineNumber, "custom-gutter", marker);
-}
-
-function highlightCodeCoverage(reportContent) {
+function highlightCodeCoverage(reportContent, editor) {
 	// Analizza il contenuto del file di output di JaCoCo per individuare le righe coperte, non coperte e parzialmente coperte
 	// Applica lo stile appropriato alle righe del tuo editor
-
 	var coveredLines = [];
 	var uncoveredLines = [];
 	var partiallyCoveredLines = [];
@@ -305,28 +288,22 @@ function highlightCodeCoverage(reportContent) {
 		else uncoveredLines.push(line.getAttribute("nr"));
 	});
 
-	/*
 	coveredLines.forEach(function (lineNumber) {
-		editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
-		editor_robot.removeLineClass(
-			lineNumber - 2,
-			"wrap",
-			"partially-covered-line"
-		);
-		editor_robot.addLineClass(lineNumber - 2, "wrap", "covered-line");
-		addCustomMarker(editor_robot, lineNumber, "green", " ")//carattere spazio vuoto di ascii non levare
-	});
-	*/
-	coveredLines.forEach(function (lineNumber) {
-		addCustomMarker(editor_robot, lineNumber, "green", " ")//carattere spazio vuoto di ascii non levare
+		editor.removeLineClass(lineNumber - 2, "gutter", "border-danger");
+		editor.removeLineClass(lineNumber - 2, "gutter", "border-warning");
+		editor.addLineClass	(lineNumber - 2, "gutter", "border-success");
 	});
 
-	uncoveredLines.forEach(function (lineNumber) {
-		addCustomMarker(editor_robot, lineNumber, "red", " ")//carattere spazio vuoto di ascii non levare
+	uncoveredLines.forEach(function (lineNumber) { 
+		editor.removeLineClass(lineNumber - 2, "gutter", "border-warning");
+		editor.removeLineClass(lineNumber - 2, "gutter", "border-success");
+		editor.addLineClass	(lineNumber - 2, "gutter", "border-danger");
 	});
 
-	partiallyCoveredLines.forEach(function (lineNumber) {
-		addCustomMarker(editor_robot, lineNumber, "orange", " ")//carattere spazio vuoto di ascii non levare
+	partiallyCoveredLines.forEach(function (lineNumber) { 
+		editor.removeLineClass(lineNumber - 2, "gutter", "border-danger");
+		editor.removeLineClass(lineNumber - 2, "gutter", "border-success");
+		editor.addLineClass	(lineNumber - 2, "gutter", "border-warning");
 	});
 }
 
