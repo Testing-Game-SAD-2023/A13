@@ -279,7 +279,7 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @return true if the objects are the same;
 	 *          false otherwise.
 	 */
-	Testa se la mancanza di annotazioni di test nella classe di test porta a un errore di compilazione.
+	//Testa se la mancanza di annotazioni di test nella classe di test porta a un errore di compilazione.
 	//@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof TimeStamp) {

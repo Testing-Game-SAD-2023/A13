@@ -49,8 +49,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	/***
 	 * Constructs a newly allocated NTP timestamp object
 	 * that represents the native 64-bit long argument.
-	 * @param ntpTime the timestamp
+	 * @param ntpTime the timestamp 
 	 */
+	
 	public TimeStamp(long ntpTime) {
 		this.ntpTime = ntpTime;
 	}
@@ -82,12 +83,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return the 64-bit long value represented by this object.
 	 */
-	 //Controlla se un metodo di test con un tipo di ritorno non valido causa un errore di compilazione.
+	// CAMBIO IL TIPO DI RITORNO da long a String
 	public long ntpValue() {
-		// Esempio 1: Usando String.valueOf
-		String ntpTimeTest = String.valueOf(ntpTime);
-		return ntpTimeTest;
-
+		return ntpTime.toString();
 	}
 
 	/***
