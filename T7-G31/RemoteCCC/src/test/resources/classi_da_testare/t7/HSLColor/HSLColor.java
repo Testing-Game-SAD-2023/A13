@@ -1,3 +1,5 @@
+import static org.mockito.Answers.valueOf;
+
 public class HSLColor {
 	private final static int HSLMAX = 255;
 	private final static int RGBMAX = 255;
@@ -20,7 +22,9 @@ public class HSLColor {
 		int cMinus;
 		int cPlus;
 
-		pRed = R;
+		int number = R;
+		String str = String.valueOf(number);
+		pRed = str;
 		pGreen = G;
 		pBlue = B;
 
@@ -65,8 +69,8 @@ public class HSLColor {
 		}
 	}
 		
-	// MODIFICO LA FIRMA
-	public void initRGBbyHS(int H, int S, int L) {
+
+	public void initRGBbyHSL(int H, int S, int L) {
 		int Magic1;
 		int Magic2;
 

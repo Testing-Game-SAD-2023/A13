@@ -8,8 +8,8 @@ import java.util.TimeZone;
  * The FTPFile class is used to represent information about files stored
  * on an FTP server.
  ***/
-
-public class FTPFile implements Serializable {
+// CLASSE FORMATTATA MALE
+public class 1FTPFile implements Serializable {
 	private static final long serialVersionUID = 9010790363003271996L;
 
 	/**
@@ -115,8 +115,7 @@ public class FTPFile implements Serializable {
 	 * @return The original FTP server raw listing used to initialize the
 	 *         FTPFile.
 	 ***/
-	// MODIFICO LA FIRMA
-	public String getRawListin() {
+	public String getRawListing() {
 		return _rawListing;
 	}
 

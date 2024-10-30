@@ -6,7 +6,8 @@ public class OutputFormat implements Cloneable {
 	/**
 	 * standard value to indent by, if we are indenting
 	 */
-	protected static final String STANDARD_INDENT = "  ";
+	// ERRORE DI FORMATTAZIONE
+	protected static final String 1STANDARD_INDENT = "  ";
 
 	/**
 	 * Whether or not to suppress the XML declaration - default is
@@ -134,8 +135,8 @@ public class OutputFormat implements Cloneable {
 		this.encoding = encoding;
 	}
 	
-	// MODIFICO LA FIRMA
-	public String getLineSeparato() {
+
+	public String getLineSeparator() {
 		return lineSeparator;
 	}
 

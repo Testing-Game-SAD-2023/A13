@@ -49,8 +49,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	/***
 	 * Constructs a newly allocated NTP timestamp object
 	 * that represents the native 64-bit long argument.
-	 * @param ntpTime the timestamp
+	 * @param ntpTime the timestamp 
 	 */
+	
 	public TimeStamp(long ntpTime) {
 		this.ntpTime = ntpTime;
 	}
@@ -172,8 +173,7 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @param   date   the milliseconds since January 1, 1970, 00:00:00 GMT.
 	 * @return NTP timestamp object at the specified date.
 	 */
-	// MODIFICO LA FIRMA
-	public static TimeStamp getNtpTim(long date) {
+	public static TimeStamp getNtpTime(long date) {
 		return new TimeStamp(toNtpTime(date));
 	}
 
@@ -264,7 +264,6 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return a hash code value for this object.
 	 */
-	
 	@Override
 	public int hashCode() {
 		return (int) (ntpTime ^ (ntpTime >>> 32));

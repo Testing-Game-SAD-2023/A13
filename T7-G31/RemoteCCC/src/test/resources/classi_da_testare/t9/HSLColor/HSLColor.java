@@ -12,7 +12,8 @@ public class HSLColor {
 	
 	public void initHSLbyRGB(int R, int G, int B) {
 		// sets Hue, Sat, Lum
-		int cMax;
+		// ERRORE DI FORMATTAZIONE
+		int 1cMax;
 		int cMin;
 		int RDelta;
 		int GDelta;
@@ -65,8 +66,8 @@ public class HSLColor {
 		}
 	}
 		
-	// MODIFICO LA FIRMA
-	public void initRGBbyHS(int H, int S, int L) {
+
+	public void initRGBbyHSL(int H, int S, int L) {
 		int Magic1;
 		int Magic2;
 

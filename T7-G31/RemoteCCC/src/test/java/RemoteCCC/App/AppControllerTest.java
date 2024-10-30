@@ -132,21 +132,21 @@ public class AppControllerTest {
             // Cicla attraverso tutte le sottocartelle
             if (subfolders != null) {
                 for (File subfolder : subfolders) {
-                    // Nome della sottocartella (che corrisponde al nome della classe)
-                    String className = subfolder.getName();
+                        // Nome della sottocartella (che corrisponde al nome della classe)
+                        String className = subfolder.getName();
 
-                    try {
-                        // Chiamata alla funzione DoTest
-                        String rootFolderClass =  Paths.get(rootFolder,className).toString();
-                        DoTest(rootFolderClass, className, Esito);
-                    } catch (Exception e) {
-                        System.err.println("Errore durante il test della classe: " + className);
-                        e.printStackTrace();
+                        try {
+                            // Chiamata alla funzione DoTest
+                            String rootFolderClass =  Paths.get(rootFolder,className).toString();
+                            DoTest(rootFolderClass, className, Esito);
+                        } catch (Exception e) {
+                            System.err.println("Errore durante il test della classe: " + className);
+                            e.printStackTrace();
+                        }
                     }
-                }
             }
         } else {
-            System.out.println("La cartella " + rootFolder + " non esiste o non è una directory.");
+            System.out.println("La cartella " + rootFolder + " non esiste o non e' una directory.");
         }
     }
 
@@ -161,10 +161,12 @@ public class AppControllerTest {
     /*
     *     test 1 - manca costruttore nella classe
     */
+    /*
     @Test
     public void CaseTest_1() throws Exception {
         runTests("t1", false);
     }
+    */
 
     /*
     *     test 2 - tipo di ritorno errato
@@ -175,18 +177,68 @@ public class AppControllerTest {
     }
 
     /*
-    *     test 3 - verifica metodo errato
+    *     test 3 - Verifica se una firma di metodo errata nella classe di test genera un errore di compilazione
     */
-    // TODO: fine di implementare CaseTest_3 ed i successivi
-    /* 
     @Test
     public void CaseTest_3() throws Exception {
         runTests("t3", false);
     }
 
+    /*
+    *     test 4 - Controlla se una classe di test vuota non genera un errore di compilazione
     */
+    @Test
+    public void CaseTest_4() throws Exception {
+        runTests("t4", true);
+    }
+
+    /*
+    *     test 5 - Testa se la mancanza di un metodo privato previsto genera un errore di compilazione
+    */
+    @Test
+    public void CaseTest_5() throws Exception {
+        runTests("t5", false);
+    }
+
+    /*
+    *     test 6 - Verifica se un'importazione non valida causa un errore di compilazione
+    */
+    @Test
+    public void CaseTest_6() throws Exception {
+        runTests("t6", false);
+    }
 
 
+    /*
+    *     test 7 - Controlla se l'assegnazione di un tipo di dato errato a una variabile genera un errore di compilazione
+    */
+    @Test
+    public void CaseTest_7() throws Exception {
+        runTests("t7", false);
+    }
 
+    /*
+    *     test 8 - Verifica se un nome del file non corrispondente genera un errore di compilazione
+    */
+    
+    @Test
+    public void CaseTest_8() throws Exception {
+        runTests("t8", false);
+    }
 
+    /*
+    *     test 9 - Verifica se un errore di formattazione del codice genera un errore di compilazione
+    */
+    @Test
+    public void CaseTest_9() throws Exception {
+        runTests("t9", false);
+    }
+
+    /*
+    *     test 10 - Controlla se un nome della classe di test non formattato correttamente genera un errore di compilazione
+    */
+    @Test
+    public void CaseTest_10() throws Exception {
+        runTests("t10", false);
+    }
 }

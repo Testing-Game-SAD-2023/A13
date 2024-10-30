@@ -75,8 +75,8 @@ public class FontInfo implements Cloneable, Serializable {
 	public void setSize(int value) {
 		_size = value;
 	}
-
-	public void setFont(Font font) throws IllegalArgumentException {
+	// MODIFICO LA FIRMA
+	public void setFon(Font font) throws IllegalArgumentException {
 		if (font == null) {
 			throw new IllegalArgumentException("Null Font passed");
 		}

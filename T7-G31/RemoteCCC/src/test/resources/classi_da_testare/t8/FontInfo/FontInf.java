@@ -17,14 +17,14 @@ public class FontInfo implements Cloneable, Serializable {
 	private boolean _isBold;
 	private boolean _isItalic;
 	private int _size;
-	/* RIMOZIONE COSTRUTTORE
+	
 	public FontInfo() {
 		super();
 		setFamily(DEFAULT_FAMILY);
 		setSize(12);
 	}
-	*/
-	/*
+	
+
 	public FontInfo(Font font) {
 		super();
 		if (font == null) {
@@ -32,7 +32,6 @@ public class FontInfo implements Cloneable, Serializable {
 		}
 		setFont(font);
 	}
-		*/
 
 	/**
 	 * Return a copy of this object.

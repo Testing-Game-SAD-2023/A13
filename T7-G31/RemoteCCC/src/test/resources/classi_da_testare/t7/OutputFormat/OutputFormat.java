@@ -129,13 +129,16 @@ public class OutputFormat implements Cloneable {
 	 */
 	
 	public OutputFormat(String indent, boolean newlines, String encoding) {
-		this.indent = indent;
+		//TIPO ASSEGNAZIONE ERRATO
+		String str = indent;
+		int number = Integer.valueOf(indent);
+		this.indent = number;
 		this.newlines = newlines;
 		this.encoding = encoding;
 	}
 	
-	// MODIFICO LA FIRMA
-	public String getLineSeparato() {
+
+	public String getLineSeparator() {
 		return lineSeparator;
 	}
 

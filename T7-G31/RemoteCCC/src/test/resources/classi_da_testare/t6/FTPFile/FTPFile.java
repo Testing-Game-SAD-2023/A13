@@ -2,7 +2,8 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
-import java.util.TimeZone;
+//IMPORTAZIONE NON VALIDA
+import java.util.TimeZon;
 
 /***
  * The FTPFile class is used to represent information about files stored
@@ -115,8 +116,7 @@ public class FTPFile implements Serializable {
 	 * @return The original FTP server raw listing used to initialize the
 	 *         FTPFile.
 	 ***/
-	// MODIFICO LA FIRMA
-	public String getRawListin() {
+	public String getRawListing() {
 		return _rawListing;
 	}
 

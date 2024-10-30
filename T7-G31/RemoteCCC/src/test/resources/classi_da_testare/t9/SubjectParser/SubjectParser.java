@@ -2,7 +2,8 @@ import java.util.StringTokenizer;
 
 public class SubjectParser {
 
-	private String Subject;
+	// ERRORE DI FORMATTAZIONE
+	private String 1Subject;
 	private String Title;
 	private String RangeString;
 	private int UpperRange;
@@ -35,8 +36,8 @@ public class SubjectParser {
 		}
 		return LowerRange;
 	}
-	// MODIFICO LA FIRMA
-	public int getUpperRang() {
+
+	public int getUpperRange() {
 		try {
 			int[] parts = this.messageParts();
 			if (parts != null) {

@@ -15,7 +15,8 @@ public class FTPFile implements Serializable {
 	/**
 	 * A constant indicating an FTPFile is a file.
 	 ***/
-	public static final int FILE_TYPE = 0;
+	// ERRORE DI FORMATTAZIONE
+	public static final int 1FILE_TYPE = 0;
 	/**
 	 * A constant indicating an FTPFile is a directory.
 	 ***/
@@ -115,8 +116,7 @@ public class FTPFile implements Serializable {
 	 * @return The original FTP server raw listing used to initialize the
 	 *         FTPFile.
 	 ***/
-	// MODIFICO LA FIRMA
-	public String getRawListin() {
+	public String getRawListing() {
 		return _rawListing;
 	}
 

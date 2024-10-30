@@ -115,8 +115,7 @@ public class FTPFile implements Serializable {
 	 * @return The original FTP server raw listing used to initialize the
 	 *         FTPFile.
 	 ***/
-	// MODIFICO LA FIRMA
-	public String getRawListin() {
+	public String getRawListing() {
 		return _rawListing;
 	}
 

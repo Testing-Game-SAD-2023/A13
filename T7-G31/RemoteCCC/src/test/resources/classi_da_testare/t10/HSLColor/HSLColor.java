@@ -1,4 +1,5 @@
-public class HSLColor {
+// CLASSE FORMATTATA MALE
+public class 1HSLColor {
 	private final static int HSLMAX = 255;
 	private final static int RGBMAX = 255;
 	private final static int UNDEFINED = 170;
@@ -65,8 +66,8 @@ public class HSLColor {
 		}
 	}
 		
-	// MODIFICO LA FIRMA
-	public void initRGBbyHS(int H, int S, int L) {
+
+	public void initRGBbyHSL(int H, int S, int L) {
 		int Magic1;
 		int Magic2;
 
