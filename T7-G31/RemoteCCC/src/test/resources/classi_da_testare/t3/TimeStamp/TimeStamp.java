@@ -82,12 +82,8 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return the 64-bit long value represented by this object.
 	 */
-	 //Controlla se un metodo di test con un tipo di ritorno non valido causa un errore di compilazione.
 	public long ntpValue() {
-		// Esempio 1: Usando String.valueOf
-		String ntpTimeTest = String.valueOf(ntpTime);
-		return ntpTimeTest;
-
+		return ntpTime;
 	}
 
 	/***
@@ -267,6 +263,7 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return a hash code value for this object.
 	 */
+	
 	@Override
 	public int hashCode() {
 		return (int) (ntpTime ^ (ntpTime >>> 32));
@@ -282,7 +279,8 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @return true if the objects are the same;
 	 *          false otherwise.
 	 */
-	@Override
+	//Testa se la mancanza di annotazioni di test nella classe di test porta a un errore di compilazione.
+	//@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof TimeStamp) {
 			return ntpTime == ((TimeStamp) obj).ntpValue();

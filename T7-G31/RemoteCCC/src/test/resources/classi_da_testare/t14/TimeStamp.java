@@ -17,7 +17,11 @@ import java.util.TimeZone;
  * representation, which is the number of milliseconds since the standard base
  * time known as "the epoch", namely January 1, 1970, 00:00:00 GMT.
  */
-public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
+ 
+ // Controlla se un nome della classe di test non formattato correttamente genera un errore di compilazione.
+ // Chiamamo la classe in questo modo poichè i nomi delle classi non possono iniziare con un numero
+ 
+public class 123TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	private static final long serialVersionUID = 8139806907588338737L;
 
 	/**
@@ -263,7 +267,6 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return a hash code value for this object.
 	 */
-	
 	@Override
 	public int hashCode() {
 		return (int) (ntpTime ^ (ntpTime >>> 32));
@@ -279,8 +282,7 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @return true if the objects are the same;
 	 *          false otherwise.
 	 */
-	Testa se la mancanza di annotazioni di test nella classe di test porta a un errore di compilazione.
-	//@Override
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof TimeStamp) {
 			return ntpTime == ((TimeStamp) obj).ntpValue();

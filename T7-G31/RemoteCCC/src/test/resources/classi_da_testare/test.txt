@@ -1,0 +1,7 @@
+t8: riga 96
+t9: standby
+t10: riga 395
+t11: riga 20
+t12: riga 395
+t13: riga 90
+t14: riga 20

@@ -18,6 +18,7 @@
 
 package RemoteCCC.App;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,10 +53,13 @@ public class AppControllerTest {
 
     private static final String BASE_PATH = ".\\src\\test\\resources\\classi_da_testare\\";
 
+    
+
     private JSONObject loadTestFiles(String folderName, String testingClassName, String underTestClassName)
             throws Exception {
         // Carica i contenuti dei file e gestisci errori, restituendo un oggetto JSON
         // per la richiesta
+        System.out.println("PATH: "+Paths.get(BASE_PATH, folderName, testingClassName + ".java").toString());
         String testingClassCode = readFileContent(Paths.get(BASE_PATH, folderName, testingClassName + ".java"));
         String underTestClassCode = readFileContent(Paths.get(BASE_PATH, folderName, underTestClassName + ".java"));
         JSONObject requestJson = new JSONObject();
@@ -96,7 +100,7 @@ public class AppControllerTest {
                       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                       .andExpect(jsonPath("$.outCompile").isNotEmpty()) // Verifica che outCompile sia una stringa non nulla
                       .andExpect(jsonPath("$.coverage").isNotEmpty()) // Verifica che coverage sia una stringa nulla
-                      .andExpect(jsonPath("$.error").value(false)); // Verifica che error sia true
+                      .andExpect(jsonPath("$.error").value(false)); // Verifica che error sia false
     }
 
 
@@ -113,14 +117,75 @@ public class AppControllerTest {
         }
 
     }
+
+    // Metodo che esegue i test per ogni sottocartella
+    public void runTests(String rootFolder, Boolean Esito) {
+        // Ottieni la cartella principale
+        String rootFolderT = Paths.get(BASE_PATH,rootFolder).toString();
+        File folder = new File(rootFolderT);
+
+        // Verifica che la cartella esista e sia effettivamente una directory
+        if (folder.exists() && folder.isDirectory()) {
+            // Ottieni la lista di tutte le sottocartelle
+            File[] subfolders = folder.listFiles(File::isDirectory);
+
+            // Cicla attraverso tutte le sottocartelle
+            if (subfolders != null) {
+                for (File subfolder : subfolders) {
+                    // Nome della sottocartella (che corrisponde al nome della classe)
+                    String className = subfolder.getName();
+
+                    try {
+                        // Chiamata alla funzione DoTest
+                        String rootFolderClass =  Paths.get(rootFolder,className).toString();
+                        DoTest(rootFolderClass, className, Esito);
+                    } catch (Exception e) {
+                        System.err.println("Errore durante il test della classe: " + className);
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            System.out.println("La cartella " + rootFolder + " non esiste o non è una directory.");
+        }
+    }
+
+    /*
+    *     test 0 - senza errori
+    */
+    @Test
+    public void CaseTest_0() throws Exception {
+        runTests("t0", true);
+    }
     
     /*
-    *     test 1 - manca costruttore nella classe 
+    *     test 1 - manca costruttore nella classe
     */
     @Test
     public void CaseTest_1() throws Exception {
-        DoTest("t1","TimeStamp", false);
+        runTests("t1", false);
     }
+
+    /*
+    *     test 2 - tipo di ritorno errato
+    */
+    @Test
+    public void CaseTest_2() throws Exception {
+        runTests("t2", false);
+    }
+
+    /*
+    *     test 3 - verifica metodo errato
+    */
+    // TODO: fine di implementare CaseTest_3 ed i successivi
+    /* 
+    @Test
+    public void CaseTest_3() throws Exception {
+        runTests("t3", false);
+    }
+
+    */
+
 
 
 
