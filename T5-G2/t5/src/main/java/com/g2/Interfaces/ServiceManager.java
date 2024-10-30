@@ -19,16 +19,21 @@
 package com.g2.Interfaces;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Game.GameController;
+import com.g2.Interfaces.ServiceActionDefinition.InvalidParameterTypeException;
+import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
 
 @Service
 public class ServiceManager {
@@ -76,7 +81,7 @@ public class ServiceManager {
     }
 
     // Metodo per gestire le richieste
-    public Object handleRequest(String serviceName, String action, Object... params) {
+    public Object handleRequest(String serviceName, String action, Object... params){
         ServiceInterface service = services.get(serviceName);
         if (service == null) {
             logger.error("[SERVICE MANAGER] ServiceNotFound "+ serviceName);
@@ -85,9 +90,41 @@ public class ServiceManager {
         try {
             logger.info("[SERVICE MANAGER] HandleRequest: " + serviceName + " - " + action);
             return service.handleRequest(action, params);
-        } catch (Exception e) {
-            logger.error("[SERVICE MANAGER]  Errore HandleRequest: " + serviceName + "Exception: " + e.getMessage());
+        } catch (MissingParametersException | InvalidParameterTypeException e) {
+            logger.error("[SERVICE MANAGER] Servizio: " + serviceName + " " + e.getMessage());
             return null; //se c'è un errore nel servizio lo segnalo e poi introduco al livello successivo una gestione del null
         }
     }
+
+    public <T> T handleRequest(String serviceName, String action, Class<T> responseType, Object... params){
+        Object obj = this.handleRequest(serviceName, action, params);
+        if (responseType.isInstance(obj)) {
+            return responseType.cast(obj); // Esegui il cast
+        } else {
+            throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a " + responseType.getName());
+        }
+    }
+
+    public <T> List<T> handleRequest(String serviceName, String action, ParameterizedTypeReference<List<T>> responseType, Class<T> clazz, Object... params) {
+        Object obj = this.handleRequest(serviceName, action, params);
+        // Verifica se obj è un'istanza di List
+        if (obj instanceof List<?>) {
+            List<?> rawList = (List<?>) obj; // Cast a List generica
+            // Crea una nuova lista per il risultato
+            List<T> resultList = new ArrayList<>();
+            // Esegui il cast per ogni elemento della lista
+            for (Object element : rawList) {
+                if (clazz.isInstance(element)) {
+                    resultList.add(clazz.cast(element));
+                } else {
+                    throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'elemento a " + clazz.getName());
+                }
+            }
+            return resultList; // Restituisci la lista
+        } else {
+            throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a List<" + responseType.getType().getTypeName() + ">");
+        }
+    }
+    
+
 }

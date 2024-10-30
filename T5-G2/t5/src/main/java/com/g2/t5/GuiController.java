@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,6 +42,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.ServiceObjectComponent;
+import com.g2.Components.VariableValidationLogicComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
@@ -116,10 +118,17 @@ public class GuiController {
             @RequestParam("ClassUT") String ClassUT) {
 
         PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
-        ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT",
-                "T1", "getClassUnderTest", ClassUT);
+        VariableValidationLogicComponent Valida_classeUT = new VariableValidationLogicComponent(ClassUT);
+        Valida_classeUT.setCheckNull(); 
+        List<String> Lista_classi_UT = serviceManager.handleRequest("T1", "getClasses", new ParameterizedTypeReference<List<String>>() {}, String.class);
+        Valida_classeUT.setCheckAllowedValues(Lista_classi_UT); //Se il request param non è in questa lista è un problema 
+        ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT","T1", "getClassUnderTest", ClassUT);
         editor.setObjectComponents(ClasseUT);
         editor.SetAuth(jwt);
+        editor.setLogicComponents(Valida_classeUT);
+        //Se l'utente ha inserito un campo nullo o un valore non consentito vuol dire che non è passato da gamemode
+        editor.setErrorPage( "NULL_VARIABLE",  "redirect:/gamemode"); 
+        editor.setErrorPage( "VALUE_NOT_ALLOWED",  "redirect:/gamemode");
         return editor.handlePageRequest();
     }
     
