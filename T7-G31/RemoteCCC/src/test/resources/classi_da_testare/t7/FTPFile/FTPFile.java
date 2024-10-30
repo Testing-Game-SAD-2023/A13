@@ -36,7 +36,10 @@ public class FTPFile implements Serializable {
 	/**
 	 * A constant indicating group access permissions.
 	 ***/
-	public static final int GROUP_ACCESS = 1;
+	//TIPO ASSEGNAZIONE ERRATO
+	int number = 11;
+	String str = String.valueOf(number);
+	public static final int GROUP_ACCESS = str;
 	/**
 	 * A constant indicating world access permissions.
 	 ***/
@@ -115,8 +118,7 @@ public class FTPFile implements Serializable {
 	 * @return The original FTP server raw listing used to initialize the
 	 *         FTPFile.
 	 ***/
-	// MODIFICO LA FIRMA
-	public String getRawListin() {
+	public String getRawListing() {
 		return _rawListing;
 	}
 

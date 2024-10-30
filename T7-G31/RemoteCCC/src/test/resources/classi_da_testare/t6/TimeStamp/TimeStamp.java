@@ -1,7 +1,8 @@
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
+//IMPORTAZIONE NON VALIDA
+import java.util.Local;
 import java.util.TimeZone;
 
 /***
@@ -49,8 +50,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	/***
 	 * Constructs a newly allocated NTP timestamp object
 	 * that represents the native 64-bit long argument.
-	 * @param ntpTime the timestamp
+	 * @param ntpTime the timestamp 
 	 */
+	
 	public TimeStamp(long ntpTime) {
 		this.ntpTime = ntpTime;
 	}
@@ -390,10 +392,5 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 		long anotherVal = anotherTimeStamp.ntpTime;
 		return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
 	}
-	
-    // Metodo per testare la ricorsione infinita
-    public void recursiveMethod() {
-        recursiveMethod(); // chiamata ricorsiva senza condizione di terminazione
-    }
 
 }

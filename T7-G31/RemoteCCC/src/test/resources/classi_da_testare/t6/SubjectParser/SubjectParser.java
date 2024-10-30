@@ -1,4 +1,5 @@
-import java.util.StringTokenizer;
+//IMPORTAZIONE NON VALIDA
+import java.util.StringTokenize;
 
 public class SubjectParser {
 
@@ -35,8 +36,8 @@ public class SubjectParser {
 		}
 		return LowerRange;
 	}
-	// MODIFICO LA FIRMA
-	public int getUpperRang() {
+
+	public int getUpperRange() {
 		try {
 			int[] parts = this.messageParts();
 			if (parts != null) {

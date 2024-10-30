@@ -115,8 +115,7 @@ public class FTPFile implements Serializable {
 	 * @return The original FTP server raw listing used to initialize the
 	 *         FTPFile.
 	 ***/
-	// MODIFICO LA FIRMA
-	public String getRawListin() {
+	public String getRawListing() {
 		return _rawListing;
 	}
 
@@ -170,10 +169,12 @@ public class FTPFile implements Serializable {
 	 *
 	 * @return true if the entry is valid
 	 */
+	//ELIMINO METODO
+	/*
 	public boolean isValid() {
 		return (_permissions != null);
 	}
-
+	*/
 	/***
 	 * Set the type of the file (DIRECTORY_TYPE,
 	 * FILE_TYPE, etc.).
@@ -220,6 +221,7 @@ public class FTPFile implements Serializable {
 	 *
 	 * @param size The file size in bytes.
 	 */
+	
 	public void setSize(long size) {
 		_size = size;
 	}
@@ -468,7 +470,8 @@ public class FTPFile implements Serializable {
 		fmt.close();
 		return sb.toString();
 	}
-
+	//ELIMINO METODO
+	/*
 	private char formatType() {
 		switch (_type) {
 			case FILE_TYPE:
@@ -481,6 +484,7 @@ public class FTPFile implements Serializable {
 				return '?';
 		}
 	}
+		*/
 
 	private String permissionToString(int access) {
 		StringBuilder sb = new StringBuilder();

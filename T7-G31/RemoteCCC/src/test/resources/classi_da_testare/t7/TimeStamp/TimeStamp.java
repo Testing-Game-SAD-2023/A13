@@ -49,8 +49,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	/***
 	 * Constructs a newly allocated NTP timestamp object
 	 * that represents the native 64-bit long argument.
-	 * @param ntpTime the timestamp
+	 * @param ntpTime the timestamp 
 	 */
+	
 	public TimeStamp(long ntpTime) {
 		this.ntpTime = ntpTime;
 	}
@@ -172,10 +173,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @param   date   the milliseconds since January 1, 1970, 00:00:00 GMT.
 	 * @return NTP timestamp object at the specified date.
 	 */
-	//Testa se la mancanza di un metodo statico previsto genera un errore di compilazione.
-	//public static TimeStamp getNtpTime(long date) {
-	//	return new TimeStamp(toNtpTime(date));
-	//}
+	public static TimeStamp getNtpTime(long date) {
+		return new TimeStamp(toNtpTime(date));
+	}
 
 	/***
 	 * Constructs a NTP timestamp object and initializes it so that
@@ -201,7 +201,10 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 		if (hexString == null) {
 			throw new NumberFormatException("null");
 		}
-		int ind = hexString.indexOf('.');
+		//TIPO ASSEGNAZIONE ERRATO
+		int number = hexString.indexOf('.');
+		String str = String.valueOf(number);
+		int ind = str;
 		if (ind == -1) {
 			if (hexString.length() == 0) {
 				return 0;

@@ -1,5 +1,4 @@
-//Verifica se un'importazione non valida causa un errore di compilazione.
-import java.text.dateformat;//DataFormat
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -19,7 +18,8 @@ import java.util.TimeZone;
  * time known as "the epoch", namely January 1, 1970, 00:00:00 GMT.
  */
 public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
-	private static final long serialVersionUID = 8139806907588338737L;
+	// ERRORE DI FORMATTAZIONE
+	private static final long 1serialVersionUID = 8139806907588338737L;
 
 	/**
 	 * baseline NTP time if bit-0=0 is 7-Feb-2036 @ 06:28:16 UTC
@@ -50,8 +50,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	/***
 	 * Constructs a newly allocated NTP timestamp object
 	 * that represents the native 64-bit long argument.
-	 * @param ntpTime the timestamp
+	 * @param ntpTime the timestamp 
 	 */
+	
 	public TimeStamp(long ntpTime) {
 		this.ntpTime = ntpTime;
 	}

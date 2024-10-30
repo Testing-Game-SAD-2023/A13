@@ -35,8 +35,8 @@ public class SubjectParser {
 		}
 		return LowerRange;
 	}
-	// MODIFICO LA FIRMA
-	public int getUpperRang() {
+
+	public int getUpperRange() {
 		try {
 			int[] parts = this.messageParts();
 			if (parts != null) {
@@ -46,8 +46,10 @@ public class SubjectParser {
 		}
 		return UpperRange;
 	}
+		
 
-
+	//ELIMINO METODO
+	/*
 	private int[] messageParts() {
 		try {
 			String mainrange = this.getRangeString();
@@ -87,6 +89,7 @@ public class SubjectParser {
 			return null;
 		}
 	}
+		*/
 
 	public String getRangeString() {
 		try {

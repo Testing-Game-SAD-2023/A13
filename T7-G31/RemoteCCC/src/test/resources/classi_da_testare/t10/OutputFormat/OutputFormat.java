@@ -2,7 +2,8 @@
  * OutputFormat represents the format configuration used to
  * format the XML output
  */
-public class OutputFormat implements Cloneable {
+// CLASSE FORMATTATA MALE
+public class 1OutputFormat implements Cloneable {
 	/**
 	 * standard value to indent by, if we are indenting
 	 */
@@ -134,8 +135,8 @@ public class OutputFormat implements Cloneable {
 		this.encoding = encoding;
 	}
 	
-	// MODIFICO LA FIRMA
-	public String getLineSeparato() {
+
+	public String getLineSeparator() {
 		return lineSeparator;
 	}
 

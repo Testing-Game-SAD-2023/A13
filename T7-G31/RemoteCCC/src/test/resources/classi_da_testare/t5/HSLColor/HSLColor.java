@@ -65,8 +65,8 @@ public class HSLColor {
 		}
 	}
 		
-	// MODIFICO LA FIRMA
-	public void initRGBbyHS(int H, int S, int L) {
+
+	public void initRGBbyHSL(int H, int S, int L) {
 		int Magic1;
 		int Magic2;
 
@@ -103,7 +103,8 @@ public class HSLColor {
 			}
 		}
 	}
-
+	//ELIMINO METODO
+	/*
 	private int hueToRGB(int mag1, int mag2, int Hue) {
 		// check the range
 		if (Hue < 0) {
@@ -123,6 +124,7 @@ public class HSLColor {
 
 		return mag1;
 	}
+		*/
 
 	private int iMax(int a, int b) {
 		if (a > b) return a;
@@ -154,7 +156,7 @@ public class HSLColor {
 
 		initRGBbyHSL(iToValue, pSat, pLum);
 	}
-
+	
 	public int getSaturation() {
 		return pSat;
 	}

@@ -1,6 +1,6 @@
 import java.util.StringTokenizer;
-
-public class SubjectParser {
+// CLASSE FORMATTATA MALE
+public class 1SubjectParser {
 
 	private String Subject;
 	private String Title;
@@ -35,8 +35,8 @@ public class SubjectParser {
 		}
 		return LowerRange;
 	}
-	// MODIFICO LA FIRMA
-	public int getUpperRang() {
+
+	public int getUpperRange() {
 		try {
 			int[] parts = this.messageParts();
 			if (parts != null) {

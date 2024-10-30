@@ -17,14 +17,14 @@ public class FontInfo implements Cloneable, Serializable {
 	private boolean _isBold;
 	private boolean _isItalic;
 	private int _size;
-	/* RIMOZIONE COSTRUTTORE
+	
 	public FontInfo() {
 		super();
 		setFamily(DEFAULT_FAMILY);
 		setSize(12);
 	}
-	*/
-	/*
+	
+
 	public FontInfo(Font font) {
 		super();
 		if (font == null) {
@@ -32,7 +32,6 @@ public class FontInfo implements Cloneable, Serializable {
 		}
 		setFont(font);
 	}
-		*/
 
 	/**
 	 * Return a copy of this object.
@@ -133,7 +132,10 @@ public class FontInfo implements Cloneable, Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		final int PRIME = 31;
+		//TIPO ASSEGNAZIONE ERRATO
+		int number = 31;
+		String str = String.valueOf(number);
+		final int PRIME = str;
 		int result = 1;
 		result = PRIME * result + ((_familyName == null) ? 0 : _familyName.hashCode());
 		result = PRIME * result + (_isBold ? 1231 : 1237);

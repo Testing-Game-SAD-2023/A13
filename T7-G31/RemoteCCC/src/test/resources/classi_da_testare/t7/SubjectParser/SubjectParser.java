@@ -11,7 +11,10 @@ public class SubjectParser {
 	
 	public SubjectParser(String s) {
 		Subject = s;
-		UpperRange = 1;
+		//TIPO ASSEGNAZIONE ERRATO
+		int number = 1;
+		String str = String.valueOf(number);
+		UpperRange = str;
 		LowerRange = 1;
 	}
 		
@@ -35,8 +38,8 @@ public class SubjectParser {
 		}
 		return LowerRange;
 	}
-	// MODIFICO LA FIRMA
-	public int getUpperRang() {
+
+	public int getUpperRange() {
 		try {
 			int[] parts = this.messageParts();
 			if (parts != null) {

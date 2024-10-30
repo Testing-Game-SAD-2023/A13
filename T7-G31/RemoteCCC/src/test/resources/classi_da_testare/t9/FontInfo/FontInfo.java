@@ -12,19 +12,19 @@ public class FontInfo implements Cloneable, Serializable {
 	}
 
 	private static String DEFAULT_FAMILY = "Monospaced";
-
-	private String _familyName;
+	// ERRORE DI FORMATTAZIONE
+	private String 1familyName;
 	private boolean _isBold;
 	private boolean _isItalic;
 	private int _size;
-	/* RIMOZIONE COSTRUTTORE
+	
 	public FontInfo() {
 		super();
 		setFamily(DEFAULT_FAMILY);
 		setSize(12);
 	}
-	*/
-	/*
+	
+
 	public FontInfo(Font font) {
 		super();
 		if (font == null) {
@@ -32,7 +32,6 @@ public class FontInfo implements Cloneable, Serializable {
 		}
 		setFont(font);
 	}
-		*/
 
 	/**
 	 * Return a copy of this object.
