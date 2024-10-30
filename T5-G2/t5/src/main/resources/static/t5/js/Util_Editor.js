@@ -520,3 +520,84 @@ function pulisciLocalStorage(chiave) {
         console.log(`Nessun dato trovato per la chiave "${chiave}".`);
     }
 }
+
+//Funzione per fare il replace del testo dell'editor 
+function replaceText(text, replacements) {
+    return text.replace(/\b(TestClasse|username|userID|date)\b/g, match => replacements[match] || match);
+}
+
+//Funzione carica
+function SetInitialEditor(replacements){
+	let text = editor_utente.value;
+	let newContent = replaceText(text, replacements) ;
+	text.value = newContent;
+}
+
+//Ottieni parametro dal URL
+function getParameterByName(name) {
+	const url = window.location.href;
+	name = name.replace(/[\[\]]/g, "\\$&");
+	const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+	const results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return "";
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+// modal info
+function openModalWithText(text_title, text_content, buttons = []) {
+	document.getElementById('Modal_title').innerText = text_title;
+	// Imposta il testo nel corpo del modal
+	document.getElementById('Modal_body').innerText = text_content;
+
+	// Pulisci eventuali bottoni esistenti nel footer
+	var modalFooter = document.getElementById('Modal_footer');
+	modalFooter.innerHTML = '';
+
+	// Aggiungi bottoni personalizzati se sono stati forniti
+	if (buttons.length > 0) {
+		buttons.forEach(button => {
+			let btn = document.createElement('a');
+			btn.innerText = button.text;
+			btn.href = button.href;  // Assegna il link al pulsante
+			btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
+			btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
+			modalFooter.appendChild(btn);
+		});
+	}
+
+	// Ottieni il modal
+	var modal = new bootstrap.Modal(document.getElementById('Modal'));
+
+	// Mostra il modal
+	modal.show();
+}
+
+// modal error 
+function openModalError(text_title, text_content, buttons = []) {
+	document.getElementById('modal_error_title').innerText = text_title;
+	// Imposta il testo nel corpo del modal
+	document.getElementById('modal_error_body').innerText = text_content;
+
+	// Pulisci eventuali bottoni esistenti nel footer
+	var modalFooter = document.getElementById('Modal_error_footer');
+	modalFooter.innerHTML = '';
+
+	// Aggiungi bottoni personalizzati se sono stati forniti
+	if (buttons.length > 0) {
+		buttons.forEach(button => {
+			let btn = document.createElement('a');
+			btn.innerText = button.text;
+			btn.href = button.href;  // Assegna il link al pulsante
+			btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
+			btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
+			modalFooter.appendChild(btn);
+		});
+	}
+
+	// Ottieni il modal
+	var modal = new bootstrap.Modal(document.getElementById('Modal_error'));
+
+	// Mostra il modal
+	modal.show();
+}

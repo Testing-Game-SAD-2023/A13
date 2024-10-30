@@ -21,14 +21,28 @@
 
 // Funzione per ottenere i dati dal localStorage
 function getGameData() {
-    return {
-		playerId: 			String(parseJwt(getCookie("jwt")).userId),
-		type_robot: 		localStorage.getItem("robot"),
-		difficulty: 		localStorage.getItem("difficulty"),
-		mode: 				localStorage.getItem("modalita"),
-		underTestClassName: localStorage.getItem("underTestClassName"),
-    };
+    let underTestClassName = localStorage.getItem("underTestClassName");
+    if (underTestClassName) {
+        // La stringa non è né nulla né vuota
+        let ClassUT = getParameterByName("ClassUT");
+        if(ClassUT === underTestClassName){
+            return {
+                playerId: 			String(parseJwt(getCookie("jwt")).userId),
+                type_robot: 		localStorage.getItem("robot"),
+                difficulty: 		localStorage.getItem("difficulty"),
+                mode: 				localStorage.getItem("modalita"),
+                underTestClassName: localStorage.getItem("underTestClassName"),
+            };
+        }
+    }   
+    //modal che ti blocca
+    openModalError(
+        "Accesso Illegale all'editor ",
+        `Non sei passato da Gamemode per settare la tua partita o hai inserito un URL sbagliato.`,
+        [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
+    );
 }
+
 // Funzione per eseguire la richiesta AJAX
 async function runGameAction(url, formData, isGameEnd) {
     try {
@@ -40,8 +54,44 @@ async function runGameAction(url, formData, isGameEnd) {
         throw error;
     }
 }
+
+// Documento pronto
+$(document).ready(function () {
+    const data = getGameData();
+    startGame(data);
+    if (data.mode === "Allenamento") {
+        document.getElementById("runButton").disabled = true;
+        console.log("Sei in allenamento");
+    }
+    const savedContent = localStorage.getItem('codeMirrorContent');
+	if (!savedContent) {
+        //non ho salvato il contenuto dell'editor, quindi lo scarico e imposto il template con i dati dell'utente
+        let formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
+        let replacements  = {
+            TestClasse: `Test${localStorage.getItem("underTestClassName")}`,
+            username: jwtData.sub,
+            userID: jwtData.userId,
+            date: formattedDate,
+        };
+        SetInitialEditor(replacements);
+	}else{
+        //Se ho del contenuto salvato 
+        editor_utente.setValue(savedContent);
+        //document.getElementById('Editor_utente').value = savedContent;
+        editor_utente.refresh(); // Ricarica l'editor per applicare le modifiche
+    }
+    const savedStorico = localStorage.getItem('storico');
+    if(savedStorico){
+        viewStorico();
+    }
+});
+
 // Gestione del click del pulsante
 async function handleGameAction(isGameEnd) {
+    //disabilito i tasti durante l'azione 
+    run_button.disabled = true;
+    coverage_button.disabled = true;
+    
     toggleLoading(true, isGameEnd ? "loading_run" : "loading_cov", isGameEnd ? "runButton" : "coverageButton");
     setStatus("sending");
 	//pulisco console utente prima di eseguire
@@ -67,9 +117,10 @@ async function handleGameAction(isGameEnd) {
 	// Chiamo T8 per recuperare il report di coverage
     const csvContent = await ajaxRequest(url, "POST", formData.get("testingClassCode"), false, "text");
     const valori_csv = extractThirdColumn(csvContent);
+    
 	// Aggiorno lo storico della partita 
-    addStorico(orderTurno, userScore, valori_csv[0]);
-    viewStorico();
+    updateStorico(orderTurno, userScore, valori_csv[0]);
+
     setStatus(isGameEnd ? "game_end" : "turn_end");
 	toggleLoading(false, isGameEnd ? "loading_run" : "loading_cov", isGameEnd ? "runButton" : "coverageButton");
 	// Determina il valore di displayUserPoints in base a isGameEnd
@@ -85,37 +136,14 @@ async function handleGameAction(isGameEnd) {
             [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
         );
         flush_localStorage();
+        //La partita è finita quindi non resetto i tasti 
+    }else{
+        run_button.disabled = false;
+        coverage_button.disabled = false;
     }
 }
 
-// Documento pronto
-$(document).ready(function () {
-    const data = getGameData();
-    startGame(data);
-    if (data.mode === "Allenamento") {
-        document.getElementById("runButton").disabled = true;
-        console.log("Sei in allenamento");
-    }
-    const formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
-    const textareaContent = document.getElementById("Editor_utente").value;
-    const replacements = {
-        TestClasse: `Test${localStorage.getItem("underTestClassName")}`,
-        username: jwtData.sub,
-        userID: jwtData.userId,
-        date: formattedDate,
-    };
-    const savedContent = localStorage.getItem('codeMirrorContent');
-	if (!savedContent) {
-        //non ho salvato il contenuto dell'editor, quindi lo scarico e imposto il template con i dati dell'utente
-        const newContent = replacePlaceholders(textareaContent, replacements);
-        document.getElementById("Editor_utente").value = newContent;
-        editor_utente.setValue(newContent);
-	}
-    const savedStorico = localStorage.getItem('storico');
-    if(savedStorico){
-        viewStorico();
-    }
-});
+
 // Pulsante "Run/Submit"
 document.getElementById("runButton").addEventListener("click", () => handleGameAction(true));
 // Pulsante "Coverage"

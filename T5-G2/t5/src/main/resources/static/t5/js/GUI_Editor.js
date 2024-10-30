@@ -125,8 +125,6 @@ document.querySelectorAll(".toggleButton").forEach((button) => {
 		toggleIcons(icon1Class, icon2Class, iconElement);
 	});
 });
-
-
 /*
 *   Qui è gestito l'handler del tema 
 */
