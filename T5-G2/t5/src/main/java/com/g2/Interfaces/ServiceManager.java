@@ -19,15 +19,12 @@
 package com.g2.Interfaces;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -105,11 +102,11 @@ public class ServiceManager {
         }
     }
 
+    /* 
     public <T> List<T> handleRequest(String serviceName, String action, ParameterizedTypeReference<List<T>> responseType, Class<T> clazz, Object... params) {
         Object obj = this.handleRequest(serviceName, action, params);
         // Verifica se obj è un'istanza di List
-        if (obj instanceof List<?>) {
-            List<?> rawList = (List<?>) obj; // Cast a List generica
+        if (obj instanceof List<?> rawList) {
             // Crea una nuova lista per il risultato
             List<T> resultList = new ArrayList<>();
             // Esegui il cast per ogni elemento della lista
@@ -125,6 +122,6 @@ public class ServiceManager {
             throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a List<" + responseType.getType().getTypeName() + ">");
         }
     }
-    
+    */
 
 }

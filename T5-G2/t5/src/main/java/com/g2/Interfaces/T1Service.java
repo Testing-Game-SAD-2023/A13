@@ -17,12 +17,11 @@
 
 package com.g2.Interfaces;
 
-import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.g2.Model.ClassUT;
 
@@ -53,7 +52,6 @@ public class T1Service extends BaseService {
         } catch (Exception e) {
             throw new IllegalArgumentException("GetClasses fallimento errore:" + e.getMessage());
         }
-
     }
 
     private String getClassUnderTest(String nomeCUT) {

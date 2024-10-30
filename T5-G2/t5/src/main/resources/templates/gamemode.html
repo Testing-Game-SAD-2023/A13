@@ -7,7 +7,6 @@
 	<body>
 		<!-- NAVBAR -->
 		<div th:replace="fragments/navbar :: navbar"></div>
-
 		<div class="container-fluid mt-3">
 			<div class="row justify-content-center row-cols-3">
 				<div class="col"></div>
@@ -102,7 +101,6 @@
 							<div class="row">
 								<div class="col">
 									<h3 class="text-center mb-4" th:text="#{gamemode_alert}"></h3>
-
 									<div class="row">
 										<ul class="list-group list-group-flush">
 											<li class="list-group-item">
@@ -116,6 +114,10 @@
 											<li class="list-group-item">
 												<label th:text="#{gamemode_difficulty}"></label>
 												<span id="gamemode_difficulty"> </span>
+											</li>
+											<li class="list-group-item">
+												<label th:text="#{gamemode_modalita}"></label>
+												<span id="gamemode_modalita"> </span>
 											</li>
 										</ul>
 									</div>
@@ -151,149 +153,11 @@
 				<div class="col"></div>
 			</div>
 		</div>
-
 		<div th:replace="fragments/footer :: footer"></div>
-		<script>
-			resetGame = false;
-			// Funzione per ottenere i parametri dall'URL
-			function getParameterByName(name) {
-				const url = window.location.href;
-				name = name.replace(/[\[\]]/g, "\\$&");
-				const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-				const results = regex.exec(url);
-				if (!results) return null;
-				if (!results[2]) return "";
-				return decodeURIComponent(results[2].replace(/\+/g, " "));
-			}
-			// Funzione per aggiornare la modalità selezionata
-			function SetMode() {
-				sanitizedMode = GetMode();
-				const elements = document.querySelectorAll(".selectedMode");
-				elements.forEach(element => {
-					element.textContent += " " + sanitizedMode;
-				});
-				localStorage.setItem("modalita", sanitizedMode);
-			}
-			function GetMode() {
-				const mode = getParameterByName("mode");
-				if (mode) {
-					const sanitizedMode = mode.replace(/[^a-zA-Z0-9\s]/g, " ");
-					return sanitizedMode;
-				}
-				return null;
-			}
-			// Funzione per salvare i valori nel localStorage
-			function saveToLocalStorage() {
-				const selectClassValue      = document.getElementById("select_class").value;
-				const selectRobotValue      = document.getElementById("select_robot").value;
-				const selectDifficultyValue = document.getElementById("select_diff").value;
-				// Salva i valori nel localStorage
-				localStorage.setItem("underTestClassName", selectClassValue);
-				localStorage.setItem("robot", selectRobotValue);
-				localStorage.setItem("difficulty", selectDifficultyValue);
-				localStorage.setItem("modalita", GetMode());
-			}
-
-			// Funzione per ottenere i dati della partita precedente solo se l'ID utente coincide
-			async function fetchPreviousGameData() {
-				try {
-					const response = await fetch("/StartGame", { method: "GET" });
-					const data = await response.json();
-
-					// Verifica se i dati per l'utente corrente sono presenti
-					if (data[userId]) {
-						return data[userId]; // Ritorna i dati solo se l'ID coincide
-					} else {
-						return null; // Se l'ID non corrisponde, ritorna null
-					}
-				} catch (error) {
-					console.error(
-						"Errore durante il recupero dei dati della partita precedente:",
-						error
-					);
-					return null;
-				}
-			}
-
-			function redirectToMain() {
-				window.location.href = "/main";
-			}
-
-			function toggleVisibility(elementId) {
-				var element = document.getElementById(elementId);
-				if (element) {
-					element.classList.toggle("d-none");
-				} else {
-					console.error("Elemento non trovato con ID:", elementId);
-				}
-			}
-
-			function pulisciLocalStorage(chiave) {
-				// Controlla se la chiave esiste nel localStorage
-				if (localStorage.getItem(chiave)) {
-					// Rimuovi la chiave dal localStorage
-					localStorage.removeItem(chiave);
-					console.log(`Dati associati a "${chiave}" rimossi dal localStorage.`);
-				} else {
-					console.log(`Nessun dato trovato per la chiave "${chiave}".`);
-				}
-			}
-
-			//pulizia local storage
-			function flush_localStorage() {
-				//Pulisco i dati locali
-				pulisciLocalStorage("difficulty");
-				pulisciLocalStorage("modalita");
-				pulisciLocalStorage("robot");
-				pulisciLocalStorage("roundId");
-				pulisciLocalStorage("turnId");
-				pulisciLocalStorage("underTestClassName");
-				pulisciLocalStorage("username");
-				pulisciLocalStorage("storico");
-				pulisciLocalStorage("codeMirrorContent");
-			}
-			// Codice da eseguire alla creazione della pagina
-			document.addEventListener("DOMContentLoaded", async function () {
-				const previousGameData = await fetchPreviousGameData();
-				SetMode();
-				if (previousGameData !== null) {
-					//esiste già una partita su questo player id
-					console.log("modalità continua");
-					toggleVisibility("scheda_nuovo");
-					toggleVisibility("scheda_continua");
-					document.getElementById("gamemode_classeUT").textContent =
-						previousGameData.classeUT;
-					document.getElementById("gamemode_robot").textContent =
-						previousGameData.type_robot;
-					document.getElementById("gamemode_difficulty").textContent =
-						previousGameData.difficulty;
-
-					// Setto tasto continua
-					const link = document.getElementById("Continua");
-					link.setAttribute(
-						"href",
-						"/editor?ClassUT=" + previousGameData.classeUT
-					);
-				}
-			});
-			
-			document.getElementById("new_game").addEventListener("click", function () {
-				toggleVisibility("scheda_nuovo");
-				toggleVisibility("scheda_continua");
-				toggleVisibility("alert_nuova");
-				resetGame = true;
-			});
-
-			document.getElementById("link_editor").addEventListener("click", function (){
-				const selectClassValue      = document.getElementById("select_class").value;
-				if (resetGame) {
-					flush_localStorage();
-				}
-				saveToLocalStorage();
-				// Aggiorna il link
-				const link = document.getElementById("link_editor");
-				link.setAttribute("href", "/editor?ClassUT=" + selectClassValue);
-			});
+		<script
+			th:src="@{/t5/js/Gamemode_logic.js}"
+			th:inline="javascript"
+		>
 		</script>
 	</body>
 </html>

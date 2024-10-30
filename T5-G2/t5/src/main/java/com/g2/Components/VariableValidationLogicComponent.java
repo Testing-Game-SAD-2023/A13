@@ -17,6 +17,7 @@
 
 package com.g2.Components;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class VariableValidationLogicComponent extends GenericLogicComponent {
 
     public VariableValidationLogicComponent(String variableToCheck) {
         this.variableToCheck = variableToCheck;
-        this.allowedValues = null;
-        this.checkNull = false;              // Di default i controlli sono disattivati
+        this.allowedValues   = new ArrayList<>();
+        this.checkNull       = false;// Di default i controlli sono disattivati
         this.checkAllowedValues = false;
     }
 
@@ -48,18 +49,18 @@ public class VariableValidationLogicComponent extends GenericLogicComponent {
         this.allowedValues.clear();  // Pulisce la lista esistente
         if (allowedValues != null) {
             this.allowedValues.addAll(allowedValues);
+            this.checkAllowedValues = true; // Attiva il controllo
         }
-        this.checkAllowedValues = true; // Attiva il controllo
     }
 
     @Override
     public boolean executeLogic() {
         if (checkNull && variableToCheck == null) {
-            ErrorCode = "NULL_VARIABLE";
+            this.ErrorCode = "NULL_VARIABLE";
             return false;
         }
         if (checkAllowedValues && !allowedValues.contains(variableToCheck)) {
-            ErrorCode = "VALUE_NOT_ALLOWED";
+            this.ErrorCode = "VALUE_NOT_ALLOWED";
             return false;
         }
         return true; // La variabile rispetta i parametri
@@ -67,6 +68,6 @@ public class VariableValidationLogicComponent extends GenericLogicComponent {
 
     @Override
     public String getErrorCode() {
-        return ErrorCode;
+        return this.ErrorCode;
     }
 }
