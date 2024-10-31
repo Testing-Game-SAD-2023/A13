@@ -78,7 +78,6 @@ public class CompilationService {
         this.underTestClassCode = underTestClassCode;
         this.outputMaven = null;
         this.mvn_path = mvn_path;
-        
         logger.info("[CompilationService] Servizi creato con successo");
     }
 

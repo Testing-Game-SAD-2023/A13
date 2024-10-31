@@ -42,7 +42,6 @@ function getGameData() {
         [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
     );
 }
-
 // Funzione per eseguire la richiesta AJAX
 async function runGameAction(url, formData, isGameEnd) {
     try {
@@ -54,7 +53,6 @@ async function runGameAction(url, formData, isGameEnd) {
         throw error;
     }
 }
-
 // Documento pronto
 $(document).ready(function () {
     const data = getGameData();
@@ -85,7 +83,6 @@ $(document).ready(function () {
         viewStorico();
     }
 });
-
 // Gestione del click del pulsante
 async function handleGameAction(isGameEnd) {
     //disabilito i tasti durante l'azione 
@@ -131,9 +128,9 @@ async function handleGameAction(isGameEnd) {
 	console_robot.setValue(displayUserPoints);
     if (isGameEnd) {
         openModalWithText(
-            "'Partita Terminata!'",
-            `Hai terminato la tua partita con un punteggio: ${userScore} pt.`,
-            [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
+            status_game_end ,
+            `${score_partita_text} ${userScore} pt.`,
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }]
         );
         flush_localStorage();
         //La partita è finita quindi non resetto i tasti 
@@ -142,8 +139,6 @@ async function handleGameAction(isGameEnd) {
         coverage_button.disabled = false;
     }
 }
-
-
 // Pulsante "Run/Submit"
 document.getElementById("runButton").addEventListener("click", () => handleGameAction(true));
 // Pulsante "Coverage"

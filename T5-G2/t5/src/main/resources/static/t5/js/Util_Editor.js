@@ -528,9 +528,9 @@ function replaceText(text, replacements) {
 
 //Funzione carica
 function SetInitialEditor(replacements){
-	let text = editor_utente.value;
+	let text = editor_utente.getValue();
 	let newContent = replaceText(text, replacements) ;
-	text.value = newContent;
+	editor_utente.setValue(newContent);
 }
 
 //Ottieni parametro dal URL
@@ -580,7 +580,7 @@ function openModalError(text_title, text_content, buttons = []) {
 	document.getElementById('modal_error_body').innerText = text_content;
 
 	// Pulisci eventuali bottoni esistenti nel footer
-	var modalFooter = document.getElementById('Modal_error_footer');
+	var modalFooter = document.getElementById('modal_error_footer');
 	modalFooter.innerHTML = '';
 
 	// Aggiungi bottoni personalizzati se sono stati forniti
