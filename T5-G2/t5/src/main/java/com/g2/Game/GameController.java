@@ -44,10 +44,8 @@ import com.g2.Interfaces.ServiceManager;
 @CrossOrigin
 @RestController
 public class GameController {
-
     //Gestisco qui tutti i giochi aperti 
     private final Map<String, GameLogic> activeGames;
-
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
     //Logger 
@@ -62,20 +60,18 @@ public class GameController {
 
     @FunctionalInterface
     interface GameFactoryFunction {
-
         GameLogic create(ServiceManager serviceManager,
                 String playerId, String underTestClassName,
-                String type_robot, String difficulty);
+                String type_robot, String difficulty, String mode);
     }
-
     /*
     *  Registra i tipi di giochi con il loro costruttore, in questo modo non ci si deve preoccupare di instanziarli, viene
     *  fatto in automatico.
      */
     private void registerGames() {
         //Attenzione le chiavi sono CaseSensitive
-        gameRegistry.put("Sfida", (sm, playerId, underTestClassName, type_robot, difficulty)
-                -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty));
+        gameRegistry.put("Sfida", (sm, playerId, underTestClassName, type_robot, difficulty, mode)
+                -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, mode));
         // Aggiungi altri giochi qui
     }
 
@@ -187,7 +183,7 @@ public class GameController {
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
                 //Creo la nuova partita 
-                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode);
                 //gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");
@@ -210,7 +206,7 @@ public class GameController {
                 errorCode = "1";    
                 //Rimuovo il vecchio game e ne creo uno nuovo 
                 activeGames.remove(playerId);
-                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty);
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode);
                 activeGames.put(playerId, gameLogic);
             }
             //Setto messaggio d'errore e codice di conseguenza 

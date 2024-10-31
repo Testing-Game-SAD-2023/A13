@@ -75,13 +75,13 @@ public class PageBuilder {
     private List<String> executeComponentsLogic() {
         // Lista per raccogliere eventuali errori
         List<String> errorCodes = new ArrayList<>(); 
-
         for (GenericLogicComponent Component : LogicComponents) {
             if (!Component.executeLogic()) {
                 System.out.println("Logica fallita per il componente: " + Component.getClass().getSimpleName());
                 errorCodes.add(Component.getErrorCode()); // Aggiunge il codice d'errore alla lista
             }
         }
+        System.out.println("Lista error code: " + errorCodes);
         return errorCodes;
     }
 
@@ -116,13 +116,13 @@ public class PageBuilder {
             // Gestisco le situazioni d'errore
             return_page_error = ExecuteError(ErrorCode);
         }
+        // Restituisco il nome del template da usare
+        if(return_page_error != null) return return_page_error;
         if (ObjectComponents != null && !ObjectComponents.isEmpty()) {
             // Costruisci la mappa combinata dei dati dei componenti
             Map<String, Object> combinedModel = buildModel();
             model_html.addAllAttributes(combinedModel);
         }
-        // Restituisco il nome del template da usare
-        if(return_page_error != null) return return_page_error;
         return this.PageName;
     }
 

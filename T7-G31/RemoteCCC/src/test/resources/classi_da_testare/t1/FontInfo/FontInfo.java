@@ -24,7 +24,7 @@ public class FontInfo implements Cloneable, Serializable {
 		setSize(12);
 	}
 	*/
-
+	/*
 	public FontInfo(Font font) {
 		super();
 		if (font == null) {
@@ -32,6 +32,7 @@ public class FontInfo implements Cloneable, Serializable {
 		}
 		setFont(font);
 	}
+		*/
 
 	/**
 	 * Return a copy of this object.

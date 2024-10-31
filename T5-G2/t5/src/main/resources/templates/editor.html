@@ -631,7 +631,7 @@ public class TestClasse {
 			</div>
 		</div>
 
-		<!-- Modal -->
+		<!-- Modal INFO-->
 		<div
 			class="modal fade"
 			id="Modal"
@@ -656,30 +656,53 @@ public class TestClasse {
 			</div>
 		</div>
 
+		<!-- Modal ERROR-->
+		<div
+			class="modal fade"
+			id="Modal_error"
+			tabindex="-1"
+			aria-labelledby="Modal"
+			aria-hidden="true"
+		>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5">
+						<i class="bi bi-clipboard-x"></i>
+						ERROR
+						<strong id="modal_error_title"> </strong>
+					</h1>
+				</div>
+				<div class="modal_error_body" id="Modal_body">
+					
+				</div>
+				<div class="modal_error_footer" id="Modal_footer">
+
+				</div>
+			</div>
+		</div>
+	</div>
+
 		<!-- FOOTER -->
 		<div th:replace="fragments/footer :: footer"></div>
 	
 		<script th:inline="javascript">
-
-		const mode_sfida        = /*[[#{modalità_sfida}]]*/ '';
-		const mode_allenamento  = /*[[#{modalità_allenamento}]]*/ '';
-		const mode_scalata      = /*[[#{modalità_scalata}]]*/ '';
-		const status_sending    = /*[[#{stato_invio}]]*/ '';
-		const status_loading    = /*[[#{stato_caricamento}]]*/ '';
-		const status_compiling  = /*[[#{stato_compilazione}]]*/ '';
-		const status_ready      = /*[[#{stato_pronto}]]*/ '';
-		const status_error      = /*[[#{stato_errore}]]*/ '';
-		const status_turn_end   = /*[[#{stato_turno_finito}]]*/ '';
-		const status_game_end   = /*[[#{stato_partita_finita}]]*/ '';
-		const status_inizia_partita = /*[[#{inizia_partita}]]*/ '';
-		const match_in_corso    = /*[[#{match_in_corso}]]*/ '';
-		const loading           = /*[[#{caricamento}]]*/ '';
-		const ClasseUT           = /*[[#{classe_ut}]]*/ '';		
-		const Difficolta           = /*[[#{gamemode_difficulty}]]*/ '';
-		
+			const mode_sfida        	= /*[[#{modalità_sfida}]]*/ '';
+			const mode_allenamento  	= /*[[#{modalità_allenamento}]]*/ '';
+			const mode_scalata      	= /*[[#{modalità_scalata}]]*/ '';
+			const status_sending    	= /*[[#{stato_invio}]]*/ '';
+			const status_loading    	= /*[[#{stato_caricamento}]]*/ '';
+			const status_compiling 	 	= /*[[#{stato_compilazione}]]*/ '';
+			const status_ready      	= /*[[#{stato_pronto}]]*/ '';
+			const status_error      	= /*[[#{stato_errore}]]*/ '';
+			const status_turn_end   	= /*[[#{stato_turno_finito}]]*/ '';
+			const status_game_end   	= /*[[#{stato_partita_finita}]]*/ '';
+			const status_inizia_partita = /*[[#{inizia_partita}]]*/ '';
+			const match_in_corso    	= /*[[#{match_in_corso}]]*/ '';
+			const loading           	= /*[[#{caricamento}]]*/ '';
+			const ClasseUT           	= /*[[#{classe_ut}]]*/ '';		
+			const Difficolta           	= /*[[#{gamemode_difficulty}]]*/ '';
 		</script>
-		
-
 
 		<!-- CODEMIRROR -->
 		<script
@@ -753,9 +776,5 @@ public class TestClasse {
 			th:inline="javascript"
 		>
 		</script>
-
-
-
-
 	</body>
 </html>

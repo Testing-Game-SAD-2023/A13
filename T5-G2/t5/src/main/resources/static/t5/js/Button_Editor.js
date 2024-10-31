@@ -176,6 +176,12 @@ function leggiStorico() {
     return storicoJSON ? JSON.parse(storicoJSON) : [];
 }
 
+function updateStorico(turnoID, punteggio, covValue){
+	addStorico(turnoID, punteggio, covValue);
+    viewStorico();
+}
+
+
 //TASTO INFO
 document.addEventListener("DOMContentLoaded", function () {
 	// Seleziona il bottone popover
@@ -255,44 +261,8 @@ function saveToLocalStorage() {
 }
 // Aggiungi un listener per l'evento change
 editor_utente.on('change', saveToLocalStorage); 
-// Carica il contenuto dal localStorage all'avvio
-window.onload = function() {
-	const savedContent = localStorage.getItem('codeMirrorContent');
-	if (savedContent) {
-		editor_utente.setValue(savedContent);
-		document.getElementById('Editor_utente').value = savedContent;
-		editor_utente.refresh(); // Ricarica l'editor per applicare le modifiche
-	}
-};
 
-// modal 
-function openModalWithText(text_title, text_content, buttons = []) {
-	document.getElementById('Modal_title').innerText = text_title;
-	// Imposta il testo nel corpo del modal
-	document.getElementById('Modal_body').innerText = text_content;
 
-	// Pulisci eventuali bottoni esistenti nel footer
-	var modalFooter = document.getElementById('Modal_footer');
-	modalFooter.innerHTML = '';
-
-	// Aggiungi bottoni personalizzati se sono stati forniti
-	if (buttons.length > 0) {
-		buttons.forEach(button => {
-			let btn = document.createElement('a');
-			btn.innerText = button.text;
-			btn.href = button.href;  // Assegna il link al pulsante
-			btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
-			btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
-			modalFooter.appendChild(btn);
-		});
-	}
-
-	// Ottieni il modal
-	var modal = new bootstrap.Modal(document.getElementById('Modal'));
-
-	// Mostra il modal
-	modal.show();
-}
 
 //pulizia local storage a fine partita
 function flush_localStorage(){

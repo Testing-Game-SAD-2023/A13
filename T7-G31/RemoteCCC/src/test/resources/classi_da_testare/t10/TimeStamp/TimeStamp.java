@@ -17,7 +17,8 @@ import java.util.TimeZone;
  * representation, which is the number of milliseconds since the standard base
  * time known as "the epoch", namely January 1, 1970, 00:00:00 GMT.
  */
-public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
+// CLASSE FORMATTATA MALE
+public class 1TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	private static final long serialVersionUID = 8139806907588338737L;
 
 	/**
@@ -49,8 +50,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	/***
 	 * Constructs a newly allocated NTP timestamp object
 	 * that represents the native 64-bit long argument.
-	 * @param ntpTime the timestamp
+	 * @param ntpTime the timestamp 
 	 */
+	
 	public TimeStamp(long ntpTime) {
 		this.ntpTime = ntpTime;
 	}
@@ -109,7 +111,6 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return NTP Timestamp in Java time
 	 */
-	 
 	public long getTime() {
 		return getTime(ntpTime);
 	}
@@ -119,10 +120,8 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return NTP Timestamp in Java Date
 	 */
-	 ////Verifica se una firma di metodo errata nella classe di test genera un errore di compilazione.
 	public Date getDate() {
-		string ntpTimeString="null";
-		long time = getTime(ntpTimeString);
+		long time = getTime(ntpTime);
 		return new Date(time);
 	}
 

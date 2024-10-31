@@ -33,17 +33,18 @@ public abstract class GameLogic {
     private String TurnID;
     private final String PlayerID;
     private String ClasseUT;
-
     private String type_robot;
     private String difficulty;
+    private String mode;
 
     public GameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
-            String type_robot, String difficulty) {
+            String type_robot, String difficulty, String mode) {
         this.serviceManager = serviceManager;
         this.PlayerID = PlayerID;
         this.ClasseUT = ClasseUT;
         this.type_robot = type_robot;
         this.difficulty = difficulty;
+        this.mode = mode;
     }
 
     // Metodi che ogni gioco deve implementare
@@ -129,6 +130,14 @@ public abstract class GameLogic {
             }else{
                 return false;
             }
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
 

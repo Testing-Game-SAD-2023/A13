@@ -64,9 +64,11 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @throws NumberFormatException - if the string does not contain a parsable timestamp.
 	 */
+	/* 
 	public TimeStamp(String hexStamp) throws NumberFormatException {
 		ntpTime = decodeNtpHexString(hexStamp);
 	}
+		*/
 
 	/***
 	 * Constructs a newly allocated NTP timestamp object
@@ -74,9 +76,11 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @param d - the Date to be represented by the Timestamp object.
 	 */
+	/* 
 	public TimeStamp(Date d) {
 		ntpTime = (d == null) ? 0 : toNtpTime(d.getTime());
 	}
+		*/
 
 	/***
 	 * Returns the value of this Timestamp as a long value.

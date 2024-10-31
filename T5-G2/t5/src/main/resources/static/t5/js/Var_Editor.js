@@ -82,6 +82,9 @@ const container_robot       = document.getElementById("card_robot");
 const close_console_result  = document.getElementById("close_console_result");
 const close_console_utente  = document.getElementById("close_console_utente");
 
+const run_button = document.getElementById("runButton");
+const coverage_button = document.getElementById("coverageButton");
+
 /*
 *   MESSAGGI E TESTO 
 */

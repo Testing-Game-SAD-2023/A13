@@ -172,7 +172,8 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @param   date   the milliseconds since January 1, 1970, 00:00:00 GMT.
 	 * @return NTP timestamp object at the specified date.
 	 */
-	public static TimeStamp getNtpTime(long date) {
+	// MODIFICO LA FIRMA
+	public static TimeStamp getNtpTim(long date) {
 		return new TimeStamp(toNtpTime(date));
 	}
 
@@ -279,8 +280,7 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @return true if the objects are the same;
 	 *          false otherwise.
 	 */
-	//Testa se la mancanza di annotazioni di test nella classe di test porta a un errore di compilazione.
-	//@Override
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof TimeStamp) {
 			return ntpTime == ((TimeStamp) obj).ntpValue();

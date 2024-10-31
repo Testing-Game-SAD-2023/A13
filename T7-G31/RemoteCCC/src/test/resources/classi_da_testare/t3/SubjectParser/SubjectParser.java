@@ -35,8 +35,8 @@ public class SubjectParser {
 		}
 		return LowerRange;
 	}
-
-	public int getUpperRange() {
+	// MODIFICO LA FIRMA
+	public int getUpperRang() {
 		try {
 			int[] parts = this.messageParts();
 			if (parts != null) {

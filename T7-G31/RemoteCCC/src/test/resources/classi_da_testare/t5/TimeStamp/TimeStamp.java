@@ -49,8 +49,9 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	/***
 	 * Constructs a newly allocated NTP timestamp object
 	 * that represents the native 64-bit long argument.
-	 * @param ntpTime the timestamp
+	 * @param ntpTime the timestamp 
 	 */
+	
 	public TimeStamp(long ntpTime) {
 		this.ntpTime = ntpTime;
 	}
@@ -91,10 +92,8 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 *
 	 * @return seconds represented by this NTP timestamp.
 	 */
-	 
-	 // Test "Controlla se l'assegnazione di un tipo di dato errato a una variabile genera un errore di compilazione."
 	public long getSeconds() {
-		return "Questo non è un long";
+		return (ntpTime >>> 32) & 0xffffffffL;
 	}
 
 	/***
@@ -308,6 +307,8 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 	 * @param buf - StringBuilder which is appended with leading 0's.
 	 * @param l - a long.
 	 */
+	//ELIMINO METODO
+	/*
 	private static void appendHexString(StringBuilder buf, long l) {
 		String s = Long.toHexString(l);
 		for (int i = s.length(); i < 8; i++) {
@@ -315,6 +316,7 @@ public class TimeStamp implements java.io.Serializable, Comparable<TimeStamp> {
 		}
 		buf.append(s);
 	}
+		*/
 
 	/***
 	 * Converts 64-bit NTP timestamp value to a String.
