@@ -31,10 +31,11 @@ function SetMode() {
 	sanitizedMode = GetMode();
 	const elements = document.querySelectorAll(".selectedMode");
 	elements.forEach((element) => {
-		element.textContent += " " + sanitizedMode;
+		element.textContent += " " + get_mode_text(sanitizedMode);
 	});
 	localStorage.setItem("modalita", sanitizedMode);
 }
+
 function GetMode() {
 	const mode = getParameterByName("mode");
 	if (mode) {
@@ -74,11 +75,9 @@ async function fetchPreviousGameData() {
 		return null;
 	}
 }
-
 function redirectToMain() {
 	window.location.href = "/main";
 }
-
 function toggleVisibility(elementId) {
 	var element = document.getElementById(elementId);
 	if (element) {
@@ -87,7 +86,6 @@ function toggleVisibility(elementId) {
 		console.error("Elemento non trovato con ID:", elementId);
 	}
 }
-
 function pulisciLocalStorage(chiave) {
 	// Controlla se la chiave esiste nel localStorage
 	if (localStorage.getItem(chiave)) {
@@ -98,7 +96,6 @@ function pulisciLocalStorage(chiave) {
 		console.log(`Nessun dato trovato per la chiave "${chiave}".`);
 	}
 }
-
 //pulizia local storage
 function flush_localStorage() {
 	//Pulisco i dati locali
@@ -127,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 			previousGameData.type_robot;
 		document.getElementById("gamemode_difficulty").textContent =
 			previousGameData.difficulty;
-		document.getElementById("gamemmode_modalita").textContent =
+		document.getElementById("gamemode_modalita").textContent =
 			previousGameData.mode;
 
 		// Setto tasto continua

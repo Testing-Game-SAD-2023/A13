@@ -89,7 +89,7 @@ const coverage_button = document.getElementById("coverageButton");
 *   MESSAGGI E TESTO 
 */
 
-const mode = document.getElementById("Nome_modalita").textContent = localStorage.getItem("modalita");
+const mode = document.getElementById("Nome_modalita").textContent = get_mode_text(localStorage.getItem("modalita"));
 // const mode_sfida             = /*[[${welcomeMessage}]]*/
 // const mode_allenamento       = /*[[${welcomeMessage}]]*/
 // const mode_scalata           = /*[[${welcomeMessage}]]*/

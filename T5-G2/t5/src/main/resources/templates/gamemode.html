@@ -14,9 +14,7 @@
 					<!-- Scheda nuovo gioco -->
 					<div class="card" id="scheda_nuovo">
 						<h5
-							class="card-header text-center"
-							id="selectedMode"
-							th:text="#{modalità}"
+							class="card-header text-center selectedMode"
 						></h5>
 						<div class="card-body">
 							<!-- Form di selezione -->
@@ -77,7 +75,7 @@
 										<div class="text-center pt-2">
 											<a
 												id="link_editor"
-												class="btn btn-primary"
+												class="btn btn-primary disabled"
 												href="#"
 												role="button"
 											>
@@ -94,7 +92,6 @@
 					<div class="card d-none" id="scheda_continua">
 						<h5
 							class="card-header text-center selectedMode"
-							th:text="#{modalità}"
 						></h5>
 						<div class="card-body">
 							<!-- Form di selezione -->
@@ -116,7 +113,7 @@
 												<span id="gamemode_difficulty"> </span>
 											</li>
 											<li class="list-group-item">
-												<label th:text="#{gamemode_modalita}"></label>
+												<label th:text="#{modalità}"></label>
 												<span id="gamemode_modalita"> </span>
 											</li>
 										</ul>
@@ -159,5 +156,6 @@
 			th:inline="javascript"
 		>
 		</script>
+		
 	</body>
 </html>

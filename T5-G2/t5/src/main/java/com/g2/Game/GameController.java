@@ -233,8 +233,8 @@ public class GameController {
      */
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
-            @RequestParam("playerId") String playerId,
-            @RequestParam("isGameEnd") Boolean isGameEnd) {
+                                         @RequestParam("playerId") String playerId,
+                                         @RequestParam("isGameEnd") Boolean isGameEnd) {
 
         try {
             //retrive gioco attivo

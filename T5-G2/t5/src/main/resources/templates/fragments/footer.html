@@ -14,6 +14,28 @@
 		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
 		crossorigin="anonymous"
 	></script>
+	<script th:inline="javascript">
+		// nome internazionale per la modalità 
+		function get_mode_text(mode){
+			let mode_text
+			// Supponiamo di avere una variabile `mode` che determina il caso da attivare
+			switch (mode) {
+				case "Sfida":
+					mode_text = /*[[#{modalità_sfida}]]*/ '';;
+					break;
+				case "Allenamento":
+					mode_text = /*[[#{modalità_allenamento}]]*/ '';
+					break;
+				case "Scalata":
+					mode_text = /*[[#{modalità_scalata}]]*/ '';
+					break;
+				default:
+					mode_text = "Modalità Sconosciuta";
+			}
+
+			return mode_text
+		}
+	</script>
 	<script>
 		// Funzione per impostare un cookie
 		function setCookie(name, value, time) {
@@ -120,5 +142,8 @@
 			}
 			updateLanguageIcon();
 		});
+	
+		
+	
 	</script>
 </div>
