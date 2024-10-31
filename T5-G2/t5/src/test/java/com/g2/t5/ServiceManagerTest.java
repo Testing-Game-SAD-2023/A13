@@ -1,0 +1,298 @@
+package com.g2.t5;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+import com.g2.Interfaces.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
+public class ServiceManagerTest {
+
+	@Mock
+	private RestTemplate restTemplate;
+
+	@InjectMocks
+	private ServiceManager serviceManager;
+
+	private final List<String> serviceNames = List.of("T1", "T4", "T7", "T23");
+	private final List<Class<? extends ServiceInterface>> serviceClasses = List.of(
+			T1Service.class, T4Service.class, T7Service.class, T23Service.class);
+
+	@BeforeEach
+	public void setUp() {
+		MockitoAnnotations.openMocks(this);
+	}
+
+	// Metodo per creare un mock di RestTemplate con una risposta specificata
+	private RestTemplate createMockRestTemplate(HttpStatus status, String responseBody) {
+		RestTemplate mockRestTemplate = mock(RestTemplate.class);
+		ResponseEntity<String> responseEntity = createResponseEntity(status, responseBody);
+
+		when(mockRestTemplate.getForEntity(anyString(), eq(String.class))).thenReturn(responseEntity);
+		when(mockRestTemplate.postForEntity(anyString(), any(), eq(String.class))).thenReturn(responseEntity);
+
+		return mockRestTemplate;
+	}
+
+	// Metodo per creare una ResponseEntity con uno stato e un corpo specificati
+	private ResponseEntity<String> createResponseEntity(HttpStatus status, String responseBody) {
+		return new ResponseEntity<>(responseBody, status);
+	}
+
+	// Test T1: Registrazione servizio valido
+	@Test
+	public void testRegisterService_ValidService() {
+		for (int i = 0; i < serviceNames.size(); i++) {
+			String serviceName = serviceNames.get(i);
+			Class<? extends ServiceInterface> serviceClass = serviceClasses.get(i);
+
+			System.out.println("Inizio test di registrazione per servizio: " + serviceName + " con classe: "
+					+ serviceClass.getSimpleName());
+
+			// Pre-condizioni: Mock di RestTemplate con risposta OK
+			RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.OK, "Registrazione completata");
+
+			// Azione: Registrazione del servizio
+			serviceManager.registerService(serviceName, serviceClass, mockRestTemplate);
+
+			// Post-condizioni: Verifica che il servizio sia stato registrato
+			assertNotNull(serviceManager.services.get(serviceName),
+					"Il servizio non è stato registrato correttamente.");
+		}
+	}
+
+	// Test T2: Registrazione servizio non valido
+	@Test
+	public void testRegisterService_InvalidService() {
+		// Classe di servizio senza costruttore valido
+		class InvalidService implements ServiceInterface {
+			public InvalidService() {
+			}
+
+			@Override
+			public Object handleRequest(String action, Object... params) {
+				return null;
+			}
+		}
+
+		// Pre-condizioni: Mock di RestTemplate con errore
+		RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.BAD_REQUEST, "Errore");
+
+		// Azione: Tentativo di registrare InvalidService
+		Exception exception = assertThrows(RuntimeException.class, () -> {
+			serviceManager.registerService("InvalidService", InvalidService.class, mockRestTemplate);
+		});
+
+		// Post-condizioni: Verifica che l'eccezione sia stata sollevata con il
+		// messaggio corretto
+		assertTrue(exception.getMessage().contains("Impossibile creare l'istanza del servizio"));
+	}
+
+	// Test T3: handleRequest servizio valido
+	@Test
+	public void testHandleRequest_RestTemplateSuccessResponse() {
+		for (String serviceName : serviceNames) {
+			System.out.println("Inizio test di handleRequest per servizio: " + serviceName);
+
+			// Pre-condizioni: Mock di un servizio e registrazione del servizio
+			ServiceInterface mockService = mock(ServiceInterface.class);
+			serviceManager.services.put(serviceName, mockService);
+			RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.OK, "Successo");
+			when(mockService.handleRequest("start", new Object[] {})).thenReturn("Successo");
+
+			// Azione: Gestione della richiesta "start"
+			Object result = serviceManager.handleRequest(serviceName, "start");
+
+			// Post-condizioni: Verifica che il risultato sia "Successo"
+			assertEquals("Successo", result, "Il risultato della richiesta non è corretto.");
+		}
+	}
+
+	// Test T4: handleRequest servizio non valido
+	@Test
+	public void testHandleRequest_ServiceNotFound() {
+		// Pre-condizioni: Non registriamo alcun servizio
+		// Azione: Tentativo di gestire richiesta per un servizio non registrato
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			serviceManager.handleRequest("T_invalid", "start");
+		});
+
+		// Post-condizioni: Verifica che l'eccezione sia stata sollevata con il
+		// messaggio corretto
+		assertTrue(exception.getMessage().contains("Servizio non trovato"));
+	}
+
+	// Test T5: handleRequest con errore di esecuzione
+	@Test
+	public void testHandleRequest_ErrorInServiceExecution() {
+		for (int i = 0; i < serviceNames.size(); i++) {
+			String serviceName = serviceNames.get(i);
+			System.out
+					.println("Inizio test di gestione richiesta con errore di esecuzione per servizio: " + serviceName);
+
+			// Pre-condizioni: Mock di un servizio, registrazione del servizio e simulazione
+			// di errore
+			ServiceInterface mockService = mock(ServiceInterface.class);
+			when(mockService.handleRequest("error", new Object[] {}))
+					.thenThrow(new RuntimeException("Errore simulato"));
+			serviceManager.services.put(serviceName, mockService);
+			RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.INTERNAL_SERVER_ERROR, "Errore simulato");
+
+			// Azione: Gestione della richiesta "error"
+			Object result = serviceManager.handleRequest(serviceName, "error");
+
+			// Post-condizioni: Verifica che il risultato sia null
+			assertNull(result,
+					"Il risultato non dovrebbe essere null in caso di errore per il servizio: " + serviceName);
+		}
+	}
+
+	// Test T6: createService con costruttore valido
+	@Test
+	public void testCreateService_ValidConstructor() {
+		for (Class<? extends ServiceInterface> serviceClass : serviceClasses) {
+			System.out.println("Inizio test di creazione servizio per classe: " + serviceClass.getSimpleName());
+
+			// Pre-condizioni: Mock di RestTemplate con risposta OK
+			RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.OK, "Servizio creato");
+
+			// Azione: Creazione del servizio
+			ServiceInterface service = serviceManager.createService(serviceClass, mockRestTemplate);
+
+			// Post-condizioni: Verifica che il servizio non sia nullo
+			assertNotNull(service, "Il servizio creato non deve essere nullo.");
+		}
+	}
+
+	// Test T7: createService con costruttore non valido
+	@Test
+	public void testCreateService_InvalidConstructor() {
+		// Classe di servizio senza costruttore valido
+		class InvalidService implements ServiceInterface {
+			@Override
+			public Object handleRequest(String action, Object... params) {
+				return null;
+			}
+		}
+
+		// Pre-condizioni: Mock di RestTemplate con errore
+		RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.BAD_REQUEST, "Errore nella creazione");
+
+		// Azione: Tentativo di creare InvalidService
+		Exception exception = assertThrows(RuntimeException.class, () -> {
+			serviceManager.createService(InvalidService.class, mockRestTemplate);
+		});
+
+		// Post-condizioni: Verifica che l'eccezione sia stata sollevata con il
+		// messaggio corretto
+		assertTrue(exception.getMessage().contains("Impossibile creare l'istanza del servizio"));
+	}
+
+	// Test T8: createService con costruttore non valido e RestTemplate nullo
+	@Test
+	public void testCreateService_InvalidConstructorAndRestTemplate() {
+		// Classe di servizio senza costruttore valido
+		class InvalidService implements ServiceInterface {
+			@Override
+			public Object handleRequest(String action, Object... params) {
+				return null;
+			}
+		}
+
+		// Pre-condizioni: RestTemplate nullo
+		RestTemplate invalidRestTemplate = null;
+
+		// Azione: Tentativo di creare InvalidService con RestTemplate nullo
+		Exception exception = assertThrows(RuntimeException.class, () -> {
+			serviceManager.createService(InvalidService.class, invalidRestTemplate);
+		});
+
+		// Post-condizioni: Verifica che l'eccezione sia stata sollevata con il
+		// messaggio corretto
+		assertTrue(exception.getMessage().contains("Impossibile creare l'istanza del servizio"));
+	}
+
+	// Test T9: createService con costruttore valido e RestTemplate nullo
+	@Test
+	public void testCreateService_ValidConstructorAndInvalidRestTemplate() {
+		// Classe di servizio con costruttore valido
+		class ValidService implements ServiceInterface {
+			public ValidService(RestTemplate restTemplate) {
+			}
+
+			@Override
+			public Object handleRequest(String action, Object... params) {
+				return null;
+			}
+		}
+
+		// Pre-condizioni: RestTemplate nullo
+		RestTemplate invalidRestTemplate = null;
+
+		// Azione: Tentativo di creare ValidService con RestTemplate nullo
+		Exception exception = assertThrows(RuntimeException.class, () -> {
+			serviceManager.createService(ValidService.class, invalidRestTemplate);
+		});
+
+		// Post-condizioni: Verifica che l'eccezione sia stata sollevata con il
+		// messaggio corretto
+		assertTrue(exception.getMessage().contains("Impossibile creare l'istanza del servizio"));
+	}
+
+	// Test T10: handleRequest con azione sconosciuta
+	@Test
+	public void testHandleRequest_UnknownAction() {
+		for (int i = 0; i < serviceNames.size(); i++) {
+			String serviceName = serviceNames.get(i);
+			System.out.println("Inizio test di gestione richiesta con azione sconosciuta per servizio: " + serviceName);
+
+			// Pre-condizioni: Mock di un servizio e registrazione del servizio
+			ServiceInterface mockService = mock(ServiceInterface.class);
+			when(mockService.handleRequest("unknownAction", new Object[] {}))
+					.thenThrow(new UnsupportedOperationException("Azione non supportata"));
+			serviceManager.services.put(serviceName, mockService);
+			RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.BAD_REQUEST, "Azione non supportata");
+
+			// Azione: Gestione di un'azione sconosciuta
+			Object result = serviceManager.handleRequest(serviceName, "unknownAction");
+
+			// Post-condizioni: Verifica che il risultato sia null
+			assertNull(result,
+					"Il risultato dovrebbe essere null per un'azione sconosciuta per il servizio: " + serviceName);
+		}
+	}
+
+	// Test T11: Verifica tipi di istanza dei servizi registrati
+	@Test
+	public void testRegisteredServices_CorrectInstanceType() {
+		for (int i = 0; i < serviceNames.size(); i++) {
+			String serviceName = serviceNames.get(i);
+			Class<? extends ServiceInterface> serviceClass = serviceClasses.get(i);
+			System.out.println("Inizio test di verifica tipi di istanza per servizio: " + serviceName);
+
+			// Pre-condizioni: Mock di RestTemplate con risposta OK
+			RestTemplate mockRestTemplate = createMockRestTemplate(HttpStatus.OK, "Registrazione completata");
+			serviceManager.registerService(serviceName, serviceClass, mockRestTemplate);
+
+			// Azione: Verifica i tipi di istanza
+			ServiceInterface service = serviceManager.services.get(serviceName);
+
+			// Post-condizioni: Verifica che il servizio sia un'istanza del tipo corretto
+			assertTrue(serviceClass.isInstance(service), "Il servizio registrato non è del tipo corretto.");
+		}
+	}
+
+}
