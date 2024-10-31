@@ -134,8 +134,8 @@ public class OutputFormat implements Cloneable {
 		this.encoding = encoding;
 	}
 	
-	// MODIFICO LA FIRMA
-	public String getLineSeparato() {
+	
+	public String getLineSeparator() {
 		return lineSeparator;
 	}
 
@@ -172,7 +172,8 @@ public class OutputFormat implements Cloneable {
 	/**
 	 * @param encoding encoding format
 	 */
-	public void setEncoding(String encoding) {
+	// MODIFICO LA FIRMA
+	public void setEncodin(String encoding) {
 		if (encoding != null) {
 			this.encoding = encoding;
 		}

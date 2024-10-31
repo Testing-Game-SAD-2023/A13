@@ -36,9 +36,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
-@Service
+//@Service
 public class CompilationService {
     /*
      * Config gestisce i path delle directory e fornisce un id univoco 
@@ -61,6 +61,7 @@ public class CompilationService {
      *  Qui metto il path di maven in base al profilo, 
      *  in fase di testing ho bisogno di esplicitarlo rispetto a windows
      */
+    @Value("${variabile.mvn}")
     private String mvn_path;
 
     //logger
