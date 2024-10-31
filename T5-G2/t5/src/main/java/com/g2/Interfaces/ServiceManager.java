@@ -34,8 +34,7 @@ import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
 
 @Service
 public class ServiceManager {
-
-    private final Map<String, ServiceInterface> services = new HashMap<>();
+    protected final Map<String, ServiceInterface> services = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     @Autowired
@@ -50,7 +49,7 @@ public class ServiceManager {
     }
 
     // Metodo helper per registrare i servizi
-    private <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
+    protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
         if (!ServiceInterface.class.isAssignableFrom(serviceClass)) {
             logger.error("[SERVICE MANAGER] La Classe: " + serviceName + "deve implementare la ServiceInterface");
             throw new IllegalArgumentException("La classe: " + serviceName + " deve implementare la ServiceInterface");
@@ -66,7 +65,7 @@ public class ServiceManager {
     }
 
     // Metodo per la creazione di un servizio
-    private <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
+    protected <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
         try {
             T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
             logger.info("[SERVICE MANAGER] \"ServiceCreation: " + serviceClass.getSimpleName());
@@ -74,6 +73,8 @@ public class ServiceManager {
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             logger.error("[SERVICE MANAGER] Errore nella creazione del servizio: " + serviceClass.getName() + " Exception: " + e.getMessage());
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
+        } catch (Exception e){
+            throw new RuntimeException("Errore Generico: " + serviceClass.getName(), e);
         }
     }
 
@@ -81,15 +82,21 @@ public class ServiceManager {
     public Object handleRequest(String serviceName, String action, Object... params){
         ServiceInterface service = services.get(serviceName);
         if (service == null) {
-            logger.error("[SERVICE MANAGER] ServiceNotFound "+ serviceName);
+            logger.error("[SERVICE MANAGER][HandleRequest] ServiceNotFound "+ serviceName);
             throw new IllegalArgumentException("Servizio non trovato: " + serviceName);
         }
         try {
-            logger.info("[SERVICE MANAGER] HandleRequest: " + serviceName + " - " + action);
+            logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
             return service.handleRequest(action, params);
         } catch (MissingParametersException | InvalidParameterTypeException e) {
-            logger.error("[SERVICE MANAGER] Servizio: " + serviceName + " " + e.getMessage());
+            logger.error("[SERVICE MANAGER][HandleRequest] Servizio: " + serviceName + " " + e.getMessage());
             return null; //se c'è un errore nel servizio lo segnalo e poi introduco al livello successivo una gestione del null
+        } catch (IllegalArgumentException e){
+            logger.error("[SERVICE MANAGER][HandleRequest] Azione non riconosciuta " + e.getMessage());
+            return null;
+        } catch (RuntimeException e){
+            logger.error("[SERVICE MANAGER][HandleRequest] ERRORE A RUNTIME" + e.getMessage());
+            return null;
         }
     }
 
@@ -102,6 +109,10 @@ public class ServiceManager {
         }
     }
 
+    protected ServiceInterface getServices(String key){
+        return services.get(key);
+    }
+    
     /* 
     public <T> List<T> handleRequest(String serviceName, String action, ParameterizedTypeReference<List<T>> responseType, Class<T> clazz, Object... params) {
         Object obj = this.handleRequest(serviceName, action, params);

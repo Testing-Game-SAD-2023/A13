@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -45,6 +47,9 @@ public class PageBuilder {
     private final Model model_html;
     // Nome della pagina (template) da utilizzare
     private final String PageName;
+    //Logger 
+    private static final Logger logger = LoggerFactory.getLogger(PageBuilder.class);
+
 
     //COSTRUTTORI 
     /**
@@ -59,6 +64,7 @@ public class PageBuilder {
         this.PageName = PageName;
         this.model_html = model_html;
         setStandardErrorPage();
+        logger.info("[PageBuilder] Builder costruito con successo");
     }
 
     public PageBuilder(ServiceManager serviceManager, String PageName, Model model_html) {
@@ -68,6 +74,7 @@ public class PageBuilder {
         this.PageName = PageName;
         this.model_html = model_html;
         setStandardErrorPage();
+        logger.info("[PAGEBULDER] Builder costruito con successo");
     }
 
     //HANDLE PAGE REQUEST 
@@ -77,11 +84,11 @@ public class PageBuilder {
         List<String> errorCodes = new ArrayList<>(); 
         for (GenericLogicComponent Component : LogicComponents) {
             if (!Component.executeLogic()) {
-                System.out.println("Logica fallita per il componente: " + Component.getClass().getSimpleName());
                 errorCodes.add(Component.getErrorCode()); // Aggiunge il codice d'errore alla lista
+                logger.error("[PAGEBULDER][executeComponentsLogic] Logica fallita per il componente: " + Component.getClass().getSimpleName());
             }
         }
-        System.out.println("Lista error code: " + errorCodes);
+        logger.info("[PAGEBULDER][executeComponentsLogic] Lista error code: " + errorCodes);
         return errorCodes;
     }
 
@@ -98,7 +105,7 @@ public class PageBuilder {
             Map<String, Object> model = component.getModel();
             model.forEach((key, value) -> {
                 if (combinedModel.put(key, value) != null) {
-                    System.err.println("[PAGEBULDER] individuate chiavi duplicate: " + key);
+                    logger.error("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
                     // Puoi decidere se lanciare un'eccezione o gestire la duplicazione come preferisci
                 }
             });
