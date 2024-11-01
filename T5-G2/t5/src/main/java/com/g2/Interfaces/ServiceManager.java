@@ -50,6 +50,9 @@ public class ServiceManager {
 
     // Metodo helper per registrare i servizi
     protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
+        if(restTemplate == null){
+            throw new RuntimeException("[SERVICE MANAGER] RestTemplate Nullo !");
+        }
         if (!ServiceInterface.class.isAssignableFrom(serviceClass)) {
             logger.error("[SERVICE MANAGER] La Classe: " + serviceName + "deve implementare la ServiceInterface");
             throw new IllegalArgumentException("La classe: " + serviceName + " deve implementare la ServiceInterface");

@@ -14,18 +14,17 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+package com.g2.Interfaces;
 
-package com.g2.t5;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.Interfaces.ServiceInterface;
-import com.g2.Interfaces.ServiceManager;
 
 @Profile("test")
 @Service
 public class MockServiceManager extends ServiceManager {
+
     public MockServiceManager(RestTemplate restTemplate) {
         super(restTemplate);
         // TODO Auto-generated constructor stub

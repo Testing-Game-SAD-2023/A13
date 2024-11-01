@@ -43,7 +43,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public abstract class BaseService implements ServiceInterface {
 
-    protected final RestTemplate restTemplate;
+    protected RestTemplate restTemplate;
     private final String baseUrl;
     protected final Map<String, ServiceActionDefinition> actions = new HashMap<>();
 
@@ -84,10 +84,10 @@ public abstract class BaseService implements ServiceInterface {
 
     // Metodo per chiamate GET che restituiscono un singolo oggetto
     protected <R> R callRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
+        if (endpoint == null || endpoint.isEmpty()) {
+            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+        }
         try {
-            if (endpoint == null || endpoint.isEmpty()) {
-                throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-            }
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<R> response = restTemplate.getForEntity(url, responseType);
             if (response.getStatusCode().is2xxSuccessful()) {
@@ -96,9 +96,17 @@ public abstract class BaseService implements ServiceInterface {
                 throw new RestClientException("Chiamata GET fallita con stato: " + response.getStatusCode());
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
+            //qui se l'errore è 4xx o 5xx
             throw new RestClientException("Chiamata GET fallita con stato: " + e);
-        } catch (RestClientException | IllegalArgumentException e) {
+        } catch (RestClientException e) {
+            /*
+             * Viene utilizzata per segnalare errori durante l'interazione con i servizi REST. 
+             * Può rappresentare una serie di problemi, come errori di rete, 
+             * risposte non valide dal server, o codici di stato HTTP che indicano un fallimento (4xx o 5xx).
+             */
             throw new RestClientException("Chiamata GET fallita con stato: " + e);
+        } catch (IllegalArgumentException e){
+            throw new RuntimeException("Chiamata Get fallita con stato: " + e);
         }
     }
 
