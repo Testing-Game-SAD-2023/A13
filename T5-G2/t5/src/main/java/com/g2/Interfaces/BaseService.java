@@ -68,8 +68,9 @@ public abstract class BaseService implements ServiceInterface {
         return actionDefinition.execute(params);
     }
 
-    // Metodi per le chiamate REST 
-    // Costruisce un URI partendo dal baseUrl e dall'endpoint, aggiungendo eventuali parametri extra
+    // Metodi per le chiamate REST
+    // Costruisce un URI partendo dal baseUrl e dall'endpoint, aggiungendo eventuali
+    // parametri extra
     private String buildUri(String endpoint, Map<String, String> queryParams) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl).path(endpoint);
         if (queryParams != null && !queryParams.isEmpty()) {
@@ -96,16 +97,18 @@ public abstract class BaseService implements ServiceInterface {
                 throw new RestClientException("Chiamata GET fallita con stato: " + response.getStatusCode());
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            //qui se l'errore è 4xx o 5xx
+            // qui se l'errore è 4xx o 5xx
             throw new RestClientException("Chiamata GET fallita con stato: " + e);
         } catch (RestClientException e) {
             /*
-             * Viene utilizzata per segnalare errori durante l'interazione con i servizi REST. 
-             * Può rappresentare una serie di problemi, come errori di rete, 
-             * risposte non valide dal server, o codici di stato HTTP che indicano un fallimento (4xx o 5xx).
+             * Viene utilizzata per segnalare errori durante l'interazione con i servizi
+             * REST.
+             * Può rappresentare una serie di problemi, come errori di rete,
+             * risposte non valide dal server, o codici di stato HTTP che indicano un
+             * fallimento (4xx o 5xx).
              */
             throw new RestClientException("Chiamata GET fallita con stato: " + e);
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException("Chiamata Get fallita con stato: " + e);
         }
     }
@@ -121,7 +124,8 @@ public abstract class BaseService implements ServiceInterface {
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + response.getStatusCode());
+                throw new RestClientException(
+                        "[CallRestGET] Chiamata GET fallita con stato: " + response.getStatusCode());
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
@@ -130,7 +134,8 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
-    //Metodo per chiamate POST senza specificare content type -> default application/x-www-form-urlencoded 
+    // Metodo per chiamate POST senza specificare content type -> default
+    // application/x-www-form-urlencoded
     protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
             Map<String, String> queryParams,
             Class<R> responseType) {
@@ -138,7 +143,7 @@ public abstract class BaseService implements ServiceInterface {
         return callRestPost(endpoint, formData, queryParams, null, responseType);
     }
 
-    // Metodo per chiamate POST con content type a application/x-www-form-urlencoded 
+    // Metodo per chiamate POST con content type a application/x-www-form-urlencoded
     protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
             Map<String, String> queryParams, Map<String, String> customHeaders,
             Class<R> responseType) {
@@ -157,7 +162,8 @@ public abstract class BaseService implements ServiceInterface {
             if (customHeaders != null) {
                 customHeaders.forEach(headers::add);
             }
-            // Imposta il content type a application/x-www-form-urlencoded se non specificato
+            // Imposta il content type a application/x-www-form-urlencoded se non
+            // specificato
             if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             }
@@ -168,14 +174,15 @@ public abstract class BaseService implements ServiceInterface {
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
+                throw new RestClientException(
+                        "[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
             }
         } catch (RestClientException | IllegalArgumentException e) {
             throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
         }
     }
 
-    //metodo per chiamare POST con content type a application/json
+    // metodo per chiamare POST con content type a application/json
     protected <R> R callRestPost(String endpoint, JSONObject jsonObject,
             Map<String, String> queryParams, Map<String, String> customHeaders,
             Class<R> responseType) {
@@ -208,7 +215,8 @@ public abstract class BaseService implements ServiceInterface {
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RestClientException("[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
+                throw new RestClientException(
+                        "[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
             }
         } catch (RestClientException | IllegalArgumentException e) {
             throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
@@ -232,7 +240,8 @@ public abstract class BaseService implements ServiceInterface {
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RestClientException("[CallRestPut] Chiamata PUT fallita con stato: " + response.getStatusCode());
+                throw new RestClientException(
+                        "[CallRestPut] Chiamata PUT fallita con stato: " + response.getStatusCode());
             }
         } catch (RestClientException | IllegalArgumentException e) {
             throw new RestClientException("[CallRestPut] Chiamata PUT fallita con stato: " + e);
@@ -248,7 +257,8 @@ public abstract class BaseService implements ServiceInterface {
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RestClientException("[CallRestDelete] Chiamata DELETE fallita con stato: " + response.getStatusCode());
+                throw new RestClientException(
+                        "[CallRestDelete] Chiamata DELETE fallita con stato: " + response.getStatusCode());
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new RestClientException("[CallRestDelete] Chiamata DELETE fallita con stato: " + e);
@@ -257,13 +267,22 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
-    //Metodi di utilità 
-    // Metodo di supporto per convertire il contenuto in stringa
     protected String convertToString(byte[] content) {
         if (content == null) {
             return null;
         }
-        return new String(content, StandardCharsets.UTF_8);
+
+        try {
+            // Tentiamo di convertire l'array di byte in una stringa
+            return new String(content, StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            // Gestiamo il caso di input malformato o caratteri non mappabili
+            throw new IllegalArgumentException("Input malformato o contiene caratteri non mappabili", e);
+        } catch (Exception e) {
+            // Gestiamo qualsiasi altra eccezione che potrebbe sorgere
+            throw new RuntimeException(
+                    "Si è verificato un errore imprevisto durante la conversione dell'array di byte in stringa", e);
+        }
     }
 
     // Metodo per rimuovere il BOM (Byte Order Mark) da una stringa

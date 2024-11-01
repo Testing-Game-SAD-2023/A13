@@ -35,13 +35,12 @@ public class T1Service extends BaseService {
 
         // Registrazione delle azioni
         registerAction("getClasses", new ServiceActionDefinition(
-                params -> getClasses() //Metodo senza argomenti
+                params -> getClasses() // Metodo senza argomenti
         ));
 
         registerAction("getClassUnderTest", new ServiceActionDefinition(
                 params -> getClassUnderTest((String) params[0]),
-                String.class
-        ));
+                String.class));
     }
 
     // Metodi effettivi
@@ -55,7 +54,12 @@ public class T1Service extends BaseService {
     }
 
     private String getClassUnderTest(String nomeCUT) {
+        if (nomeCUT == null) {
+            throw new IllegalArgumentException("Il nomeCUT non può essere nullo");
+        }
+
         try {
+
             byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
             return removeBOM(convertToString(result));
         } catch (Exception e) {
