@@ -18,25 +18,27 @@ package com.g2.Interfaces;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 import com.g2.Interfaces.ServiceActionDefinition.InvalidParameterTypeException;
 import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
@@ -56,7 +58,6 @@ public class BaseServiceTest {
         mockServer = MockRestServiceServer.createServer(restTemplate);
         baseService = new BaseServiceImpl(restTemplate, Base_URL);
     }
-
 
     /*
     *  T0_A  - Eseguo una chiamata che non è stata registrata 
@@ -92,6 +93,7 @@ public class BaseServiceTest {
         });     
         assertEquals(expected_exception, exception.getMessage());
     }
+
     /*
     *    T1 - Eseguo una GET senza parametri  
     */
@@ -142,7 +144,6 @@ public class BaseServiceTest {
         assertEquals("L'endpoint non può essere nullo o vuoto", exception.getMessage());
     }
 
-
     /*
     *  T4 - Eseguo una Get che mi deve dare una lista 
     */
@@ -169,6 +170,27 @@ public class BaseServiceTest {
         mockServer.verify();
     }
 
+    // eccezione su GET LIST con eccezione 
+    @Test
+    public void testGetListException() {
+        String Expected_exception = "[CallRestGET] Chiamata GET fallita con stato: org.springframework.web.client.HttpClientErrorException$BadRequest: 400 Bad Request: [no body]";
+        mockServer.expect(requestTo(Base_URL + "/resources"))
+                    .andExpect(method(HttpMethod.GET))
+                    .andRespond(withStatus(HttpStatus.BAD_REQUEST));
+        RestClientException exception = assertThrows(RestClientException.class, () -> {
+            baseService.handleRequest("testGetList");
+        });
+        assertEquals(Expected_exception, exception.getMessage());
+    }
+
+    @Test
+    public void testGetListNullEndpoint() {
+        // Chiamiamo il metodo testGetList
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            baseService.handleRequest("testGetListWithoutEndpoint");
+        });
+        assertEquals("L'endpoint non può essere nullo o vuoto", exception.getMessage());
+    }
 
     /*
      * T5 - eseguo una get ma il server mi risponde 400 
@@ -184,7 +206,23 @@ public class BaseServiceTest {
         RestClientException exception = assertThrows(RestClientException.class, () -> {
             baseService.handleRequest("testGetNoParams");
         });
+        assertEquals(Expected_exception, exception.getMessage());
+    }
+
+     /*
+     * T5 - eseguo una get ma il server mi risponde 300 
+     */
+    @Test
+    public void testGetWithBadRequest2() {
+        String Expected_exception = "Chiamata GET fallita con stato: org.springframework.web.client.RestClientException: Chiamata GET fallita con stato: 300 MULTIPLE_CHOICES";
+        mockServer.expect(requestTo(Base_URL + "/testGetNoParams"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.MULTIPLE_CHOICES)); // Simula una risposta 300
     
+        // Ci aspettiamo che venga sollevata un'eccezione
+        RestClientException exception = assertThrows(RestClientException.class, () -> {
+            baseService.handleRequest("testGetNoParams");
+        });
         assertEquals(Expected_exception, exception.getMessage());
     }
 
@@ -218,6 +256,59 @@ public class BaseServiceTest {
     }
 
     /*
+     *  T4 - Eseguo una Post con un formdate nullo
+     */
+    @Test
+    public void testPostWithNullFormData() {
+        // Configura l'endpoint e la risposta attesa
+        String expectedResponse = "formData non può essere nullo";  // Risposta simulata
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            baseService.handleRequest("testPostNullForm");
+        });
+        // Verifica la risposta
+        assertEquals(expectedResponse, exception.getMessage());
+    }
+
+    /*
+     *  Testo post con custom header con 200 
+     */
+    @Test
+    public void testCreateResourceSuccess() {
+        // Simula una risposta 200 OK dal server
+        String endpoint = Base_URL + "/resources/create";
+        mockServer.expect(requestTo(endpoint))
+                  .andExpect(method(HttpMethod.POST))
+                  .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                  .andRespond(withSuccess("{\"result\":\"Resource created successfully\"}", MediaType.APPLICATION_JSON));
+        // Esegui il metodo e verifica il risultato
+        String response = baseService.createResource("ExampleName", "ExampleData");
+        assertEquals("{\"result\":\"Resource created successfully\"}", response);
+        // Verifica che tutte le richieste siano state soddisfatte
+        mockServer.verify();
+    }
+
+    /*
+     * Testo post con custom header con errore 400
+     */
+    @Test
+    public void testCreateResourceFailure() {
+        // Simula una risposta 400 Bad Request dal server
+        String endpoint = Base_URL + "/resources/create";
+        String Expected_exception = "[CallRestPost] Chiamata POST fallita con errore: 400 Bad Request: [no body]";
+        mockServer.expect(requestTo(endpoint))
+                  .andExpect(method(HttpMethod.POST))
+                  .andRespond(withBadRequest());
+
+        // Esegui il metodo e verifica che venga lanciata un'eccezione
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            baseService.createResource("ExampleName", "ExampleData");
+        });
+        assertEquals(Expected_exception, exception.getMessage());
+
+        // Verifica che tutte le richieste siano state soddisfatte
+        mockServer.verify();
+    }
+    /*
     *  T5 - Eseguo una put
     */
     @Test
@@ -241,4 +332,32 @@ public class BaseServiceTest {
         // Verifica che il server mock abbia ricevuto la richiesta
         mockServer.verify();
     }
+
+    @Test
+    public void testDeleteResource_Success() {
+        String resourceId = "123";
+        String endpoint = Base_URL + "/resources/" + resourceId;
+        mockServer.expect(requestTo(endpoint))
+                  .andExpect(method(HttpMethod.DELETE))
+                  .andRespond(withSuccess("{\"message\":\"Success\"}", MediaType.APPLICATION_JSON)); // 204 No Content
+
+        baseService.handleRequest("testDelete", resourceId); // Non dovrebbe lanciare eccezioni
+        mockServer.verify();
+    }
+
+    @Test
+    public void testDeleteResource_NotFound() {
+        String resourceId = "123";
+        String expected_exception = "[CallRestDelete] Chiamata DELETE fallita con stato: org.springframework.web.client.HttpClientErrorException$NotFound: 404 Not Found: [no body]";
+        mockServer.expect(requestTo(Base_URL + "/resources/" + resourceId))
+                  .andExpect(method(HttpMethod.DELETE))
+                  .andRespond(withStatus(HttpStatus.NOT_FOUND)); // 404 Not Found
+
+        RestClientException exception = assertThrows(RestClientException.class, () -> {
+            baseService.handleRequest("testDelete", resourceId); // Non dovrebbe lanciare eccezioni
+        });
+        assertEquals(expected_exception, exception.getMessage());
+    }
+
+
 }
