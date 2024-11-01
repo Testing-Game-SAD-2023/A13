@@ -128,9 +128,9 @@ async function handleGameAction(isGameEnd) {
 	console_robot.setValue(displayUserPoints);
     if (isGameEnd) {
         openModalWithText(
-            "'Partita Terminata!'",
-            `Hai terminato la tua partita con un punteggio: ${userScore} pt.`,
-            [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
+            status_game_end ,
+            `${score_partita_text} ${userScore} pt.`,
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }]
         );
         flush_localStorage();
         //La partita è finita quindi non resetto i tasti 
