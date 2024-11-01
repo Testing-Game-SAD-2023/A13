@@ -83,8 +83,14 @@ $(document).ready(function () {
         viewStorico();
     }
 });
+
+let isActionInProgress = false; // Flag per indicare se un'azione è in corso
+
 // Gestione del click del pulsante
 async function handleGameAction(isGameEnd) {
+
+    isActionInProgress = true; // Imposta il flag a true
+
     //disabilito i tasti durante l'azione 
     run_button.disabled = true;
     coverage_button.disabled = true;
@@ -105,6 +111,7 @@ async function handleGameAction(isGameEnd) {
 		//Errore di compilazione
         setStatus("error");
         console_robot.setValue(getConsoleTextError());
+        isActionInProgress = false; // Imposta il flag a false in caso di errore
         return;
     }
     highlightCodeCoverage($.parseXML(coverage), editor_robot);
@@ -138,7 +145,17 @@ async function handleGameAction(isGameEnd) {
         run_button.disabled = false;
         coverage_button.disabled = false;
     }
+    isActionInProgress = false; // Imposta il flag a false al termine dell'azione
 }
+
+// Gestione dell'evento beforeunload
+window.addEventListener('beforeunload', (event) => {
+    if (isActionInProgress) {
+        const confirmationMessage = 'Stai per aggiornare la pagina durante un caricamento. La seguente azione causerà inconsistenza nei dati e vanificherà i tuoi sforzi nella sfida attuale. Vuoi continuare?';
+        event.returnValue = confirmationMessage; // Firefox
+        return confirmationMessage; // Standard
+    }
+});
 // Pulsante "Run/Submit"
 document.getElementById("runButton").addEventListener("click", () => handleGameAction(true));
 // Pulsante "Coverage"
