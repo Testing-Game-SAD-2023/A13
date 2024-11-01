@@ -54,7 +54,12 @@ public class T1Service extends BaseService {
     }
 
     private String getClassUnderTest(String nomeCUT) {
+        if (nomeCUT == null) {
+            throw new IllegalArgumentException("Il nomeCUT non può essere nullo");
+        }
+
         try {
+
             byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
             return removeBOM(convertToString(result));
         } catch (Exception e) {
