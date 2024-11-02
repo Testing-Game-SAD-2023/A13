@@ -15,6 +15,7 @@
  *   limitations under the License.
  */
 
+/*
 function initializeEditorResizing(container, editor, divider, section1, section2, closeButton) {
     function setEditorSize(container, editor) {
         // Altezza del container
@@ -116,6 +117,73 @@ function toggleIcons(icon1Class, icon2Class, iconElement) {
 		iconElement.classList.remove(icon2Class); // Aggiunge l'icona 1
 	}
 }
+
+*/
+
+function initializeEditorResizing(container, editor, divider, section1, section2, closeButton) {
+    function setEditorSize() {
+        const availableHeight = container.clientHeight; 
+        editor.setSize(null, availableHeight + "px");
+    }
+
+    function updateIcon(iconElement, isMinimized, icon1Class, icon2Class) {
+        if (isMinimized) {
+            iconElement.classList.add(icon2Class);
+            iconElement.classList.remove(icon1Class);
+        } else {
+            iconElement.classList.add(icon1Class);
+            iconElement.classList.remove(icon2Class);
+        }
+    }
+
+    function enableResizing() {
+        let isDragging = false;
+
+        divider.addEventListener("mousedown", () => {
+            isDragging = true;
+            document.body.style.cursor = "n-resize";
+            container.classList.add("no-select");
+        });
+
+        container.addEventListener("mousemove", (e) => {
+            if (!isDragging) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const offsetY = e.clientY - containerRect.top;
+
+            section1.style.height = `${offsetY}px`;
+            section2.style.height = `${containerRect.height - offsetY - divider.offsetHeight}px`;
+        });
+
+        document.addEventListener("mouseup", () => {
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.cursor = "default";
+                container.classList.remove("no-select");
+            }
+            const iconElement = closeButton.querySelector("i");
+            updateIcon(iconElement, section2.offsetHeight === 0, closeButton.getAttribute("data-icon1"), closeButton.getAttribute("data-icon2"));
+        });
+
+        closeButton.addEventListener("click", () => {
+            const isMinimized = section2.offsetHeight === 0;
+            section2.style.height = isMinimized ? '200px' : '0'; // Imposta l'altezza desiderata
+            section1.style.height = isMinimized ? `${container.clientHeight - 200}px` : `${container.clientHeight}px`; // Cambia l'altezza di section1
+            const iconElement = closeButton.querySelector("i");
+            updateIcon(iconElement, !isMinimized, closeButton.getAttribute("data-icon1"), closeButton.getAttribute("data-icon2"));
+        });
+    }
+
+    window.addEventListener("resize", setEditorSize);
+    enableResizing();
+    setEditorSize(); 
+}
+
+// Chiama la funzione per inizializzare il ridimensionamento degli editor
+initializeEditorResizing(container_user, editor_utente, divider_Console, section_editor, section_console, close_console_utente);
+initializeEditorResizing(container_robot, editor_robot, divider_result, section_UT, section_result, close_console_result);
+
+
 // Aggiungi gli event listener ai bottoni
 document.querySelectorAll(".toggleButton").forEach((button) => {
 	button.addEventListener("click", function () {

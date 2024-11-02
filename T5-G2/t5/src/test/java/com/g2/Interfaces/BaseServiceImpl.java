@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
@@ -55,6 +56,9 @@ public class BaseServiceImpl extends BaseService {
         registerAction("testPost", new ServiceActionDefinition(
             params -> testPost((String) params[0]), 
             String.class
+        )); 
+        registerAction("testPostNullForm", new ServiceActionDefinition(
+            params -> testPostNullForm()
         ));
         registerAction("testPut", new ServiceActionDefinition(
             params -> testPut((String) params[0], (String) params[0]), 
@@ -64,6 +68,13 @@ public class BaseServiceImpl extends BaseService {
             params -> testDelete((String) params[0]), 
             String.class
         ));
+        registerAction("createResource", new ServiceActionDefinition(
+            params -> createResource((String) params[0], (String) params[1]), 
+            String.class, String.class
+        )); 
+        registerAction("testGetListWithoutEndpoint", new ServiceActionDefinition(
+            params -> testGetListWithoutEndpoint()
+        )); 
     }
 
     /**
@@ -102,6 +113,9 @@ public class BaseServiceImpl extends BaseService {
             return callRestGET(endpoint, null, new ParameterizedTypeReference<List<String>>() {});
     }
 
+    public List<String> testGetListWithoutEndpoint() {
+        return callRestGET(null, null, new ParameterizedTypeReference<List<String>>() {});
+    }
 
     /**
      * Metodo per eseguire una chiamata POST con parametri.
@@ -117,6 +131,33 @@ public class BaseServiceImpl extends BaseService {
             String response = callRestPost(endpoint, formData, null, null, String.class);
             return response;
     }
+
+    private Object testPostNullForm() {
+        MultiValueMap<String, String> formData = null;
+        // Endpoint per la chiamata POST
+        String endpoint = "/example-post-endpoint";
+        // Chiamata POST con il corpo JSON
+        String response = callRestPost(endpoint, formData, null, null, String.class);
+        return response;
+    }
+
+    public String createResource(String resourceName, String resourceData) {
+        // Creazione del JSONObject con i dati della risorsa
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", resourceName);
+        jsonObject.put("data", resourceData);
+
+        // Endpoint per la creazione della risorsa
+        String endpoint = "/resources/create";
+
+        // Header personalizzati (opzionale)
+        Map<String, String> customHeaders = new HashMap<>();
+        customHeaders.put("Authorization", "Bearer token_esempio");
+
+        // Chiamata al metodo callRestPost
+        return callRestPost(endpoint, jsonObject, null, customHeaders, String.class);
+    }
+
 
     // Metodo per aggiornare una risorsa tramite una chiamata PUT
     public String testPut(String resourceId, String Text_param) {
