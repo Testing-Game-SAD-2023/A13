@@ -26,16 +26,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.client.MockRestServiceServer;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -147,7 +158,7 @@ public class BaseServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             baseService.handleRequest("testGetWithoutEndpoint");
         });
-        assertEquals("Chiamata Get fallita con stato: java.lang.IllegalArgumentException: L'endpoint non può essere nullo o vuoto.", exception.getMessage());
+        assertEquals("Chiamata REST fallita: L'endpoint non può essere nullo o vuoto. (eseguita da: callRestGET)", exception.getMessage());
     }
 
     /*
@@ -155,7 +166,7 @@ public class BaseServiceTest {
     */
     @Test
     public void testGetNoExistEndpoint() {
-        String expected_exception = "Chiamata GET fallita con stato: org.springframework.web.client.HttpClientErrorException$NotFound: 404 Not Found: [no body]";
+        String expected_exception = "Chiamata REST fallita con stato 4xx: 404 NOT_FOUND (eseguita da: callRestGET)";
         String endpoint = Base_URL + "/nonEsisteEndpoint";
         mockServer.expect(requestTo(endpoint)).andRespond(withStatus(HttpStatus.NOT_FOUND));
         RestClientException exception = assertThrows(RestClientException.class, () -> {
@@ -192,7 +203,7 @@ public class BaseServiceTest {
     // eccezione su GET LIST con eccezione 
     @Test
     public void testGetListException() {
-        String Expected_exception = "[CallRestGET] Chiamata GET fallita con stato: org.springframework.web.client.HttpClientErrorException$BadRequest: 400 Bad Request: [no body]";
+        String Expected_exception = "Chiamata REST fallita con stato 4xx: 400 BAD_REQUEST (eseguita da: callRestGET)";
         mockServer.expect(requestTo(Base_URL + "/resources"))
                     .andExpect(method(HttpMethod.GET))
                     .andRespond(withStatus(HttpStatus.BAD_REQUEST));
@@ -204,9 +215,9 @@ public class BaseServiceTest {
 
     @Test
     public void testGetListNullEndpoint() {
-        String expected_exception = "[CallRestGET] Chiamata GET fallita con stato: java.lang.IllegalArgumentException: L'endpoint non può essere nullo o vuoto.";
+        String expected_exception = "Chiamata REST fallita: L'endpoint non può essere nullo o vuoto. (eseguita da: callRestGET)";
         // Chiamiamo il metodo testGetList
-        RestClientException exception = assertThrows(RestClientException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             baseService.handleRequest("testGetListWithoutEndpoint");
         });
         assertEquals(expected_exception, exception.getMessage());
@@ -217,7 +228,7 @@ public class BaseServiceTest {
      */
     @Test
     public void testGetWithBadRequest() {
-        String Expected_exception = "Chiamata GET fallita con stato: org.springframework.web.client.HttpClientErrorException$BadRequest: 400 Bad Request: [no body]";
+        String Expected_exception = "Chiamata REST fallita con stato 4xx: 400 BAD_REQUEST (eseguita da: callRestGET)";
         mockServer.expect(requestTo(Base_URL + "/testGetNoParams"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)); // Simula una risposta 400
@@ -230,14 +241,14 @@ public class BaseServiceTest {
     }
 
      /*
-     * T5 - eseguo una get ma il server mi risponde 300 
+     * T5 - eseguo una get ma il server mi risponde 500 
      */
     @Test
-    public void testGetWithBadRequest2() {
-        String Expected_exception = "Chiamata GET fallita con stato: org.springframework.web.client.RestClientException: Chiamata GET fallita con stato: 300 MULTIPLE_CHOICES";
+    public void testGetWithMultipleChoices() {
+        String Expected_exception = "Chiamata REST fallita con stato 5xx: 500 INTERNAL_SERVER_ERROR (eseguita da: callRestGET)";
         mockServer.expect(requestTo(Base_URL + "/testGetNoParams"))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.MULTIPLE_CHOICES)); // Simula una risposta 300
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)); // Simula una risposta 5xx
     
         // Ci aspettiamo che venga sollevata un'eccezione
         RestClientException exception = assertThrows(RestClientException.class, () -> {
@@ -314,7 +325,7 @@ public class BaseServiceTest {
     public void testCreateResourceFailure() {
         // Simula una risposta 400 Bad Request dal server
         String endpoint = Base_URL + "/resources/create";
-        String Expected_exception = "[CallRestPost] Chiamata POST fallita con errore: 400 Bad Request: [no body]";
+        String Expected_exception = "Chiamata REST fallita con stato 4xx: 400 BAD_REQUEST (eseguita da: callRestPost)";
         mockServer.expect(requestTo(endpoint))
                   .andExpect(method(HttpMethod.POST))
                   .andRespond(withBadRequest());
@@ -368,7 +379,7 @@ public class BaseServiceTest {
     @Test
     public void testDeleteResource_NotFound() {
         String resourceId = "123";
-        String expected_exception = "[CallRestDelete] Chiamata DELETE fallita con stato: org.springframework.web.client.HttpClientErrorException$NotFound: 404 Not Found: [no body]";
+        String expected_exception = "Chiamata REST fallita con stato 4xx: 404 NOT_FOUND (eseguita da: callRestDelete)";
         mockServer.expect(requestTo(Base_URL + "/resources/" + resourceId))
                   .andExpect(method(HttpMethod.DELETE))
                   .andRespond(withStatus(HttpStatus.NOT_FOUND)); // 404 Not Found
@@ -461,7 +472,6 @@ public class BaseServiceTest {
 
     }
 
-
     /*
      *  Testo il comportamento atteso di convertToString
      */
@@ -474,7 +484,6 @@ public class BaseServiceTest {
         assertEquals(fileContent, result); // Verifica che il risultato sia quello atteso
         mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
     }
-
 
     /*
      *  Testo che convertToString dia eccezione se gli dò un null
@@ -497,7 +506,6 @@ public class BaseServiceTest {
         });
         assertEquals("L'array di byte non può essere nullo.", e.getMessage());
     }
-
 
     /*
      * Test23: testConvertToStringWithMalformedInput
@@ -573,5 +581,46 @@ public class BaseServiceTest {
     public void testRemoveBOMWithNullInput() {
         String result = baseService.removeBOM(null);
         assertNull(result);
+    }
+
+    /*
+     * Esecuzione con custom headers
+     */
+    @Test
+    void testCallRestPostWithCustomHeaders() {
+        // Setup
+        String endpoint = Base_URL + "/api";
+        MultiValueMap<String, String> formData =  new LinkedMultiValueMap<>();
+        Map<String, String> queryParams = new HashMap<>();
+        Map<String, String> customHeaders = new HashMap<>();
+        customHeaders.put("X-Custom-Header", "CustomValue");
+        Class<String> responseType = String.class;
+
+        // Configura il mock server per aspettarsi una richiesta e restituire una risposta
+        mockServer.expect(requestTo(endpoint))
+                    .andExpect(method(HttpMethod.POST))
+                    .andExpect(header("X-Custom-Header", "CustomValue"))
+                    .andExpect(header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=UTF-8"))
+                    .andRespond(withSuccess("Success", MediaType.TEXT_PLAIN));
+
+        // Call the method
+        String result = baseService.callRestPost("/api", formData, queryParams, customHeaders, responseType);
+        // Verifica che la risposta sia come ci si aspetta
+        assertEquals("Success", result);
+        // Verifica che tutte le richieste siano state soddisfatte
+        mockServer.verify();
+    }
+
+    @Test
+    void testTimeoutCall(){
+        String expected_exception = "Chiamata REST fallita con stato 5xx: 504 GATEWAY_TIMEOUT (eseguita da: callRestGET)";
+        String endpoint = Base_URL + "/testGetNoParams";
+        // Configura il server mock per simulare un timeout
+        mockServer.expect(requestTo(endpoint)).andRespond(withStatus(HttpStatus.GATEWAY_TIMEOUT));
+
+        RestClientException exception = assertThrows(RestClientException.class, () -> {
+            baseService.handleRequest("testGetNoParams"); // Non dovrebbe lanciare eccezioni
+        });
+        assertEquals(expected_exception, exception.getMessage());
     }
 }

@@ -73,11 +73,9 @@ public class ServiceManager {
             T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
             logger.info("[SERVICE MANAGER] \"ServiceCreation: " + serviceClass.getSimpleName());
             return service;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException  e) {
             logger.error("[SERVICE MANAGER] Errore nella creazione del servizio: " + serviceClass.getName() + " Exception: " + e.getMessage());
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
-        } catch (Exception e){
-            throw new RuntimeException("Errore Generico: " + serviceClass.getName(), e);
         }
     }
 

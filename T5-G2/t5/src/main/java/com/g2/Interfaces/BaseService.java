@@ -14,7 +14,6 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package com.g2.Interfaces;
 
 import java.nio.ByteBuffer;
@@ -34,12 +33,16 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -105,48 +108,49 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
+    // Interfaccia funzionale per le chiamate REST
+    @FunctionalInterface
+    protected interface RestCall<R> {
+        R execute() throws RestClientException, RuntimeException;
+    }
+
+    /*
+     * Mi serve per non ripetere i controlli sul try catch
+     */
+    private <R> R executeRestCall(String caller, RestCall<R> call) {
+        try {
+            return call.execute();
+        } catch (HttpClientErrorException e) { // Gestisce gli errori 4xx
+            throw new RestClientException("Chiamata REST fallita con stato 4xx: " + e.getStatusCode() + 
+                                          " (eseguita da: " + caller + ")", e);
+        } catch (HttpServerErrorException e) { // Gestisce gli errori 5xx
+            throw new RestClientException("Chiamata REST fallita con stato 5xx: " + e.getStatusCode() + 
+                                          " (eseguita da: " + caller + ")", e);
+        } catch (RestClientException e) { // Altri tipi di errori di RestClient
+            throw new RestClientException("Chiamata REST fallita: " + e.getMessage() + 
+                                          " (eseguita da: " + caller + ")", e);
+        } catch (IllegalArgumentException e) { // Errori dovuti a parametri non validi
+            throw new RuntimeException("Chiamata REST fallita: " + e.getMessage() + 
+                                       " (eseguita da: " + caller + ")", e);
+        }
+    }
+    
     // Metodo per chiamate GET che restituiscono un singolo oggetto
     protected <R> R callRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
-        try {
+        return executeRestCall("callRestGET", () -> {
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<R> response = restTemplate.getForEntity(url, responseType);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
-            } else {
-                throw new RestClientException("Chiamata GET fallita con stato: " + response.getStatusCode());
-            }
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            // qui se l'errore è 4xx o 5xx
-            throw new RestClientException("Chiamata GET fallita con stato: " + e);
-        }catch (RestClientException e) {
-            /*
-             * Viene utilizzata per segnalare errori durante l'interazione con i servizi
-             * REST.
-             * Può rappresentare una serie di problemi, come errori di rete,
-             * risposte non valide dal server, o codici di stato HTTP che indicano un
-             * fallimento (4xx o 5xx).
-             */
-            throw new RestClientException("Chiamata GET fallita con stato: " + e);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Chiamata Get fallita con stato: " + e);
-        }
+            return response.getBody();
+        });
     }
 
     // Metodo per chiamate GET che restituiscono una lista di oggetti
     protected <R> List<R> callRestGET(String endpoint, Map<String, String> queryParams, ParameterizedTypeReference<List<R>> responseType) {
-        try {
+        return executeRestCall("callRestGET", () -> {
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<List<R>> response = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
-            } else {
-                throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + response.getStatusCode());
-            }
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
-        } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
-        }
+            return response.getBody();
+        });
     }
 
     // Metodo per chiamate POST senza specificare content type -> default
@@ -165,9 +169,8 @@ public abstract class BaseService implements ServiceInterface {
         if (formData == null) {
             throw new IllegalArgumentException("formData non può essere nullo");
         }
-        try {
+        return executeRestCall("callRestPost", () -> {
             String url = buildUri(endpoint, queryParams);
-
             // Imposta gli header, incluso il Content-Type di default
             HttpHeaders headers = new HttpHeaders();
             // Aggiunge gli header personalizzati
@@ -181,15 +184,8 @@ public abstract class BaseService implements ServiceInterface {
             }
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
-            } else {
-                throw new RestClientException(
-                        "[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
-            }
-        } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
-        }
+            return response.getBody();
+        });
     }
 
     // metodo per chiamare POST con content type a application/json
@@ -199,32 +195,20 @@ public abstract class BaseService implements ServiceInterface {
         if (jsonObject == null) {
             throw new IllegalArgumentException("Il body JSON non può essere nullo");
         }
-        try {
-            // Conversione del JSONObject in stringa
+        return executeRestCall("callRestPost", () -> {
             String jsonBody = jsonObject.toString();
-
             String url = buildUri(endpoint, queryParams);
             HttpHeaders headers = new HttpHeaders();
-
-            // Aggiunge gli header personalizzati
             if (customHeaders != null) {
                 customHeaders.forEach(headers::add);
             }
-            // Imposta il content type a application/json se non specificato
             if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
                 headers.setContentType(MediaType.APPLICATION_JSON);
             }
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
-            } else {
-                throw new RestClientException(
-                        "[CallRestPost] Chiamata POST fallita con stato: " + response.getStatusCode());
-            }
-        } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestPost] Chiamata POST fallita con errore: " + e.getMessage(), e);
-        }
+            return response.getBody();
+        });
     }
 
     // Metodo per chiamate PUT
@@ -235,40 +219,26 @@ public abstract class BaseService implements ServiceInterface {
         if (formData == null) {
             throw new IllegalArgumentException("formData non può essere nullo");
         }
-        try {
+        return executeRestCall("callRestPut", () -> {
             String url = buildUri(endpoint, queryParams);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/x-www-form-urlencoded");
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
             ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
-            } else {
-                throw new RestClientException(
-                        "[CallRestPut] Chiamata PUT fallita con stato: " + response.getStatusCode());
-            }
-        } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestPut] Chiamata PUT fallita con stato: " + e);
-        }
+            return response.getBody();
+        });
     }
 
     // Metodo per chiamate DELETE
-    protected void callRestDelete(String endpoint, Map<String, String> queryParams) {
-        try {
+    protected String callRestDelete(String endpoint, Map<String, String> queryParams) {
+        return executeRestCall("callRestDelete", () -> {
             String url = buildUri(endpoint, queryParams);
-            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RestClientException(
-                        "[CallRestDelete] Chiamata DELETE fallita con stato: " + response.getStatusCode());
-            }
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            throw new RestClientException("[CallRestDelete] Chiamata DELETE fallita con stato: " + e);
-        } catch (RestClientException | IllegalArgumentException e) {
-            throw new RestClientException("[CallRestDelete] Chiamata DELETE fallita con stato: " + e);
-        }
+            ResponseEntity<String> response =  restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+            return response.getBody();
+        });
     }
 
-    protected String convertToString(byte[] content){
+    protected String convertToString(byte[] content) {
         if (content == null || content.length == 0) {
             throw new IllegalArgumentException("L'array di byte non può essere nullo.");
         }
@@ -281,12 +251,12 @@ public abstract class BaseService implements ServiceInterface {
                 // Aggiungi il carattere decodificato al risultato
                 result.append(decoder.decode(byteBuffer));
             }
-             // Completa la decodifica
+            // Completa la decodifica
             decoder.flush(CharBuffer.allocate(1));
             return result.toString();
         } catch (CharacterCodingException e) {
-           throw new RuntimeException("Erorr conversione, Il byte array contiene byte non validi per UTF-8.");
-        } catch (Exception e){
+            throw new RuntimeException("Erorr conversione, Il byte array contiene byte non validi per UTF-8.");
+        } catch (Exception e) {
             throw new RuntimeException("Errore imprevisto durante la conversione");
         }
     }

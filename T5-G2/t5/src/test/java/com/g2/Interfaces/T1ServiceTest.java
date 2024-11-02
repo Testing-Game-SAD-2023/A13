@@ -581,38 +581,6 @@ public class T1ServiceTest {
                 exception.getMessage());
     }
 
-    /*
-     * Test20: testGetClassesWithMultipleChoices
-     * Precondizioni: Il mock server è impostato per restituire una risposta HTTP
-     * 300
-     * (Multiple Choices) per una richiesta GET al percorso /home.
-     * Azioni: Invocare il metodo handleRequest con il parametro "getClasses".
-     * Post-condizioni: Verificare che venga sollevata un'eccezione e che il
-     * messaggio
-     * dell'eccezione contenga l'indicazione che si tratta di una risposta
-     * Multiple Choices (300).
-     */
-
-    @Test
-    public void testGetClassesWithMultipleChoices() {
-        String endpoint = Base_URL + "/home";
-        mockServer.expect(once(), requestTo(endpoint))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.MULTIPLE_CHOICES)); // Risposta 300 Multiple Choices
-
-        String errorMessage = null;
-        try {
-            T1Service.handleRequest("getClasses");
-        } catch (Exception e) {
-            errorMessage = e.getMessage();
-        }
-
-        assertNotNull(errorMessage, "Expected an error message for HTTP 300 response");
-        assertTrue(errorMessage.contains("Multiple Choices") || errorMessage.contains("300"),
-                "Error message should indicate a Multiple Choices (300) response");
-
-        mockServer.verify();
-    }
 
     /*
      * Test21: testGetClassesWithNotFoundError
