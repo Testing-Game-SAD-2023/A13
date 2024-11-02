@@ -202,26 +202,21 @@ async function startGame(data) {
 function toggleLoading(showSpinner, divId, buttonId) {
 	const divElement = document.getElementById(divId);
 	const button = document.getElementById(buttonId);
-
 	if (!divElement) {
 		console.error(`Elemento con ID "${divId}" non trovato.`);
 		return;
 	}
-
 	const spinner = divElement.querySelector(".spinner-border");
 	const statusText = divElement.querySelector('[role="status"]');
 	const icon = divElement.querySelector("i");
-
 	if (showSpinner) {
 		spinner.style.display = "inline-block"; // Mostra lo spinner
 		statusText.innerText = loading; // Mostra il testo "Loading..."
 		icon.style.display = "none"; // Nascondi l'icona
-		button.disabled = true;
 	} else {
 		spinner.style.display = "none"; // Nascondi lo spinner
 		statusText.innerText =  statusText.getAttribute('data-title'); // Nascondi il testo "Loading..."
 		icon.style.display = "inline-block"; // Mostra l'icona
-		button.disabled = false;
 	}
 }
 

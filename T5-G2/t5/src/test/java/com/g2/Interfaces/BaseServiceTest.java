@@ -16,11 +16,16 @@
  */
 package com.g2.Interfaces;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,12 +143,25 @@ public class BaseServiceTest {
     */
     @Test
     public void testGetWithoutEndpoint() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             baseService.handleRequest("testGetWithoutEndpoint");
         });
-        assertEquals("L'endpoint non può essere nullo o vuoto", exception.getMessage());
+        assertEquals("Chiamata Get fallita con stato: java.lang.IllegalArgumentException: L'endpoint non può essere nullo o vuoto.", exception.getMessage());
     }
 
+    /*
+    * T3 - GET endpoint errato che non esiste
+    */
+    @Test
+    public void testGetNoExistEndpoint() {
+        String expected_exception = "Chiamata GET fallita con stato: org.springframework.web.client.HttpClientErrorException$NotFound: 404 Not Found: [no body]";
+        String endpoint = Base_URL + "/nonEsisteEndpoint";
+        mockServer.expect(requestTo(endpoint)).andRespond(withStatus(HttpStatus.NOT_FOUND));
+        RestClientException exception = assertThrows(RestClientException.class, () -> {
+            baseService.handleRequest("testGetSetEndpoint", "/nonEsisteEndpoint");
+        });
+        assertEquals(expected_exception, exception.getMessage());
+    }
     /*
     *  T4 - Eseguo una Get che mi deve dare una lista 
     */
@@ -185,11 +203,12 @@ public class BaseServiceTest {
 
     @Test
     public void testGetListNullEndpoint() {
+        String expected_exception = "[CallRestGET] Chiamata GET fallita con stato: java.lang.IllegalArgumentException: L'endpoint non può essere nullo o vuoto.";
         // Chiamiamo il metodo testGetList
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        RestClientException exception = assertThrows(RestClientException.class, () -> {
             baseService.handleRequest("testGetListWithoutEndpoint");
         });
-        assertEquals("L'endpoint non può essere nullo o vuoto", exception.getMessage());
+        assertEquals(expected_exception, exception.getMessage());
     }
 
     /*
@@ -359,5 +378,86 @@ public class BaseServiceTest {
         assertEquals(expected_exception, exception.getMessage());
     }
 
+    /*
+     *   endpoint nullo
+     */
+    @Test
+    public void testBuildUri_WithNullEndpoint_ShouldThrowIllegalArgumentException() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            baseService.buildUri_test(null, null);
+        });
+        assertEquals("L'endpoint non può essere nullo o vuoto.", exception.getMessage());
+    }
+
+    /*
+     * endpoint vuoto 
+     */
+    @Test
+    public void testBuildUri_WithEmptyEndpoint_ShouldThrowIllegalArgumentException() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            baseService.buildUri_test("", null);
+        });
+        assertEquals("L'endpoint non può essere nullo o vuoto.", exception.getMessage());
+    }
+
+    /*
+     * endpoint con query ma chiave vuota
+     */
+    @Test
+    public void testBuildUri_WithInvalidQueryParamKey_ShouldThrowIllegalArgumentException() {
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("", "value"); // Chiave vuota
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            baseService.buildUri_test("/validEndpoint", queryParams);
+        });
+        assertEquals("URL malformato: Le chiavi dei parametri non possono essere nulle o vuote.", exception.getMessage());
+
+    }
+
+    /*
+     * endpoint con query ma valori vuoti
+     */
+    @Test
+    public void testBuildUri_WithNullQueryParamValue_ShouldThrowIllegalArgumentException() {
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("key", null); // Valore nullo
+        Exception exception =  assertThrows(IllegalArgumentException.class, () -> {
+            baseService.buildUri_test("/validEndpoint", queryParams);
+        });
+        assertEquals("URL malformato: I valori dei parametri non possono essere nulli.", exception.getMessage());
+    }
+
+    /*
+     *  endpoint con queryparam vuoto non deve generare eccezioni 
+     */
+    @Test
+    public void testBuildUri_WithEmptyQueryParams_ShouldReturnValidUrl() {
+        // Endpoint valido e query parameters vuoti
+        String endpoint = "/validEndpoint";
+        String expectedUrl = Base_URL + "/validEndpoint"; // Sostituisci con il tuo baseUrl
+
+        // Invoca il metodo buildUri senza aspettarsi eccezioni
+        String resultUrl = baseService.buildUri_test(endpoint, Collections.emptyMap());
+
+        // Verifica che l'URL risultante sia quello atteso
+        assertEquals(expectedUrl, resultUrl);
+    }
+
+    /*
+     *  endpoint con queryparam
+     */
+    @Test
+    public void testBuildUri_WithNullQueryParamKey_ShouldThrowIllegalArgumentException() {
+        // Creazione di query parameters con una chiave vuota
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put(null, "someValue"); // Chiave vuota
+
+        // Passa un endpoint valido con una chiave di query parameter vuota
+        Exception exception =  assertThrows(IllegalArgumentException.class, () -> {
+            baseService.buildUri_test("/validEndpoint", queryParams);
+        });
+        assertEquals("URL malformato: Le chiavi dei parametri non possono essere nulle o vuote.", exception.getMessage());
+
+    }
 
 }

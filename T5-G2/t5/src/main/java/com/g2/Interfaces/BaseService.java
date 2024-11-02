@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -71,23 +72,35 @@ public abstract class BaseService implements ServiceInterface {
     // Metodi per le chiamate REST
     // Costruisce un URI partendo dal baseUrl e dall'endpoint, aggiungendo eventuali
     // parametri extra
-    private String buildUri(String endpoint, Map<String, String> queryParams) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl).path(endpoint);
-        if (queryParams != null && !queryParams.isEmpty()) {
-            for (Map.Entry<String, String> param : queryParams.entrySet()) {
-                builder.queryParam(param.getKey(), param.getValue());
-            }
+    protected String buildUri(String endpoint, Map<String, String> queryParams) {
+        // Controllo se l'endpoint è nullo o vuoto
+        if (endpoint == null || endpoint.trim().isEmpty()) {
+            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto.");
         }
-        String url = builder.build().toUriString();
-        System.out.println(url);
-        return url;
+        // Costruzione dell'URI
+        try {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl).path(endpoint);
+            if (queryParams != null && !queryParams.isEmpty()) {
+                for (Map.Entry<String, String> param : queryParams.entrySet()) {
+                    // Controllo se la chiave o il valore del parametro sono nulli o vuoti
+                    if (param.getKey() == null || param.getKey().trim().isEmpty()) {
+                        throw new IllegalArgumentException("Le chiavi dei parametri non possono essere nulle o vuote.");
+                    }
+                    if (param.getValue() == null) {
+                        throw new IllegalArgumentException("I valori dei parametri non possono essere nulli.");
+                    }
+                    builder.queryParam(param.getKey(), param.getValue());
+                }
+            }
+            String url = builder.build().toUriString();
+            return url;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("URL malformato: " + e.getMessage(), e);
+        }
     }
 
     // Metodo per chiamate GET che restituiscono un singolo oggetto
     protected <R> R callRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
-        if (endpoint == null || endpoint.isEmpty()) {
-            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-        }
         try {
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<R> response = restTemplate.getForEntity(url, responseType);
@@ -99,7 +112,7 @@ public abstract class BaseService implements ServiceInterface {
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             // qui se l'errore è 4xx o 5xx
             throw new RestClientException("Chiamata GET fallita con stato: " + e);
-        } catch (RestClientException e) {
+        }catch (RestClientException e) {
             /*
              * Viene utilizzata per segnalare errori durante l'interazione con i servizi
              * REST.
@@ -115,17 +128,13 @@ public abstract class BaseService implements ServiceInterface {
 
     // Metodo per chiamate GET che restituiscono una lista di oggetti
     protected <R> List<R> callRestGET(String endpoint, Map<String, String> queryParams, ParameterizedTypeReference<List<R>> responseType) {
-        if (endpoint == null || endpoint.isEmpty()) {
-            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-        }
         try {
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<List<R>> response = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RestClientException(
-                        "[CallRestGET] Chiamata GET fallita con stato: " + response.getStatusCode());
+                throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + response.getStatusCode());
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new RestClientException("[CallRestGET] Chiamata GET fallita con stato: " + e);
@@ -147,9 +156,6 @@ public abstract class BaseService implements ServiceInterface {
     protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
             Map<String, String> queryParams, Map<String, String> customHeaders,
             Class<R> responseType) {
-        if (endpoint == null || endpoint.isEmpty()) {
-            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-        }
         if (formData == null) {
             throw new IllegalArgumentException("formData non può essere nullo");
         }
@@ -167,10 +173,8 @@ public abstract class BaseService implements ServiceInterface {
             if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             }
-
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
-
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
@@ -186,9 +190,6 @@ public abstract class BaseService implements ServiceInterface {
     protected <R> R callRestPost(String endpoint, JSONObject jsonObject,
             Map<String, String> queryParams, Map<String, String> customHeaders,
             Class<R> responseType) {
-        if (endpoint == null || endpoint.isEmpty()) {
-            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-        }
         if (jsonObject == null) {
             throw new IllegalArgumentException("Il body JSON non può essere nullo");
         }
@@ -203,15 +204,12 @@ public abstract class BaseService implements ServiceInterface {
             if (customHeaders != null) {
                 customHeaders.forEach(headers::add);
             }
-
             // Imposta il content type a application/json se non specificato
             if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
                 headers.setContentType(MediaType.APPLICATION_JSON);
             }
-
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
-
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
@@ -225,9 +223,6 @@ public abstract class BaseService implements ServiceInterface {
 
     // Metodo per chiamate PUT
     protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
-        if (endpoint == null || endpoint.isEmpty()) {
-            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-        }
         if (formData == null) {
             throw new IllegalArgumentException("formData non può essere nullo");
         }
@@ -250,9 +245,6 @@ public abstract class BaseService implements ServiceInterface {
 
     // Metodo per chiamate DELETE
     protected void callRestDelete(String endpoint, Map<String, String> queryParams) {
-        if (endpoint == null || endpoint.isEmpty()) {
-            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-        }
         try {
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
@@ -271,7 +263,6 @@ public abstract class BaseService implements ServiceInterface {
         if (content == null) {
             return null;
         }
-
         try {
             // Tentiamo di convertire l'array di byte in una stringa
             return new String(content, StandardCharsets.UTF_8);

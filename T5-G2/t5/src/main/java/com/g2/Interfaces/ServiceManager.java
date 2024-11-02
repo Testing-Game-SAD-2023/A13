@@ -115,27 +115,5 @@ public class ServiceManager {
     protected ServiceInterface getServices(String key){
         return services.get(key);
     }
-    
-    /* 
-    public <T> List<T> handleRequest(String serviceName, String action, ParameterizedTypeReference<List<T>> responseType, Class<T> clazz, Object... params) {
-        Object obj = this.handleRequest(serviceName, action, params);
-        // Verifica se obj è un'istanza di List
-        if (obj instanceof List<?> rawList) {
-            // Crea una nuova lista per il risultato
-            List<T> resultList = new ArrayList<>();
-            // Esegui il cast per ogni elemento della lista
-            for (Object element : rawList) {
-                if (clazz.isInstance(element)) {
-                    resultList.add(clazz.cast(element));
-                } else {
-                    throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'elemento a " + clazz.getName());
-                }
-            }
-            return resultList; // Restituisci la lista
-        } else {
-            throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a List<" + responseType.getType().getTypeName() + ">");
-        }
-    }
-    */
 
 }
