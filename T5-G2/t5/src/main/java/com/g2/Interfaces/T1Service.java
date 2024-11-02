@@ -46,16 +46,27 @@ public class T1Service extends BaseService {
     // Metodi effettivi
     private List<ClassUT> getClasses() {
         try {
-            return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {
+            List<ClassUT> result = callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {
             });
+
+            // Verifica che il risultato non sia nullo o vuoto
+            if (result == null || result.isEmpty()) {
+                throw new IllegalArgumentException("Risposta vuota o nulla dal servizio per il metodo getClasses");
+            }
+
+            return result;
         } catch (Exception e) {
-            throw new IllegalArgumentException("GetClasses fallimento errore:" + e.getMessage());
+            throw new IllegalArgumentException("Errore in getClasses: " + e.getMessage(), e);
         }
     }
 
     private String getClassUnderTest(String nomeCUT) {
         if (nomeCUT == null) {
             throw new IllegalArgumentException("Il nomeCUT non può essere nullo");
+        }
+
+        if (nomeCUT.trim().isEmpty()) {
+            throw new IllegalArgumentException("Il nomeCUT non può essere vuoto o contenere solo spazi");
         }
 
         try {

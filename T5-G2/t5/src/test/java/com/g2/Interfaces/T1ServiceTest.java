@@ -244,16 +244,25 @@ public class T1ServiceTest {
     public void testGetListEmptyResponse() {
         String endpoint = Base_URL + "/home";
         String jsonResponse = "[]"; // Risposta JSON vuota
+
+        // Configurazione del mock server per rispondere con una lista JSON vuota su
+        // richiesta GET
         mockServer.expect(once(), requestTo(endpoint))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
 
-        @SuppressWarnings("unchecked")
-        List<ClassUT> resources = (List<ClassUT>) T1Service.handleRequest("getClasses");
-        assertNotNull(resources);
-        assertEquals(0, resources.size()); // Verifica che la lista sia vuota
+        // Verifica che venga sollevata un'eccezione IllegalArgumentException con il
+        // messaggio atteso
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            T1Service.handleRequest("getClasses");
+        });
 
-        mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
+        // Verifica il messaggio dell'eccezione
+        assertEquals("Errore in getClasses: Risposta vuota o nulla dal servizio per il metodo getClasses",
+                exception.getMessage());
+
+        // Verifica che tutte le aspettative del mock server siano state soddisfatte
+        mockServer.verify();
     }
 
     /*
@@ -539,12 +548,15 @@ public class T1ServiceTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("", MediaType.APPLICATION_JSON));
 
-        // Invoca il metodo getClasses e verifica che il risultato sia null o una
-        // stringa vuota
-        String result = (String) T1Service.handleRequest("getClasses");
+        // Verifica che venga sollevata un'eccezione IllegalArgumentException con il
+        // messaggio atteso
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            T1Service.handleRequest("getClasses");
+        });
 
-        // Assicura che il risultato sia null o vuoto come previsto
-        assertTrue(result == null || result.isEmpty(), "Expected result to be null or empty for empty response");
+        // Verifica il messaggio dell'eccezione
+        assertEquals("Errore in getClasses: Risposta vuota o nulla dal servizio per il metodo getClasses",
+                exception.getMessage());
 
         // Verifica che tutte le aspettative del mock server siano state soddisfatte
         mockServer.verify();
@@ -798,6 +810,49 @@ public class T1ServiceTest {
         String result = T1Service.removeBOM(null);
 
         assertNull(result);
+    }
+
+    /*
+     * Test28: testGetClassUnderTest_NomeCUTNullo
+     * Precondizioni: L'input nomeCUT è null.
+     * Azioni: Invocare il metodo getClassUnderTest passando null come argomento.
+     * Post-condizioni: Verificare che venga lanciata un'eccezione
+     * IllegalArgumentException
+     * con il messaggio atteso.
+     */
+
+    @Test
+    public void testGetClassUnderTest_NomeCUTNullo() {
+        // Preparazione del contesto, se necessario
+
+        // Assert che venga lanciata l'eccezione attesa
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            T1Service.handleRequest(Base_URL, null); // Chiamata al metodo con nomeCUT nullo
+        });
+
+        // Verifica il messaggio dell'eccezione
+        assertEquals("[HANDLEREQUEST] Azione non riconosciuta: http://manvsclass-controller-1:8080",
+                exception.getMessage());
+    }
+
+    /*
+     * Test29: testGetClassUnderTest_NomeCUTVuoto
+     * Precondizioni: L'input nomeCUT è una stringa vuota ("").
+     * Azioni: Invocare il metodo getClassUnderTest passando una stringa vuota come
+     * argomento.
+     * Post-condizioni: Verificare che venga lanciata un'eccezione
+     * IllegalArgumentException
+     * con il messaggio atteso.
+     */
+    @Test
+    public void testGetClassUnderTest_NomeCUTVuoto() {
+        // Assert che venga lanciata l'eccezione attesa
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            T1Service.handleRequest("getClassUnderTest", ""); // Chiamata al metodo con nomeCUT vuoto
+        });
+
+        // Verifica il messaggio dell'eccezione
+        assertEquals("Il nomeCUT non può essere vuoto o contenere solo spazi", exception.getMessage());
     }
 
 }
