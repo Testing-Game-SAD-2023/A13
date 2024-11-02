@@ -29,8 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Game.GameController;
-import com.g2.Interfaces.ServiceActionDefinition.InvalidParameterTypeException;
-import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
 
 @Service
 public class ServiceManager {
@@ -52,11 +50,14 @@ public class ServiceManager {
     // Metodo helper per registrare i servizi
     protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass,
             RestTemplate restTemplate) {
+        if (serviceClass == null){
+            throw new IllegalArgumentException("[SERVICE MANAGER] serviceClass Nullo !");
+        }
         if (serviceName == null || serviceName.trim().isEmpty()) {
             throw new IllegalArgumentException("Il nome del servizio non può essere nullo o vuoto.");
         }
         if (restTemplate == null) {
-            throw new RuntimeException("[SERVICE MANAGER] RestTemplate Nullo !");
+            throw new IllegalArgumentException("[SERVICE MANAGER] RestTemplate Nullo !");
         }
         if (!ServiceInterface.class.isAssignableFrom(serviceClass)) {
             logger.error("[SERVICE MANAGER] La Classe: " + serviceName + " deve implementare la ServiceInterface");
@@ -66,21 +67,16 @@ public class ServiceManager {
             logger.error("[SERVICE MANAGER] Il servizio: " + serviceName + " è già registrato.");
             throw new IllegalArgumentException("Il servizio: " + serviceName + " è già registrato.");
         }
-
         // Creo il servizio da registrare nel manager
         T service = createService(serviceClass, restTemplate);
         if (service != null) {
             services.put(serviceName, service);
             logger.info("[SERVICE MANAGER] Servizio registrato: " + serviceName);
-        } else {
-            logger.error("[SERVICE MANAGER] Errore nell'instanziare il servizio: " + serviceName + " è nullo");
-            throw new IllegalArgumentException("Errore nell'instanziare il servizio: " + serviceName + " è nullo");
         }
     }
 
     // Metodo per la creazione di un servizio
     protected <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
-
         try {
             T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
             logger.info("[SERVICE MANAGER] \"ServiceCreation: " + serviceClass.getSimpleName());
@@ -88,8 +84,6 @@ public class ServiceManager {
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException  e) {
             logger.error("[SERVICE MANAGER] Errore nella creazione del servizio: " + serviceClass.getName() + " Exception: " + e.getMessage());
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
-        } catch (Exception e){
-            throw new RuntimeException("Errore Generico: " + serviceClass.getName(), e);
         }
     }
 
@@ -100,20 +94,8 @@ public class ServiceManager {
             logger.error("[SERVICE MANAGER][HandleRequest] ServiceNotFound " + serviceName);
             throw new IllegalArgumentException("Servizio non trovato: " + serviceName);
         }
-        try {
-            logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
-            return service.handleRequest(action, params);
-        } catch (MissingParametersException | InvalidParameterTypeException e) {
-            logger.error("[SERVICE MANAGER][HandleRequest] Servizio: " + serviceName + " " + e.getMessage());
-            return null; // se c'è un errore nel servizio lo segnalo e poi introduco al livello
-                         // successivo una gestione del null
-        } catch (IllegalArgumentException e) {
-            logger.error("[SERVICE MANAGER][HandleRequest] Azione non riconosciuta " + e.getMessage());
-            return null;
-        } catch (RuntimeException e) {
-            logger.error("[SERVICE MANAGER][HandleRequest] ERRORE A RUNTIME" + e.getMessage());
-            return null;
-        }
+        logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
+        return service.handleRequest(action, params);
     }
 
     public <T> T handleRequest(String serviceName, String action, Class<T> responseType, Object... params) {
@@ -121,8 +103,7 @@ public class ServiceManager {
         if (responseType.isInstance(obj)) {
             return responseType.cast(obj); // Esegui il cast
         } else {
-            throw new ClassCastException(
-                    "[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a " + responseType.getName());
+            throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a " + responseType.getName());
         }
     }
 

@@ -49,29 +49,20 @@ public class T23Service extends BaseService {
     // Metodo per l'autenticazione
     private Boolean GetAuthenticated(String jwt) {
         final String endpoint = "/validateToken";
-
         // Verifica se il JWT è valido prima di fare la richiesta
         if (jwt.isEmpty()) {
             throw new IllegalArgumentException("[GETAUTHENTICATED] Errore, token nullo o vuoto");
         }
-            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-            formData.add("jwt", jwt);
-
-            // Chiamata POST utilizzando il metodo della classe base
-            Boolean isAuthenticated = callRestPost(endpoint, formData, null, Boolean.class);
-            return isAuthenticated != null && isAuthenticated;
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("jwt", jwt);
+        // Chiamata POST utilizzando il metodo della classe base
+        Boolean isAuthenticated = callRestPost(endpoint, formData, null, Boolean.class);
+        return isAuthenticated != null && isAuthenticated;
     }
 
     // Metodo per ottenere la lista degli utenti
     private List<User> GetUsers() {
         final String endpoint = "/students_list";
-        try {
-            // Chiamata GET utilizzando il metodo della classe base per ottenere una lista di utenti
-            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {
-            });
-        } catch (RuntimeException e) {
-            // Gestione degli errori durante la richiesta
-            throw new IllegalArgumentException("[GETUSERS] Errore durante il recupero degli utenti: " + e.getMessage());
-        }
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
     }
 }

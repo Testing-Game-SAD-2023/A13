@@ -94,17 +94,13 @@ public class T4Service extends BaseService {
 
 
     private String GetRisultati(String className, String robot_type, String difficulty) {
-        try {
-            Map<String, String> formData = new HashMap<>();
-            formData.put("testClassId", className);          // Nome della classe
-            formData.put("type", robot_type);               // Tipo di robot
-            formData.put("difficulty", difficulty);        // Livello di difficoltà corrente
+        Map<String, String> formData = new HashMap<>();
+        formData.put("testClassId", className);          // Nome della classe
+        formData.put("type", robot_type);               // Tipo di robot
+        formData.put("difficulty", difficulty);        // Livello di difficoltà corrente
 
-            String response = callRestGET("/robots", formData, String.class);
-            return response;
-        } catch (Exception e) {
-            return "errore GetRisultati";
-        }
+        String response = callRestGET("/robots", formData, String.class);
+        return response;
     }
 
     /**
@@ -164,16 +160,12 @@ public class T4Service extends BaseService {
         obj.put("description", description);
         obj.put("username", username);
         obj.put("startedAt", Time);
-        try {
-            //Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio parse per avere l'id
-            String respose = callRestPost(endpoint, obj, null, null,String.class);
-            // Parsing della stringa JSON
-            JSONObject jsonObject = new JSONObject(respose);
-            // Estrazione del valore di id
-            return jsonObject.getInt("id");
-        } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
-        }
+        //Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio parse per avere l'id
+        String respose = callRestPost(endpoint, obj, null, null,String.class);
+        // Parsing della stringa JSON
+        JSONObject jsonObject = new JSONObject(respose);
+        // Estrazione del valore di id
+        return jsonObject.getInt("id");
     }
 
     private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner){
@@ -183,12 +175,8 @@ public class T4Service extends BaseService {
         formData.add("username", username);
         formData.add("score", Integer.toString(Score));
         formData.add("isWinner", isWinner ? "true" : "false");
-        try {
-            String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
-        }
+        String respose = callRestPost(endpoint, formData, null, String.class);
+        return respose;
     }
 
     private int CreateRound(int game_id, String ClasseUT, String Time) {
@@ -197,28 +185,20 @@ public class T4Service extends BaseService {
         obj.put("gameId", game_id);
         obj.put("testClassId", ClasseUT);
         obj.put("startedAt", Time);
-        try {
-            String respose = callRestPost(endpoint, obj, null, null, String.class);
-            // Parsing della stringa JSON
-            JSONObject jsonObject = new JSONObject(respose);
-            // Estrazione del valore di id
-            return jsonObject.getInt("id");
-        } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateRound]: " + e.getMessage());
-        }
+        String respose = callRestPost(endpoint, obj, null, null, String.class);
+        // Parsing della stringa JSON
+        JSONObject jsonObject = new JSONObject(respose);
+        // Estrazione del valore di id
+        return jsonObject.getInt("id");
     }
 
     private String EndRound(String Time, int roundId) {
         //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);
-        try {
-            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-            formData.add("closedAt", Time);
-            String response = callRestPut(endpoint, formData, null, String.class);
-            return response;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("[EndRound]: " + e.getMessage());
-        }
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("closedAt", Time);
+        String response = callRestPut(endpoint, formData, null, String.class);
+        return response;
     }
 
     private String CreateTurn(String Player_id, int Round_id, String Time) {
@@ -229,26 +209,18 @@ public class T4Service extends BaseService {
         obj.put("players", playersArray);
         obj.put("roundId", Round_id);
         obj.put("startedAt", Time);
-        try {
-            String respose = callRestPost(endpoint, obj, null, null, String.class);
-            return respose;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateTurn]: " + e.getMessage());
-        }
+        String respose = callRestPost(endpoint, obj, null, null, String.class);
+        return respose;
     }
 
     private String EndTurn(String user_score, String Time, int turnId) {
         //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "turns/" + String.valueOf(turnId);
-        try {
-            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-            formData.add("scores", user_score);
-            formData.add("closedAt", Time);
-            String response = callRestPut(endpoint, formData, null, String.class);
-            return response;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("[EndTurn]: " + e.getMessage());
-        }
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("scores", user_score);
+        formData.add("closedAt", Time);
+        String response = callRestPut(endpoint, formData, null, String.class);
+        return response;
     }
 
     //Questa chiamata non è documentata nel materiale di caterina
@@ -259,12 +231,7 @@ public class T4Service extends BaseService {
         formData.add("scalataName", scalata_name);
         formData.add("creationTime", creation_Time);
         formData.add("creationDate", creation_date);
-
-        try {
-            String respose = callRestPost(endpoint, formData, null, String.class);
-            return respose;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("[CreateScalata]: " + e.getMessage());
-        }
+        String respose = callRestPost(endpoint, formData, null, String.class);
+        return respose;
     }
 }
