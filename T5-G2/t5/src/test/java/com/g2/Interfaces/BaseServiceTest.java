@@ -16,6 +16,7 @@
  */
 package com.g2.Interfaces;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +24,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -460,4 +461,117 @@ public class BaseServiceTest {
 
     }
 
+
+    /*
+     *  Testo il comportamento atteso di convertToString
+     */
+    @Test
+    public void testConvertToString(){
+        String fileContent = "public class Calcolatrice {}";
+        byte[] byteArray = fileContent.getBytes(StandardCharsets.UTF_8);
+        String result = baseService.convertToString(byteArray);
+        assertNotNull(result);
+        assertEquals(fileContent, result); // Verifica che il risultato sia quello atteso
+        mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
+    }
+
+
+    /*
+     *  Testo che convertToString dia eccezione se gli dò un null
+     */
+    @Test
+    public void testConvertToStringNullinput(){
+        Exception e = assertThrows(IllegalArgumentException.class, ()->{
+            baseService.convertToString(null);
+        });
+        assertEquals("L'array di byte non può essere nullo.", e.getMessage());
+    }
+
+    /*
+     *  Testo che convertToString dia eccezione se gli dò un array empty
+     */
+    @Test
+    public void testConvertToStringempthyinput(){
+        Exception e = assertThrows(IllegalArgumentException.class, ()->{
+            baseService.convertToString(new byte[0]);
+        });
+        assertEquals("L'array di byte non può essere nullo.", e.getMessage());
+    }
+
+
+    /*
+     * Test23: testConvertToStringWithMalformedInput
+     * Precondizioni: Provo a fornire un Byte Array che rappresenta un immagine piuttosto che una stringa. 
+     * Azioni: Invocare il metodo convertToString con l'array di byte.
+     * Post-condizioni: Verificare che venga sollevata un'eccezione
+     * IllegalArgumentException
+     * e che il messaggio dell'eccezione indichi un input malformato o caratteri non
+     * mappabili.
+     */
+    @Test
+    public void testConvertToStringWithMalformedInput() {
+        // Esempio di un array di byte che simula il contenuto di un file JPEG
+        // (Questi non sono byte reali di un'immagine, ma un esempio per illustrare il concetto)
+        byte[] jpegmalformedByteArray = new byte[] {
+            (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 
+            (byte) 0x00, (byte) 0x10, (byte) 0x4A, (byte) 0x46, 
+            (byte) 0x00, (byte) 0x01, (byte) 0x01, (byte) 0x01, 
+            (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+            // Altri byte dell'immagine JPEG...
+            (byte) 0xFF, (byte) 0xD9 // Marker di fine immagine
+        };
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            baseService.convertToString(jpegmalformedByteArray);
+        });
+
+        assertNotNull(exception, "Expected IllegalArgumentException to be thrown");
+        assertEquals("Erorr conversione, Il byte array contiene byte non validi per UTF-8.", exception.getMessage());
+    }
+
+       /*
+     * Test25: testRemoveBOMWithValidInput
+     * Precondizioni: Una stringa con BOM è preparata per il test.
+     * Azioni: Invocare il metodo removeBOM con la stringa contenente il BOM.
+     * Post-condizioni: Verificare che il BOM sia rimosso correttamente dalla
+     * stringa
+     * e che il risultato corrisponda alla stringa attesa senza BOM.
+     */
+    @Test
+    public void testRemoveBOMWithValidInput() {
+        String inputWithBOM = "\uFEFFHello World!";
+        String expectedOutput = "Hello World!";
+        String result = baseService.removeBOM(inputWithBOM);
+        assertNotNull(result);
+        assertEquals(expectedOutput, result);
+    }
+
+    /*
+     * Test26: testRemoveBOMWithoutBOM
+     * Precondizioni: Una stringa senza BOM è preparata per il test.
+     * Azioni: Invocare il metodo removeBOM con la stringa che non contiene BOM.
+     * Post-condizioni: Verificare che la stringa di output sia la stessa della
+     * stringa di input,
+     * poiché non c'è nulla da rimuovere.
+     */
+    @Test
+    public void testRemoveBOMWithoutBOM() {
+        String inputWithoutBOM = "Hello World!";
+        String result = baseService.removeBOM(inputWithoutBOM);
+        assertNotNull(result);
+        assertEquals(inputWithoutBOM, result);
+    }
+
+    /*
+     * Test27: testRemoveBOMWithNullInput
+     * Precondizioni: L'input è null.
+     * Azioni: Invocare il metodo removeBOM con un input null.
+     * Post-condizioni: Verificare che il risultato sia null, come ci si aspetta
+     * quando l'input è null.
+     */
+    @Test
+    public void testRemoveBOMWithNullInput() {
+        String result = baseService.removeBOM(null);
+        assertNull(result);
+    }
 }

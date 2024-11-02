@@ -17,7 +17,14 @@
 
 package com.g2.Interfaces;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +39,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -223,6 +229,9 @@ public abstract class BaseService implements ServiceInterface {
 
     // Metodo per chiamate PUT
     protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
+        if (endpoint == null || endpoint.isEmpty()) {
+            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+        }
         if (formData == null) {
             throw new IllegalArgumentException("formData non può essere nullo");
         }
@@ -259,20 +268,26 @@ public abstract class BaseService implements ServiceInterface {
         }
     }
 
-    protected String convertToString(byte[] content) {
-        if (content == null) {
-            return null;
+    protected String convertToString(byte[] content){
+        if (content == null || content.length == 0) {
+            throw new IllegalArgumentException("L'array di byte non può essere nullo.");
         }
         try {
-            // Tentiamo di convertire l'array di byte in una stringa
-            return new String(content, StandardCharsets.UTF_8);
-        } catch (IllegalArgumentException e) {
-            // Gestiamo il caso di input malformato o caratteri non mappabili
-            throw new IllegalArgumentException("Input malformato o contiene caratteri non mappabili", e);
-        } catch (Exception e) {
-            // Gestiamo qualsiasi altra eccezione che potrebbe sorgere
-            throw new RuntimeException(
-                    "Si è verificato un errore imprevisto durante la conversione dell'array di byte in stringa", e);
+            CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+            ByteBuffer byteBuffer = ByteBuffer.wrap(content);
+            StringBuilder result = new StringBuilder();
+            // Decodifica il buffer di byte
+            while (byteBuffer.hasRemaining()) {
+                // Aggiungi il carattere decodificato al risultato
+                result.append(decoder.decode(byteBuffer));
+            }
+             // Completa la decodifica
+            decoder.flush(CharBuffer.allocate(1));
+            return result.toString();
+        } catch (CharacterCodingException e) {
+           throw new RuntimeException("Erorr conversione, Il byte array contiene byte non validi per UTF-8.");
+        } catch (Exception e){
+            throw new RuntimeException("Errore imprevisto durante la conversione");
         }
     }
 

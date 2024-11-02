@@ -32,39 +32,23 @@ public class T1Service extends BaseService {
 
     public T1Service(RestTemplate restTemplate) {
         super(restTemplate, BASE_URL);
-
         // Registrazione delle azioni
         registerAction("getClasses", new ServiceActionDefinition(
                 params -> getClasses() // Metodo senza argomenti
         ));
-
         registerAction("getClassUnderTest", new ServiceActionDefinition(
                 params -> getClassUnderTest((String) params[0]),
                 String.class));
     }
 
     // Metodi effettivi
-    private List<ClassUT> getClasses() {
-        try {
-            return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {
-            });
-        } catch (Exception e) {
-            throw new IllegalArgumentException("GetClasses fallimento errore:" + e.getMessage());
-        }
+    private List<ClassUT> getClasses(){
+        return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {});
     }
 
     private String getClassUnderTest(String nomeCUT) {
-        if (nomeCUT == null) {
-            throw new IllegalArgumentException("Il nomeCUT non può essere nullo");
-        }
-
-        try {
-
-            byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
-            return removeBOM(convertToString(result));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("getClassUnderTest fallimento errore:" + e.getMessage());
-        }
+        byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
+        return removeBOM(convertToString(result));
     }
 
 }
