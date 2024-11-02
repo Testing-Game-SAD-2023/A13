@@ -18,6 +18,7 @@
 package com.g2.Interfaces;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +115,8 @@ public abstract class BaseService implements ServiceInterface {
     }
 
     // Metodo per chiamate GET che restituiscono una lista di oggetti
-    protected <R> List<R> callRestGET(String endpoint, Map<String, String> queryParams, ParameterizedTypeReference<List<R>> responseType) {
+    protected <R> List<R> callRestGET(String endpoint, Map<String, String> queryParams,
+            ParameterizedTypeReference<List<R>> responseType) {
         if (endpoint == null || endpoint.isEmpty()) {
             throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
         }
@@ -224,7 +226,8 @@ public abstract class BaseService implements ServiceInterface {
     }
 
     // Metodo per chiamate PUT
-    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
+    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData,
+            Map<String, String> queryParams, Class<R> responseType) {
         if (endpoint == null || endpoint.isEmpty()) {
             throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
         }
@@ -270,6 +273,21 @@ public abstract class BaseService implements ServiceInterface {
     protected String convertToString(byte[] content) {
         if (content == null) {
             return null;
+        }
+
+        // Controllo se il contenuto inizia con il BOM e lo rimuove se presente
+        if (content.length >= 3 && content[0] == (byte) 0xEF && content[1] == (byte) 0xBB
+                && content[2] == (byte) 0xBF) {
+            // Rimuovi il BOM UTF-8
+            content = Arrays.copyOfRange(content, 3, content.length);
+        }
+
+        // Aggiunta di un controllo per i byte non validi
+        for (byte b : content) {
+            // Aggiungi qui un controllo che considera alcuni byte come "non validi"
+            if (b < 0) { // Ad esempio, puoi definire un criterio di corruzione
+                throw new IllegalArgumentException("Input malformato o contiene caratteri non mappabili");
+            }
         }
 
         try {

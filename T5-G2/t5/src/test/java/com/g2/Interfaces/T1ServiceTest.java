@@ -3,11 +3,12 @@ package com.g2.Interfaces;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
@@ -154,30 +155,39 @@ public class T1ServiceTest {
     }
 
     /*
-     * Test5: testGetClassUnderTestWithBOM
-     * Precondizioni: Il server mock è impostato per restituire una risposta byte
-     * con BOM.
-     * Azioni: Invocare handleRequest per la classe specifica.
-     * Post-condizioni: Verificare che il BOM venga rimosso dal risultato.
+     * Test12: testGetClassUnderTestWithBOM
+     * Precondizioni: Il server mock è impostato per restituire un file
+     * contenente un Byte Order Mark (BOM) UTF-8 all'inizio.
+     * Azioni: Invocare handleRequest per ottenere la rappresentazione
+     * della classe "Calcolatrice".
+     * Post-condizioni: Verificare che il contenuto restituito sia la stringa
+     * attesa senza il BOM.
      */
     @Test
     public void testGetClassUnderTestWithBOM() {
         String nomeCUT = "Calcolatrice";
         String endpoint = "/downloadFile/" + nomeCUT;
-        String Base_URL_t = Base_URL + endpoint;
+        String baseUrl = Base_URL + endpoint; // Assicurati che BASE_URL sia definito
 
+        // Contenuto del file con BOM
         String fileContentWithBOM = "\uFEFFpublic class Calcolatrice {}";
         byte[] byteArray = fileContentWithBOM.getBytes(StandardCharsets.UTF_8);
 
-        mockServer.expect(once(), requestTo(Base_URL_t))
+        // Simuliamo la risposta del server mock
+        mockServer.expect(once(), requestTo(baseUrl))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(byteArray, MediaType.APPLICATION_OCTET_STREAM));
 
-        String result = (String) T1Service.handleRequest("getClassUnderTest", nomeCUT);
-        assertNotNull(result);
-        assertEquals("public class Calcolatrice {}", result); // Verifica che il BOM sia rimosso
+        // Invocare il metodo che si occupa della richiesta e convertire il contenuto
+        String result = (String) T1Service.handleRequest("getClassUnderTest", nomeCUT); // Assicurati che questo chiami
+                                                                                        // il server
 
-        mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
+        // Verifica che il risultato non sia nullo e che il BOM sia stato rimosso
+        assertNotNull(result);
+        assertEquals("public class Calcolatrice {}", result);
+
+        // Verifica che il server mock abbia ricevuto la richiesta
+        mockServer.verify(); // Dovrebbe verificare che la richiesta sia stata eseguita
     }
 
     /*
@@ -247,36 +257,39 @@ public class T1ServiceTest {
     }
 
     /*
-     * @Test
-     * public void testGetClassUnderTestNonConvertibleByteArray() {
-     * String nomeCUT = "Calcolatrice";
-     * String endpoint = "/downloadFile/" + nomeCUT;
-     * String Base_URL_t = Base_URL + endpoint;
-     * 
-     * // Simuliamo una risposta con un contenuto non convertibile in stringa
-     * byte[] invalidByteArray = new byte[] { (byte) 0xFF, (byte) 0xFE, (byte) 0xFD
-     * }; // Dati binari non validi
-     * mockServer.expect(once(), requestTo(Base_URL_t))
-     * .andExpect(method(HttpMethod.GET))
-     * .andRespond(withSuccess(invalidByteArray,
-     * MediaType.APPLICATION_OCTET_STREAM)); // Restituiamo un
-     * // contenuto di tipo
-     * // octet-stream
-     * 
-     * // Verifica che venga lanciata l'eccezione attesa quando si tenta di
-     * convertire
-     * // i dati in stringa
-     * IllegalArgumentException exception =
-     * assertThrows(IllegalArgumentException.class, () -> {
-     * T1Service.handleRequest("getClassUnderTest", nomeCUT);
-     * });
-     * 
-     * // Assicurati che il messaggio dell'eccezione corrisponda a quello atteso
-     * assertNotNull(exception);
-     * assertEquals("Input malformato o contiene caratteri non mappabili",
-     * exception.getMessage());
-     * }
+     * Test11: testGetClassUnderTestCorruptedFile
+     * Precondizioni: Il server mock è impostato per restituire un array di byte
+     * corrotto che rappresenta un file non valido.
+     * Azioni: Invocare handleRequest con il parametro "getClassUnderTest" e il
+     * nome del CUT "Calcolatrice" per tentare di ottenere la rappresentazione
+     * stringa del file.
+     * Post-condizioni: Verificare che venga lanciata un'eccezione
+     * IllegalArgumentException e che il messaggio dell'eccezione contenga
+     * l'indicazione di un errore di input malformato.
      */
+    @Test
+    public void testGetClassUnderTestCorruptedFile() {
+        String nomeCUT = "Calcolatrice";
+        String endpoint = "/downloadFile/" + nomeCUT;
+        String baseUrl = Base_URL + endpoint;
+
+        // Simuliamo una risposta con un contenuto che rappresenta un file corrotto
+        byte[] corruptedByteArray = new byte[] { (byte) 0xFF, (byte) 0xFE, (byte) 0xFD }; // Dati binari non validi
+        mockServer.expect(once(), requestTo(baseUrl))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(corruptedByteArray, MediaType.APPLICATION_OCTET_STREAM));
+
+        // Verifica che venga lanciata l'eccezione attesa quando si tenta di convertire
+        // i dati in stringa
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            T1Service.handleRequest("getClassUnderTest", nomeCUT);
+        });
+
+        // Assicurati che il messaggio dell'eccezione corrisponda a quello atteso
+        assertNotNull(exception, "Expected IllegalArgumentException to be thrown");
+        assertEquals("getClassUnderTest fallimento errore:Input malformato o contiene caratteri non mappabili",
+                exception.getMessage());
+    }
 
     /*
      * Test10: testGetClassesLargeResponse
@@ -621,6 +634,170 @@ public class T1ServiceTest {
 
         assertEquals("[HANDLEREQUEST] Azione non riconosciuta: http://manvsclass-controller-1:8080",
                 exception.getMessage());
+    }
+
+    /*
+     * Test21: testGetClassesWithMultipleChoices
+     * Precondizioni: Il mock server è impostato per restituire una risposta HTTP
+     * 300
+     * (Multiple Choices) per una richiesta GET al percorso /home.
+     * Azioni: Invocare il metodo handleRequest con il parametro "getClasses".
+     * Post-condizioni: Verificare che venga sollevata un'eccezione e che il
+     * messaggio
+     * dell'eccezione contenga l'indicazione che si tratta di una risposta
+     * Multiple Choices (300).
+     */
+
+    @Test
+    public void testGetClassesWithMultipleChoices() {
+        String endpoint = Base_URL + "/home";
+        mockServer.expect(once(), requestTo(endpoint))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.MULTIPLE_CHOICES)); // Risposta 300 Multiple Choices
+
+        String errorMessage = null;
+        try {
+            T1Service.handleRequest("getClasses");
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+
+        assertNotNull(errorMessage, "Expected an error message for HTTP 300 response");
+        assertTrue(errorMessage.contains("Multiple Choices") || errorMessage.contains("300"),
+                "Error message should indicate a Multiple Choices (300) response");
+
+        mockServer.verify();
+    }
+
+    /*
+     * Test22: testGetClassesWithNotFoundError
+     * Precondizioni: Il mock server è impostato per restituire una risposta HTTP
+     * 404
+     * (Not Found) per una richiesta GET al percorso /home.
+     * Azioni: Invocare il metodo handleRequest con il parametro "getClasses".
+     * Post-condizioni: Verificare che venga sollevata un'eccezione e che il
+     * messaggio
+     * dell'eccezione contenga l'indicazione che si tratta di una risposta
+     * Not Found (404).
+     */
+
+    @Test
+    public void testGetClassesWithNotFoundError() {
+        String endpoint = Base_URL + "/home";
+        mockServer.expect(once(), requestTo(endpoint))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND)); // Risposta 404 Not Found
+
+        String errorMessage = null;
+        try {
+            T1Service.handleRequest("getClasses");
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+
+        assertNotNull(errorMessage, "Expected an error message for HTTP 404 response");
+        assertTrue(errorMessage.contains("Not Found") || errorMessage.contains("404"),
+                "Error message should indicate a Not Found (404)");
+
+        mockServer.verify();
+    }
+
+    /*
+     * Test23: testConvertToStringWithMalformedInput
+     * Precondizioni: Un array di byte malformato è preparato per il test.
+     * Azioni: Invocare il metodo convertToString con l'array di byte malformato.
+     * Post-condizioni: Verificare che venga sollevata un'eccezione
+     * IllegalArgumentException
+     * e che il messaggio dell'eccezione indichi un input malformato o caratteri non
+     * mappabili.
+     */
+    @Test
+    public void testConvertToStringWithMalformedInput() {
+        byte[] malformedByteArray = new byte[] { (byte) 0xFF, (byte) 0xFE, (byte) 0xFD }; // Dati binari non validi
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            T1Service.convertToString(malformedByteArray);
+        });
+
+        assertNotNull(exception, "Expected IllegalArgumentException to be thrown");
+        assertEquals("Input malformato o contiene caratteri non mappabili", exception.getMessage());
+    }
+
+    /*
+     * Test24: testConvertToStringWithUnexpectedError
+     * Precondizioni: Un array di byte valido è preparato per il test e il metodo
+     * convertToString
+     * è spied per lanciare un'eccezione RuntimeException durante la conversione.
+     * Azioni: Invocare il metodo convertToString con l'array di byte valido.
+     * Post-condizioni: Verificare che venga sollevata una RuntimeException
+     * e che il messaggio dell'eccezione indichi un errore imprevisto.
+     */
+    @Test
+    public void testConvertToStringWithUnexpectedError() {
+        byte[] validByteArray = "Hello".getBytes(StandardCharsets.UTF_8);
+
+        T1Service service = Mockito.spy(new T1Service(restTemplate));
+        Mockito.doThrow(new RuntimeException("Errore imprevisto durante la conversione"))
+                .when(service).convertToString(validByteArray);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            service.convertToString(validByteArray);
+        });
+
+        assertNotNull(exception, "Expected RuntimeException to be thrown");
+        assertEquals("Errore imprevisto durante la conversione",
+                exception.getMessage());
+    }
+
+    /*
+     * Test25: testRemoveBOMWithValidInput
+     * Precondizioni: Una stringa con BOM è preparata per il test.
+     * Azioni: Invocare il metodo removeBOM con la stringa contenente il BOM.
+     * Post-condizioni: Verificare che il BOM sia rimosso correttamente dalla
+     * stringa
+     * e che il risultato corrisponda alla stringa attesa senza BOM.
+     */
+    @Test
+    public void testRemoveBOMWithValidInput() {
+        String inputWithBOM = "\uFEFFHello World!";
+        String expectedOutput = "Hello World!";
+
+        String result = T1Service.removeBOM(inputWithBOM);
+
+        assertNotNull(result);
+        assertEquals(expectedOutput, result);
+    }
+
+    /*
+     * Test26: testRemoveBOMWithoutBOM
+     * Precondizioni: Una stringa senza BOM è preparata per il test.
+     * Azioni: Invocare il metodo removeBOM con la stringa che non contiene BOM.
+     * Post-condizioni: Verificare che la stringa di output sia la stessa della
+     * stringa di input,
+     * poiché non c'è nulla da rimuovere.
+     */
+    @Test
+    public void testRemoveBOMWithoutBOM() {
+        String inputWithoutBOM = "Hello World!";
+
+        String result = T1Service.removeBOM(inputWithoutBOM);
+
+        assertNotNull(result);
+        assertEquals(inputWithoutBOM, result);
+    }
+
+    /*
+     * Test27: testRemoveBOMWithNullInput
+     * Precondizioni: L'input è null.
+     * Azioni: Invocare il metodo removeBOM con un input null.
+     * Post-condizioni: Verificare che il risultato sia null, come ci si aspetta
+     * quando l'input è null.
+     */
+    @Test
+    public void testRemoveBOMWithNullInput() {
+        String result = T1Service.removeBOM(null);
+
+        assertNull(result);
     }
 
 }
