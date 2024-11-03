@@ -40,12 +40,14 @@ function createApiUrl(formData, orderTurno) {
 
 // Funzione per generare il percorso del test
 function generaPercorsoTest(orderTurno, formData) {
-	const modalita = localStorage.getItem("modalita");
+	let modalita = localStorage.getItem("modalita");
 	const playerId = formData.get("playerId");
 	const gameId = formData.get("gameId");
 	const roundId = formData.get("roundId");
 	const classeLocal = formData.get("className");
 
+	modalita = (modalita === "Allenamento") ? "Sfida" : modalita;
+	
 	// Verifica la modalità e costruisce il percorso appropriato
 	if (modalita === "Scalata" || modalita === "Sfida") {
 		const scalataPart =
@@ -216,12 +218,10 @@ function toggleLoading(showSpinner, divId, buttonId) {
 		spinner.style.display = "inline-block"; // Mostra lo spinner
 		statusText.innerText = loading; // Mostra il testo "Loading..."
 		icon.style.display = "none"; // Nascondi l'icona
-		button.disabled = true;
 	} else {
 		spinner.style.display = "none"; // Nascondi lo spinner
 		statusText.innerText =  statusText.getAttribute('data-title'); // Nascondi il testo "Loading..."
 		icon.style.display = "inline-block"; // Mostra l'icona
-		button.disabled = false;
 	}
 }
 
@@ -324,6 +324,7 @@ function getFormData() {
 	formData.append("order", orderTurno);
 	formData.append("username", localStorage.getItem("username"));
 	formData.append("testClassId", className);
+	formData.append("eliminaGame", false);
 	return formData;
 }
 

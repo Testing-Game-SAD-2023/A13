@@ -72,6 +72,8 @@ public class GameController {
         //Attenzione le chiavi sono CaseSensitive
         gameRegistry.put("Sfida", (sm, playerId, underTestClassName, type_robot, difficulty, mode)
                 -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, mode));
+        gameRegistry.put("Allenamento", (sm, playerId, underTestClassName, type_robot, difficulty, mode)
+                -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, mode));
         // Aggiungi altri giochi qui
     }
 
@@ -232,62 +234,77 @@ public class GameController {
      *  quindi vuole terminare la partita ed ottenere i risultati del robot
      */
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> Runner(@RequestParam("testingClassCode") String testingClassCode,
-                                         @RequestParam("playerId") String playerId,
-                                         @RequestParam("isGameEnd") Boolean isGameEnd) {
+    public ResponseEntity<String> Runner(@RequestParam(value = "testingClassCode", required = false, defaultValue = "") String testingClassCode,
+                                        @RequestParam("playerId") String playerId,
+                                        @RequestParam("isGameEnd") Boolean isGameEnd,
+                                        @RequestParam(value = "eliminaGame", required = false, defaultValue = "false") Boolean eliminaGame) {
 
         try {
-            //retrive gioco attivo
+            // Recupero gioco attivo
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
                 logger.error("[GAMECONTROLLER] /run: errore non esiste partita");
                 return createErrorResponse("[/RUN] errore non esiste partita", "4");
             }
 
-            //Preparazione dati per i task, hanno bisogno di questi nomi in modo preciso e non li calcolano internamente
+            // Se il flag eliminaGame è true, elimina il gioco e restituisci la risposta
+            if (eliminaGame) {
+                return eliminaGame(playerId);
+            }
+
+            // Preparazione dati per i task
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
             String underTestClassName = gameLogic.getClasseUT() + ".java";
 
             logger.info("[GAMECONTROLLER] /run: {}", testingClassName);
             logger.info("[GAMECONTROLLER] /run: {}", underTestClassName);
 
-            //Calcolo dati utente
-            Map<String, String> UserData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(), underTestClassName);
-            //Calcolo punteggio robot
-            int RobotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
-            logger.info("[GAMECONTROLLER] /run: RobotScore {}", RobotScore);
+            // Calcolo dati utente
+            Map<String, String> userData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(), underTestClassName);
+            // Calcolo punteggio robot
+            int robotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
+            logger.info("[GAMECONTROLLER] /run: RobotScore {}", robotScore);
 
-            if (UserData.get("coverage") != null && !UserData.get("coverage").isEmpty()) {
-                //Non ci sono errori di compilazione
-                //aggiorno il turno
-                int LineCov = LineCoverage(UserData.get("coverage"));
-                logger.info("[GAMECONTROLLER] /run: LineCov {}", LineCov);
-                //Crea lo score per l'utente in base al gioco
-                int user_score = gameLogic.GetScore(LineCov);
-                logger.info("[GAMECONTROLLER] /run: user_score {}", user_score);
-                //Salvo i dati del turno appena giocato
-                gameLogic.playTurn(user_score, RobotScore);
+            // Gestione copertura di linea e punteggio utente
+            return gestisciPartita(userData, gameLogic, isGameEnd, robotScore, playerId);
 
-                if (isGameEnd || gameLogic.isGameEnd()) {
-                    //Qua partita finita quindi lo segnalo
-                    //gameLogic.EndRound(playerId);
-                    //gameLogic.EndGame(playerId, user_score, user_score > RobotScore);
-                    activeGames.remove(playerId);
-                    logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                    return createResponseRun(UserData, RobotScore, user_score, true);
-                } else {
-                    //Qua partita ancora in corso
-                    logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
-                    return createResponseRun(UserData, RobotScore, user_score, false);
-                }
-            } else {
-                //Ci sono errori di compilazione, invio i dati della console, ma impedisco all'utente di fare submit 
-                logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
-                return createResponseRun(UserData, 0, 0, false);
-            }
         } catch (Exception e) {
-            logger.error("[GAMECONTROLLER] /run: errore non esiste partita", e);
-            return createErrorResponse("[/RUN]" + e.getMessage(), "2");
+            logger.error("[GAMECONTROLLER] /run: errore", e);
+            return createErrorResponse("[/RUN] " + e.getMessage(), "2");
+        }
+    }
+
+    private ResponseEntity<String> eliminaGame(String playerId) {
+        activeGames.remove(playerId);
+        logger.info("[GAMECONTROLLER] /run: partita eliminata con successo");
+        return createErrorResponse("[/RUN] partita eliminata", "5");
+    }
+
+    private ResponseEntity<String> gestisciPartita(Map<String, String> userData, GameLogic gameLogic, Boolean isGameEnd, int robotScore, String playerId) {
+        if (userData.get("coverage") != null && !userData.get("coverage").isEmpty()) {
+            // Calcolo copertura e punteggio utente
+            int lineCov = LineCoverage(userData.get("coverage"));
+            logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);
+
+            int userScore = gameLogic.GetScore(lineCov);
+            logger.info("[GAMECONTROLLER] /run: user_score {}", userScore);
+
+            // Salvo i dati del turno
+            gameLogic.playTurn(userScore, robotScore);
+
+            // Controllo fine partita
+            if (isGameEnd || gameLogic.isGameEnd()) {
+                activeGames.remove(playerId);
+                logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
+                return createResponseRun(userData, robotScore, userScore, true);
+            } else {
+                logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
+                return createResponseRun(userData, robotScore, userScore, false);
+            }
+        } else {
+            // Errori di compilazione
+            logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
+            return createResponseRun(userData, 0, 0, false);
         }
     }
 
@@ -315,6 +332,7 @@ public class GameController {
      *  2 -  esiste già la partita
      *  3 -  è avvenuta un eccezione 
      *  4 -  non esiste la partita
+     *  5 -  partita eliminata
      */
     private ResponseEntity<String> createErrorResponse(String errorMessage, String errorCode) {
         JSONObject error = new JSONObject();

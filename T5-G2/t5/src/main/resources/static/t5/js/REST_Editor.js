@@ -142,7 +142,7 @@ async function handleGameAction(isGameEnd) {
         flush_localStorage();
         //La partita è finita quindi non resetto i tasti 
     }else{
-        run_button.disabled = false;
+        run_button.disabled = (localStorage.getItem("modalita") === "Allenamento");
         coverage_button.disabled = false;
     }
     isActionInProgress = false; // Imposta il flag a false al termine dell'azione

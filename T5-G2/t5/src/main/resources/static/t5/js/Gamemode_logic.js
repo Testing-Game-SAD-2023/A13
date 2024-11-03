@@ -27,13 +27,16 @@ function getParameterByName(name) {
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 // Funzione per aggiornare la modalità selezionata
-function SetMode() {
-	sanitizedMode = GetMode();
-	const elements = document.querySelectorAll(".selectedMode");
-	elements.forEach((element) => {
-		element.textContent += " " + get_mode_text(sanitizedMode);
-	});
-	localStorage.setItem("modalita", sanitizedMode);
+function SetMode(setM) {
+	if(!setM){
+		sanitizedMode = GetMode();
+		const elements = document.querySelectorAll(".selectedMode");
+		elements.forEach((element) => {
+			element.textContent += " " + get_mode_text(sanitizedMode);
+		});
+	}else{
+		localStorage.setItem("modalita", sanitizedMode);
+	}
 }
 
 function GetMode() {
@@ -104,15 +107,27 @@ function flush_localStorage() {
 	pulisciLocalStorage("robot");
 	pulisciLocalStorage("roundId");
 	pulisciLocalStorage("turnId");
+	pulisciLocalStorage("gameId");
 	pulisciLocalStorage("underTestClassName");
 	pulisciLocalStorage("username");
 	pulisciLocalStorage("storico");
 	pulisciLocalStorage("codeMirrorContent");
 }
+// Funzione per eseguire la richiesta AJAX
+async function runGameActionElimina(url, formData, isGameEnd) {
+    try {
+        formData.append("isGameEnd", isGameEnd);
+        const response = await ajaxRequest(url, "POST", formData, false, "json");
+        return response;
+    } catch (error) {
+        console.error("Errore nella richiesta AJAX:", error);
+        throw error;
+    }
+}
 // Codice da eseguire alla creazione della pagina
 document.addEventListener("DOMContentLoaded", async function () {
 	const previousGameData = await fetchPreviousGameData();
-	SetMode();
+	SetMode(false);
 	if (previousGameData !== null) {
 		//esiste già una partita su questo player id
 		console.log("modalità continua");
@@ -130,6 +145,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 		// Setto tasto continua
 		const link = document.getElementById("Continua");
 		link.setAttribute("href", "/editor?ClassUT=" + previousGameData.classeUT);
+	}else{
+		flush_localStorage();
+		SetMode(true);
 	}
 });
 
@@ -140,9 +158,16 @@ document.getElementById("new_game").addEventListener("click", function () {
 	resetGame = true;
 });
 
-document.getElementById("link_editor").addEventListener("click", function () {
+document.getElementById("link_editor").addEventListener("click", async function () {
 	const selectClassValue = document.getElementById("select_class").value;
 	if (resetGame) {
+
+		const formData = new FormData();
+		formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
+		formData.append("eliminaGame", true);
+		
+		const response = runGameActionElimina("/run", formData, true);
+
 		flush_localStorage();
 	}
 	saveToLocalStorage();
