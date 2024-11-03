@@ -29,8 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Game.GameController;
-import com.g2.Interfaces.ServiceActionDefinition.InvalidParameterTypeException;
-import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
 
 @Service
 public class ServiceManager {
@@ -40,8 +38,9 @@ public class ServiceManager {
     @Autowired
     public ServiceManager(RestTemplate restTemplate) {
         /*
-        *   Registrazione dinamica dei servizi, si occupa lui di instanziare in automatico 
-        */ 
+         * Registrazione dinamica dei servizi, si occupa lui di instanziare in
+         * automatico
+         */
         registerService("T1", T1Service.class, restTemplate);
         registerService("T23", T23Service.class, restTemplate);
         registerService("T4", T4Service.class, restTemplate);
@@ -49,21 +48,30 @@ public class ServiceManager {
     }
 
     // Metodo helper per registrare i servizi
-    protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
-        if(restTemplate == null){
-            throw new RuntimeException("[SERVICE MANAGER] RestTemplate Nullo !");
+    protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass,
+            RestTemplate restTemplate) {
+        if (serviceClass == null){
+            throw new IllegalArgumentException("[SERVICE MANAGER] serviceClass Nullo !");
+        }
+        if (serviceName == null || serviceName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Il nome del servizio non può essere nullo o vuoto.");
+        }
+        if (restTemplate == null) {
+            throw new IllegalArgumentException("[SERVICE MANAGER] RestTemplate Nullo !");
         }
         if (!ServiceInterface.class.isAssignableFrom(serviceClass)) {
-            logger.error("[SERVICE MANAGER] La Classe: " + serviceName + "deve implementare la ServiceInterface");
+            logger.error("[SERVICE MANAGER] La Classe: " + serviceName + " deve implementare la ServiceInterface");
             throw new IllegalArgumentException("La classe: " + serviceName + " deve implementare la ServiceInterface");
         }
-        //creo il servizio da registrare nel manager
+        if (services.containsKey(serviceName)) {
+            logger.error("[SERVICE MANAGER] Il servizio: " + serviceName + " è già registrato.");
+            throw new IllegalArgumentException("Il servizio: " + serviceName + " è già registrato.");
+        }
+        // Creo il servizio da registrare nel manager
         T service = createService(serviceClass, restTemplate);
         if (service != null) {
             services.put(serviceName, service);
-        } else {
-            logger.error("[SERVICE MANAGER] Errore nell'instanziare il servizio: " + serviceName + "è nullo");
-            throw new IllegalArgumentException("Errore nell'instanziare il servizio: " + serviceName + "è nullo");
+            logger.info("[SERVICE MANAGER] Servizio registrato: " + serviceName);
         }
     }
 
@@ -73,37 +81,24 @@ public class ServiceManager {
             T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
             logger.info("[SERVICE MANAGER] \"ServiceCreation: " + serviceClass.getSimpleName());
             return service;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException  e) {
             logger.error("[SERVICE MANAGER] Errore nella creazione del servizio: " + serviceClass.getName() + " Exception: " + e.getMessage());
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
-        } catch (Exception e){
-            throw new RuntimeException("Errore Generico: " + serviceClass.getName(), e);
         }
     }
 
     // Metodo per gestire le richieste
-    public Object handleRequest(String serviceName, String action, Object... params){
+    public Object handleRequest(String serviceName, String action, Object... params) {
         ServiceInterface service = services.get(serviceName);
         if (service == null) {
-            logger.error("[SERVICE MANAGER][HandleRequest] ServiceNotFound "+ serviceName);
+            logger.error("[SERVICE MANAGER][HandleRequest] ServiceNotFound " + serviceName);
             throw new IllegalArgumentException("Servizio non trovato: " + serviceName);
         }
-        try {
-            logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
-            return service.handleRequest(action, params);
-        } catch (MissingParametersException | InvalidParameterTypeException e) {
-            logger.error("[SERVICE MANAGER][HandleRequest] Servizio: " + serviceName + " " + e.getMessage());
-            return null; //se c'è un errore nel servizio lo segnalo e poi introduco al livello successivo una gestione del null
-        } catch (IllegalArgumentException e){
-            logger.error("[SERVICE MANAGER][HandleRequest] Azione non riconosciuta " + e.getMessage());
-            return null;
-        } catch (RuntimeException e){
-            logger.error("[SERVICE MANAGER][HandleRequest] ERRORE A RUNTIME" + e.getMessage());
-            return null;
-        }
+        logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
+        return service.handleRequest(action, params);
     }
 
-    public <T> T handleRequest(String serviceName, String action, Class<T> responseType, Object... params){
+    public <T> T handleRequest(String serviceName, String action, Class<T> responseType, Object... params) {
         Object obj = this.handleRequest(serviceName, action, params);
         if (responseType.isInstance(obj)) {
             return responseType.cast(obj); // Esegui il cast
@@ -112,30 +107,8 @@ public class ServiceManager {
         }
     }
 
-    protected ServiceInterface getServices(String key){
+    protected ServiceInterface getServices(String key) {
         return services.get(key);
     }
-    
-    /* 
-    public <T> List<T> handleRequest(String serviceName, String action, ParameterizedTypeReference<List<T>> responseType, Class<T> clazz, Object... params) {
-        Object obj = this.handleRequest(serviceName, action, params);
-        // Verifica se obj è un'istanza di List
-        if (obj instanceof List<?> rawList) {
-            // Crea una nuova lista per il risultato
-            List<T> resultList = new ArrayList<>();
-            // Esegui il cast per ogni elemento della lista
-            for (Object element : rawList) {
-                if (clazz.isInstance(element)) {
-                    resultList.add(clazz.cast(element));
-                } else {
-                    throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'elemento a " + clazz.getName());
-                }
-            }
-            return resultList; // Restituisci la lista
-        } else {
-            throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a List<" + responseType.getType().getTypeName() + ">");
-        }
-    }
-    */
 
 }

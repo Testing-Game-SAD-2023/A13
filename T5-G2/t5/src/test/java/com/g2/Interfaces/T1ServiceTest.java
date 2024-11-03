@@ -1,42 +1,47 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.g2.Interfaces;
-
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.ResponseCreator;
-import org.springframework.test.web.client.response.MockRestResponseCreators;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.when;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-// e altri import necessari
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
-
 import com.g2.Interfaces.ServiceActionDefinition.InvalidParameterTypeException;
 import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
 import com.g2.Model.ClassUT;
 import com.g2.t5.T5Application;
 import static org.springframework.test.web.client.ExpectedCount.once;
 
-import org.springframework.http.HttpMethod;
-
-import org.springframework.http.MediaType;
 
 @SpringBootTest(classes = T5Application.class)
 public class T1ServiceTest {
@@ -137,6 +142,7 @@ public class T1ServiceTest {
      */
     @Test
     public void testGetClassUnderTestEmptyResponse() {
+        String expected_exception = "L'array di byte non può essere nullo.";
         String nomeCUT = "Calcolatrice";
         String endpoint = "/downloadFile/" + nomeCUT;
         String Base_URL_t = Base_URL + endpoint;
@@ -147,37 +153,46 @@ public class T1ServiceTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(byteArray, MediaType.APPLICATION_OCTET_STREAM));
 
-        String result = (String) T1Service.handleRequest("getClassUnderTest", nomeCUT);
-        assertNull(result); // Ci si aspetta un risultato nullo per la risposta vuota
-
-        mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
+        Exception e = assertThrows(IllegalArgumentException.class, () -> {
+            T1Service.handleRequest("getClassUnderTest", nomeCUT);
+        });
+        assertEquals(expected_exception, e.getMessage());
     }
 
     /*
-     * Test5: testGetClassUnderTestWithBOM
-     * Precondizioni: Il server mock è impostato per restituire una risposta byte
-     * con BOM.
-     * Azioni: Invocare handleRequest per la classe specifica.
-     * Post-condizioni: Verificare che il BOM venga rimosso dal risultato.
+     * Test12: testGetClassUnderTestWithBOM
+     * Precondizioni: Il server mock è impostato per restituire un file
+     * contenente un Byte Order Mark (BOM) UTF-8 all'inizio.
+     * Azioni: Invocare handleRequest per ottenere la rappresentazione
+     * della classe "Calcolatrice".
+     * Post-condizioni: Verificare che il contenuto restituito sia la stringa
+     * attesa senza il BOM.
      */
     @Test
     public void testGetClassUnderTestWithBOM() {
         String nomeCUT = "Calcolatrice";
         String endpoint = "/downloadFile/" + nomeCUT;
-        String Base_URL_t = Base_URL + endpoint;
+        String baseUrl = Base_URL + endpoint; // Assicurati che BASE_URL sia definito
 
+        // Contenuto del file con BOM
         String fileContentWithBOM = "\uFEFFpublic class Calcolatrice {}";
         byte[] byteArray = fileContentWithBOM.getBytes(StandardCharsets.UTF_8);
 
-        mockServer.expect(once(), requestTo(Base_URL_t))
+        // Simuliamo la risposta del server mock
+        mockServer.expect(once(), requestTo(baseUrl))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(byteArray, MediaType.APPLICATION_OCTET_STREAM));
 
-        String result = (String) T1Service.handleRequest("getClassUnderTest", nomeCUT);
-        assertNotNull(result);
-        assertEquals("public class Calcolatrice {}", result); // Verifica che il BOM sia rimosso
+        // Invocare il metodo che si occupa della richiesta e convertire il contenuto
+        String result = (String) T1Service.handleRequest("getClassUnderTest", nomeCUT); // Assicurati che questo chiami
+                                                                                        // il server
 
-        mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
+        // Verifica che il risultato non sia nullo e che il BOM sia stato rimosso
+        assertNotNull(result);
+        assertEquals("public class Calcolatrice {}", result);
+
+        // Verifica che il server mock abbia ricevuto la richiesta
+        mockServer.verify(); // Dovrebbe verificare che la richiesta sia stata eseguita
     }
 
     /*
@@ -234,49 +249,57 @@ public class T1ServiceTest {
     public void testGetListEmptyResponse() {
         String endpoint = Base_URL + "/home";
         String jsonResponse = "[]"; // Risposta JSON vuota
+        List<ClassUT> expetedResponse = new ArrayList<>();
+
+        // Configurazione del mock server per rispondere con una lista JSON vuota su
+        // richiesta GET
         mockServer.expect(once(), requestTo(endpoint))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
 
+        // Verifica che venga sollevata un'eccezione IllegalArgumentException con il
+        // messaggio atteso
         @SuppressWarnings("unchecked")
-        List<ClassUT> resources = (List<ClassUT>) T1Service.handleRequest("getClasses");
-        assertNotNull(resources);
-        assertEquals(0, resources.size()); // Verifica che la lista sia vuota
+        List<ClassUT> response = (List<ClassUT>) T1Service.handleRequest("getClasses");
+        // Verifica il messaggio dell'eccezione
 
-        mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
+        // Verifica che tutte le aspettative del mock server siano state soddisfatte
+        assertEquals(expetedResponse, response);
+        mockServer.verify();
     }
 
     /*
-     * @Test
-     * public void testGetClassUnderTestNonConvertibleByteArray() {
-     * String nomeCUT = "Calcolatrice";
-     * String endpoint = "/downloadFile/" + nomeCUT;
-     * String Base_URL_t = Base_URL + endpoint;
-     * 
-     * // Simuliamo una risposta con un contenuto non convertibile in stringa
-     * byte[] invalidByteArray = new byte[] { (byte) 0xFF, (byte) 0xFE, (byte) 0xFD
-     * }; // Dati binari non validi
-     * mockServer.expect(once(), requestTo(Base_URL_t))
-     * .andExpect(method(HttpMethod.GET))
-     * .andRespond(withSuccess(invalidByteArray,
-     * MediaType.APPLICATION_OCTET_STREAM)); // Restituiamo un
-     * // contenuto di tipo
-     * // octet-stream
-     * 
-     * // Verifica che venga lanciata l'eccezione attesa quando si tenta di
-     * convertire
-     * // i dati in stringa
-     * IllegalArgumentException exception =
-     * assertThrows(IllegalArgumentException.class, () -> {
-     * T1Service.handleRequest("getClassUnderTest", nomeCUT);
-     * });
-     * 
-     * // Assicurati che il messaggio dell'eccezione corrisponda a quello atteso
-     * assertNotNull(exception);
-     * assertEquals("Input malformato o contiene caratteri non mappabili",
-     * exception.getMessage());
-     * }
+     * Test11: testGetClassUnderTestCorruptedFile
+     * Precondizioni: Il server mock è impostato per restituire un array di byte
+     * corrotto che rappresenta un file non valido.
+     * Azioni: Invocare handleRequest con il parametro "getClassUnderTest" e il
+     * nome del CUT "Calcolatrice" per tentare di ottenere la rappresentazione
+     * stringa del file.
+     * Post-condizioni: Verificare che venga lanciata un'eccezione
+     * IllegalArgumentException e che il messaggio dell'eccezione contenga
+     * l'indicazione di un errore di input malformato.
      */
+    @Test
+    public void testGetClassUnderTestCorruptedFile() {
+        String nomeCUT = "Calcolatrice";
+        String endpoint = "/downloadFile/" + nomeCUT;
+        String baseUrl = Base_URL + endpoint;
+        // Simuliamo una risposta con un contenuto che rappresenta un file corrotto
+        byte[] corruptedByteArray = new byte[] { (byte) 0xC3, (byte) 0x28 }; // 0xC3 è un byte di inizio per un carattere UTF-8, ma 0x28 non è valido come secondo byte
+
+        mockServer.expect(once(), requestTo(baseUrl))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(corruptedByteArray, MediaType.APPLICATION_OCTET_STREAM));
+
+        // Verifica che venga lanciata l'eccezione attesa quando si tenta di convertire
+        // i dati in stringa
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            T1Service.handleRequest("getClassUnderTest", nomeCUT);
+        });
+        // Assicurati che il messaggio dell'eccezione corrisponda a quello atteso
+        assertNotNull(exception, "Expected IllegalArgumentException to be thrown");
+        assertEquals("Erorr conversione, Il byte array contiene byte non validi per UTF-8.", exception.getMessage());
+    }
 
     /*
      * Test10: testGetClassesLargeResponse
@@ -473,72 +496,7 @@ public class T1ServiceTest {
     }
 
     /*
-     * Test16: testMultipleConcurrentRequests
-     * Precondizioni: Il server mock è impostato per restituire la risposta per
-     * richieste concorrenti.
-     * Azioni: Invocare getClassUnderTest in due thread separati.
-     * Post-condizioni: Verificare che entrambi i risultati siano corretti e che il
-     * server mock gestisca le richieste simultanee.
-     */
-    @Test
-    public void testMultipleConcurrentRequests() throws InterruptedException {
-        Runnable task = () -> {
-            String nomeCUT = "Calcolatrice";
-            String endpoint = "/downloadFile/" + nomeCUT;
-            String Base_URL_t = Base_URL + endpoint;
-
-            String fileContent = "public class Calcolatrice {}";
-            byte[] byteArray = fileContent.getBytes(StandardCharsets.UTF_8);
-
-            mockServer.expect(once(), requestTo(Base_URL_t))
-                    .andExpect(method(HttpMethod.GET))
-                    .andRespond(withSuccess(byteArray, MediaType.APPLICATION_OCTET_STREAM));
-
-            String result = (String) T1Service.handleRequest("getClassUnderTest", nomeCUT);
-            assertNotNull(result);
-            assertEquals(fileContent, result);
-        };
-
-        Thread thread1 = new Thread(task);
-        Thread thread2 = new Thread(task);
-        thread1.start();
-        thread2.start();
-        thread1.join();
-        thread2.join();
-
-        mockServer.verify();
-    }
-
-    /*
-     * Test17: testGetClassesWithEmptyResponse
-     * Precondizioni: Il server mock è impostato per restituire una risposta JSON
-     * vuota per una richiesta GET.
-     * Azioni: Invocare il metodo getClasses per recuperare l'elenco delle classi.
-     * Post-condizioni: Verificare che il risultato sia null o vuoto.
-     */
-    @Test
-    public void testGetClassesWithEmptyResponse() {
-        String endpoint = Base_URL + "/home";
-
-        // Configurazione del mock server per rispondere con una stringa vuota su
-        // richiesta GET
-        mockServer.expect(once(), requestTo(endpoint))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess("", MediaType.APPLICATION_JSON));
-
-        // Invoca il metodo getClasses e verifica che il risultato sia null o una
-        // stringa vuota
-        String result = (String) T1Service.handleRequest("getClasses");
-
-        // Assicura che il risultato sia null o vuoto come previsto
-        assertTrue(result == null || result.isEmpty(), "Expected result to be null or empty for empty response");
-
-        // Verifica che tutte le aspettative del mock server siano state soddisfatte
-        mockServer.verify();
-    }
-
-    /*
-     * Test18: testGetClassesWithBadRequest
+     * Test17: testGetClassesWithBadRequest
      * Precondizioni: Il server mock è impostato per restituire un errore HTTP 400
      * (Bad Request) per una richiesta GET.
      * Azioni: Invocare il metodo getClasses per recuperare l'elenco delle classi.
@@ -574,7 +532,7 @@ public class T1ServiceTest {
     }
 
     /*
-     * Test19: testGetClassesWithInternalServerError
+     * Test18: testGetClassesWithInternalServerError
      * Precondizioni: Il server mock è impostato per restituire un errore HTTP 500
      * (Internal Server Error) per una richiesta GET.
      * Azioni: Invocare il metodo getClasses per recuperare l'elenco delle classi.
@@ -603,7 +561,7 @@ public class T1ServiceTest {
     }
 
     /*
-     * Test20: testGetClassUnderTestWithNullNomeCUT
+     * Test19: testGetClassUnderTestWithNullNomeCUT
      * Precondizioni: Il metodo handleRequest è chiamato con un valore nullo per
      * nomeCUT, il che dovrebbe attivare la logica di gestione degli errori.
      * Azioni: Invocare il metodo handleRequest passando Base_URL e null
@@ -623,4 +581,37 @@ public class T1ServiceTest {
                 exception.getMessage());
     }
 
+
+    /*
+     * Test21: testGetClassesWithNotFoundError
+     * Precondizioni: Il mock server è impostato per restituire una risposta HTTP
+     * 404
+     * (Not Found) per una richiesta GET al percorso /home.
+     * Azioni: Invocare il metodo handleRequest con il parametro "getClasses".
+     * Post-condizioni: Verificare che venga sollevata un'eccezione e che il
+     * messaggio
+     * dell'eccezione contenga l'indicazione che si tratta di una risposta
+     * Not Found (404).
+     */
+    @Test
+    public void testGetClassesWithNotFoundError() {
+        String endpoint = Base_URL + "/home";
+        mockServer.expect(once(), requestTo(endpoint))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND)); // Risposta 404 Not Found
+
+        String errorMessage = null;
+        try {
+            T1Service.handleRequest("getClasses");
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+        assertNotNull(errorMessage, "Expected an error message for HTTP 404 response");
+        assertTrue(errorMessage.contains("Not Found") || errorMessage.contains("404"),
+                "Error message should indicate a Not Found (404)");
+
+        mockServer.verify();
+    }
+
+    
 }

@@ -45,6 +45,10 @@ public class BaseServiceImpl extends BaseService {
         ));
         registerAction("testGetWithoutEndpoint", new ServiceActionDefinition(
             params -> testGetWithoutEndpoint()
+        )); 
+        registerAction("testGetSetEndpoint", new ServiceActionDefinition(
+            params -> testGetSetEndpoint((String) params[0]), 
+            String.class
         ));
         registerAction("TestGetParams", new ServiceActionDefinition(
             params -> TestGetParams((String) params[0]),
@@ -77,6 +81,14 @@ public class BaseServiceImpl extends BaseService {
         )); 
     }
 
+
+    /*
+    * Rendo publico buildURI così è più semplice testarlo 
+    */
+    public String buildUri_test(String endpoint, Map<String, String> queryParams){
+        return buildUri(endpoint, queryParams);
+    }
+
     /**
      * Metodo per eseguire una chiamata GET senza parametri.
      * @return La risposta della chiamata GET come stringa
@@ -107,6 +119,11 @@ public class BaseServiceImpl extends BaseService {
         return response;
     }
 
+    private String testGetSetEndpoint(String endpoint){
+        String response = callRestGET(endpoint, null, String.class);
+        return response;
+    }
+
     public List<String> testGetList() {
             String endpoint = "/resources";
             // Chiamata GET per ottenere la lista di risorse
@@ -128,7 +145,7 @@ public class BaseServiceImpl extends BaseService {
             // Endpoint per la chiamata POST
             String endpoint = "/example-post-endpoint";
             // Chiamata POST con il corpo JSON
-            String response = callRestPost(endpoint, formData, null, null, String.class);
+            String response = callRestPost(endpoint, formData, null, String.class);
             return response;
     }
 
