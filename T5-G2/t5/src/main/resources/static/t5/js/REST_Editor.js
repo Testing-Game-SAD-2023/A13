@@ -111,6 +111,9 @@ async function handleGameAction(isGameEnd) {
 		//Errore di compilazione
         setStatus("error");
         console_robot.setValue(getConsoleTextError());
+        toggleLoading(false, isGameEnd ? "loading_run" : "loading_cov", isGameEnd ? "runButton" : "coverageButton");
+        run_button.disabled = (localStorage.getItem("modalita") === "Allenamento");
+        coverage_button.disabled = false;
         isActionInProgress = false; // Imposta il flag a false in caso di errore
         return;
     }

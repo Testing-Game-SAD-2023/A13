@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,11 +137,25 @@ class T23ServiceTest {
         @SuppressWarnings("unchecked")
         List<User> result = (List<User>) T23Service.handleRequest("GetUsers");
 
-        // Verifica che il risultato corrisponda ai dati mock
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("John", result.get(0).getName());
-        assertEquals("Jane", result.get(1).getName());
+         // Verifica dei campi del primo utente
+         User user1 = result.get(0);
+         assertEquals(1L, user1.getId());
+         assertEquals("John", user1.getName());
+         assertEquals("Doe", user1.getSurname());
+         assertEquals("john.doe@example.com", user1.getEmail());
+         assertEquals("password123", user1.getPassword());
+         assertEquals(false, user1.isRegisteredWithFacebook());
+         assertEquals("Computer Science", user1.getStudies());
+  
+         // Verifica dei campi del secondo utente
+         User user2 = result.get(1);
+         assertEquals(2L, user2.getId());
+         assertEquals("Jane", user2.getName());
+         assertEquals("Smith", user2.getSurname());
+         assertEquals("jane.smith@example.com", user2.getEmail());
+         assertEquals("password456", user2.getPassword());
+         assertEquals(true, user2.isRegisteredWithFacebook());
+         assertEquals("Mathematics", user2.getStudies());
     }
 
     /*
