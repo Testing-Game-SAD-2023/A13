@@ -48,56 +48,48 @@ public class T4Service extends BaseService {
                 // parametro di tipo String
                 params -> getLevels((String) params[0]),
                 // L'azione è definita per accettare un parametro di tipo String
-                String.class
-        ));
+                String.class));
 
         registerAction("CreateGame", new ServiceActionDefinition(
-                params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3], (String) params[4]),
-                String.class, String.class, String.class, String.class, String.class
-        ));
+                params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3],
+                        (String) params[4]),
+                String.class, String.class, String.class, String.class, String.class));
 
         registerAction("EndGame", new ServiceActionDefinition(
-            params -> EndGame((int) params[0], (String) params[1], (String) params[2], (int) params[3], (Boolean) params[4]),
-            Integer.class, String.class, String.class, int.class, Boolean.class
-        ));
+                params -> EndGame((int) params[0], (String) params[1], (String) params[2], (int) params[3],
+                        (Boolean) params[4]),
+                Integer.class, String.class, String.class, int.class, Boolean.class));
 
         registerAction("CreateRound", new ServiceActionDefinition(
                 params -> CreateRound((int) params[0], (String) params[1], (String) params[2]),
-                Integer.class, String.class, String.class
-        ));
+                Integer.class, String.class, String.class));
 
         registerAction("EndRound", new ServiceActionDefinition(
                 params -> EndRound((String) params[0], (int) params[1]),
-                String.class, Integer.class
-        ));
+                String.class, Integer.class));
 
         registerAction("CreateTurn", new ServiceActionDefinition(
                 params -> CreateTurn((String) params[0], (int) params[1], (String) params[2]),
-                String.class, Integer.class, String.class
-        ));
+                String.class, Integer.class, String.class));
 
         registerAction("EndTurn", new ServiceActionDefinition(
                 params -> EndTurn((String) params[0], (String) params[1], (int) params[2]),
-                String.class, String.class, Integer.class
-        ));
+                String.class, String.class, Integer.class));
 
         registerAction("CreateScalata", new ServiceActionDefinition(
                 params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]),
-                String.class, String.class, String.class, String.class
-        ));
+                String.class, String.class, String.class, String.class));
 
         registerAction("GetRisultati", new ServiceActionDefinition(
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
-                String.class, String.class, String.class
-        ));
+                String.class, String.class, String.class));
     }
-
 
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
-        formData.put("testClassId", className);          // Nome della classe
-        formData.put("type", robot_type);               // Tipo di robot
-        formData.put("difficulty", difficulty);        // Livello di difficoltà corrente
+        formData.put("testClassId", className); // Nome della classe
+        formData.put("type", robot_type); // Tipo di robot
+        formData.put("difficulty", difficulty); // Livello di difficoltà corrente
 
         String response = callRestGET("/robots", formData, String.class);
         return response;
@@ -160,15 +152,16 @@ public class T4Service extends BaseService {
         obj.put("description", description);
         obj.put("username", username);
         obj.put("startedAt", Time);
-        //Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio parse per avere l'id
-        String respose = callRestPost(endpoint, obj, null, null,String.class);
+        // Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio
+        // parse per avere l'id
+        String respose = callRestPost(endpoint, obj, null, null, String.class);
         // Parsing della stringa JSON
         JSONObject jsonObject = new JSONObject(respose);
         // Estrazione del valore di id
         return jsonObject.getInt("id");
     }
 
-    private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner){
+    private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner) {
         final String endpoint = "/games/" + String.valueOf(gameid);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("closedAt", closedAt);
@@ -193,7 +186,8 @@ public class T4Service extends BaseService {
     }
 
     private String EndRound(String Time, int roundId) {
-        //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
+        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
+        // costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("closedAt", Time);
@@ -214,7 +208,8 @@ public class T4Service extends BaseService {
     }
 
     private String EndTurn(String user_score, String Time, int turnId) {
-        //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
+        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
+        // costruito a mano
         final String endpoint = "turns/" + String.valueOf(turnId);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("scores", user_score);
@@ -223,7 +218,7 @@ public class T4Service extends BaseService {
         return response;
     }
 
-    //Questa chiamata non è documentata nel materiale di caterina
+    // Questa chiamata non è documentata nel materiale di caterina
     private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date) {
         final String endpoint = "/turns";
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();

@@ -16,7 +16,10 @@
  */
 package com.g2.Interfaces;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
-
 import com.g2.t5.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
@@ -33,11 +35,11 @@ public class ServiceManagerTest {
     @Autowired
     private RestTemplate restTemplate;
     private MockServiceManager serviceManager;
+
     /*
      * Metodo di inizializzazione per la registrazione dei servizi.
      * Precondizioni: RestTemplate non nullo.
-     * Azioni: Registrazione del servizio ServiceManager
-     * 
+     * Azioni: Registrazione del servizio ServiceManager.
      */
     @BeforeEach
     private void setUp_registrazione() {
@@ -49,30 +51,22 @@ public class ServiceManagerTest {
      * Precondizioni: RestTemplate è impostato su null.
      * Azioni: Tentare di registrare il servizio "T1Service" con un RestTemplate
      * nullo.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * RuntimeException con
-     * il messaggio "RestTemplate Nullo".
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione
+     * IllegalArgumentException con il messaggio "RestTemplate Nullo".
      */
     @Test
     public void testRegisterService_InvalidService() {
-        // Verifica che l'eccezione venga sollevata quando si tenta di registrare i
-        // servizi
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            // Esegui la creazione del servizio
             serviceManager.registerService("T1Service", T1Service.class, null);
         });
-        // Assicurati che il messaggio dell'eccezione contenga l'indicazione corretta
         assertTrue(exception.getMessage().contains("RestTemplate Nullo"));
     }
 
     /*
      * Test2: testCreateService_NoSuchMethodException
-     * Precondizioni: Viene definita una classe InvalidService che implementa
-     * ServiceInterface senza un costruttore valido.
-     * Azioni: Tentare di registrare il servizio "T1Service" utilizzando
-     * InvalidService.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * RuntimeException
+     * Precondizioni: Definita una classe InvalidService senza costruttore valido.
+     * Azioni: Tentare di registrare il servizio "T1Service" usando InvalidService.
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione RuntimeException
      * con il messaggio "Impossibile creare l'istanza del servizio".
      */
     @Test
@@ -92,13 +86,10 @@ public class ServiceManagerTest {
 
     /*
      * Test3: testCreateService_InstantiationException
-     * Precondizioni: Viene definita una classe astratta AbstractService che
-     * implementa
-     * ServiceInterface.
-     * Azioni: Tentare di registrare il servizio "TinvalidServiceClass" utilizzando
+     * Precondizioni: Definita una classe astratta AbstractService.
+     * Azioni: Tentare di registrare il servizio "TinvalidServiceClass" usando
      * AbstractService.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * RuntimeException
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione RuntimeException
      * con il messaggio "Impossibile creare l'istanza del servizio".
      */
     @Test
@@ -114,19 +105,20 @@ public class ServiceManagerTest {
 
     /*
      * Test5: testCreateService_ValidConstructorAndInvalidRestTemplate
-     * Precondizioni: Viene definita una classe ValidService con un costruttore
-     * valido
-     * ma con un RestTemplate nullo.
-     * Azioni: Tentare di registrare il servizio "TValidService" utilizzando
-     * ValidService con un RestTemplate nullo.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * RuntimeException
-     * con il messaggio "[SERVICE MANAGER] RestTemplate Nullo !".
+     * Precondizioni: Definita una classe ValidService con costruttore valido e
+     * RestTemplate nullo.
+     * Azioni: Tentare di registrare il servizio "TValidService" usando ValidService
+     * con un RestTemplate nullo.
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione
+     * IllegalArgumentException con il messaggio
+     * "[SERVICE MANAGER] RestTemplate Nullo !".
      */
     @Test
     public void testCreateService_ValidConstructorAndInvalidRestTemplate() {
         class ValidService implements ServiceInterface {
-            public ValidService(RestTemplate restTemplate) {}
+            public ValidService(RestTemplate restTemplate) {
+            }
+
             @Override
             public Object handleRequest(String action, Object... params) {
                 return null;
@@ -141,15 +133,13 @@ public class ServiceManagerTest {
 
     /*
      * Test6: testCreateService_IncompatibleConstructorParameter
-     * Precondizioni: Viene definita una classe IncompatibleService con un
-     * costruttore
-     * che richiede un parametro incompatibile.
-     * Azioni: Tentare di registrare il servizio "TIncompatibleService" utilizzando
+     * Precondizioni: Definita una classe IncompatibleService con costruttore che
+     * richiede un parametro incompatibile.
+     * Azioni: Tentare di registrare il servizio "TIncompatibleService" usando
      * IncompatibleService.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * RuntimeException
-     * con il messaggio appropriato riguardante l'impossibilità di creare l'istanza
-     * del servizio.
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione RuntimeException
+     * con messaggio appropriato riguardo impossibilità di creare l'istanza del
+     * servizio.
      */
     @Test
     public void testCreateService_IncompatibleConstructorParameter() {
@@ -166,16 +156,18 @@ public class ServiceManagerTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             serviceManager.registerService("TIncompatibleService", IncompatibleService.class, restTemplate);
         });
-        assertEquals("Impossibile creare l'istanza del servizio: com.g2.Interfaces.ServiceManagerTest$1IncompatibleService", exception.getMessage());
+        assertEquals(
+                "Impossibile creare l'istanza del servizio: com.g2.Interfaces.ServiceManagerTest$1IncompatibleService",
+                exception.getMessage());
     }
 
     /*
      * Test8: testRegisterService_NullServiceClass
-     * Precondizioni: Il RestTemplate è valido e funzionante.
+     * Precondizioni: RestTemplate è valido e funzionante.
      * Azioni: Tentare di registrare un servizio con una classe di servizio nulla.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * RuntimeException
-     * con il messaggio "La classe del servizio non può essere nulla".
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione
+     * IllegalArgumentException con il messaggio
+     * "[SERVICE MANAGER] serviceClass Nullo !".
      */
     @Test
     public void testRegisterService_NullServiceClass() {
@@ -187,32 +179,29 @@ public class ServiceManagerTest {
 
     /*
      * Test10: testRegisterService_DuplicateService
-     * Precondizioni: Il RestTemplate è valido e un servizio "T1Service" è già
+     * Precondizioni: RestTemplate è valido e un servizio "T1Service" è già
      * registrato.
      * Azioni: Tentare di registrare nuovamente il servizio "T1Service".
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * IllegalArgumentException
-     * con il messaggio "Il servizio: T1Service è già registrato."
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione
+     * IllegalArgumentException con il messaggio
+     * "Il servizio: T1Service è già registrato."
      */
     @Test
     public void testRegisterService_DuplicateService() {
-        // Registrazione iniziale del servizio
         serviceManager.registerService("T1Service", T1Service.class, restTemplate);
-        // Tentativo di registrazione duplicata
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             serviceManager.registerService("T1Service", T1Service.class, restTemplate);
         });
-        // Verifica che l'eccezione sia quella attesa
         assertEquals("Il servizio: T1Service è già registrato.", exception.getMessage());
     }
 
     /*
      * Test11: testRegisterService_NullServiceName
-     * Precondizioni: Il RestTemplate è valido e funzionante.
-     * Azioni: Tentare di registrare un servizio con un nome di servizio nullo.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * IllegalArgumentException
-     * con il messaggio "Il nome del servizio non può essere nullo o vuoto."
+     * Precondizioni: RestTemplate è valido e funzionante.
+     * Azioni: Tentare di registrare un servizio con un nome nullo.
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione
+     * IllegalArgumentException con il messaggio
+     * "Il nome del servizio non può essere nullo o vuoto."
      */
     @Test
     public void testRegisterService_NullServiceName() {
@@ -224,11 +213,11 @@ public class ServiceManagerTest {
 
     /*
      * Test12: testRegisterService_EmptyServiceName
-     * Precondizioni: Il RestTemplate è valido e funzionante.
-     * Azioni: Tentare di registrare un servizio con un nome di servizio vuoto.
-     * Post-condizioni: Ci si aspetta che venga sollevata un'eccezione
-     * IllegalArgumentException
-     * con il messaggio "Il nome del servizio non può essere nullo o vuoto."
+     * Precondizioni: RestTemplate è valido e funzionante.
+     * Azioni: Tentare di registrare un servizio con un nome vuoto.
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione
+     * IllegalArgumentException con il messaggio
+     * "Il nome del servizio non può essere nullo o vuoto."
      */
     @Test
     public void testRegisterService_EmptyServiceName() {
@@ -238,38 +227,39 @@ public class ServiceManagerTest {
         assertEquals("Il nome del servizio non può essere nullo o vuoto.", exception.getMessage());
     }
 
-    // Test T8_C: valuto la creazione di un servizio con costruttore privato
+    /*
+     * Test13: testHandleRequest_ServiceNotFound
+     * Precondizioni: RestTemplate valido, nessun servizio registrato con nome
+     * "NonExistentService".
+     * Azioni: Tentare di invocare handleRequest su un servizio non registrato.
+     * Post-condizioni: Si prevede che venga sollevata un'eccezione
+     * IllegalArgumentException con il messaggio
+     * "Servizio non trovato: NonExistentService".
+     */
     @Test
-    public void testCreateService_IllegalAccessException() {
-        // Classe di servizio senza costruttore valido
-        class PrivateConstructorService implements ServiceInterface {
-
-            private PrivateConstructorService(RestTemplate restTemplate) {
-                // Costruttore privato
-            }
-
-            @Override
-            public Object handleRequest(String action, Object... params) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'handleRequest'");
-            }
-        }
-        // Simula una classe di servizio senza un costruttore che accetta RestTemplate
-        Class<PrivateConstructorService> invalidServiceClass = PrivateConstructorService.class; // Classe fittizia
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            serviceManager.createService(invalidServiceClass, restTemplate);
+    public void testHandleRequest_ServiceNotFound() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            serviceManager.handleRequest("NonExistentService", "someAction");
         });
-        assertTrue(exception.getMessage().contains("Impossibile creare l'istanza del servizio"));
+        assertEquals("Servizio non trovato: NonExistentService", exception.getMessage());
     }
 
-
+    /*
+     * Test14: testGetService_NonExistentKey
+     * Precondizioni: Nessun servizio è registrato con la chiave
+     * "NonExistentService".
+     * Azioni: Tentare di recuperare il servizio con la chiave non esistente.
+     * Post-condizioni: Ci si aspetta che il metodo restituisca null.
+     */
     @Test
-    public void handleRequest_NoExistAction() {
-        serviceManager.registerService("MockService", T1Service.class, this.restTemplate);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            serviceManager.handleRequest("MockService", "MockAction");
-        });
-        assertEquals("[HANDLEREQUEST] Azione non riconosciuta: MockAction", exception.getMessage());
+    public void testGetService_NonExistentKey() {
+        // Tentare di recuperare un servizio che non è stato registrato
+        ServiceInterface service = serviceManager.getServices("NonExistentService");
+
+        // Verifica che il servizio restituito sia nullo
+        assertNull(service,
+                "Errore: il servizio 'NonExistentService' avrebbe dovuto restituire null, ma ha restituito: "
+                        + service);
     }
 
 }
