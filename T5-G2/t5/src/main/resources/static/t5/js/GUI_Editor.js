@@ -203,7 +203,7 @@ function handleThemeToggle() {
     const editors = [editor_utente, console_utente, editor_robot, console_robot];
 
     // Definisci i temi come variabili
-    const lightTheme = "eclipse";      // Tema chiaro
+    const lightTheme = "mdn-like";      // Tema chiaro
     const darkTheme = "material-darker"; // Tema scuro
 
     // Funzione per applicare il tema e gestire l'opacità

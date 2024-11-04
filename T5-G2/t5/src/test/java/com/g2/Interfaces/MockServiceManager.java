@@ -32,15 +32,12 @@ public class MockServiceManager extends ServiceManager {
     @Override
     public <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass,
             RestTemplate restTemplate) {
-
         super.registerService(serviceName, serviceClass, restTemplate); // Esposto come pubblico solo per i test
     }
 
     @Override
     public <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
-
         return super.createService(serviceClass, restTemplate);
-
     }
 
     public boolean hasService(String key) {

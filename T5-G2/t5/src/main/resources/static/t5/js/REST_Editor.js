@@ -18,7 +18,6 @@
 /*
 * 		Qui ci sono le chiamate REST dell'editor 
 */
-
 // Funzione per ottenere i dati dal localStorage
 function getGameData() {
     let underTestClassName = localStorage.getItem("underTestClassName");
@@ -53,6 +52,7 @@ async function runGameAction(url, formData, isGameEnd) {
         throw error;
     }
 }
+
 // Documento pronto
 $(document).ready(function () {
     const data = getGameData();
@@ -84,81 +84,124 @@ $(document).ready(function () {
     }
 });
 
-let isActionInProgress = false; // Flag per indicare se un'azione è in corso
 
-// Gestione del click del pulsante
+let isActionInProgress = false; // Flag per indicare se un'azione è attualmente in corso
+
+// Funzione principale per gestire l'azione del gioco
 async function handleGameAction(isGameEnd) {
+    isActionInProgress = true; // Imposta il flag per bloccare altre azioni
+    run_button.disabled = true; // Disabilita il pulsante di esecuzione
+    coverage_button.disabled = true; // Disabilita il pulsante di coverage
 
-    isActionInProgress = true; // Imposta il flag a true
+    // Determina le chiavi per il caricamento e il pulsante in base a isGameEnd
+    const loadingKey = isGameEnd ? "loading_run" : "loading_cov";
+    const buttonKey = isGameEnd ? "runButton" : "coverageButton";
 
-    //disabilito i tasti durante l'azione 
-    run_button.disabled = true;
-    coverage_button.disabled = true;
-    
-    toggleLoading(true, isGameEnd ? "loading_run" : "loading_cov", isGameEnd ? "runButton" : "coverageButton");
-    setStatus("sending");
-	//pulisco console utente prima di eseguire
-    const formData = getFormData();
-    const response = await runGameAction("/run", formData, isGameEnd);
-    setStatus("compiling");
-    const { robotScore, userScore, outCompile, coverage, GameOver, gameId, roundId } = response;
-    // Aggiornamento dei dati del form
+    toggleLoading(true, loadingKey, buttonKey); // Mostra l'indicatore di caricamento
+    setStatus("sending"); // Aggiorna lo stato a "sending"
+
+    const formData = getFormData(); // Recupera i dati del modulo
+    const response = await runGameAction("/run", formData, isGameEnd); // Esegue l'azione del gioco
+    setStatus("compiling"); // Aggiorna lo stato a "compiling"
+
+    handleResponse(response, formData, isGameEnd, loadingKey, buttonKey); // Gestisce la risposta ricevuta
+
+    isActionInProgress = false; // Reimposta il flag al termine dell'azione
+}
+
+// Gestisce la risposta dal server
+function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
+    const { robotScore, userScore, outCompile, coverage, gameId, roundId } = response;
+
+    // Aggiorna i dati del modulo con gameId e roundId
     formData.append("gameId", gameId);
     formData.append("roundId", roundId);
-    console_utente.setValue(outCompile);
-    parseMavenOutput(outCompile);
-    if (!coverage) {
-		//Errore di compilazione
+
+    console_utente.setValue(outCompile); // Mostra l'output della compilazione nella console utente
+    parseMavenOutput(outCompile); // Analizza l'output di Maven
+
+    if (!coverage) { // Se non c'è copertura, gestisce l'errore di compilazione
         setStatus("error");
-        console_robot.setValue(getConsoleTextError());
-        toggleLoading(false, isGameEnd ? "loading_run" : "loading_cov", isGameEnd ? "runButton" : "coverageButton");
-        run_button.disabled = (localStorage.getItem("modalita") === "Allenamento");
-        coverage_button.disabled = false;
-        isActionInProgress = false; // Imposta il flag a false in caso di errore
+        handleCompileError(loadingKey, buttonKey); // Gestisce l'errore
         return;
     }
-    highlightCodeCoverage($.parseXML(coverage), editor_robot);
-    orderTurno++;
-    const url = createApiUrl(formData, orderTurno);
-    setStatus("loading");
-	// Chiamo T8 per recuperare il report di coverage
-    const csvContent = await ajaxRequest(url, "POST", formData.get("testingClassCode"), false, "text");
-    const valori_csv = extractThirdColumn(csvContent);
-    
-	// Aggiorno lo storico della partita 
-    updateStorico(orderTurno, userScore, valori_csv[0]);
 
-    setStatus(isGameEnd ? "game_end" : "turn_end");
-	toggleLoading(false, isGameEnd ? "loading_run" : "loading_cov", isGameEnd ? "runButton" : "coverageButton");
-	// Determina il valore di displayUserPoints in base a isGameEnd
-	const displayUserPoints = isGameEnd 
-	? getConsoleTextRun(valori_csv, 0, robotScore, userScore) 
-	: getConsoleTextCoverage(valori_csv, userScore);
-	// Imposta il valore nel console_robot
-	console_robot.setValue(displayUserPoints);
-    if (isGameEnd) {
-        openModalWithText(
-            status_game_end ,
-            `${score_partita_text} ${userScore} pt.`,
-            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }]
-        );
-        flush_localStorage();
-        //La partita è finita quindi non resetto i tasti 
-    }else{
-        run_button.disabled = (localStorage.getItem("modalita") === "Allenamento");
-        coverage_button.disabled = false;
+    // Se la copertura è disponibile, la processa
+    processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey);
+}
+
+// Processa la copertura del codice e aggiorna i dati di gioco
+async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey) {
+    highlightCodeCoverage($.parseXML(coverage), editor_robot); // Evidenzia la copertura del codice nell'editor
+    orderTurno++; // Incrementa l'ordine del turno
+
+    const csvContent = await fetchCoverageReport(formData); // Recupera il report di coverage
+    setStatus("loading"); // Aggiorna lo stato a "loading"
+
+    const valori_csv = extractThirdColumn(csvContent); // Estrae i valori dalla terza colonna del CSV
+    updateStorico(orderTurno, userScore, valori_csv[0]); // Aggiorna lo storico del gioco
+
+    setStatus(isGameEnd ? "game_end" : "turn_end"); // Imposta lo stato di fine gioco o fine turno
+    toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
+
+    displayUserPoints(isGameEnd, valori_csv, robotScore, userScore); // Mostra i punti dell'utente
+
+    if (isGameEnd) { // Se il gioco è finito
+        handleEndGame(userScore); // Gestisce la fine del gioco
+    } else {
+        resetButtons(); // Reimposta i pulsanti
     }
-    isActionInProgress = false; // Imposta il flag a false al termine dell'azione
+}
+
+// Mostra i punti dell'utente nella console
+function displayUserPoints(isGameEnd, valori_csv, robotScore, userScore) {
+    const displayUserPoints = isGameEnd 
+        ? getConsoleTextRun(valori_csv, 0, robotScore, userScore) // Testo per la fine del gioco
+        : getConsoleTextCoverage(valori_csv, userScore); // Testo per la copertura
+
+    console_robot.setValue(displayUserPoints); // Aggiorna la console del robot con i punti
+}
+
+// Gestisce gli errori di compilazione
+function handleCompileError(loadingKey, buttonKey) {
+    console_robot.setValue(getConsoleTextError()); // Mostra l'errore nella console del robot
+    toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
+    resetButtons(); // Reimposta i pulsanti
+}
+
+// Recupera il report di coverage
+async function fetchCoverageReport(formData) {
+    const url = createApiUrl(formData, orderTurno); // Crea l'URL dell'API
+    return await ajaxRequest(url, "POST", formData.get("testingClassCode"), false, "text"); // Esegue la richiesta AJAX
+}
+
+// Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
+function handleEndGame(userScore) {
+    openModalWithText(
+        status_game_end,
+        `${score_partita_text} ${userScore} pt.`, // Mostra il punteggio dell'utente
+        [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
+    );
+    flush_localStorage(); // Pulisce i dati salvati nel localStorage
+}
+
+// Reimposta i pulsanti per consentire nuove azioni
+function resetButtons() {
+    run_button.disabled = (localStorage.getItem("modalita") === "Allenamento"); // Abilita/disabilita in base alla modalità
+    coverage_button.disabled = false; // Abilita il pulsante di coverage
 }
 
 // Gestione dell'evento beforeunload
 window.addEventListener('beforeunload', (event) => {
     if (isActionInProgress) {
-        const confirmationMessage = 'Stai per aggiornare la pagina durante un caricamento. La seguente azione causerà inconsistenza nei dati e vanificherà i tuoi sforzi nella sfida attuale. Vuoi continuare?';
-        event.returnValue = confirmationMessage; // Firefox
-        return confirmationMessage; // Standard
+        openModalWithText(
+            status_exit_game,
+            confirmationMessage, 
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
+        );
     }
 });
+
 // Pulsante "Run/Submit"
 document.getElementById("runButton").addEventListener("click", () => handleGameAction(true));
 // Pulsante "Coverage"
