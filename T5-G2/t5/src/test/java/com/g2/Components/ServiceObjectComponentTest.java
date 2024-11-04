@@ -1,11 +1,6 @@
 package com.g2.Components;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,26 +8,111 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Interfaces.MockServiceManager;
-import com.g2.Interfaces.ServiceManager;
 import com.g2.t5.T5Application;
+import java.util.Map;
 
 @SpringBootTest(classes = T5Application.class)
 class ServiceObjectComponentTest {
 
     private ServiceObjectComponent serviceObjectComponent;
-
+    private MockServiceManager serviceManager;
 
     @Autowired
     private RestTemplate restTemplate;
-    private MockServiceManager serviceManager;
 
-    /*
-     * Metodo di inizializzazione per la registrazione dei servizi.
-     * Precondizioni: RestTemplate non nullo.
-     * Azioni: Registrazione del servizio ServiceManager.
-     */
     @BeforeEach
-    private void setUp_registrazione() {
+    public void setUp() {
         serviceManager = new MockServiceManager(restTemplate);
+        serviceObjectComponent = new ServiceObjectComponent(serviceManager, "testKey", "TestService", "TestAction", "param1");
     }
+
+    @Test
+    public void testGetModelSuccess() {
+        // Configura il MockServiceManager per restituire un oggetto valido
+        serviceManager.setShouldReturnTrue(true);
+        Object expectedObject = "Valid Object";
+        serviceManager.setReturnedObject(expectedObject);  // Metodo nel MockServiceManager per impostare l'oggetto di ritorno
+
+        Map<String, Object> model = serviceObjectComponent.getModel();
+
+        // Verifica che l'oggetto sia stato inserito correttamente nel modello
+        assertNotNull(model, "Il modello non dovrebbe essere nullo.");
+        assertEquals(expectedObject, model.get("testKey"), "L'oggetto nel modello dovrebbe essere quello restituito da handleRequest.");
+    }
+
+    @Test
+    public void testGetModelNullObject() {
+        // Configura il MockServiceManager per restituire null
+        serviceManager.setReturnedObject(null);
+
+        Map<String, Object> model = serviceObjectComponent.getModel();
+
+        // Verifica che il modello contenga "Object not found" per la chiave specificata
+        assertNotNull(model, "Il modello non dovrebbe essere nullo.");
+        assertEquals("Object not found", model.get("testKey"), "Quando handleRequest restituisce null, il modello dovrebbe contenere 'Object not found'.");
+    }
+
+    @Test
+    public void testGetModelException() {
+        // Configura il MockServiceManager per lanciare un'eccezione
+        serviceManager.setShouldThrowException(true);
+
+        Map<String, Object> model = serviceObjectComponent.getModel();
+
+        // Verifica che il metodo gestisca l'eccezione e restituisca null
+        assertNull(model, "Il modello dovrebbe essere null quando si verifica un'eccezione.");
+    }
+
+    @Test
+    public void testServiceObjectComponentFieldsWithReflection() throws Exception {
+        String modelKey = "testKey";
+        String serviceName = "TestService";
+        String action = "TestAction";
+        MockServiceManager mockServiceManager = new MockServiceManager(new RestTemplate());
+    
+        ServiceObjectComponent serviceObjectComponent = new ServiceObjectComponent(mockServiceManager, modelKey, serviceName, action);
+    
+        // Accesso ai campi privati tramite riflessione
+        java.lang.reflect.Field serviceNameField = ServiceObjectComponent.class.getDeclaredField("serviceName");
+        java.lang.reflect.Field actionField = ServiceObjectComponent.class.getDeclaredField("action");
+    
+        serviceNameField.setAccessible(true);
+        actionField.setAccessible(true);
+    
+        // Verifica che i campi siano stati inizializzati correttamente
+        assertEquals(serviceName, serviceNameField.get(serviceObjectComponent), "serviceName deve essere impostato correttamente.");
+        assertEquals(action, actionField.get(serviceObjectComponent), "action deve essere impostato correttamente.");
+        assertEquals(modelKey, serviceObjectComponent.getModelKey(), "modelKey deve essere impostato correttamente.");
+    }
+    
+
+    @Test
+    public void testGetSetModelKey() {
+
+        String modelKey = "testKey";
+        serviceObjectComponent = new ServiceObjectComponent(serviceManager, modelKey, "TestService", "TestAction");
+
+
+        assertEquals(modelKey, serviceObjectComponent.getModelKey(), "getModelKey deve restituire la chiave di modello corretta.");
+
+        String newModelKey = "newTestKey";
+        serviceObjectComponent.setModelKey(newModelKey);
+        assertEquals(newModelKey, serviceObjectComponent.getModelKey(), "getModelKey deve restituire la nuova chiave di modello.");
+    }
+
+    @Test
+    public void testSetParams() {
+        
+        Object[] params = new Object[]{"param1", "param2"};
+        serviceObjectComponent = new ServiceObjectComponent(serviceManager, "testKey", "TestService", "TestAction");
+        serviceObjectComponent.setParams(params);
+
+
+        Map<String, Object> model = serviceObjectComponent.getModel();
+        assertNotNull(model, "Il modello non dovrebbe essere nullo.");
+
+}
+
+
+
 }

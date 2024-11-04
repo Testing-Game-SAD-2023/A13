@@ -2,11 +2,12 @@ package com.g2.Components;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
+import com.g2.t5.T5Application;
 
+@SpringBootTest(classes = T5Application.class)
 public class GenericObjectComponentTest {
     private GenericObjectComponent genericObjectComponent;
 
