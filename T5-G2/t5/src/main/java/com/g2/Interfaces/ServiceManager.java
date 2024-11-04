@@ -48,8 +48,7 @@ public class ServiceManager {
     }
 
     // Metodo helper per registrare i servizi
-    protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass,
-            RestTemplate restTemplate) {
+    protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
         if (serviceClass == null){
             throw new IllegalArgumentException("[SERVICE MANAGER] serviceClass Nullo !");
         }
@@ -58,10 +57,6 @@ public class ServiceManager {
         }
         if (restTemplate == null) {
             throw new IllegalArgumentException("[SERVICE MANAGER] RestTemplate Nullo !");
-        }
-        if (!ServiceInterface.class.isAssignableFrom(serviceClass)) {
-            logger.error("[SERVICE MANAGER] La Classe: " + serviceName + " deve implementare la ServiceInterface");
-            throw new IllegalArgumentException("La classe: " + serviceName + " deve implementare la ServiceInterface");
         }
         if (services.containsKey(serviceName)) {
             logger.error("[SERVICE MANAGER] Il servizio: " + serviceName + " è già registrato.");
@@ -96,15 +91,6 @@ public class ServiceManager {
         }
         logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
         return service.handleRequest(action, params);
-    }
-
-    public <T> T handleRequest(String serviceName, String action, Class<T> responseType, Object... params) {
-        Object obj = this.handleRequest(serviceName, action, params);
-        if (responseType.isInstance(obj)) {
-            return responseType.cast(obj); // Esegui il cast
-        } else {
-            throw new ClassCastException("[SERVICE MANAGER] Impossibile eseguire il cast dell'oggetto a " + responseType.getName());
-        }
     }
 
     protected ServiceInterface getServices(String key) {

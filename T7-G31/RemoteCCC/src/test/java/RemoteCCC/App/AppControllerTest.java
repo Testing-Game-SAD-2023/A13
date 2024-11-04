@@ -43,10 +43,9 @@ public class AppControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
+    @Autowired
+    private AppController appController;
     private static final String BASE_PATH = ".\\src\\test\\resources\\classi_da_testare\\";
-
-    
 
     private JSONObject loadTestFiles(String folderName, String testingClassName, String underTestClassName)
             throws Exception {
@@ -127,18 +126,15 @@ public class AppControllerTest {
         // Ottieni la cartella principale
         String rootFolderT = Paths.get(BASE_PATH,rootFolder).toString();
         File folder = new File(rootFolderT);
-
         // Verifica che la cartella esista e sia effettivamente una directory
         if (folder.exists() && folder.isDirectory()) {
             // Ottieni la lista di tutte le sottocartelle
             File[] subfolders = folder.listFiles(File::isDirectory);
-
             // Cicla attraverso tutte le sottocartelle
             if (subfolders != null) {
                 for (File subfolder : subfolders) {
                         // Nome della sottocartella (che corrisponde al nome della classe)
                         String className = subfolder.getName();
-
                         try {
                             // Chiamata alla funzione DoTest
                             String rootFolderClass =  Paths.get(rootFolder,className).toString();

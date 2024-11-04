@@ -40,6 +40,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Model.User;
 import com.g2.t5.T5Application;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 
 @SpringBootTest(classes = T5Application.class)
 class T23ServiceTest {
@@ -94,11 +95,14 @@ class T23ServiceTest {
         assertEquals(true, result);
     }
 
-    /* 
-    * Test3: testGetAuthenticatedWithNullToken
-    * Precondizioni: Testare il metodo handleRequest con un token null.
-    * Azioni: Invocare handleRequest su T23Service con "GetAuthenticated" e un token null.
-    * Post-condizioni: Ci si aspetta che il risultato sia false e venga stampato un messaggio di log.
+    /*
+     * Test3: testGetAuthenticatedWithInvalidToken
+     * Precondizioni: Simulare una chiamata a validateToken con un token non valido.
+     * Azioni: Chiamare handleRequest su T23Service con "GetAuthenticated" e un
+     * token invalido.
+     * Post-condizioni: Ci si aspetta che il risultato sia false, poiché il token
+     * fornito
+     * non è valido e il server risponde con un valore JSON "false".
      */
     @Test
     public void testGetAuthenticatedWithInvalidToken() {
@@ -116,14 +120,17 @@ class T23ServiceTest {
      * Test4: testGetUsersSuccess
      * Precondizioni: Il server mock deve restituire una lista di utenti.
      * Azioni: Invocare handleRequest su T23Service con "GetUsers".
-     * Post-condizioni: Ci si aspetta di ricevere una lista di utenti correttamente popolata.
+     * Post-condizioni: Ci si aspetta di ricevere una lista di utenti correttamente
+     * popolata.
      */
     @Test
     public void testGetUsersSuccess() {
         // Dati di test: Lista di utenti fittizi
         List<User> mockUsers = new ArrayList<>();
-        mockUsers.add(new User(1L, "John", "Doe", "john.doe@example.com", "password123", false, "Computer Science", null));
-        mockUsers.add(new User(2L, "Jane", "Smith", "jane.smith@example.com", "password456", true, "Mathematics", null));
+        mockUsers.add(
+                new User(1L, "John", "Doe", "john.doe@example.com", "password123", false, "Computer Science", null));
+        mockUsers
+                .add(new User(2L, "Jane", "Smith", "jane.smith@example.com", "password456", true, "Mathematics", null));
 
         // Configurazione del server mock per rispondere con i dati fittizi
         try {
@@ -137,32 +144,33 @@ class T23ServiceTest {
         @SuppressWarnings("unchecked")
         List<User> result = (List<User>) T23Service.handleRequest("GetUsers");
 
-         // Verifica dei campi del primo utente
-         User user1 = result.get(0);
-         assertEquals(1L, user1.getId());
-         assertEquals("John", user1.getName());
-         assertEquals("Doe", user1.getSurname());
-         assertEquals("john.doe@example.com", user1.getEmail());
-         assertEquals("password123", user1.getPassword());
-         assertEquals(false, user1.isRegisteredWithFacebook());
-         assertEquals("Computer Science", user1.getStudies());
-  
-         // Verifica dei campi del secondo utente
-         User user2 = result.get(1);
-         assertEquals(2L, user2.getId());
-         assertEquals("Jane", user2.getName());
-         assertEquals("Smith", user2.getSurname());
-         assertEquals("jane.smith@example.com", user2.getEmail());
-         assertEquals("password456", user2.getPassword());
-         assertEquals(true, user2.isRegisteredWithFacebook());
-         assertEquals("Mathematics", user2.getStudies());
+        // Verifica dei campi del primo utente
+        User user1 = result.get(0);
+        assertEquals(1L, user1.getId());
+        assertEquals("John", user1.getName());
+        assertEquals("Doe", user1.getSurname());
+        assertEquals("john.doe@example.com", user1.getEmail());
+        assertEquals("password123", user1.getPassword());
+        assertEquals(false, user1.isRegisteredWithFacebook());
+        assertEquals("Computer Science", user1.getStudies());
+
+        // Verifica dei campi del secondo utente
+        User user2 = result.get(1);
+        assertEquals(2L, user2.getId());
+        assertEquals("Jane", user2.getName());
+        assertEquals("Smith", user2.getSurname());
+        assertEquals("jane.smith@example.com", user2.getEmail());
+        assertEquals("password456", user2.getPassword());
+        assertEquals(true, user2.isRegisteredWithFacebook());
+        assertEquals("Mathematics", user2.getStudies());
     }
 
     /*
      * Test5: testGetUsersThrowsException
      * Precondizioni: Simulare un errore durante la chiamata a callRestGET
      * Azioni: Chiamare handleRequest su T23Service con "GetUsers".
-     * Post-condizioni: Ci si aspetta un'IllegalArgumentException con il messaggio appropriato.
+     * Post-condizioni: Ci si aspetta un'IllegalArgumentException con il messaggio
+     * appropriato.
      */
     @Test
     public void testGetUsersThrowsException() {
@@ -181,4 +189,24 @@ class T23ServiceTest {
         assertEquals(expectedExceptionMessage, exception.getMessage());
     }
 
+    /*
+     * Test6: testGetAuthenticatedWithNullToken
+     * Precondizioni: Simulare una chiamata a validateToken con un token null.
+     * Azioni: Chiamare handleRequest su T23Service con "GetAuthenticated" e un
+     * token non valido.
+     * Post-condizioni: Ci si aspetta che il risultato sia false, poiché il token
+     * non è valido
+     * e il server risponde con un codice di stato 204 No Content, che indica che
+     * non ci sono contenuti.
+     */
+    @Test
+    public void testGetAuthenticatedWithNullToken() {
+        // Chiamata al metodo handleRequest con un token null
+        String invalidToken = "invalid.jwt.token";
+        mockServer.expect(requestTo(Base_URL + "/validateToken"))
+                .andRespond(withNoContent());
+        Boolean result = (Boolean) T23Service.handleRequest("GetAuthenticated", invalidToken);
+        // Verifica che il risultato sia false
+        assertEquals(false, result);
+    }
 }
