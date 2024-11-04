@@ -16,9 +16,7 @@
  */
 package com.g2.Interfaces;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
+
 import com.g2.t5.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
@@ -261,5 +260,20 @@ public class ServiceManagerTest {
                 "Errore: il servizio 'NonExistentService' avrebbe dovuto restituire null, ma ha restituito: "
                         + service);
     }
+
+    /* 
+    @Test
+    public void testService_allgood(){
+        String Base_URL = "http://mock_url:123";
+        MockRestServiceServer mockServer;
+        mockServer.expect(requestTo(Base_URL + "/testGetNoParams" ))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess("{\"message\":\"Success\"}", MediaType.APPLICATION_JSON));
+
+        serviceManager.registerService("MockService", BaseServiceImpl.class, restTemplate);
+        response = serviceManager.handleRequest("MockService", "testGetNoParams");
+        assertisnotnull();
+    }
+    */
 
 }

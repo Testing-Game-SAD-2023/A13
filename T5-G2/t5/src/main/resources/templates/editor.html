@@ -20,7 +20,7 @@
 		<!-- CodeMirror CSS -->
 		<link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
 		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
-		<link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css" />
+		<link rel="stylesheet" href="./t5/codemirror/theme/mdn-like.css" />
 
 		<link rel="stylesheet" href="/t5/css/main_style.css" />
 
@@ -77,20 +77,9 @@
 				overflow: hidden; /* Nasconde la scrollbar */
 			}
 
-
 			.highlight {
 				background-color: yellow;
 				color: black;
-			}
-
-			.border-secondary-subtle {
- 				 --bs-border-opacity: 1;
-  				border-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-border-opacity)) !important;
-			}
-			.border-secondary-subtle:hover{
-				cursor:n-resize;
-				transition: border-color 3s ease; 
-				border-color: rgba(var(--bs-primary-bg-rgb), var(--bs-border-opacity)) !important;
 			}
 		</style>
 	</head>
@@ -701,13 +690,15 @@ public class TestClasse {
 			const status_error      	= /*[[#{stato_errore}]]*/ '';
 			const status_turn_end   	= /*[[#{stato_turno_finito}]]*/ '';
 			const status_game_end   	= /*[[#{stato_partita_finita}]]*/ '';
+			const status_exit_game 	    = /*[[#{stato_uscita_partita}]]*/ '';
 			const status_inizia_partita = /*[[#{inizia_partita}]]*/ '';
 			const match_in_corso    	= /*[[#{match_in_corso}]]*/ '';
 			const loading           	= /*[[#{caricamento}]]*/ '';
 			const ClasseUT           	= /*[[#{classe_ut}]]*/ '';		
 			const Difficolta           	= /*[[#{gamemode_difficulty}]]*/ '';
 			const score_partita_text    = /*[[#{partita_punteggio}]]*/ '';
-			const vai_home    = /*[[#{home}]]*/ '';
+			const vai_home    			= /*[[#{home}]]*/ '';
+			const confirmationMessage   = /*[[#{confirmationMessage}]]*/ '';
 		</script>
 
 		<!-- CODEMIRROR -->

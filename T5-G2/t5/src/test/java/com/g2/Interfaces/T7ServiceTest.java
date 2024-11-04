@@ -40,16 +40,5 @@
          T7Service = new T7Service(restTemplate);
      }
 
-    /*
-    *  T1 - 10 thread fanno richieste in contemporanea, tutte e 10 formattate bene
-    */
-
-    /*
-    *  T2 - 10 thread fanno richieste in contemporanea, 5 formattate bene e 5 formattate male 
-    */
-
-    /*
-    *  T3 - 10 thread che partono a pochissima distanza l'uno dall'altro 
-    */
 
 }

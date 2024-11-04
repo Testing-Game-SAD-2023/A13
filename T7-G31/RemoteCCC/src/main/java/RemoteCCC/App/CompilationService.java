@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.channels.FileLockInterruptionException;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.OverlappingFileLockException;
@@ -32,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class CompilationService {
      * Config gestisce i path delle directory e fornisce un id univoco 
      * serve solo per non tenere tutta la logica qua
      */
-    private final Config config;
+    protected final Config config;
     private final String testingClassName;
     private final String testingClassCode;
     private final String underTestClassName;
@@ -65,7 +65,7 @@ public class CompilationService {
     private String mvn_path;
 
     //logger
-    private static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
 
     public CompilationService(String testingClassName, String testingClassCode,
                               String underTestClassName, String underTestClassCode, 
@@ -113,7 +113,7 @@ public class CompilationService {
         }
     }
 
-    private void createDirectoriesAndCopyPom() throws IOException {
+    protected void createDirectoriesAndCopyPom() throws IOException {
         /*
              *   Creo la cartella usrPath/timestamp/
              *   poi creo  usrPath/timestamp/src/main/java/
@@ -136,7 +136,7 @@ public class CompilationService {
         logger.info("[Compilation Service] directory creata con successo: {}", config.getCoverageFolderPath());
     }
 
-    private void createDirectoryIfNotExists(String path) throws IOException {
+    protected void createDirectoryIfNotExists(String path) throws IOException {
         File directory = new File(path);
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
@@ -150,42 +150,40 @@ public class CompilationService {
     private void copyPomFile() throws IOException {
         File pomFile = new File(config.getUsrPath() + config.getsep() + "ClientProject" + config.getsep() + "pom.xml");
         File destPomFile = new File(config.getPathCompiler() + "pom.xml");
-        File lockFile = new File(config.getPathCompiler() + "pom.lock"); // File di lock
 
         // Controlla se il file pom.xml esiste prima di tentare di copiarlo
         if (!pomFile.exists()) {
             throw new IOException("[Compilation Service] Il file pom.xml non esiste: " + pomFile.getAbsolutePath());
-        } else {
-            //Col filechannel rende l'operazione atomica
-            try (
-                 FileChannel lockChannel   = FileChannel.open(lockFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE); 
-                 FileChannel sourceChannel = FileChannel.open(pomFile.toPath(), StandardOpenOption.READ); 
-                 FileChannel destChannel   = FileChannel.open(destPomFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
-                ) {
-                // Acquisisci un lock sul file di lock
-                try (FileLock lock = lockChannel.lock()) {
-                    // Acquisisci un lock sul file sorgente per evitare accessi concorrenti
-                    try (FileLock sourceLock = sourceChannel.lock(0, Long.MAX_VALUE, true)) {
-                        // Copia il contenuto
-                        long size = sourceChannel.size();
-                        long position = 0;
-
-                        while (position < size) {
-                            position += sourceChannel.transferTo(position, size - position, destChannel);
-                        }
-                    } catch (OverlappingFileLockException e) {
-                        throw new FileConcurrencyException("[copyPomFile] FileLock concorrente sul file sorgente: " + e.getMessage(), e);
-                    } catch (FileLockInterruptionException e) {
-                        throw new FileConcurrencyException("[copyPomFile] L'acquisizione del lock è stata interrotta: " + e.getMessage(), e);
-                    } catch (NonWritableChannelException e) {
-                        throw new FileConcurrencyException("[copyPomFile] Canale di scrittura non valido per acquisire il lock: " + e.getMessage(), e);
-                    } catch (ClosedChannelException e) {
-                        throw new FileConcurrencyException("[copyPomFile] Il canale è stato chiuso prima di acquisire il lock: " + e.getMessage(), e);
-                    }
-                }
-            } catch (IOException e) {
-                throw new IOException("[copyPomFile] Errore copia pom.xml: " + e.getMessage(), e);
+        } 
+        /*
+        *   Questa classe implementa un tipo di lock che distingue tra operazioni di lettura e scrittura, 
+        *   consentendo a più thread di leggere simultaneamente, 
+        *   ma limitando l'accesso esclusivo per le operazioni di scrittura.
+        */
+        final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+        final ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
+        /*
+        *    Col filechannel rende l'operazione atomica
+        */
+        FileChannel sourceChannel = FileChannel.open(pomFile.toPath(), StandardOpenOption.READ); 
+        FileChannel destChannel   = FileChannel.open(destPomFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        readLock.lock();
+        try {
+            long size = sourceChannel.size();
+            long position = 0;
+            while (position < size) {
+                position += sourceChannel.transferTo(position, size - position, destChannel);
             }
+        } catch (OverlappingFileLockException e) {
+            throw new FileConcurrencyException("[copyPomFile] FileLock concorrente sul file sorgente: " + e.getMessage(), e);
+        } catch (FileLockInterruptionException e) {
+            throw new FileConcurrencyException("[copyPomFile] L'acquisizione del lock è stata interrotta: " + e.getMessage(), e);
+        } catch (NonWritableChannelException e) {
+            throw new FileConcurrencyException("[copyPomFile] Canale di scrittura non valido per acquisire il lock: " + e.getMessage(), e);
+        } catch (ClosedChannelException e) {
+            throw new FileConcurrencyException("[copyPomFile] Il canale è stato chiuso prima di acquisire il lock: " + e.getMessage(), e);
+        }finally {
+            readLock.unlock();
         }
     }
 
@@ -194,11 +192,9 @@ public class CompilationService {
         if (nameclass == null || nameclass.isEmpty()) {
             throw new IllegalArgumentException("[saveCodeToFile] Il nome della classe non può essere nullo o vuoto.");
         }
-
         if(!nameclass.endsWith(".java")){
             throw new IllegalArgumentException("[saveCodeToFile] Il nome della classe non ha l'estensione .java");
         }
-
         if (path == null || path.isEmpty()) {
             throw new IllegalArgumentException("[saveCodeToFile] Il percorso non può essere nullo o vuoto.");
         }
@@ -211,21 +207,9 @@ public class CompilationService {
         tempFile.deleteOnExit();
         // Utilizza FileChannel per scrivere in modo atomico
         try (FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
-            // Acquisisci un lock sul file per evitare accessi concorrenti
-            try (FileLock lock = channel.lock()) {
-                // Scrivi il codice nel file
-                logger.info("[CompilationService] Ho creato il file " + path + nameclass);
-                ByteBuffer buffer = StandardCharsets.UTF_8.encode(code);
-                channel.write(buffer);
-            } catch (OverlappingFileLockException e) {
-                throw new FileConcurrencyException("[saveCodeToFile] FileLock concorrente sul file durante la scrittura: " + e.getMessage(), e);
-            } catch (FileLockInterruptionException e) {
-                throw new FileConcurrencyException("[saveCodeToFile] L'acquisizione del lock è stata interrotta: " + e.getMessage(), e);
-            } catch (NonWritableChannelException e) {
-                throw new FileConcurrencyException("[saveCodeToFile] Canale di scrittura non valido per acquisire il lock: " + e.getMessage(), e);
-            } catch (ClosedChannelException e) {
-                throw new FileConcurrencyException("[saveCodeToFile] Il canale è stato chiuso prima di acquisire il lock: " + e.getMessage(), e);
-            }
+            logger.info("[CompilationService] Ho creato il file " + path + nameclass);
+            ByteBuffer buffer = StandardCharsets.UTF_8.encode(code);
+            channel.write(buffer);
         } catch (IOException e) {
             throw new IOException("[saveCodeToFile] Errore durante la scrittura nel file: " + tempFile.getAbsolutePath(), e);
         }
@@ -308,6 +292,10 @@ public class CompilationService {
         }
     }
 
+    protected void deleteCartelleTest() throws IOException {
+        deleteTemporaryDirectories(config.getPathCompiler());
+    }
+
     private String readFileToString(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         return new String(bytes);
@@ -324,5 +312,4 @@ public class CompilationService {
             super(message, cause);
         }
     }
-
 }

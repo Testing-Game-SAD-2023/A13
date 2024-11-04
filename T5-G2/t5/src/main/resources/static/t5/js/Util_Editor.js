@@ -286,21 +286,21 @@ function highlightCodeCoverage(reportContent, editor) {
 	});
 
 	coveredLines.forEach(function (lineNumber) {
-		editor.removeLineClass(lineNumber - 2, "gutter", "border-danger");
-		editor.removeLineClass(lineNumber - 2, "gutter", "border-warning");
-		editor.addLineClass	(lineNumber - 2, "gutter", "border-success");
+		editor.removeLineClass(lineNumber - 2, "gutter", "bg-danger");
+		editor.removeLineClass(lineNumber - 2, "gutter", "bg-warning");
+		editor.addLineClass	(lineNumber - 2, "gutter", "  bg-success");
 	});
 
 	uncoveredLines.forEach(function (lineNumber) { 
-		editor.removeLineClass(lineNumber - 2, "gutter", "border-warning");
-		editor.removeLineClass(lineNumber - 2, "gutter", "border-success");
-		editor.addLineClass	(lineNumber - 2, "gutter", "border-danger");
+		editor.removeLineClass(lineNumber - 2, "gutter", "bg-warning");
+		editor.removeLineClass(lineNumber - 2, "gutter", "bg-success");
+		editor.addLineClass	(lineNumber - 2, "gutter", "bg-danger");
 	});
 
 	partiallyCoveredLines.forEach(function (lineNumber) { 
-		editor.removeLineClass(lineNumber - 2, "gutter", "border-danger");
-		editor.removeLineClass(lineNumber - 2, "gutter", "border-success");
-		editor.addLineClass	(lineNumber - 2, "gutter", "border-warning");
+		editor.removeLineClass(lineNumber - 2, "gutter", "bg-danger");
+		editor.removeLineClass(lineNumber - 2, "gutter", "bg-success");
+		editor.addLineClass	(lineNumber - 2, "gutter", "bg-warning");
 	});
 }
 

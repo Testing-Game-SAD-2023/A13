@@ -18,7 +18,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
@@ -257,6 +263,85 @@ public class T4ServiceTest {
                 mockServer.verify();
         }
 
-        /////////////////////////////
+        /*
+         * Test10: testEndGame_ValidGameEnd
+         * Precondizioni: ID di gioco valido e parametri corretti per chiudere il gioco.
+         * Azioni: Invocare EndGame con parametri validi per chiudere il gioco.
+         * Post-condizioni:
+         * - Verificare che la risposta del gioco terminato corrisponda a quella
+         * mockata.
+         */
+        @Test
+        public void testEndGame_ValidGameEnd() {
+                // Parametri di input del metodo
+                int gameId = 12345;
+                String username = "TestUser";
+                String closedAt = "2024-10-29T12:00:00Z";
+                int score = 100;
+                Boolean isWinner = true;
+
+                // URL di endpoint atteso
+                String expectedUrl = String.format("%s/games/%d", Base_URL, gameId);
+
+                // Mock della risposta attesa
+                String mockResponse = "{\"status\": \"ended\", \"score\": 100, \"isWinner\": true}";
+
+                // Configurazione del mock server
+                mockServer.expect(requestTo(expectedUrl))
+                                .andExpect(method(HttpMethod.POST))
+                                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+                // Chiamata al metodo sotto test
+
+                // EndGame
+                String response = (String) T4Service.handleRequest("EndGame", gameId, username, closedAt, score,
+                                isWinner);
+
+                // Verifica della risposta
+                assertEquals(mockResponse, response);
+
+                // Verifica delle aspettative del mock server
+                mockServer.verify();
+        }
+
+        /*
+         * Test11: testEndGame_ValidGameEnd_NotWinner
+         * Precondizioni: ID di gioco valido, username, data di chiusura, punteggio e
+         * flag isWinner impostato a false.
+         * Azioni: Invocare EndGame con parametri validi per chiudere il gioco.
+         * Post-condizioni: Verificare che la risposta sia quella mockata e che le
+         * aspettative del mock server siano soddisfatte.
+         */
+
+        @Test
+        public void testEndGame_ValidGameEnd_NotWinner() {
+                // Parametri di input del metodo
+                int gameId = 12345;
+                String username = "TestUser";
+                String closedAt = "2024-10-29T12:00:00Z";
+                int score = 100;
+                Boolean isWinner = false;
+
+                // URL di endpoint atteso
+                String expectedUrl = String.format("%s/games/%d", Base_URL, gameId);
+
+                // Mock della risposta attesa
+                String mockResponse = "{\"status\": \"ended\", \"score\": 100, \"isWinner\": false}";
+
+                // Configurazione del mock server
+                mockServer.expect(requestTo(expectedUrl))
+                                .andExpect(method(HttpMethod.POST))
+                                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+                // Chiamata al metodo sotto test
+                String response = (String) T4Service.handleRequest("EndGame", gameId, username, closedAt, score,
+                                isWinner);
+
+                // Verifica della risposta
+                assertEquals(mockResponse, response);
+
+                // Verifica delle aspettative del mock server
+                mockServer.verify();
+        }
 
 }

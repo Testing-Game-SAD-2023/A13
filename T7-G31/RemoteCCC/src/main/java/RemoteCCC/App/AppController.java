@@ -32,12 +32,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @CrossOrigin
 @RestController
 public class AppController {
 
-    private static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
 
     @Value("${variabile.mvn}")
     private String mvn_path;
@@ -59,14 +58,17 @@ public class AppController {
     @PostMapping(value = "/compile-and-codecoverage", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> compileAndTest(@RequestBody RequestDTO request) throws IOException, InterruptedException {
         try {
+            int count;
             // Crea un'istanza del servizio di compilazione e chiama il metodo
-            CompilationService compilationService = new CompilationService(request.getTestingClassName(), 
-                                                                           request.getTestingClassCode(),
-                                                                           request.getUnderTestClassName(), 
-                                                                           request.getUnderTestClassCode(), 
-                                                                           mvn_path);
+            while (count < 5) {
+                CompilationService compilationService = new CompilationService(request.getTestingClassName(),
+                        request.getTestingClassCode(),
+                        request.getUnderTestClassName(),
+                        request.getUnderTestClassCode(),
+                        mvn_path);
 
-            compilationService.compileAndTest();
+                compilationService.compileAndTest();
+            }
             JSONObject result = new JSONObject();
             result.put("outCompile", compilationService.outputMaven);
             result.put("coverage", compilationService.Coverage);
@@ -82,7 +84,7 @@ public class AppController {
     /*
      *  gestisco il request body come una classe per semplicità 
      */
-    private static class RequestDTO {
+    protected static class RequestDTO {
 
         private String testingClassName;
         private String testingClassCode;

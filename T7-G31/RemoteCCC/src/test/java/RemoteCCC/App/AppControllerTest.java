@@ -28,7 +28,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,16 +43,9 @@ public class AppControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private CompilationService compilationService;
-
     @Autowired
     private AppController appController;
-
     private static final String BASE_PATH = ".\\src\\test\\resources\\classi_da_testare\\";
-
-    
 
     private JSONObject loadTestFiles(String folderName, String testingClassName, String underTestClassName)
             throws Exception {
@@ -107,34 +99,42 @@ public class AppControllerTest {
     /*
     *  METODI PRINCIPALI PER FARE TEST
     */
-    private void DoTest(String foldername, String ClassName, Boolean Esito) throws Exception{
+    private void DoTest(String foldername, String ClassName, Integer Esito) throws Exception{
         String TestingClassName = "Test" + ClassName;
         JSONObject requestJson = loadTestFiles(foldername, TestingClassName, ClassName);
-        if(Esito){
-            Mock_correct_compile(requestJson);
-        }else{
-            Mock_error_compile(requestJson);
+        
+        switch (Esito) {
+            case 0:  
+                Mock_correct_compile(requestJson);
+                break;
+            case 1:  
+                Mock_error_compile(requestJson);
+                break;
+            case 2:  
+                Mock_error_compile(requestJson);
+                break;    
+            default: // Caso di default, se Esito ha un valore non gestito specificamente
+                System.out.println("Valore non valido per Esito: " + Esito);
+                break;
         }
+        
 
     }
 
     // Metodo che esegue i test per ogni sottocartella
-    public void runTests(String rootFolder, Boolean Esito) {
+    public void runTests(String rootFolder, Integer Esito) {
         // Ottieni la cartella principale
         String rootFolderT = Paths.get(BASE_PATH,rootFolder).toString();
         File folder = new File(rootFolderT);
-
         // Verifica che la cartella esista e sia effettivamente una directory
         if (folder.exists() && folder.isDirectory()) {
             // Ottieni la lista di tutte le sottocartelle
             File[] subfolders = folder.listFiles(File::isDirectory);
-
             // Cicla attraverso tutte le sottocartelle
             if (subfolders != null) {
                 for (File subfolder : subfolders) {
                         // Nome della sottocartella (che corrisponde al nome della classe)
                         String className = subfolder.getName();
-
                         try {
                             // Chiamata alla funzione DoTest
                             String rootFolderClass =  Paths.get(rootFolder,className).toString();
@@ -155,25 +155,24 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_0() throws Exception {
-        runTests("t0", true);
+        runTests("t0", 0);
     }
     
     /*
     *     test 1 - manca costruttore nella classe
     */
-    /*
     @Test
     public void CaseTest_1() throws Exception {
-        runTests("t1", false);
+        runTests("t1", 0);
     }
-    */
+    
 
     /*
     *     test 2 - tipo di ritorno errato
     */
     @Test
     public void CaseTest_2() throws Exception {
-        runTests("t2", false);
+        runTests("t2", 1);
     }
 
     /*
@@ -181,7 +180,7 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_3() throws Exception {
-        runTests("t3", false);
+        runTests("t3", 1);
     }
 
     /*
@@ -189,7 +188,7 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_4() throws Exception {
-        runTests("t4", true);
+        runTests("t4", 0);
     }
 
     /*
@@ -197,7 +196,7 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_5() throws Exception {
-        runTests("t5", false);
+        runTests("t5", 1);
     }
 
     /*
@@ -205,7 +204,7 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_6() throws Exception {
-        runTests("t6", false);
+        runTests("t6", 1);
     }
 
 
@@ -214,7 +213,7 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_7() throws Exception {
-        runTests("t7", false);
+        runTests("t7", 1);
     }
 
     /*
@@ -223,7 +222,7 @@ public class AppControllerTest {
     
     @Test
     public void CaseTest_8() throws Exception {
-        runTests("t8", false);
+        runTests("t8", 1);
     }
 
     /*
@@ -231,7 +230,7 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_9() throws Exception {
-        runTests("t9", false);
+        runTests("t9", 1);
     }
 
     /*
@@ -239,6 +238,7 @@ public class AppControllerTest {
     */
     @Test
     public void CaseTest_10() throws Exception {
-        runTests("t10", false);
+        runTests("t10", 1);
     }
+
 }
