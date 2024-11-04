@@ -44,7 +44,7 @@ public class CompilationService {
      * Config gestisce i path delle directory e fornisce un id univoco 
      * serve solo per non tenere tutta la logica qua
      */
-    private final Config config;
+    protected final Config config;
     private final String testingClassName;
     private final String testingClassCode;
     private final String underTestClassName;
@@ -65,7 +65,7 @@ public class CompilationService {
     private String mvn_path;
 
     //logger
-    private static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
 
     public CompilationService(String testingClassName, String testingClassCode,
                               String underTestClassName, String underTestClassCode, 
@@ -113,7 +113,7 @@ public class CompilationService {
         }
     }
 
-    private void createDirectoriesAndCopyPom() throws IOException {
+    protected void createDirectoriesAndCopyPom() throws IOException {
         /*
              *   Creo la cartella usrPath/timestamp/
              *   poi creo  usrPath/timestamp/src/main/java/
@@ -136,7 +136,7 @@ public class CompilationService {
         logger.info("[Compilation Service] directory creata con successo: {}", config.getCoverageFolderPath());
     }
 
-    private void createDirectoryIfNotExists(String path) throws IOException {
+    protected void createDirectoryIfNotExists(String path) throws IOException {
         File directory = new File(path);
         if (!directory.exists()) {
             if (!directory.mkdirs()) {
@@ -308,6 +308,10 @@ public class CompilationService {
         }
     }
 
+    protected void deleteCartelleTest() throws IOException {
+        deleteTemporaryDirectories(config.getPathCompiler());
+    }
+
     private String readFileToString(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         return new String(bytes);
@@ -324,5 +328,4 @@ public class CompilationService {
             super(message, cause);
         }
     }
-
 }
