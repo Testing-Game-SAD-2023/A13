@@ -58,17 +58,12 @@ public class AppController {
     @PostMapping(value = "/compile-and-codecoverage", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> compileAndTest(@RequestBody RequestDTO request) throws IOException, InterruptedException {
         try {
-            int count;
-            // Crea un'istanza del servizio di compilazione e chiama il metodo
-            while (count < 5) {
-                CompilationService compilationService = new CompilationService(request.getTestingClassName(),
+            CompilationService compilationService = new CompilationService(request.getTestingClassName(),
                         request.getTestingClassCode(),
                         request.getUnderTestClassName(),
                         request.getUnderTestClassCode(),
                         mvn_path);
-
-                compilationService.compileAndTest();
-            }
+            compilationService.compileAndTest();
             JSONObject result = new JSONObject();
             result.put("outCompile", compilationService.outputMaven);
             result.put("coverage", compilationService.Coverage);

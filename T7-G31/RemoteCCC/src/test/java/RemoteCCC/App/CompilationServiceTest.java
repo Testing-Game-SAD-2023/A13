@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package RemoteCCC.App;
 
 import java.io.IOException;
@@ -8,6 +25,7 @@ import java.nio.file.Paths;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,7 +33,9 @@ import static org.mockito.Mockito.spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 public class CompilationServiceTest {
 
     //private CompilationService compilationService;
@@ -58,18 +78,14 @@ public class CompilationServiceTest {
 
     @BeforeEach
     public void setUp() {
-
-        JSONObject requestJson;
         try {
-            requestJson = loadTestFiles("t11", "SubjectParser", "TestSubjectParser");
-
+            JSONObject requestJson = loadTestFiles("t11", "SubjectParser", "TestSubjectParser");
             // Crea un'istanza di CompilationService con il Config simulato
             mockCompilationService = new MockCompilationService(requestJson.getString("testingClassName"),
-                    requestJson.getString("testingClassCode"),
-                    requestJson.getString("underTestClassName"),
-                    requestJson.getString("underTestClassCode"),
-                    mvn_path);
-
+                                                                requestJson.getString("testingClassCode"),
+                                                                requestJson.getString("underTestClassName"),
+                                                                requestJson.getString("underTestClassCode"),
+                                                                mvn_path);
         } catch (IOException e) {
             logger.error("[IOException] [ERROR] ", e);
         } catch (Exception e) {
@@ -93,6 +109,6 @@ public class CompilationServiceTest {
         IOException exception = assertThrows(IOException.class, () -> {
             compilationServiceSpy.createDirectoriesAndCopyPom();
         });
-        logger.debug(exception.getMessage());
+        assertTrue(exception.getMessage().contains("[createDirectoryIfNotExists] Errore esiste già la directory:"));
     }
 }
