@@ -1,6 +1,10 @@
 package com.g2.Components;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +13,19 @@ import org.springframework.web.client.RestTemplate;
 
 import com.g2.Interfaces.MockServiceManager;
 import com.g2.t5.T5Application;
-import java.util.Map;
 
 @SpringBootTest(classes = T5Application.class)
 class ServiceObjectComponentTest {
 
     private ServiceObjectComponent serviceObjectComponent;
-    private MockServiceManager serviceManager;
+    private StubServiceManager serviceManager;
 
     @Autowired
     private RestTemplate restTemplate;
 
     @BeforeEach
     public void setUp() {
-        serviceManager = new MockServiceManager(restTemplate);
+        serviceManager = new StubServiceManager(restTemplate);
         serviceObjectComponent = new ServiceObjectComponent(serviceManager, "testKey", "TestService", "TestAction", "param1");
     }
 
