@@ -162,10 +162,6 @@ function initializeEditorResizing(
             section2.style.height = `${containerRect.height - offsetY - divider.offsetHeight}px`;
         });
 
-			const containerRect = container.getBoundingClientRect();
-			const offsetY = e.clientY - containerRect.top;
-			const minimumHeight = 5; // Altezza minima per impostare section2 a 0
-
         closeButton.addEventListener("click", () => {
             const isMinimized = section2.offsetHeight === 0;
             section2.style.height = isMinimized ? '200px' : '0'; // Imposta l'altezza desiderata

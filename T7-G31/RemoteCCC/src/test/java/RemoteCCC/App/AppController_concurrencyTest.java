@@ -199,7 +199,7 @@ public class AppController_concurrencyTest {
                     JSONObject requestJson;
                     if (isValidRequest) {
                         // Costruisci il JSON per la richiesta valida
-                        requestJson = loadTestFiles("t0\\Timestamp", "TestTimeStamp", "TimeStamp");
+                        requestJson = loadTestFiles("t0", "TestTimeStamp", "TimeStamp");
                         // Esegui la richiesta POST e verifica l'esito positivo
                         Mock_correct_compile(requestJson);
                     } else {
