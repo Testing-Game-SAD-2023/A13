@@ -33,6 +33,7 @@ public class ServiceManagerTest {
 
     @Autowired
     private RestTemplate restTemplate;
+
     private MockServiceManager serviceManager;
 
     /*
@@ -260,20 +261,4 @@ public class ServiceManagerTest {
                 "Errore: il servizio 'NonExistentService' avrebbe dovuto restituire null, ma ha restituito: "
                         + service);
     }
-
-    /* 
-    @Test
-    public void testService_allgood(){
-        String Base_URL = "http://mock_url:123";
-        MockRestServiceServer mockServer;
-        mockServer.expect(requestTo(Base_URL + "/testGetNoParams" ))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess("{\"message\":\"Success\"}", MediaType.APPLICATION_JSON));
-
-        serviceManager.registerService("MockService", BaseServiceImpl.class, restTemplate);
-        response = serviceManager.handleRequest("MockService", "testGetNoParams");
-        assertisnotnull();
-    }
-    */
-
 }

@@ -124,7 +124,7 @@ public class AppController_concurrencyTest {
     }
 
     /*
-     *  Mando in esecuzione 20 thread nello stesso istante, 
+     *  Mando in esecuzione 10 thread nello stesso istante, 
      *  tutti fanno lo stesso tipo di richiesta da cui mi aspetto esito positivo 
      */
     @Test
@@ -135,7 +135,7 @@ public class AppController_concurrencyTest {
             executor.submit(() -> {
                 try {
                     startLatch.await();
-                    JSONObject requestJson = loadTestFiles("t0\\Timestamp", "TestTimeStamp", "TimeStamp");
+                    JSONObject requestJson = loadTestFiles("t0", "TestTimeStamp", "TimeStamp");
                     Mock_correct_compile(requestJson);
                 } catch (Exception e) {
                     exceptions.add(e); 
@@ -150,9 +150,8 @@ public class AppController_concurrencyTest {
         assertTrue(exceptions.isEmpty());
     }
 
-
     /*
-    *  Mando in esecuzione 20 thread nello stesso istante, 
+    *  Mando in esecuzione 10 thread nello stesso istante, 
     *  tutti fanno lo stesso tipo di richiesta da cui mi aspetto esito negativo 
      */
     @Test
@@ -165,7 +164,7 @@ public class AppController_concurrencyTest {
                 try {
                     startLatch.await(); // Attendi che tutti i thread siano pronti
                     // Costruisci il JSON da inviare nella richiesta
-                    JSONObject requestJson = loadTestFiles("t1\\Fontinfo", "TestFontinfo", "Fontinfo");
+                    JSONObject requestJson = loadTestFiles("t1", "TestFontinfo", "Fontinfo");
                     // Esegui la richiesta POST
                     Mock_error_compile(requestJson);
                 } catch (Exception e) {
@@ -182,7 +181,7 @@ public class AppController_concurrencyTest {
     }
 
     /*
-    *  Mando in esecuzione 20 thread nello stesso istante, 
+    *  Mando in esecuzione 10 thread nello stesso istante, 
     *  metà fanno richieste di tipo 1 con  esito positivo 
     *  l'altra metà fanno richieste di tipo 2 con esito negativo
     */
@@ -204,7 +203,7 @@ public class AppController_concurrencyTest {
                         Mock_correct_compile(requestJson);
                     } else {
                         // Costruisci il JSON per la richiesta non valida
-                        requestJson = loadTestFiles("t1\\Fontinfo", "TestFontinfo", "Fontinfo");
+                        requestJson = loadTestFiles("t1", "TestFontinfo", "Fontinfo");
                         // Esegui la richiesta POST e verifica l'esito negativo
                         Mock_error_compile(requestJson);
                     }
@@ -234,7 +233,7 @@ public class AppController_concurrencyTest {
                     startLatch.await();
                     // Simula un timeout
                     Thread.sleep(10000); // Ad esempio, dormire per 10 secondi
-                    JSONObject requestJson = loadTestFiles("t0\\Timestamp", "TestTimeStamp", "TimeStamp");
+                    JSONObject requestJson = loadTestFiles("t0", "TestTimeStamp", "TimeStamp");
                     Mock_correct_compile(requestJson);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -250,5 +249,6 @@ public class AppController_concurrencyTest {
         doneLatch.await();
         executor.shutdown();
         // Verifica che l'applicazione gestisca i timeout come previsto
+        assertTrue(exceptions.isEmpty());
     }
 }

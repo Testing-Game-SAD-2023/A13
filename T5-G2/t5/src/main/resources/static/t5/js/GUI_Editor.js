@@ -120,84 +120,121 @@ function toggleIcons(icon1Class, icon2Class, iconElement) {
 
 */
 
-function initializeEditorResizing(container, editor, divider, section1, section2, closeButton) {
-    function setEditorSize() {
-        const availableHeight = container.clientHeight; 
-        editor.setSize(null, availableHeight + "px");
-    }
+function initializeEditorResizing(
+	container,
+	editor,
+	divider,
+	section1,
+	section2,
+	closeButton
+) {
+	function setEditorSize() {
+		const availableHeight = container.clientHeight;
+		editor.setSize(null, availableHeight + "px");
+	}
 
-    function updateIcon(iconElement, isMinimized, icon1Class, icon2Class) {
-        if (isMinimized) {
-            iconElement.classList.add(icon2Class);
-            iconElement.classList.remove(icon1Class);
-        } else {
-            iconElement.classList.add(icon1Class);
-            iconElement.classList.remove(icon2Class);
-        }
-    }
+	function updateIcon(iconElement, isMinimized, icon1Class, icon2Class) {
+		if (isMinimized) {
+			iconElement.classList.add(icon2Class);
+			iconElement.classList.remove(icon1Class);
+		} else {
+			iconElement.classList.add(icon1Class);
+			iconElement.classList.remove(icon2Class);
+		}
+	}
 
-    function enableResizing() {
-        let isDragging = false;
-        let lastHeightSection1 = null;
-        let lastHeightSection2 = null;
+	function enableResizing() {
+		let isDragging = false;
+		let lastHeightSection1 = null;
+		let lastHeightSection2 = null;
 
-        divider.addEventListener("mousedown", () => {
-            isDragging = true;
-            document.body.style.cursor = "n-resize";
-            container.classList.add("no-select");
-        });
+		divider.addEventListener("mousedown", () => {
+			isDragging = true;
+			document.body.style.cursor = "n-resize";
+			container.classList.add("no-select");
+		});
 
-        container.addEventListener("mousemove", (e) => {
-            if (!isDragging) return;
-            const containerRect = container.getBoundingClientRect();
-            const offsetY = e.clientY - containerRect.top;
-            section1.style.height = `${offsetY}px`;
-            section2.style.height = `${containerRect.height - offsetY - divider.offsetHeight}px`;
-            if(section2.style.height < '50px'){
-                section1.style.height = `${container.clientHeight}px`;
-                section2.style.height = 0;
-            }
-        });
+		container.addEventListener("mousemove", (e) => {
+			if (!isDragging) return;
 
-        document.addEventListener("mouseup", () => {
-            if (isDragging) {
-                isDragging = false;
-                document.body.style.cursor = "default";
-                container.classList.remove("no-select");
-            }
-            const iconElement = closeButton.querySelector("i");
-            updateIcon(iconElement, section2.offsetHeight === 0, 
-                                    closeButton.getAttribute("data-icon1"), 
-                                    closeButton.getAttribute("data-icon2"));
-        });
+			const containerRect = container.getBoundingClientRect();
+			const offsetY = e.clientY - containerRect.top;
+			const minimumHeight = 5; // Altezza minima per impostare section2 a 0
 
-        closeButton.addEventListener("click", () => {
+			if (
+				containerRect.height - offsetY - divider.offsetHeight < minimumHeight
+			) {
+				section2.style.height = "0";
+				section1.style.height = `${
+                    containerRect.height - divider.offsetHeight
+				}px`;
+			} else {
+				section1.style.height = `${offsetY}px`;
+				section2.style.height = `${
+					containerRect.height - offsetY - divider.offsetHeight
+				}px`;
+			}
+		});
 
-            const section2Height = getComputedStyle(section2).height; // Ottiene l'altezza calcolata di section2
-            if (lastHeightSection1 === null || lastHeightSection2 === null) {
-                lastHeightSection1 = getComputedStyle(section1).height;
-                lastHeightSection2 = getComputedStyle(section2).height;
-            }
+		document.addEventListener("mouseup", () => {
+			if (isDragging) {
+				isDragging = false;
+				document.body.style.cursor = "default";
+				container.classList.remove("no-select");
+			}
+			const iconElement = closeButton.querySelector("i");
+			updateIcon(
+				iconElement,
+				section2.offsetHeight === 0,
+				closeButton.getAttribute("data-icon1"),
+				closeButton.getAttribute("data-icon2")
+			);
+		});
 
-            const isMinimized = section2.offsetHeight === 0;
-            section2.style.height = isMinimized ? lastHeightSection2 : '0'; // Imposta l'altezza desiderata
-            section1.style.height = isMinimized ? `${container.clientHeight - lastHeightSection2}px` : `${container.clientHeight}px`; // Cambia l'altezza di section1
-            const iconElement = closeButton.querySelector("i");
-            updateIcon(iconElement, !isMinimized, 
-                                    closeButton.getAttribute("data-icon1"), 
-                                    closeButton.getAttribute("data-icon2"));
-        });
-    }
+		closeButton.addEventListener("click", () => {
+			const isMinimized = section2.offsetHeight === 0;
+			if (isMinimized) {
+				// Ripristina l'altezza precedente
+				section2.style.height = `${previousHeight}px`;
+				section1.style.height = `${container.clientHeight - previousHeight}px`;
+			} else {
+				// Salva l'altezza attuale prima di minimizzare
+				previousHeight = section2.offsetHeight;
+				section2.style.height = "0";
+				section1.style.height = `${container.clientHeight}px`;
+			}
+			const iconElement = closeButton.querySelector("i");
+			updateIcon(
+				iconElement,
+				!isMinimized,
+				closeButton.getAttribute("data-icon1"),
+				closeButton.getAttribute("data-icon2")
+			);
+		});
+	}
 
-    window.addEventListener("resize", setEditorSize);
-    enableResizing();
-    setEditorSize(); 
+	window.addEventListener("resize", setEditorSize);
+	enableResizing();
+	setEditorSize();
 }
 
 // Chiama la funzione per inizializzare il ridimensionamento degli editor
-initializeEditorResizing(container_user, editor_utente, divider_Console, section_editor, section_console, close_console_utente);
-initializeEditorResizing(container_robot, editor_robot, divider_result, section_UT, section_result, close_console_result);
-
+initializeEditorResizing(
+	container_user,
+	editor_utente,
+	divider_Console,
+	section_editor,
+	section_console,
+	close_console_utente
+);
+initializeEditorResizing(
+	container_robot,
+	editor_robot,
+	divider_result,
+	section_UT,
+	section_result,
+	close_console_result
+);
 
 // Aggiungi gli event listener ai bottoni
 document.querySelectorAll(".toggleButton").forEach((button) => {
@@ -209,66 +246,66 @@ document.querySelectorAll(".toggleButton").forEach((button) => {
 	});
 });
 /*
-*   Qui è gestito l'handler del tema 
-*/
+ *   Qui è gestito l'handler del tema
+ */
 const chk = document.getElementById("chk_theme");
 function handleThemeToggle() {
-    const htmlElement = document.getElementById("html-root");
-    // Ottieni tutti gli editor e console
-    const editors = [editor_utente, console_utente, editor_robot, console_robot];
+	const htmlElement = document.getElementById("html-root");
+	// Ottieni tutti gli editor e console
+	const editors = [editor_utente, console_utente, editor_robot, console_robot];
 
-    // Definisci i temi come variabili
-    const lightTheme = "mdn-like";      // Tema chiaro
-    const darkTheme = "material-darker"; // Tema scuro
+	// Definisci i temi come variabili
+	const lightTheme = "mdn-like"; // Tema chiaro
+	const darkTheme = "material-darker"; // Tema scuro
 
-    // Funzione per applicare il tema e gestire l'opacità
-    const applyTheme = () => {
-        // Imposta un fade out
-        editors.forEach((editor) => {
-            editor.getWrapperElement().style.transition = "opacity 0.6s ease";
-            editor.getWrapperElement().style.opacity = 0; // Fai svanire l'editor
-        });
+	// Funzione per applicare il tema e gestire l'opacità
+	const applyTheme = () => {
+		// Imposta un fade out
+		editors.forEach((editor) => {
+			editor.getWrapperElement().style.transition = "opacity 0.6s ease";
+			editor.getWrapperElement().style.opacity = 0; // Fai svanire l'editor
+		});
 
-        // Cambiamo il tema visivamente
-        setTimeout(() => {
-            if (chk.checked) {
-                // Tema chiaro
-                htmlElement.setAttribute("data-bs-theme", "light");
-                editors.forEach((editor) => {
-                    editor.setOption("theme", lightTheme);
-                    editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
-                });
-            } else {
-                // Tema scuro
-                htmlElement.setAttribute("data-bs-theme", "dark");
-                editors.forEach((editor) => {
-                    editor.setOption("theme", darkTheme);
-                    editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
-                });
-            }
+		// Cambiamo il tema visivamente
+		setTimeout(() => {
+			if (chk.checked) {
+				// Tema chiaro
+				htmlElement.setAttribute("data-bs-theme", "light");
+				editors.forEach((editor) => {
+					editor.setOption("theme", lightTheme);
+					editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
+				});
+			} else {
+				// Tema scuro
+				htmlElement.setAttribute("data-bs-theme", "dark");
+				editors.forEach((editor) => {
+					editor.setOption("theme", darkTheme);
+					editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
+				});
+			}
 
-            // Dopo che il tema è cambiato, riporta l'opacità a 1 per il fade in
-            editors.forEach((editor) => {
-                editor.getWrapperElement().style.opacity = 1; // Fai riapparire l'editor
-            });
-        }, 500); // Tempo per il fade out prima di cambiare il tema
-    };
+			// Dopo che il tema è cambiato, riporta l'opacità a 1 per il fade in
+			editors.forEach((editor) => {
+				editor.getWrapperElement().style.opacity = 1; // Fai riapparire l'editor
+			});
+		}, 500); // Tempo per il fade out prima di cambiare il tema
+	};
 
-    // Inizializza il tema al caricamento della pagina
-    const initializeTheme = () => {
-        if (chk.checked) {
-            htmlElement.setAttribute("data-bs-theme", "light");
-        } else {
-            htmlElement.setAttribute("data-bs-theme", "dark");
-        }
-        applyTheme(); // Applica il tema iniziale
-    };
+	// Inizializza il tema al caricamento della pagina
+	const initializeTheme = () => {
+		if (chk.checked) {
+			htmlElement.setAttribute("data-bs-theme", "light");
+		} else {
+			htmlElement.setAttribute("data-bs-theme", "dark");
+		}
+		applyTheme(); // Applica il tema iniziale
+	};
 
-    // Gestisci l'evento di change del toggle
-    chk.addEventListener("change", applyTheme);
+	// Gestisci l'evento di change del toggle
+	chk.addEventListener("change", applyTheme);
 
-    // Inizializza il tema al caricamento della pagina
-    document.addEventListener("DOMContentLoaded", initializeTheme);
+	// Inizializza il tema al caricamento della pagina
+	document.addEventListener("DOMContentLoaded", initializeTheme);
 }
 // Chiama la funzione per gestire il toggle
 handleThemeToggle();

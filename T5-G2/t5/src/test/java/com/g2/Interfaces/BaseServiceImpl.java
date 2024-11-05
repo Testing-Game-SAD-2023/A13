@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,6 @@ import org.springframework.web.client.RestTemplate;
 public class BaseServiceImpl extends BaseService {
 
     // Costruttore che richiama il costruttore della classe base
-    @Autowired
     public BaseServiceImpl(RestTemplate restTemplate, String baseUrl) {
         super(restTemplate, baseUrl);
         // Registrazione delle azioni specifiche del servizio
