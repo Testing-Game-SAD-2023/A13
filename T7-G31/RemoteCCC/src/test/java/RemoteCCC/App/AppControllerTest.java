@@ -48,7 +48,7 @@ public class AppControllerTest {
     private static final String BASE_PATH = ".\\src\\test\\resources\\classi_da_testare\\";
 
     /*
-    *   Carica i contenuti dei file, restituendo un oggetto JSON per la richiesta
+     * Carica i contenuti dei file, restituendo un oggetto JSON per la richiesta
      */
     private JSONObject loadTestFiles(String folderName, String testingClassName, String underTestClassName)
             throws Exception {
@@ -72,7 +72,8 @@ public class AppControllerTest {
         return Files.readString(path);
     }
 
-    private ResultActions Mock_perform(JSONObject requestJson, Boolean expectedError, Boolean expectCoverage) throws Exception {
+    private ResultActions Mock_perform(JSONObject requestJson, Boolean expectedError, Boolean expectCoverage)
+            throws Exception {
         // Metodo per eseguire la richiesta di compilazione e testing
         return mockMvc.perform(post("/compile-and-codecoverage")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -88,51 +89,79 @@ public class AppControllerTest {
     }
 
     /*
-    *  METODI PRINCIPALI PER FARE TEST
-    */
+     * METODI PRINCIPALI PER FARE TEST
+     */
     @ParameterizedTest
     @MethodSource("testParameters")
-    public void DoTest(String foldername, String ClassName, Boolean expectedError, Boolean expectCoverage) throws Exception {
+    public void DoTest(String foldername, String ClassName, Boolean expectedError, Boolean expectCoverage)
+            throws Exception {
         String TestingClassName = "Test" + ClassName;
         JSONObject requestJson = loadTestFiles(foldername, TestingClassName, ClassName);
         Mock_perform(requestJson, expectedError, expectCoverage);
     }
 
     /*
-    *     test 0 - senza errori
-    *     test 1 - manca costruttore nella classe
-    *     test 2 - tipo di ritorno errato
-    *     test 3 - Verifica se una firma di metodo errata nella classe di test genera un errore di compilazione
-    *     test 4 - Controlla se una classe di test vuota non genera un errore di compilazione
-    *     test 5 - Testa se la mancanza di un metodo privato previsto genera un errore di compilazione
-    *     test 6 - Verifica se un'importazione non valida causa un errore di compilazione
-    *     test 7 - Controlla se l'assegnazione di un tipo di dato errato a una variabile genera un errore di compilazione
-    *     test 8 - Verifica se un nome del file non corrispondente genera un errore di compilazione
-    *     test 9 - Verifica se un errore di formattazione del codice genera un errore di compilazione
-    *     test 10 - Controlla se un nome della classe di test non formattato correttamente genera un errore di compilazione
-    */
+     * test 0 - senza errori
+     * test 1 - manca costruttore nella classe
+     * test 2 - tipo di ritorno errato
+     * test 3 - Verifica se una firma di metodo errata nella classe di test genera
+     * un errore di compilazione
+     * test 4 - Controlla se una classe di test vuota non genera un errore di
+     * compilazione
+     * test 5 - Testa se la mancanza di un metodo privato previsto genera un errore
+     * di compilazione
+     * test 6 - Verifica se un'importazione non valida causa un errore di
+     * compilazione
+     * test 7 - Controlla se l'assegnazione di un tipo di dato errato a una
+     * variabile genera un errore di compilazione
+     * test 8 - Verifica se un nome del file non corrispondente genera un errore di
+     * compilazione
+     * test 9 - Verifica se un errore di formattazione del codice genera un errore
+     * di compilazione
+     * test 10 - Controlla se un nome della classe di test non formattato
+     * correttamente genera un errore di compilazione
+     * template 0 - Classe test senza errori
+     * template 1 - Manca costruttore nella classe di test
+     * template 2 - Verifica se il test della classe di test è errato, prevedendo un
+     * valore non nullo
+     * nonostante l'introduzione di dati incompleti, come la rimozione dell'email,
+     * che ne causa
+     * il fallimento.
+     * template 3 - Controlla se il test all'interno della classe di test è errato
+     * confrontando una variabile con un
+     * valore sbagliato, il che provoca il fallimento del test
+     * template 4 - Verifica se il test all'interno della classe di test è errato
+     * poiché restituisce null, mentre ci
+     * aspettiamo il risultato opposto
+     * template 5- Verifica se il nome del file della classe di test non
+     * corrispondente generando
+     * un errore di compilazione
+     */
     /*
-    * Metodo di supporto per fornire i parametri
+     * Metodo di supporto per fornire i parametri
      */
     static Stream<Arguments> testParameters() {
         return Stream.of(
                 /*
-                *   DIR NAME | ClassName | Expected Error | Expected Coverage
-                */ 
-                Arguments.of("t0", "TimeStamp",     false, true), // Caso senza errori, con coverage
-                Arguments.of("t1", "Fontinfo",      true, false), // Errore atteso, nessuna coverage
-                Arguments.of("t2", "HSLColor",      true, false), // Errore atteso, nessuna coverage
-                Arguments.of("t3", "OutputFormat",  true, false), // Altri casi...
+                 * DIR NAME | ClassName | Expected Error | Expected Coverage
+                 */
+                Arguments.of("t0", "TimeStamp", false, true), // Caso senza errori, con coverage
+                Arguments.of("t1", "Fontinfo", true, false), // Errore atteso, nessuna coverage
+                Arguments.of("t2", "HSLColor", true, false), // Errore atteso, nessuna coverage
+                Arguments.of("t3", "OutputFormat", true, false), // Altri casi...
                 Arguments.of("t4", "SubjectParser", false, true),
-                Arguments.of("t5", "TimeStamp",     true, false),
-                Arguments.of("t6", "TimeStamp",     true, false),
-                Arguments.of("t7", "FTPFile",       true, false),
-                Arguments.of("t8", "FontInf",       true, false),
-                Arguments.of("t9", "HSLColor",      true, false),
-                Arguments.of("t10", "OutputFormat", true, false)
-        );
+                Arguments.of("t5", "TimeStamp", true, false),
+                Arguments.of("t6", "TimeStamp", true, false),
+                Arguments.of("t7", "FTPFile", true, false),
+                Arguments.of("t8", "FontInf", true, false),
+                Arguments.of("t9", "HSLColor", true, false),
+                Arguments.of("t10", "OutputFormat", true, false),
+                Arguments.of("template0", "VCardBean", false, true),
+                Arguments.of("template1", "VCardBean", true, false),
+                Arguments.of("template2", "VCardBean", true, false),
+                Arguments.of("template3", "VCardBean", true, false),
+                Arguments.of("template4", "VCardBean", true, false),
+                Arguments.of("template5", "VCardBean", true, false));
     }
-
-
 
 }
