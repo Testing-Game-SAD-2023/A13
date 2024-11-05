@@ -14,17 +14,16 @@
 			rel="stylesheet"
 			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
 		/>
-		
 		<!-- CodeMirror JavaScript -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
 		<!-- code mirror-->
 		<!-- CodeMirror CSS -->
 		<link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
 		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
-		<link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css" />
-		
+		<link rel="stylesheet" href="./t5/codemirror/theme/mdn-like.css" />
+
 		<link rel="stylesheet" href="/t5/css/main_style.css" />
-		
+
 		<style>
 			.no-select {
 				user-select: none; /* Per browser moderni */
@@ -32,36 +31,33 @@
 				-moz-user-select: none; /* Per Firefox */
 				-ms-user-select: none; /* Per Internet Explorer */
 			}
+
+			.icon-fade {
+				opacity: 0; /* Inizialmente invisibile */
+				transition: opacity 0.3s ease; /* Transizione per l'opacità */
+			}
+
+			.icon-visible {
+				opacity: 1; /* Completamente visibile */
+			}
+
 			.CodeMirror {
 				height: 100%; /* Assicura che l'editor utilizzi il 100% dello spazio disponibile */
 			}
 			.covered-line {
-				background-color: #c8e6c9; /* Colore di sfondo per le righe coperte */
-				color: black !important;
+				border-left: 4px solid green; /* Colore del bordo a sinistra */
 			}
 			.uncovered-line {
-				background-color: #ffcdd2; /* Colore di sfondo per le righe non coperte */
-				color: black !important;
+				border-left: 4px solid red; /* Colore del bordo a sinistra */
 			}
 			.partially-covered-line {
-				background-color: #ffecb3; /* Colore di sfondo per le righe parzialmente coperte */
-				color: black !important;
-			}
-
-			#dashboard {
-				display: flex;
-				flex-direction: row;
-				width: 100vw; /* Occupa tutta la larghezza della viewport */
-				height: 100vh; /* Occupa tutta l'altezza della viewport */
-				overflow: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
+				border-left: 4px solid #FF5733; /* Colore del bordo a sinistra */
 			}
 
 			#card_user,
 			#card_robot {
-				height: 95vh;
+				height: 95.6vh;
 				width: 49.7vw;
-				flex-grow: 0; /* Disabilita la crescita del container */
-				flex-shrink: 0; /* Disabilita il restringimento del container */
 				overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
 			}
 
@@ -77,457 +73,646 @@
 				); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
 			}
 
+			.CodeMirror-vscrollbar {
+				overflow: hidden; /* Nasconde la scrollbar */
+			}
+
 			.highlight {
 				background-color: yellow;
 				color: black;
 			}
+
+			.border-secondary-subtle {
+ 				 --bs-border-opacity: 1;
+  				border-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-border-opacity)) !important;
+			}
+			
+			.border-secondary-subtle:hover{
+				cursor:n-resize;
+				transition: border-color 3s ease; 
+				border-color: rgba(var(--bs-primary-bg-rgb), var(--bs-border-opacity)) !important;
+			}
 		</style>
 	</head>
-	
-	<body class="overflow-y-hidden overflow-x-hidden px-1">
+
+	<body class="overflow-y-hidden">
 		<!-- NAV-->
-		<ul class="nav">
-			<li class="nav-item flex-grow-1">
-				<a
-					href="/logout"
-					class="btn btn-sm text-light"
-					tabindex="-1"
-					role="button"
-					aria-disabled="true"
-				>
-					<i class="bi bi-arrow-90deg-left"></i>
-					Logout
-				</a>
-			</li>
-			<li class="nav-item">
-				<div class="form-check form-switch mt-1">
-					<label class="form-check-label text-light" for="themeToggle"> Mode </label>
-					<input
-						class="form-check-input"
-						type="checkbox"
-						role="switch"
-						id="themeToggle"
-					/>
-				</div>
-			</li>
-		</ul>
-		<!-- DASHBOARD -->
-		<div class="container-fluid" id="dashboard">
-			<div class="row">
-				<!-- PRIMA COLONNA-->
-				<div class="col px-0">
-					<div class="card rounded-0" id="card_user">
-						<!-- EDITOR-->
-						<div class="card-header p-0">
-							<nav class="navbar bg-body-tertiary p-2">
-								<span class="navbar-brand lead my-0 py-0"> Edit </span>
-								<div class="">
-									<!-- UNDO e REDO -->
-									<button type="button" class="btn" id="undo-button">
-										<i class="bi bi-arrow-90deg-left"></i>
-									</button>
-									<button type="button" class="btn" id="redo-button">
-										<i class="bi bi-arrow-90deg-right"></i>
-									</button>
-									<!-- COVERAGE -->
-									<button
-										class="btn btn-primary"
-										type="button"
-										id="coverageButton"
-									>
-										<div id="loading_cov">
-											<span
-												class="spinner-border spinner-border-sm"
-												aria-hidden="true"
-												style="display: none"
-											></span>
-											<i
-												id="loading_icon_1"
-												class="bi bi-play-fill"
-												aria-hidden="true"
-											></i>
-											<span role="status">Play</span>
-											<!-- Icona nascosta -->
+		<nav class="nav bg-body-tertiary border border-bottom-0">
+			<div class="container-fluid px-0">
+				<div class="d-flex justify-content-between">
+					<!-- GO BACK -->
+					<div>
+						<a
+							href="/main"
+							class="btn btn-sm"
+							tabindex="-1"
+							role="button"
+							aria-disabled="true"
+						>
+							<i class="bi bi-arrow-90deg-left" th:text="#{indietro}"></i>
+						</a>
+					</div>
+					<div class="text-center">
+						<a class="navbar-brand" id="Nome_modalita">
+						</a>
+					</div>
+						<div>
+							<!-- Language -->
+							<button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+								<i id="dropdownIcon">
+									<!-- English icon-->
+									<svg width="14px" height="14px"enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+								</i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end p-0">
+								<div class="list-group">
+									<!-- English -->
+									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="en">
+										<div class="d-flex justify-content-between">
+											<h6>
+												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+											</h6>
+											<h6>
+												English
+											</h6>
 										</div>
-									</button>
-									<!-- MENU BUTTON -->
-									<button
-										type="button"
-										id="utente_menu"
-										class="btn btn-sm dropdown-toggle-split my-0"
-										data-bs-toggle="dropdown"
-										aria-expanded="false"
-										data-bs-auto-close="outside"
-										aria-haspopup="true"
-									>
-										<i class="bi bi-three-dots-vertical"></i>
-									</button>
-									<!-- MENU OPZIONI -->
-									<div
-										class="dropdown-menu shadow dropdown-menu-end"
-										aria-labelledby="navbarDropdownMenuLink"
-										style="width: 400px;"
-									>
-										<div class="container-fluid p-0">
-											<div class="tab-content" id="myTabContent">
-												<!-- MENU -->
-												<div
-													class="tab-pane fade show active"
-													id="paneA"
-													role="tabpanel"
-													aria-labelledby="pane-A"
-												>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item"> 
-															<Strong>Menu</Strong>
-														</li>
-														<li class="breadcrumb-item active" aria-current="page">CTRL+D</li>
-												  	</ol>
-													<div class="list-group list-group-flush">
-														<button
-															type="button"
-															onclick="showTabPane('paneB')"
-															class="list-group-item list-group-item-action"
-															aria-current="true"
-														>
-															<i class="bi bi-clock-history"></i>
-															Storico
-														</button>
-														<button
-															type="button"
-															onclick="showTabPane('paneC')"
-															class="list-group-item list-group-item-action"
-														>
-															<i class="bi bi-upload"></i> Upload
-														</button>
-														<button
-															type="button"
-															id="DownloadButton"
-															class="list-group-item list-group-item-action"
-														>
-															<i class="bi bi-download"></i> Download
-														</button>
-														<button
-															type="button"
-															onclick="showTabPane('paneD')"
-															class="list-group-item list-group-item-action"
-														>
-															<i class="bi bi-search"></i> Cerca&Sostituisci
-														</button>
-													</div>
-												</div>
-												<!-- STORICO-->
-												<div
-													class="tab-pane fade overflow-y-auto "
-													id="paneB"
-													role="tabpanel"
-													aria-labelledby="pane-B"
-												>
-													<div class="d-flex">
-														<button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
-															<i class="bi bi-arrow-left"></i>
-														</button>
-														<ol class="breadcrumb m-0 px-2">
-															<li class="breadcrumb-item">Menu</li>
-															<li class="breadcrumb-item active" aria-current="page">Storico</li>
-														</ol>
-													</div>
-													<ol
-														id="storico_list"
-														class="list-group list-group-flush list-group-numbered overflow-auto border-top"
-														style="max-height: 150px"
+									</a>
+									<!-- Italian -->
+									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="it">
+										<div class="d-flex justify-content-between">
+											<h6>
+												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"/><path d="m0 256c0 110.071 69.472 203.906 166.957 240.077v-480.154c-97.485 36.171-166.957 130.006-166.957 240.077z" fill="#6da544"/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+											</h6>
+											<h6>
+												Italian 
+											</h6>
+										</div>
+									</a>
+									<!-- Spanish -->
+									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="es">
+										<div class="d-flex justify-content-between">
+											<h6>
+												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m0 256c0 31.314 5.633 61.31 15.923 89.043l240.077 22.261 240.077-22.261c10.29-27.733 15.923-57.729 15.923-89.043s-5.633-61.31-15.923-89.043l-240.077-22.261-240.077 22.261c-10.29 27.733-15.923 57.729-15.923 89.043z" fill="#ffda44"/><g fill="#d80027"><path d="m496.077 166.957c-36.171-97.484-130.006-166.957-240.077-166.957s-203.906 69.473-240.077 166.957z"/><path d="m15.923 345.043c36.171 97.484 130.006 166.957 240.077 166.957s203.906-69.473 240.077-166.957z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+											</h6>
+											<h6>
+												Spanish
+											</h6>
+										</div>
+									</a>									 
+								</div>
+							</div>
+							<!-- Setting -->
+							<button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+								<i class="bi bi-gear-fill"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end p-0">
+								<div class="list-group">
+									<!-- Tema -->
+									<a class="list-group-item list-group-item-action p-2" aria-current="true">
+										<div class="d-flex justify-content-between align-baseline">
+											<h6 class="my-1 mx-1" th:text="#{tema}"> </h6>
+											<div class="form-check form-switch mt-1">
+												<input class="form-check-input" type="checkbox" role="switch" id="chk_theme">
+											</div>
+										</div>
+									</a>
+									<!-- Font size -->
+									<a class="list-group-item list-group-item-action p-2" aria-current="true">
+										<div class="d-flex gap-5 justify-content-between">
+											<h6 class="my-1 mx-1" th:text="#{grandezza_carattere}"> </h6>
+											<div class="input-group my-2 input-group-sm" >
+												<button class="btn btn-outline-secondary" type="button" id="decrement-button">
+													<i class="bi bi-dash"></i>
+												</button>
+												<input type="text" class="form-control" id="font-size-input" placeholder="16" style="width:10px; text-align: center;">
+												<button class="btn btn-outline-secondary" type="button" id="increment-button">
+													<i class="bi bi-plus"></i>
+												</button>
+											</div>
+										</div>
+									</a>									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</nav>
+
+		<!-- DASHBOARD -->
+		<div class="card-group">
+				<!-- PRIMA COLONNA-->
+				<div class="card rounded-0" id="card_user">
+					<!-- EDITOR-->
+					<div class="card-header p-0">
+						<nav class="navbar bg-body-tertiary p-2">
+							<span class="navbar-brand lead my-0 py-0" th:text="#{modifica}"></span>
+							<div class="">
+								<!-- UNDO e REDO -->
+								<button type="button" class="btn" id="undo-button">
+									<i class="bi bi-arrow-90deg-left"></i>
+								</button>
+								<button type="button" class="btn" id="redo-button">
+									<i class="bi bi-arrow-90deg-right"></i>
+								</button>
+								<!-- COVERAGE -->
+								<button
+									class="btn btn-primary"
+									type="button"
+									id="coverageButton"
+								>
+									<div id="loading_cov">
+										<span
+											class="spinner-border spinner-border-sm"
+											aria-hidden="true"
+											style="display: none"
+										></span>
+										<i
+											id="loading_icon_1"
+											class="bi bi-play-fill"
+											aria-hidden="true"
+										></i>
+										<span role="status" data-title="Play" th:text="#{tasto_play}"></span>
+										<!-- Icona nascosta -->
+									</div>
+								</button>
+								<!-- MENU BUTTON -->
+								<button
+									type="button"
+									id="utente_menu"
+									class="btn btn-sm dropdown-toggle-split my-0"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									data-bs-auto-close="outside"
+									aria-haspopup="true"
+								>
+									<i class="bi bi-three-dots-vertical"></i>
+								</button>
+								<!-- MENU OPZIONI -->
+								<div
+									class="dropdown-menu shadow dropdown-menu-end"
+									aria-labelledby="navbarDropdownMenuLink"
+									style="width: 400px"
+								>
+									<div class="container-fluid p-0">
+										<div class="tab-content" id="myTabContent">
+											<!-- MENU -->
+											<div
+												class="tab-pane fade show active"
+												id="paneA"
+												role="tabpanel"
+												aria-labelledby="pane-A"
+											>
+												<ol class="breadcrumb m-0 px-2">
+													<li class="breadcrumb-item">
+														<strong>Menu</strong>
+													</li>
+													<li
+														class="breadcrumb-item active"
+														aria-current="page"
 													>
+														CTRL+D
+													</li>
+												</ol>
+												<div class="list-group list-group-flush">
+													<button
+														type="button"
+														onclick="showTabPane('paneB')"
+														class="list-group-item list-group-item-action"
+														aria-current="true"
+													>
+														<i class="bi bi-clock-history" th:text="#{storico}"></i>														
+													</button>
+													<button
+														type="button"
+														onclick="showTabPane('paneC')"
+														class="list-group-item list-group-item-action"
+													>
+														<i class="bi bi-upload"></i> Upload
+													</button>
+													<button
+														type="button"
+														id="DownloadButton"
+														class="list-group-item list-group-item-action"
+													>
+														<i class="bi bi-download"></i> Download
+													</button>
+													<button
+														type="button"
+														onclick="showTabPane('paneD')"
+														class="list-group-item list-group-item-action"
+													>
+														<i class="bi bi-search" th:text="#{cerca_sostituisci}"></i> 
+													</button>
+												</div>
+											</div>
+											<!-- STORICO-->
+											<div
+												class="tab-pane fade overflow-y-auto"
+												id="paneB"
+												role="tabpanel"
+												aria-labelledby="pane-B"
+											>
+												<div class="d-flex">
+													<button
+														type="button"
+														onclick="showTabPane('paneA')"
+														class="list-group-item mb-2 mx-2"
+													>
+														<i class="bi bi-arrow-left"></i>
+													</button>
+													<ol class="breadcrumb m-0 px-2">
+														<li class="breadcrumb-item">Menu</li>
 														<li
-															id="placeholder-item"
-															class="list-group-item d-flex justify-content-between align-items-start"
+															class="breadcrumb-item active"
+															aria-current="page" th:text="#{storico}"
 														>
-															<div class="ms-2 me-auto">
-																<div class="fw-bold">
-																	Nessun turno presente!
-																</div>
-															</div>
+															
 														</li>
 													</ol>
 												</div>
-												<!-- UPLOAD -->
-												<div
-													class="tab-pane fade"
-													id="paneC"
-													role="tabpanel"
-													aria-labelledby="pane-C"
+												<ol
+													id="storico_list"
+													class="list-group list-group-flush list-group-numbered overflow-auto border-top"
+													style="max-height: 150px"
 												>
+													<li
+														id="placeholder-item"
+														class="list-group-item d-flex justify-content-between align-items-start"
+													>
+														<div class="ms-2 me-auto">
+															<div class="fw-bold" th:text="#{no_turni}">
+															</div>
+														</div>
+													</li>
+												</ol>
+											</div>
+											<!-- UPLOAD -->
+											<div
+												class="tab-pane fade"
+												id="paneC"
+												role="tabpanel"
+												aria-labelledby="pane-C"
+											>
 												<div class="d-flex">
-													<button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
+													<button
+														type="button"
+														onclick="showTabPane('paneA')"
+														class="list-group-item mb-2 mx-2"
+													>
 														<i class="bi bi-arrow-left"></i>
 													</button>
 													<ol class="breadcrumb m-0 px-2">
 														<li class="breadcrumb-item">Menu</li>
-														<li class="breadcrumb-item active" aria-current="page">Upload</li>
+														<li
+															class="breadcrumb-item active"
+															aria-current="page"
+														>
+															Upload
+														</li>
 													</ol>
 												</div>
+												<input
+													class="container-fluid form-control"
+													id="fileInput"
+													type="file"
+												/>
+											</div>
+											<!-- SEARCH -->
+											<div
+												class="tab-pane fade"
+												id="paneD"
+												role="tabpanel"
+												aria-labelledby="pane-D"
+											>
+												<div class="d-flex">
+													<button
+														type="button"
+														onclick="showTabPane('paneA')"
+														class="list-group-item mb-2 mx-2"
+													>
+														<i class="bi bi-arrow-left"></i>
+													</button>
+													<ol class="breadcrumb m-0 px-2">
+														<li class="breadcrumb-item">Menu</li>
+														<li
+															class="breadcrumb-item active"
+															aria-current="page"
+															th:text="#{cerca_sostituisci}"
+														>
+														</li>
+													</ol>
+												</div>
+												<div class="input-group mb-3 px-2">
+													<button
+														class="btn btn-primary"
+														type="button"
+														id="searchButton"
+													>
+														<i class="bi bi-search"></i>
+													</button>
 													<input
-														class="container-fluid form-control"
-														id="fileInput"
-														type="file"
+														type="text"
+														id="searchTerm"
+														class="form-control border-secondary"
+														placeholder="Cerca"
+														aria-label="Cerca"
 													/>
+													<span
+														class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger"
+														id="SearchItems"
+														style="display: none"
+													>
+													</span>
 												</div>
-												<!-- SEARCH -->
-												<div
-													class="tab-pane fade"
-													id="paneD"
-													role="tabpanel"
-													aria-labelledby="pane-D"
-												>
-												<div class="d-flex">
-													<button type="button" onclick="showTabPane('paneA')" class="list-group-item mb-2 mx-2">
-														<i class="bi bi-arrow-left"></i>
+												<div class="input-group mb-2 px-2">
+													<button
+														class="btn btn-primary"
+														type="button"
+														id="startReplace"
+													>
+														<i class="bi bi-arrow-left-right"></i>
 													</button>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item">Menu</li>
-														<li class="breadcrumb-item active" aria-current="page">Cerca&Sostituisci</li>
-													</ol>
-												</div>
-													<div class="input-group mb-3 px-2">
-														<button
-															class="btn btn-primary"
-															type="button"
-															id="searchButton"
-														>
-															<i class="bi bi-search"></i>
-														</button>
-														<input
-															type="text"
-															id="searchTerm"
-															class="form-control border-secondary"
-															placeholder="Cerca"
-															aria-label="Cerca"
-														/>
-														<span
-															class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger"
-															id="SearchItems"
-															style="display: none"
-														>
-														</span>
-													</div>
-													<div class="input-group mb-2 px-2">
-														<button
-															class="btn btn-primary"
-															type="button"
-															id="startReplace"
-														>
-															<i class="bi bi-arrow-left-right"></i>
-														</button>
-														<input
-															type="text"
-															id="replaceTerm"
-															class="form-control border-secondary"
-															placeholder="Sostituisci"
-															aria-label="Sostituisci"
-														/>
-													</div>
+													<input
+														type="text"
+														id="replaceTerm"
+														class="form-control border-secondary"
+														placeholder="Sostituisci"
+														aria-label="Sostituisci"
+													/>
 												</div>
 											</div>
 										</div>
 									</div>
 								</div>
-							</nav>
-						</div>
-						<div
-							class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-							id="section_editor"
-						>
-							<textarea id="Editor_utente">
-	/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
-	Nome: "inserire il proprio nome"
-	Cognome: "inserire il proprio cognome"
-	Username: username
-	UserID: userID
-	Date: date
-	*/
+							</div>
+						</nav>
+					</div>
+					<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_editor">
+						<textarea id="Editor_utente">
+/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+Nome: "inserire il proprio nome"
+Cognome: "inserire il proprio cognome"
+Username: username
+UserID: userID
+Date: date
+*/
 
-	import org.junit.Before;
-	import org.junit.After;
-	import org.junit.BeforeClass;
-	import org.junit.AfterClass;
-	import org.junit.Test;
-	import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-	public class TestClasse {
-		@BeforeClass
-		public static void setUpClass() {
-			// Eseguito una volta prima dell'inizio dei test nella classe
-			// Inizializza risorse condivise 
-			// o esegui altre operazioni di setup
-		}
-					
-		@AfterClass
-		public static void tearDownClass() {
-			// Eseguito una volta alla fine di tutti i test nella classe
-			// Effettua la pulizia delle risorse condivise 
-			// o esegui altre operazioni di teardown
-		}
-					
-		@Before
-		public void setUp() {
-			// Eseguito prima di ogni metodo di test
-			// Preparazione dei dati di input specifici per il test
-		}
-					
-		@After
-		public void tearDown() {
-			// Eseguito dopo ogni metodo di test
-			// Pulizia delle risorse o ripristino dello stato iniziale
-		}
-					
-		@Test
-		public void testMetodo() {
-			// Preparazione dei dati di input
-			// Esegui il metodo da testare
-			// Verifica l'output o il comportamento atteso
-			// Utilizza assert per confrontare il risultato atteso 
-			// con il risultato effettivo
-		}
-					
-		// Aggiungi altri metodi di test se necessario
+public class TestClasse {
+	@BeforeClass
+	public static void setUpClass() {
+		// Eseguito una volta prima dell'inizio dei test nella classe
+		// Inizializza risorse condivise 
+		// o esegui altre operazioni di setup
 	}
+				
+	@AfterClass
+	public static void tearDownClass() {
+		// Eseguito una volta alla fine di tutti i test nella classe
+		// Effettua la pulizia delle risorse condivise 
+		// o esegui altre operazioni di teardown
+	}
+				
+	@Before
+	public void setUp() {
+		// Eseguito prima di ogni metodo di test
+		// Preparazione dei dati di input specifici per il test
+	}
+				
+	@After
+	public void tearDown() {
+		// Eseguito dopo ogni metodo di test
+		// Pulizia delle risorse o ripristino dello stato iniziale
+	}
+				
+	@Test
+	public void testMetodo() {
+		// Preparazione dei dati di input
+		// Esegui il metodo da testare
+		// Verifica l'output o il comportamento atteso
+		// Utilizza assert per confrontare il risultato atteso 
+		// con il risultato effettivo
+	}
+				
+	// Aggiungi altri metodi di test se necessario
+}
 
-
-
-							</textarea
-							>
-						</div>
-						<!-- CONSOLE -->
-						<div class="card-header border-top p-0">
-							<nav class="navbar bg-body-tertiary p-2">
-								<span class="navbar-brand lead my-0 py-0"> Console </span>
-								<div>
-									<button type="button" class="btn btn-sm" id="close_console_utente">
-										<i class="bi bi-arrow-bar-down"></i>
-									</button>
-									<button type="button" class="btn btn-sm" id="divider_Console">
-										<i class="bi bi-arrows-expand"></i>
-									</button>
-								</div>
-							</nav>
-						</div>
-						<div
-							class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-							id="section_console"
-						>
-							<textarea id="Console_utente"> </textarea>
-						</div>
-						<div class="card-footer text-body-secondary"></div>
+						</textarea>
+					</div>
+					<!-- CONSOLE -->
+					<div class="card-header border-top p-0">
+						<div id="divider_Console" class="border border-3 border-secondary-subtle"></div>
+						<nav class="navbar bg-body-tertiary p-1">
+							<span class="navbar-brand lead my-0 py-0"> Console </span>
+							<div>
+								<button
+									type="button"
+									class="btn btn-sm toggleButton"
+									id="close_console_utente"
+									data-icon1="bi-arrow-bar-down"
+									data-icon2="bi-arrow-bar-up"
+								>
+									<i class="bi bi-arrow-bar-down"></i>
+								</button>
+							</div>
+						</nav>
+					</div>
+					<div
+						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+						id="section_console"
+					>
+						<textarea id="Console_utente"> </textarea>
+					</div>
+					<div class="card-footer text-body-secondary py-0 px-1">
+						<small class="pl-5">
+							<i class="bi bi-exclamation-triangle-fill"></i> 
+						</small>
+						<small class="pr-2" id="warning_compiler">
+							0
+						</small>						
+						<small class="pr-2">
+							<i class="bi bi-x-circle"></i>
+						</small>
+						<small class="pr-2" id="error_compiler">
+							0
+						</small>
 					</div>
 				</div>
 				<!-- SECONDA COLONNA-->
-				<div class="col px-0">
-					<div class="card rounded-0" id="card_robot">
-						<!-- CLASS UNDER TEST-->
-						<div class="card-header p-0">
-							<nav class="navbar bg-body-tertiary p-2">
-								<span class="navbar-brand lead my-0 py-0">
-									Class Under Test
+				<div class="card rounded-0" id="card_robot">
+					<!-- CLASS UNDER TEST-->
+					<div class="card-header p-0">
+						<nav class="navbar bg-body-tertiary p-2">
+							<span class="navbar-brand lead my-0 py-0" th:text="#{classe_ut}">
+							</span>
+							<div class="">
+								<!-- INFO BUTTON -->
+								<span
+									class="d-inline-block mx-3"
+									tabindex="0"
+									id="popover_info"
+									data-bs-toggle="popover"
+									data-bs-trigger="hover focus"
+									data-bs-title="Game info"
+									data-bs-placement="bottom"
+									data-bs-content="prova"
+								>
+									<i class="bi bi-info-circle"></i>
 								</span>
-								<div class="">
-									<!-- INFO BUTTON -->
-									<span
-										class="d-inline-block mx-3"
-										tabindex="0"
-										id="popover_info"
-										data-bs-toggle="popover"
-										data-bs-trigger="hover focus"
-										data-bs-title="Game Info"
-										data-bs-placement="bottom"
-										data-bs-content="prova"
-									>
-										<i class="bi bi-info-circle"></i>
-									</span>
-									<!-- SUBMIT /RUN -->
-									<button class="btn btn-success" type="button" id="runButton">
-										<div id="loading_run">
-											<span
-												class="spinner-border spinner-border-sm"
-												aria-hidden="true"
-												style="display: none"
-											></span>
-											<i
-												id="loading_icon_1"
-												class="bi bi-play-fill"
-												aria-hidden="true"
-											></i>
-											<span role="status">Submit</span>
-											<!-- Icona nascosta -->
-										</div>
-									</button>
-								</div>
-							</nav>
-						</div>
-						<div
-							class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-							id="section_UT"
-						>
-							<textarea id="Editor_Robot" th:text="${classeUT}"> </textarea>
-						</div>
-						<!-- COMPARE RESULT -->
-						<div class="card-header border-top p-0">
-							<nav class="navbar bg-body-tertiary p-2">
-								<span class="navbar-brand lead my-0 py-0"> Results </span>
-								<div>
-									<button type="button" class="btn btn-sm" id="close_console_result">
-										<i class="bi bi-arrow-bar-down"></i>
-									</button>
-									<button type="button" class="btn btn-sm" id="divider_result">
-										<i class="bi bi-arrows-expand"></i>
-									</button>
-								</div>
-							</nav>
-						</div>
-						<div
-							class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-							id="section_result"
-						>
-							<textarea id="Console_Robot"> </textarea>
-						</div>
-						<div class="card-footer text-body-secondary"></div>
+								<!-- SUBMIT /RUN -->
+								<button class="btn btn-success" type="button" id="runButton">
+									<div id="loading_run">
+										<span
+											class="spinner-border spinner-border-sm"
+											aria-hidden="true"
+											style="display: none"
+										></span>
+										<i
+											id="loading_icon_1"
+											class="bi bi-play-fill"
+											aria-hidden="true"
+										></i>
+										<span role="status" data-title="Submit" th:text="#{submit}"></span>
+										<!-- Icona nascosta -->
+									</div>
+								</button>
+							</div>
+						</nav>
+					</div>
+					<div
+						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+						id="section_UT"
+					>
+						<textarea id="Editor_Robot" th:text="${classeUT}"> </textarea>
+					</div>
+					<!-- COMPARE RESULT -->
+					<div class="card-header border-top p-0">
+						<div id="divider_result" class="border border-3 border-secondary-subtle"></div>
+						<nav class="navbar bg-body-tertiary p-1">
+							<span class="navbar-brand lead my-0 py-0" th:text="#{risultati}"> </span>
+							<div>
+								<button
+									type="button"
+									class="btn btn-sm toggleButton"
+									id="close_console_result"
+									data-icon1="bi-arrow-bar-down"
+									data-icon2="bi-arrow-bar-up"
+								>
+									<i class="bi bi-arrow-bar-down"></i>
+								</button>
+							</div>
+						</nav>
+					</div>
+					<div
+						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+						id="section_result"
+					>
+						<textarea id="Console_Robot"> </textarea>
+					</div>
+					<div class="card-footer text-body-secondary py-0 px-1" id="status_compiler">
+						<small class="pl-5">
+							<i
+								id="loading_icon_1"
+								class="bi bi-server"
+								aria-hidden="true"
+							></i>
+							<div class="spinner-border spinner-border-sm" role="status" 
+								aria-hidden="true"
+								style="display: none">
+							</div>
+						</small>
+						<small class="pr-2" id="status_text" th:text="#{pronto}">
+						</small>						
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- Modal -->
-		<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
+		<!-- Modal INFO-->
+		<div
+			class="modal fade"
+			id="Modal"
+			tabindex="-1"
+			aria-labelledby="Modal"
+			aria-hidden="true"
+		>
 			<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-				<h1 class="modal-title fs-5" id="Modal_title">
-					Modal title
-				</h1>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="Modal_title">Modal title</h1>
+						<button
+							type="button"
+							class="btn-close"
+							data-bs-dismiss="modal"
+							aria-label="Close"
+						></button>
+					</div>
+					<div class="modal-body" id="Modal_body">...</div>
+					<div class="modal-footer" id="Modal_footer"></div>
 				</div>
-				<div class="modal-body" id="Modal_body">
-				...
-				</div>
-				<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
 			</div>
 		</div>
 
-		<!-- SCRIPTS-->
-		<script 
-			src="https://cdnjs.cloudflare.com/ajax/libs/driver.js/0.9.8/driver.min.js"
-		></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-			crossorigin="anonymous"
-		></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-			integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-			crossorigin="anonymous"
-		></script>
+		<!-- Modal ERROR-->
+		<div
+			class="modal fade"
+			id="Modal_error"
+			tabindex="-1"
+			aria-labelledby="Modal"
+			aria-hidden="true"
+		>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5">
+						<i class="bi bi-clipboard-x"></i>
+						ERROR
+						<strong id="modal_error_title"> </strong>
+					</h1>
+				</div>
+				<div class="modal_error_body" id="Modal_body">
+					
+				</div>
+				<div class="modal_error_footer" id="Modal_footer">
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<!-- FOOTER -->
+		<div th:replace="fragments/footer :: footer"></div>
+		<script th:inline="javascript">
+			const mode_sfida        	= /*[[#{modalità_sfida}]]*/ '';
+			const mode_allenamento  	= /*[[#{modalità_allenamento}]]*/ '';
+			const mode_scalata      	= /*[[#{modalità_scalata}]]*/ '';
+			const status_sending    	= /*[[#{stato_invio}]]*/ '';
+			const status_loading    	= /*[[#{stato_caricamento}]]*/ '';
+			const status_compiling 	 	= /*[[#{stato_compilazione}]]*/ '';
+			const status_ready      	= /*[[#{stato_pronto}]]*/ '';
+			const status_error      	= /*[[#{stato_errore}]]*/ '';
+			const status_turn_end   	= /*[[#{stato_turno_finito}]]*/ '';
+			const status_game_end   	= /*[[#{stato_partita_finita}]]*/ '';
+			const status_exit_game 	    = /*[[#{stato_uscita_partita}]]*/ '';
+			const status_inizia_partita = /*[[#{inizia_partita}]]*/ '';
+			const match_in_corso    	= /*[[#{match_in_corso}]]*/ '';
+			const loading           	= /*[[#{caricamento}]]*/ '';
+			const ClasseUT           	= /*[[#{classe_ut}]]*/ '';		
+			const Difficolta           	= /*[[#{gamemode_difficulty}]]*/ '';
+			const score_partita_text    = /*[[#{partita_punteggio}]]*/ '';
+			const vai_home    			= /*[[#{home}]]*/ '';
+			const confirmationMessage   = /*[[#{confirmationMessage}]]*/ '';
+		</script>
+
+		<!-- CODEMIRROR -->
 		<script
 			th:src="@{/t5/codemirror/lib/codemirror.js}"
 			th:inline="javascript"
@@ -572,246 +757,32 @@
 			th:src="@{/t5/codemirror/addon/search/search.js}"
 			th:inline="javascript"
 		></script>
+
+		<!-- FILE JS GUI -->
 		<script
-			th:src="@{/t5/jquery/jquery-3.7.0.com.js}"
+			th:src="@{/t5/js/Var_Editor.js}"
 			th:inline="javascript"
-		></script>
-
-		<script>
-			// Inizializzazione di CodeMirror
-			var editor_utente = CodeMirror.fromTextArea(
-				document.getElementById("Editor_utente"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "java", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					matchBrackets: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-					foldGutter: true, // Abilita il gutter per il folding
-					gutters: ["CodeMirror-foldgutter"], // Aggiungi il gutter per il folding
-					lineWrapping: true, // Abilita il wrapping delle righe
-				}
-			);
-			var editor_robot = CodeMirror.fromTextArea(
-				document.getElementById("Editor_Robot"),
-				{
-					lineNumbers: true, // Mostra i numeri di riga
-					mode: "java", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-				}
-			);
-			var console_utente = CodeMirror.fromTextArea(
-				document.getElementById("Console_utente"),
-				{
-					lineNumbers: false, // Mostra i numeri di riga
-					mode: "shell", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
-			var console_robot = CodeMirror.fromTextArea(
-				document.getElementById("Console_Robot"),
-				{
-					lineNumbers: false, // Mostra i numeri di riga
-					mode: "shell", // Specifica la modalità del linguaggio (ad es. javascript, html, css)
-					theme: "material-darker", // Tema opzionale, puoi rimuoverlo o cambiarlo
-					tabSize: 4, // Dimensione del tab
-					readOnly: true,
-					autoCloseBrackets: true, // Chiude automaticamente parentesi e virgolette
-				}
-			);
-
-			const divider_Console = document.getElementById("divider_Console");
-			const divider_result = document.getElementById("divider_result");
-			const section_editor = document.getElementById("section_editor");
-			const section_console = document.getElementById("section_console");
-			const section_UT = document.getElementById("section_UT");
-			const section_result = document.getElementById("section_result");
-			const container_user = document.getElementById("card_user");
-			const container_robot = document.getElementById("card_robot");
-
-			// Abilita il folding del codice
-			editor_utente.on("gutterClick", function (cm, line, gutter, event) {
-				// Verifica se il gutter è quello del folding
-				if (gutter === "CodeMirror-foldgutter") {
-					var fold = cm.getLineHandle(line);
-					if (fold && fold.folded) {
-						cm.foldCode(line, null); // Espandi
-					} else {
-						cm.foldCode(line, null); // Collassa
-					}
-				}
-			});
-
-			function enableResizing(container, divider, section1, section2, close_button) {
-				let isDragging = false;
-
-				// Aggiungi event listener per il mouse down (quando si inizia a trascinare)
-				divider.addEventListener("mousedown", function (e) {
-					isDragging = true;
-					document.body.style.cursor = "grabbing"; // Mostra la mano chiusa durante il trascinamento
-					container.classList.add("no-select"); // Disabilita la selezione del testo
-				});
-
-				// Event listener per il movimento del mouse
-				container.addEventListener("mousemove", function (e) {
-					if (!isDragging) return; // Se non si sta trascinando, non fare nulla
-
-					// Calcola la nuova altezza della prima sezione
-					const containerRect = container.getBoundingClientRect();
-					const offsetY = e.clientY - containerRect.top;
-
-					// Imposta la nuova altezza per la prima sezione
-					section1.style.height = `${offsetY}px`;
-
-					// Imposta l'altezza per la seconda sezione
-					section2.style.height = `${containerRect.height - offsetY - 10}px`;
-				});
-
-				// Event listener per il rilascio del mouse (fine del trascinamento)
-				document.addEventListener("mouseup", function () {
-					if (isDragging) {
-						isDragging = false;
-						document.body.style.cursor = "default"; // Ripristina il cursore predefinito
-						container.classList.remove("no-select"); // Riabilita la selezione del testo
-					}
-				});
-			
-				// Funzione per chiudere totalmente la sezione
-				close_button.addEventListener("click", function () {
-					const iconElement = close_button.querySelector('i');
-					if(section2.style.height != "0"){
-						section2.style.height = "0"; // Imposta l'altezza della seconda sezione a 0
-						section1.style.height = `${container.clientHeight}px`; // Opzionale: imposta la prima sezione per occupare tutta l'altezza
-					}
-				});
-			}
-
-			// Imposta l'altezza del container all'altezza del viewport in modo dinamico
-			function setEditorSize() {
-				const availableHeightUser = container_user.clientHeight; // Altezza del container utente
-				const availableHeightRobot = container_robot.clientHeigh; // Altezza del container robot
-
-				// Imposta l'altezza degli editor in base all'altezza del container disponibile
-				editor_utente.setSize(null, availableHeightUser + "px");
-				editor_robot.setSize(null, availableHeightRobot + "px");
-			}
-
-			window.addEventListener("resize", function () {
-				setEditorSize(); // Mantieni l'altezza degli editor sincronizzata con l'altezza del container
-			});
-
-			enableResizing(
-				container_user,
-				divider_Console,
-				section_editor,
-				section_console,
-				close_console_utente
-			);
-			enableResizing(
-				container_robot,
-				divider_result,
-				section_UT,
-				section_result, 
-				close_console_result
-			);
-
-			// Funzione per cambiare il tema
-			function toggleTheme() {
-				const htmlElement = document.getElementById("html-root");
-				const checkbox = document.getElementById("themeToggle");
-
-				// Ottieni tutti gli editor e console
-				const editors = [
-					editor_utente,
-					console_utente,
-					editor_robot,
-					console_robot,
-				];
-
-				// Imposta un fade out
-				editors.forEach((editor) => {
-					editor.getWrapperElement().style.transition = "opacity 0.6s ease";
-					editor.getWrapperElement().style.opacity = 0; // Fai svanire l'editor
-				});
-
-				// Cambiamo il tema visivamente
-				setTimeout(() => {
-					if (checkbox.checked) {
-						// Tema chiaro
-						htmlElement.setAttribute("data-bs-theme", "light");
-						editors.forEach((editor) => {
-							editor.setOption("theme", "eclipse");
-							editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
-						});
-					} else {
-						// Tema scuro
-						htmlElement.setAttribute("data-bs-theme", "dark");
-						editors.forEach((editor) => {
-							editor.setOption("theme", "material-darker");
-							editor.setOption("mode", "text/x-java"); // Imposta il linguaggio Java
-						});
-					}
-
-					// Dopo che il tema è cambiato, riporta l'opacità a 1 per il fade in
-					editors.forEach((editor) => {
-						editor.getWrapperElement().style.transition = "opacity 0.6s ease";
-						editor.getWrapperElement().style.opacity = 1; // Fai riapparire l'editor
-					});
-				}, 500); // Tempo per il fade out prima di cambiare il tema
-			}
-			toggleTheme();
-			// Assegna l'evento al cambio di stato del checkbox
-			document
-				.getElementById("themeToggle")
-				.addEventListener("change", toggleTheme);
-
-			//funzione menu
-			function showTabPane(paneId) {
-				// Nascondi tutte le tab pane attive
-				var tabPanes = document.querySelectorAll(".tab-pane");
-				tabPanes.forEach(function (tabPane) {
-					tabPane.classList.remove("show", "active");
-				});
-
-				// Mostra solo la tab pane richiesta
-				var activePane = document.getElementById(paneId);
-				activePane.classList.add("show", "active");
-			}
-
-			// Gestione dell'evento keydown per aprire e chiudere il dropdown
-			document.addEventListener("keydown", function (event) {
-				if (event.ctrlKey && event.key === "d") {
-					// Combinazione di tasti Ctrl + D
-					event.preventDefault(); // Evita comportamenti predefiniti (ad es. segnalibri nel browser)
-
-					// Ottieni l'elemento del bottone del dropdown
-					var dropdownButton = document.getElementById("utente_menu");
-
-					// Crea o recupera l'istanza del dropdown di Bootstrap
-					var dropdownInstance = bootstrap.Dropdown.getInstance(dropdownButton);
-					if (!dropdownInstance) {
-						dropdownInstance = new bootstrap.Dropdown(dropdownButton);
-					}
-
-					// Verifica lo stato corrente e alterna tra aprire e chiudere
-					if (dropdownButton.getAttribute("aria-expanded") === "true") {
-						dropdownInstance.hide(); // Chiudi il dropdown se è aperto
-					} else {
-						dropdownInstance.show(); // Apri il dropdown se è chiuso
-					}
-				}
-			});
+		>
 		</script>
-		<script th:src="@{/t5/js/common.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/commonEditor.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/funzioni.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/editor.js}" th:inline="javascript"></script>
-		<script th:src="@{/t5/js/editor_tour.js}" th:inline="javascript"></script>
+		<script
+			th:src="@{/t5/js/Util_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/REST_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/Button_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/GUI_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
 	</body>
 </html>

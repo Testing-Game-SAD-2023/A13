@@ -32,15 +32,15 @@ import com.g2.Game.GameController;
 
 @Service
 public class ServiceManager {
-
-    private final Map<String, ServiceInterface> services = new HashMap<>();
+    protected final Map<String, ServiceInterface> services = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     @Autowired
     public ServiceManager(RestTemplate restTemplate) {
         /*
-        *   Registrazione dinamica dei servizi, si occupa lui di instanziare in automatico 
-        */ 
+         * Registrazione dinamica dei servizi, si occupa lui di instanziare in
+         * automatico
+         */
         registerService("T1", T1Service.class, restTemplate);
         registerService("T23", T23Service.class, restTemplate);
         registerService("T4", T4Service.class, restTemplate);
@@ -48,28 +48,35 @@ public class ServiceManager {
     }
 
     // Metodo helper per registrare i servizi
-    private <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
-        if (!ServiceInterface.class.isAssignableFrom(serviceClass)) {
-            logger.error("[SERVICE MANAGER] La Classe: " + serviceName + "deve implementare la ServiceInterface");
-            throw new IllegalArgumentException("La classe: " + serviceName + " deve implementare la ServiceInterface");
+    protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
+        if (serviceClass == null){
+            throw new IllegalArgumentException("[SERVICE MANAGER] serviceClass Nullo !");
         }
-        //creo il servizio da registrare nel manager
+        if (serviceName == null || serviceName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Il nome del servizio non può essere nullo o vuoto.");
+        }
+        if (restTemplate == null) {
+            throw new IllegalArgumentException("[SERVICE MANAGER] RestTemplate Nullo !");
+        }
+        if (services.containsKey(serviceName)) {
+            logger.error("[SERVICE MANAGER] Il servizio: " + serviceName + " è già registrato.");
+            throw new IllegalArgumentException("Il servizio: " + serviceName + " è già registrato.");
+        }
+        // Creo il servizio da registrare nel manager
         T service = createService(serviceClass, restTemplate);
         if (service != null) {
             services.put(serviceName, service);
-        } else {
-            logger.error("[SERVICE MANAGER] Errore nell'instanziare il servizio: " + serviceName + "è nullo");
-            throw new IllegalArgumentException("Errore nell'instanziare il servizio: " + serviceName + "è nullo");
+            logger.info("[SERVICE MANAGER] Servizio registrato: " + serviceName);
         }
     }
 
     // Metodo per la creazione di un servizio
-    private <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
+    protected <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
         try {
             T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
             logger.info("[SERVICE MANAGER] \"ServiceCreation: " + serviceClass.getSimpleName());
             return service;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException  e) {
             logger.error("[SERVICE MANAGER] Errore nella creazione del servizio: " + serviceClass.getName() + " Exception: " + e.getMessage());
             throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
         }
@@ -79,15 +86,15 @@ public class ServiceManager {
     public Object handleRequest(String serviceName, String action, Object... params) {
         ServiceInterface service = services.get(serviceName);
         if (service == null) {
-            logger.error("[SERVICE MANAGER] ServiceNotFound "+ serviceName);
+            logger.error("[SERVICE MANAGER][HandleRequest] ServiceNotFound " + serviceName);
             throw new IllegalArgumentException("Servizio non trovato: " + serviceName);
         }
-        try {
-            logger.info("[SERVICE MANAGER] HandleRequest: " + serviceName + " - " + action);
-            return service.handleRequest(action, params);
-        } catch (Exception e) {
-            logger.error("[SERVICE MANAGER]  Errore HandleRequest: " + serviceName + "Exception: " + e.getMessage());
-            return null; //se c'è un errore nel servizio lo segnalo e poi introduco al livello successivo una gestione del null
-        }
+        logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
+        return service.handleRequest(action, params);
     }
+
+    protected ServiceInterface getServices(String key) {
+        return services.get(key);
+    }
+
 }

@@ -32,20 +32,19 @@ public abstract class GameLogic {
     private int  RoundID;
     private String TurnID;
     private final String PlayerID;
-    private final String ClasseUT;
-
-    private final String type_robot;
-    private final String difficulty;
-    private final String gamemode;
+    private String ClasseUT;
+    private String type_robot;
+    private String difficulty;
+    private String mode;
 
     public GameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
-            String type_robot, String difficulty, String gamemode) {
+            String type_robot, String difficulty, String mode) {
         this.serviceManager = serviceManager;
         this.PlayerID = PlayerID;
         this.ClasseUT = ClasseUT;
         this.type_robot = type_robot;
         this.difficulty = difficulty;
-        this.gamemode = gamemode;
+        this.mode = mode;
     }
 
     // Metodi che ogni gioco deve implementare
@@ -68,7 +67,7 @@ public abstract class GameLogic {
      */
     protected void CreateGame() {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", this.gamemode, this.PlayerID);
+        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", "description", this.PlayerID);
         this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time);
     }
 
@@ -123,5 +122,23 @@ public abstract class GameLogic {
         return this.ClasseUT;
     }
 
-    public String getGamemode() { return gamemode; }
+    public Boolean CheckGame(String type_robot, String difficulty, String underTestClassName){
+        if( this.type_robot.equals(type_robot) && 
+            this.difficulty.equals(difficulty) &&
+            this.ClasseUT.equals(underTestClassName)){
+                return true;
+            }else{
+                return false;
+            }
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+
 }

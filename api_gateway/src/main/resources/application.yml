@@ -18,18 +18,10 @@ zuul:
       sensitiveHeaders:
       path: /api/getJaCoCoReport/**
       url: http://t6-g12-app-1:80/getJaCoCoReport
-    receiveClass-service:
-      sensitiveHeaders:
-      path: /api/receiveClassUnderTest/**
-      url: http://t6-g12-app-1:80/receiveClassUnderTest
     calculateScalataFinalScore-service:
       sensitiveHeaders:
       path: /api/calculateScalataFinalScore/**
       url: http://t6-g12-app-1:80/calculateScalataFinalScore
-    sendInfo-service:
-      sensitiveHeaders:
-      path: /api/sendInfo/**
-      url: http://t6-g12-app-1:80/sendInfo
     saveData-service:
       sensitiveHeaders:
       path: /api/save-data/**
@@ -46,15 +38,21 @@ zuul:
       sensitiveHeaders:
       path: /api/run/**
       url: http://t6-g12-app-1:80/run
-    allenamento-service:
-      sensitiveHeaders:
-      path: /api/allenamento/**
-      url: http://t6-g12-app-1:80/allenamento
     loadingresult-service:
       sensitiveHeaders:
       path: /api/VolumeT8/FolderTreeEvo/**
       url:  http://prototipo20-t8_generazione-1:3080/api/VolumeT8/FolderTreeEvo
-
+    compile-and-codecoverage-service:
+      sensitiveHeaders:
+      path: /api/compile-and-codecoverage/**
+      url: http://remoteccc-app-1:1234/compile-and-codecoverage
 eureka:
   client:
     enabled: false
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG  # Abilita il logging per richieste web
+    com.netflix.zuul: DEBUG         # Abilita il logging per Zuul
+    org.springframework.cloud.netflix.zuul.filters: DEBUG  # Abilita il logging per i filtri Zuul

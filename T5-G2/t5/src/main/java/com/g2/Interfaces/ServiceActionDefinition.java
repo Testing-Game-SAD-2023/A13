@@ -41,15 +41,28 @@ public class ServiceActionDefinition {
 
     private void validateParameters(Object[] params) {
         if (params.length != parameterTypes.length) {
-            throw new IllegalArgumentException("[HANDLEREQUEST] Numero di parametri errato: atteso "
-                    + parameterTypes.length + ", ricevuto " + params.length);
+            throw new MissingParametersException("[ServiceActionDefinition] Numero di parametri errato: atteso "
+                + parameterTypes.length + ", ricevuto " + params.length);
         }
         for (int i = 0; i < params.length; i++) {
             if (!parameterTypes[i].isInstance(params[i])) {
-                throw new IllegalArgumentException("[HANDLEREQUEST] Parametro " + (i + 1) + " non è del tipo corretto: atteso "
+                throw new InvalidParameterTypeException("[ServiceActionDefinition] Parametro " + (i + 1) + " non è del tipo corretto: atteso "
                         + parameterTypes[i].getSimpleName() + ", ricevuto "
                         + (params[i] == null ? "null" : params[i].getClass().getSimpleName()));
             }
+        }
+    }
+
+    //Eccezioni specifiche del ServiceAction 
+    public class MissingParametersException extends RuntimeException {
+        public MissingParametersException(String message) {
+            super(message);
+        }
+    }
+    
+    public class InvalidParameterTypeException extends RuntimeException {
+        public InvalidParameterTypeException(String message) {
+            super(message);
         }
     }
 }

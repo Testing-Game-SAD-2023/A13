@@ -18,11 +18,8 @@ public class JWTService {
 	public boolean verifyToken(String token) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<String, String>();
         formData.add("jwt", token);
-
         Boolean isAuthenticated = restTemplate.postForObject("http://t23-g1-app-1:8080/validateToken", formData, Boolean.class);
-	
 		if(isAuthenticated == null) return false;
-
 		return isAuthenticated.booleanValue();
 	}
 }

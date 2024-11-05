@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html lang="it" data-bs-theme="dark">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <!-- CUSTOM CSS -->
-    <link rel="stylesheet" href="/t5/css/main_style.css"/>
-    <title>Dashboard</title>
+    <div th:replace ="fragments/header :: header"></div>
+    <title>Home</title>
 </head>
 
 <body >
@@ -25,12 +18,7 @@
                 <h5 class="card-title display-1 text-center">
                     Testing Robot Challenge
                 </h5>
-                <p class="card-text">
-                    Siamo entusiasti di presentarvi un'esperienza di gioco unica, dove potrete affrontare diverse modalità. 
-                    Che siate in vena di una partita veloce, una sfida progressiva o un allenamento per perfezionare le vostre abilità, 
-                    c'è una modalità di gioco adatta a voi.Scorrete verso il basso per scegliere la modalità 
-                    che preferite e iniziate a giocare subito!
-                </p>
+                <p class="card-text" th:text="#{intro}"></p>
             </div>
         </div>
     </div>
@@ -38,7 +26,7 @@
     <!-- Sezione Modalità di Gioco -->
     <div class="container-fluid">
         <div class="row text-center border-top border-opacity-75 mb-3">
-            <h1> Modalità di Gioco</h1>
+            <h1 th:text="#{gm}"></h1>
         </div>
 
         <div class="row row-cols-4 g-4 justify-content-center px-4">
@@ -47,24 +35,21 @@
                 <div class="card shadow-lg bg-dark text-white"> 
                     <img src="/t5/images/Partita_singola.jpeg" class="card-img-top" alt="Immagine Modalità 1">
                     <div class="card-body">
-                        <h3 class="card-title text-center">Partita Singola</h3>
-                        <p>
-                            Vuoi una sfida rapida e coinvolgente? La modalità Partita Singola è perfetta per te! 
-                            Affronta un match unico contro due possibili avversari predeterminati, senza l'impegno di una serie lunga.
-                            Ideale per chi cerca una partita veloce e divertente in qualsiasi momento.
-                        </p>
+                        <h3 class="card-title text-center" th:text="#{singola}"></h3>
+                        <p th:text="#{singola_desc}"></p>
+
                     </div>
                     <div class="card-footer">
                         <div class="row  row-cols-2">
                             <div class="col">
-                                    <span class="badge bg-primary m-1">Veloce</span>
+                                    <span class="badge bg-primary m-1" th:text="#{tag_veloce}"></span>
                                     <span class="badge bg-info text-dark m-1">1 vs CPU</span>
                                     <span class="badge bg-warning text-dark m-1">Turn</span>
                             </div>
-                            <div class="col">
-                                <a href="/gamemode?mode=Sfida" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                            <div class="col text-end">
+                                <a href="/gamemode?mode=Sfida" class="btn btn-success mx-3 my-2">
                                     <i class="bi bi-play-fill me-2"></i>
-                                    <span>Play</span>
+                                    <span th:text="#{tasto_play}"></span>
                                 </a> 
                             </div>
                         </div>
@@ -78,24 +63,20 @@
                     <img src="/t5/images/Scalata.jpeg" class="card-img-top" alt="Immagine Modalità 2">
 
                     <div class="card-body">
-                        <h3 class="card-title text-center">Scalata</h3>
-                        <p>
-                            Pronto a mettere alla prova le tue capacità in una serie di sfide sempre più difficili? 
-                            La modalità Scalata ti permetterà di affrontare un percorso in cui ogni livello è più impegnativo del precedente.
-                            Salendo in classifica, avrai l'opportunità di dimostrare di essere il migliore!
-                        </p>
+                        <h3 class="card-title text-center" th:text="#{scalata}"></h3>
+                        <p th:text="#{scalata_desc}"></p>                      
                     </div>
                     <div class="card-footer">
                         <div class="row  row-cols-2">
                             <div class="col">
-                                    <span class="badge bg-primary">Lunga</span>
-                                    <span class="badge bg-info text-dark">Progressiva</span>
-                                    <span class="badge bg-primary">Competitiva</span>
+                                    <span class="badge bg-primary" th:text="#{tag_lunga}"></span>
+                                    <span class="badge bg-info text-dark" th:text="#{tag_competitiva}"></span>
+                                    <span class="badge bg-primary" th:text="#{tag_progressiva}"></span>
                             </div>
-                            <div class="col">
-                                <a href="/gamemode?mode=Scalata" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                            <div class="col text-end">
+                                <a href="/gamemode?mode=Scalata" class="btn btn-success mx-3 my-2">
                                     <i class="bi bi-play-fill me-2"></i>
-                                    <span>Play</span>
+                                    <span th:text="#{tasto_play}"></span>
                                 </a> 
                             </div>
                         </div>
@@ -108,23 +89,20 @@
                 <div class="card shadow-lg bg-dark text-white">
                     <img src="/t5/images/Allenamento.jpeg" class="card-img-top" alt="Immagine Modalità 3">
                     <div class="card-body">
-                        <h3 class="card-title text-center">Allenamento</h3>
-                        <p>
-                            Hai bisogno di migliorare le tue abilità? Con la modalità Allenamento, puoi esercitarti senza pressioni, perfezionare le tue tecniche e sperimentare strategie.
-                            È lo spazio perfetto per affinare le tue competenze e prepararti a sfide più grandi.
-                        </p>
+                        <h3 class="card-title text-center" th:text="#{allenamento}"></h3>
+                        <p th:text="#{allenamento_desc}"></p>
                     </div>
                     <div class="card-footer">
                         <div class="row  row-cols-2">
                             <div class="col">
-                                <span class="badge bg-info text-dark">Pratica</span>
+                                <span class="badge bg-info text-dark" th:text="#{tag_pratica}"></span>
                                 <span class="badge bg-primary">Casual</span>
-                                <span class="badge bg-info text-dark">Veloce</span>
+                                <span class="badge bg-info text-dark" th:text="#{tag_veloce}"></span>
                             </div>
-                            <div class="col">
-                                <a href="/gamemode?mode=Allenamento" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                            <div class="col text-end">
+                                <a href="/gamemode?mode=Allenamento" class="btn btn-success mx-3 my-2">
                                     <i class="bi bi-play-fill me-2"></i>
-                                    <span>Play</span>
+                                    <span th:text="#{tasto_play}"></span>
                                 </a> 
                             </div>
                         </div>
@@ -137,24 +115,21 @@
                 <div class="card shadow-lg bg-dark text-white">
                     <img src="/t5/images/Multiplayer.jpeg" class="card-img-top" alt="Immagine Modalità 4">
                     <div class="card-body">
-                        <h3 class="card-title text-center">Multiplayer</h3>
-                        <p>
-                            Vuoi sfidare amici o giocatori da tutto il mondo? Nella modalità Multiplayer, puoi competere o collaborare con altri giocatori in tempo reale.
-                            Che tu voglia dimostrare la tua superiorità o fare squadra, questa modalità ti offre un’esperienza sociale e avvincente.
-                        </p>
+                        <h3 class="card-title text-center" th:text="#{multiplayer}"></h3>
+                        <p th:text="#{multiplayer_desc}"></p>
                     </div>
                     <div class="card-footer">
                         <div class="row  row-cols-2">
                             <div class="col">
                                 <span class="badge bg-primary">Online</span>
                                 <span class="badge bg-info text-dark">Social</span>
-                                <span class="badge bg-primary">Competitivo</span>
+                                <span class="badge bg-primary" th:text="#{tag_competitiva}"></span>
                             </div>
-                            <div class="col">
-                                <button type="button" class="btn btn-success position-absolute end-0 mx-3 my-2"
+                            <div class="col text-end">
+                                <button type="button" class="btn btn-success mx-3 my-2"
                                  data-bs-toggle="modal" data-bs-target="#Alert">
                                     <i class="bi bi-play-fill me-2"></i>
-                                    <span>Play</span>
+                                    <span th:text="#{tasto_play}"></span>
                                 </button>
                             </div>
                         </div>
@@ -170,21 +145,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="alertModalLabel">Attenzione</h1>
+                <h1 class="modal-title fs-5" id="alertModalLabel" th:text="#{alert}"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                Non ancora disponibile!
+            <div class="modal-body" th:text="#{disponibile}"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{chiudi}"></button>
             </div>
         </div>
     </div>
 </div>
 
     <div th:replace="fragments/footer :: footer"></div>
-    
 </body>
 </html>
 

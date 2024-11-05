@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark" id="html-root">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Editor</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+		/>
+		<!-- CodeMirror JavaScript -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+		<!-- code mirror-->
+		<!-- CodeMirror CSS -->
+		<link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
+		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
+		<link rel="stylesheet" href="./t5/codemirror/theme/eclipse.css" />
+
+		<link rel="stylesheet" href="/t5/css/main_style.css" />
+
+		<style>
+			.no-select {
+				user-select: none; /* Per browser moderni */
+				-webkit-user-select: none; /* Per Safari */
+				-moz-user-select: none; /* Per Firefox */
+				-ms-user-select: none; /* Per Internet Explorer */
+			}
+
+			.icon-fade {
+				opacity: 0; /* Inizialmente invisibile */
+				transition: opacity 0.3s ease; /* Transizione per l'opacità */
+			}
+
+			.icon-visible {
+				opacity: 1; /* Completamente visibile */
+			}
+
+			.CodeMirror {
+				height: 100%; /* Assicura che l'editor utilizzi il 100% dello spazio disponibile */
+			}
+			.covered-line {
+				border-left: 4px solid green; /* Colore del bordo a sinistra */
+			}
+			.uncovered-line {
+				border-left: 4px solid red; /* Colore del bordo a sinistra */
+			}
+			.partially-covered-line {
+				border-left: 4px solid #FF5733; /* Colore del bordo a sinistra */
+			}
+
+			#card_user,
+			#card_robot {
+				height: 95.6vh;
+				width: 49.7vw;
+				overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
+			}
+
+			#section_editor {
+				height: calc(
+					100vh - 250px
+				); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+			}
+
+			#section_UT {
+				height: calc(
+					100vh - 250px
+				); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+			}
+
+			.highlight {
+				background-color: yellow;
+				color: black;
+			}
+
+			.border-secondary-subtle {
+ 				 --bs-border-opacity: 1;
+  				border-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-border-opacity)) !important;
+			}
+			.border-secondary-subtle:hover{
+				cursor:n-resize;
+				transition: border-color 3s ease; 
+				border-color: rgba(var(--bs-primary-bg-rgb), var(--bs-border-opacity)) !important;
+			}
+		</style>
+	</head>
+
+	<body class="overflow-y-hidden">
+		<!-- NAV-->
+		<nav class="nav bg-body-tertiary border border-bottom-0">
+			<div class="container-fluid px-0">
+				<div class="d-flex justify-content-between">
+					<!-- GO BACK -->
+					<div>
+						<a
+							href="/main"
+							class="btn btn-sm"
+							tabindex="-1"
+							role="button"
+							aria-disabled="true"
+						>
+							<i class="bi bi-arrow-90deg-left" th:text="#{indietro}"></i>
+						</a>
+					</div>
+					<div class="text-center">
+						<a class="navbar-brand" id="Nome_modalita">
+						</a>
+					</div>
+						<div>
+							<!-- Language -->
+							<button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+								<i id="dropdownIcon">
+									<!-- English icon-->
+									<svg width="14px" height="14px"enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+								</i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end p-0">
+								<div class="list-group">
+									<!-- English -->
+									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="en">
+										<div class="d-flex justify-content-between">
+											<h6>
+												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+											</h6>
+											<h6>
+												English
+											</h6>
+										</div>
+									</a>
+									<!-- Italian -->
+									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="it">
+										<div class="d-flex justify-content-between">
+											<h6>
+												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"/><path d="m0 256c0 110.071 69.472 203.906 166.957 240.077v-480.154c-97.485 36.171-166.957 130.006-166.957 240.077z" fill="#6da544"/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+											</h6>
+											<h6>
+												Italian 
+											</h6>
+										</div>
+									</a>
+									<!-- Spanish -->
+									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="es">
+										<div class="d-flex justify-content-between">
+											<h6>
+												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m0 256c0 31.314 5.633 61.31 15.923 89.043l240.077 22.261 240.077-22.261c10.29-27.733 15.923-57.729 15.923-89.043s-5.633-61.31-15.923-89.043l-240.077-22.261-240.077 22.261c-10.29 27.733-15.923 57.729-15.923 89.043z" fill="#ffda44"/><g fill="#d80027"><path d="m496.077 166.957c-36.171-97.484-130.006-166.957-240.077-166.957s-203.906 69.473-240.077 166.957z"/><path d="m15.923 345.043c36.171 97.484 130.006 166.957 240.077 166.957s203.906-69.473 240.077-166.957z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+											</h6>
+											<h6>
+												Spanish
+											</h6>
+										</div>
+									</a>									 
+								</div>
+							</div>
+							<!-- Setting -->
+							<button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+								<i class="bi bi-gear-fill"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end p-0">
+								<div class="list-group">
+									<!-- Tema -->
+									<a class="list-group-item list-group-item-action p-2" aria-current="true">
+										<div class="d-flex justify-content-between align-baseline">
+											<h6 class="my-1 mx-1" th:text="#{tema}"> </h6>
+											<div class="form-check form-switch mt-1">
+												<input class="form-check-input" type="checkbox" role="switch" id="chk_theme">
+											</div>
+										</div>
+									</a>
+									<!-- Font size -->
+									<a class="list-group-item list-group-item-action p-2" aria-current="true">
+										<div class="d-flex gap-5 justify-content-between">
+											<h6 class="my-1 mx-1" th:text="#{grandezza_carattere}"> </h6>
+											<div class="input-group my-2 input-group-sm" >
+												<button class="btn btn-outline-secondary" type="button" id="decrement-button">
+													<i class="bi bi-dash"></i>
+												</button>
+												<input type="text" class="form-control" id="font-size-input" placeholder="16" style="width:10px; text-align: center;">
+												<button class="btn btn-outline-secondary" type="button" id="increment-button">
+													<i class="bi bi-plus"></i>
+												</button>
+											</div>
+										</div>
+									</a>									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</nav>
+
+		<!-- DASHBOARD -->
+		<div class="card-group">
+				<!-- PRIMA COLONNA-->
+				<div class="card rounded-0" id="card_user">
+					<!-- EDITOR-->
+					<div class="card-header p-0">
+							<div class="d-flex justify-content-between ps-3 pt-2 bg-body-tertiary">
+								<ul class="nav nav-tabs card-header-tabs">
+									<li class="nav-item">
+										<a class="nav-link active" aria-current="true" href="#">
+											Class UT
+											<i class="bi bi-x"></i>
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link" href="#">
+											Test 
+										</a>
+									</li>
+									<li class="nav-item">
+										<a class="nav-link disabled" aria-disabled="true">
+											
+										</a>
+									</li>
+								</ul>		
+								
+								<!-- add button -->
+								<div class="dropdown">
+									<button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+										<i class="bi bi-plus-lg"></i>
+									</button>
+									<ul class="dropdown-menu">
+									  <li><a class="dropdown-item" href="#">Action</a></li>
+									  <li><a class="dropdown-item" href="#">Another action</a></li>
+									  <li><a class="dropdown-item" href="#">Something else here</a></li>
+									</ul>
+								</div>
+							</div>
+									
+					</div>
+					<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_editor">
+						<textarea id="Editor_utente">
+/*Compila i campi "Nome" e "Cognome" con le informazioni richieste
+Nome: "inserire il proprio nome"
+Cognome: "inserire il proprio cognome"
+Username: username
+UserID: userID
+Date: date
+*/
+
+import org.junit.Before;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class TestClasse {
+	@BeforeClass
+	public static void setUpClass() {
+		// Eseguito una volta prima dell'inizio dei test nella classe
+		// Inizializza risorse condivise 
+		// o esegui altre operazioni di setup
+	}
+				
+	@AfterClass
+	public static void tearDownClass() {
+		// Eseguito una volta alla fine di tutti i test nella classe
+		// Effettua la pulizia delle risorse condivise 
+		// o esegui altre operazioni di teardown
+	}
+				
+	@Before
+	public void setUp() {
+		// Eseguito prima di ogni metodo di test
+		// Preparazione dei dati di input specifici per il test
+	}
+				
+	@After
+	public void tearDown() {
+		// Eseguito dopo ogni metodo di test
+		// Pulizia delle risorse o ripristino dello stato iniziale
+	}
+				
+	@Test
+	public void testMetodo() {
+		// Preparazione dei dati di input
+		// Esegui il metodo da testare
+		// Verifica l'output o il comportamento atteso
+		// Utilizza assert per confrontare il risultato atteso 
+		// con il risultato effettivo
+	}
+				
+	// Aggiungi altri metodi di test se necessario
+}
+
+						</textarea>
+					</div>
+					<!-- CONSOLE -->
+					<div class="card-header border-top p-0">
+						<div id="divider_Console" class="border border-3 border-secondary-subtle"></div>
+						<nav class="navbar bg-body-tertiary p-1">
+							<span class="navbar-brand lead my-0 py-0"> Console </span>
+							<div>
+								<button
+									type="button"
+									class="btn btn-sm toggleButton"
+									id="close_console_utente"
+									data-icon1="bi-arrow-bar-down"
+									data-icon2="bi-arrow-bar-up"
+								>
+									<i class="bi bi-arrow-bar-down"></i>
+								</button>
+							</div>
+						</nav>
+					</div>
+					<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_console">
+							<div class="row row-cols-2">
+								<div class="col-10">
+									<textarea id="Console_utente"> </textarea>
+								</div>
+								<div class="col-2">
+									<ul class="list-group">
+										<li class="list-group-item">An item</li>
+										<li class="list-group-item">A second item</li>
+										<li class="list-group-item">A third item</li>
+										<li class="list-group-item">A fourth item</li>
+										<li class="list-group-item">And a fifth one</li>
+									  </ul>
+								</div>		
+							</div>			
+					</div>
+					<!-- FOOTER -->
+					<div class="card-footer text-body-secondary py-0 px-1">
+						<div class="d-flex justify-content-between">
+							<div class="">
+								<small class="pl-5">
+									<i class="bi bi-exclamation-triangle-fill"></i> 
+								</small>
+								<small class="pr-2" id="warning_compiler">
+									0
+								</small>						
+								<small class="pr-2">
+									<i class="bi bi-x-circle"></i>
+								</small>
+								<small class="pr-2" id="error_compiler">
+									0
+								</small>
+							</div>
+							<div>
+								<small class="pl-5">
+									<i
+										id="loading_icon_1"
+										class="bi bi-server"
+										aria-hidden="true"
+									></i>
+									<div class="spinner-border spinner-border-sm" role="status" 
+										aria-hidden="true"
+										style="display: none">
+									</div>
+								</small>
+								<small class="pr-2" id="status_text" th:text="#{pronto}">
+								</small>	
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal -->
+		<div
+			class="modal fade"
+			id="Modal"
+			tabindex="-1"
+			aria-labelledby="Modal"
+			aria-hidden="true"
+		>
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="Modal_title">Modal title</h1>
+						<button
+							type="button"
+							class="btn-close"
+							data-bs-dismiss="modal"
+							aria-label="Close"
+						></button>
+					</div>
+					<div class="modal-body" id="Modal_body">...</div>
+					<div class="modal-footer" id="Modal_footer"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- FOOTER -->
+		<div th:replace="fragments/footer :: footer"></div>
+
+		<!-- CODEMIRROR -->
+		<script
+			th:src="@{/t5/codemirror/lib/codemirror.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/mode/clike/clike.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/foldcode.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/search/searchcursor.js}"
+			th:inline="javascript"
+		></script>
+		<script
+			th:src="@{/t5/codemirror/addon/search/search.js}"
+			th:inline="javascript"
+		></script>
+
+		<!-- FILE JS GUI -->
+		<script
+			th:src="@{/t5/js/Var_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/Util_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/REST_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/Button_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/GUI_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+	</body>
+</html>

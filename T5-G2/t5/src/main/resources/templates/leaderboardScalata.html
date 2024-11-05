@@ -16,7 +16,7 @@
     <!--Navbar-->
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;" id="navbar">
         <a class="navbar-brand" href="#">
-          <i class="fas fa-trophy"></i> LeaderboardScalata
+          <i class="fas fa-trophy" th:text="#{classifica_scalata}"></i>
         </a>
         <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -25,7 +25,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <a class="nav-link" id="nav-home" href="/main">Go Back <span class="sr-only">(current)</span></a>
+              <a class="nav-link" id="nav-home" href="/main" th:text="#{indietro}"> <span class="sr-only">(current)</span></a>
             </li>
             <!-- <li class="nav-item active">
                 <a class="nav-link" id="logout-button" href="/login">Logout <span class="sr-only">(current)</span></a>
@@ -47,7 +47,7 @@
 
     <div class="container">
         <div class="selector">
-            <label for="scalataSelector">Seleziona la Scalata:</label>
+            <label for="scalataSelector" th:text="#{selezione_scalata}"></label>
             <select id="scalataSelector">
                 <!-- <option value="partita1">Partita 1</option>
                 <option value="partita2">Partita 2</option> -->
@@ -55,15 +55,14 @@
                  <!-- La tabella verrà popolata dinamicamente -->
             </select>
         </div>
-        <div class="participant">
-            <h2>Classifica personale</h2>
+        <div class="participant" th:text="#{classifica_personale}">
             <table>
                 <thead>
                     <tr>
-                        <th>Posizione</th>
-                        <th>Nome</th>
-                        <th>Punteggio</th>
-                        <th>Tempo</th>
+                        <th th:text="#{posizione}"></th>
+                        <th th:text="#{name}"></th>
+                        <th th:text="#{punti}"></th>
+                        <th th:text="#{time}"></th>
                     </tr>
                 </thead>
                 <tbody id="participantRow">

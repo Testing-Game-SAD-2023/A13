@@ -1,179 +1,166 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html lang="it" xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>GameMode</title>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-		<!-- Custom CSS -->
-		<link rel="stylesheet" href="/t5/css/main_style.css" />
+		<div th:replace="fragments/header :: header"></div>
+		<title>Gamemode</title>
 	</head>
-
 	<body>
 		<!-- NAVBAR -->
 		<div th:replace="fragments/navbar :: navbar"></div>
-
 		<div class="container-fluid mt-3">
 			<div class="row justify-content-center row-cols-3">
 				<div class="col"></div>
 				<div class="col">
-					<div class="card">
-						<h5 class="card-header text-center" id="selectedMode">Modalità</h5>
+					<!-- Scheda nuovo gioco -->
+					<div class="card" id="scheda_nuovo">
+						<h5
+							class="card-header text-center selectedMode"
+						></h5>
 						<div class="card-body">
 							<!-- Form di selezione -->
-								<div class="row">
-									<div class="col">
-										<h3 class="text-center mb-4">
-											Imposta la tua partita
-										</h3>
-										<form>
-											<!-- Selezione Classe UT -->
-											<div class="form-group mb-3">
-												<label for="select_class">Seleziona la Classe da Testare:</label>
-												<select class="form-control" id="select_class">
-													<option value="">Seleziona un'opzione</option>
-													<th:block th:each="option : ${lista_classi}">
-														<option
-															th:value="${option.name}"
-															th:text="${option.name}"
-														></option>
-													</th:block>
-												</select>
-											</div>
-		
-											<!-- Selezione Robot -->
-											<div class="form-group mb-3">
-												<label for="select_robot">Seleziona il Robot:</label>
-												<select class="form-control" id="select_robot">
-													<option value="">Seleziona un'opzione</option>
-													<th:block th:each="option : ${lista_robot}">
-														<option
-															th:value="${option}"
-															th:text="${option}"
-														></option>
-													</th:block>
-												</select>
-											</div>
-		
-											<!-- Selezione Difficoltà -->
-											<div class="form-group mb-3">
-												<label for="select_diff">Seleziona la difficoltà:</label>
-												<select class="form-control" id="select_diff">
-													<option value="">Seleziona un'opzione</option>
-													<option value="1">Easy</option>
-													<option value="2">Medium</option>
-													<option value="3">Hard</option>
-												</select>
-											</div>
-		
-											<!-- Link editor -->
-											<div class="text-center pt-2">
-												<a
-													id="link_editor"
-													class="btn btn-primary"
-													href="#"
-													role="button"
-													>Vai all'editor</a
-												>
-											</div>
-										</form>
+							<div class="row">
+								<div class="col">
+									<h3 class="text-center mb-4" th:text="#{partita}"></h3>
+									<div
+										class="alert alert-warning d-none"
+										role="alert"
+										id="alert_nuova"
+										th:text="#{chiudi_partita}"
+									>
+									</div>
+									<form>
+										<!-- Selezione Classe UT -->
+										<div class="form-group mb-3">
+											<label
+												for="select_class"
+												th:text="#{selezione_classeUT}"
+											></label>
+											<select class="form-control" id="select_class">
+												<option value="" th:text="#{opzioni}"></option>
+												<th:block th:each="option : ${lista_classi}">
+													<option
+														th:value="${option.name}"
+														th:text="${option.name}"
+													></option>
+												</th:block>
+											</select>
+										</div>
+
+										<!-- Selezione Robot -->
+										<div class="form-group mb-3">
+											<label for="select_robot" th:text="#{robot}"></label>
+											<select class="form-control" id="select_robot">
+												<option value="" th:text="#{opzioni}"></option>
+												<th:block th:each="option : ${lista_robot}">
+													<option
+														th:value="${option}"
+														th:text="${option}"
+													></option>
+												</th:block>
+											</select>
+										</div>
+
+										<!-- Selezione Difficoltà -->
+										<div class="form-group mb-3">
+											<label for="select_diff" th:text="#{difficoltà}"></label>
+											<select class="form-control" id="select_diff">
+												<option value="" th:text="#{opzioni}"></option>
+												<option value="1" th:text="#{d_facile}"></option>
+												<option value="2" th:text="#{d_medio}"></option>
+												<option value="3" th:text="#{d_difficile}"></option>
+											</select>
+										</div>
+
+										<!-- Link editor -->
+										<div class="text-center pt-2">
+											<a
+												id="link_editor"
+												class="btn btn-primary disabled"
+												href="#"
+												role="button"
+											>
+												<i class="bi bi-play-fill" th:text="#{inizia_partita}"></i>
+											</a>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Scheda continua gioco-->
+					<div class="card d-none" id="scheda_continua">
+						<h5
+							class="card-header text-center selectedMode"
+						></h5>
+						<div class="card-body">
+							<!-- Form di selezione -->
+							<div class="row">
+								<div class="col">
+									<h3 class="text-center mb-4" th:text="#{gamemode_alert}"></h3>
+									<div class="row">
+										<ul class="list-group list-group-flush">
+											<li class="list-group-item">
+												<label th:text="#{gamemode_classeUT}"> </label>
+												<span id="gamemode_classeUT"> </span>
+											</li>
+											<li class="list-group-item">
+												<label> Robot: </label>
+												<span id="gamemode_robot"> </span>
+											</li>
+											<li class="list-group-item">
+												<label th:text="#{gamemode_difficulty}"></label>
+												<span id="gamemode_difficulty"> </span>
+											</li>
+											<li class="list-group-item">
+												<label th:text="#{modalità}"></label>
+												<span id="gamemode_modalita"> </span>
+											</li>
+										</ul>
+									</div>
+
+									<div class="d-flex gap-5 justify-content-between">
+										<!-- Set new Game-->
+										<div class="text-center pt-2">
+											<button
+												type="button"
+												class="btn btn-primary"
+												id="new_game"
+											>
+												<i class="bi bi-plus-lg" th:text="#{nuova_partita}"></i>
+											</button>
+										</div>
+										<!-- Link editor -->
+										<div class="text-center pt-2">
+											<a
+												class="btn btn-primary"
+												href="#"
+												role="button"
+												id="Continua"
+											>
+												<i class="bi bi-play-fill" th:text="#{riprendi_partita}"></i>
+											</a>
+										</div>
 									</div>
 								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col"></div>
 			</div>
 		</div>
-
-		<!-- Bootstrap JS -->
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-		<!-- Inclusione jQuery -->
+		<div th:replace="fragments/footer :: footer"></div>
 		<script
-			th:src="@{/t5/jquery/jquery-3.7.0.com.js}"
+			th:src="@{/t5/js/Gamemode_logic.js}"
 			th:inline="javascript"
-		></script>
-
-		<script>
-			// Funzione per ottenere i parametri dall'URL
-			function getParameterByName(name) {
-				const url = window.location.href;
-				name = name.replace(/[\[\]]/g, "\\$&");
-				const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-				const results = regex.exec(url);
-				if (!results) return null;
-				if (!results[2]) return "";
-				return decodeURIComponent(results[2].replace(/\+/g, " "));
-			}
-
-			// Funzione per aggiornare la modalità selezionata
-			function updateModeFromUrl() {
-				const mode = getParameterByName("mode");
-				if (mode) {
-					const sanitizedMode = mode.replace(/[^a-zA-Z0-9\s]/g, " ");
-					document.getElementById("selectedMode").textContent +=
-						" " + sanitizedMode;
-					localStorage.setItem("modalita", sanitizedMode);
-				}
-			}
-
-			// Funzione per salvare i valori nel localStorage
-			function saveToLocalStorage() {
-				const selectClassValue = document.getElementById("select_class").value;
-				const selectRobotValue = document.getElementById("select_robot").value;
-				const selectDifficultyValue =
-					document.getElementById("select_diff").value;
-
-				// Salva i valori nel localStorage
-				localStorage.setItem("underTestClassName", selectClassValue);
-				localStorage.setItem("robot", selectRobotValue);
-				localStorage.setItem("difficulty", selectDifficultyValue);
-
-				// Aggiorna il link
-				const link = document.getElementById("link_editor");
-				link.setAttribute("href", "/editor?ClassUT=" + selectClassValue);
-			}
-
-			// Event listeners per i dropdown
-			document
-				.getElementById("select_class")
-				.addEventListener("change", saveToLocalStorage);
-			document
-				.getElementById("select_robot")
-				.addEventListener("change", saveToLocalStorage);
-			document
-				.getElementById("select_diff")
-				.addEventListener("change", saveToLocalStorage);
-
-			// Esegui all'avvio
-			window.onload = updateModeFromUrl;
-
-			function redirectToMain() {
-				window.location.href = "/main";
-			}
-
-			const getCookie = (name) => {
-				const value = `; ${document.cookie}`;
-				const parts = value.split(`; ${name}=`);
-				if (parts.length === 2) return parts.pop().split(";").shift();
-				return null;
-			};
-
-			const parseJwt = (token) => {
-				try {
-					return JSON.parse(atob(token.split(".")[1]));
-				} catch (e) {
-					return null;
-				}
-			};
-
-			const jwtData = parseJwt(getCookie("jwt"));
-			const username = jwtData.sub;
-			const userId = jwtData.userId;
-			document.getElementById("usernameField").textContent = username;
+		>
 		</script>
+		<script
+		th:src="@{/t5/js/Util_Editor.js}"
+		th:inline="javascript"
+	>
+	</script>
+		
 	</body>
 </html>

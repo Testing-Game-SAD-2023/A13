@@ -14,13 +14,13 @@
         <div class="profile-container">
             <div class="text-center mb-4">
                 <h3 class="text-custom">
-                    <td th:text="${player.name}"></td>
-                    <td th:text="${player.surname}"></td>
+                    <span th:text="${player.name}"></span>
+                    <span th:text="${player.surname}"></span>
                 </h3>
             </div>
             <form>
                 <div class="mb-3">
-                    <label for="email" class="form-label">Studies:</label>
+                    <label for="email" class="form-label" th:text="#{studi}"></label>
                     <input type="email" id="email" class="form-control" value="${player.studies}" readonly>
                 </div>
                 <div class="mb-3">
@@ -28,9 +28,7 @@
                     <input type="email" id="email" class="form-control" value="${player.email}" readonly>
                 </div>
                 <div class="text-center mt-3">
-                    <button type="button" class="btn btn-sm btn-success"> 
-                        Edit Profile
-                    </button>
+                    <button type="button" class="btn btn-sm btn-success" th:text="#{modifica_profilo}"></button>
                 </div>
             </form>
         </div>
