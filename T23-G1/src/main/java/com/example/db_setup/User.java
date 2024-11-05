@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 import lombok.Data;
 
-@Table (name = "Students", schema = "STUDENTSREPO")
+@Table (name = "Students", schema = "studentsrepo")
 @Data 
 @Entity
 public class User {
@@ -32,6 +32,8 @@ public class User {
     //MODIFICA
     public boolean isRegisteredWithFacebook;
     //FINE MODIFICA
+    //MODIFICA 18/06/2024
+    public boolean isRegisteredWithGoogle;
     
     @Enumerated (EnumType.STRING)
     public Studies studies;

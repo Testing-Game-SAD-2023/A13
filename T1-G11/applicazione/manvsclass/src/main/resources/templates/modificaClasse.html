@@ -220,17 +220,17 @@ var parametro = location.search.split('parametro=')[1];
   
   <div class="mb-3">
     <label for="category1" class="form-label"  >Category 1</label>
-    <input type="text" class="form-control" id="category1" value="${home.category[0]}" aria-describedby="categoryHelp">
+    <input type="text" class="form-control" id="category1" value="${home.statistic[0]}" aria-describedby="categoryHelp">
   </div>
 
   <div class="mb-3">
     <label for="category2" class="form-label" >Category 2</label>
-    <input type="text" class="form-control" value="${home.category[1]}" id="category2" aria-describedby="categoryHelp">
+    <input type="text" class="form-control" value="${home.statistic[1]}" id="category2" aria-describedby="categoryHelp">
   </div>
 
   <div class="mb-3">
-    <label for="category3" class="form-label" value="${home.category[2]}">Category 3</label>
-    <input type="text" class="form-control" id="category3" value="${home.category[2]}" aria-describedby="categoryHelp">
+    <label for="category3" class="form-label" value="${home.statistic[2]}">Category 3</label>
+    <input type="text" class="form-control" id="category3" value="${home.statistic[2]}" aria-describedby="categoryHelp">
   </div>
 
   
@@ -269,7 +269,7 @@ function uploadFile(event) {
   const difficulty = document.getElementById('difficulty').value;
   const code_Uri = "";
   const description = document.getElementById('description').value;
-  const category = [
+  const statistic = [
     document.getElementById('category1').value,
     document.getElementById('category2').value,
     document.getElementById('category3').value
@@ -281,7 +281,7 @@ function uploadFile(event) {
     difficulty: difficulty,
     code_Uri: code_Uri,
     description: description,
-    category: category
+    statistic: statistic
   };
 
   fetch('/update/' + name, {

@@ -17,6 +17,11 @@
 
 package com.g2.Interfaces;
 
+import com.g2.Model.Achievement;
+import com.g2.Model.AchievementProgress;
+import com.g2.Model.Statistic;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -33,6 +38,14 @@ public class T1Service extends BaseService {
     public T1Service(RestTemplate restTemplate) {
         super(restTemplate, BASE_URL);
         // Registrazione delle azioni
+        registerAction("getStatistics", new ServiceActionDefinition(
+                params -> getStatistics()
+        ));
+
+        registerAction("getAchievements", new ServiceActionDefinition(
+                params -> getAchievements()
+        ));
+
         registerAction("getClasses", new ServiceActionDefinition(
                 params -> getClasses() // Metodo senza argomenti
         ));
@@ -44,6 +57,14 @@ public class T1Service extends BaseService {
     // Metodi effettivi
     private List<ClassUT> getClasses(){
         return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {});
+    }
+
+    private List<Statistic> getStatistics() {
+        return callRestGET("/statistics/list", null, new ParameterizedTypeReference<List<Statistic>>() {});
+    }
+
+    private List<Achievement> getAchievements() {
+        return callRestGET("/achievements/list", null, new ParameterizedTypeReference<List<Achievement>>() {});
     }
 
     private String getClassUnderTest(String nomeCUT) {

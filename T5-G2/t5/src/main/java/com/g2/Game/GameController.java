@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.commons.model.Gamemode;
+import com.g2.Service.AchievementService;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -28,6 +30,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +51,10 @@ public class GameController {
     private final Map<String, GameLogic> activeGames;
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
+
+    @Autowired
+    private AchievementService achievementService;
+
     //Logger 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 

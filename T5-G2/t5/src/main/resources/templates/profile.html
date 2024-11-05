@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <link href="/t5/css/main.css" rel="stylesheet" />
+        <link href="/t5/css/main2.css" rel="stylesheet" />
+        <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
+
+        <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
+        <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
+        <!--Modifica (20/05) Adding Sweet Alert-->
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <!--Modifica (21/05) Adding JQuery-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!--Fine Modifica-->
+
+        <script src="/t5/js/profile.js"></script>
+
+        <title>Profilo utente</title>
+    </head>
+
+    <body class="bg-custom">
+        <div class="container-fluid">
+            <div class="row">
+                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" >Profilo</p>
+                <div id="topRightContainer">
+                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Profilo</button>
+                    <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <div class="row">
+                        <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-210">
+                                        <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                                    </div>
+                                    <div class="col">
+                                        <h4 class="card-title" id="usernameField"></h4>
+                                        <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
+                                        <hr>
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur maximus pretium lacinia. Curabitur et varius neque. Aliquam tincidunt tortor eget felis rhoncus, et commodo ex vulputate. Cras tristique id arcu non condimentum. Fusce non dignissim lorem. Ut porttitor mattis nisl quis interdum. Aliquam tortor orci, interdum in gravida faucibus, auctor sit amet tellus. Aliquam vulputate enim quis rhoncus eleifend. Maecenas id orci est. Mauris at rutrum velit. Nunc posuere leo eget nisl lacinia semper. Fusce interdum, neque at suscipit tristique, tellus sem elementum quam, quis placerat justo orci eget nunc. Nam eget turpis ut elit sollicitudin ornare ac id lorem. Cras facilisis enim et eros suscipit, ut convallis ante suscipit. Nunc luctus diam at sollicitudin ornare. Mauris vel pharetra dolor. </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
+                            <div class="card-body">
+                                <h4 class="card-title">Trofei</h4>
+                                <hr>
+                                <div style="height:44.2vh; overflow-y: auto">
+                                    <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
+                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                            </div>
+                                            <div class="col">
+                                                <h4 th:text="${element.Name}">Nome achievement</h4>
+                                                <p th:text="${element.Description}">Descrizione achievement</p>
+                                                <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
+                                                    <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card" style="height:92vh">
+                        <div class="card-body">
+                            <h4 class="card-title">Statistiche</h4>
+                            <hr>
+                            <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
+                                <!--<div class="col-1">
+                                    I
+                                </div>-->
+                                <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
+                                    Nome statistica
+                                </div>
+                                <div class="col text-right" th:text="${element.Progress}">
+                                    1000
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <span id="user_id" style="display: none;" th:text="${userID}"></span>
+    </body>
+</html>

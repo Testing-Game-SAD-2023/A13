@@ -96,7 +96,7 @@ func fromModel(g *model.Game) Game {
 		CurrentRound: g.CurrentRound,
 		Username:     g.Username,
 		Difficulty:   g.Difficulty,
-		Description:  g.Description.String,
+		Description:  g.Description,
 		Score:        g.Score,
 		CreatedAt:    g.CreatedAt,
 		UpdatedAt:    g.UpdatedAt,

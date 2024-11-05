@@ -22,6 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.g2.Model.Game;
+import com.g2.Model.StatisticProgress;
+import com.g2.Model.User;
+import org.springframework.core.ParameterizedTypeReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,26 @@ public class T4Service extends BaseService {
     public T4Service(RestTemplate restTemplate) {
         // Inizializzazione del servizio base con RestTemplate e URL specificato
         super(restTemplate, BASE_URL);
+
+        // Registrazione dell'azione "getLevels" con una definizione specifica per
+        // questa azione
+        registerAction("getLevels", new ServiceActionDefinition(
+                // Definizione di un'operazione lambda che invoca il metodo getLevels con un
+                // parametro di tipo String
+                params -> getLevels((String) params[0]),
+                // L'azione è definita per accettare un parametro di tipo String
+                String.class
+        ));
+
+        registerAction("getGames", new ServiceActionDefinition(
+                params -> getGames((int) params[0]),
+                Integer.class
+        ));
+
+        registerAction("getStatisticsProgresses", new ServiceActionDefinition(
+                params -> getStatisticsProgresses((int) params[0]),
+                Integer.class
+        ));
 
         registerAction("CreateGame", new ServiceActionDefinition(
                 params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3],
@@ -76,6 +100,25 @@ public class T4Service extends BaseService {
                 String.class, String.class, String.class));
     }
 
+    // usa /games per ottenere una lista di giochi
+    private List<Game> getGames(int playerId) {
+        final String endpoint = "/games/player/" + playerId;
+            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {});
+            // Gestione degli errori durante la richiesta
+            throw new IllegalArgumentException("[GETGAMES] Errore durante il recupero dei giochi: " + e.getMessage());
+    }
+
+    private List<StatisticProgress> getStatisticsProgresses(int playerID) {
+            Map<String, String> formData = new HashMap<>();
+            formData.put("pid", String.valueOf(playerID));
+
+            String endpoint = "/phca/" + playerID;
+
+            List<StatisticProgress> response = callRestGET(endpoint, formData, new ParameterizedTypeReference<List<StatisticProgress>>() {});
+            return response;
+    }
+
+    // usa /robots per ottenere dati 
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
         formData.put("testClassId", className); // Nome della classe
@@ -86,14 +129,16 @@ public class T4Service extends BaseService {
         return response;
     }
 
-    private int CreateGame(String Time, String difficulty, String name, String description, String username) {
+    private int CreateGame(String Time, String difficulty, String name, String description, String id) {
         final String endpoint = "/games";
         JSONObject obj = new JSONObject();
         obj.put("difficulty", difficulty);
         obj.put("name", name);
         obj.put("description", description);
-        obj.put("username", username);
         obj.put("startedAt", Time);
+        JSONArray playersArray = new JSONArray();
+        playersArray.put(String.valueOf(id));
+        obj.put("players", playersArray);
         // Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio
         // parse per avere l'id
         String respose = callRestPost(endpoint, obj, null, null, String.class);

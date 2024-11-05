@@ -2,6 +2,15 @@
 
 GOTO :MAIN
 
+REM Installer function for commons
+:function0
+echo "Installing commons"
+IF NOT DEFINED JAVA_HOME SET JAVA_HOME=C:\Program Files\Java\jdk-21
+cd "./commons"
+call mvn package || ( echo "Error in commons installation during mvn package. Check that the JAVA_HOME variable will point to a valid JDK" &&  exit /b 1 )
+exit /b 0
+
+
 REM Installer function for T1-G11
 :function1
 echo "Installing T1-G11"
@@ -96,7 +105,7 @@ docker volume create VolumeT8 || ( echo "Error in creating the volume T8" && exi
 REM Creazione della rete Docker 'global-network'
 docker network create global-network || ( echo "Error in creating the network global-network" && exit /b 1 )
 
-for /l %%i in (1,1,10) do (
+for /l %%i in (0,1,10) do (
 
    pushd .
    echo "Calling function # %%i:"

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<!--Adding Thymeleaf-->
+<html lang ="en" 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!--Enabling proper responsive behavior-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title id="title-scalata-gamemode" th:text="#{seleziona_scalata}"></title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale-extreme.css">
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/translucent.css">
+
+    <link rel="stylesheet" href="/t5/css/gamemode_scalata.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <!-- <script type= "text/javascript" src="/t5/js/main.js"></script> -->
+    <script type="text/javascript" src="/t5/js_old/common.js"></script>
+    <script type="text/javascript" src="/t5/js_old/gamemode_scalata.js"></script>
+    
+
+</head>
+
+<body class=bg-custom>
+  
+  <!--Navbar-->
+  <nav class="navbar navbar-dark bg-dark" id="navbar">
+      <a class="navbar-brand" href="javascript:void(0);">
+        <i class="fas fa-stairs" th:text="#{seleziona_scalata}"></i> 
+      </a>
+      <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" id="nav-go-back" href="/main" th:text="#{indietro}"> <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="nav-logout" href="/logout" th:text="#{logout}"> <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="nav-rules" href="#" data-toggle="modal" data-target="#rulesModal" th:text="#{regole}"></a>
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" id="nav-tour" href=#>Inizia il tour</a>
+          </li> -->
+        </ul>
+      </div>
+  </nav>
+
+  <!--Jumbotron-->
+  <div class="jumbotron">
+    <h1 class="title" th:text="#{titolo_scalata}"></h1>
+    <h2 class="subtitle" th:text="#{descrizione_scalata}"></h2>
+  </div>
+  <br>
+  <div id="scalate-container" class="container">
+    <!-- List of all "Scalate" to choose-->
+  </div>
+  <br>
+  <br>
+  <div class="text-center">
+    <button type="button" id="submit-button" class="btn btn-light btn-lg" th:text="#{submit}"></button>
+  </div>
+  <br>
+  <br>
+<!--Regolamento modal dialog-->
+<div class="modal fade" id="rulesModal" tabindex="-1" role="dialog" aria-labelledby="rulesModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rulesModalLabel" th:text="#{regole}"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" th:text="#{descrizione_scalata2}"></div>     
+      <div class="modal-footer d-flex justify-content-center">
+        <button type="button" class="btn btn-dark" data-dismiss="modal" th:text="#{chiudi}"></button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+
+</html>

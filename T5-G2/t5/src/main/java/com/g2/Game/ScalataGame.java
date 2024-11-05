@@ -20,6 +20,7 @@ package com.g2.Game;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
 
 public class ScalataGame extends GameLogic {

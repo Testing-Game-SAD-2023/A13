@@ -17,6 +17,7 @@
 
 package com.g2.t5;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -26,16 +27,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g2.Model.*;
+import com.g2.Service.AchievementService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -59,6 +59,9 @@ public class GuiController {
 
     private final ServiceManager serviceManager;
     private final LocaleResolver localeResolver;
+
+    @Autowired
+    private AchievementService achievementService;
 
     @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
@@ -87,6 +90,58 @@ public class GuiController {
         PageBuilder main = new PageBuilder(serviceManager, "main", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
+    }
+
+    @GetMapping("/profile")
+    public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt)
+    {
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+
+            String userId = map.get("userId").toString();
+
+            return profilePage(model, userId, jwt);
+        }
+        catch (Exception e) {
+            System.out.println("(/profile) Error requesting profile: " + e.getMessage());
+        }
+
+        return "error";
+    }
+
+    @GetMapping("/profile/{playerID}")
+    public String profilePage(Model model,
+                              @PathVariable(value="playerID") String playerID,
+                              @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
+        profile.SetAuth(jwt);
+
+        int userId = Integer.parseInt(playerID);
+
+        List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
+        List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
+
+        List<Statistic> allStatistics = achievementService.getStatistics();
+        Map<String, Statistic> IdToStatistic = new HashMap<>();
+
+        for (Statistic stat : allStatistics)
+            IdToStatistic.put(stat.getID(), stat);
+
+        GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
+        GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
+        GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
+        GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
+
+        profile.setObjectComponents(objAchievementProgresses);
+        profile.setObjectComponents(objStatisticProgresses);
+        profile.setObjectComponents(objIdToStatistic);
+        profile.setObjectComponents(objUserID);
+
+        return profile.handlePageRequest();
     }
 
     @GetMapping("/gamemode")
@@ -238,7 +293,7 @@ public class GuiController {
 
     @PostMapping("/save-data")
     public ResponseEntity<String> saveGame(@RequestParam("playerId") int playerId, @RequestParam("robot") String robot,
-            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty,
+            @RequestParam("classe") String classe, @RequestParam("difficulty") String difficulty, @RequestParam("gamemode") String gamemode,
             @RequestParam("username") String username, @RequestParam("selectedScalata") Optional<Integer> selectedScalata, HttpServletRequest request) {
 
         if (!request.getHeader("X-UserID").equals(String.valueOf(playerId))) {
@@ -251,7 +306,7 @@ public class GuiController {
 
         GameDataWriter gameDataWriter = new GameDataWriter();
         // g.setGameId(gameDataWriter.getGameId());
-        Game g = new Game(playerId, "descrizione", "nome", difficulty, username);
+        Game g = new Game(playerId, gamemode, "nome", difficulty, username);
         // g.setPlayerId(pl);
         // g.setPlayerClass(classe);
         // g.setRobot(robot);
@@ -268,6 +323,9 @@ public class GuiController {
         if (ids == null) {
             return ResponseEntity.badRequest().body("Bad Request");
         }
+
+        System.out.println("Checking achievements...");
+        achievementService.updateProgressByPlayer(playerId);
 
         return ResponseEntity.ok(ids.toString());
     }
