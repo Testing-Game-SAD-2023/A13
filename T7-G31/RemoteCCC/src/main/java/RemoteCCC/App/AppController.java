@@ -20,10 +20,7 @@ import java.io.IOException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RestController
 public class AppController {
-
-    protected static final Logger logger = LoggerFactory.getLogger(CompilationService.class);
-
-    @Value("${variabile.mvn}")
-    private String mvn_path;
 
     @Autowired
     public AppController() {
@@ -58,11 +50,10 @@ public class AppController {
     @PostMapping(value = "/compile-and-codecoverage", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> compileAndTest(@RequestBody RequestDTO request) throws IOException, InterruptedException {
         try {
-            CompilationService compilationService = new CompilationService(request.getTestingClassName(),
-                        request.getTestingClassCode(),
-                        request.getUnderTestClassName(),
-                        request.getUnderTestClassCode(),
-                        mvn_path);
+            // Crea un'istanza del servizio di compilazione e chiama il metodo
+            CompilationService compilationService = new CompilationService(request.getTestingClassName(), request.getTestingClassCode(),
+                    request.getUnderTestClassName(), request.getUnderTestClassCode());
+
             compilationService.compileAndTest();
             JSONObject result = new JSONObject();
             result.put("outCompile", compilationService.outputMaven);
@@ -70,7 +61,6 @@ public class AppController {
             result.put("error", compilationService.Errors);
             return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "application/json").body(result.toString()); // Imposta l'intestazione Content-Type
         } catch (IOException | InterruptedException | JSONException e) {
-            logger.error("[Compile-and-codecoverage]", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
         }
     }
@@ -79,7 +69,7 @@ public class AppController {
     /*
      *  gestisco il request body come una classe per semplicità 
      */
-    protected static class RequestDTO {
+    private static class RequestDTO {
 
         private String testingClassName;
         private String testingClassCode;

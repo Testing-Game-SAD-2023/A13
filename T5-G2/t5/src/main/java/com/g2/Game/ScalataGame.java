@@ -20,16 +20,17 @@ package com.g2.Game;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
 
 public class ScalataGame extends GameLogic {
-    private final List<Sfida> games;
+    private final List<TurnBasedGameLogic> games;
     private int currentRound;
     private int currentGameIndex;
 
     public ScalataGame(ServiceManager serviceManager, String playerID, String classeUT,
-                       List<String> typesRobot, List<String> difficulties, String mode) {
-        super(serviceManager, playerID, classeUT, typesRobot.get(0), difficulties.get(0), mode); 
+                       List<String> typesRobot, List<String> difficulties) {
+        super(serviceManager, playerID, classeUT, typesRobot.get(0), difficulties.get(0), Gamemode.Scalata.toString());
         this.games = new ArrayList<>();
         this.currentRound = 1; // Inizia dal round 1
         this.currentGameIndex = 0; // Indice del gioco corrente
@@ -37,14 +38,14 @@ public class ScalataGame extends GameLogic {
         for (int i = 0; i < typesRobot.size(); i++) {
             String typeRobot = typesRobot.get(i);
             String difficulty = difficulties.get(i);
-            games.add(new Sfida(serviceManager, playerID, classeUT, typeRobot, difficulty, mode));
+            games.add(new TurnBasedGameLogic(serviceManager, playerID, classeUT, typeRobot, difficulty, Gamemode.Scalata.toString()));
         }
     }
 
     @Override
     public void playTurn(int userScore, int robotScore) {
         if (currentGameIndex < games.size()) {
-            Sfida currentGame = games.get(currentGameIndex);
+            TurnBasedGameLogic currentGame = games.get(currentGameIndex);
             currentGame.playTurn(userScore, robotScore);
 
             // Verifica se il gioco corrente è finito
@@ -67,7 +68,7 @@ public class ScalataGame extends GameLogic {
     public int GetScore(int coverage) {
         // Implementa la logica per calcolare il punteggio totale tra tutti i giochi
         int totalScore = 0;
-        for (Sfida game : games) {
+        for (TurnBasedGameLogic game : games) {
             totalScore += game.GetScore(coverage); // Calcola il punteggio per ogni gioco
         }
         return totalScore;

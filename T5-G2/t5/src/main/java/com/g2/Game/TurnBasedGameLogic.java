@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 
 import com.g2.Interfaces.ServiceManager;
 
-public class Sfida extends GameLogic {
+public class TurnBasedGameLogic extends GameLogic {
 
     private int currentTurn;
     private int userScore;
@@ -33,9 +33,9 @@ public class Sfida extends GameLogic {
 
 
     //Questa classe si specializza in una partita semplice basata sui turni, prende il nome di Sfida nella UI
-    public Sfida(ServiceManager serviceManager, String PlayerID, String ClasseUT,
-                                String type_robot, String difficulty, String mode) {
-        super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty, mode);
+    public TurnBasedGameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
+                                String type_robot, String difficulty, String gamemode) {
+        super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty, gamemode);
         currentTurn = 0;
     }
 

@@ -15,11 +15,6 @@
  *   limitations under the License.
  */
 
-
-/*
-*		QUI CI SONO TUTTE LE FUNZIONI UTILI PER L'EDITOR 
-*/
-
 // Funzione per creare l'URL dell'API
 function createApiUrl(formData, orderTurno) {
 	const className = formData.get("className");
@@ -40,14 +35,12 @@ function createApiUrl(formData, orderTurno) {
 
 // Funzione per generare il percorso del test
 function generaPercorsoTest(orderTurno, formData) {
-	let modalita = localStorage.getItem("modalita");
+	const modalita = localStorage.getItem("modalita");
 	const playerId = formData.get("playerId");
 	const gameId = formData.get("gameId");
 	const roundId = formData.get("roundId");
 	const classeLocal = formData.get("className");
 
-	modalita = (modalita === "Allenamento") ? "Sfida" : modalita;
-	
 	// Verifica la modalità e costruisce il percorso appropriato
 	if (modalita === "Scalata" || modalita === "Sfida") {
 		const scalataPart =
@@ -108,7 +101,8 @@ ______ _____  _____   ____   _____
 |______|_|  \_\_|  \_\\____/|_____/  
 `;
 
-function getConsoleTextCoverage(valori_csv, gameScore) {
+function getConsoleTextCoverage(data, gameScore) {
+	var valori_csv = extractThirdColumn(data);
 	var consoleText = 
 `============================== Results ===============================
 Il tuo punteggio: ${gameScore}pt
@@ -134,7 +128,8 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 	return consoleText;
 }
 
-function getConsoleTextRun(valori_csv, punteggioJacoco, punteggioRobot, gameScore) {
+function getConsoleTextRun(data, punteggioJacoco, punteggioRobot, gameScore) {
+	var valori_csv = extractThirdColumn(data);
 	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
 	consoleText =
 `===================================================================== \n` +
@@ -169,10 +164,7 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 }
 
 function getConsoleTextError(){
-	return  `===================================================================== \n` 
-			+ error +  "\n" +
-			`============================== Results =============================== \n
-			Ci sono stati errori di compilazione, controlla la console !`;
+	return error + "\n Ci sono stati errori di compilazione, controlla la console !";
 }
 
 // Funzione per avviare il gioco utilizzando ajaxRequest
@@ -190,11 +182,11 @@ async function startGame(data) {
 		console.log("Partita iniziata con successo:", response);
 	} catch (error) {
 		// Assicurati che error sia una stringa prima di usare includes
-		errorMessage = JSON.stringify(error);
+		const errorMessage = error.message || error.toString();
 
 		if (errorMessage.includes("errore esiste già la partita")) {
 			console.log("Il messaggio d'errore indica che esiste già la partita.");
-			openModalWithText(status_inizia_partita, match_in_corso);
+			openModalWithText("Start Game", "Hai già un match in corso!");
 		} 
 
 		console.log("[start Game]", errorMessage);
@@ -204,71 +196,33 @@ async function startGame(data) {
 function toggleLoading(showSpinner, divId, buttonId) {
 	const divElement = document.getElementById(divId);
 	const button = document.getElementById(buttonId);
+
 	if (!divElement) {
 		console.error(`Elemento con ID "${divId}" non trovato.`);
 		return;
 	}
+
 	const spinner = divElement.querySelector(".spinner-border");
 	const statusText = divElement.querySelector('[role="status"]');
 	const icon = divElement.querySelector("i");
+
 	if (showSpinner) {
 		spinner.style.display = "inline-block"; // Mostra lo spinner
-		statusText.innerText = loading; // Mostra il testo "Loading..."
+		statusText.innerText = "Loading..."; // Mostra il testo "Loading..."
 		icon.style.display = "none"; // Nascondi l'icona
+		button.disabled = true;
 	} else {
 		spinner.style.display = "none"; // Nascondi lo spinner
-		statusText.innerText =  statusText.getAttribute('data-title'); // Nascondi il testo "Loading..."
+		statusText.innerText = "Play"; // Nascondi il testo "Loading..."
 		icon.style.display = "inline-block"; // Mostra l'icona
+		button.disabled = false;
 	}
 }
 
-// Definizione degli stati predefiniti
-const statusMessages = {
-	sending:    { showSpinner: true,  text: status_sending	},
-    loading: 	{ showSpinner: true,  text: status_loading  },
-    compiling: 	{ showSpinner: true,  text: status_compiling},
-    ready: 		{ showSpinner: false, text: status_ready 	},
-    error: 		{ showSpinner: false, text: status_error    },
-	turn_end:   { showSpinner: false, text: status_turn_end },
-	game_end:   { showSpinner: false, text: status_game_end }
-};
-
-// Funzione per comunicare lo stato in cui si trova l'editor 
-function setStatus(statusName) {
-    const divElement = document.getElementById("status_compiler");
-
-    if (!divElement) {
-        console.error(`Elemento con ID "status_compiler" non trovato.`);
-        return;
-    }
-
-    const spinner = divElement.querySelector(".spinner-border");
-    const statusText = divElement.querySelector('#status_text');
-    const icon = divElement.querySelector("i");
-
-    // Recupera le impostazioni per lo stato specificato
-    const status = statusMessages[statusName];
-
-    if (!status) {
-        console.error(`Stato "${statusName}" non definito.`);
-        return;
-    }
-
-    // Controlla lo stato attuale dello spinner e inverte la visibilità
-    if (status.showSpinner) {
-        spinner.style.display = "inline-block"; // Mostra lo spinner
-        statusText.innerText = status.text; // Mostra il testo personalizzato
-        icon.style.display = "none"; // Nascondi l'icona
-    } else {
-        spinner.style.display = "none"; // Nascondi lo spinner
-        statusText.innerText = status.text; // Mostra il testo personalizzato
-        icon.style.display = "inline-block"; // Mostra l'icona
-    }
-}
-
-function highlightCodeCoverage(reportContent, editor) {
+function highlightCodeCoverage(reportContent) {
 	// Analizza il contenuto del file di output di JaCoCo per individuare le righe coperte, non coperte e parzialmente coperte
 	// Applica lo stile appropriato alle righe del tuo editor
+
 	var coveredLines = [];
 	var uncoveredLines = [];
 	var partiallyCoveredLines = [];
@@ -286,21 +240,29 @@ function highlightCodeCoverage(reportContent, editor) {
 	});
 
 	coveredLines.forEach(function (lineNumber) {
-		editor.removeLineClass(lineNumber - 2, "gutter", "bg-danger");
-		editor.removeLineClass(lineNumber - 2, "gutter", "bg-warning");
-		editor.addLineClass	(lineNumber - 2, "gutter", "  bg-success");
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+		editor_robot.removeLineClass(
+			lineNumber - 2,
+			"wrap",
+			"partially-covered-line"
+		);
+		editor_robot.addLineClass(lineNumber - 2, "wrap", "covered-line");
 	});
 
-	uncoveredLines.forEach(function (lineNumber) { 
-		editor.removeLineClass(lineNumber - 2, "gutter", "bg-warning");
-		editor.removeLineClass(lineNumber - 2, "gutter", "bg-success");
-		editor.addLineClass	(lineNumber - 2, "gutter", "bg-danger");
+	uncoveredLines.forEach(function (lineNumber) {
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+		editor_robot.removeLineClass(
+			lineNumber - 2,
+			"wrap",
+			"partially-covered-line"
+		);
+		editor_robot.addLineClass(lineNumber - 2, "wrap", "uncovered-line");
 	});
 
-	partiallyCoveredLines.forEach(function (lineNumber) { 
-		editor.removeLineClass(lineNumber - 2, "gutter", "bg-danger");
-		editor.removeLineClass(lineNumber - 2, "gutter", "bg-success");
-		editor.addLineClass	(lineNumber - 2, "gutter", "bg-warning");
+	partiallyCoveredLines.forEach(function (lineNumber) {
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+		editor_robot.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+		editor_robot.addLineClass(lineNumber - 2, "wrap", "partially-covered-line");
 	});
 }
 
@@ -321,7 +283,6 @@ function getFormData() {
 	formData.append("order", orderTurno);
 	formData.append("username", localStorage.getItem("username"));
 	formData.append("testClassId", className);
-	formData.append("eliminaGame", false);
 	return formData;
 }
 
@@ -479,123 +440,4 @@ function controlloScalata(
 				);
 			});
 	}
-}
-
-// Funzione per analizzare l'output di Maven
-function parseMavenOutput(output) {
-    const lines = output.split('\n');
-    let results = {
-        errors: 0,
-        warnings: 0
-    };
-
-    lines.forEach(line => {
-        // Regex per contare avvisi
-        const warningMatch = line.match(/^\[INFO\] (\d+) warning/);
-        if (warningMatch) {
-            results.warnings = parseInt(warningMatch[1], 10);
-        }
-
-        // Regex per contare errori
-        const errorMatch = line.match(/^\[INFO\] (\d+) error/);
-        if (errorMatch) {
-            results.errors = parseInt(errorMatch[1], 10);
-        }
-    });
-
-	document.getElementById("error_compiler").textContent = results.errors;
-	document.getElementById("warning_compiler").textContent =  results.warnings;
-    return results;
-}
-
-function pulisciLocalStorage(chiave) {
-    // Controlla se la chiave esiste nel localStorage
-    if (localStorage.getItem(chiave)) {
-        // Rimuovi la chiave dal localStorage
-        localStorage.removeItem(chiave);
-        console.log(`Dati associati a "${chiave}" rimossi dal localStorage.`);
-    } else {
-        console.log(`Nessun dato trovato per la chiave "${chiave}".`);
-    }
-}
-
-//Funzione per fare il replace del testo dell'editor 
-function replaceText(text, replacements) {
-    return text.replace(/\b(TestClasse|username|userID|date)\b/g, match => replacements[match] || match);
-}
-
-//Funzione carica
-function SetInitialEditor(replacements){
-	let text = editor_utente.getValue();
-	let newContent = replaceText(text, replacements) ;
-	editor_utente.setValue(newContent);
-}
-
-//Ottieni parametro dal URL
-function getParameterByName(name) {
-	const url = window.location.href;
-	name = name.replace(/[\[\]]/g, "\\$&");
-	const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-	const results = regex.exec(url);
-	if (!results) return null;
-	if (!results[2]) return "";
-	return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-// modal info
-function openModalWithText(text_title, text_content, buttons = []) {
-	document.getElementById('Modal_title').innerText = text_title;
-	// Imposta il testo nel corpo del modal
-	document.getElementById('Modal_body').innerText = text_content;
-
-	// Pulisci eventuali bottoni esistenti nel footer
-	var modalFooter = document.getElementById('Modal_footer');
-	modalFooter.innerHTML = '';
-
-	// Aggiungi bottoni personalizzati se sono stati forniti
-	if (buttons.length > 0) {
-		buttons.forEach(button => {
-			let btn = document.createElement('a');
-			btn.innerText = button.text;
-			btn.href = button.href;  // Assegna il link al pulsante
-			btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
-			btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
-			modalFooter.appendChild(btn);
-		});
-	}
-
-	// Ottieni il modal
-	var modal = new bootstrap.Modal(document.getElementById('Modal'));
-
-	// Mostra il modal
-	modal.show();
-}
-
-// modal error 
-function openModalError(text_title, text_content, buttons = []) {
-	document.getElementById('modal_error_title').innerText = text_title;
-	// Imposta il testo nel corpo del modal
-	document.getElementById('modal_error_body').innerText = text_content;
-
-	// Pulisci eventuali bottoni esistenti nel footer
-	var modalFooter = document.getElementById('modal_error_footer');
-	modalFooter.innerHTML = '';
-
-	// Aggiungi bottoni personalizzati se sono stati forniti
-	if (buttons.length > 0) {
-		buttons.forEach(button => {
-			let btn = document.createElement('a');
-			btn.innerText = button.text;
-			btn.href = button.href;  // Assegna il link al pulsante
-			btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
-			btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
-			modalFooter.appendChild(btn);
-		});
-	}
-
-	// Ottieni il modal
-	var modal = new bootstrap.Modal(document.getElementById('Modal_error'));
-
-	// Mostra il modal
-	modal.show();
 }
