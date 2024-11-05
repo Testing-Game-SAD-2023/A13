@@ -11,6 +11,15 @@ public class Game {
     private String ora_creazione;
     private String classe;
     private String username;
+    private double score;
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
 
     public void setClasse(String classe) {
         this.classe = classe;
@@ -23,6 +32,10 @@ public class Game {
         this.difficulty = difficulty;
         this.classe = "";
         this.username = username;
+    }
+
+    public Game() {
+
     }
 
     public int getPlayerId() {
@@ -93,4 +106,18 @@ public class Game {
         this.username = username;
     }
 
+    @Override
+    public String toString() {
+        return "Game{" +
+                "playerId=" + playerId +
+                ", id=" + id +
+                ", description='" + description + '\'' +
+                ", name='" + name + '\'' +
+                ", difficulty='" + difficulty + '\'' +
+                ", data_creazione=" + data_creazione +
+                ", ora_creazione='" + ora_creazione + '\'' +
+                ", classe='" + classe + '\'' +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

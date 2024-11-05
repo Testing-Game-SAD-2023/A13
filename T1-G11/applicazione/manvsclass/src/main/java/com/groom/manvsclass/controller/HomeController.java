@@ -6,15 +6,19 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.commons.model.Gamemode;
+import com.commons.model.Robot;
+import com.commons.model.StatisticRole;
+import com.groom.manvsclass.model.Achievement;
+import com.groom.manvsclass.model.*;
+import com.groom.manvsclass.model.repository.*;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -23,8 +27,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,7 +37,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
@@ -45,37 +46,20 @@ import com.groom.manvsclass.model.filesystem.upload.FileUploadUtil;
 import com.groom.manvsclass.model.filesystem.RobotUtil;
 import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
 
-import com.groom.manvsclass.model.Admin;
-import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.interaction;
-import com.groom.manvsclass.model.Operation;
-
 //MODIFICA (14/05/2024) : Importazione delle classi Scalata e ScalataRepository
-import com.groom.manvsclass.model.Scalata;
-import com.groom.manvsclass.model.repository.ScalataRepository;
-
-import com.groom.manvsclass.model.repository.AdminRepository;
-import com.groom.manvsclass.model.repository.ClassRepository;
-import com.groom.manvsclass.model.repository.InteractionRepository;
-import com.groom.manvsclass.model.repository.OperationRepository;
-import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Claims;
 
 //MODIFICA(11/02/2024): Gestione sessione tramite JWT
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 //MODIFICA (11/02/2024) : Controlli sul form registrazione
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 //MODIFICA (12/02/2024) : Gestione autenticazione
-import com.groom.manvsclass.controller.Authentication.AuthenticatedAdmin;
 import com.groom.manvsclass.controller.Authentication.AuthenticatedAdminRepository;
 
 //MODIFICA (13/02/2024) : Autenticazione token proveniente dai players
@@ -101,6 +85,14 @@ public class HomeController {
 	//MODIFICA (14/05/2024) : Inizializzazione del repository per le Scalate
 	@Autowired
 	ScalataRepository scalata_repo;
+
+	//MODIFICA (18/09/2024) : Inizializzazione del repository per gli Achievement
+	@Autowired
+	AchievementRepository achievementRepository;
+
+	//MODIFICA (07/10/2024) : Inizializzazione del repository per le Statistiche
+	@Autowired
+	StatisticRepository statisticRepository;
 	
 	@Autowired
     private MongoTemplate mongoTemplate; 
@@ -645,16 +637,32 @@ public class HomeController {
 	public	List<ClassUT>	ricercaClasse(@PathVariable String text) {
 	return srepo.findByText(text);
 	}
+
+	@GetMapping("/test")
+	@ResponseBody
+	public String test() {
+		return "test T1";
+	}
 	
 	@GetMapping("/downloadFile/{name}")
 	@ResponseBody
 	public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
 
 		System.out.println("/downloadFile/{name} (HomeController) - name: "+ name);
-	 	List<ClassUT> classe= srepo.findByText(name);
-		System.out.println(classe.get(0).getcode_Uri());
-	 	return FileDownloadUtil.downloadClassFile(classe.get(0).getcode_Uri());
-	}
+		System.out.println("test");
+		try{
+			List<ClassUT> classe= srepo.findByText(name);
+			System.out.println("File download:");
+			System.out.println(classe.get(0).getcode_Uri());
+			ResponseEntity file =  FileDownloadUtil.downloadClassFile(classe.get(0).getcode_Uri());
+			return file;
+		}
+		catch(Exception e){
+			System.out.println("Eccezione------------");
+			return new ResponseEntity<>("Cartella non trovata.", HttpStatus.NOT_FOUND);
+			}
+		}
+	 	
 
 	//MODIFICA (11/02/2024) : Gestione flusso JWT
 
@@ -1259,6 +1267,117 @@ public class HomeController {
         return new ModelAndView("login_admin");
 	}
 
+	//MODIFICA (18/09/2024) : Aggiunta pagina di configurazione degli achievement
+	@GetMapping("/achievements")
+	public ModelAndView showAchievementsPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+
+		System.out.println("(GET /achievements) Token JWT valido?");
+		if(isJwtValid(jwt)) {
+			ModelAndView model = new ModelAndView("achievements");
+
+			List<Gamemode> allGamemodes = Arrays.asList(Gamemode.values());
+			List<StatisticRole> allRoles = Arrays.asList(StatisticRole.values());
+			List<Robot> allRobots = Arrays.asList(Robot.values());
+
+			List<Statistic> allStatistics = statisticRepository.findAll();
+
+			model.addObject("gamemodesList", allGamemodes);
+			model.addObject("rolesList", allRoles);
+			model.addObject("robotsList", allRobots);
+
+			model.addObject("statisticsList", allStatistics);
+
+			return model;
+		}
+
+		System.out.println("(GET /achievements) Token JWT invalido");
+
+		return new ModelAndView("login_admin");
+	}
+
+	//MODIFICA (18/09/2024) : Aggiunta API di get per la lista degli achievement
+	@GetMapping("/achievements/list")
+	@ResponseBody
+	public ResponseEntity<?> listAchievements() {
+		System.out.println("(GET /achievements/list) Recupero degli achievement memorizzati nel sistema.");
+
+		List<Achievement> achievements = achievementRepository.findAll();
+		System.out.println("(GET /achievements/list) Recupero achievement avvenuto con successo.");
+
+		return new ResponseEntity<>(achievements, HttpStatus.OK);
+	}
+
+	@PostMapping("/achievements")
+	public Object createAchievement(Achievement achievement, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+		// Check JWT token
+		System.out.println("(POST /createAchievement) Token JWT valido?");
+		if(!isJwtValid(jwt)) {
+			// Invalid token
+			System.out.println("(POST /createAchievement) Token non valido");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /createAchivement) Attenzione, non sei loggato!");
+		}
+
+		// Valid Token
+		System.out.println("(POST /createAchievement) Token valido, procedere con la configurazione della propria 'Scalata'.");
+
+		achievementRepository.save(achievement);
+		System.out.println("(POST /createAchievement) Salvataggio avvenuto correttamente all'interno del DB");
+
+		return showAchievementsPage(request, jwt);
+	}
+
+	//MODIFICA (07/10/2024) : Aggiunta API di get per la lista delle statistiche
+	@GetMapping("/statistics/list")
+	@ResponseBody
+	public ResponseEntity<?> listStatistics() {
+		System.out.println("(GET /statistics/list) Recupero delle statistiche memorizzate nel sistema.");
+
+		List<Statistic> statistics = statisticRepository.findAll();
+		System.out.println("(GET /statistics/list) Recupero statistiche avvenuto con successo.");
+
+		return new ResponseEntity<>(statistics, HttpStatus.OK);
+	}
+
+	@PostMapping("/statistics")
+	public Object createStatistic(Statistic statistic, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+		// Check JWT token
+		System.out.println("(POST /createStatistic) Token JWT valido?");
+		if(!isJwtValid(jwt)) {
+			// Invalid token
+			System.out.println("(POST /createStatistic) Token non valido");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /createStatistic) Attenzione, non sei loggato!");
+		}
+
+		// Valid Token
+		System.out.println("(POST /createStatistic) Token valido.");
+
+		statisticRepository.save(statistic);
+		System.out.println("(POST /createStatistic) Salvataggio avvenuto correttamente all'interno del DB");
+
+		return showAchievementsPage(request, jwt);
+	}
+
+	@DeleteMapping("/statistics/{Id}")
+	public Object deleteStatistic(@PathVariable("Id") String Id, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+		// Check JWT token
+		System.out.println("(DELETE /deleteStatistic) Token JWT valido?");
+		if(!isJwtValid(jwt)) {
+			// Invalid token
+			System.out.println("(DELETE /deleteStatistic) Token non valido");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /deleteStatistic) Attenzione, non sei loggato!");
+		}
+
+		// Valid Token
+		System.out.println("(DELETE /deleteStatistic) Token valido.");
+
+		System.out.println("(DELETE /deleteStatistic) Deleting by Id:" + Id + ".");
+		statisticRepository.deleteById(Id);
+		System.out.println("(DELETE /deleteStatistic) Salvataggio avvenuto correttamente all'interno del DB");
+
+		return new ModelAndView("achievements");
+	}
+
+
 	//MODIFICA (14/05/2024) : Creazione della propria "Scalata"
 	@PostMapping("/configureScalata")
 	public ResponseEntity<?> uploadScalata(@RequestBody Scalata scalata, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
@@ -1339,7 +1458,6 @@ public class HomeController {
 		System.out.println("(GET /scalate_list) Recupero delle 'Scalate' memorizzate nel sistema avvenuto con successo");
 
 		return new ResponseEntity<>(scalate, HttpStatus.OK);
-	
 	}
 
 	//MODIFICA (16/05/2024) : Rimozione di una specifica "Scalata" memorizzata nel sistema

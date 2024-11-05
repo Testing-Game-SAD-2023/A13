@@ -1,0 +1,32 @@
+<div th:fragment="footer">
+<footer class="footer">
+    <div class="footer-column centered">
+        <img class="footer-logo" th:src="@{t23/css/images/Federico_II_University_Logo.svg}" alt="Federico II Logo" style="filter: brightness(0) invert(1);">
+        <img class="footer-logo" th:src="@{t23/css/images/logo.png}" alt="App Logo" style="width: 100px; height: 100px;">
+        <img class="footer-logo" th:src="@{t23/css/images/Logo 1_ENACTEST_horizontal.png}" alt="ENAC Logo" style="height: 90px;">
+    </div>
+    <div class="footer-column">
+        <h1 th:text="#{footer.info.title}"></h1>
+        <p th:text="#{footer.info.text}"></p>
+        <a th:text="#{footer.info.href}" href="https://github.com/Testing-Game-SAD-2023/A13"></a>
+        
+    </div>
+    <div class="footer-column">
+        <h1 th:text="#{footer.members}"></h1>
+        <p>Andriy Korsun-M63001275</p>
+        <p>Giuseppe Laterza-M63001411</p>
+        <p>Luca D'Angelo-M63001488</p>
+    </div>
+    <div class="footer-column">
+        <h1 th:text="#{footer.lang}"></h1>
+            <div class="lang-wrapper">
+                <img id="en-flag" th:src="@{/t23/css/images/en.png}" alt="English" style="cursor: pointer; width: 40px; height: 40px;">
+                <img id="it-flag" th:src="@{/t23/css/images/it.png}" alt="Italian" style="cursor: pointer; width: 40px; height: 40px;">
+            </div>
+        </div>
+    <div class="footer-copyright">
+        <p>&copy; SAD 2024.</p>
+    </div>
+  </footer>
+  <script th:src="@{/t23/js/language-change.js}"></script>
+</div>
