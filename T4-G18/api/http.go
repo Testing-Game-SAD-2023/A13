@@ -75,6 +75,12 @@ func FromUrlParams[T Parseable[T]](r *http.Request, name string) (T, error) {
 	return fromString[T](s, name)
 }
 
+func StringFromUrlParams(r *http.Request, name string) (string, error) {
+	s := chi.URLParam(r, name)
+	return s, nil
+}
+
+
 func FromUrlQuery[T Parseable[T]](r *http.Request, name string, fallback T) (T, error) {
 	s := r.URL.Query().Get(name)
 	if s == "" {

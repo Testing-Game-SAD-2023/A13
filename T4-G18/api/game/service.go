@@ -4,6 +4,8 @@ import (
 	"github.com/alarmfox/game-repository/api"
 	"github.com/alarmfox/game-repository/model"
 	"gorm.io/gorm"
+
+	"strconv"
 )
 
 type Repository struct {
@@ -26,6 +28,7 @@ func (gs *Repository) Create(r *CreateRequest) (Game, error) {
 			ClosedAt:      r.ClosedAt,
 			ScalataGameID: r.ScalataGameID,
 			Players:       make([]model.Player, len(r.Players)),
+			Description:   r.Description,
 		}
 	)
 	// detect duplication in player
@@ -59,6 +62,23 @@ func (gs *Repository) FindById(id int64) (Game, error) {
 		Error
 
 	return fromModel(&game), api.MakeServiceError(err)
+}
+
+func (gs *Repository) FindByPID(pid int64) ([]Game, error) {
+	var games []model.Game
+
+	err := gs.db.
+		Preload("Players").
+		Where("id IN (SELECT game_id FROM player_games WHERE player_id = ?)", strconv.FormatInt(pid, 10)).
+		Find(&games).
+		Error
+
+    res := make([]Game, len(games))
+    for i, game := range games {
+        res[i] = fromModel(&game)
+    }
+
+	return res, api.MakeServiceError(err)
 }
 
 func (gs *Repository) FindByInterval(accountId string, i api.IntervalParams, p api.PaginationParams) ([]Game, int64, error) {
