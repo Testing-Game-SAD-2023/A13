@@ -165,7 +165,7 @@ function pressedSubmit() {
                         localStorage.setItem("scalata_name", selectedScalata);
 
                         retrieveScalata(selectedScalata)
-                            .then( data => {return createGame("evosuite", data[0].selectedClasses[0], 1, result.scalataGameId, username, "Scalata")})
+                            .then( data => {return createGame("evosuite", data[0].selectedClasses[0], 1, result.scalataGameId, username)})
                             .then( data => {
                                 return swal("Successo!", "La tua scelta è stata confermata, a breve verrai reindirizzato all'arena di gioco.", "success");
                             })

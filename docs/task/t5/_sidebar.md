@@ -1,5 +1,0 @@
-* [T5/6 - User Experience](/task/t5/)
-** [Achievement Service](/task/t5/achievementService)
-** [Page Builder](/task/t5/pageBuilder)
-** [Game](/task/t5/game)
-** [Interface](/task/t5/interface)

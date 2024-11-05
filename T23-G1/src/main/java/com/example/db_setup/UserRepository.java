@@ -15,7 +15,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     //MODIFICA
     User findByisRegisteredWithFacebook(boolean isRegisteredWithFacebook);
     //FINE MODIFICA
-    //Modifica 18/06/2024
-    User findByisRegisteredWithGoogle(boolean isRegisteredWithGoogle);
     List<User> findAll();
+
 }

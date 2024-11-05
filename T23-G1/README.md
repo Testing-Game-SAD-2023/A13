@@ -19,6 +19,6 @@ All'atto della autenticazione, lo studente fornirà l'indirizzo e-mail fornito p
 <li><p>Per effettuare le richieste, aprire da browser le pagine tramite i path in locale (http://localhost:8080/register, http://localhost:8080/login, ecc.) </p></li>
 <li><p>Per visionare il popolamento delle tabelle del database, aprire un terminale ed eseguire i seguenti comandi:  
 	<code>docker exec –it g1-t2t3-app-1 bash</code> viene utilizzato per entrare all'interno di un container Docker in esecuzione e avviare una shell interattiva al suo interno. </p></li>  
-	<code>mysql –u root –p studentsrepo</code>: viene utilizzato per accedere all'interfaccia della riga di comando di MySQL e connettersi al database <code>studentsrepo</code> utilizzando l'utente <code>root</code> e richiedendo la password <code>password</code>. </p></li>
+	<code>mysql –u root –p STUDENTSREPO</code>: viene utilizzato per accedere all'interfaccia della riga di comando di MySQL e connettersi al database <code>STUDENTSREPO</code> utilizzando l'utente <code>root</code> e richiedendo la password <code>password</code>. </p></li>
 <li><p>Utilizzare i comandi SQL per la gestione delle tabelle (<code>SELECT</code>, <code>DROP</code>, <code>SHOW TABLES </code>, ecc.) </p></li>
 

@@ -10,7 +10,6 @@ import (
 type Service interface {
 	Create(request *CreateRequest) (Game, error)
 	FindById(id int64) (Game, error)
-	FindByPID(pid int64) ([]Game, error)
 	Delete(id int64) error
 	Update(id int64, ug *UpdateRequest) (Game, error)
 	FindByInterval(accountId string, i api.IntervalParams, p api.PaginationParams) ([]Game, int64, error)
@@ -57,24 +56,6 @@ func (gc *Controller) FindByID(w http.ResponseWriter, r *http.Request) error {
 	return api.WriteJson(w, http.StatusOK, g)
 
 }
-
-func (gc *Controller) FindByPID(w http.ResponseWriter, r *http.Request) error {
-
-	id, err := api.FromUrlParams[KeyType](r, "pid")
-	if err != nil {
-		return err
-	}
-
-	g, err := gc.service.FindByPID(id.AsInt64())
-
-	if err != nil {
-		return api.MakeHttpError(err)
-	}
-
-	return api.WriteJson(w, http.StatusOK, g)
-
-}
-
 
 func (gc *Controller) Delete(w http.ResponseWriter, r *http.Request) error {
 

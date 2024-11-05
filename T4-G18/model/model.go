@@ -2,20 +2,8 @@ package model
 
 import (
 	"database/sql"
-
 	"time"
 )
-
-
-type PlayerHasCategoryAchievement struct {
-    PlayerID            int64      `gorm:"primaryKey;autoIncrement:false"`
-    Category            string     `gorm:"primaryKey;autoIncrement:false"`
-    Progress            float64    `gorm:"default:0"`                      // Current progress
-}
-
-func (PlayerHasCategoryAchievement) TableName() string {
-    return "player_has_category_achievement"
-}
 
 type ScalataGame struct {
 	ID           int64      `gorm:"primaryKey;autoIncrement"`
@@ -40,7 +28,7 @@ type Game struct {
 	Name          string         `gorm:"default:null"`
 	Username      string         `gorm:"default:null"`
 	CurrentRound  int            `gorm:"default:1"`
-	Description   string         `gorm:"default:null"`
+	Description   sql.NullString `gorm:"default:null"`
 	Difficulty    string         `gorm:"default:null"`
 	Score         float64        `gorm:"default:0"`
 	IsWinner      bool           `gorm:"default:false"`
