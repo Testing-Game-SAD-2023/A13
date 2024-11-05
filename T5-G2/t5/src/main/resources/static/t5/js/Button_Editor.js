@@ -158,7 +158,7 @@ function addStorico(turnoID, punteggio, covValue) {
     const nuovoElemento = {
         turnoID: turnoID,
         punteggio: punteggio,
-        covValue: covValue
+        covValue: covValue * 100
     };
     
     // Aggiungi il nuovo elemento all'array

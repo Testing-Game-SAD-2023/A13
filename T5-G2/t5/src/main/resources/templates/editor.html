@@ -81,6 +81,17 @@
 				background-color: yellow;
 				color: black;
 			}
+
+			.border-secondary-subtle {
+ 				 --bs-border-opacity: 1;
+  				border-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-border-opacity)) !important;
+			}
+			
+			.border-secondary-subtle:hover{
+				cursor:n-resize;
+				transition: border-color 3s ease; 
+				border-color: rgba(var(--bs-primary-bg-rgb), var(--bs-border-opacity)) !important;
+			}
 		</style>
 	</head>
 
