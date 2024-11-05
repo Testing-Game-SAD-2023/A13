@@ -62,14 +62,14 @@ public class AppController_concurrencyTest {
 
     final static int numberOfThreads = 10;
     static ExecutorService executor;
-    static List<Exception> exceptions; 
+    static List<Exception> exceptions;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(appController).build();
         executor = Executors.newFixedThreadPool(numberOfThreads);
-        exceptions = Collections.synchronizedList(new ArrayList<>()); 
+        exceptions = Collections.synchronizedList(new ArrayList<>());
     }
 
     private JSONObject loadTestFiles(String folderName, String testingClassName, String underTestClassName)
@@ -136,13 +136,17 @@ public class AppController_concurrencyTest {
                 try {
                     startLatch.await();
                     JSONObject requestJson = loadTestFiles("t0\\Timestamp", "TestTimeStamp", "TimeStamp");
-                    Mock_correct_compile(requestJson);
+                    mockMvc.perform(post("/compile-and-codecoverage")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestJson.toString()));
                 } catch (Exception e) {
-                    exceptions.add(e); 
+                    exceptions.add(e);
                 } finally {
-                    doneLatch.countDown(); 
+                    doneLatch.countDown();
+
                 }
-            });
+            }
+            );
         }
         startLatch.countDown(); // Release all threads
         doneLatch.await(); // Wait for all threads to complete
@@ -169,7 +173,7 @@ public class AppController_concurrencyTest {
                     // Esegui la richiesta POST
                     Mock_error_compile(requestJson);
                 } catch (Exception e) {
-                    exceptions.add(e); 
+                    exceptions.add(e);
                 } finally {
                     doneLatch.countDown(); // Segnala che questo thread ha finito
                 }
@@ -185,7 +189,7 @@ public class AppController_concurrencyTest {
     *  Mando in esecuzione 20 thread nello stesso istante, 
     *  metà fanno richieste di tipo 1 con  esito positivo 
     *  l'altra metà fanno richieste di tipo 2 con esito negativo
-    */
+     */
     @Test
     public void testConcurrentMixedRequests() throws Exception {
         final CountDownLatch startLatch = new CountDownLatch(1);
@@ -209,7 +213,7 @@ public class AppController_concurrencyTest {
                         Mock_error_compile(requestJson);
                     }
                 } catch (Exception e) {
-                    exceptions.add(e); 
+                    exceptions.add(e);
                 } finally {
                     doneLatch.countDown(); // Segnala che questo thread ha finito
                 }

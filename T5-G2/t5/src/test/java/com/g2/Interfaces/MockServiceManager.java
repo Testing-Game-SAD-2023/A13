@@ -47,28 +47,4 @@ public class MockServiceManager extends ServiceManager {
     public boolean hasService(String key) {
         return services.containsKey(key);
     }
-
-    //Aggiunti per simulare handlerequest per i test del package components
-    public void setShouldReturnTrue(boolean shouldReturnTrue) {
-        this.shouldReturnTrue = shouldReturnTrue;
-    }
-
-    public void setShouldThrowException(boolean shouldThrowException) {
-        this.shouldThrowException = shouldThrowException;
-    }
-
-    @Override
-    public Object handleRequest(String serviceName, String action, Object... params) {
-        if (shouldThrowException) {
-            throw new RuntimeException("Simulated exception");
-        }
-        if(action == "executelogic")return shouldReturnTrue;
-        else return returnedObject;
-    }
-
-    public void setReturnedObject(Object returnedObject) {
-        this.returnedObject = returnedObject;
-    }
-
-
 }

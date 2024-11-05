@@ -153,10 +153,6 @@ function initializeEditorResizing(container, editor, divider, section1, section2
             const offsetY = e.clientY - containerRect.top;
             section1.style.height = `${offsetY}px`;
             section2.style.height = `${containerRect.height - offsetY - divider.offsetHeight}px`;
-            if(section2.style.height < '50px'){
-                section1.style.height = `${container.clientHeight}px`;
-                section2.style.height = 0;
-            }
         });
 
         document.addEventListener("mouseup", () => {
@@ -172,20 +168,11 @@ function initializeEditorResizing(container, editor, divider, section1, section2
         });
 
         closeButton.addEventListener("click", () => {
-
-            const section2Height = getComputedStyle(section2).height; // Ottiene l'altezza calcolata di section2
-            if (lastHeightSection1 === null || lastHeightSection2 === null) {
-                lastHeightSection1 = getComputedStyle(section1).height;
-                lastHeightSection2 = getComputedStyle(section2).height;
-            }
-
             const isMinimized = section2.offsetHeight === 0;
-            section2.style.height = isMinimized ? lastHeightSection2 : '0'; // Imposta l'altezza desiderata
-            section1.style.height = isMinimized ? `${container.clientHeight - lastHeightSection2}px` : `${container.clientHeight}px`; // Cambia l'altezza di section1
+            section2.style.height = isMinimized ? '200px' : '0'; // Imposta l'altezza desiderata
+            section1.style.height = isMinimized ? `${container.clientHeight - 200}px` : `${container.clientHeight}px`; // Cambia l'altezza di section1
             const iconElement = closeButton.querySelector("i");
-            updateIcon(iconElement, !isMinimized, 
-                                    closeButton.getAttribute("data-icon1"), 
-                                    closeButton.getAttribute("data-icon2"));
+            updateIcon(iconElement, !isMinimized, closeButton.getAttribute("data-icon1"), closeButton.getAttribute("data-icon2"));
         });
     }
 
