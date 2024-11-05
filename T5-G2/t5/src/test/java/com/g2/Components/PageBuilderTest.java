@@ -16,178 +16,131 @@
  */
 
 package com.g2.Components;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.ui.Model;
-import org.springframework.web.client.RestTemplate;
 
-import com.g2.Interfaces.MockServiceManager;
-import com.g2.Interfaces.ServiceManager;
 import com.g2.t5.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
 @ExtendWith(MockitoExtension.class)
 public class PageBuilderTest {
 
-    @InjectMocks
+    private StubServiceManager ServiceManager;
+    
+    @Mock
+    private Model mockModel;
     private PageBuilder pageBuilder;
 
-    private ServiceManager serviceManager;
-    //private GenericLogicComponent mockLogicComponent;
-    private Model model_html; 
-
-
     @BeforeEach
-    public void setUp() {
-
-        serviceManager = new MockServiceManager(new RestTemplate());
-        model_html = Mockito.mock(Model.class);
-
-        /* 
-        mockLogicComponent = new GenericLogicComponent() {
-            @Override
-            public boolean executeLogic() {
-                return true; // Default behavior
-            }
-
-            @Override
-            public String getErrorCode() {
-                return "NO_ERROR"; // Default behavior
-            }
-        };
-
-        List<GenericLogicComponent> logicComponents = new ArrayList<>();
-        logicComponents.add(mockLogicComponent);
-        */
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        pageBuilder = new PageBuilder(ServiceManager, "testPage", mockModel);
     }
 
-    @Test
-    public void testPageBuilderInitialization_With_Object_Logic_Components() {
-
-        List<GenericObjectComponent> objectComponents = new ArrayList<>();
-        List<GenericLogicComponent> logicComponents = new ArrayList<>();
-        pageBuilder = new PageBuilder(serviceManager, "TestPage", model_html, objectComponents, logicComponents);
-
-        // Verifica che il PageBuilder sia stato inizializzato correttamente
-        assertNotNull(pageBuilder, "PageBuilder non deve essere nullo.");
-        
-        // Verifica che le proprietà siano impostate correttamente
-        assertEquals(objectComponents, pageBuilder.getObjectComponents(), "I componenti oggetto devono corrispondere.");
-        assertEquals(logicComponents, pageBuilder.getLogicComponents(), "I componenti logici devono corrispondere.");
-
-    }
-
-    @Test
-    public void testPageBuilderInitialization_No_Object_Logic_Components() {
-
-        pageBuilder = new PageBuilder(serviceManager, "TestPage", model_html);
-        assertNotNull(pageBuilder, "PageBuilder non deve essere nullo.");
-        assertEquals(0, pageBuilder.getObjectComponents().size(), "ObjectComponents deve essere inizializzato come lista vuota.");
-        assertEquals(0, pageBuilder.getLogicComponents().size(), "LogicComponents deve essere inizializzato come lista vuota.");
-
-    }
-
-    @Test
-    public void testHandlePageRequest_NoErrors() {
-
-        List<GenericObjectComponent> objectComponents = new ArrayList<>();
-        List<GenericLogicComponent> logicComponents = new ArrayList<>();
-        pageBuilder = new PageBuilder(serviceManager, "TestPage", model_html, objectComponents, logicComponents);
-
-        String result = pageBuilder.handlePageRequest();
-        assertEquals("TestPage", result, "Dovrebbe restituire il nome della pagina.");
-    }
-
-    @Test
-    public void testHandlePageRequest_PageNull() {
-        List<GenericObjectComponent> objectComponents = new ArrayList<>();
-        List<GenericLogicComponent> logicComponents = new ArrayList<>();
-        pageBuilder = new PageBuilder(serviceManager, null, model_html, objectComponents, logicComponents);
-
-        String result = pageBuilder.handlePageRequest();
-        assertEquals(null, result, "Dovrebbe restituire il nome della pagina.");
-    }
-
-    /* Dovrebbe tornare null ma torna il nome della pagina
-    @Test
-    public void testHandlePageRequest_WithLogicComponents_ErrorOccurred() {
-        // Cambia il comportamento del mock per simulare un errore
-        mockLogicComponent = new GenericLogicComponent() {
-            @Override
-            public boolean executeLogic() {
-                return false; // Simula un errore
-            }
-
-            @Override
-            public String getErrorCode() {
-                return "LOGIC_ERROR"; // Codice d'errore
-            }
-        };
-
-        String result = pageBuilder.handlePageRequest();
-        
-        assertNull(result, "Dovrebbe restituire null in caso di errore durante l'esecuzione della logica.");
-        // Aggiungi ulteriori asserzioni secondo necessità
-    }
+    /*
+     * Testo un page builder senza componenti, deve restituire a prescindere il PageName deciso
      */
+    @Test
+    public void testHandlePageRequest_NoComponents_ReturnsPageName() {
+        String result = pageBuilder.handlePageRequest();
+        assertEquals("testPage", result);
+    }
 
-     @Test
-     public void testSetAuth() {
-         String jwt = "testJwt";
-         pageBuilder = new PageBuilder(serviceManager, "TestPage", model_html);
-         
-         // Prima della chiamata a SetAuth, assicurati che non ci siano componenti di logica
-         assertEquals(0, pageBuilder.getLogicComponents().size(), "Dovrebbe non esserci alcun componente di logica inizialmente.");
-     
-         // Imposta l'autenticazione
-         pageBuilder.SetAuth(jwt);
-     
-         // Verifica che un AuthComponent sia stato aggiunto
-         assertEquals(1, pageBuilder.getLogicComponents().size(), "Dovrebbe esserci un componente di logica dopo la chiamata a SetAuth.");
-         assertTrue(pageBuilder.getLogicComponents().get(0) instanceof AuthComponent, "Il componente di logica deve essere un'istanza di AuthComponent.");
-     }
+    /*
+    *  Testo un page builder in cui il componente logico funziona, mi aspetto che 
+    *  l'handler mi restituisca la pagina di default 
+    */
+    @Test
+    public void testHandlePageRequest_LogicComponent_ReturnsPage() {
+        ServiceLogicComponent mockLogicComponent = 
+            new ServiceLogicComponent(ServiceManager, "mockService", "executeLogic_true");
+        pageBuilder.setLogicComponents(mockLogicComponent);
+        String result = pageBuilder.handlePageRequest();
+        assertEquals("testPage", result); 
+    }
 
-     @Test
-     public void testHandlePageRequestWithError() {
-         String errorCode = "default"; 
-         String errorPage = "redirect:/error"; 
-         pageBuilder.setErrorPage(errorCode, errorPage);
-     
-         // Simula una richiesta di pagina
-         pageBuilder = new PageBuilder(serviceManager, "redirect:/error", model_html);
-         String resultPage = pageBuilder.handlePageRequest();
-     
-         // Verifica che la pagina restituita sia quella corretta per l'errore
-         assertEquals("redirect:/error", resultPage, "La pagina di errore deve essere correttamente restituita.");
-     }
+    /*
+    *  Testo un page builder in cui fallisce il componente logico, mi aspetto che 
+    *  l'handler mi restituisca la pagina d'errore di default 
+    */
+    @Test
+    public void testHandlePageRequest_LogicComponentFails_ReturnsErrorPage() {
+        ServiceLogicComponent mockLogicComponent = 
+            new ServiceLogicComponent(ServiceManager, "mockService", "executeLogic_false");
+        mockLogicComponent.setErrorCode("mock_error");
+        pageBuilder.setLogicComponents(mockLogicComponent);
+        String result = pageBuilder.handlePageRequest();
+        assertEquals("redirect:/error", result); // Verifica il redirect all'errore
+    }
+    /*
+    *  Testo un page builder in cui fallisce il componente logico e in cui setto la pagina d'errore 
+    *   mi aspetto che l'handler mi restituisca la pagina d'errore specificata 
+    */
+    @Test
+    public void testHandlePageRequest_LogicComponentFails_ReturnsSpecificErrorPage() {
+        ServiceLogicComponent mockLogicComponent = 
+            new ServiceLogicComponent(ServiceManager, "mockService", "executeLogic_false");
+
+        mockLogicComponent.setErrorCode("mock_error");
+        pageBuilder.setLogicComponents(mockLogicComponent);
+        pageBuilder.setErrorPage("mock_error", "mockPageError");
+
+        String result = pageBuilder.handlePageRequest();
+        assertEquals("mockPageError", result); // Verifica il redirect all'errore
+
+    }
+
+    /*
+    *  Testo un page builder con un object componente, quindi deve restituire dati e il giusto page name
+    */
+    @Test
+    public void testHandlePageRequest_ObjectComponent_SetsModelAttributes() {
+        GenericObjectComponent mockObjectComponent = new GenericObjectComponent("mock_key", "mock_value");
+        pageBuilder.setObjectComponents(mockObjectComponent);
+        
+        String result = pageBuilder.handlePageRequest();
+        assertEquals("testPage", result);
+
+        Map<String, Object> modelData = new HashMap<>();
+        modelData.put("mock_key", "mock_value");
+        verify(mockModel).addAllAttributes(modelData); // Verifica che i dati siano aggiunti al modello
+    }
 
 
-     /* Per questo mancano le geterrorpagemap()
-     @Test
-     public void testSetErrorPageWithMap() {
-         // Crea una mappa di errori personalizzata
-         Map<String, String> userErrorPageMap = new HashMap<>();
-         userErrorPageMap.put("default", "redirect:/error");
-         userErrorPageMap.put("Auth_error", "redirect:/login");
- 
-         // Chiama il metodo setErrorPage
-         pageBuilder.setErrorPage(userErrorPageMap);
-         String resultPage = pageBuilder.handlePageRequest();
+    @Test
+    public void testHandlePageRequest_DuplicateKeysInModel_LogsError() {
+        // Simula due componenti oggetto con chiavi duplicate
+        Map<String, Object> modelData1 = new HashMap<>();
+        modelData1.put("key1", "value1");
+        
+        Map<String, Object> modelData2 = new HashMap<>();
+        modelData2.put("key1", "value2"); // Chiave duplicata
 
-         // Verifica che la mappa degli errori contenga i valori attesi
-         assertEquals("redirect:/error", pageBuilder.getErrorPageMap().get("default"), "La mappa degli errori deve contenere il codice d'errore 'default'.");
-         assertEquals("redirect:/login", pageBuilder.getErrorPageMap().get("Auth_error"), "La mappa degli errori deve contenere il codice d'errore 'Auth_error'.");
-     }
-        */
+        GenericObjectComponent mockObjectComponent_1 = 
+            new GenericObjectComponent("mock_key", "mock_value");
+        GenericObjectComponent mockObjectComponent_2 = 
+            new GenericObjectComponent("mock_key", "mock_value");
+
+
+        pageBuilder.setObjectComponents(mockObjectComponent_1, mockObjectComponent_2);
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            pageBuilder.handlePageRequest();
+        });
+        assertEquals("[PAGEBULDER][buildModel] individuate chiavi duplicate:mock_key", 
+            exception.getMessage());
+    }
      
      
 

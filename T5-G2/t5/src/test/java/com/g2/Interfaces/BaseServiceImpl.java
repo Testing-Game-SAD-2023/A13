@@ -29,7 +29,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-// Annotazione @Service per Spring
 @Profile("test")
 @Service
 public class BaseServiceImpl extends BaseService {

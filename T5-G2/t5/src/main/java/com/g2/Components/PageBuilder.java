@@ -100,13 +100,13 @@ public class PageBuilder {
      */
     private Map<String, Object> buildModel() {
         Map<String, Object> combinedModel = new HashMap<>();
-
         for (GenericObjectComponent component : ObjectComponents) {
             Map<String, Object> model = component.getModel();
             model.forEach((key, value) -> {
                 if (combinedModel.put(key, value) != null) {
-                    logger.error("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
+                    //logger.error("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
                     // Puoi decidere se lanciare un'eccezione o gestire la duplicazione come preferisci
+                    throw new RuntimeException("[PAGEBULDER][buildModel] individuate chiavi duplicate:" + key);
                 }
             });
         }
@@ -191,6 +191,10 @@ public class PageBuilder {
 
     public void setLogicComponents(GenericLogicComponent... components) {
         this.LogicComponents.addAll(Arrays.asList(components));
+    }
+
+    public Model getModel_html() {
+        return model_html;
     }
 
 }

@@ -89,18 +89,6 @@ public class AppControllerTest {
     }
 
     /*
-     * METODI PRINCIPALI PER FARE TEST
-     */
-    @ParameterizedTest
-    @MethodSource("testParameters")
-    public void DoTest(String foldername, String ClassName, Boolean expectedError, Boolean expectCoverage)
-            throws Exception {
-        String TestingClassName = "Test" + ClassName;
-        JSONObject requestJson = loadTestFiles(foldername, TestingClassName, ClassName);
-        Mock_perform(requestJson, expectedError, expectCoverage);
-    }
-
-    /*
      * test 0 - senza errori
      * test 1 - manca costruttore nella classe
      * test 2 - tipo di ritorno errato
@@ -120,6 +108,42 @@ public class AppControllerTest {
      * di compilazione
      * test 10 - Controlla se un nome della classe di test non formattato
      * correttamente genera un errore di compilazione
+     */
+
+    /*
+     * METODI PRINCIPALI PER FARE TEST
+     */
+    @ParameterizedTest
+    @MethodSource("testParameters_ClassUT")
+    public void DoTest_ClassUT(String foldername, String ClassName, Boolean expectedError, Boolean expectCoverage)
+            throws Exception {
+        String TestingClassName = "Test" + ClassName;
+        JSONObject requestJson = loadTestFiles(foldername, TestingClassName, ClassName);
+        Mock_perform(requestJson, expectedError, expectCoverage);
+    }
+
+    /*
+     * Metodo di supporto per fornire i parametri
+     */
+    static Stream<Arguments> testParameters_ClassUT() {
+        return Stream.of(
+                /*
+                 * DIR NAME | ClassName | Expected Error | Expected Coverage
+                 */
+                Arguments.of("t0", "TimeStamp", false, true), 
+                Arguments.of("t1", "Fontinfo", true, false), 
+                Arguments.of("t2", "HSLColor", true, false), 
+                Arguments.of("t3", "OutputFormat", true, false), 
+                Arguments.of("t4", "SubjectParser", false, true),
+                Arguments.of("t5", "TimeStamp", true, false),
+                Arguments.of("t6", "TimeStamp", true, false),
+                Arguments.of("t7", "FTPFile", true, false),
+                Arguments.of("t8", "FontInf", true, false),
+                Arguments.of("t9", "HSLColor", true, false),
+                Arguments.of("t10", "OutputFormat", true, false));
+    }
+
+    /*
      * template 0 - Classe test senza errori
      * template 1 - Manca costruttore nella classe di test
      * template 2 - Verifica se il test della classe di test è errato, prevedendo un
@@ -137,25 +161,21 @@ public class AppControllerTest {
      * corrispondente generando
      * un errore di compilazione
      */
-    /*
-     * Metodo di supporto per fornire i parametri
-     */
-    static Stream<Arguments> testParameters() {
+
+    @ParameterizedTest
+    @MethodSource("testParameters_Template")
+    public void DoTest_TestTemplate(String foldername, String ClassName, Boolean expectedError, Boolean expectCoverage)
+            throws Exception {
+        String TestingClassName = "Test" + ClassName;
+        JSONObject requestJson = loadTestFiles(foldername, TestingClassName, ClassName);
+        Mock_perform(requestJson, expectedError, expectCoverage);
+    }
+
+    static Stream<Arguments> testParameters_Template() {
         return Stream.of(
                 /*
                  * DIR NAME | ClassName | Expected Error | Expected Coverage
                  */
-                Arguments.of("t0", "TimeStamp", false, true), // Caso senza errori, con coverage
-                Arguments.of("t1", "Fontinfo", true, false), // Errore atteso, nessuna coverage
-                Arguments.of("t2", "HSLColor", true, false), // Errore atteso, nessuna coverage
-                Arguments.of("t3", "OutputFormat", true, false), // Altri casi...
-                Arguments.of("t4", "SubjectParser", false, true),
-                Arguments.of("t5", "TimeStamp", true, false),
-                Arguments.of("t6", "TimeStamp", true, false),
-                Arguments.of("t7", "FTPFile", true, false),
-                Arguments.of("t8", "FontInf", true, false),
-                Arguments.of("t9", "HSLColor", true, false),
-                Arguments.of("t10", "OutputFormat", true, false),
                 Arguments.of("template0", "VCardBean", false, true),
                 Arguments.of("template1", "VCardBean", true, false),
                 Arguments.of("template2", "VCardBean", true, false),
@@ -163,5 +183,4 @@ public class AppControllerTest {
                 Arguments.of("template4", "VCardBean", true, false),
                 Arguments.of("template5", "VCardBean", true, false));
     }
-
 }
