@@ -41,6 +41,7 @@ function getGameData() {
         [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
     );
 }
+
 // Funzione per eseguire la richiesta AJAX
 async function runGameAction(url, formData, isGameEnd) {
     try {
@@ -191,14 +192,22 @@ function resetButtons() {
     coverage_button.disabled = false; // Abilita il pulsante di coverage
 }
 
-// Gestione dell'evento beforeunload
+/*
+*   Se premo il tasto go back quando è in atto un caricamento 
+*/
 window.addEventListener('beforeunload', (event) => {
     if (isActionInProgress) {
-        openModalWithText(
-            status_exit_game,
-            confirmationMessage, 
-            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
-        );
+        // Ottieni il link di destinazione. Puoi usare `event.target` per prendere il link dell'evento.
+        // Se l'utente sta cercando di navigare tramite un link, usa `document.activeElement.href` se è un link.
+        let targetUrl = '';
+        // Verifica se l'evento proviene da un link cliccato
+        if (document.activeElement && document.activeElement.tagName === 'A') {
+            targetUrl = document.activeElement.href;
+        }
+        // Previeni il comportamento predefinito del browser
+        event.preventDefault();
+        // Il messaggio predefinito non può essere personalizzato, ma il modal può apparire
+        return ''; // Restituisce una stringa vuota per attivare il messaggio predefinito
     }
 });
 

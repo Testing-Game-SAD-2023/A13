@@ -15,111 +15,6 @@
  *   limitations under the License.
  */
 
-/*
-function initializeEditorResizing(container, editor, divider, section1, section2, closeButton) {
-    function setEditorSize(container, editor) {
-        // Altezza del container
-        const availableHeight = container.clientHeight; 
-        // Imposta l'altezza dell'editor in base all'altezza del container disponibile
-        editor.setSize(null, availableHeight + "px");
-    }
-
-    function enableResizing(container, divider, section1, section2, closeButton) {
-        let isDragging = false;
-        let lastHeightSection1 = null;
-        let lastHeightSection2 = null;
-
-        // Aggiungi event listener per il mouse down (quando si inizia a trascinare)
-        divider.addEventListener("mousedown", function () {
-            isDragging = true;
-            document.body.style.cursor = "n-resize"; // Mostra la mano chiusa durante il trascinamento
-            container.classList.add("no-select"); // Disabilita la selezione del testo
-        });
-
-        // Event listener per il movimento del mouse
-        container.addEventListener("mousemove", function (e) {
-            if (!isDragging) return; // Se non si sta trascinando, non fare nulla
-
-            // Calcola la nuova altezza della prima sezione
-            const containerRect = container.getBoundingClientRect();
-            const offsetY = e.clientY - containerRect.top;
-
-            // Imposta la nuova altezza per la prima sezione
-            section1.style.height = `${offsetY}px`;
-            // Imposta l'altezza per la seconda sezione
-            section2.style.height = `${containerRect.height - offsetY - 10}px`;
-
-            // Aggiorna le ultime altezze
-            lastHeightSection1 = section1.style.height;
-            lastHeightSection2 = section2.style.height;
-        });
-
-        // Event listener per il rilascio del mouse (fine del trascinamento)
-        document.addEventListener("mouseup", function () {
-            if (isDragging) {
-                isDragging = false;
-                document.body.style.cursor = "default"; // Ripristina il cursore predefinito
-                container.classList.remove("no-select"); // Riabilita la selezione del testo
-            }
-        });
-
-        // Funzione per chiudere totalmente la sezione
-        closeButton.addEventListener("click", function () {
-            const section2Height = getComputedStyle(section2).height; // Ottiene l'altezza calcolata di section2
-
-            if (lastHeightSection1 === null || lastHeightSection2 === null) {
-                lastHeightSection1 = getComputedStyle(section1).height;
-                lastHeightSection2 = getComputedStyle(section2).height;
-            }
-
-            // Alterna tra le altezze salvate e 0
-            if (section2Height !== "0px") {
-                // Imposta l'altezza della seconda sezione a 0
-                section2.style.height = "0";
-                // La prima sezione occupa tutta l'altezza del contenitore
-                section1.style.height = `${container.clientHeight}px`;
-            } else {
-                // Ripristina l'ultima altezza fissata dall'utente
-                section2.style.height = lastHeightSection2;
-                section1.style.height = lastHeightSection1;
-            }
-        });
-    }
-
-    // Attiva il ridimensionamento degli editor al caricamento della finestra
-    window.addEventListener("resize", function () {
-        setEditorSize(container, editor); 
-    });
-
-    // Inizializza il ridimensionamento 
-    enableResizing(
-        container,
-        divider,
-        section1,
-        section2,
-        closeButton
-    );
-    // Imposta inizialmente la dimensione degli editor
-    setEditorSize(container, editor); 
-}
-// Chiama la funzione per inizializzare il ridimensionamento degli editor
-initializeEditorResizing(container_user, editor_utente, divider_Console, section_editor, section_console, close_console_utente);
-initializeEditorResizing(container_robot, editor_robot, divider_result, section_UT, section_result, close_console_result);
-
-
-function toggleIcons(icon1Class, icon2Class, iconElement) {
-	// Controlla quale icona è attualmente presente e toggla
-	if (iconElement.classList.contains(icon1Class)) {
-		iconElement.classList.remove(icon1Class); // Rimuove l'icona 1
-		iconElement.classList.add(icon2Class); // Aggiunge l'icona 2
-	} else {
-		iconElement.classList.add(icon1Class); // Rimuove l'icona 2
-		iconElement.classList.remove(icon2Class); // Aggiunge l'icona 1
-	}
-}
-
-*/
-
 function initializeEditorResizing(
 	container,
 	editor,
@@ -133,7 +28,10 @@ function initializeEditorResizing(
 		editor.setSize(null, availableHeight + "px");
 	}
 
-	function updateIcon(iconElement, isMinimized, icon1Class, icon2Class) {
+	function updateIcon(iconElement, isMinimized) {
+		const icon1Class = "bi-arrow-bar-down";
+		const icon2Class = "bi-arrow-bar-up";
+
 		if (isMinimized) {
 			iconElement.classList.add(icon2Class);
 			iconElement.classList.remove(icon1Class);
@@ -146,7 +44,9 @@ function initializeEditorResizing(
 	function enableResizing() {
 		let isDragging = false;
 		let lastHeightSection1 = null;
-		let lastHeightSection2 = null;
+		let lastHeightSection2 = section2.offsetHeight; // Inizializza con l'altezza attuale
+		const minHeightThreshold = 50; // Soglia per impostare section2 a 0
+		const maxHeightThreshold = container.clientHeight - 50; // Soglia per espandere section2 al massimo
 
 		divider.addEventListener("mousedown", () => {
 			isDragging = true;
@@ -154,22 +54,60 @@ function initializeEditorResizing(
 			container.classList.add("no-select");
 		});
 
-        container.addEventListener("mousemove", (e) => {
-            if (!isDragging) return;
-            const containerRect = container.getBoundingClientRect();
-            const offsetY = e.clientY - containerRect.top;
-            section1.style.height = `${offsetY}px`;
-            section2.style.height = `${containerRect.height - offsetY - divider.offsetHeight}px`;
-        });
+		document.addEventListener("mousemove", (e) => {
+			if (!isDragging) return;
+			const containerRect = container.getBoundingClientRect();
+			const offsetY = e.clientY - containerRect.top;
+			const newHeightSection2 = containerRect.height - offsetY - divider.offsetHeight;
+			if (newHeightSection2 < minHeightThreshold) {
+				// Imposta section2 a 0 se l'altezza è sotto la soglia minima
+				section2.style.height = '0';
+				section1.style.height = `${containerRect.height}px`;
+				updateIcon(closeButton.querySelector("i"), true);
+			} else if (newHeightSection2 > maxHeightThreshold) {
+				// Espande section2 al massimo se supera la soglia massima
+				section2.style.height = `${containerRect.height}px`;
+				section1.style.height = '0';
+				updateIcon(closeButton.querySelector("i"), false);
+			} else {
+				section1.style.height = `${offsetY}px`;
+				section2.style.height = `${newHeightSection2}px`;
+				updateIcon(closeButton.querySelector("i"), false);
+			}
+		});
 
-        closeButton.addEventListener("click", () => {
-            const isMinimized = section2.offsetHeight === 0;
-            section2.style.height = isMinimized ? '200px' : '0'; // Imposta l'altezza desiderata
-            section1.style.height = isMinimized ? `${container.clientHeight - 200}px` : `${container.clientHeight}px`; // Cambia l'altezza di section1
-            const iconElement = closeButton.querySelector("i");
-            updateIcon(iconElement, !isMinimized, closeButton.getAttribute("data-icon1"), closeButton.getAttribute("data-icon2"));
-        });
-    }
+		document.addEventListener("mouseup", () => {
+			if (isDragging) {
+				isDragging = false;
+				document.body.style.cursor = "default";
+				container.classList.remove("no-select");
+				// Salva l'ultima altezza di section2 solo se non è minimizzata
+				if (section2.offsetHeight > 0) {
+					lastHeightSection2 = section2.offsetHeight;
+				}
+			}
+		});
+
+		closeButton.addEventListener("click", () => {
+			const isMinimized = section2.offsetHeight === 0;
+			if (isMinimized) {
+				// Ripristina l'ultima altezza salvata
+				section2.style.height = `${lastHeightSection2}px`;
+				section1.style.height = `${container.clientHeight - lastHeightSection2}px`;
+			} else {
+				// Minimizza section2
+				lastHeightSection2 = section2.offsetHeight; // Salva l'altezza corrente
+				section2.style.height = '0';
+				section1.style.height = `${container.clientHeight}px`;
+			}
+
+			// Aggiorna l'icona in base allo stato
+			updateIcon(
+				closeButton.querySelector("i"),
+				!isMinimized
+			);
+		});
+	}
 
 	window.addEventListener("resize", setEditorSize);
 	enableResizing();
