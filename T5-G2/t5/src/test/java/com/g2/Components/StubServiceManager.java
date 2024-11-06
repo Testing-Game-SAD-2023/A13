@@ -28,49 +28,50 @@ import com.g2.Interfaces.ServiceManager;
 @Service
 public class StubServiceManager extends ServiceManager {
 
-    private boolean shouldReturnTrue;
-    private boolean shouldThrowException;
     private Object returnedObject;
+    private Boolean set_exception = false;
+    private Boolean return_value;
 
     public StubServiceManager(RestTemplate restTemplate) {
         super(restTemplate);
         // TODO Auto-generated constructor stub
     }
-
-    @Override
-    public <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass,
-            RestTemplate restTemplate) {
-        super.registerService(serviceName, serviceClass, restTemplate); // Esposto come pubblico solo per i test
-    }
-
-    @Override
-    public <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
-        return super.createService(serviceClass, restTemplate);
-    }
-
-    public boolean hasService(String key) {
-        return services.containsKey(key);
-    }
-
-    //Aggiunti per simulare handlerequest per i test del package components
-    public void setShouldReturnTrue(boolean shouldReturnTrue) {
-        this.shouldReturnTrue = shouldReturnTrue;
-    }
-
-    public void setShouldThrowException(boolean shouldThrowException) {
-        this.shouldThrowException = shouldThrowException;
-    }
     
+    public void setShouldReturnTrue(Boolean return_value){
+        this.return_value = return_value;
+    }
+
+    public void setShouldThrowException(){
+        this.set_exception = true;
+    }
+
+
     @Override
     public Object handleRequest(String serviceName, String action, Object... params) {
-        if (shouldThrowException) {
-            throw new RuntimeException("Simulated exception");
+        
+        if(action.equals("executelogic_true") || 
+            action.equals("executelogic_false") ||
+            action.equals("executelogic_object") ||
+            action.equals("executelogic_exception ")){
+                switch(action){
+                    case "executelogic_true" -> {
+                        return true;
+                    }
+                    case "executeLogic_false" ->{
+                        return false;
+                    }
+                    case "executeLogic_object" ->{
+                        return returnedObject;
+                    }
+                    case "executeLogic_exception" ->{
+                        throw new RuntimeException("Simulated exception");
+                    }
+                }
         }
-        if ("executelogic".equals(action)) {
-            return shouldReturnTrue;
-        } else {
-            return returnedObject;
-        }
+        
+        if(set_exception) throw new RuntimeException("Simulated exception");
+        if(returnedObject != null) return returnedObject;
+        return return_value;
     }
 
     public void setReturnedObject(Object returnedObject) {

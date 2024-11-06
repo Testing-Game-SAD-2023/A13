@@ -43,40 +43,65 @@ class ServiceLogicComponentTest {
         serviceLogicComponent = new ServiceLogicComponent(serviceManager, "Test_service", "executelogic", "params");
     }
 
+/*
+     * Test1: testExecuteLogicSuccess
+     * Precondizioni: La variabile shouldReturnTrue è impostata su true nel
+     * serviceManager.
+     * Azioni: Chiamare executeLogic su serviceLogicComponent.
+     * Post-condizioni: Dovrebbe restituire true indicando che l'esecuzione ha avuto
+     * successo.
+     */
     @Test
     public void testExecuteLogicSuccess() {
-        // Caso di successo: handleRequest restituisce true
         serviceManager.setShouldReturnTrue(true);
         boolean result = serviceLogicComponent.executeLogic();
         assertTrue(result, "executeLogic deve restituire true quando l'esecuzione ha successo.");
     }
 
+    /*
+     * Test2: testExecuteLogicFailure
+     * Precondizioni: La variabile shouldReturnTrue è impostata su false nel
+     * serviceManager.
+     * Azioni: Chiamare executeLogic su serviceLogicComponent.
+     * Post-condizioni: Dovrebbe restituire false indicando che l'esecuzione è
+     * fallita.
+     */
     @Test
     public void testExecuteLogicFailure() {
-        // Caso di insuccesso: handleRequest restituisce false
         serviceManager.setShouldReturnTrue(false);
         boolean result = serviceLogicComponent.executeLogic();
         assertFalse(result, "executeLogic deve restituire false quando handleRequest restituisce false.");
     }
 
+    /*
+     * Test3: testExecuteLogicException
+     * Precondizioni: La variabile shouldThrowException è impostata su true nel
+     * serviceManager.
+     * Azioni: Chiamare executeLogic su serviceLogicComponent.
+     * Post-condizioni: Dovrebbe restituire false indicando che è stata lanciata
+     * un'eccezione durante l'esecuzione.
+     */
     @Test
     public void testExecuteLogicException() {
-        // Caso di eccezione: handleRequest lancia un'eccezione
-        serviceManager.setShouldThrowException(true);
+        serviceManager.setShouldThrowException();
         boolean result = serviceLogicComponent.executeLogic();
         assertFalse(result, "executeLogic deve restituire false quando viene lanciata un'eccezione.");
     }
 
+    /*
+     * Test4: testGetAndSetErrorCode
+     * Precondizioni: ErrorCode è inizialmente nullo.
+     * Azioni: Impostare ErrorCode su un nuovo valore "Custom_Error_Code" e chiamare
+     * setErrorCode.
+     * Post-condizioni: getErrorCode deve restituire "Custom_Error_Code".
+     */
     @Test
     public void testGetAndSetErrorCode() {
-        // Test number: 4
-        // Precondizioni: ErrorCode viene impostato su un nuovo valore.
-        // Azioni: chiamare setErrorCode.
-        // Postcondizioni: getErrorCode deve restituire il nuovo valore.
-
         String newErrorCode = "Custom_Error_Code";
         serviceLogicComponent.setErrorCode(newErrorCode);
 
-        assertEquals(newErrorCode, serviceLogicComponent.getErrorCode(), "getErrorCode deve restituire il valore aggiornato di ErrorCode.");
+        assertEquals(newErrorCode, serviceLogicComponent.getErrorCode(),
+                "getErrorCode deve restituire il valore aggiornato di ErrorCode.");
     }
+
 }

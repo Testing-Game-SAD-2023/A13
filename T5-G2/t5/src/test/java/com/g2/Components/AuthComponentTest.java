@@ -42,13 +42,22 @@ public class AuthComponentTest {
         serviceManager = new MockServiceManager(restTemplate);
         authComponent = new AuthComponent(serviceManager, "Jwt");
     }
-
+    /*
+     * Test 1: testAuthComponentInitialization
+     * Precondizioni: AuthComponent deve essere inizializzato tramite il metodo
+     * setUp.
+     * Azioni: Verifica che l'istanza di AuthComponent non sia nulla e che
+     * l'error code sia impostato correttamente.
+     * Postcondizioni: L'AuthComponent è stato correttamente inizializzato
+     * e l'error code è "Auth_error".
+     */
     @Test
     public void testAuthComponentInitialization() {
         // Verifica che l'AuthComponent sia stato inizializzato correttamente
         assertNotNull(authComponent, "AuthComponent non deve essere nullo.");
         // Verifica che l'error code sia stato impostato correttamente
-        assertEquals("Auth_error", authComponent.getErrorCode(), 
-        "L'error code deve essere 'Auth_error'.");
+        assertEquals("Auth_error", authComponent.getErrorCode(),
+                "L'error code deve essere 'Auth_error'.");
     }
+
 }

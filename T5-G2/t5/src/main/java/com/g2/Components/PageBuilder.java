@@ -47,6 +47,10 @@ public class PageBuilder {
     private final Model model_html;
     // Nome della pagina (template) da utilizzare
     private final String PageName;
+    //Lista codici d'errore ottenuti 
+    private List<String> ErrorCode;
+
+
     //Logger 
     private static final Logger logger = LoggerFactory.getLogger(PageBuilder.class);
 
@@ -105,8 +109,9 @@ public class PageBuilder {
             Map<String, Object> model = component.getModel();
             model.forEach((key, value) -> {
                 if (combinedModel.put(key, value) != null) {
-                    logger.error("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
+                    //logger.error("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
                     // Puoi decidere se lanciare un'eccezione o gestire la duplicazione come preferisci
+                    throw new RuntimeException("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
                 }
             });
         }
@@ -119,7 +124,7 @@ public class PageBuilder {
         String return_page_error = null;
         if (LogicComponents != null && !LogicComponents.isEmpty()) {
             // Esegui la logica di tutti i componenti
-            List<String> ErrorCode = executeComponentsLogic();
+            this.ErrorCode = executeComponentsLogic();
             // Gestisco le situazioni d'errore
             return_page_error = ExecuteError(ErrorCode);
         }
@@ -193,4 +198,11 @@ public class PageBuilder {
         this.LogicComponents.addAll(Arrays.asList(components));
     }
 
+    public List<String> getErrorCode() {
+        return ErrorCode;
+    }
+
+    public Map<String, String> getErrorPageMap() {
+        return errorPageMap;
+    }
 }

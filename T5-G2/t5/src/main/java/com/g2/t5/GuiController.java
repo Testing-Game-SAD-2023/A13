@@ -105,9 +105,7 @@ public class GuiController {
             ObjectMapper mapper = new ObjectMapper();
             @SuppressWarnings("unchecked")
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-
             String userId = map.get("userId").toString();
-
             return profilePage(model, userId, jwt);
         }
         catch (Exception e) {
