@@ -216,7 +216,6 @@ public class T1ServiceTest {
         String result = (String) T1Service.handleRequest("getClassUnderTest", nomeCUT);
         assertNotNull(result);
         assertEquals(fileContent, result); // Verifica che il risultato sia quello atteso
-
         mockServer.verify(); // Verifica che il server mock abbia ricevuto la richiesta
     }
 

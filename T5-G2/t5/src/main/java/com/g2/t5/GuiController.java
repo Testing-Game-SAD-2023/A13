@@ -23,8 +23,11 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -100,6 +103,7 @@ public class GuiController {
 
         try {
             ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
 
             String userId = map.get("userId").toString();
@@ -124,7 +128,6 @@ public class GuiController {
 
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
-
         List<Statistic> allStatistics = achievementService.getStatistics();
         Map<String, Statistic> IdToStatistic = new HashMap<>();
 

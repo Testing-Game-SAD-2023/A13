@@ -17,14 +17,12 @@
 
 package com.g2.Interfaces;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.g2.Model.Game;
 import com.g2.Model.StatisticProgress;
-import com.g2.Model.User;
 import org.springframework.core.ParameterizedTypeReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,16 +42,6 @@ public class T4Service extends BaseService {
     public T4Service(RestTemplate restTemplate) {
         // Inizializzazione del servizio base con RestTemplate e URL specificato
         super(restTemplate, BASE_URL);
-
-        // Registrazione dell'azione "getLevels" con una definizione specifica per
-        // questa azione
-        registerAction("getLevels", new ServiceActionDefinition(
-                // Definizione di un'operazione lambda che invoca il metodo getLevels con un
-                // parametro di tipo String
-                params -> getLevels((String) params[0]),
-                // L'azione è definita per accettare un parametro di tipo String
-                String.class
-        ));
 
         registerAction("getGames", new ServiceActionDefinition(
                 params -> getGames((int) params[0]),
@@ -103,9 +91,7 @@ public class T4Service extends BaseService {
     // usa /games per ottenere una lista di giochi
     private List<Game> getGames(int playerId) {
         final String endpoint = "/games/player/" + playerId;
-            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {});
-            // Gestione degli errori durante la richiesta
-            throw new IllegalArgumentException("[GETGAMES] Errore durante il recupero dei giochi: " + e.getMessage());
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {});
     }
 
     private List<StatisticProgress> getStatisticsProgresses(int playerID) {

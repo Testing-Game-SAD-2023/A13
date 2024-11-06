@@ -77,10 +77,10 @@ public class GameController {
      */
     private void registerGames() {
         //Attenzione le chiavi sono CaseSensitive
-        gameRegistry.put("Sfida", (sm, playerId, underTestClassName, type_robot, difficulty, mode)
-                -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, mode));
-        gameRegistry.put("Allenamento", (sm, playerId, underTestClassName, type_robot, difficulty, mode)
-                -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, mode));
+        gameRegistry.put(Gamemode.Sfida.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode)
+                -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Sfida.toString()));
+        gameRegistry.put(Gamemode.Allenamento.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode)
+                -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Allenamento.toString()));
         // Aggiungi altri giochi qui
     }
 

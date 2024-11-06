@@ -68,12 +68,13 @@ public class BaseServiceTest {
     private RestTemplate restTemplate;
     private BaseServiceImpl baseService;
     private MockRestServiceServer mockServer;
-    private final String Base_URL = "http://mock_url:123";
+    private String Base_URL = "http://mock_url:123";
+
 
     @BeforeEach
     public void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
-        baseService = new BaseServiceImpl(restTemplate, Base_URL);
+        baseService = new BaseServiceImpl(restTemplate);
     }
 
     /*

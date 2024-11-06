@@ -34,8 +34,10 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class BaseServiceImpl extends BaseService {
 
+    private static String baseUrl = "http://mock_url:123";
+
     // Costruttore che richiama il costruttore della classe base
-    public BaseServiceImpl(RestTemplate restTemplate, String baseUrl) {
+    public BaseServiceImpl(RestTemplate restTemplate) {
         super(restTemplate, baseUrl);
         // Registrazione delle azioni specifiche del servizio
         registerAction("testGetNoParams", new ServiceActionDefinition(
