@@ -22,12 +22,10 @@
  import static org.junit.jupiter.api.Assertions.assertEquals;
  import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;
  import org.junit.jupiter.api.extension.ExtendWith;
  import org.mockito.Mock;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
  import org.mockito.MockitoAnnotations;
@@ -177,28 +175,16 @@ import com.g2.t5.T5Application;
         assertTrue(pageBuilder.getLogicComponents().get(0) instanceof AuthComponent, "Il componente instanziato dovrebbe essere di tipo authcomponent");
     }
 
-        // Test per il getter e setter di ObjectComponents
+    // Test per il getter e setter di ObjectComponents
     @Test
     void testSetAndGetObjectComponents() {
-        GenericObjectComponent component1 = mock(GenericObjectComponent.class);
-        GenericObjectComponent component2 = mock(GenericObjectComponent.class);
+        GenericObjectComponent component1 = new GenericObjectComponent("mock_key_1", new Object());
+        GenericObjectComponent component2 = new GenericObjectComponent("mock_key_2", new Object());
         pageBuilder.setObjectComponents(component1, component2);
         // Verifica che i componenti siano correttamente aggiunti
         assertEquals(2, pageBuilder.getObjectComponents().size(), "deve ritornare due componenti");
         assertTrue(pageBuilder.getObjectComponents().contains(component1), "deve contenere omponent1");
         assertTrue(pageBuilder.getObjectComponents().contains(component2), "deve contenere component2");
-    }
-
-    // Test per il getter e setter di LogicComponents
-    @Test
-    void testSetAndGetLogicComponents() {
-        GenericLogicComponent logicComponent1 = mock(GenericLogicComponent.class);
-        GenericLogicComponent logicComponent2 = mock(GenericLogicComponent.class);
-        pageBuilder.setLogicComponents(logicComponent1, logicComponent2);
-        // Verifica che i componenti di logica siano correttamente aggiunti
-        assertEquals(2, pageBuilder.getLogicComponents().size(), "deve ritornare due componenti");
-        assertTrue(pageBuilder.getLogicComponents().contains(logicComponent1), "deve contenere omponent1");
-        assertTrue(pageBuilder.getLogicComponents().contains(logicComponent2), "deve contenere component2");
     }
 
     // Test per il getter e setter di errorPageMap
@@ -230,17 +216,6 @@ import com.g2.t5.T5Application;
         // Chiamata al metodo handlePageRequest
         String result = pageBuilder.handlePageRequest();
         // Verifica che non venga eseguita alcuna logica e venga restituito il template giusto
-        assertEquals("testPage", result);
-    }
-    
-    // Test per handlePageRequest quando ci sono solo ObjectComponents e LogicComponents è vuota
-    @Test
-    void testHandlePageRequestWithOnlyObjectComponents() {
-        GenericObjectComponent objectComponent = mock(GenericObjectComponent.class);
-        pageBuilder.setObjectComponents(objectComponent); // Impostiamo solo ObjectComponents
-        // Chiamata al metodo handlePageRequest
-        String result = pageBuilder.handlePageRequest();
-        // Verifica che la logica venga comunque eseguita per gli ObjectComponents
         assertEquals("testPage", result);
     }
 

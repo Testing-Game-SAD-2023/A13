@@ -34,11 +34,17 @@ function SetMode(setM) {
 		elements.forEach((element) => {
 			element.textContent += " " + get_mode_text(sanitizedMode);
 		});
+		// Rende invisibile il select del robot se la modalità è allenamento
+		const selectRobotElement = document.getElementById("robot_selector");
+		if (sanitizedMode === "Allenamento") {
+			selectRobotElement.classList.add("d-none")
+		} else {
+			selectRobotElement.classList.remove("d-none");
+		}
 	}else{
 		localStorage.setItem("modalita", sanitizedMode);
 	}
 }
-
 function GetMode() {
 	const mode = getParameterByName("mode");
 	if (mode) {
@@ -58,6 +64,8 @@ function saveToLocalStorage() {
 	localStorage.setItem("difficulty", selectDifficultyValue);
 	localStorage.setItem("modalita", GetMode());
 }
+
+
 // Funzione per ottenere i dati della partita precedente solo se l'ID utente coincide
 async function fetchPreviousGameData() {
 	try {
@@ -161,13 +169,10 @@ document.getElementById("new_game").addEventListener("click", function () {
 document.getElementById("link_editor").addEventListener("click", async function () {
 	const selectClassValue = document.getElementById("select_class").value;
 	if (resetGame) {
-
 		const formData = new FormData();
 		formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
 		formData.append("eliminaGame", true);
-		
 		const response = runGameActionElimina("/run", formData, true);
-
 		flush_localStorage();
 	}
 	saveToLocalStorage();
@@ -179,12 +184,10 @@ document.getElementById("link_editor").addEventListener("click", async function 
 //Tasto submit disabilitato fin quando non ho selezionato dei parametri
 // Funzione generica per verificare le select e abilitare/disabilitare il pulsante
 function updateButtonState() {
-	const selectClassValue = document.getElementById("select_class").value;
-	const selectRobotValue = document.getElementById("select_robot").value;
+	const selectClassValue 		= document.getElementById("select_class").value;
+	const selectRobotValue 		= document.getElementById("select_robot").value || "Allenamento_no_robot";
 	const selectDifficultyValue = document.getElementById("select_diff").value;
-
-	const submitButton = document.getElementById("link_editor");
-
+	const submitButton 			= document.getElementById("link_editor");
 	if (selectClassValue && selectRobotValue && selectDifficultyValue) {
 		submitButton.classList.remove("disabled");
 	} else {

@@ -45,7 +45,6 @@ $(document).ready(function () {
   //Redirect to /main page if some parameters are missing
   if (idUtente == null || idPartita == null || idTurno == null || nameCUT == null || robotScelto == null || difficolta == null) window.location.href = "/main";
   
-
   $.ajax({
     url: "/api/receiveClassUnderTest",
     type: "GET",
