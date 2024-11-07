@@ -17,11 +17,19 @@ zuul:
     jacoco-service:
       sensitiveHeaders:
       path: /api/getJaCoCoReport/**
-      url: http://t6-g12-app-1:80/getJaCoCoReport
+      url: http://t6-g12-app-1:80/
+    receiveClass-service:
+      sensitiveHeaders:
+      path: /api/receiveClassUnderTest/**
+      url: http://t6-g12-app-1:80/receiveClassUnderTest
     calculateScalataFinalScore-service:
       sensitiveHeaders:
       path: /api/calculateScalataFinalScore/**
       url: http://t6-g12-app-1:80/calculateScalataFinalScore
+    sendInfo-service:
+      sensitiveHeaders:
+      path: /api/sendInfo/**
+      url: http://t6-g12-app-1:80/sendInfo
     saveData-service:
       sensitiveHeaders:
       path: /api/save-data/**

@@ -4,7 +4,7 @@ function getScalataClasse(roundId, scalateJsonArray) {
 }
 
 async function createGame(robot, classe, difficulty, scalataId, username, gamemode) {
-    console.log("[createGame] robot: ", robot, " classe: ", classe, " difficulty: ", difficulty, " scalataId: ", scalataId, " username: ", username);
+    console.log("[createGame] robot: ", robot, " classe: ", classe, " difficulty: ", difficulty, " scalataId: ", scalataId, " username: ", username, "gamemode: ", gamemode);
     return new Promise((resolve, reject) => { 
         $.ajax({
             url: '/api/save-data',
