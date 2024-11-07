@@ -735,7 +735,7 @@ public class HomeController {
 		 * 07/11/2024 STEFANO ho aggiunto un controllo per non far registrare all'infinito 
 		 */
 		long actual_admin = arepo.count();
-		if(actual_admin > 2){
+		if(actual_admin > 1){
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile accettare un nuovo admin fase di registrazione terminata");
 		}
 
