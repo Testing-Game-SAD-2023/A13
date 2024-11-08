@@ -69,7 +69,10 @@ public class AchievementService {
     private void setProgress(int playerID, String statisticID, float progress) {
         //TODO: integrare con Service Manager
         restTemplate.put("http://t4-g18-app-1:3000/phca/" + playerID + "/" + statisticID,
-                new StatisticProgress(playerID, statisticID, progress));
+        new StatisticProgress(playerID, statisticID, progress));
+
+        //String response = (String) serviceManager.handleRequest("T4", "updateStatisticProgress", playerID, statisticID, progress);
+        //System.out.println(response);
     }
 
     public List<AchievementProgress> getProgressesByPlayer(int playerID) {

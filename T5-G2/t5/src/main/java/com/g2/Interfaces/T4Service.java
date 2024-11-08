@@ -17,10 +17,7 @@
 
 package com.g2.Interfaces;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.g2.Model.Game;
 import com.g2.Model.StatisticProgress;
@@ -63,6 +60,11 @@ public class T4Service extends BaseService {
         registerAction("getStatisticsProgresses", new ServiceActionDefinition(
                 params -> getStatisticsProgresses((int) params[0]),
                 Integer.class
+        ));
+
+        registerAction("updateStatisticProgress", new ServiceActionDefinition(
+                params -> updateStatisticProgress((int) params[0], (String) params[1], (float) params[2]),
+                Integer.class, String.class, Float.class
         ));
 
         registerAction("CreateGame", new ServiceActionDefinition(
@@ -130,6 +132,24 @@ public class T4Service extends BaseService {
         } catch (Exception e) {
             System.out.println("[GETSTATISTICSPROGRESSES] Errore nel prelievo delle statistiche: " + e.getMessage());
             return new ArrayList<>();
+        }
+    }
+
+    private String updateStatisticProgress(int playerID, String statisticID, float progress) {
+        try {
+            MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
+            jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
+            jsonMap.put("statistic", Collections.singletonList(statisticID));
+            jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
+
+            String endpoint = "/phca/" + playerID + "/" + statisticID;
+
+            String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
+
+            return response;
+        } catch (Exception e) {
+            System.out.println("[updateStatisticProgress] Errore nell'update delle statistiche: " + e.getMessage());
+            return "errore UPDATESTATISTICPROGRESS";
         }
     }
 
