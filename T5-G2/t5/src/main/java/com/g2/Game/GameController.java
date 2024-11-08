@@ -268,6 +268,7 @@ public class GameController {
                     logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
                 }
 
+                // Chiamata al servizio di Update di Statistiche e Achievement
                 achievementService.updateProgressByPlayer(Integer.parseInt(playerId));
                 return createResponseRun(UserData, RobotScore, user_score, gameOver);
             }else{

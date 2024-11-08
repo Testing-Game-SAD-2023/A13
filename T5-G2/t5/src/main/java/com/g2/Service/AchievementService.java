@@ -39,6 +39,8 @@ public class AchievementService {
             if(statistic.getGamemode() != Gamemode.All)
                 filteredGameList = gamesList.stream().filter(game -> Objects.equals(game.getDescription(), statistic.getGamemode().toString())).toList();
 
+            //TODO: filtrare anche per Robot (allo stato attuale non vi è associazione in DB tra robot e partita)
+
             float statisticValue = statistic.calculate(filteredGameList);
 
             System.out.println("[CALCULATION] Calculating for games: " + filteredGameList);
