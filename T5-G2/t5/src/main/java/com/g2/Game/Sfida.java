@@ -58,8 +58,7 @@ public class Sfida extends GameLogic {
         if (coverage == 0) {
             return 0;
         }
-
-        // Calcolo della percentuale della posizione
+        // Calcolo della percentuale
         double locPerc = ((double) coverage) / 100;
         // Penalità crescente per ogni turno aggiuntivo
         double penaltyFactor = Math.pow(0.9, currentTurn);

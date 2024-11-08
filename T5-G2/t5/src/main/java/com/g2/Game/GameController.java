@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.commons.model.Gamemode;
-import com.g2.Service.AchievementService;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -41,7 +39,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
+import com.g2.Service.AchievementService;
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
 @CrossOrigin
@@ -148,19 +148,15 @@ public class GameController {
         try {
             // Parsing del documento XML con Jsoup
             Document doc = Jsoup.parse(cov, "", Parser.xmlParser());
-
             // Selezione dell'elemento counter di tipo "LINE"
             Element line = doc.selectFirst("report > counter[type=LINE]");
-
             // Verifica se l'elemento è stato trovato
             if (line == null) {
                 throw new IllegalArgumentException("Elemento 'counter' di tipo 'LINE' non trovato nel documento XML.");
             }
-
             // Lettura degli attributi "covered" e "missed" e calcolo della percentuale di copertura
             int covered = Integer.parseInt(line.attr("covered"));
             int missed = Integer.parseInt(line.attr("missed"));
-
             // Calcolo della percentuale di copertura
             return 100 * covered / (covered + missed);
         } catch (NumberFormatException e) {

@@ -204,19 +204,72 @@ public abstract class BaseService implements ServiceInterface {
         });
     }
 
-    // Metodo per chiamate PUT
-    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
+    // Metodo per chiamate PUT senza specificare content type -> default application/x-www-form-urlencoded
+    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, 
+                                Map<String, String> queryParams, Class<R> responseType) {
+        return callRestPut(endpoint, formData, queryParams, null, responseType);
+    }
+
+     // Metodo per chiamate PUT con content type a application/x-www-form-urlencoded
+    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, 
+                            Map<String, String> queryParams, Map<String, String> customHeaders, 
+                            Class<R> responseType) {
+    if (endpoint == null || endpoint.isEmpty()) {
+        throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+    }
+    if (formData == null) {
+        throw new IllegalArgumentException("formData non può essere nullo");
+    }
+    
+    return executeRestCall("callRestPut", () -> {
+        String url = buildUri(endpoint, queryParams);
+        
+        HttpHeaders headers = new HttpHeaders();
+        
+        // Aggiunge gli header personalizzati se presenti
+        if (customHeaders != null) {
+            customHeaders.forEach(headers::add);
+        }
+        
+        // Imposta il content type di default se non specificato
+        if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        }
+        
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
+        ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
+        return response.getBody();
+    });
+}
+
+    // metodo per chiamare PUT con content type a application/json
+    protected <R> R callRestPut(String endpoint, JSONObject jsonObject, 
+                                Map<String, String> queryParams, Map<String, String> customHeaders, 
+                                Class<R> responseType) {
         if (endpoint == null || endpoint.isEmpty()) {
             throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
         }
-        if (formData == null) {
-            throw new IllegalArgumentException("formData non può essere nullo");
+        if (jsonObject == null) {
+            throw new IllegalArgumentException("Il body JSON non può essere nullo");
         }
+        
         return executeRestCall("callRestPut", () -> {
             String url = buildUri(endpoint, queryParams);
+            String jsonBody = jsonObject.toString();
+            
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Type", "application/x-www-form-urlencoded");
-            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
+            
+            // Aggiunge gli header personalizzati, se presenti
+            if (customHeaders != null) {
+                customHeaders.forEach(headers::add);
+            }
+            
+            // Imposta il content type a application/json se non specificato
+            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                headers.setContentType(MediaType.APPLICATION_JSON);
+            }
+            
+            HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
             return response.getBody();
         });

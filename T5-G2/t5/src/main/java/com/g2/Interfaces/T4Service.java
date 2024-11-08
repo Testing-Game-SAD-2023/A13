@@ -14,9 +14,9 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package com.g2.Interfaces;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +52,10 @@ public class T4Service extends BaseService {
                 params -> getStatisticsProgresses((int) params[0]),
                 Integer.class
         ));
+
+        registerAction("updateStatisticProgress", new ServiceActionDefinition(
+                params -> updateStatisticProgress((int) params[0], (String) params[1], (float) params[2]),
+                Integer.class, String.class, Float.class));
 
         registerAction("CreateGame", new ServiceActionDefinition(
                 params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3],
@@ -91,17 +95,29 @@ public class T4Service extends BaseService {
     // usa /games per ottenere una lista di giochi
     private List<Game> getGames(int playerId) {
         final String endpoint = "/games/player/" + playerId;
-        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {});
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {
+        });
     }
 
     private List<StatisticProgress> getStatisticsProgresses(int playerID) {
-            Map<String, String> formData = new HashMap<>();
-            formData.put("pid", String.valueOf(playerID));
+        Map<String, String> formData = new HashMap<>();
+        formData.put("pid", String.valueOf(playerID));
 
-            String endpoint = "/phca/" + playerID;
+        String endpoint = "/phca/" + playerID;
 
-            List<StatisticProgress> response = callRestGET(endpoint, formData, new ParameterizedTypeReference<List<StatisticProgress>>() {});
-            return response;
+        List<StatisticProgress> response = callRestGET(endpoint, formData, new ParameterizedTypeReference<List<StatisticProgress>>() {
+        });
+        return response;
+    }
+
+    private String updateStatisticProgress(int playerID, String statisticID, float progress) {
+        MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
+        jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
+        jsonMap.put("statistic", Collections.singletonList(statisticID));
+        jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
+        String endpoint = "/phca/" + playerID + "/" + statisticID;
+        String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
+        return response;
     }
 
     // usa /robots per ottenere dati 
