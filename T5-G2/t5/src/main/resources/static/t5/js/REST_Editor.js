@@ -170,7 +170,7 @@ function handleCompileError(loadingKey, buttonKey) {
     resetButtons(); // Reimposta i pulsanti
 }
 
-// Recupera il report di coverage
+// Recupera il report di coverage da T8
 async function fetchCoverageReport(formData) {
     const url = createApiUrl(formData, orderTurno); // Crea l'URL dell'API
     return await ajaxRequest(url, "POST", formData.get("testingClassCode"), false, "text"); // Esegue la richiesta AJAX

@@ -276,11 +276,7 @@ function highlightCodeCoverage(reportContent, editor) {
 	reportContent.querySelectorAll("line").forEach(function (line) {
 		if (line.getAttribute("mi") == 0)
 			coveredLines.push(line.getAttribute("nr"));
-		else if (
-			line.getAttribute("cb") /
-				(line.getAttribute("mb") + line.getAttribute("cb")) ==
-			2 / 4
-		)
+		else if (line.getAttribute("mb") > 0 && line.getAttribute("cb") > 0)
 			partiallyCoveredLines.push(line.getAttribute("nr"));
 		else uncoveredLines.push(line.getAttribute("nr"));
 	});
