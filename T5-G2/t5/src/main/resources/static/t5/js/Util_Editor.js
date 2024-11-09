@@ -104,12 +104,14 @@ ______ _____  _____   ____   _____
 |______|_|  \_\_|  \_\\____/|_____/  
 `;
 
-function getConsoleTextCoverage(valori_csv, gameScore) {
+function getConsoleTextCoverage(valori_csv, gameScore, punteggioJacoco) {
 	var consoleText = 
 `============================== Results ===============================
 Il tuo punteggio: ${gameScore}pt
 ----------------------------------------------------------------------
-la tua coverage:  ${valori_csv[0]*100}% LOC
+la tua coverage (Jacoco):  ${punteggioJacoco}% LOC
+----------------------------------------------------------------------
+la tua coverage (Evosuite):  ${valori_csv[0]*100}% LOC
 ============================== Coverage ===============================
 Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
@@ -139,9 +141,9 @@ function getConsoleTextRun(valori_csv, punteggioJacoco, punteggioRobot, gameScor
 `============================== Results ===============================
 Il tuo punteggio: ${gameScore}pt
 ----------------------------------------------------------------------
-la tua coverage:  ${valori_csv[0]*100}% LOC
+la tua coverage (Jacoco):  ${punteggioJacoco}% LOC
 ----------------------------------------------------------------------
-Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
+la tua coverage (Evosuite):  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
 Ia coverage del robot:    ${punteggioRobot}% LOC
 ============================== Coverage ===============================

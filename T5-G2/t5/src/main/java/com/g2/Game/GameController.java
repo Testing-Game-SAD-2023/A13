@@ -299,28 +299,29 @@ public class GameController {
             if (isGameEnd || gameLogic.isGameEnd()) {
                 activeGames.remove(playerId);
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                return createResponseRun(userData, robotScore, userScore, true);
+                return createResponseRun(userData, robotScore, userScore, true, lineCov);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
-                return createResponseRun(userData, robotScore, userScore, false);
+                return createResponseRun(userData, robotScore, userScore, false, lineCov);
             }
         } else {
             // Errori di compilazione
             logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
-            return createResponseRun(userData, 0, 0, false);
+            return createResponseRun(userData, 0, 0, false, 0);
         }
     }
 
 
     //metodo di supporto per creare la risposta
     private ResponseEntity<String> createResponseRun(Map<String, String> userData, int robotScore,
-            int userScore, boolean gameOver) {
+            int userScore, boolean gameOver, int lineCov) {
         JSONObject result = new JSONObject();
         result.put("outCompile", userData.get("outCompile"));
         result.put("coverage", userData.get("coverage"));
         result.put("robotScore", robotScore);
         result.put("userScore", userScore);
         result.put("GameOver", gameOver);
+        result.put("LineCoverageJacoco", lineCov);
         return ResponseEntity
                 .status(HttpStatus.OK) // Codice di stato HTTP 200
                 .header("Content-Type", "application/json") // Imposta l'intestazione Content-Type

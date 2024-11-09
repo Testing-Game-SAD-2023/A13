@@ -112,7 +112,7 @@ async function handleGameAction(isGameEnd) {
 
 // Gestisce la risposta dal server
 function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
-    const { robotScore, userScore, outCompile, coverage, gameId, roundId } = response;
+    const { robotScore, userScore, outCompile, coverage, gameId, roundId, LineCoverageJacoco } = response;
     // Aggiorna i dati del modulo con gameId e roundId
     formData.append("gameId", gameId);
     formData.append("roundId", roundId);
@@ -125,11 +125,11 @@ function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
     }
 
     // Se la copertura è disponibile, la processa
-    processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey);
+    processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, LineCoverageJacoco);
 }
 
 // Processa la copertura del codice e aggiorna i dati di gioco
-async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey) {
+async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, LineCoverageJacoco) {
     highlightCodeCoverage($.parseXML(coverage), editor_robot); // Evidenzia la copertura del codice nell'editor
     orderTurno++; // Incrementa l'ordine del turno
     const csvContent = await fetchCoverageReport(formData); // Recupera il report di coverage
@@ -138,7 +138,7 @@ async function processCoverage(coverage, formData, robotScore, userScore, isGame
     updateStorico(orderTurno, userScore, valori_csv[0]); // Aggiorna lo storico del gioco
     setStatus(isGameEnd ? "game_end" : "turn_end"); // Imposta lo stato di fine gioco o fine turno
     toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
-    displayUserPoints(isGameEnd, valori_csv, robotScore, userScore); // Mostra i punti dell'utente
+    displayUserPoints(isGameEnd, valori_csv, robotScore, userScore, LineCoverageJacoco); // Mostra i punti dell'utente
     if (isGameEnd) { // Se il gioco è finito
         handleEndGame(userScore); // Gestisce la fine del gioco
     } else {
@@ -147,10 +147,10 @@ async function processCoverage(coverage, formData, robotScore, userScore, isGame
 }
 
 // Mostra i punti dell'utente nella console
-function displayUserPoints(isGameEnd, valori_csv, robotScore, userScore) {
+function displayUserPoints(isGameEnd, valori_csv, robotScore, userScore, LineCoverageJacoco) {
     const displayUserPoints = isGameEnd 
-        ? getConsoleTextRun(valori_csv, 0, robotScore, userScore) // Testo per la fine del gioco
-        : getConsoleTextCoverage(valori_csv, userScore); // Testo per la copertura
+        ? getConsoleTextRun(valori_csv, LineCoverageJacoco, robotScore, userScore) // Testo per la fine del gioco
+        : getConsoleTextCoverage(valori_csv, userScore, LineCoverageJacoco); // Testo per la copertura
 
     console_robot.setValue(displayUserPoints); // Aggiorna la console del robot con i punti
 }
