@@ -193,10 +193,8 @@ function updateButtonState() {
 	const allSelected = document.getElementById("select_class").value 
 						&& document.getElementById("select_robot").value 
 						&& document.getElementById("select_diff").value;
-						
+			
 	const classSelected = document.getElementById("select_class").value;
-
-
 	// Se mi trovo in allenamento mi interessa controllare solo la classe, altrimenti devo controllare tutto 
 	submitButton.classList.toggle("disabled", mode !== "Allenamento" ? !allSelected : !classSelected);
 }

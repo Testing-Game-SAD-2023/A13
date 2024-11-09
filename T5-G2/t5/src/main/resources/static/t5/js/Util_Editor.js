@@ -104,15 +104,30 @@ ______ _____  _____   ____   _____
 |______|_|  \_\_|  \_\\____/|_____/  
 `;
 
-function getConsoleTextCoverage(valori_csv, gameScore, punteggioJacoco) {
+function getConsoleTextCoverage(valori_csv, gameScore, coverageDetails) {
+
+	let lineCoveragePercentage = (coverageDetails.line.covered / (coverageDetails.line.covered + coverageDetails.line.missed)) * 100;
+	let BranchCoveragePercentage = (coverageDetails.branch.covered / (coverageDetails.branch.covered + coverageDetails.branch.missed)) * 100;
+	let instructionCoveragePercentage = (coverageDetails.instruction.covered / (coverageDetails.instruction.covered + coverageDetails.instruction.missed)) * 100;
+
 	var consoleText = 
 `============================== Results ===============================
 Il tuo punteggio: ${gameScore}pt
+============================== JaCoCo ===============================
+Line Coverage COV%:  ${lineCoveragePercentage}% LOC
+covered: ${coverageDetails.line.covered}  
+missed: ${coverageDetails.line.missed}
 ----------------------------------------------------------------------
-la tua coverage (Jacoco):  ${punteggioJacoco}% LOC
+Branch Coverage COV%:  ${BranchCoveragePercentage}% LOC
+covered: ${coverageDetails.branch.covered} 
+missed: ${coverageDetails.branch.missed}
 ----------------------------------------------------------------------
-la tua coverage (Evosuite):  ${valori_csv[0]*100}% LOC
-============================== Coverage ===============================
+Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
+covered: ${coverageDetails.instruction.covered} 
+missed: ${coverageDetails.instruction.missed}
+============================== EvoSuite ===============================
+la tua Coverage:  ${valori_csv[0]*100}% LOC
+----------------------------------------------------------------------
 Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
 Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
@@ -132,21 +147,34 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 	return consoleText;
 }
 
-function getConsoleTextRun(valori_csv, punteggioJacoco, punteggioRobot, gameScore) {
+function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScore) {
+	let lineCoveragePercentage = (coverageDetails.line.covered / (coverageDetails.line.covered + coverageDetails.line.missed)) * 100;
+	let BranchCoveragePercentage = (coverageDetails.branch.covered / (coverageDetails.branch.covered + coverageDetails.branch.missed)) * 100;
+	let instructionCoveragePercentage = (coverageDetails.instruction.covered / (coverageDetails.instruction.covered + coverageDetails.instruction.missed)) * 100;
 	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
 	consoleText =
 `===================================================================== \n` +
 		consoleText2 +
 		"\n" +
 `============================== Results ===============================
-Il tuo punteggio: ${gameScore}pt
+Il tuo punteggio:${gameScore}pt
 ----------------------------------------------------------------------
-la tua coverage (Jacoco):  ${punteggioJacoco}% LOC
+La coverage del robot:${punteggioRobot}% LOC
+============================== JaCoCo ===============================
+Line Coverage COV%:  ${lineCoveragePercentage}% LOC
+covered: ${coverageDetails.line.covered}  
+missed: ${coverageDetails.line.missed}
 ----------------------------------------------------------------------
-la tua coverage (Evosuite):  ${valori_csv[0]*100}% LOC
+Branch Coverage COV%:  ${BranchCoveragePercentage}% LOC
+covered: ${coverageDetails.branch.covered} 
+missed: ${coverageDetails.branch.missed}
 ----------------------------------------------------------------------
-Ia coverage del robot:    ${punteggioRobot}% LOC
-============================== Coverage ===============================
+Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
+covered: ${coverageDetails.instruction.covered} 
+missed: ${coverageDetails.instruction.missed}
+============================== EvoSuite ===============================
+la tua Coverage:  ${valori_csv[0]*100}% LOC
+----------------------------------------------------------------------
 Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
 Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
@@ -184,17 +212,14 @@ async function startGame(data) {
 			true,
 			"text"
 		);
-
 		console.log("Partita iniziata con successo:", response);
 	} catch (error) {
 		// Assicurati che error sia una stringa prima di usare includes
 		errorMessage = JSON.stringify(error);
-
 		if (errorMessage.includes("errore esiste già la partita")) {
 			console.log("Il messaggio d'errore indica che esiste già la partita.");
 			openModalWithText(status_inizia_partita, match_in_corso);
 		} 
-
 		console.log("[start Game]", errorMessage);
 	}
 }
@@ -234,24 +259,19 @@ const statusMessages = {
 // Funzione per comunicare lo stato in cui si trova l'editor 
 function setStatus(statusName) {
     const divElement = document.getElementById("status_compiler");
-
     if (!divElement) {
         console.error(`Elemento con ID "status_compiler" non trovato.`);
         return;
     }
-
     const spinner = divElement.querySelector(".spinner-border");
     const statusText = divElement.querySelector('#status_text');
     const icon = divElement.querySelector("i");
-
     // Recupera le impostazioni per lo stato specificato
     const status = statusMessages[statusName];
-
     if (!status) {
         console.error(`Stato "${statusName}" non definito.`);
         return;
     }
-
     // Controlla lo stato attuale dello spinner e inverte la visibilità
     if (status.showSpinner) {
         spinner.style.display = "inline-block"; // Mostra lo spinner
