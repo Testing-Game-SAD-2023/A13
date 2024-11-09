@@ -25,16 +25,12 @@ function createApiUrl(formData, orderTurno) {
 	const className = formData.get("className");
 	const underTestClassName = formData.get("underTestClassName");
 	const playerId = formData.get("playerId");
-
 	// Costruisce il percorso per la classe
 	const classePath = `VolumeT8/FolderTreeEvo/${className}/${className}SourceCode/${underTestClassName}`;
-
 	// Ottiene il percorso del test generato
 	const testPath = generaPercorsoTest(orderTurno, formData);
-
 	// Costruisce l'URL dell'API
 	const apiUrl = `/api/${classePath}+${testPath}+/app+${playerId}`;
-
 	return apiUrl;
 }
 
@@ -147,7 +143,7 @@ la tua coverage:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
 Il tuo punteggio Jacoco:   ${punteggioJacoco}% LOC
 ----------------------------------------------------------------------
-Il punteggio del robot:    ${punteggioRobot}% LOC
+Ia coverage del robot:    ${punteggioRobot}% LOC
 ============================== Coverage ===============================
 Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------

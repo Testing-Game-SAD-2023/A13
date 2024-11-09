@@ -34,15 +34,19 @@ function SetMode(setM) {
 		elements.forEach((element) => {
 			element.textContent += " " + get_mode_text(sanitizedMode);
 		});
-		// Rende invisibile il select del robot se la modalità è allenamento
-		const selectRobotElement = document.getElementById("robot_selector");
-		if (sanitizedMode === "Allenamento") {
-			selectRobotElement.classList.add("d-none")
-		} else {
-			selectRobotElement.classList.remove("d-none");
-		}
 	}else{
 		localStorage.setItem("modalita", sanitizedMode);
+	}
+
+	// Rende invisibile il select del robot e difficoltà se la modalità è allenamento
+	const selectRobotElement = document.getElementById("robot_selector");
+	const selectdifficultyElemenet = document.getElementById("difficulty_selector");
+	if (sanitizedMode === "Allenamento") {
+		selectRobotElement.classList.add("d-none");
+		selectdifficultyElemenet.classList.add("d-none");
+	} else {
+		selectRobotElement.classList.remove("d-none");
+		selectdifficultyElemenet.classList.remove("d-none");
 	}
 }
 function GetMode() {
@@ -184,15 +188,17 @@ document.getElementById("link_editor").addEventListener("click", async function 
 //Tasto submit disabilitato fin quando non ho selezionato dei parametri
 // Funzione generica per verificare le select e abilitare/disabilitare il pulsante
 function updateButtonState() {
-	const selectClassValue 		= document.getElementById("select_class").value;
-	const selectRobotValue 		= document.getElementById("select_robot").value || "Allenamento_no_robot";
-	const selectDifficultyValue = document.getElementById("select_diff").value;
-	const submitButton 			= document.getElementById("link_editor");
-	if (selectClassValue && selectRobotValue && selectDifficultyValue) {
-		submitButton.classList.remove("disabled");
-	} else {
-		submitButton.classList.add("disabled");
-	}
+	const submitButton = document.getElementById("link_editor");
+	const mode = GetMode();
+	const allSelected = document.getElementById("select_class").value 
+						&& document.getElementById("select_robot").value 
+						&& document.getElementById("select_diff").value;
+						
+	const classSelected = document.getElementById("select_class").value;
+
+
+	// Se mi trovo in allenamento mi interessa controllare solo la classe, altrimenti devo controllare tutto 
+	submitButton.classList.toggle("disabled", mode !== "Allenamento" ? !allSelected : !classSelected);
 }
 
 // Aggiungi un evento change a ciascun select

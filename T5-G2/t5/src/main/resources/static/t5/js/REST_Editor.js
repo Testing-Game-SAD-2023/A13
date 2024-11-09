@@ -113,14 +113,11 @@ async function handleGameAction(isGameEnd) {
 // Gestisce la risposta dal server
 function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
     const { robotScore, userScore, outCompile, coverage, gameId, roundId } = response;
-
     // Aggiorna i dati del modulo con gameId e roundId
     formData.append("gameId", gameId);
     formData.append("roundId", roundId);
-
     console_utente.setValue(outCompile); // Mostra l'output della compilazione nella console utente
     parseMavenOutput(outCompile); // Analizza l'output di Maven
-
     if (!coverage) { // Se non c'è copertura, gestisce l'errore di compilazione
         setStatus("error");
         handleCompileError(loadingKey, buttonKey); // Gestisce l'errore
@@ -135,18 +132,13 @@ function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
 async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey) {
     highlightCodeCoverage($.parseXML(coverage), editor_robot); // Evidenzia la copertura del codice nell'editor
     orderTurno++; // Incrementa l'ordine del turno
-
     const csvContent = await fetchCoverageReport(formData); // Recupera il report di coverage
     setStatus("loading"); // Aggiorna lo stato a "loading"
-
     const valori_csv = extractThirdColumn(csvContent); // Estrae i valori dalla terza colonna del CSV
     updateStorico(orderTurno, userScore, valori_csv[0]); // Aggiorna lo storico del gioco
-
     setStatus(isGameEnd ? "game_end" : "turn_end"); // Imposta lo stato di fine gioco o fine turno
     toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
-
     displayUserPoints(isGameEnd, valori_csv, robotScore, userScore); // Mostra i punti dell'utente
-
     if (isGameEnd) { // Se il gioco è finito
         handleEndGame(userScore); // Gestisce la fine del gioco
     } else {
