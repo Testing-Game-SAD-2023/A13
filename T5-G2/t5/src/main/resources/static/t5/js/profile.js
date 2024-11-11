@@ -13,6 +13,7 @@ const parseJwt = (token) => {
   }
 };
 
+//TODO: questo è solo per DEMO, i dati del profilo devono essere contenuti in un model
 document.addEventListener("DOMContentLoaded", (e) => {
       var userId = document.getElementById("user_id").innerHTML;
       console.log(userId)
