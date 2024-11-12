@@ -119,7 +119,8 @@ public class T4Service extends BaseService {
         String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
         return response;
     }
-
+    
+/*
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
         try {
             MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
@@ -137,7 +138,8 @@ public class T4Service extends BaseService {
             return "errore UPDATESTATISTICPROGRESS";
         }
     }
-
+*/
+    
     // usa /robots per ottenere dati 
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
