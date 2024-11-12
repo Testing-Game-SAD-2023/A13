@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -45,6 +47,13 @@ public class PageBuilder {
     private final Model model_html;
     // Nome della pagina (template) da utilizzare
     private final String PageName;
+    //Lista codici d'errore ottenuti 
+    private List<String> ErrorCode;
+
+
+    //Logger 
+    private static final Logger logger = LoggerFactory.getLogger(PageBuilder.class);
+
 
     //COSTRUTTORI 
     /**
@@ -59,6 +68,7 @@ public class PageBuilder {
         this.PageName = PageName;
         this.model_html = model_html;
         setStandardErrorPage();
+        logger.info("[PageBuilder] Builder costruito con successo");
     }
 
     public PageBuilder(ServiceManager serviceManager, String PageName, Model model_html) {
@@ -68,6 +78,7 @@ public class PageBuilder {
         this.PageName = PageName;
         this.model_html = model_html;
         setStandardErrorPage();
+        logger.info("[PAGEBULDER] Builder costruito con successo");
     }
 
     //HANDLE PAGE REQUEST 
@@ -75,13 +86,13 @@ public class PageBuilder {
     private List<String> executeComponentsLogic() {
         // Lista per raccogliere eventuali errori
         List<String> errorCodes = new ArrayList<>(); 
-
         for (GenericLogicComponent Component : LogicComponents) {
             if (!Component.executeLogic()) {
-                System.out.println("Logica fallita per il componente: " + Component.getClass().getSimpleName());
                 errorCodes.add(Component.getErrorCode()); // Aggiunge il codice d'errore alla lista
+                logger.error("[PAGEBULDER][executeComponentsLogic] Logica fallita per il componente: " + Component.getClass().getSimpleName());
             }
         }
+        logger.info("[PAGEBULDER][executeComponentsLogic] Lista error code: " + errorCodes);
         return errorCodes;
     }
 
@@ -98,8 +109,9 @@ public class PageBuilder {
             Map<String, Object> model = component.getModel();
             model.forEach((key, value) -> {
                 if (combinedModel.put(key, value) != null) {
-                    System.err.println("[PAGEBULDER] individuate chiavi duplicate: " + key);
+                    //logger.error("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
                     // Puoi decidere se lanciare un'eccezione o gestire la duplicazione come preferisci
+                    throw new RuntimeException("[PAGEBULDER][buildModel] individuate chiavi duplicate: " + key);
                 }
             });
         }
@@ -112,17 +124,17 @@ public class PageBuilder {
         String return_page_error = null;
         if (LogicComponents != null && !LogicComponents.isEmpty()) {
             // Esegui la logica di tutti i componenti
-            List<String> ErrorCode = executeComponentsLogic();
+            this.ErrorCode = executeComponentsLogic();
             // Gestisco le situazioni d'errore
             return_page_error = ExecuteError(ErrorCode);
         }
+        // Restituisco il nome del template da usare
+        if(return_page_error != null) return return_page_error;
         if (ObjectComponents != null && !ObjectComponents.isEmpty()) {
             // Costruisci la mappa combinata dei dati dei componenti
             Map<String, Object> combinedModel = buildModel();
             model_html.addAllAttributes(combinedModel);
         }
-        // Restituisco il nome del template da usare
-        if(return_page_error != null) return return_page_error;
         return this.PageName;
     }
 
@@ -186,4 +198,11 @@ public class PageBuilder {
         this.LogicComponents.addAll(Arrays.asList(components));
     }
 
+    public List<String> getErrorCode() {
+        return ErrorCode;
+    }
+
+    public Map<String, String> getErrorPageMap() {
+        return errorPageMap;
+    }
 }

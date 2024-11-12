@@ -4,14 +4,13 @@
 <html lang ="en" 
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:th="http://www.thymeleaf.org">
-<html lang="en">
 
 <head>
     <!--Enabling proper responsive behavior-->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title id="title-scalata-gamemode">Seleziona la tua "Scalata"</title>
+    <title id="title-scalata-gamemode" th:text="#{seleziona_scalata}"></title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
@@ -41,7 +40,7 @@
   <!--Navbar-->
   <nav class="navbar navbar-dark bg-dark" id="navbar">
       <a class="navbar-brand" href="javascript:void(0);">
-        <i class="fas fa-stairs"></i> Seleziona la tua "Scalata"
+        <i class="fas fa-stairs" th:text="#{seleziona_scalata}"></i> 
       </a>
       <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -50,12 +49,13 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" id="nav-go-back" href="/main">Go Back <span class="sr-only">(current)</span></a>
+            <a class="nav-link" id="nav-go-back" href="/main" th:text="#{indietro}"> <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="nav-logout" href="/logout">Logout <span class="sr-only">(current)</span></a>
+            <a class="nav-link" id="nav-logout" href="/logout" th:text="#{logout}"> <span class="sr-only">(current)</span></a>
+          </li>
           <li class="nav-item">
-            <a class="nav-link" id="nav-rules" href="#" data-toggle="modal" data-target="#rulesModal">Regolamento</a>
+            <a class="nav-link" id="nav-rules" href="#" data-toggle="modal" data-target="#rulesModal" th:text="#{regole}"></a>
           </li>
           <!-- <li class="nav-item">
             <a class="nav-link" id="nav-tour" href=#>Inizia il tour</a>
@@ -66,8 +66,8 @@
 
   <!--Jumbotron-->
   <div class="jumbotron">
-    <h1 class="title">Modalità "Scalata"</h1>
-    <h2 class="subtitle">Sei pronto a metteri alla prova? <br> in questa nuova modalità di gioco dovrai sfoderare tutte le tue <br> abilità: scegli una "Scalata" dall'elenco e prova a superare <br> tutte le sfide proposte! </h2>
+    <h1 class="title" th:text="#{titolo_scalata}"></h1>
+    <h2 class="subtitle" th:text="#{descrizione_scalata}"></h2>
   </div>
   <br>
   <div id="scalate-container" class="container">
@@ -76,7 +76,7 @@
   <br>
   <br>
   <div class="text-center">
-    <button type="button" id="submit-button" class="btn btn-light btn-lg">Submit</button>
+    <button type="button" id="submit-button" class="btn btn-light btn-lg" th:text="#{submit}"></button>
   </div>
   <br>
   <br>
@@ -85,16 +85,14 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="rulesModalLabel">Regolamento</h5>
+        <h5 class="modal-title" id="rulesModalLabel" th:text="#{regole}"></h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <p>In questa nuova modalità, i giocatori si troveranno a dover testare, in una singola sessione di gioco, un insieme di classi aventi un livello di "difficoltà" crescente, competendo con il robot EvoSuite: un generatore automatico di test. La partita può considerarsi vinta solamente dal giocatore che è stato in grado di superare brillantemente tutti i rounds proposti battendo, a colpi di test JUnit, il robot in questione; maggiore è il numero di round, maggiore è la difficoltà associata alla partita, sei pronto a cogliere il guanto di sfida?</p>
-      </div>
+      <div class="modal-body" th:text="#{descrizione_scalata2}"></div>     
       <div class="modal-footer d-flex justify-content-center">
-        <button type="button" class="btn btn-dark" data-dismiss="modal">Chiudi</button>
+        <button type="button" class="btn btn-dark" data-dismiss="modal" th:text="#{chiudi}"></button>
       </div>
     </div>
   </div>

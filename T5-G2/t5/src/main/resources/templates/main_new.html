@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CUSTOM CSS -->
+    <link rel="stylesheet" href="/t5/css/main_style.css"/>
+    <title>Dashboard</title>
+</head>
+
+<body >
+
+    <div class="container-fluid">
+        <div class="row row-cols-2">
+            <!-- SIDEBAR -->
+            <div class="col-2 collapse collapse-horizontal show border-end p-0" id="sidebar">
+                    <a class="d-flex align-items-center link-body-emphasis">
+                        <span class="fs-4">Sidebar</span>
+                    </a>
+                    <hr>
+                    <ul class="nav flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" aria-current="page">
+                            Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link link-body-emphasis">
+                            Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link link-body-emphasis">
+                            Orders
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link link-body-emphasis">
+                            Products
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link link-body-emphasis">
+                            Customers
+                            </a>
+                        </li>
+                    </ul>
+            </div>
+            <!-- MAIN -->
+            <div class="d-flex flex-column flex-grow-1 px-0">
+                <!-- NAVBAR -->
+                <nav class="navbar">
+                    <div class="container-fluid">
+                        <button type="button" class="btn btn-sm" data-bs-toggle="collapse" data-bs-target="#sidebar" aria-expanded="false">
+                            <i class="bi bi-list bi-lg py-2 p-1"></i> 
+                        </button>
+                        <div class="d-flex">
+                            <div class="btn-group">
+                                <!-- Language -->
+                                <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i id="dropdownIcon">
+                                    </i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end p-0">
+                                    <div class="list-group">
+                                        <!-- English -->
+                                        <a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="en">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>
+                                                    <svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+                                                </h6>
+                                                <h6>
+                                                    English
+                                                </h6>
+                                            </div>
+                                        </a>
+                                        <!-- Italian -->
+                                        <a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="it">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>
+                                                    <svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"/><path d="m0 256c0 110.071 69.472 203.906 166.957 240.077v-480.154c-97.485 36.171-166.957 130.006-166.957 240.077z" fill="#6da544"/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+                                                </h6>
+                                                <h6>
+                                                    Italian 
+                                                </h6>
+                                            </div>
+                                        </a>
+                                        <!-- Spanish -->
+                                        <a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="es">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>
+                                                    <svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m0 256c0 31.314 5.633 61.31 15.923 89.043l240.077 22.261 240.077-22.261c10.29-27.733 15.923-57.729 15.923-89.043s-5.633-61.31-15.923-89.043l-240.077-22.261-240.077 22.261c-10.29 27.733-15.923 57.729-15.923 89.043z" fill="#ffda44"/><g fill="#d80027"><path d="m496.077 166.957c-36.171-97.484-130.006-166.957-240.077-166.957s-203.906 69.473-240.077 166.957z"/><path d="m15.923 345.043c36.171 97.484 130.006 166.957 240.077 166.957s203.906-69.473 240.077-166.957z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+                                                </h6>
+                                                <h6>
+                                                    Spanish
+                                                </h6>
+                                            </div>
+                                        </a>									 
+                                    </div>
+                                </div>
+                                <!-- Setting -->
+                                <button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <!-- DROPDOWN -->
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#"> Voce di prova </a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <a class="dropdown-item" href="/logout">
+                                            <i class="bi bi-box-arrow-left"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                <div class="container-fluid p-0">
+                    <!-- JUMBO -->
+                    <div class="container-fluid m-1">
+                        <div class="p-5 text-center bg-body-tertiary rounded-3">
+                          <h1 class="text-body-emphasis">Basic jumbotron</h1>
+                          <p class="lead">
+                            This is a simple Bootstrap jumbotron that sits within a <code>.container</code>, recreated with built-in utility classes.
+                          </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                          Featured
+                        </div>
+                        <div class="card-body">
+                          <h5 class="card-title">Special title treatment</h5>
+                          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                          <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                      </div>
+
+                    <div class="container-fluid border-top mt-3">
+                        <ul class="nav justify-content-end px-0 mb-3">
+                            <li class="nav-item">
+                                <button type="button" class="btn btn-sm">
+                                    <i class="bi bi-search"></i>                                
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                                    <button type="button" class="btn">
+                                        <i class="bi bi-caret-left-fill"></i>
+                                    </button>
+                                    <button type="button" class="btn">
+                                        <i class="bi bi-caret-right-fill"></i>
+                                    </button>
+                                  </div>
+                            </li>
+                        </ul>
+                        <div class="row row-col-4">
+                            <!-- Modalità 1 -->
+                            <div class="col mb-4 d-flex align-items-stretch">
+                                <div class="card shadow-lg bg-dark text-white"> 
+                                    <img src="/t5/images/Partita_singola.jpeg" class="card-img-top" alt="Immagine Modalità 1">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-center">Partita Singola</h3>
+                                        <p>
+                                            Vuoi una sfida rapida e coinvolgente? La modalità Partita Singola è perfetta per te! 
+                                            Affronta un match unico contro due possibili avversari predeterminati, senza l'impegno di una serie lunga.
+                                            Ideale per chi cerca una partita veloce e divertente in qualsiasi momento.
+                                        </p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="row  row-cols-2">
+                                            <div class="col">
+                                                    <span class="badge bg-primary m-1">Veloce</span>
+                                                    <span class="badge bg-info text-dark m-1">1 vs CPU</span>
+                                                    <span class="badge bg-warning text-dark m-1">Turn</span>
+                                            </div>
+                                            <div class="col">
+                                                <a href="/gamemode?mode=Sfida" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                                                    <i class="bi bi-play-fill me-2"></i>
+                                                    <span>Play</span>
+                                                </a> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modalità 2 -->
+                            <div class="col mb-4 d-flex align-items-stretch">
+                                <div class="card shadow-lg bg-dark text-white">
+                                    <img src="/t5/images/Scalata.jpeg" class="card-img-top" alt="Immagine Modalità 2">
+
+                                    <div class="card-body">
+                                        <h3 class="card-title text-center">Scalata</h3>
+                                        <p>
+                                            Pronto a mettere alla prova le tue capacità in una serie di sfide sempre più difficili? 
+                                            La modalità Scalata ti permetterà di affrontare un percorso in cui ogni livello è più impegnativo del precedente.
+                                            Salendo in classifica, avrai l'opportunità di dimostrare di essere il migliore!
+                                        </p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="row  row-cols-2">
+                                            <div class="col">
+                                                    <span class="badge bg-primary">Lunga</span>
+                                                    <span class="badge bg-info text-dark">Progressiva</span>
+                                                    <span class="badge bg-primary">Competitiva</span>
+                                            </div>
+                                            <div class="col">
+                                                <a href="/gamemode?mode=Scalata" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                                                    <i class="bi bi-play-fill me-2"></i>
+                                                    <span>Play</span>
+                                                </a> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                            <!-- Modalità 3 -->
+                            <div class="col mb-4 d-flex align-items-stretch">
+                                <div class="card shadow-lg bg-dark text-white">
+                                    <img src="/t5/images/Allenamento.jpeg" class="card-img-top" alt="Immagine Modalità 3">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-center">Allenamento</h3>
+                                        <p>
+                                            Hai bisogno di migliorare le tue abilità? Con la modalità Allenamento, puoi esercitarti senza pressioni, perfezionare le tue tecniche e sperimentare strategie.
+                                            È lo spazio perfetto per affinare le tue competenze e prepararti a sfide più grandi.
+                                        </p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="row  row-cols-2">
+                                            <div class="col">
+                                                <span class="badge bg-info text-dark">Pratica</span>
+                                                <span class="badge bg-primary">Casual</span>
+                                                <span class="badge bg-info text-dark">Veloce</span>
+                                            </div>
+                                            <div class="col">
+                                                <a href="/gamemode?mode=Allenamento" class="btn btn-success position-absolute end-0 mx-3 my-2">
+                                                    <i class="bi bi-play-fill me-2"></i>
+                                                    <span>Play</span>
+                                                </a> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+   	<!-- SCRIPTS-->
+	<script
+    th:src="@{/t5/jquery/jquery-3.7.0.com.js}"
+    th:inline="javascript"
+></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"
+></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"
+></script>
+    
+</body>
+</html>
+

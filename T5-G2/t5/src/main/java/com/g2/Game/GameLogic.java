@@ -32,11 +32,10 @@ public abstract class GameLogic {
     private int  RoundID;
     private String TurnID;
     private final String PlayerID;
-    private final String ClasseUT;
-
-    private final String type_robot;
-    private final String difficulty;
-    private final String gamemode;
+    private String ClasseUT;
+    private String type_robot;
+    private String difficulty;
+    private String gamemode;
 
     public GameLogic(ServiceManager serviceManager, String PlayerID, String ClasseUT,
             String type_robot, String difficulty, String gamemode) {
@@ -123,5 +122,23 @@ public abstract class GameLogic {
         return this.ClasseUT;
     }
 
-    public String getGamemode() { return gamemode; }
+    public Boolean CheckGame(String type_robot, String difficulty, String underTestClassName){
+        if( this.type_robot.equals(type_robot) && 
+            this.difficulty.equals(difficulty) &&
+            this.ClasseUT.equals(underTestClassName)){
+                return true;
+            }else{
+                return false;
+            }
+    }
+
+    public String getMode() {
+        return gamemode;
+    }
+
+    public void setMode(String mode) {
+        this.gamemode = gamemode;
+    }
+
+
 }

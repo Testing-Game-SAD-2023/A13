@@ -45,7 +45,6 @@ $(document).ready(function () {
   //Redirect to /main page if some parameters are missing
   if (idUtente == null || idPartita == null || idTurno == null || nameCUT == null || robotScelto == null || difficolta == null) window.location.href = "/main";
   
-
   $.ajax({
     url: "/api/receiveClassUnderTest",
     type: "GET",
@@ -404,7 +403,7 @@ runButton.addEventListener("click", function () {
                                   Difficulty: 1\n\
                                   ScalataId: "+localStorage.getItem("scalataId")+"\n\
                                   Username: "+localStorage.getItem("username")+".");
-                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username")).then((data) => {
+                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username"),localStorage.getItem("modalita")).then((data) => {
                                   console.log(data);
                                   window.location.href = "editor_old";
                                 });

@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.g2.Model.ClassUT;
 
@@ -36,7 +37,6 @@ public class T1Service extends BaseService {
 
     public T1Service(RestTemplate restTemplate) {
         super(restTemplate, BASE_URL);
-
         // Registrazione delle azioni
         registerAction("getStatistics", new ServiceActionDefinition(
                 params -> getStatistics()
@@ -47,50 +47,29 @@ public class T1Service extends BaseService {
         ));
 
         registerAction("getClasses", new ServiceActionDefinition(
-                params -> getClasses() //Metodo senza argomenti
+                params -> getClasses() // Metodo senza argomenti
         ));
-
         registerAction("getClassUnderTest", new ServiceActionDefinition(
                 params -> getClassUnderTest((String) params[0]),
-                String.class
-        ));
+                String.class));
     }
 
     // Metodi effettivi
+    private List<ClassUT> getClasses(){
+        return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {});
+    }
+
     private List<Statistic> getStatistics() {
-        try {
-            return callRestGET("/statistics/list", null, new ParameterizedTypeReference<List<Statistic>>() {
-            });
-        } catch (Exception e) {
-            throw new IllegalArgumentException("getStatistics fallimento errore:" + e.getMessage());
-        }
+        return callRestGET("/statistics/list", null, new ParameterizedTypeReference<List<Statistic>>() {});
     }
 
     private List<Achievement> getAchievements() {
-        try {
-            return callRestGET("/achievements/list", null, new ParameterizedTypeReference<List<Achievement>>() {
-            });
-        } catch (Exception e) {
-            throw new IllegalArgumentException("getAchievements fallimento errore:" + e.getMessage());
-        }
-    }
-
-    private List<ClassUT> getClasses() {
-        try {
-            return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {
-            });
-        } catch (Exception e) {
-            throw new IllegalArgumentException("GetClasses fallimento errore:" + e.getMessage());
-        }
+        return callRestGET("/achievements/list", null, new ParameterizedTypeReference<List<Achievement>>() {});
     }
 
     private String getClassUnderTest(String nomeCUT) {
-        try {
-            byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
-            return removeBOM(convertToString(result));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("getClassUnderTest fallimento errore:" + e.getMessage());
-        }
+        byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
+        return removeBOM(convertToString(result));
     }
 
 }

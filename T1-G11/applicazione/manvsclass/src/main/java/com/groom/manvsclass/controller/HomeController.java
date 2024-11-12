@@ -1,28 +1,44 @@
+/*
+ *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.groom.manvsclass.controller;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.commons.model.Gamemode;
-import com.commons.model.Robot;
-import com.commons.model.StatisticRole;
-import com.groom.manvsclass.model.Achievement;
-import com.groom.manvsclass.model.*;
-import com.groom.manvsclass.model.repository.*;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,31 +57,34 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.commons.model.Gamemode;
+import com.commons.model.Robot;
+import com.commons.model.StatisticRole;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.groom.manvsclass.controller.Authentication.AuthenticatedAdminRepository;
+import com.groom.manvsclass.model.Achievement;
+import com.groom.manvsclass.model.Admin;
+import com.groom.manvsclass.model.ClassUT;
+import com.groom.manvsclass.model.Operation;
+import com.groom.manvsclass.model.Scalata;
+import com.groom.manvsclass.model.Statistic;
+ import com.groom.manvsclass.model.filesystem.RobotUtil;
+import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
 import com.groom.manvsclass.model.filesystem.upload.FileUploadResponse;
 import com.groom.manvsclass.model.filesystem.upload.FileUploadUtil;
-import com.groom.manvsclass.model.filesystem.RobotUtil;
-import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
-
-//MODIFICA (14/05/2024) : Importazione delle classi Scalata e ScalataRepository
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.groom.manvsclass.model.interaction;
+import com.groom.manvsclass.model.repository.AchievementRepository;
+import com.groom.manvsclass.model.repository.AdminRepository;
+import com.groom.manvsclass.model.repository.ClassRepository;
+import com.groom.manvsclass.model.repository.InteractionRepository;
+import com.groom.manvsclass.model.repository.OperationRepository;
+import com.groom.manvsclass.model.repository.ScalataRepository;
+import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
+import com.groom.manvsclass.model.repository.StatisticRepository;
 
 import io.jsonwebtoken.Claims;
-
-//MODIFICA(11/02/2024): Gestione sessione tramite JWT
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
-//MODIFICA (11/02/2024) : Controlli sul form registrazione
-import java.util.regex.Matcher;
-
-//MODIFICA (12/02/2024) : Gestione autenticazione
-import com.groom.manvsclass.controller.Authentication.AuthenticatedAdminRepository;
-
-//MODIFICA (13/02/2024) : Autenticazione token proveniente dai players
-// import org.springframework.web.client.RestTemplate;
- //MODIFICA (15/02/2024) : Servizio di posta elettronica
- import javax.mail.MessagingException;
 
 //FINE MODIFICA
 
@@ -647,7 +666,6 @@ public class HomeController {
 	@GetMapping("/downloadFile/{name}")
 	@ResponseBody
 	public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
-
 		System.out.println("/downloadFile/{name} (HomeController) - name: "+ name);
 		System.out.println("test");
 		try{
@@ -658,8 +676,8 @@ public class HomeController {
 			return file;
 		}
 		catch(Exception e){
-			System.out.println("Eccezione------------");
-			return new ResponseEntity<>("Cartella non trovata.", HttpStatus.NOT_FOUND);
+			System.out.println("Eccezione------------ " + e.getMessage());
+			return new ResponseEntity<>("Cartella non trovata.", HttpStatus.BAD_REQUEST);
 			}
 		}
 	 	
@@ -711,6 +729,14 @@ public class HomeController {
 										   @CookieValue(name = "jwt", required = false) String jwt) {
 		if (isJwtValid(jwt)) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
+		}
+
+		/*
+		 * 07/11/2024 STEFANO ho aggiunto un controllo per non far registrare all'infinito 
+		 */
+		long actual_admin = arepo.count();
+		if(actual_admin > 1){
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile accettare un nuovo admin fase di registrazione terminata");
 		}
 
 		// Se il token JWT non è valido, procedi con la registrazione dell'admin
