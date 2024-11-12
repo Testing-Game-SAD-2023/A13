@@ -298,7 +298,6 @@ public class GameController {
 
             // Gestione copertura di linea e punteggio utente
             return gestisciPartita(userData, gameLogic, isGameEnd, robotScore, playerId);
-
         } catch (Exception e) {
             logger.error("[GAMECONTROLLER] /run: errore", e);
             return createErrorResponse("[/RUN] " + e.getMessage(), "2");

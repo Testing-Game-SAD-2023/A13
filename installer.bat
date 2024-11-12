@@ -7,7 +7,7 @@ REM Installer function for commons
 echo "Installing commons"
 IF NOT DEFINED JAVA_HOME SET JAVA_HOME=C:\Program Files\Java\jdk-21
 cd "./commons"
-call mvn package || ( echo "Error in commons installation during mvn package. Check that the JAVA_HOME variable will point to a valid JDK" &&  exit /b 1 )
+call mvn install || ( echo "Error in commons installation during mvn package. Check that the JAVA_HOME variable will point to a valid JDK" &&  exit /b 1 )
 exit /b 0
 
 

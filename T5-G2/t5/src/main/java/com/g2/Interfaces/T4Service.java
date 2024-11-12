@@ -120,6 +120,24 @@ public class T4Service extends BaseService {
         return response;
     }
 
+    private String updateStatisticProgress(int playerID, String statisticID, float progress) {
+        try {
+            MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
+            jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
+            jsonMap.put("statistic", Collections.singletonList(statisticID));
+            jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
+
+            String endpoint = "/phca/" + playerID + "/" + statisticID;
+
+            String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
+
+            return response;
+        } catch (Exception e) {
+            System.out.println("[updateStatisticProgress] Errore nell'update delle statistiche: " + e.getMessage());
+            return "errore UPDATESTATISTICPROGRESS";
+        }
+    }
+
     // usa /robots per ottenere dati 
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();

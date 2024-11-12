@@ -37,6 +37,12 @@ public class User {
     
     @Enumerated (EnumType.STRING)
     public Studies studies;
+
+    /* Informazioni Personali utente da aggiungere per il profilo
+    public String bio;
+    public List<User> friendsList;
+    public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
+    */
     
     @Column(name = "reset_token")
     private String resetToken;
