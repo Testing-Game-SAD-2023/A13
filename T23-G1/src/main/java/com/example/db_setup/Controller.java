@@ -3,21 +3,11 @@ package com.example.db_setup;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -27,47 +17,45 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-
 
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 import com.example.db_setup.Service.OAuthUserGoogleService;
-import com.example.db_setup.Language.*;
-import org.springframework.web.servlet.LocaleResolver;
+import com.example.db_setup.Service.UserService;
 //MODIFICA (Deserializzazione risposta JSON)
 import com.fasterxml.jackson.databind.ObjectMapper;
 //FINE MODIFICA
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
 public class Controller {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
@@ -88,11 +76,11 @@ public class Controller {
     @Value("${recaptcha.url}")
     private String recaptchaServerURL;
 
-    @Bean 
+    @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder){
         return builder.build();
     }
-    
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -117,7 +105,7 @@ public class Controller {
                                             @RequestParam("password") String password,
                                             @RequestParam("check_password") String check_password,
                                             @RequestParam("studies") Studies studies, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
-        
+
         if(isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
         }
@@ -125,7 +113,7 @@ public class Controller {
         //verifica del recaptcha
         //MODIFICA (23/2/2024) : Commento alla riga riguardante il reCAPTCHA perchè non più utilizzato
         //verifyReCAPTCHA(gRecaptchaResponse);
-        
+
         User n = new User();
 
         // NOME -- Modifica (02/02/2024) : Possibilità di inserire più nomi separati da uno spazio
@@ -186,11 +174,11 @@ public class Controller {
 
         try {
             emailService.sendMailRegister(email, ID);
-            
+
             //MODIFICA (03/02/2024) : Redirect
             //Modifica (18/06/2024) : Cambiato il codice per consentire il reindirizzamento
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Location", "/login_success");    
+            headers.add("Location", "/login_success");
             return new ResponseEntity<String>(headers,HttpStatus.MOVED_PERMANENTLY);
             //FINE MODIFICA
 
@@ -205,17 +193,17 @@ public class Controller {
     // private void verifyReCAPTCHA(String gRecaptchaResponse) {
     //     HttpHeaders headers = new HttpHeaders();
     //     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-    
+
     //     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     //     map.add("secretkey", recaptchaSecret);
     //     map.add("response", gRecaptchaResponse);
-    
+
     //     HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
     //     ResponseEntity<String> response = restTemplate.postForEntity(recaptchaServerURL, request, String.class);
-    
+
     //     System.out.println(response);
     // }
-        
+
     // Autenticazione
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestParam("email") String email,
@@ -267,13 +255,13 @@ public class Controller {
         //     // if(userRepository.findByEmail(email) == null) {
         //     //     //save user to db with email
         //     // }
-        
-        
+
+
         //Contattare FB  e validare il token
         //     String token = generateToken(user);
         //     AuthenticatedUser authenticatedUser = new AuthenticatedUser(user, token);
         //     authenticatedUserRepository.save(authenticatedUser);
-    
+
         //     Cookie jwtTokenCookie = new Cookie("jwt", token);
         //     jwtTokenCookie.setMaxAge(3600);
         //     response.addCookie(jwtTokenCookie);
@@ -281,8 +269,8 @@ public class Controller {
         System.out.println(email);
         System.out.println(tokenFb);
         System.out.println(name);
-        
-        //Verificare token di accesso 
+
+        //Verificare token di accesso
 
         //Invio GET presso end-point debug-token
 
@@ -313,17 +301,17 @@ public class Controller {
         try {
             // Converti il corpo della risposta in un oggetto Java (es. MyResponseClass)
             MyResponseClass responseObj = objectMapper.readValue(responseBody, MyResponseClass.class);
-    
+
             // Ora puoi accedere ai campi dell'oggetto responseObj
             is_valid = responseObj.getData().isIs_valid();
             //int campo2 = responseObj.getCampo2();
-    
+
             // Esegui le operazioni desiderate con i dati della risposta
             System.out.println("is_valid: " + is_valid);
             //System.out.println("Campo2: " + campo2);
         } catch (IOException e) {
             e.printStackTrace();
-        } 
+        }
 
         //Token valido?
         if (is_valid==true) {
@@ -359,7 +347,7 @@ public class Controller {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    
+
                 } else {
                     //Non si è registrato con Facebook
                     System.out.println("Utente non registrato con Facebook");
@@ -378,22 +366,22 @@ public class Controller {
                 n.setPassword("");
                 n.setRegisteredWithFacebook(true);
                 n.setStudies(Studies.ALTRO);
-    
+
                 //Salvataggio
                 System.out.println("Salvataggio...");
                 userRepository.save(n);
                 System.out.println("Salvataggio completato.");
-    
+
                 //Assegnazione ID
                 Integer ID = n.getID();
-    
+
                 try {
                     emailService.sendMailRegister(email, ID);
                     //Flusso JWT
                     String token = generateToken(n);
                     AuthenticatedUser authenticatedUser = new AuthenticatedUser(n, token);
                     authenticatedUserRepository.save(authenticatedUser);
-    
+
                     Cookie jwtTokenCookie = new Cookie("jwt", token);
                     jwtTokenCookie.setMaxAge(3600);
                     response.addCookie(jwtTokenCookie);
@@ -442,7 +430,7 @@ public class Controller {
         jwtTokenCookie.setMaxAge(0);
         response.addCookie(jwtTokenCookie);
         System.out.println("GET logout called, token removed");
-        return new ModelAndView("redirect:/login"); 
+        return new ModelAndView("redirect:/login");
     }
 
     @PostMapping("/logout")
@@ -470,12 +458,12 @@ public class Controller {
         if(session != null) {
             session.invalidate();
         }
-        
+
         return ResponseEntity.ok("Logout successful");
     }
 
 
-    
+
     //Recupera Password
     @PostMapping("/password_reset")
     public ResponseEntity<String> resetPassword(@RequestParam("email") String email, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
@@ -544,7 +532,7 @@ public class Controller {
     // // ID per il task 5
     // @GetMapping("/get_ID")
     // public Integer getID(@RequestParam("email") String email, @RequestParam("password") String password){
-        
+
     //     User user = userRepository.findByEmail(email);
 
     //     if (user == null) {
@@ -586,7 +574,7 @@ public class Controller {
 
     @GetMapping("/register")
     public ModelAndView showRegistrationForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
 
         return new ModelAndView("register_new");
     }
@@ -594,16 +582,16 @@ public class Controller {
     //MODIFICA (03/02/2024) : Feedback registrazione avvenuta con successo + redirect alla pagina di /login
     @GetMapping("/login_success")
     public ModelAndView showLoginSuccesForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
         return new ModelAndView("login_success");
     }
-    
+
     //MODIFICA (18/02/2024) : Aggiunta menù
     @GetMapping("/menu")
     public ModelAndView showMenuForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
 
         System.out.println("GET (/menu)");
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/login"); 
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/login");
 
         return new ModelAndView("menu_new");
     }
@@ -611,7 +599,7 @@ public class Controller {
 
     @GetMapping("/login")
     public ModelAndView showLoginForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
 
         return new ModelAndView("login_new");
     }
@@ -627,25 +615,30 @@ public class Controller {
         return userRepository.findByID(Integer.parseInt(ID));
     }
 
-    
+    @GetMapping("/profile_by_email")
+    public UserProfile getProfileByEmail(@RequestParam("email") String email) {
+        return userService.findProfileByEmail(email);
+    }
+
+
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
-        
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
+
         return new ModelAndView("password_reset_new");
     }
 
-    
+
     @GetMapping("/password_change")
     public ModelAndView showChangeForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
 
         return new ModelAndView("password_change");
     }
 
     @GetMapping("/mail_register")
     public ModelAndView showMailForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
 
         return new ModelAndView("mail_register");
     }
@@ -656,7 +649,7 @@ public class Controller {
     public void loginWithGoogle(HttpServletResponse response) throws IOException {
         response.sendRedirect("/oauth2/authorization/google");
     }
-    
+
     @GetMapping("/checkService")
     @ResponseBody
     public String checkService() {
