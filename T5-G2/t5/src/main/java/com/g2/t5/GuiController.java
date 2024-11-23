@@ -102,6 +102,7 @@ public class GuiController {
         return main.handlePageRequest();
     }
 
+    // Ricevuta chiamata a profile, effettuo l'autenticazione
     @GetMapping("/profile")
     public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt)
     {
@@ -112,7 +113,8 @@ public class GuiController {
             ObjectMapper mapper = new ObjectMapper();
             @SuppressWarnings("unchecked")
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-            String userId = map.get("userId").toString();
+            String userId = map.get("userId").toString(); //Identifico l'utente
+            //Passo l'holder del modello, l'id dell'utente e il token alla pagina effettiva
             return profilePage(model, userId, jwt);
         }
         catch (Exception e) {
@@ -122,15 +124,20 @@ public class GuiController {
         return "error";
     }
 
+    //Definisco la mia pagina utente
     @GetMapping("/profile/{playerID}")
     public String profilePage(Model model,
                               @PathVariable(value="playerID") String playerID,
                               @CookieValue(name = "jwt", required = false) String jwt) {
+        //Mi sto istanziando il profilo come PageBuilder
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
+        //Do l'autenticazione
         profile.SetAuth(jwt);
 
+        //Mi prendo l'id del giocatore, così da filtrare per il suo id i suoi progressi degli achievement e le sue statistiche
         int userId = Integer.parseInt(playerID);
-
+        //TODO: Aggiungere URL immagine, bio e oggetti per il NotificationService
+        
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
         List<Statistic> allStatistics = achievementService.getStatistics();
