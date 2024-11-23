@@ -10,10 +10,11 @@ public class User {
     private String password;
     private boolean isRegisteredWithFacebook;
     private String studies;
+    private UserProfile userProfile;
     private String resetToken;
 
     public User(Long id, String name, String surname, String email, String password,
-    boolean isRegisteredWithFacebook, String studies, String resetToken) {
+    boolean isRegisteredWithFacebook, String studies, UserProfile userProfile,String resetToken) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -21,9 +22,10 @@ public class User {
         this.password = password;
         this.isRegisteredWithFacebook = isRegisteredWithFacebook;
         this.studies = studies;
+        this.userProfile = userProfile;
         this.resetToken = resetToken;
     }
-    
+
     //Costruttore vuoto necessario per thymeleaf
     public User(){}
 
@@ -82,6 +84,14 @@ public class User {
 
     public void setStudies(String studies) {
         this.studies = studies;
+    }
+
+    public UserProfile getUserProfile() {
+        return userProfile;
+    }
+
+    public void setUserProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
     }
 
     public String getResetToken() {

@@ -620,6 +620,20 @@ public class Controller {
         return userService.findProfileByEmail(email);
     }
 
+    @PostMapping("/edit_profile")
+    public ResponseEntity<String> editProfile(@RequestParam("email") String email,
+                                              @RequestParam("bio") String bio,
+                                              @RequestParam("profilePicturePath") String profilePicturePath) {
+        UserProfile profile = userService.findProfileByEmail(email);
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile not found");
+        }
+
+        profile.setBio(bio);
+        profile.setProfilePicturePath(profilePicturePath);
+
+        return ResponseEntity.ok("Profile edited successfully");
+    }
 
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
