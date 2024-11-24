@@ -34,7 +34,8 @@ public class UserProfile {
     @Column(length = 500)
     public String bio = "Test addicted...";
 
-    public String profilePicturePath = "t23/images/profile_images/defaultProfilePicture.png";
+    // Nome dell'immagine, usata come parte finale del path nel servizio dove sono salvate le immagini
+    public String profilePicturePath = "defaultProfilePicture.png";
 
     @ManyToMany
     @JoinTable(

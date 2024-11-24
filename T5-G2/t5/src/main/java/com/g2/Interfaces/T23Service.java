@@ -44,6 +44,12 @@ public class T23Service extends BaseService {
         registerAction("GetUsers", new ServiceActionDefinition(
                 params -> GetUsers() //metodo senza parametri
         ));
+
+        registerAction("EditProfile", new ServiceActionDefinition(
+                params -> EditProfile((String) params[0], (String) params[1], (String) params[2]),
+                String.class, String.class, String.class
+        ));
+
     }
 
     // Metodo per l'autenticazione
@@ -64,5 +70,17 @@ public class T23Service extends BaseService {
     private List<User> GetUsers() {
         final String endpoint = "/students_list";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
+    }
+
+    // Metodo per modificare il profilo di un utente
+    private Boolean EditProfile(String userEmail, String bio, String imagePath) {
+        final String endpoint = "/edit_profile";
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("email", userEmail);
+        map.add("bio", bio);
+        map.add("profilePicturePath", imagePath);
+
+        return callRestPost(endpoint, map, null, Boolean.class);
     }
 }

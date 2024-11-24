@@ -17,6 +17,8 @@
 
 package com.g2.t5;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -57,6 +59,7 @@ import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
+import com.g2.Model.UserProfile;
 import com.g2.Service.AchievementService;
 
 import jakarta.servlet.http.Cookie;
@@ -136,7 +139,6 @@ public class GuiController {
 
         //Mi prendo l'id del giocatore, così da filtrare per il suo id i suoi progressi degli achievement e le sue statistiche
         int userId = Integer.parseInt(playerID);
-        //TODO: Aggiungere URL immagine, bio e oggetti per il NotificationService
         
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
@@ -229,14 +231,68 @@ public class GuiController {
     }
 
     @GetMapping("/edit_profile")
-    public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+    public String aut_edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String userId = map.get("userId").toString(); //Identifico l'utente
+            //Passo l'holder del modello, l'id dell'utente e il token alla pagina effettiva
+            return edit_profile(model, userId, jwt);
+        }
+        catch (Exception e) {
+            System.out.println("(/edit_profile) Error requesting edit_profile: " + e.getMessage());
+        }
+
+        return "error";
+}
+
+    @GetMapping("/edit_profile/{playerID}")
+    public String edit_profile(Model model, @PathVariable(value="playerID") String playerID,@CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
 
-        
-        User player_placeholder = new User((long) 1, "placeholder", "placeholder", "email", "password",
-                true, "studies", "resetToke");
+        // Mi prendo l'id del giocatore, così forse carico la foto e la bio che già ci sono
+        int userId = Integer.parseInt(playerID);
 
-        GenericObjectComponent player = new GenericObjectComponent("player", player_placeholder);
+        /* 
+        UserProfile userProfile = new UserProfile();
+        User player_placeholder = new User((long) 1, "placeholder", "placeholder", "email", "password",
+                true, "studies",userProfile, "resetToke");
+        */
+
+        List<String> list_images = new ArrayList<>();
+        String directoryPath = "src/main/resources/static/t5/images/profileImages";
+        File directory = new File(directoryPath);
+
+        // Verifica se il percorso esiste ed è una directory
+        if (!directory.exists() || !directory.isDirectory()) {
+            System.err.println("Percorso non valido o non è una directory: " + directoryPath);
+            list_images=null; // Oppure una lista vuota o lancia un'eccezione, a seconda delle tue esigenze
+        }
+
+        // Crea un filtro per accettare solo file immagine (ad esempio, .jpg, .png, .gif)
+        FilenameFilter imageFilter = (dir, name) -> {
+            String lowercaseName = name.toLowerCase();
+            return lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".png") || lowercaseName.endsWith(".gif");
+        };
+
+        // Ottieni la lista dei nomi dei file che corrispondono al filtro
+        String[] imageNamesArray = directory.list(imageFilter);
+
+        // Converti l'array in una lista (opzionale, ma spesso più utile)
+        if (imageNamesArray != null) {
+            List<String> list = new ArrayList<>(Arrays.asList(imageNamesArray));
+            list_images = list;
+        } else {
+        System.err.println("Nessun file immagine trovato nella directory: " + directoryPath);
+            list_images=null; // Oppure una lista vuota o lancia un'eccezione, a secondo delle tue esigenze
+        }
+
+        GenericObjectComponent images = new GenericObjectComponent("images", list_images);
+        main.setObjectComponents(images);
         main.setObjectComponents(player);
         main.SetAuth(jwt);
         return main.handlePageRequest();

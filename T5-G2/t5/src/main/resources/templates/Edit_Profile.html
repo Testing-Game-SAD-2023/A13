@@ -1,40 +1,83 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark" id="html-root" xmlns:th="http://www.thymeleaf.org">
-    <head th:include="fragments/header :: header">
-        <link rel="stylesheet" href="/t5/css/Css/Edit_profile_marco.css"/>
-    </head>
-    
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifica Profilo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .profile-picture.selected {
+            border-color: #007bff;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
 <body>
-
-    <!-- NAV -->
-<div th:replace="fragments/navbar :: navbar"></div>
-
-    <!-- Profile Page -->
-    <div class="container">
-        <div class="profile-container">
-            <div class="text-center mb-4">
-                <h3 class="text-custom">
-                    <span th:text="${player.name}"></span>
-                    <span th:text="${player.surname}"></span>
-                </h3>
-            </div>
-            <form>
-                <div class="mb-3">
-                    <label for="email" class="form-label" th:text="#{studi}"></label>
-                    <input type="email" id="email" class="form-control" value="${player.studies}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">email:</label>
-                    <input type="email" id="email" class="form-control" value="${player.email}" readonly>
-                </div>
-                <div class="text-center mt-3">
-                    <button type="button" class="btn btn-sm btn-success" th:text="#{modifica_profilo}"></button>
-                </div>
-            </form>
-        </div>
+    <h1>Modifica Profilo</h1>
+    <div id="profile-pictures">
+        <!-- Generazione dinamica delle immagini con Thymeleaf -->
+        <img th:each="picture : ${profilePictures}"
+             th:src="${picture}"
+             alt="Foto profilo"
+             class="profile-picture">
     </div>
+    <textarea id="bio-input" rows="4" cols="40" placeholder="Scrivi una nuova bio..."></textarea><br>
+    <button id="save-button">Salva</button>
 
-    <div th:replace="fragments/footer :: footer"></div>
+    <script>
+        let selectedPicture = null;
 
+        // Aggiungi un listener per la selezione delle immagini
+        document.querySelectorAll('.profile-picture').forEach(picture => {
+            picture.addEventListener('click', function () {
+                document.querySelectorAll('.profile-picture').forEach(pic => pic.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPicture = this.src;
+            });
+        });
+
+        // Gestione del salvataggio
+        document.getElementById('save-button').addEventListener('click', function () {
+            const newBio = document.getElementById('bio-input').value;
+            if (!selectedPicture) {
+                alert('Seleziona una foto profilo.');
+                return;
+            }
+            if (!newBio.trim()) {
+                alert('Inserisci una bio valida.');
+                return;
+            }
+
+            // Simula il salvataggio (puoi sostituirlo con una chiamata AJAX o un form)
+            alert('Profilo aggiornato:\nFoto: ' + selectedPicture + '\nBio: ' + newBio);
+
+            // Reindirizza al profilo principale
+            window.location.href = '/profile';
+        });
+    </script>
 </body>
 </html>

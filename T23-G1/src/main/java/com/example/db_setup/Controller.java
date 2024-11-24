@@ -616,6 +616,7 @@ public class Controller {
     }
 
     @GetMapping("/profile_by_email")
+    @ResponseBody
     public UserProfile getProfileByEmail(@RequestParam("email") String email) {
         return userService.findProfileByEmail(email);
     }
