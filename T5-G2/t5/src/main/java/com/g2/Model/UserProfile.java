@@ -2,13 +2,23 @@ package com.g2.Model;
 
 import java.util.List;
 
+import org.json.JSONPropertyName;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class UserProfile {
 
+    @JsonProperty("id")
     private Integer ID;
+    @JsonProperty("user")
     private User user;
+    @JsonProperty("bio")
     private String bio;
+    @JsonProperty("profilePicturePath")
     private String profilePicturePath;
+    @JsonProperty("followingList")
     private List<UserProfile> followingList;
+    @JsonProperty("followersList")
     private List<UserProfile> followersList;
 
     public UserProfile(Integer ID, User user, String bio, String profilePicturePath, List<UserProfile> followingList, List<UserProfile> followersList) {

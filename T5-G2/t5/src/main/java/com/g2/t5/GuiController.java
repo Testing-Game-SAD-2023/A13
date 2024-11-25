@@ -140,6 +140,8 @@ public class GuiController {
         //Mi prendo l'id del giocatore, così da filtrare per il suo id i suoi progressi degli achievement e le sue statistiche
         int userId = Integer.parseInt(playerID);
         
+        // PROVARE A RENDERE REALE IL PASSAGGIO DEI DATI ALLA PAGINA PROFILO
+        
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
         List<Statistic> allStatistics = achievementService.getStatistics();
@@ -254,15 +256,25 @@ public class GuiController {
     public String edit_profile(Model model, @PathVariable(value="playerID") String playerID,@CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
 
+        // MODIFICHE FATTE
+        // Ho preso con ID giocatore un istanza di utente
+        // Modificato i model User e UserProfile resi compatibili deserializzazione JSON
+        // Ho preso il profilo utente una volta preso l'utente
+        // Ho preso la bio 
+        // Ho aggiunto un bottone nel file html del profilo per modificare la bio
+        // Forse meglio fare un servizio per le immagini, troppo grande qui dentro
+
         // Mi prendo l'id del giocatore, così forse carico la foto e la bio che già ci sono
         int userId = Integer.parseInt(playerID);
 
-        /* 
-        UserProfile userProfile = new UserProfile();
-        User player_placeholder = new User((long) 1, "placeholder", "placeholder", "email", "password",
-                true, "studies",userProfile, "resetToke");
-        */
+        // Mi prendo prima tutti gli utenti
+        @SuppressWarnings("unchecked")
+        List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers", userId);
 
+        // Mi prendo l'utente che mi interessa con l'id
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+
+        // Mi prendo le foto e la bio
         List<String> list_images = new ArrayList<>();
         String directoryPath = "src/main/resources/static/t5/images/profileImages";
         File directory = new File(directoryPath);
@@ -270,7 +282,7 @@ public class GuiController {
         // Verifica se il percorso esiste ed è una directory
         if (!directory.exists() || !directory.isDirectory()) {
             System.err.println("Percorso non valido o non è una directory: " + directoryPath);
-            list_images=null; // Oppure una lista vuota o lancia un'eccezione, a seconda delle tue esigenze
+            directory=null; // Oppure una lista vuota o lancia un'eccezione, a seconda delle tue esigenze
         }
 
         // Crea un filtro per accettare solo file immagine (ad esempio, .jpg, .png, .gif)
@@ -280,7 +292,10 @@ public class GuiController {
         };
 
         // Ottieni la lista dei nomi dei file che corrispondono al filtro
-        String[] imageNamesArray = directory.list(imageFilter);
+        String[] imageNamesArray = null;
+        if(directory!=null){
+            imageNamesArray = directory.list(imageFilter);
+        }
 
         // Converti l'array in una lista (opzionale, ma spesso più utile)
         if (imageNamesArray != null) {
@@ -291,9 +306,16 @@ public class GuiController {
             list_images=null; // Oppure una lista vuota o lancia un'eccezione, a secondo delle tue esigenze
         }
 
+        // Mi prendo la bio 
+        String bio = user.getUserProfile().getBio();
+
         GenericObjectComponent images = new GenericObjectComponent("images", list_images);
+        GenericObjectComponent userObject = new GenericObjectComponent("user", user);
+        GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
+        
         main.setObjectComponents(images);
-        main.setObjectComponents(player);
+        main.setObjectComponents(userObject);
+        main.setObjectComponents(bioObject);
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }

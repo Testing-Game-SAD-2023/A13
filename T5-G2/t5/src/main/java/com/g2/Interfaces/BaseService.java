@@ -39,6 +39,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.g2.Model.User;
+
 /*
  *  Questa è una classe base che implementa l'interfaccia ServiceInterface per il dispatcher ServiceManager
  *   e ti fornisce svariati metodi che mappano POST, GET, PUT E DELETE, in vari formati e header.
@@ -129,9 +131,9 @@ public abstract class BaseService implements ServiceInterface {
     }
     
     // Metodo per chiamate GET che restituiscono un singolo oggetto
-    protected <R> R callRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
+    protected <R> R callRestGET(String endpoint, MultiValueMap<String map, Class<User> responseType) {
         return executeRestCall("callRestGET", () -> {
-            String url = buildUri(endpoint, queryParams);
+            String url = buildUri(endpoint, map);
             ResponseEntity<R> response = restTemplate.getForEntity(url, responseType);
             return response.getBody();
         });

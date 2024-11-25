@@ -75,8 +75,30 @@
             // Simula il salvataggio (puoi sostituirlo con una chiamata AJAX o un form)
             alert('Profilo aggiornato:\nFoto: ' + selectedPicture + '\nBio: ' + newBio);
 
-            // Reindirizza al profilo principale
-            window.location.href = '/profile';
+            // Effettua una richiesta POST AJAX per salvare i dati
+            fetch('/editProfile', { // Sostituisci '/updateProfile' con il tuo endpoint effettivo
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded' // O 'application/json' se invii JSON
+                },
+                body: `profilePicture=${selectedPicture}&bio=${newBio}` // Adatta i nomi dei parametri se necessario
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reindirizza al profilo principale dopo il salvataggio riuscito
+                    window.location.href = '/profile';
+                } else {
+                    // Gestisci gli errori
+                    console.error('Errore durante l\'aggiornamento del profilo:', response.status);
+                    alert('Errore durante l\'aggiornamento del profilo.');
+                }
+            })
+            .catch(error => {
+                // Gestisci gli errori di rete
+                console.error('Errore di rete:', error);
+                alert('Errore di rete.');
+            });
+
         });
     </script>
 </body>

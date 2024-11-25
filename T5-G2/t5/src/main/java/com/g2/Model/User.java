@@ -1,16 +1,26 @@
 package com.g2.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("name")
     private String surname;
+    @JsonProperty("email")
     private String email;
+    @JsonProperty("password")
     private String password;
+    @JsonProperty("isRegisteredWithFacebook")
     private boolean isRegisteredWithFacebook;
+    @JsonProperty("studies")
     private String studies;
+    @JsonProperty("userProfile")
     private UserProfile userProfile;
+    @JsonProperty("resetToken")
     private String resetToken;
 
     public User(Long id, String name, String surname, String email, String password,
@@ -57,6 +67,7 @@ public class User {
     public String getEmail() {
         return email;
     }
+    
 
     public void setEmail(String email) {
         this.email = email;
