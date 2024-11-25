@@ -131,9 +131,9 @@ public abstract class BaseService implements ServiceInterface {
     }
     
     // Metodo per chiamate GET che restituiscono un singolo oggetto
-    protected <R> R callRestGET(String endpoint, MultiValueMap<String map, Class<User> responseType) {
+    protected <R> R callRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
         return executeRestCall("callRestGET", () -> {
-            String url = buildUri(endpoint, map);
+            String url = buildUri(endpoint, queryParams);
             ResponseEntity<R> response = restTemplate.getForEntity(url, responseType);
             return response.getBody();
         });

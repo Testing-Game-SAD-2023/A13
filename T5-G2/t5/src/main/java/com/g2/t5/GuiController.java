@@ -141,7 +141,18 @@ public class GuiController {
         int userId = Integer.parseInt(playerID);
         
         // PROVARE A RENDERE REALE IL PASSAGGIO DEI DATI ALLA PAGINA PROFILO
+
+        // Mi prendo prima tutti gli utenti e poi l'utente che mi interessa con l'id con un filtraggio
+        List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers", userId);
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+
+        // Mi prendo i suoi dati da passare alla pagina
+        String email = user.getEmail();
+        String studies = user.getStudies();
+        String username = user.getName();
+        String surname = user.getSurname();
         
+        // Mi prendo i progressi degli achievement e le statistiche
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
         List<Statistic> allStatistics = achievementService.getStatistics();
@@ -150,11 +161,21 @@ public class GuiController {
         for (Statistic stat : allStatistics)
             IdToStatistic.put(stat.getID(), stat);
 
+        // Creo i componenti per passare i dati alla pagina
+        GenericObjectComponent objEmail = new GenericObjectComponent("email", email);   
+        GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies); 
+        GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
+        GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
         GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
         GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
 
+        // Aggiungo i componenti alla pagina
+        profile.setObjectComponents(objEmail);
+        profile.setObjectComponents(objStudies);
+        profile.setObjectComponents(objUsername);
+        profile.setObjectComponents(objSurname);
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
