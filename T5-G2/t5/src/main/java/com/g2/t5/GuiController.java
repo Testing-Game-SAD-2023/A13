@@ -59,7 +59,6 @@ import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
-import com.g2.Model.UserProfile;
 import com.g2.Service.AchievementService;
 import com.g2.Service.UserProfileService;
 
@@ -84,10 +83,10 @@ public class GuiController {
         this.localeResolver = localeResolver;
     }
 
-    //Gestione lingua 
+    //Gestione lingua
     @PostMapping("/changeLanguage")
-    public ResponseEntity<Void> changeLanguage(@RequestParam("lang") String lang, 
-                                                HttpServletRequest request, 
+    public ResponseEntity<Void> changeLanguage(@RequestParam("lang") String lang,
+                                                HttpServletRequest request,
                                                 HttpServletResponse response) {
         Cookie cookie = new Cookie("lang", lang);
         cookie.setMaxAge(3600); // Imposta la durata del cookie a 1 ora
@@ -97,7 +96,7 @@ public class GuiController {
         Locale locale = new Locale(lang);
         localeResolver.setLocale(request, response, locale);
         // Restituisce una risposta vuota con codice di stato 200 OK
-        return ResponseEntity.ok().build(); 
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/main")
@@ -141,7 +140,7 @@ public class GuiController {
 
         //Mi prendo l'id del giocatore, così da filtrare per il suo id i suoi progressi degli achievement e le sue statistiche
         int userId = Integer.parseInt(playerID);
-        
+
         // PROVARE A RENDERE REALE IL PASSAGGIO DEI DATI ALLA PAGINA PROFILO
 
         // Mi prendo prima tutti gli utenti e poi l'utente che mi interessa con l'id con un filtraggio
@@ -168,14 +167,10 @@ public class GuiController {
             IdToStatistic.put(stat.getID(), stat);
 
         // Creo i componenti per passare i dati alla pagina
-        GenericObjectComponent objEmail = new GenericObjectComponent("email", email);   
-        GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies); 
+        GenericObjectComponent objEmail = new GenericObjectComponent("email", email);
+        GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies);
         GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
         GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
-
-        GenericObjectComponent propicObject = new GenericObjectComponent("propic", image);
-        GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
-
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
         GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
@@ -186,10 +181,6 @@ public class GuiController {
         profile.setObjectComponents(objStudies);
         profile.setObjectComponents(objUsername);
         profile.setObjectComponents(objSurname);
-
-        profile.setObjectComponents(propicObject);
-        profile.setObjectComponents(bioObject);
-
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
@@ -202,15 +193,15 @@ public class GuiController {
     public String gamemodePage(Model model,
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam(value = "mode", required = false) String mode) {
-       
+
         if("Sfida".equals(mode) || "Allenamento".equals(mode)){
             PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
             //controllo che sia stata fornita una modalità valida dall'utente
             VariableValidationLogicComponent Valida_classeUT = new VariableValidationLogicComponent(mode);
-            Valida_classeUT.setCheckNull(); 
+            Valida_classeUT.setCheckNull();
             List<String> list_mode = Arrays.asList("Sfida", "Allenamento");
-            Valida_classeUT.setCheckAllowedValues(list_mode); //Se il request param non è in questa lista è un problema 
-            ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");        
+            Valida_classeUT.setCheckAllowedValues(list_mode); //Se il request param non è in questa lista è un problema
+            ServiceObjectComponent lista_classi = new ServiceObjectComponent(serviceManager, "lista_classi", "T1", "getClasses");
             gamemode.setObjectComponents(lista_classi);
             List<String> list_robot = new ArrayList<>();
             // Aggiungere elementi alla lista
@@ -236,9 +227,9 @@ public class GuiController {
 
         PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
         VariableValidationLogicComponent Valida_classeUT = new VariableValidationLogicComponent(ClassUT);
-        Valida_classeUT.setCheckNull(); 
+        Valida_classeUT.setCheckNull();
         @SuppressWarnings("unchecked")
-        List<ClassUT> Lista_classi_UT = (List<com.g2.Model.ClassUT>) serviceManager.handleRequest("T1", "getClasses");      
+        List<ClassUT> Lista_classi_UT = (List<com.g2.Model.ClassUT>) serviceManager.handleRequest("T1", "getClasses");
         List<String>  Lista_classi_UT_nomi =  new ArrayList<>();
         for(ClassUT element : Lista_classi_UT){
             Lista_classi_UT_nomi.add(element.getName());
@@ -246,17 +237,17 @@ public class GuiController {
 
         System.out.println(Lista_classi_UT_nomi);
 
-        Valida_classeUT.setCheckAllowedValues(Lista_classi_UT_nomi); //Se il request param non è in questa lista è un problema 
+        Valida_classeUT.setCheckAllowedValues(Lista_classi_UT_nomi); //Se il request param non è in questa lista è un problema
         ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT","T1", "getClassUnderTest", ClassUT);
         editor.setObjectComponents(ClasseUT);
         editor.SetAuth(jwt);
         editor.setLogicComponents(Valida_classeUT);
         //Se l'utente ha inserito un campo nullo o un valore non consentito vuol dire che non è passato da gamemode
-        editor.setErrorPage( "NULL_VARIABLE",  "redirect:/main"); 
+        editor.setErrorPage( "NULL_VARIABLE",  "redirect:/main");
         editor.setErrorPage( "VALUE_NOT_ALLOWED",  "redirect:/main");
         return editor.handlePageRequest();
     }
-    
+
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
@@ -295,7 +286,7 @@ public class GuiController {
         // Ho preso con ID giocatore un istanza di utente
         // Modificato i model User e UserProfile resi compatibili deserializzazione JSON
         // Ho preso il profilo utente una volta preso l'utente
-        // Ho preso la bio 
+        // Ho preso la bio
         // Ho aggiunto un bottone nel file html del profilo per modificare la bio
         // Forse meglio fare un servizio per le immagini, troppo grande qui dentro
 
@@ -338,7 +329,6 @@ public class GuiController {
         main.setObjectComponents(imagesObject);
         main.setObjectComponents(propicObject);
         main.setObjectComponents(bioObject);
-
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }
@@ -408,13 +398,13 @@ public class GuiController {
     }
 
     @PostMapping("/save-data")
-    public ResponseEntity<String> saveGame(@RequestParam("playerId") int playerId, 
+    public ResponseEntity<String> saveGame(@RequestParam("playerId") int playerId,
                                             @RequestParam("robot") String robot,
-                                            @RequestParam("classe") String classe, 
-                                            @RequestParam("difficulty") String difficulty, 
+                                            @RequestParam("classe") String classe,
+                                            @RequestParam("difficulty") String difficulty,
                                             @RequestParam("gamemode") String gamemode,
-                                            @RequestParam("username") String username, 
-                                            @RequestParam("selectedScalata") Optional<Integer> selectedScalata, 
+                                            @RequestParam("username") String username,
+                                            @RequestParam("selectedScalata") Optional<Integer> selectedScalata,
                                             HttpServletRequest request) {
 
         if (!request.getHeader("X-UserID").equals(String.valueOf(playerId))) {
