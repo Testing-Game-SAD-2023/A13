@@ -61,6 +61,7 @@ import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Model.UserProfile;
 import com.g2.Service.AchievementService;
+import com.g2.Service.UserProfileService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,6 +76,7 @@ public class GuiController {
 
     @Autowired
     private AchievementService achievementService;
+    private UserProfileService userProfileService;
 
     @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
@@ -151,6 +153,10 @@ public class GuiController {
         String studies = user.getStudies();
         String username = user.getName();
         String surname = user.getSurname();
+
+        //mi prendo immagine e bio
+        String image = userProfileService.getProfilePicture(userId);
+        String bio = userProfileService.getProfilePicture(userId);
         
         // Mi prendo i progressi degli achievement e le statistiche
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
@@ -166,6 +172,10 @@ public class GuiController {
         GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies); 
         GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
         GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
+
+        GenericObjectComponent propicObject = new GenericObjectComponent("propic", image);
+        GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
+
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
         GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
@@ -176,6 +186,10 @@ public class GuiController {
         profile.setObjectComponents(objStudies);
         profile.setObjectComponents(objUsername);
         profile.setObjectComponents(objSurname);
+
+        profile.setObjectComponents(propicObject);
+        profile.setObjectComponents(bioObject);
+
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
@@ -294,49 +308,37 @@ public class GuiController {
 
         // Mi prendo l'utente che mi interessa con l'id
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        String email = user.getEmail();
+        String name = user.getName();
+        String surname =  user.getSurname();
 
-        // Mi prendo le foto e la bio
-        List<String> list_images = new ArrayList<>();
-        String directoryPath = "src/main/resources/static/t5/images/profileImages";
-        File directory = new File(directoryPath);
+        //Prendiamo le risorse dal servizio UserProfileService
+        List<String> list_images = userProfileService.getAllProfilePictures();
+        String image = userProfileService.getProfilePicture(userId);
+        String bio = userProfileService.getProfilePicture(userId);
 
-        // Verifica se il percorso esiste ed è una directory
-        if (!directory.exists() || !directory.isDirectory()) {
-            System.err.println("Percorso non valido o non è una directory: " + directoryPath);
-            directory=null; // Oppure una lista vuota o lancia un'eccezione, a seconda delle tue esigenze
-        }
 
-        // Crea un filtro per accettare solo file immagine (ad esempio, .jpg, .png, .gif)
-        FilenameFilter imageFilter = (dir, name) -> {
-            String lowercaseName = name.toLowerCase();
-            return lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".png") || lowercaseName.endsWith(".gif");
-        };
+        GenericObjectComponent userObject = new GenericObjectComponent("user",userId);
 
-        // Ottieni la lista dei nomi dei file che corrispondono al filtro
-        String[] imageNamesArray = null;
-        if(directory!=null){
-            imageNamesArray = directory.list(imageFilter);
-        }
+        GenericObjectComponent nameObject = new GenericObjectComponent("name",name);
+        GenericObjectComponent surnameObject = new GenericObjectComponent("surname",surname);
+        GenericObjectComponent emailObject = new GenericObjectComponent("email",email);
 
-        // Converti l'array in una lista (opzionale, ma spesso più utile)
-        if (imageNamesArray != null) {
-            List<String> list = new ArrayList<>(Arrays.asList(imageNamesArray));
-            list_images = list;
-        } else {
-        System.err.println("Nessun file immagine trovato nella directory: " + directoryPath);
-            list_images=null; // Oppure una lista vuota o lancia un'eccezione, a secondo delle tue esigenze
-        }
-
-        // Mi prendo la bio 
-        String bio = user.getUserProfile().getBio();
-
-        GenericObjectComponent images = new GenericObjectComponent("images", list_images);
-        GenericObjectComponent userObject = new GenericObjectComponent("user", user);
+        GenericObjectComponent imagesObject = new GenericObjectComponent("images", list_images);
+        GenericObjectComponent propicObject = new GenericObjectComponent("propic", image);
         GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
+
         
-        main.setObjectComponents(images);
         main.setObjectComponents(userObject);
+        
+        main.setObjectComponents(surnameObject);
+        main.setObjectComponents(nameObject);
+        main.setObjectComponents(emailObject);
+        
+        main.setObjectComponents(imagesObject);
+        main.setObjectComponents(propicObject);
         main.setObjectComponents(bioObject);
+
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }
