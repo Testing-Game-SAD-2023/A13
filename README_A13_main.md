@@ -1,25 +1,3 @@
-# Modifiche Apportate:
-1. Modulo T23: 
-    Implementato logica di Follow con le modifiche:
-        User.java
-        UserRepository.java
-    Aggiunto al Controller.java i metodi:
-        getFollowerListbyUserID (Da Testare)
-        addFollow
-
-# Come Compilare:
-1. Creare un file .bat contente le righe da echo "Installing Txxxx" fino a exit /b 0
-
-2. Chiudere il container associato per quella modifica
-
-3. Eseguire effettivamente il file .bat con il docker aperto (Non è necessario cancellare il vecchio container)
-
-4. Aspettare il completamento e vedere se il container parte, se non parte controllare il possibile errore di compilazione a terminale.
-
-Nel caso in cui qualcosa non sia andato a buon fine reinstalla tutto (Tutto sia riferito alla sola cancellazione del container modificato e la sua reinstallazione, o mal che vada reinstalla l'applicativo)
-
-
-
 # Gruppo A13-2024
 Componente:
 - Caterina Maria Accetto - M63/1117
