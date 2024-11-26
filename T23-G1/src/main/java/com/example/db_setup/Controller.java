@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -71,6 +72,7 @@ public class Controller {
 
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
+
 
     @Autowired
     private MyPasswordEncoder myPasswordEncoder;
@@ -618,15 +620,65 @@ public class Controller {
 
     @GetMapping("/students_list")
     public List<User> getAllStudents() {
+        //implemntare la logica dei coockie
         return userRepository.findAll();
     }
 
     @GetMapping("/students_list/{ID}")
     @ResponseBody
     public User getStudent(@PathVariable String ID) {
+        //implemntare la logica dei coockie
         return userRepository.findByID(Integer.parseInt(ID));
     }
+   
+    @GetMapping("/follower_list/{ID}")
+    public List<User> getFollowerListbyUserID(@PathVariable String ID) {
+        //Implementare la logica dei coockie
+        return userRepository.findByID(Integer.parseInt(ID)).getFollowers();
+    }
 
+    @PostMapping("/addFollow")
+    public ResponseEntity<String> addFollow(@RequestParam("userID_1") String userID_1,
+                                                @RequestParam("userID_2") String userID_2,
+                                                /*@CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
+        
+            /* 
+            if(isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
+            }
+            */
+            
+            User follower = userRepository.findByID(Integer.parseInt(userID_1));
+            User followed = userRepository.findByID(Integer.parseInt(userID_2));
+            
+            if( follower == null ){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 not exist");
+            } else if ( followed == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 not exist");
+            }
+            
+            // Controllo per evitare che un utente segua se stesso
+            if (follower.getID().equals(followed.getID())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower non può seguire se stesso");
+            }
+
+            if (userRepository.existsFollowRelationship(follower.ID, followed.ID) > 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower già segue followed");
+            }
+        
+
+            // Aggiungi l'utente alla lista di following e viceversa
+            follower.getFollowing().add(followed);
+            followed.getFollowers().add(follower);
+
+            // Salva le modifiche
+            userRepository.save(follower);
+            userRepository.save(followed);
+
+
+            return ResponseEntity.status(HttpStatus.OK).body("Operation of follow completed");
+
+    }
     
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {

@@ -1,5 +1,7 @@
 package com.example.db_setup;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -7,6 +9,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -18,7 +23,6 @@ public class User {
  
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-
     public Integer ID;
 
     public String name;
@@ -43,6 +47,20 @@ public class User {
     public List<User> friendsList;
     public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
     */
+
+    // Relazione per la logica di "Follow"
+    @ManyToMany
+    @JoinTable(
+        name = "Follows",
+        schema = "studentsrepo",
+        joinColumns = @JoinColumn(name = "follower_id"),
+        inverseJoinColumns = @JoinColumn(name = "followed_id")
+    )
+    public List<User> following;
+
+    @ManyToMany(mappedBy = "following")
+    public List<User> followers;
+
     
     @Column(name = "reset_token")
     private String resetToken;
