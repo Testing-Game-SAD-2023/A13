@@ -1,105 +1,37 @@
 <!DOCTYPE html>
-<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifica Profilo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        .profile-picture {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-        .profile-picture.selected {
-            border-color: #007bff;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #28a745;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-    </style>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/static/css/profile-edit.css">
 </head>
 <body>
-    <h1>Modifica Profilo</h1>
-    <div id="profile-pictures">
-        <!-- Generazione dinamica delle immagini con Thymeleaf -->
-        <img th:each="picture : ${profilePictures}"
-             th:src="${picture}"
-             alt="Foto profilo"
-             class="profile-picture">
-    </div>
-    <textarea id="bio-input" rows="4" cols="40" placeholder="Scrivi una nuova bio..."></textarea><br>
-    <button id="save-button">Salva</button>
+    <!-- Header con il pulsante -->
+    <header class="header">
+        <a href="/profile/{{user.id}}" class="profile-link">
+            <button class="profile-button">{{user.email}}</button>
+        </a>
+    </header>
 
-    <script>
-        let selectedPicture = null;
+    <!-- Contenuto principale -->
+    <main class="content">
+        <!-- Sezione immagini profilo -->
+        <div id="profile-pictures">
+            <img th:each="image : ${images}"
+                 th:src="@{/t5/images/profileImages/{image}(image=${image})}"
+                 class="profile-picture"
+                 alt="Profile Picture" />
+        </div>
 
-        // Aggiungi un listener per la selezione delle immagini
-        document.querySelectorAll('.profile-picture').forEach(picture => {
-            picture.addEventListener('click', function () {
-                document.querySelectorAll('.profile-picture').forEach(pic => pic.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedPicture = this.src;
-            });
-        });
+        <!-- Campo per la bio -->
+        <textarea id="bio-input" placeholder="Inserisci la tua bio" th:attr="placeholder=${bio}"></textarea>
 
-        // Gestione del salvataggio
-        document.getElementById('save-button').addEventListener('click', function () {
-            const newBio = document.getElementById('bio-input').value;
-            if (!selectedPicture) {
-                alert('Seleziona una foto profilo.');
-                return;
-            }
-            if (!newBio.trim()) {
-                alert('Inserisci una bio valida.');
-                return;
-            }
+        <!-- Pulsante per salvare -->
+        <button id="save-button">Salva</button>
+    </main>
 
-            // Simula il salvataggio (puoi sostituirlo con una chiamata AJAX o un form)
-            alert('Profilo aggiornato:\nFoto: ' + selectedPicture + '\nBio: ' + newBio);
-
-            // Effettua una richiesta POST AJAX per salvare i dati
-            fetch('/editProfile', { // Sostituisci '/updateProfile' con il tuo endpoint effettivo
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded' // O 'application/json' se invii JSON
-                },
-                body: `profilePicture=${selectedPicture}&bio=${newBio}` // Adatta i nomi dei parametri se necessario
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Reindirizza al profilo principale dopo il salvataggio riuscito
-                    window.location.href = '/profile';
-                } else {
-                    // Gestisci gli errori
-                    console.error('Errore durante l\'aggiornamento del profilo:', response.status);
-                    alert('Errore durante l\'aggiornamento del profilo.');
-                }
-            })
-            .catch(error => {
-                // Gestisci gli errori di rete
-                console.error('Errore di rete:', error);
-                alert('Errore di rete.');
-            });
-
-        });
-    </script>
+    <script src="/static/js/profile-edit.js"></script>
 </body>
 </html>

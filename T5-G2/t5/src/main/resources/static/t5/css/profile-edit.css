@@ -1,0 +1,117 @@
+/* Stile per l'header */
+.header {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: flex-end;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Pulsante profilo */
+.profile-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.profile-button:hover {
+    background-color: #0056b3;
+}
+
+/* Stile del contenuto principale */
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Container immagini profilo */
+#profile-pictures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Immagini profilo */
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.profile-picture:hover {
+    transform: scale(1.1);
+    border-color: #007bff;
+}
+
+/* Immagine selezionata */
+.profile-picture.selected {
+    border-color: #28a745;
+    box-shadow: 0 0 10px #28a745;
+}
+
+/* Input bio */
+#bio-input {
+    width: 100%;
+    max-width: 600px;
+    height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+    margin-bottom: 20px;
+}
+
+/* Pulsante di salvataggio */
+#save-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#save-button:hover {
+    background-color: #0056b3;
+}
+
+/* Messaggi di errore e successo */
+.alert {
+    max-width: 600px;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.alert.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
