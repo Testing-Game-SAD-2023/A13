@@ -39,6 +39,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Model.User;
+import com.g2.Model.UserProfile;
 import com.g2.t5.T5Application;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 
@@ -127,10 +128,13 @@ class T23ServiceTest {
     public void testGetUsersSuccess() {
         // Dati di test: Lista di utenti fittizi
         List<User> mockUsers = new ArrayList<>();
+        UserProfile mockProfile1 = new UserProfile(1, 1L, "Bio1", "path1", null, null);
+        UserProfile mockProfile2 = new UserProfile(2, 2L, "Bio2", "path2", null, null);
+
         mockUsers.add(
-                new User(1L, "John", "Doe", "john.doe@example.com", "password123", false, "Computer Science", null));
+                new User(1L, "John", "Doe", "john.doe@example.com", "password123", false, "Computer Science",mockProfile1, null));
         mockUsers
-                .add(new User(2L, "Jane", "Smith", "jane.smith@example.com", "password456", true, "Mathematics", null));
+                .add(new User(2L, "Jane", "Smith", "jane.smith@example.com", "password456", true, "Mathematics", mockProfile2,null));
 
         // Configurazione del server mock per rispondere con i dati fittizi
         try {

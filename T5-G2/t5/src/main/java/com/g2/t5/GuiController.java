@@ -143,7 +143,7 @@ public class GuiController {
         // PROVARE A RENDERE REALE IL PASSAGGIO DEI DATI ALLA PAGINA PROFILO
 
         // Mi prendo prima tutti gli utenti e poi l'utente che mi interessa con l'id con un filtraggio
-        List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers", userId);
+        List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
 
         // Mi prendo i suoi dati da passare alla pagina
@@ -290,7 +290,7 @@ public class GuiController {
 
         // Mi prendo prima tutti gli utenti
         @SuppressWarnings("unchecked")
-        List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers", userId);
+        List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
 
         // Mi prendo l'utente che mi interessa con l'id
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);

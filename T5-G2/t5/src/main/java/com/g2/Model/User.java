@@ -8,7 +8,7 @@ public class User {
     private Long id;
     @JsonProperty("name")
     private String name;
-    @JsonProperty("name")
+    @JsonProperty("surname")
     private String surname;
     @JsonProperty("email")
     private String email;

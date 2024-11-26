@@ -11,7 +11,7 @@ public class UserProfile {
     @JsonProperty("id")
     private Integer ID;
     @JsonProperty("user")
-    private User user;
+    private Long userId;
     @JsonProperty("bio")
     private String bio;
     @JsonProperty("profilePicturePath")
@@ -21,9 +21,9 @@ public class UserProfile {
     @JsonProperty("followersList")
     private List<UserProfile> followersList;
 
-    public UserProfile(Integer ID, User user, String bio, String profilePicturePath, List<UserProfile> followingList, List<UserProfile> followersList) {
+    public UserProfile(Integer ID, Long userId, String bio, String profilePicturePath, List<UserProfile> followingList, List<UserProfile> followersList) {
         this.ID = ID;
-        this.user = user;
+        this.userId = userId;
         this.bio = bio;
         this.profilePicturePath = profilePicturePath;
         this.followingList = followingList;
@@ -42,12 +42,12 @@ public class UserProfile {
         this.ID = ID;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUser() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(Long user) {
+        this.userId = user;
     }
 
     public String getBio() {
@@ -86,7 +86,7 @@ public class UserProfile {
     public String toString(){
         return "UserProfile{" +
                 "ID=" + ID +
-                ", user=" + user +
+                ", user=" + userId +
                 ", bio='" + bio + '\'' +
                 ", profilePicturePath='" + profilePicturePath + '\'' +
                 ", followingList=" + followingList +

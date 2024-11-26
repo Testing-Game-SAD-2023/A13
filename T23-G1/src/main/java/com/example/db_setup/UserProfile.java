@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -37,7 +38,7 @@ public class UserProfile {
     // Nome dell'immagine, usata come parte finale del path nel servizio dove sono salvate le immagini
     public String profilePicturePath = "defaultProfilePicture.png";
 
-    @ManyToMany
+    @OneToMany
     @JoinTable(
         name = "user_following",
         joinColumns = @JoinColumn(name = "profile_id"),
@@ -45,13 +46,13 @@ public class UserProfile {
     )
     public List<UserProfile> followingList;
 
-    @ManyToMany
+    @OneToMany
     @JoinTable(
         name = "user_followers",
         joinColumns = @JoinColumn(name = "profile_id"),
         inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
-    public List<Profile> followersList;
+    public List<UserProfile> followersList;
 
     //List<Statistic> allStatistics;
 }
