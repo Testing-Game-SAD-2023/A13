@@ -1,11 +1,12 @@
 # Modifiche Apportate:
 1. Modulo T23: 
-    Implementato logica di Follow con le modifiche:
-        User.java
-        UserRepository.java
-    Aggiunto al Controller.java i metodi:
-        getFollowerListbyUserID (Da Testare)
-        addFollow
+    - Implementato logica di Follow con le modifiche:
+        - `User.java`
+        - `UserRepository.java`
+    - Aggiunto al `Controller.java` i metodi:
+        - `getFollowerListbyUserID` *(Da Testare)*
+        - `addFollow`
+
 
 # Come Compilare:
 1. Creare un file .bat contente le righe da echo "Installing Txxxx" fino a exit /b 0
