@@ -38,6 +38,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
+import com.example.db_setup.Service.NotificationService;
 import com.example.db_setup.Service.OAuthUserGoogleService;
 import com.example.db_setup.Service.UserService;
 //MODIFICA (Deserializzazione risposta JSON)
@@ -55,7 +56,13 @@ public class Controller {
     private UserRepository userRepository;
 
     @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
@@ -635,6 +642,20 @@ public class Controller {
 
         return ResponseEntity.ok("Profile edited successfully");
     }
+
+    @PostMapping("/new_notification")
+    public ResponseEntity<String> updateNotifications(@RequestParam("email") String email,
+                                                    @RequestParam("title") String title,
+                                                    @RequestParam("message") String message) {
+        UserProfile profile = userService.findProfileByEmail(email);
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile not found");
+        }
+        notificationService.saveNotification(profile.getUser().getID(),title,message);
+                                                        
+        return ResponseEntity.ok("Profile notifications updated successfully");
+    }
+
 
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {

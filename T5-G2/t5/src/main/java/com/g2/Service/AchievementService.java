@@ -111,4 +111,14 @@ public class AchievementService {
 
         return statisticProgresses;
     }
+
+    public void updateNotificationsForAchievements(String userEmail, List<String> newAchievements) {
+
+        for (String achievement : newAchievements) {
+            String titolo = "Nuovo Achievement";
+            String message = "Congratulazioni! Hai ottenuto il nuovo achievement: " + achievement;
+            serviceManager.handleRequest("T23", "new_notification", userEmail, titolo, message);
+    
+        }
+    }
 }

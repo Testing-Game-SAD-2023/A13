@@ -95,5 +95,5 @@ public class UserService {
             .compact();
 
     return token;
-}
+    }
 }

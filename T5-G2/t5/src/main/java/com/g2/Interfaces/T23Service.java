@@ -50,6 +50,11 @@ public class T23Service extends BaseService {
                 String.class, String.class, String.class
         ));
 
+        registerAction("NewNotification", new ServiceActionDefinition(
+                params -> NewNotification((String) params[0], (String) params[1], (String) params[2]),
+                String.class, String.class, String.class
+        ));
+
     }
 
     // Metodo per l'autenticazione
@@ -80,6 +85,18 @@ public class T23Service extends BaseService {
         map.add("email", userEmail);
         map.add("bio", bio);
         map.add("profilePicturePath", imagePath);
+
+        return callRestPost(endpoint, map, null, Boolean.class);
+    }
+
+    // Metodo per la creazione di una notifica
+    private Boolean NewNotification(String userEmail, String title, String message) {
+        final String endpoint = "/new_notification";
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("email", userEmail);
+        map.add("title", title);
+        map.add("profilePicturePath", message);
 
         return callRestPost(endpoint, map, null, Boolean.class);
     }
