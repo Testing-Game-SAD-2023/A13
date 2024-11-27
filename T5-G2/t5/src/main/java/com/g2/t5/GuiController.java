@@ -59,6 +59,7 @@ import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
+import com.g2.Model.UserProfile;
 import com.g2.Service.AchievementService;
 import com.g2.Service.UserProfileService;
 
@@ -75,9 +76,9 @@ public class GuiController {
 
     @Autowired
     private AchievementService achievementService;
+    @Autowired
     private UserProfileService userProfileService;
 
-    @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
         this.serviceManager = new ServiceManager(restTemplate);
         this.localeResolver = localeResolver;
@@ -142,10 +143,10 @@ public class GuiController {
         int userId = Integer.parseInt(playerID);
 
         // PROVARE A RENDERE REALE IL PASSAGGIO DEI DATI ALLA PAGINA PROFILO
-
+        //UserProfile profileDTO=new UserProfile(userId,"Inserisci qui la tua bio...","sample_propic.jpg",null,null);
         // Mi prendo prima tutti gli utenti e poi l'utente che mi interessa con l'id con un filtraggio
         List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
         // Mi prendo i suoi dati da passare alla pagina
         String email = user.getEmail();
@@ -171,6 +172,9 @@ public class GuiController {
         GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies);
         GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
         GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
+        GenericObjectComponent objImage = new GenericObjectComponent("image", image);
+        GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
+
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
         GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
@@ -181,6 +185,8 @@ public class GuiController {
         profile.setObjectComponents(objStudies);
         profile.setObjectComponents(objUsername);
         profile.setObjectComponents(objSurname);
+        profile.setObjectComponents(objImage);
+        profile.setObjectComponents(objBio);
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);

@@ -128,8 +128,8 @@ class T23ServiceTest {
     public void testGetUsersSuccess() {
         // Dati di test: Lista di utenti fittizi
         List<User> mockUsers = new ArrayList<>();
-        UserProfile mockProfile1 = new UserProfile(1, 1L, "Bio1", "path1", null, null);
-        UserProfile mockProfile2 = new UserProfile(2, 2L, "Bio2", "path2", null, null);
+        UserProfile mockProfile1 = new UserProfile(1, "Bio1", "path1", null, null);
+        UserProfile mockProfile2 = new UserProfile(2, "Bio2", "path2", null, null);
 
         mockUsers.add(
                 new User(1L, "John", "Doe", "john.doe@example.com", "password123", false, "Computer Science",mockProfile1, null));

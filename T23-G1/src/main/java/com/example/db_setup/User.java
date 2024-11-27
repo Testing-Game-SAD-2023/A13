@@ -10,14 +10,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Table (name = "Students", schema = "studentsrepo")
 @Data
 @Entity
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -49,10 +54,16 @@ public class User {
     */
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private UserProfile userProfile;
 
+    
     @Column(name = "reset_token")
     private String resetToken;
+
+    public User(){
+        this.userProfile=new UserProfile();
+    }
 
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;

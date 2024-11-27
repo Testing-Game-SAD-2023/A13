@@ -33,7 +33,8 @@ public class UserProfileService{
         List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
 
         // Mi prendo l'utente che mi interessa con l'id e la sua bio
-        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println(userId+"non trovato");
         String bio = user.getUserProfile().getBio();
 
         return bio;
@@ -86,7 +87,8 @@ public String getProfilePicture(int playerID){
    List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
 
    // Mi prendo l'utente che mi interessa con l'id
-   User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+   User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+   System.out.println(userId+"non trovato");
    
    List<String> list_images=this.getAllProfilePictures();
 

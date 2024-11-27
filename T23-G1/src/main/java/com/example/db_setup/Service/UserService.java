@@ -28,6 +28,7 @@ public class UserService {
     @Autowired
     // Usa la dipendenza UserRepository per accedere ai dati dell'utente sul DB
     private UserRepository userRepository;
+    private UserProfile userProfile;
     // Stessa cosa di sopra
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
@@ -41,6 +42,10 @@ public class UserService {
         User newUser = new User();
         newUser.setEmail(oauthUser.getEmail());
         newUser.setName(oauthUser.getName());
+        //Istanzio il profilo
+        newUser.setUserProfile(userProfile);
+        newUser.getUserProfile().setUser(newUser);
+
         newUser.setRegisteredWithGoogle(true);
         String[] nameParts = oauthUser.getName().split(" ");
         if (nameParts.length > 1) {

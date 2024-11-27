@@ -13,6 +13,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 
@@ -26,7 +28,8 @@ public class UserProfile {
     public Integer ID;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "ID")
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @Column(length = 500)
