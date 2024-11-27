@@ -33,15 +33,33 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-210">
+                                        <!--
                                         <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                                        -->
+                                        <img th:src="${propic != null ? '/t5/images/' + propic : '/t5/images/sample_propic.jpg'}" 
+                                                class="rounded float-start propic" 
+                                                alt="Profile picture">
                                         <!-- Bottone per modificare il profilo -->
                                         <button class="btn btn-primary" style="margin-top: 10px;" onclick="location.href='/edit_profile'">Modifica Profilo</button>
                                     </div>
                                     <div class="col">
+                                        <!-- 
                                         <h4 class="card-title" id="usernameField"></h4>
                                         <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
                                         <hr>
                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur maximus pretium lacinia. Curabitur et varius neque. Aliquam tincidunt tortor eget felis rhoncus, et commodo ex vulputate. Cras tristique id arcu non condimentum. Fusce non dignissim lorem. Ut porttitor mattis nisl quis interdum. Aliquam tortor orci, interdum in gravida faucibus, auctor sit amet tellus. Aliquam vulputate enim quis rhoncus eleifend. Maecenas id orci est. Mauris at rutrum velit. Nunc posuere leo eget nisl lacinia semper. Fusce interdum, neque at suscipit tristique, tellus sem elementum quam, quis placerat justo orci eget nunc. Nam eget turpis ut elit sollicitudin ornare ac id lorem. Cras facilisis enim et eros suscipit, ut convallis ante suscipit. Nunc luctus diam at sollicitudin ornare. Mauris vel pharetra dolor. </p>
+                                        --> 
+                                        <div id="user-container" class="user-container" style="margin: 2px">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <h4 class="card-title" th:text="${username}">Nome</h4>
+                                                    <h6 class="card-subtitle mb-2 text-body-secondary" th:text="${surname}">Cognome</h6>
+                                                    <p th:text="${email}">Email</p>
+                                                    <hr>
+                                                    <p th:text="${bio}">Bio</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
