@@ -5,13 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
-    <link rel="stylesheet" href="/static/css/profile-edit.css">
+    <link rel="stylesheet" href="/t5/css/profile-edit.css">
 </head>
 <body>
     <!-- Header con il pulsante -->
     <header class="header">
-        <a href="/profile/{${user.id}}" class="profile-link">
-            <button class="profile-button">{{user.email}}</button>
+        <a href="/profile/{${userId}}" class="profile-link">
+            <button class="profile-button" th:text="${email}">Torna al profilo utente</button>
         </a>
     </header>
 
