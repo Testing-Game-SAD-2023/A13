@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const profilePictures = document.querySelectorAll(".profile-picture");
     const bioInput = document.getElementById("bio-input");
     const saveButton = document.getElementById("save-button");
-    const userEmail = "{{user.email}}"; // Inserisce l'email direttamente dal server
+    const userEmail = "{email}"; // Inserisce l'email direttamente dal server
     let selectedImage = null;
 
     // Gestione della selezione delle immagini
