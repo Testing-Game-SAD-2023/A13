@@ -10,8 +10,8 @@
 <body>
     <!-- Header con il pulsante -->
     <header class="header">
-        <a href="/profile/{${user.id}}" class="profile-link">
-            <button class="profile-button">{{user.email}}</button>
+        <a href="/profile/{${userId}}" class="profile-link">
+            <button class="profile-button" th:text="${email}">Torna al profilo utente</button>
         </a>
     </header>
 
