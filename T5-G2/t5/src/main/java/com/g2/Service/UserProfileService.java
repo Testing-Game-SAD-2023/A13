@@ -84,6 +84,8 @@ public class UserProfileService{
 
     List<String> list_images = new ArrayList<>();
     list_images.add("defaultProfilePicture.png");
+    list_images.add("SimpleFemale.png");
+    list_images.add("SimpleMale.png");
 
     return list_images;
 }
