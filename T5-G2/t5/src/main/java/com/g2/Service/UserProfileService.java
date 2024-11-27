@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,6 @@ public class UserProfileService{
 
         // Mi prendo l'utente che mi interessa con l'id e la sua bio
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-        System.out.println(userId+"non trovato");
         String bio = user.getUserProfile().getBio();
 
         return bio;
@@ -44,9 +44,15 @@ public class UserProfileService{
    public List<String> getAllProfilePictures(){
 
    // Mi prendo le foto 
+   /* 
     List<String> list_images = new ArrayList<>();
-    String directoryPath = "src/main/resources/static/t5/images/profileImages";
-    File directory = new File(directoryPath);
+    String directoryPath = "profileImages";
+    URL resource = getClass().getClassLoader().getResource(directoryPath);
+    if (resource == null) {
+        System.err.println("Directory non trovata nel class path");
+        return list_images;
+    }
+    File directory = new File(resource.getFile());
 
     // Verifica se il percorso esiste ed è una directory
     if (!directory.exists() || !directory.isDirectory()) {
@@ -71,11 +77,15 @@ public class UserProfileService{
         List<String> list = new ArrayList<>(Arrays.asList(imageNamesArray));
         list_images = list;
     } else {
-    System.err.println("Nessun file immagine trovato nella directory: " + directoryPath);
+    System.err.println("Nessun file immagine trovato nella directory: " + resource);
         list_images=null; // Oppure una lista vuota o lancia un'eccezione, a secondo delle tue esigenze
     }
+    */
 
-   return list_images;
+    List<String> list_images = new ArrayList<>();
+    list_images.add("defaultProfilePicture.png");
+
+    return list_images;
 }
 
 public String getProfilePicture(int playerID){
@@ -88,14 +98,13 @@ public String getProfilePicture(int playerID){
 
    // Mi prendo l'utente che mi interessa con l'id
    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-   System.out.println(userId+"non trovato");
    
    List<String> list_images=this.getAllProfilePictures();
 
     //Verifico la validità del path
     Boolean propicvalid = false;
     for (int i=0;i<list_images.size();i++){
-        if (user.getUserProfile().getProfilePicturePath() == list_images.get(i)){
+        if (user.getUserProfile().getProfilePicturePath().equals(list_images.get(i))){
             propicvalid=true;
             break;
         }

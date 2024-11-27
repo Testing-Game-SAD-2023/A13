@@ -54,7 +54,6 @@ public class User {
     */
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
     private UserProfile userProfile;
 
     
@@ -63,6 +62,7 @@ public class User {
 
     public User(){
         this.userProfile=new UserProfile();
+        this.userProfile.setUser(this);
     }
 
     public void setResetToken(String resetToken) {

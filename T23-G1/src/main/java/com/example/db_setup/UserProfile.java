@@ -54,5 +54,9 @@ public class UserProfile {
     )
     public List<UserProfile> followersList;
 
+    public void setUser(User user){
+        this.user = user;
+    }
+
     //List<Statistic> allStatistics;
 }

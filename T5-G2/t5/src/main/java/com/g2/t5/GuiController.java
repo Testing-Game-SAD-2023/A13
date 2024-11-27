@@ -148,6 +148,7 @@ public class GuiController {
         List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
+
         // Mi prendo i suoi dati da passare alla pagina
         String email = user.getEmail();
         String studies = user.getStudies();
@@ -156,7 +157,7 @@ public class GuiController {
 
         //mi prendo immagine e bio
         String image = userProfileService.getProfilePicture(userId);
-        String bio = userProfileService.getProfilePicture(userId);
+        String bio = userProfileService.getProfileBio(userId);
         
         // Mi prendo i progressi degli achievement e le statistiche
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
@@ -172,7 +173,7 @@ public class GuiController {
         GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies);
         GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
         GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
-        GenericObjectComponent objImage = new GenericObjectComponent("image", image);
+        GenericObjectComponent objImage = new GenericObjectComponent("propic", image);
         GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
 
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
