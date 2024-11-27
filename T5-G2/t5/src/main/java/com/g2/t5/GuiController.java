@@ -61,6 +61,7 @@ import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Model.UserProfile;
 import com.g2.Service.AchievementService;
+import com.g2.Service.UserProfileService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -287,14 +288,6 @@ public class GuiController {
     public String edit_profile(Model model, @PathVariable(value="playerID") String playerID,@CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
 
-        // MODIFICHE FATTE
-        // Ho preso con ID giocatore un istanza di utente
-        // Modificato i model User e UserProfile resi compatibili deserializzazione JSON
-        // Ho preso il profilo utente una volta preso l'utente
-        // Ho preso la bio
-        // Ho aggiunto un bottone nel file html del profilo per modificare la bio
-        // Forse meglio fare un servizio per le immagini, troppo grande qui dentro
-
         // Mi prendo l'id del giocatore, così forse carico la foto e la bio che già ci sono
         int userId = Integer.parseInt(playerID);
 
@@ -304,41 +297,28 @@ public class GuiController {
 
         // Mi prendo l'utente che mi interessa con l'id
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        String email = user.getEmail();
+        String name = user.getName();
+        String surname = user.getSurname();
 
-        // Mi prendo le foto e la bio
-        List<String> list_images = new ArrayList<>();
-        String directoryPath = "src/main/resources/static/t5/images/profileImages";
-        File directory = new File(directoryPath);
+        // Prendiamo le risorse dal servizio UserProfileService
+        List<String> list_images = userProfileService.getAllProfilePictures();
+        String image = userProfileService.getProfilePicture(userId);
+        String bio = userProfileService.getProfileBio(userId);
 
-        // Verifica se il percorso esiste ed è una directory
-        if (!directory.exists() || !directory.isDirectory()) {
-            System.err.println("Percorso non valido o non è una directory: " + directoryPath);
-            directory=null; // Oppure una lista vuota o lancia un'eccezione, a seconda delle tue esigenze
-        }
-
-        // Crea un filtro per accettare solo file immagine (ad esempio, .jpg, .png, .gif)
-        FilenameFilter imageFilter = (dir, name) -> {
-            String lowercaseName = name.toLowerCase();
-            return lowercaseName.endsWith(".jpg") || lowercaseName.endsWith(".png") || lowercaseName.endsWith(".gif");
-        };
-
-        // Ottieni la lista dei nomi dei file che corrispondono al filtro
-        String[] imageNamesArray = null;
-        if(directory!=null){
-            imageNamesArray = directory.list(imageFilter);
-        }
-
+        GenericObjectComponent userObject = new GenericObjectComponent("user", userId);
+        GenericObjectComponent surnameObject = new GenericObjectComponent("surname", surname);
+        GenericObjectComponent nameObject = new GenericObjectComponent("name", name);
+        GenericObjectComponent emailObject = new GenericObjectComponent("email", email);
         GenericObjectComponent imagesObject = new GenericObjectComponent("images", list_images);
         GenericObjectComponent propicObject = new GenericObjectComponent("propic", image);
         GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
 
         
         main.setObjectComponents(userObject);
-        
         main.setObjectComponents(surnameObject);
         main.setObjectComponents(nameObject);
         main.setObjectComponents(emailObject);
-        
         main.setObjectComponents(imagesObject);
         main.setObjectComponents(propicObject);
         main.setObjectComponents(bioObject);
