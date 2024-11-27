@@ -2,16 +2,12 @@ package com.g2.Model;
 
 import java.util.List;
 
-import org.json.JSONPropertyName;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserProfile {
 
     @JsonProperty("id")
     private Integer ID;
-    @JsonProperty("user")
-    private Long userId;
     @JsonProperty("bio")
     private String bio;
     @JsonProperty("profilePicturePath")
@@ -21,14 +17,14 @@ public class UserProfile {
     @JsonProperty("followersList")
     private List<UserProfile> followersList;
 
-    public UserProfile(Integer ID, Long userId, String bio, String profilePicturePath, List<UserProfile> followingList, List<UserProfile> followersList) {
+    public UserProfile(Integer ID, String bio, String profilePicturePath, List<UserProfile> followingList, List<UserProfile> followersList) {
         this.ID = ID;
-        this.userId = userId;
         this.bio = bio;
         this.profilePicturePath = profilePicturePath;
         this.followingList = followingList;
         this.followersList = followersList;
     }
+
 
     //Costruttore vuoto necessario per thymeleaf
     public UserProfile(){}
@@ -40,14 +36,6 @@ public class UserProfile {
 
     public void setID(Integer ID) {
         this.ID = ID;
-    }
-
-    public Long getUser() {
-        return userId;
-    }
-
-    public void setUser(Long user) {
-        this.userId = user;
     }
 
     public String getBio() {
@@ -86,7 +74,6 @@ public class UserProfile {
     public String toString(){
         return "UserProfile{" +
                 "ID=" + ID +
-                ", user=" + userId +
                 ", bio='" + bio + '\'' +
                 ", profilePicturePath='" + profilePicturePath + '\'' +
                 ", followingList=" + followingList +

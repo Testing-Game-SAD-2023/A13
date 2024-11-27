@@ -59,6 +59,7 @@ import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
+import com.g2.Model.UserProfile;
 import com.g2.Service.AchievementService;
 
 import jakarta.servlet.http.Cookie;
@@ -74,8 +75,9 @@ public class GuiController {
 
     @Autowired
     private AchievementService achievementService;
-
     @Autowired
+    private UserProfileService userProfileService;
+
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
         this.serviceManager = new ServiceManager(restTemplate);
         this.localeResolver = localeResolver;
@@ -140,10 +142,10 @@ public class GuiController {
         int userId = Integer.parseInt(playerID);
 
         // PROVARE A RENDERE REALE IL PASSAGGIO DEI DATI ALLA PAGINA PROFILO
-
+        //UserProfile profileDTO=new UserProfile(userId,"Inserisci qui la tua bio...","sample_propic.jpg",null,null);
         // Mi prendo prima tutti gli utenti e poi l'utente che mi interessa con l'id con un filtraggio
         List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
         // Mi prendo i suoi dati da passare alla pagina
         String email = user.getEmail();
@@ -151,6 +153,10 @@ public class GuiController {
         String username = user.getName();
         String surname = user.getSurname();
 
+        //mi prendo immagine e bio
+        String image = userProfileService.getProfilePicture(userId);
+        String bio = userProfileService.getProfilePicture(userId);
+        
         // Mi prendo i progressi degli achievement e le statistiche
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
@@ -165,6 +171,9 @@ public class GuiController {
         GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies);
         GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
         GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
+        GenericObjectComponent objImage = new GenericObjectComponent("image", image);
+        GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
+
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
         GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
@@ -175,6 +184,8 @@ public class GuiController {
         profile.setObjectComponents(objStudies);
         profile.setObjectComponents(objUsername);
         profile.setObjectComponents(objSurname);
+        profile.setObjectComponents(objImage);
+        profile.setObjectComponents(objBio);
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
@@ -317,30 +328,20 @@ public class GuiController {
             imageNamesArray = directory.list(imageFilter);
         }
 
-        // Converti l'array in una lista (opzionale, ma spesso più utile)
-        if (imageNamesArray != null) {
-            List<String> list = new ArrayList<>(Arrays.asList(imageNamesArray));
-            list_images = list;
-        } else {
-        System.err.println("Nessun file immagine trovato nella directory: " + directoryPath);
-            list_images=null; // Oppure una lista vuota o lancia un'eccezione, a secondo delle tue esigenze
-        }
-
-        // Mi prendo la bio
-        String bio = user.getUserProfile().getBio();
-
-        // Mi prendo la email
-        String email = user.getEmail();
-
-        GenericObjectComponent images = new GenericObjectComponent("images", list_images);
-        GenericObjectComponent userObject = new GenericObjectComponent("user", user);
+        GenericObjectComponent imagesObject = new GenericObjectComponent("images", list_images);
+        GenericObjectComponent propicObject = new GenericObjectComponent("propic", image);
         GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
-        GenericObjectComponent emailObject = new GenericObjectComponent("email", email);
 
-        main.setObjectComponents(images);
+        
         main.setObjectComponents(userObject);
-        main.setObjectComponents(bioObject);
+        
+        main.setObjectComponents(surnameObject);
+        main.setObjectComponents(nameObject);
         main.setObjectComponents(emailObject);
+        
+        main.setObjectComponents(imagesObject);
+        main.setObjectComponents(propicObject);
+        main.setObjectComponents(bioObject);
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }
