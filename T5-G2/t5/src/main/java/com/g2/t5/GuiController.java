@@ -148,7 +148,6 @@ public class GuiController {
         List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
-
         // Mi prendo i suoi dati da passare alla pagina
         String email = user.getEmail();
         String studies = user.getStudies();
