@@ -90,14 +90,14 @@ public class T23Service extends BaseService {
     }
 
     // Metodo per la creazione di una notifica
-    private Boolean NewNotification(String userEmail, String title, String message) {
+    private String NewNotification(String userEmail, String title, String message) {
         final String endpoint = "/new_notification";
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("email", userEmail);
         map.add("title", title);
-        map.add("profilePicturePath", message);
+        map.add("message", message);
 
-        return callRestPost(endpoint, map, null, Boolean.class);
+        return callRestPost(endpoint, map, null, String.class);
     }
 }
