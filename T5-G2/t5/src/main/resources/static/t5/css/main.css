@@ -731,3 +731,21 @@ padding-left: 8%;
     filter: grayscale(1);
     mix-blend-mode: multiply;
 }
+
+/* Stili per le sezioni */
+/*Modifica (28/11) by GabMan 'Sezioni Pagina Profilo'*/
+.section {
+  padding: 20px;
+  min-height: 80vh;
+  display: none; /* Nascondi tutte le sezioni per impostazione predefinita */
+}
+
+/* Mostra solo la sezione visibile */
+.section.active {
+  display: block;
+}
+
+/* Stili per i pulsanti */
+.btn {
+  margin: 5px;
+}
