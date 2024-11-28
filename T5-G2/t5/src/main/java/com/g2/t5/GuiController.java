@@ -17,8 +17,6 @@
 
 package com.g2.t5;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -158,7 +156,7 @@ public class GuiController {
         //mi prendo immagine e bio
         String image = userProfileService.getProfilePicture(userId);
         String bio = userProfileService.getProfileBio(userId);
-        
+
         // Mi prendo i progressi degli achievement e le statistiche
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
@@ -315,7 +313,7 @@ public class GuiController {
         GenericObjectComponent propicObject = new GenericObjectComponent("propic", image);
         GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
 
-        
+
         main.setObjectComponents(userObject);
         main.setObjectComponents(surnameObject);
         main.setObjectComponents(nameObject);
@@ -325,6 +323,26 @@ public class GuiController {
         main.setObjectComponents(bioObject);
         main.SetAuth(jwt);
         return main.handlePageRequest();
+    }
+
+    // Salvataggio delle modifiche al profilo
+    @PostMapping("/update-profile")
+    public ResponseEntity<String> updateProfile(@RequestParam("email") String email,
+                                                @RequestParam("bio") String bio,
+                                                @RequestParam("profilePicturePath") String profilePicturePath){
+
+        System.out.println("Email: " + email);
+        System.out.println("Bio: " + bio);
+        System.out.println("Profile Picture Path: " + profilePicturePath);
+        // Chiamata al servizio T23 per modificare il profilo
+        Boolean result = (Boolean) serviceManager.handleRequest("T23", "EditProfile", email, bio, profilePicturePath);
+
+        if(result){
+            return ResponseEntity.ok("Profile updated successfully");
+        }
+        else{
+            return ResponseEntity.badRequest().body("Error updating profile");
+        }
     }
 
     @GetMapping("/report")

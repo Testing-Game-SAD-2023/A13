@@ -3,7 +3,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const profilePictures = document.querySelectorAll(".profile-picture");
     const bioInput = document.getElementById("bio-input");
     const saveButton = document.getElementById("save-button");
-    const userEmail = "{{user.email}}"; // Inserisce l'email direttamente dal server
+    const userEmailElement = document.getElementById("user-email"); // Inserisce l'email direttamente dal server
+    const userEmail = userEmailElement ? userEmailElement.textContent.trim() : null;
+
+    if (!userEmail) {
+        console.error("Errore: l'email non è stata trovata nel DOM.");
+    }
+
     let selectedImage = null;
 
     // Gestione della selezione delle immagini
@@ -13,7 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
             profilePictures.forEach((img) => img.classList.remove("selected"));
             // Aggiungi la classe "selected" all'immagine cliccata
             this.classList.add("selected");
-            selectedImage = this.getAttribute("src");
+
+            // Ottieni solo il nome del file senza hash finale
+            selectedImage = this.getAttribute("src").split("/").pop().replace(/-\w{32}\.png$/, ".png");
         });
     });
 
@@ -35,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 formData.append("profilePicturePath", selectedImage);
 
                 // Effettua la chiamata POST
-                const response = await fetch("/edit_profile", {
+                const response = await fetch("/update-profile", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
