@@ -622,18 +622,19 @@ public class Controller {
     }
 
     @PostMapping("/edit_profile")
-    public ResponseEntity<String> editProfile(@RequestParam("email") String email,
+    public ResponseEntity<Boolean> editProfile(@RequestParam("email") String email,
                                               @RequestParam("bio") String bio,
                                               @RequestParam("profilePicturePath") String profilePicturePath) {
         UserProfile profile = userService.findProfileByEmail(email);
         if (profile == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile not found");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false); // Ritorna false in caso di errore
         }
 
         profile.setBio(bio);
         profile.setProfilePicturePath(profilePicturePath);
+        userService.saveProfile(profile);
 
-        return ResponseEntity.ok("Profile edited successfully");
+        return ResponseEntity.ok(true); // Ritorna true se l'operazione ha avuto successo
     }
 
     @GetMapping("/password_reset")

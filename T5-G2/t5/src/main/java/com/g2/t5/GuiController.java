@@ -329,6 +329,9 @@ public class GuiController {
                                                 @RequestParam("bio") String bio,
                                                 @RequestParam("profilePicturePath") String profilePicturePath){
 
+        System.out.println("Email: " + email);
+        System.out.println("Bio: " + bio);
+        System.out.println("Profile Picture Path: " + profilePicturePath);
         // Chiamata al servizio T23 per modificare il profilo
         Boolean result = (Boolean) serviceManager.handleRequest("T23", "EditProfile", email, bio, profilePicturePath);
 
