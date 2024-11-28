@@ -479,24 +479,34 @@ public class Controller {
      
     @PostMapping("/updateProfile")
     public ResponseEntity<String> updateProfile(
-        @CookieValue(name = "jwt", required = false) String jwt,
-        @RequestParam("name") String name,
-        @RequestParam("surname") String surname,
-        @RequestParam("email") String email,
-        @RequestParam("biography") String biography,
-        @RequestParam("avatar") String avatar) {
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("name") String name,
+    @RequestParam("surname") String surname,
+    @RequestParam("email") String email,
+    @RequestParam("biography") String biography,
+    @RequestParam("avatar") String avatar) {
+
+    System.out.println("Incoming update request:");
+    System.out.println("Name: " + name);
+    System.out.println("Surname: " + surname);
+    System.out.println("Email: " + email);
+    System.out.println("Biography: " + biography);
+    System.out.println("Avatar: " + avatar);
 
     if (!isJwtValid(jwt)) {
+        System.out.println("JWT not valid");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
     }
 
     // Recupera l'ID utente dal token JWT
     Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
     Integer userId = (Integer) claims.get("userId");
+    System.out.println("UserId from JWT: " + userId);
 
     // Trova l'utente nel database
     User user = userRepository.findById(userId).orElse(null);
     if (user == null) {
+        System.out.println("User not found in database");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
@@ -507,10 +517,11 @@ public class Controller {
     user.setBiography(biography);
     user.setAvatar(avatar);
 
+    System.out.println("Saving updated user to database");
     userRepository.save(user); // Salva i cambiamenti nel database
     return ResponseEntity.ok("Profile updated successfully");
 }
-// FINE MODIFICHE
+//fine
 
     
     //Recupera Password
