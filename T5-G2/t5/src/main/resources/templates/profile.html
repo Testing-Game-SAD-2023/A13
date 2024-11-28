@@ -4,11 +4,11 @@
     <link href="/t5/css/main2.css" rel="stylesheet" />
     <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
+    <!--Modifica (05/04) by GabMan 'Pulsanti di navigazione per le sezioni'-->
     <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
-    <!--Modifica (20/05) Adding Sweet Alert-->
+    <!--Modifica (20/05) by GabMan 'Aggiunta libreria SweetAlert'-->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <!--Modifica (21/05) Adding JQuery-->
+    <!--Modifica (21/05) by GabMan 'Aggiunta libreria JQuery'-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!--Fine Modifica-->
 
@@ -39,7 +39,7 @@
                     <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
                 </div>
             </div>
-            <!-- Contenuto del profilo -->
+            <!--Modifica (28/11) by GabMan 'Aggiunta area di modifica della biografia'-->
             <div class="row">
                 <div class="col-8">
                     <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
@@ -52,7 +52,12 @@
                                     <h4 class="card-title" id="usernameField"></h4>
                                     <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
                                     <hr>
-                                    <p>Lorem ipsum dolor sit amet...</p>
+                                    <!--Modifica (28/11) by GabMan 'Aggiunta textarea per modificare la biografia'-->
+                                    <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
+                                    <!--Modifica (28/11) by GabMan 'Aggiunta pulsante per salvare la biografia'-->
+                                    <button id="saveBioButton" class="btn btn-success mt-2">Salva Biografia</button>
+                                    <!--Modifica (28/11) by GabMan 'Aggiunta messaggio di conferma per salvataggio'-->
+                                    <div id="saveMessage" class="mt-2" style="display: none; color: green;">Biografia salvata con successo!</div>
                                 </div>
                             </div>
                         </div>
@@ -107,6 +112,39 @@
             // Mostra solo la sezione selezionata
             document.getElementById(sectionId).classList.add('active');
         }
+
+        //Modifica (28/11) by GabMan 'Script per salvare la biografia'
+        document.addEventListener("DOMContentLoaded", () => {
+            const saveButton = document.getElementById("saveBioButton");
+
+            if (saveButton) {
+                saveButton.addEventListener("click", async () => {
+                    const bio = document.getElementById("biography").value;
+
+                    try {
+                        const response = await fetch("/updateBiography", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: new URLSearchParams({ biography: bio })
+                        });
+
+                        if (response.ok) {
+                            document.getElementById("saveMessage").style.display = "block";
+                            setTimeout(() => {
+                                document.getElementById("saveMessage").style.display = "none";
+                            }, 3000);
+                        } else {
+                            const error = await response.text();
+                            alert("Errore nel salvataggio: " + error);
+                        }
+                    } catch (error) {
+                        alert("Errore nella connessione al server.");
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
