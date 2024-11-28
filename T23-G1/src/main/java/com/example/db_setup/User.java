@@ -45,7 +45,7 @@ public class User {
     public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
     */
     
-    // INIZIO MODIFICHE - Campi aggiuntivi per la gestione delle informazioni profilo
+    // INIZIO MODIFICHE cami - Campi aggiuntivi per la gestione delle informazioni profilo
     @Column(name = "biography", length = 500)
     private String biography; // Campo per la descrizione personale
 
