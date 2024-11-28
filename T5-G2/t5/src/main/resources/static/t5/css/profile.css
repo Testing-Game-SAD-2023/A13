@@ -1,0 +1,212 @@
+/* Generale */
+body {
+    background-color: #1a1a2e; /* Sfondo scuro */
+    color: #fff; /* Testo bianco */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+.nav-bar {
+    background-color: #0e153a; /* Sfondo della navbar */
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #333;
+}
+
+.nav-bar a {
+    text-decoration: none;
+    color: #ccc; /* Colore tenue per i link */
+    font-weight: bold;
+}
+
+.nav-bar a:hover {
+    color: #fff;
+}
+
+.logout-button {
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #c9302c;
+}
+
+/* Layout principale */
+.container-fluid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Due colonne uguali */
+    grid-template-rows: auto auto; /* Righe automatiche */
+    gap: 20px; /* Spaziatura tra le celle */
+    padding: 20px;
+}
+
+/* Card generiche */
+.card {
+    background-color: #2a2a42; /* Sfondo delle card */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #ccc;
+    border-bottom: 1px solid #444;
+    margin-bottom: 10px;
+}
+
+.card-body {
+    color: #aaa;
+}
+
+/* Profilo Utente */
+.card-body.d-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-body.d-flex img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+.card-body.d-flex div {
+    flex-grow: 1;
+}
+
+.card-body.d-flex button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.card-body.d-flex button:hover {
+    background-color: #0056b3;
+}
+
+/* Achievements Tab */
+.nav-tabs .nav-link {
+    color: #ccc;
+    background-color: transparent;
+    border: none;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 5px;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #fff;
+}
+
+/* Notifiche */
+.notifications {
+    overflow-y: auto;
+    max-height: 150px;
+}
+
+.notifications p {
+    color: #aaa;
+}
+
+/* Statistiche */
+.statistics-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #444;
+}
+
+.statistics-row:last-child {
+    border-bottom: none;
+}
+
+/* Layout principale */
+.container-fluid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Due colonne uguali */
+    gap: 20px; /* Spaziatura tra le colonne */
+    padding: 20px;
+}
+
+.left-column, .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Spaziatura tra le card */
+}
+
+/* Achievements Styles */
+.achievements-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spaziatura tra gli achievement */
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    background-color: #2a2a42; /* Colore di sfondo */
+    border-radius: 10px; /* Angoli arrotondati */
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.achievement-icon {
+    width: 60px; /* Dimensione massima dell'icona */
+    height: 60px; /* Dimensione massima dell'icona */
+    object-fit: contain; /* Mantiene il rapporto d'aspetto */
+    margin-right: 15px; /* Spaziatura tra l'icona e il testo */
+}
+
+.achievement-details {
+    flex-grow: 1;
+    color: #fff; /* Colore del testo */
+}
+
+.achievement-details h5 {
+    margin: 0;
+    font-size: 16px; /* Titolo più piccolo */
+    font-weight: bold;
+}
+
+.achievement-details p {
+    margin: 5px 0 0;
+    font-size: 14px; /* Testo descrittivo */
+    color: #aaa; /* Colore più tenue per la descrizione */
+}
+
+/* Achievement "Locked" Style */
+.achievement-item.unobtained {
+    opacity: 0.5; /* Riduce l'opacità per i trofei bloccati */
+    background-color: #1a1a2e; /* Colore di sfondo diverso per quelli bloccati */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container-fluid {
+        grid-template-columns: 1fr; /* Una colonna su dispositivi più piccoli */
+    }
+}

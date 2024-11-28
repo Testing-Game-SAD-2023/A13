@@ -151,12 +151,18 @@ public class GuiController {
         String username = user.getName();
         String surname = user.getSurname();
 
-        //mi prendo immagine e bio
+        // Mi prendo immagine e bio
         String image = userProfileService.getProfilePicture(userId);
         String bio = userProfileService.getProfileBio(userId);
 
-        // Mi prendo i progressi degli achievement e le statistiche
+        // Mi prendo i progressi degli achievement
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
+
+        // Divido i progressi degli achievement in "unlocked" e "locked"
+        List<AchievementProgress> unlockedAchievements = achievementProgresses.stream().filter(a -> a.getProgress() >= a.getProgressRequired()).toList();
+        List<AchievementProgress> lockedAchievements = achievementProgresses.stream().filter(a -> a.getProgress() < a.getProgressRequired()).toList();
+
+        // Mi prendo le statistiche del giocatore
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
         List<Statistic> allStatistics = achievementService.getStatistics();
         Map<String, Statistic> IdToStatistic = new HashMap<>();
@@ -172,6 +178,8 @@ public class GuiController {
         GenericObjectComponent objImage = new GenericObjectComponent("propic", image);
         GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
 
+        GenericObjectComponent objUnlockedAchievements = new GenericObjectComponent("unlockedAchievements", unlockedAchievements);
+        GenericObjectComponent objLockedAchievements = new GenericObjectComponent("lockedAchievements", lockedAchievements);
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
         GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
@@ -184,10 +192,13 @@ public class GuiController {
         profile.setObjectComponents(objSurname);
         profile.setObjectComponents(objImage);
         profile.setObjectComponents(objBio);
+        profile.setObjectComponents(objUnlockedAchievements);
+        profile.setObjectComponents(objLockedAchievements);
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
         profile.setObjectComponents(objUserID);
+        //TODO: Aggiungere componenti missioni e notifiche
 
         return profile.handlePageRequest();
     }

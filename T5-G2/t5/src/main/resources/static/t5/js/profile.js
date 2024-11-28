@@ -13,31 +13,12 @@ const parseJwt = (token) => {
   }
 };
 
-/*
-
-//Your time has come
-
-//TODO: questo è solo per DEMO, i dati del profilo devono essere contenuti in un model
-document.addEventListener("DOMContentLoaded", (e) => {
-      var userId = document.getElementById("user_id").innerHTML;
-      console.log(userId)
-
-      var userAPIString = '/students_list/{0}'.replace('{0}', userId);
-
-      // Get user infos
-      $.ajax({
-        url: userAPIString,
-        type: 'GET',
-        timeout: 30000,
-        success: function (data, textStatus, xhr) {
-          document.getElementById("usernameField").innerText = data.email + " - " + data.name + " " + data.surname;
-
-          document.getElementById("studiesField").innerText = data.studies;
-        },
-        error: function (xhr, textStatus, errorThrown) {
-          console.error("Errore durante il recupero dei dati utente:", errorThrown);
-          swal("Errore","Errore durante il recupero dei dati utente","error");
-        }
+document.addEventListener("DOMContentLoaded", function () {
+  // Aggiungi un listener per i tab
+  const trophyTabs = document.querySelectorAll('#trophyTabs button[data-bs-toggle="tab"]');
+  trophyTabs.forEach(tab => {
+      tab.addEventListener('shown.bs.tab', function (event) {
+          console.log(`Tab attivo: ${event.target.id}`); // Log del tab attivo
       });
+  });
 });
-*/
