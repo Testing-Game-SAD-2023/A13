@@ -11,6 +11,11 @@ public class User {
     private boolean isRegisteredWithFacebook;
     private String studies;
     private String resetToken;
+    
+    //modifiche cami
+    private String avatar;
+    private String biography; // Nuovo campo
+    //fine modifiche
 
     public User(Long id, String name, String surname, String email, String password,
     boolean isRegisteredWithFacebook, String studies, String resetToken) {
@@ -22,6 +27,11 @@ public class User {
         this.isRegisteredWithFacebook = isRegisteredWithFacebook;
         this.studies = studies;
         this.resetToken = resetToken;
+        //cami
+        this.biography = "";
+        this.avatar="" ;// Nuovo campo
+        //fine
+        
     }
     
     //Costruttore vuoto necessario per thymeleaf
@@ -67,6 +77,22 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+    //modifiche cami
+    public String getAvatar() {
+    return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+    this.avatar = avatar;
+    }
+   
+    public String getBiography() { // Getter per biography
+        return biography;
+    }
+    public void setBiography(String biography) { // Setter per biography
+        this.biography = biography;
+    }
+    //fine
 
     public boolean isRegisteredWithFacebook() {
         return isRegisteredWithFacebook;

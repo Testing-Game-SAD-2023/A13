@@ -121,6 +121,74 @@ public class GuiController {
 
         return "error";
     }
+        //modifiche cami
+    @PostMapping("/updateBiography")
+    public ResponseEntity<String> updateBiography(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam("biography") String biography) {
+    try {
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Crea i parametri per la richiesta
+        Map<String, String> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("biography", biography);
+
+        // Invio richiesta al servizio T23 per aggiornare la biografia
+        Boolean updateSuccess = (Boolean) serviceManager.handleRequest("T23", "UpdateBiography", params);
+
+        if (updateSuccess) {
+            return ResponseEntity.ok("Biography updated successfully!");
+        } else {
+            return ResponseEntity.status(400).body("Failed to update biography.");
+        }
+    } catch (Exception e) {
+        System.out.println("Error updating biography: " + e.getMessage());
+        return ResponseEntity.status(500).body("Internal server error.");
+    }
+}
+
+    @PostMapping("/updateAvatar")
+public ResponseEntity<String> updateAvatar(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam("avatar") String avatar) {
+    try {
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Crea i parametri per la richiesta
+        Map<String, String> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("avatar", avatar);
+
+        // Invio richiesta al servizio T23 per aggiornare l'avatar
+        Boolean updateSuccess = (Boolean) serviceManager.handleRequest("T23", "UpdateAvatar", params);
+
+        if (updateSuccess) {
+            return ResponseEntity.ok("Avatar updated successfully!");
+        } else {
+            return ResponseEntity.status(400).body("Failed to update avatar.");
+        }
+    } catch (Exception e) {
+        System.out.println("Error updating avatar: " + e.getMessage());
+        return ResponseEntity.status(500).body("Internal server error.");
+    }
+}
+
+    //fine modifiche cami
 
     @GetMapping("/profile/{playerID}")
     public String profilePage(Model model,

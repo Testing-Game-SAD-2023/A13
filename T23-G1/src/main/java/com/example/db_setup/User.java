@@ -1,3 +1,4 @@
+
 package com.example.db_setup;
 
 import javax.persistence.Column;
@@ -44,6 +45,14 @@ public class User {
     public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
     */
     
+    // INIZIO MODIFICHE - Campi aggiuntivi per la gestione delle informazioni profilo
+    @Column(name = "biography", length = 500)
+    private String biography; // Campo per la descrizione personale
+
+    @Column(name = "avatar")
+    private String avatar; // Campo per il percorso dell'immagine profilo o URL
+    // FINE MODIFICHE
+
     @Column(name = "reset_token")
     private String resetToken;
     
@@ -54,5 +63,23 @@ public class User {
     public String getResetToken() {
         return resetToken;
     }
+
+     // INIZIO MODIFICHE - Getter e Setter per i nuovi campi
+    public String getBiography() {
+        return biography;
+    }
+
+    public void setBiography(String biography) {
+        this.biography = biography;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+    // FINE MODIFICHE
 
 }

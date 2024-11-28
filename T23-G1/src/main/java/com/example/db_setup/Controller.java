@@ -475,6 +475,43 @@ public class Controller {
     }
 
 
+    //Modifiche cam:Metodo per aggiornare i dati personali dell'utente
+     
+    @PostMapping("/updateProfile")
+    public ResponseEntity<String> updateProfile(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam("name") String name,
+        @RequestParam("surname") String surname,
+        @RequestParam("email") String email,
+        @RequestParam("biography") String biography,
+        @RequestParam("avatar") String avatar) {
+
+    if (!isJwtValid(jwt)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+    }
+
+    // Recupera l'ID utente dal token JWT
+    Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
+    Integer userId = (Integer) claims.get("userId");
+
+    // Trova l'utente nel database
+    User user = userRepository.findById(userId).orElse(null);
+    if (user == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+
+    // Aggiorna i campi
+    user.setName(name);
+    user.setSurname(surname);
+    user.setEmail(email);
+    user.setBiography(biography);
+    user.setAvatar(avatar);
+
+    userRepository.save(user); // Salva i cambiamenti nel database
+    return ResponseEntity.ok("Profile updated successfully");
+}
+// FINE MODIFICHE
+
     
     //Recupera Password
     @PostMapping("/password_reset")
@@ -690,4 +727,3 @@ public class Controller {
 }
 
 }
-

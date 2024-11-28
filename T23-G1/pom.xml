@@ -18,7 +18,12 @@
         <springsecurity.version>5.1.1.RELEASE</springsecurity.version>
     </properties>
     <dependencies>
-
+    <!--cami-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+        </dependency>
+    <!--fine-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
