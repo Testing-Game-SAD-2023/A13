@@ -123,7 +123,24 @@
      public ResponseEntity<List<ClassUT>> ordinaClassiNomi(@CookieValue(name = "jwt", required = false) String jwt) {
          return adminService.ordinaClassiNomi(jwt);
      }
- 
+
+    /* MODIFICA 29/11/2024: Aggiunta EndPoint: /teams e /assignments*/
+
+    @GetMapping("/teams")
+    @ResponseBody
+    public ModelAndView showGestioneTeams(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
+        System.out.println("DIOOOO");
+        return adminService.showGestioneTeams(request,jwt);
+    }
+
+    @GetMapping("/assignments")
+    @ResponseBody
+    public ModelAndView showGestioneAssignments(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
+        System.out.println("DIOOOO");
+        return adminService.showGestioneAssignments(request,jwt);
+    }
+
+    
      //Solo x testing
      @GetMapping("/getLikes/{name}")
      @ResponseBody
@@ -435,4 +452,10 @@
          return utilsService.eliminaInteraction(id_i);
      }
      
+
+ 
+    
  }
+
+
+

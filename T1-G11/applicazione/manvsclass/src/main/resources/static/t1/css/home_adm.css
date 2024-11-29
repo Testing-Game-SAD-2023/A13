@@ -361,3 +361,92 @@ nav.top-right {
 .scalata-button-container button:hover i {
     transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
 }
+
+/*Modifica 29/11/2024 : creazione iniziale del bottone Gestione-Team*/
+.gestione-team-container {
+  position: fixed;
+  top: 70%;  /* Modificato per distanziarlo un po' dal bordo inferiore */
+  left: 50%;
+  transform: translate(-50%, -50%);  /* Allineamento corretto */
+  z-index: 9999; /* Assicura che il bottone sia sopra gli altri elementi */
+}
+
+.gestione-team-container form {
+  position: relative;
+  display: inline-block;
+}
+
+.gestione-team-container button {
+  width: 120px;  /* Aumentato per migliorare la visibilità */
+  height: 120px; /* Stessa altezza per mantenere la forma rotonda */
+  border-radius: 50%;
+  background-color: #4CAF50;  /* Colore verde più distintivo */
+  color: white;  /* Colore del testo bianco per contrasto */
+  font-size: 35px;  /* Aumentato per migliorare la leggibilità */
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  font-family: Alegreya Sans, sans-serif;
+  text-align: center;
+}
+
+.gestione-team-container button:hover {
+  background-color: #388E3C;  /* Colore verde scuro per l'hover */
+  font-weight: bold;
+  text-decoration: underline;
+  transform: rotate(360deg); /* Rotazione al passaggio del mouse */
+}
+
+.gestione-team-container button i {
+  font-size: 60px; /* Aumentato per migliorare la visibilità dell'icona */
+  transition: transform 0.5s;
+}
+
+.gestione-team-container button:hover i {
+  transform: rotate(360deg); /* Rotazione al passaggio del mouse */
+}
+
+
+/* Modifica 29/11/2024: Assignments Button */
+.assignment-button-container {
+  position: fixed;
+  top: 55%;  /* Modificato per separarlo più da Gestione Team */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+.assignment-button-container form {
+  position: relative;
+  display: inline-block;
+}
+
+.assignment-button-container button {
+  width: 120px;  /* Aumentato per coerenza con il primo bottone */
+  height: 120px;
+  border-radius: 50%;
+  background-color: #2196F3;  /* Colore blu distintivo */
+  color: white;
+  font-size: 35px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  font-family: Alegreya Sans, sans-serif;
+  text-align: center;
+}
+
+.assignment-button-container button:hover {
+  background-color: #1976D2;  /* Colore blu scuro per l'hover */
+  font-weight: bold;
+  text-decoration: underline;
+  transform: rotate(360deg);
+}
+
+.assignment-button-container button i {
+  font-size: 60px;  /* Aumentato per migliorare la visibilità dell'icona */
+  transition: transform 0.5s;
+}
+
+.assignment-button-container button:hover i {
+  transform: rotate(360deg); /* Rotazione al passaggio del mouse */
+}

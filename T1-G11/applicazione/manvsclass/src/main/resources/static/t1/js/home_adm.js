@@ -107,3 +107,62 @@ function Scalata() {
     //Aggiungi qui il codice per gestire gli errori
   });
 }
+
+//Modifica 29/11/2024: Creazione chiamate Teams per reindirizzare alla view
+function Teams() {
+  fetch('/teams', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      response.text().then(okMessage => {
+        alert("Verrai reindirizzato alla pagina dei Teams.");
+      })
+      
+      window.location.href = "/teams";  // Reindirizza alla pagina dei team
+    }
+    else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      })
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    //Aggiungi qui il codice per gestire gli errori
+  });
+}
+
+//Modifica 29/11/2024: creazione funzione Assignments per reinderizzare alla view.
+function Assignments() {
+  fetch('/assignments', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      
+      response.text().then(okMessage => {
+        alert("Verrai reindirizzato alla pagina degli assignments.");
+      })
+
+      window.location.href = "/assignments";  // Reindirizza alla pagina degli assignments
+    }
+    else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      })
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    //Aggiungi qui il codice per gestire gli errori
+  });
+}
