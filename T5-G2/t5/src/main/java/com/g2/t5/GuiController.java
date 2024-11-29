@@ -142,7 +142,7 @@ public class GuiController {
         params.put("biography", biography);
 
         // Invio richiesta al servizio T23 per aggiornare la biografia
-        Boolean updateSuccess = (Boolean) serviceManager.handleRequest("T23", "UpdateBiography", params);
+        Boolean updateSuccess = (Boolean) serviceManager.handleRequest("T23", "updateBiography", params);
 
         if (updateSuccess) {
             return ResponseEntity.ok("Biography updated successfully!");
