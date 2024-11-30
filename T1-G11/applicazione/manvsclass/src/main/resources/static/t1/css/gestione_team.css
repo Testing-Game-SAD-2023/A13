@@ -200,3 +200,41 @@ nav.top-right {
   background-color: rgb(25, 70, 160);
   transform: scale(0.95);
 }
+
+.team-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 15px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  width: 50%;
+  height: 40vh;
+  overflow-y: auto; /* Aggiunge la scrollbar */
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+}
+
+.team-section {
+  padding: 15px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  background-color: #fff;
+  width: calc(100% - 30px); /* Rimuove padding extra */
+  margin: 0 auto; /* Assicura che le sezioni siano a filo */
+}
+
+.team-section h2 {
+  font-size: 1.5em;
+  margin: 0 0 10px 0;
+}
+
+.team-section p {
+  font-size: 1em;
+  margin: 0;
+}
