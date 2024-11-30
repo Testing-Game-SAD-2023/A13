@@ -81,4 +81,14 @@ public class T23Service extends BaseService {
         return callRestPost(endpoint, formData, null, Boolean.class);
     }
     //fine cami 
+
+    // byGabMan:30/11 Metodo per ottenere la lista degli amici di un utente
+    public List<Map<String, String>> getFriends(String userId) {
+        final String endpoint = "/getFriends"; // Endpoint del servizio T23
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("userId", userId);
+
+        return callRestPost(endpoint, formData, null, new ParameterizedTypeReference<List<Map<String, String>>>() {});
+}
+
 }

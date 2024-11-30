@@ -13,6 +13,9 @@
     <!--Fine Modifica-->
 
     <script src="/t5/js/profile.js"></script>
+    <script src="/t5/js/Util_Editor.js"></script>
+    <script src="/t5/js/Amici.js"></script>
+
 
     <title>Profilo utente</title>
 </head>
@@ -26,6 +29,8 @@
                 <button class="btn btn-primary" onclick="showSection('profile')">Profilo</button>
                 <button class="btn btn-primary" onclick="showSection('trophies')">Trofei</button>
                 <button class="btn btn-primary" onclick="showSection('stats')">Statistiche</button>
+                <button class="btn btn-primary" onclick="showSection('friends')">Amici</button>
+                <button class="btn btn-primary" onclick="showSection('leaderboard')">Classifica</button>
             </div>
         </div>
 
@@ -39,6 +44,23 @@
                     <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
                 </div>
             </div>
+            <!--Modifica (30/11) by GabMan 'Aggiunta sezione amici'-->
+            <div id="friends" class="section">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
+                            <div class="card-body">
+                                <h4 class="card-title">Amici</h4>
+                                <hr>
+                                <div id="friendsContainer" style="height:44.2vh; overflow-y: auto">
+                                    <!-- Il contenuto sarà aggiunto dinamicamente da Amici.js -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!--Modifica (30/11) by GabMan 'Aggiunta area di modifica della biografia'-->
        
 <div class="row">

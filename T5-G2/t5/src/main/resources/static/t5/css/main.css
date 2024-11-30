@@ -791,3 +791,28 @@ padding-left: 8%;
   color: #ffffff;
   font-family: Arial, sans-serif;
 }
+
+/* Modifica (30/11) by GabMan 'Stile per il box della biografia' */
+.btn-selected {
+  background-color: #7ebcda; /* Blu selezionato */
+  color: white;
+  font-weight: bold;
+  border: 2px solid #0b1118; /* Bordo più scuro */
+}
+
+/* Modifica (30/11) by GabMan 'Sezione Amici' */
+.friend-item {
+  padding: 10px;
+  margin: 5px 0;
+  background-color: rgba(57, 57, 83, 1);
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.friend-item:hover {
+  background-color: #007bff;
+  cursor: pointer;
+}
+
+

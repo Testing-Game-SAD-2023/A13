@@ -436,4 +436,29 @@ public class GuiController {
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
     }
+
+//by Gabman 30/11 Endpoint Amici.js-T23Service
+@GetMapping("/api/getFriends")
+public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al T23Service per ottenere la lista degli amici
+        List<Map<String, String>> friends = t23Service.getFriends(userId);
+
+        return ResponseEntity.ok(friends);
+    } catch (Exception e) {
+        System.out.println("Error retrieving friends: " + e.getMessage());
+        return ResponseEntity.status(500).body(null);
+    }
+}
+
+
 }
