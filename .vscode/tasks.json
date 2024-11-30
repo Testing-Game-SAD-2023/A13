@@ -53,6 +53,8 @@
             "label": "docker ui_gateway",
             "type": "shell",
             "command": "cd ui_gateway; docker image prune -f; docker compose up -d --build"
+            "command": "cd ui_gateway; docker image prune -f; docker compose up -d --build",
+            "problemMatcher": []
         }
     ]
 }

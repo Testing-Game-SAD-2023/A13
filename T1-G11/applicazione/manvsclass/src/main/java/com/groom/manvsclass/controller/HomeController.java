@@ -138,7 +138,6 @@
         return adminService.showGestioneAssignments(request,jwt);
     }
 
-    
      //Solo x testing
      @GetMapping("/getLikes/{name}")
      @ResponseBody
