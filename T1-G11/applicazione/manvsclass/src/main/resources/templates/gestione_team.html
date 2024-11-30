@@ -16,8 +16,6 @@
 
 </head>
 <body>
-
-<!--Codice HTML qui-->
 <br>
 <br>
 <h1>Gestione Team</h1>
@@ -46,7 +44,30 @@
 	</a>
 </nav>
 
-<!--FINE MODIFICA-->
+<div class="team-container">
+    <div class=\"team-actions\">
+        <button onclick=\"addTeam()\">Aggiungi Team</button>
+        <button onclick=\"removeTeam()\">Rimuovi Team</button>
+        <button onclick=\"modifyTeam()\">Modifica Team</button>
+        <div id=\"modify-options\" style=\"display: none; margin-top: 10px;\">
+            <button onclick=\"addPlayer()\">Aggiungi Giocatore</button>
+            <button onclick=\"removePlayer()\">Rimuovi Giocatore</button>
+        </div>
+    </div>
+    <div class="team-section">
+        <h2>Team 1</h2>
+        <p>Descrizione del team 1.</p>
+    </div>
+    <div class="team-section">
+        <h2>Team 2</h2>
+        <p>Descrizione del team 2.</p>
+    </div>
+    <div class="team-section">
+        <h2>Team 3</h2>
+        <p>Descrizione del team 3.</p>
+    </div>
+    <!-- Aggiungi altre sezioni dinamicamente con JavaScript se necessario -->
+</div>
 </body>
 
 <!--Includi JQuery-->
