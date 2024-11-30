@@ -21,6 +21,27 @@ function returnToHome() {
     window.location.href = "/home_admin";
 }
 
+function addTeam() {
+    alert('Funzionalità per aggiungere un team.');
+}
+
+function removeTeam() {
+    alert('Funzionalità per rimuovere un team.');
+}
+
+function modifyTeam() {
+    const modifyOptions = document.getElementById('modify-options');
+    modifyOptions.style.display = modifyOptions.style.display === 'none' ? 'block' : 'none';
+}
+
+function addPlayer() {
+    alert('Funzionalità per aggiungere un giocatore.');
+}
+
+function removePlayer() {
+    alert('Funzionalità per rimuovere un giocatore.');
+}
+
 // function aggiungiTeam() {
 //     fetch('/aggiungi_team', {
 //         method: 'POST',
