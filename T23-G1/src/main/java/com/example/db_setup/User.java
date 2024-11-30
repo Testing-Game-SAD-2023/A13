@@ -13,6 +13,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 
 @Entity
@@ -31,6 +33,16 @@ public class User {
     private String email;
 
     private String password;
+
+    //MODIFICA
+    public boolean isRegisteredWithFacebook;
+    //FINE MODIFICA
+    //MODIFICA 18/06/2024
+    public boolean isRegisteredWithGoogle;
+    
+    @Enumerated (EnumType.STRING)
+    public Studies studies;
+
 
     @Column(name = "biography", length = 500)
     private String biography; // Campo per la descrizione personale
