@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,10 +17,10 @@ import (
 
 	"github.com/alarmfox/game-repository/api"
 	"github.com/alarmfox/game-repository/api/game"
+	"github.com/alarmfox/game-repository/api/playerhascategoryachievement"
 	"github.com/alarmfox/game-repository/api/robot"
 	"github.com/alarmfox/game-repository/api/round"
 	"github.com/alarmfox/game-repository/api/scalatagame"
-	"github.com/alarmfox/game-repository/api/playerhascategoryachievement"
 	"github.com/alarmfox/game-repository/api/turn"
 	"github.com/alarmfox/game-repository/limiter"
 	"github.com/alarmfox/game-repository/model"
@@ -55,6 +56,42 @@ type Configuration struct {
 
 //go:embed postman
 var postmanDir embed.FS
+
+func createTrigger(db *gorm.DB) error {
+	triggerFunction := `
+        CREATE OR REPLACE FUNCTION update_player_stats() RETURNS TRIGGER AS $$
+		BEGIN
+			-- Check if the player exists in player_stats
+			IF EXISTS (SELECT 1 FROM player_stats WHERE player_id = NEW.player_id) THEN
+				-- Increment SfidaPlayedGames
+				UPDATE player_stats
+                SET sfida_played_games = sfida_played_games + 1,
+					sfida_won_games = sfida_won_games + CASE WHEN NEW.is_winner THEN 1 ELSE 0 END
+				WHERE player_id = NEW.player_id;
+			ELSE
+				-- Insert a new row into player_stats
+                INSERT INTO player_stats (player_id, sfida_played_games, sfida_won_games)
+				VALUES (NEW.player_id, 1, CASE WHEN NEW.is_winner THEN 1 ELSE 0 END);
+			END IF;
+			RETURN NEW;
+		END;
+		$$ LANGUAGE plpgsql;`
+
+	trigger := `
+        CREATE OR REPLACE TRIGGER after_player_games_insert
+		AFTER INSERT ON player_games
+		FOR EACH ROW
+		EXECUTE FUNCTION update_player_stats();	
+	`
+
+	if err := db.Exec(triggerFunction).Error; err != nil {
+		return err
+	}
+	if err := db.Exec(trigger).Error; err != nil {
+		return err
+	}
+	return nil
+}
 
 func main() {
 	var (
@@ -104,6 +141,7 @@ func run(ctx context.Context, c Configuration) error {
 		&model.PlayerGame{},
 		&model.Robot{},
 		&model.PlayerHasCategoryAchievement{},
+		&model.PlayerStats{},
 	)
 
 	if err != nil {
@@ -112,6 +150,28 @@ func run(ctx context.Context, c Configuration) error {
 	if err := db.SetupJoinTable(&model.Game{}, "Players", &model.PlayerGame{}); err != nil {
 		return err
 	}
+
+	if err = createTrigger(db); err != nil {
+		return err
+	}
+
+	//Start TEST DB
+	tm := time.Now()
+	for i := 0; i < 100000; i++ {
+		playerGame := model.PlayerGame{
+			PlayerID:  fmt.Sprintf("%d", i%50),
+			GameID:    rand.Int63(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			IsWinner:  rand.Intn(2) == 1,
+		}
+		if err := db.Create(&playerGame).Error; err != nil {
+			//log.Fatalf("Failed to insert: %v", err)
+			log.Println("Errore Insert")
+		}
+	}
+	log.Printf("took %v", time.Since(tm))
+	//End TEST DB
 
 	if err := os.Mkdir(c.DataDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {
 		return fmt.Errorf("cannot create data directory: %w", err)
@@ -181,8 +241,8 @@ func run(ctx context.Context, c Configuration) error {
 			// scalatagame endpoint
 			scalataController = scalatagame.NewController(scalatagame.NewRepository(db))
 
-            // phca endpoint
-            phcaController = playerhascategoryachievement.NewController(playerhascategoryachievement.NewRepository(db))
+			// phca endpoint
+			phcaController = playerhascategoryachievement.NewController(playerhascategoryachievement.NewRepository(db))
 		)
 
 		r.Mount(c.ApiPrefix, setupRoutes(
@@ -424,12 +484,12 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 
 	})
 
-    r.Route("/phca", func(r chi.Router) {
-        // List PHCAs
-        r.Get("/", api.HandlerFunc(pc.FindAll))
+	r.Route("/phca", func(r chi.Router) {
+		// List PHCAs
+		r.Get("/", api.HandlerFunc(pc.FindAll))
 
-        // Get PHCA by Player ID
-        r.Get("/{pid}", api.HandlerFunc(pc.FindByPID))
+		// Get PHCA by Player ID
+		r.Get("/{pid}", api.HandlerFunc(pc.FindByPID))
 
 		// Create PHCA
 		r.With(middleware.AllowContentType("application/json")).
@@ -441,7 +501,7 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 
 		// Delete achievement
 		r.Delete("/{pid}/{statistic}", api.HandlerFunc(pc.Delete))
-    })
+	})
 
 	return r
 }

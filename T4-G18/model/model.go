@@ -6,15 +6,14 @@ import (
 	"time"
 )
 
-
 type PlayerHasCategoryAchievement struct {
-    PlayerID            int64      `gorm:"primaryKey;autoIncrement:false"`
-    Category            string     `gorm:"primaryKey;autoIncrement:false"`
-    Progress            float64    `gorm:"default:0"`                      // Current progress
+	PlayerID int64   `gorm:"primaryKey;autoIncrement:false"`
+	Category string  `gorm:"primaryKey;autoIncrement:false"`
+	Progress float64 `gorm:"default:0"` // Current progress
 }
 
 func (PlayerHasCategoryAchievement) TableName() string {
-    return "player_has_category_achievement"
+	return "player_has_category_achievement"
 }
 
 type ScalataGame struct {
@@ -36,21 +35,21 @@ func (ScalataGame) TableName() string {
 }
 
 type Game struct {
-	ID            int64          `gorm:"primaryKey;autoIncrement"`
-	Name          string         `gorm:"default:null"`
-	Username      string         `gorm:"default:null"`
-	CurrentRound  int            `gorm:"default:1"`
-	Description   string         `gorm:"default:null"`
-	Difficulty    string         `gorm:"default:null"`
-	Score         float64        `gorm:"default:0"`
-	IsWinner      bool           `gorm:"default:false"`
-	CreatedAt     time.Time      `gorm:"autoCreateTime"`
-	UpdatedAt     time.Time      `gorm:"autoUpdateTime"`
-	StartedAt     *time.Time     `gorm:"default:null"`
-	ClosedAt      *time.Time     `gorm:"default:null"`
-	Rounds        []Round        `gorm:"foreignKey:GameID;constraint:OnDelete:CASCADE;"`
-	Players       []Player       `gorm:"many2many:player_games;foreignKey:ID;joinForeignKey:GameID;References:AccountID;joinReferences:PlayerID"`
-	ScalataGameID int64          `gorm:"default:null"`
+	ID            int64      `gorm:"primaryKey;autoIncrement"`
+	Name          string     `gorm:"default:null"`
+	Username      string     `gorm:"default:null"`
+	CurrentRound  int        `gorm:"default:1"`
+	Description   string     `gorm:"default:null"`
+	Difficulty    string     `gorm:"default:null"`
+	Score         float64    `gorm:"default:0"`
+	IsWinner      bool       `gorm:"default:false"`
+	CreatedAt     time.Time  `gorm:"autoCreateTime"`
+	UpdatedAt     time.Time  `gorm:"autoUpdateTime"`
+	StartedAt     *time.Time `gorm:"default:null"`
+	ClosedAt      *time.Time `gorm:"default:null"`
+	Rounds        []Round    `gorm:"foreignKey:GameID;constraint:OnDelete:CASCADE;"`
+	Players       []Player   `gorm:"many2many:player_games;foreignKey:ID;joinForeignKey:GameID;References:AccountID;joinReferences:PlayerID"`
+	ScalataGameID int64      `gorm:"default:null"`
 }
 
 func (Game) TableName() string {
@@ -140,4 +139,15 @@ type Robot struct {
 
 func (Robot) TableName() string {
 	return "robots"
+}
+
+type PlayerStats struct {
+	ID               int64  `gorm:"primaryKey;autoIncrement"`
+    PlayerID         string `gorm:"default:null"`
+	SfidaWonGames    int64  
+	SfidaPlayedGames int64  
+}
+
+func (PlayerStats) TableName() string {
+	return "player_stats"
 }
