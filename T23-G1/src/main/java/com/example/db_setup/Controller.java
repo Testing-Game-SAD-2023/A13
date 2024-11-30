@@ -3,6 +3,11 @@ package com.example.db_setup;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Optional;
+
  
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
@@ -727,27 +732,43 @@ public class Controller {
 }
  
 /*Modifiche GabMan 29/11/2024 : Gestione biografia in sezione separata dal profilo  */
-@PostMapping("/updateBiography")
-public ResponseEntity<String> updateBiography(
+    @PostMapping("/updateBiography")
+    public ResponseEntity<String> updateBiography(
         @CookieValue(name = "jwt", required = false) String jwt,
-        @RequestParam("userId") Integer userId,
+        //@RequestParam("userId") Integer userId,
         @RequestParam("biography") String biography) {
-    // Verifica se il token JWT è valido
-    if (!isJwtValid(jwt)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+    try {
+        // Verifica il token JWT
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+        String userId = userData.get("userId").toString();
+
+        // Recupera l'utente dal database
+       Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+
+        if (!optionalUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        // Aggiorna la biografia
+        User user = optionalUser.get();
+        user.setBiography(biography);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Biography updated successfully!");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating biography.");
     }
- 
-    // Trova l'utente nel database usando l'ID fornito
-    User user = userRepository.findById(userId).orElse(null);
-    if (user == null) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-    }
- 
-    // Aggiorna la biografia dell'utente
-    user.setBiography(biography);
-    userRepository.save(user); // Salva le modifiche nel database
- 
-    return ResponseEntity.ok("Biography updated successfully!");
 }
+
  
 }

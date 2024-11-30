@@ -44,6 +44,12 @@ public class T23Service extends BaseService {
         registerAction("GetUsers", new ServiceActionDefinition(
                 params -> GetUsers() //metodo senza parametri
         ));
+        //cami
+        // Registra il metodo per aggiornare la biografia
+        registerAction("UpdateBiography", new ServiceActionDefinition(
+                params -> updateBiography((String) params[0], (String) params[1])
+        ));
+        //fine cami
     }
 
     // Metodo per l'autenticazione
@@ -65,4 +71,14 @@ public class T23Service extends BaseService {
         final String endpoint = "/students_list";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
     }
+    //cami
+    // Nuovo metodo per aggiornare la biografia
+    public Boolean updateBiography(String userId, String biography) {
+        final String endpoint = "/updateBiography";
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("userId", userId);
+        formData.add("biography", biography);
+        return callRestPost(endpoint, formData, null, Boolean.class);
+    }
+    //fine cami 
 }

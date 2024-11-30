@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: new URLSearchParams({ biography: bio })
+          body:new URLSearchParams({ biography: bio }),
         });
 
         if (response.ok) {

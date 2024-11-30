@@ -16,6 +16,8 @@
  */
 
 package com.g2.t5;
+import com.g2.Interfaces.T23Service;
+
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -31,10 +33,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,6 +80,11 @@ public class GuiController {
 
     @Autowired
     private AchievementService achievementService;
+
+    @Autowired
+    private T23Service t23Service;
+
+
 
     @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
@@ -124,8 +137,8 @@ public class GuiController {
         //modifiche cami
     @PostMapping("/updateBiography")
     public ResponseEntity<String> updateBiography(
-        @CookieValue(name = "jwt", required = false) String jwt,
-        @RequestParam("biography") String biography) {
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("biography") String biography) {
     try {
         // Decodifica il token JWT per ottenere l'ID utente
         byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
@@ -135,15 +148,8 @@ public class GuiController {
         @SuppressWarnings("unchecked")
         Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
         String userId = map.get("userId").toString();
-
-        // Crea i parametri per la richiesta
-        Map<String, String> params = new HashMap<>();
-        params.put("userId", userId);
-        params.put("biography", biography);
-
-        // Invio richiesta al servizio T23 per aggiornare la biografia
-        Boolean updateSuccess = (Boolean) serviceManager.handleRequest("T23", "updateBiography", params);
-
+        // Chiamata al metodo del T23Service
+        Boolean updateSuccess = t23Service.updateBiography(userId, biography);
         if (updateSuccess) {
             return ResponseEntity.ok("Biography updated successfully!");
         } else {
@@ -153,10 +159,12 @@ public class GuiController {
         System.out.println("Error updating biography: " + e.getMessage());
         return ResponseEntity.status(500).body("Internal server error.");
     }
-}
+    }
 
-    @PostMapping("/updateAvatar")
-public ResponseEntity<String> updateAvatar(
+    //fine modifiche 
+
+    /*@PostMapping("/updateAvatar")
+        public ResponseEntity<String> updateAvatar(
         @CookieValue(name = "jwt", required = false) String jwt,
         @RequestParam("avatar") String avatar) {
     try {
@@ -186,9 +194,11 @@ public ResponseEntity<String> updateAvatar(
         System.out.println("Error updating avatar: " + e.getMessage());
         return ResponseEntity.status(500).body("Internal server error.");
     }
-}
+    }
 
     //fine modifiche cami
+
+    */
 
     @GetMapping("/profile/{playerID}")
     public String profilePage(Model model,
