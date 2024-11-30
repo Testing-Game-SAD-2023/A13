@@ -107,3 +107,33 @@ function Scalata() {
     //Aggiungi qui il codice per gestire gli errori
   });
 }
+
+function Gestisci_Team() {
+  fetch('/gestione_team', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      
+      response.text().then(okMessage => {
+        alert("Verrai reindirizzato alla pagina di gestione dei team.");
+      });
+
+      window.location.href = "/gestione_team";
+    }
+    else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      });
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    // Gestione errori
+    alert("Si è verificato un errore durante il reindirizzamento alla pagina di gestione dei team.");
+  });
+}

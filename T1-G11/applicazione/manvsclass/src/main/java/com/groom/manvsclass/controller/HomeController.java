@@ -25,14 +25,16 @@
  import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
  import com.groom.manvsclass.model.Admin; 
  import com.groom.manvsclass.model.Achievement; 
- import com.groom.manvsclass.model.Statistic; 
- import com.groom.manvsclass.model.interaction; 
+ import com.groom.manvsclass.model.Statistic;
+import com.groom.manvsclass.model.Team;
+import com.groom.manvsclass.model.interaction; 
  import com.groom.manvsclass.model.Scalata; 
  
  import com.groom.manvsclass.service.AchievementService;
  import com.groom.manvsclass.service.AdminService;
  import com.groom.manvsclass.service.ScalataService;
- import com.groom.manvsclass.service.Util;
+import com.groom.manvsclass.service.TeamService;
+import com.groom.manvsclass.service.Util;
  
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
@@ -42,7 +44,8 @@
  import org.springframework.web.bind.annotation.GetMapping;
  import org.springframework.web.bind.annotation.PathVariable;
  import org.springframework.web.bind.annotation.PostMapping;
- import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestParam;
  import org.springframework.web.bind.annotation.ResponseBody;
  import org.springframework.web.multipart.MultipartFile;
@@ -75,6 +78,10 @@
      // MODIFICA (5/11/2024) - Inizializzazione dei servizi aggiunti
      @Autowired
      private Util utilsService;
+
+     // MODIFICA (29/11/2024) - Inizializzazione dei servizi aggiunti
+     @Autowired
+    private TeamService teamService;
  
      @GetMapping("/home_adm")
      public ModelAndView showHomeAdmin(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -435,4 +442,55 @@
          return utilsService.eliminaInteraction(id_i);
      }
      
+        // INIZIO MODIFICA: Rotte per la gestione dei Team 29/11/2024
+    @PostMapping("/team")
+    @ResponseBody
+    public ResponseEntity<Team> createTeam(@RequestBody Team team, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.createTeam(team, jwt);
+    }
+
+    @GetMapping("/team/{teamName}")
+    @ResponseBody
+    public ResponseEntity<Team> getTeamByName(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.getTeamByName(teamName, jwt);
+    }
+
+    @GetMapping("/teams")
+    @ResponseBody
+    public ResponseEntity<List<Team>> getAllTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.getAllTeams(jwt);
+    }
+
+    @PutMapping("/team/{teamName}")
+    @ResponseBody
+    public ResponseEntity<Team> updateTeam(@PathVariable String teamName, @RequestBody Team updatedTeam, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.updateTeam(teamName, updatedTeam, jwt);
+    }
+
+    @DeleteMapping("/team/{teamName}")
+    @ResponseBody
+    public ResponseEntity<String> deleteTeam(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.deleteTeam(teamName, jwt);
+    }
+
+    @GetMapping("/teams/leader/{leaderId}")
+    @ResponseBody
+    public ResponseEntity<List<Team>> findTeamsByLeader(@PathVariable String leaderId, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.findTeamsByLeader(leaderId, jwt);
+    }
+    
+    
+
+    @GetMapping("/teams/view")
+    public ModelAndView showAllTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+    return teamService.showAllTeams(jwt);
+    }
+
+    @GetMapping("/team/view/{teamName}")
+    public ModelAndView showTeamDetails(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
+    return teamService.showTeamDetails(teamName, jwt);
+    }
+
+    // Fine Modifica 29/11/2024
+
  }

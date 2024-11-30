@@ -361,3 +361,37 @@ nav.top-right {
 .scalata-button-container button:hover i {
     transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
 }
+
+/* MODIFICA (29/11/2024) : Aggiunta stile per il bottone "Gestisci Team" */
+.Gestione-Team {
+  position: fixed;
+  bottom: 10%;
+  right: 10%;
+  z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+}
+
+.Gestione-Team button {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: rgb(60, 120, 216); /* Colore iniziale */
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  font-family: Alegreya Sans, sans-serif;
+  text-align: center;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.Gestione-Team button:hover {
+  background-color: rgb(35, 90, 190); /* Colore più scuro al passaggio del mouse */
+  font-weight: bold;
+  transform: scale(1.1); /* Leggera espansione */
+}
+
+.Gestione-Team button:active {
+  background-color: rgb(25, 70, 160); /* Colore più scuro durante il click */
+  transform: scale(0.9); /* Leggera contrazione */
+}
+

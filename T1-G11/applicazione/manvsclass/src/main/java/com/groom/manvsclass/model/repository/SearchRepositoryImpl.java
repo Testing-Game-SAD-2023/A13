@@ -255,5 +255,6 @@ public class SearchRepositoryImpl {
 
             return posts;
         }    
-    
+
+
 }
