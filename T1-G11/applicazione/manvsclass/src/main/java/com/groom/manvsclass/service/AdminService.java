@@ -770,13 +770,11 @@ public class AdminService {
     public ModelAndView showGestioneTeams(HttpServletRequest request, String jwt) {
         if (jwtService.isJwtValid(jwt)) {
             System.out.println("Show Gestione Team: gestione_teams.html");    
-            return new ModelAndView("redirect:/gestione_teams");}
         
         return new ModelAndView("redirect:/loginAdmin");
     }
 
     public ModelAndView showGestioneAssignments(HttpServletRequest request, String jwt) {
-        if (jwtService.isJwtValid(jwt)) return new ModelAndView("redirect:/gestione_assignments");
         return new ModelAndView("redirect:/loginAdmin");
     }
 
