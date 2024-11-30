@@ -39,32 +39,41 @@
                     <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
                 </div>
             </div>
-            <!--Modifica (28/11) by GabMan 'Aggiunta area di modifica della biografia'-->
-            <div class="row">
-                <div class="col-8">
-                    <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-210">
-                                    <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
-                                </div>
-                                <div class="col">
-                                    <h4 class="card-title" id="usernameField"></h4>
-                                    <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
-                                    <hr>
-                                    <!--Modifica (28/11) by GabMan 'Aggiunta textarea per modificare la biografia'-->
-                                    <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
-                                    <!--Modifica (28/11) by GabMan 'Aggiunta pulsante per salvare la biografia'-->
-                                    <button id="saveBioButton" class="btn btn-success mt-2">Salva Biografia</button>
-                                    <!--Modifica (28/11) by GabMan 'Aggiunta messaggio di conferma per salvataggio'-->
-                                    <div id="saveMessage" class="mt-2" style="display: none; color: green;">Biografia salvata con successo!</div>
-                                </div>
-                            </div>
+            <!--Modifica (30/11) by GabMan 'Aggiunta area di modifica della biografia'-->
+       
+<div class="row">
+    <div class="col-8">
+        <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-210">
+                        <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                    </div>
+                    <div class="col">
+                        <h4 class="card-title" id="usernameField"></h4>
+                        <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
+                        <hr>
+
+                        <!-- Visualizzazione della biografia -->
+                        <div id="bioDisplaySection">
+                            <p id="bioText" style="white-space: pre-wrap; color: #fff;">La tua biografia...</p>
+                            <button id="editBioButton" class="btn btn-primary mt-2">Modifica Biografia</button>
                         </div>
+
+                        <!-- Modifica della biografia -->
+                        <div id="bioEditSection" style="display: none;">
+                            <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
+                            <button id="saveBioButton" class="btn btn-success mt-2">Salva Biografia</button>
+                            <div id="saveMessage" class="mt-2" style="display: none; color: green;">Biografia salvata con successo!</div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
         <!--Modifica (28/11) by GabMan 'Aggiunta sezione Trofei'-->
         <div id="trophies" class="section">

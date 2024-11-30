@@ -769,7 +769,7 @@ padding-left: 8%;
   background-color: #1e7e34; /* Colore ancora più scuro per il click */
 }
 
-/* Modifica (28/11) by GabMan 'Stile per il box della biografia' */
+/* Modifica (30/11) by GabMan 'Stile per il box della biografia' */
 #biography {
   border: 2px solid #6c757d; /* Bordo grigio chiaro */
   border-radius: 5px; /* Angoli arrotondati */
@@ -784,4 +784,10 @@ padding-left: 8%;
   border-color: #007bff; /* Cambia colore del bordo quando è attivo */
   outline: none; /* Rimuove il bordo di focus di default */
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Glow azzurro */
+}
+
+#bioText {
+  font-size: 16px;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
 }
