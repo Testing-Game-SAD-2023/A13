@@ -1,70 +1,85 @@
-
 package com.example.db_setup;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import jakarta.persistence.*;
 import lombok.Data;
+import java.util.HashSet;
+import java.util.Set;
 
-@Table (name = "Students", schema = "studentsrepo")
-@Data 
 @Entity
+@Table(name = "Students", schema = "studentsrepo")
+@Data
 public class User {
- 
+
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer ID;
 
-    public Integer ID;
+    private String name;
 
-    public String name;
+    private String surname;
 
-    public String surname;
-    
-    public String email;
+    private String email;
 
-    public String password;
+    private String password;
 
-    //MODIFICA
-    public boolean isRegisteredWithFacebook;
-    //FINE MODIFICA
-    //MODIFICA 18/06/2024
-    public boolean isRegisteredWithGoogle;
-    
-    @Enumerated (EnumType.STRING)
-    public Studies studies;
-
-    /* Informazioni Personali utente da aggiungere per il profilo
-    public String bio;
-    public List<User> friendsList;
-    public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
-    */
-    
-    // INIZIO MODIFICHE cami - Campi aggiuntivi per la gestione delle informazioni profilo
     @Column(name = "biography", length = 500)
     private String biography; // Campo per la descrizione personale
 
     @Column(name = "avatar")
     private String avatar; // Campo per il percorso dell'immagine profilo o URL
-    // FINE MODIFICHE
 
     @Column(name = "reset_token")
     private String resetToken;
-    
-    public void setResetToken(String resetToken) {
-        this.resetToken = resetToken;
-    }
-    
-    public String getResetToken() {
-        return resetToken;
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_friends",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    private Set<User> friends = new HashSet<>();
+
+    // Getter e Setter
+    public Integer getID() {
+        return ID;
     }
 
-     // INIZIO MODIFICHE - Getter e Setter per i nuovi campi
+    public void setID(Integer ID) {
+        this.ID = ID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getBiography() {
         return biography;
     }
@@ -80,6 +95,20 @@ public class User {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
-    // FINE MODIFICHE
 
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public Set<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<User> friends) {
+        this.friends = friends;
+    }
 }

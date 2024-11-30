@@ -438,9 +438,14 @@ public class GuiController {
     }
 
 //by Gabman 30/11 Endpoint Amici.js-T23Service
+// --- Nuovo Endpoint per Gestire gli Amici ---
 @GetMapping("/api/getFriends")
 public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = "jwt", required = false) String jwt) {
     try {
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(401).body(null); // Utente non autenticato
+        }
+
         // Decodifica il token JWT per ottenere l'ID utente
         byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
         String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
@@ -450,13 +455,12 @@ public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = 
         Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
         String userId = map.get("userId").toString();
 
-        // Chiamata al T23Service per ottenere la lista degli amici
+        // Recupero lista amici tramite T23Service
         List<Map<String, String>> friends = t23Service.getFriends(userId);
-
         return ResponseEntity.ok(friends);
     } catch (Exception e) {
         System.out.println("Error retrieving friends: " + e.getMessage());
-        return ResponseEntity.status(500).body(null);
+        return ResponseEntity.status(500).body(null); // Errore server
     }
 }
 

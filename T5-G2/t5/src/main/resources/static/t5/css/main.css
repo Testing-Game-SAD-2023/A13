@@ -801,18 +801,58 @@ padding-left: 8%;
 }
 
 /* Modifica (30/11) by GabMan 'Sezione Amici' */
-.friend-item {
-  padding: 10px;
-  margin: 5px 0;
-  background-color: rgba(57, 57, 83, 1);
-  color: white;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
 
 .friend-item:hover {
   background-color: #007bff;
   cursor: pointer;
 }
 
+/* Sezione amici */
+#friendsContainer {
+  padding: 10px;
+  border: 1px solid #444;
+  background-color: #333;
+  border-radius: 5px;
+  overflow-y: auto;
+}
+
+/* Stile per singolo amico */
+.friend-item {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #444;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 5px;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Input e pulsante per aggiungere amici */
+#friendIdInput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+}
+
+#addFriendButton {
+  width: 100%;
+  background-color: #28a745;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#addFriendButton:hover {
+  background-color: #218838;
+}
 

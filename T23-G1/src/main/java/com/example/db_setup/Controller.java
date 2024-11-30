@@ -770,5 +770,100 @@ public class Controller {
     }
 }
 
+    // by GabMan: Endpoint per ottenere la lista degli amici
+@PostMapping("/getFriends")
+public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica il token JWT
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
+        Integer userId = (Integer) claims.get("userId");
+
+        // Recupera l'utente dal database
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Ottieni la lista di amici
+        List<Map<String, String>> friends = userRepository.findFriendsByUserId(userId);
+        return ResponseEntity.ok(friends);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+}
+
+// by GabMan: Endpoint per aggiungere un amico
+@PostMapping("/addFriend")
+public ResponseEntity<String> addFriend(
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("friendId") Integer friendId) {
+    try {
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
+        Integer userId = (Integer) claims.get("userId");
+
+        // Recupera l'utente e l'amico dal database
+        User user = userRepository.findById(userId).orElse(null);
+        User friend = userRepository.findById(friendId).orElse(null);
+
+        if (user == null || friend == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
+        }
+
+        // Aggiungi l'amico alla lista
+        user.getFriends().add(friend);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Friend added successfully!");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while adding the friend.");
+    }
+}
+
+//byGabMan: Endpoint per rimuovere un amico
+@PostMapping("/removeFriend")
+public ResponseEntity<String> removeFriend(
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("friendId") Integer friendId) {
+    try {
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
+        Integer userId = (Integer) claims.get("userId");
+
+        // Recupera l'utente e l'amico dal database
+        User user = userRepository.findById(userId).orElse(null);
+        User friend = userRepository.findById(friendId).orElse(null);
+
+        if (user == null || friend == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
+        }
+
+        // Rimuovi l'amico dalla lista
+        user.getFriends().remove(friend);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Friend removed successfully!");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the friend.");
+    }
+}
+
+
+
  
 }

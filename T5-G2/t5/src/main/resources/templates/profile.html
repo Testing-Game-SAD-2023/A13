@@ -45,21 +45,42 @@
                 </div>
             </div>
             <!--Modifica (30/11) by GabMan 'Aggiunta sezione amici'-->
-            <div id="friends" class="section">
-                <div class="row">
-                    <div class="col-8">
-                        <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
-                            <div class="card-body">
-                                <h4 class="card-title">Amici</h4>
-                                <hr>
-                                <div id="friendsContainer" style="height:44.2vh; overflow-y: auto">
-                                    <!-- Il contenuto sarà aggiunto dinamicamente da Amici.js -->
-                                </div>
-                            </div>
-                        </div>
+        <!-- Sezione Amici -->
+<div id="friends" class="section">
+    <div class="row">
+        <div class="col-8">
+            <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
+                <div class="card-body">
+                    <h4 class="card-title">Amici</h4>
+                    <hr>
+
+                    <!-- Contenitore Lista Amici -->
+                    <div id="friendsContainer" style="height:44.2vh; overflow-y: auto">
+                        <!-- Il contenuto sarà aggiunto dinamicamente da Amici.js -->
+                    </div>
+
+                    <!-- Modulo per aggiungere amici -->
+                    <div style="margin-top: 20px;">
+                        <input
+                            type="text"
+                            id="friendIdInput"
+                            class="form-control"
+                            placeholder="Inserisci ID amico"
+                        />
+                        <button
+                            id="addFriendButton"
+                            class="btn btn-success mt-2"
+                            onclick="addFriend()"
+                        >
+                            Aggiungi Amico
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+    
             
             <!--Modifica (30/11) by GabMan 'Aggiunta area di modifica della biografia'-->
        
