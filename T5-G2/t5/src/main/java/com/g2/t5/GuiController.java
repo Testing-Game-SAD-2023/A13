@@ -439,7 +439,7 @@ public class GuiController {
 
 //by Gabman 30/11 Endpoint Amici.js-T23Service
 // --- Nuovo Endpoint per Gestire gli Amici ---
-@GetMapping("/api/getFriends")
+@GetMapping("/getFriends")
 public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = "jwt", required = false) String jwt) {
     try {
         if (jwt == null || jwt.isEmpty()) {
@@ -461,6 +461,61 @@ public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = 
     } catch (Exception e) {
         System.out.println("Error retrieving friends: " + e.getMessage());
         return ResponseEntity.status(500).body(null); // Errore server
+    }
+}
+// Metodo per aggiungere un amico
+@PostMapping("/addFriend")
+public ResponseEntity<String> addFriend(
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("friendId") String friendId) {
+    try {
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al T23Service per aggiungere un amico
+        Boolean addSuccess = t23Service.addFriend(userId, friendId);
+        if (addSuccess) {
+            return ResponseEntity.ok("Amico aggiunto con successo!");
+        } else {
+            return ResponseEntity.status(400).body("Impossibile aggiungere l'amico.");
+        }
+    } catch (Exception e) {
+        System.out.println("Errore durante l'aggiunta dell'amico: " + e.getMessage());
+        return ResponseEntity.status(500).body("Errore interno del server.");
+    }
+}
+
+// Metodo per rimuovere un amico
+@PostMapping("/removeFriend")
+public ResponseEntity<String> removeFriend(
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("friendId") String friendId) {
+    try {
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al T23Service per rimuovere un amico
+        Boolean removeSuccess = t23Service.removeFriend(userId, friendId);
+        if (removeSuccess) {
+            return ResponseEntity.ok("Amico rimosso con successo!");
+        } else {
+            return ResponseEntity.status(400).body("Impossibile rimuovere l'amico.");
+        }
+    } catch (Exception e) {
+        System.out.println("Errore durante la rimozione dell'amico: " + e.getMessage());
+        return ResponseEntity.status(500).body("Errore interno del server.");
     }
 }
 
