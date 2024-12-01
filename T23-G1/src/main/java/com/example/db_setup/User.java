@@ -14,6 +14,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 
 @Table (name = "Students", schema = "studentsrepo")
@@ -56,9 +58,11 @@ public class User {
         joinColumns = @JoinColumn(name = "follower_id"),
         inverseJoinColumns = @JoinColumn(name = "followed_id")
     )
+    @JsonIgnoreProperties({"followers", "following"})
     public List<User> following;
 
     @ManyToMany(mappedBy = "following")
+    @JsonIgnoreProperties({"followers", "following"})
     public List<User> followers;
 
     

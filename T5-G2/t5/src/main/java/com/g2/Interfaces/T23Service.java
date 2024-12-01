@@ -17,7 +17,9 @@
 
 package com.g2.Interfaces;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,12 @@ public class T23Service extends BaseService {
         registerAction("GetUsers", new ServiceActionDefinition(
                 params -> GetUsers() //metodo senza parametri
         ));
+
+        registerAction("GetUserbyID", new ServiceActionDefinition(
+            params -> GetUserbyID((Integer) params[0]),
+            Integer.class
+    ));
+
     }
 
     // Metodo per l'autenticazione
@@ -65,4 +73,12 @@ public class T23Service extends BaseService {
         final String endpoint = "/students_list";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
     }
+
+    private User GetUserbyID(Integer user_id) {
+        final String endpoint = "/students_list/" + user_id;
+
+        return callRestGET(endpoint, null, User.class);
+    }
+
+    
 }

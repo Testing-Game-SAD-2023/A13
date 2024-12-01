@@ -1,11 +1,31 @@
 # Modifiche Apportate:
 1. Modulo T23: 
-    - Implementato logica di Follow con le modifiche:
-        - `User.java`
-        - `UserRepository.java`
-    - Aggiunto al `Controller.java` i metodi:
-        - `getFollowerListbyUserID` *(Da Testare)*
+    - Modifiche ai model:
+        - `User.java` aggiunto i campi di:
+          - `List<User> following` [Logica Follow]
+          - `List<User> followers` [Logica Follow]
+    - Modifiche ai repository:
+      - `UserRepository.java` aggiunto il metodo:
+        - `existsFollowRelationship`
+    - Aggiunto al `Controller.java` i metodi/route:
+        - `getFollowerListbyUserID` *(Ok ma si potrebbe togliere)*
         - `addFollow`
+        - `rmFollow`
+        - `searchPlayer`
+        - `modifyPlayer`
+2. Ui Gateway:
+    - Aggiunto addFollow, rmFollow, searchPlayer, modifyPlayer, getFollowerListbyUserID a riga 51 di default.conf
+3. Modulo T5:
+    - Modifiche a:
+      - `User.java`
+      - `T23ServiceTest.java`
+    - Mofiche front-end:
+      - `profile.html`
+      - `profile.js`
+    - Aggiunto il service `UserService.java` con i metodi:
+      - `getUserbyID`
+    - Aggiunto al `T23Service.java` i metodi:
+      - `GetUserbyID`
 
 
 # Come Compilare:

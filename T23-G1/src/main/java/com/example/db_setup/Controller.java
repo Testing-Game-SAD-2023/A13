@@ -11,6 +11,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +41,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -626,23 +629,48 @@ public class Controller {
 
     @GetMapping("/students_list/{ID}")
     @ResponseBody
-    public User getStudent(@PathVariable String ID) {
-        //implemntare la logica dei coockie
-        return userRepository.findByID(Integer.parseInt(ID));
+    public ResponseEntity<User> getStudent(@PathVariable String ID) {
+        User user = userRepository.findByID(Integer.parseInt(ID));
+        if (user != null) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header("Content-Type", "application/json")
+                    .body(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
-   
+    
+
+    //SI PUò TOGLIERE NON CI SERVE
     @GetMapping("/follower_list/{ID}")
-    public List<User> getFollowerListbyUserID(@PathVariable String ID) {
-        //Implementare la logica dei coockie
-        return userRepository.findByID(Integer.parseInt(ID)).getFollowers();
+    public List<User> getFollowerListbyUserID(@PathVariable String ID 
+                                                /*
+                                                DA DECOMMENTARE
+                                                ,@CookieValue(name = "jwt", required = false) String jwt*/) {
+        /* 
+        DA DECOMMENTARE
+        
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
+
+        if(isJwtValid(jwt)) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
+        }
+        */        
+        return userRepository.findByID(Integer.parseInt(ID)).getFollowing();
     }
 
     @PostMapping("/addFollow")
     public ResponseEntity<String> addFollow(@RequestParam("userID_1") String userID_1,
                                                 @RequestParam("userID_2") String userID_2,
-                                                /*@CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
+                                                /*
+                                                DA DECOMMENTARE
+                                                @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
         
             /* 
+            DA DECOMMENTARE
+            
+            if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
+
             if(isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
             }
@@ -680,6 +708,120 @@ public class Controller {
 
     }
     
+    
+    @PostMapping("/rmFollow")
+    public ResponseEntity<String> rmFollow(@RequestParam("userID_1") String userID_1,
+                                                @RequestParam("userID_2") String userID_2,
+                                                /*
+                                                DA DECOMMENTARE
+                                                @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
+        
+            /* 
+            DA DECOMMENTARE
+            
+            if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
+
+            if(isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
+            }
+            */
+            
+            User follower = userRepository.findByID(Integer.parseInt(userID_1));
+            User followed = userRepository.findByID(Integer.parseInt(userID_2));
+            
+            if( follower == null ){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 not exist");
+            } else if ( followed == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 not exist");
+            }
+            
+            //Controlla se io provo a defolloware una persona che già non follow
+            if (!(userRepository.existsFollowRelationship(follower.ID, followed.ID) > 0)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower già non segue followed");
+            }
+        
+
+            // Aggiungi l'utente alla lista di following e viceversa
+            follower.getFollowing().remove(followed);
+            followed.getFollowers().remove(follower);
+
+            // Salva le modifiche
+            userRepository.save(follower);
+            userRepository.save(followed);
+
+
+            return ResponseEntity.status(HttpStatus.OK).body("Operation of unfollow completed");
+
+    }
+    
+    @GetMapping("/searchPlayer")
+    public ResponseEntity<User> searchPlayer (@RequestParam("key_search") String key_search,
+                            /*
+                            DA DECOMMENTARE
+                            @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request){
+            
+        /* 
+        DA DECOMMENTARE
+        
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
+
+        if(isJwtValid(jwt)) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
+        }
+        */
+
+        User user = null;
+
+        if(key_search.matches(".*[a-zA-Z]+.*")){
+            user = userRepository.findByEmail(key_search);
+        }else{
+            user = userRepository.findByID(Integer.parseInt(key_search));
+        }
+
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }else{
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        }
+
+    }
+
+
+    @PutMapping("/modifyUser")
+    public ResponseEntity<String> modifyUser (@RequestBody User user_updated, @RequestParam("old_psw") String old_psw,
+                                            /*
+                                            DA DECOMMENTARE
+                                            @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
+        /* 
+        DA DECOMMENTARE
+        
+        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
+
+        if(isJwtValid(jwt)) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
+        }
+        */
+
+        User user = userRepository.findByID(user_updated.ID);
+
+        if(user != null){
+
+            boolean passwordMatches = myPasswordEncoder.matches(old_psw, user.password);
+
+            if (!passwordMatches) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
+            }
+            
+            user_updated.password = myPasswordEncoder.encode(user_updated.password);
+
+            userRepository.save(user_updated);
+            
+            return ResponseEntity.status(HttpStatus.OK).body("Update completed");
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User doesn't exist");
+        }
+    }
+
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 

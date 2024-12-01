@@ -128,9 +128,9 @@ class T23ServiceTest {
         // Dati di test: Lista di utenti fittizi
         List<User> mockUsers = new ArrayList<>();
         mockUsers.add(
-                new User(1L, "John", "Doe", "john.doe@example.com", "password123", false, "Computer Science", null));
+                new User(1, "John", "Doe", "john.doe@example.com", "password123", false, false, "Computer Science", null, null, null));
         mockUsers
-                .add(new User(2L, "Jane", "Smith", "jane.smith@example.com", "password456", true, "Mathematics", null));
+                .add(new User(2, "Jane", "Smith", "jane.smith@example.com", "password456", true, false, "Mathematics", null, null, null));
 
         // Configurazione del server mock per rispondere con i dati fittizi
         try {
@@ -146,22 +146,22 @@ class T23ServiceTest {
 
         // Verifica dei campi del primo utente
         User user1 = result.get(0);
-        assertEquals(1L, user1.getId());
+        assertEquals(1, user1.getId());
         assertEquals("John", user1.getName());
         assertEquals("Doe", user1.getSurname());
         assertEquals("john.doe@example.com", user1.getEmail());
         assertEquals("password123", user1.getPassword());
-        assertEquals(false, user1.isRegisteredWithFacebook());
+        assertEquals(false, user1.getisRegisteredWithFacebook());
         assertEquals("Computer Science", user1.getStudies());
 
         // Verifica dei campi del secondo utente
         User user2 = result.get(1);
-        assertEquals(2L, user2.getId());
+        assertEquals(2, user2.getId());
         assertEquals("Jane", user2.getName());
         assertEquals("Smith", user2.getSurname());
         assertEquals("jane.smith@example.com", user2.getEmail());
         assertEquals("password456", user2.getPassword());
-        assertEquals(true, user2.isRegisteredWithFacebook());
+        assertEquals(true, user2.getisRegisteredWithFacebook());
         assertEquals("Mathematics", user2.getStudies());
     }
 

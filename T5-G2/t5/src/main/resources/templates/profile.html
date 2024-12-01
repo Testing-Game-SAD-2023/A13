@@ -158,9 +158,9 @@
                                             <div class="name-container">
                                                 <div>
                                                     <h4 >
-                                                        <p id="firstNameField"></p> <!-- Nome -->
-                                                        <p id="lastNameField"></p>  <!-- Cognome -->
-                                                        <p id="usernameField"></p>
+                                                        <p th:text="${user.name}"></p> <!-- Nome -->
+                                                        <p th:text="${user.surname}"></p>  <!-- Cognome -->
+                                                        <p th:text="${user.email}"></p>
                                                     </h4>
                                                 </div>
                                                 <div>
@@ -168,7 +168,7 @@
                                                 </div>
                                             </div>
                                             <h6 class="card-subtitle mb-2 text-body-secondary" >
-                                                <p id="studiesField"></p>
+                                                <p th:text="${user.studies}"></p>
                                             </h6>
                                             
                                             
@@ -237,23 +237,9 @@
                             </div>
                             <hr>
                             <div class="followed-list-container">
-                                <div class="followed-item" >
-                                    <p>Nome Seguito 1</p>
-                                </div>
-                                <div class="followed-item" >
-                                    <p>Nome Seguito 2</p>
-                                </div>
-                                <div class="followed-item" >
-                                    <p>Nome Seguito 3</p>
-                                </div>
-                                <div class="followed-item" >
-                                    <p>Nome Seguito 4</p>
-                                </div>
-                                <div class="followed-item">
-                                    <p>Nome Seguito 5</p>
-                                </div>
-                                <div class="followed-item">
-                                    <p>Nome Seguito 6</p>
+                                <div th:each="element: ${user.following}" class="row">
+                                    <div class="followed-item" th:text="${element.name} + ' ' + ${element.surname}">
+                                    </div>                                    
                                 </div>
                             </div>
                         </div>
@@ -262,6 +248,6 @@
             </div>
         </div>
 
-        <span id="user_id" style="display: none;" th:text="${userID}"></span>
+        <!--<span id="user_id" style="display: none;" th:text="${userID}"></span> -->
     </body>
 </html>

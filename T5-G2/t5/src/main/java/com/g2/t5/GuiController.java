@@ -58,6 +58,7 @@ import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
+import com.g2.Service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -72,6 +73,9 @@ public class GuiController {
 
     @Autowired
     private AchievementService achievementService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
@@ -131,6 +135,8 @@ public class GuiController {
 
         int userId = Integer.parseInt(playerID);
 
+        User user = userService.getUserbyID(userId);
+
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
         List<Statistic> allStatistics = achievementService.getStatistics();
@@ -138,16 +144,18 @@ public class GuiController {
 
         for (Statistic stat : allStatistics)
             IdToStatistic.put(stat.getID(), stat);
-
+        
         GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
         GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
-        GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
+        //GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
+        GenericObjectComponent objUser = new GenericObjectComponent("user", user);
 
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
-        profile.setObjectComponents(objUserID);
+        //profile.setObjectComponents(objUserID);
+        profile.setObjectComponents(objUser);
 
         return profile.handlePageRequest();
     }
@@ -221,6 +229,8 @@ public class GuiController {
         return leaderboard.handlePageRequest();
     }
 
+    //??? Nn funziona non esiste???
+    /* 
     @GetMapping("/edit_profile")
     public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
@@ -234,6 +244,7 @@ public class GuiController {
         main.SetAuth(jwt);
         return main.handlePageRequest();
     }
+    */
 
     @GetMapping("/report")
     public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {

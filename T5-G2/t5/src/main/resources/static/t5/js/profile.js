@@ -15,7 +15,10 @@ const parseJwt = (token) => {
 };
 
 //TODO: questo è solo per DEMO, i dati del profilo devono essere contenuti in un model
+
 document.addEventListener("DOMContentLoaded", (e) => {
+  /*
+
       var userId = document.getElementById("user_id").innerHTML;
       console.log(userId)
 
@@ -39,4 +42,6 @@ document.addEventListener("DOMContentLoaded", (e) => {
           swal("Errore","Errore durante il recupero dei dati utente","error");
         }
       });
+  */
 });
+
