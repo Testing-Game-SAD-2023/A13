@@ -1,3 +1,4 @@
+
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -26,7 +27,10 @@ document.addEventListener("DOMContentLoaded", (e) => {
         type: 'GET',
         timeout: 30000,
         success: function (data, textStatus, xhr) {
-          document.getElementById("usernameField").innerText = data.email + " - " + data.name + " " + data.surname;
+          document.getElementById("usernameField").innerText = data.email;
+          document.getElementById("firstNameField").innerText =  data.name ;
+          document.getElementById("lastNameField").innerText = data.surname;
+
 
           document.getElementById("studiesField").innerText = data.studies;
         },

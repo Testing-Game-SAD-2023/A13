@@ -1,4 +1,4 @@
-<html>
+<html> 
     <head>
         <link href="/t5/css/main.css" rel="stylesheet" />
         <link href="/t5/css/main2.css" rel="stylesheet" />
@@ -15,42 +15,179 @@
         <script src="/t5/js/profile.js"></script>
 
         <title>Profilo utente</title>
+        <style>
+        
+        .achievements-container {
+            max-height: 200px; /* Altezza massima per il contenuto */
+            overflow-y: auto; /* Abilita lo scroll verticale */
+            padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
+        }
+
+        .container-fluid {
+            height: 100vh; /* Usa tutta l'altezza dello schermo */
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
+        .top-bar {
+            height: 50px; /* Riduce l'altezza */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            background-color: #1c1c2b; /* Sfondo scuro */
+        }
+
+        /* Layout a due colonne */
+        .row {
+            flex: 1;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .col-6 {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Distribuisce le card equamente */
+            height: 100%;
+            padding: 0;
+        }
+
+        /* Card con altezza bilanciata */
+        .card {
+            flex: 1; /* Ogni card occupa metà della colonna */
+            margin: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-body {
+            flex: 1; /* Occupa tutto lo spazio disponibile nella card */
+            overflow-y: auto; /* Scroll interno se il contenuto eccede */
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .btn-sm {
+            font-size: 0.875rem;
+            padding: 0.4rem 0.8rem;
+        }
+        .followed-list-container {
+            max-height: 150px; /* Altezza massima per limitare l'espansione */
+            overflow-y: auto; /* Scroll verticale se il contenuto eccede */
+            padding-right: 10px; /* Spazio per evitare sovrapposizione con lo scroll */
+        }
+
+        .followed-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd; /* Separatore tra gli elementi */
+            font-size: 0.9rem; /* Riduci leggermente il testo se necessario */
+        }
+
+        /* Immagine profilo */
+        .propic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Sezione informazioni profilo */
+        .profile-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-info {
+            margin-left: 20px;
+        }
+
+        .profile-info .name-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .statistics-container {
+            max-height: 200px; /* Altezza massima per il contenuto */
+            overflow-y: auto; /* Abilita lo scroll verticale */
+            padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
+        }
+
+        /* Media query per schermi piccoli */
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+
+            .col-6 {
+                height: auto; /* Consenti alle colonne di adattarsi */
+            }
+        }
+
+        </style>
     </head>
 
     <body class="bg-custom">
         <div class="container-fluid">
-            <div class="row">
-                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" >Profilo</p>
+            <div class="top-bar">
+                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" ></p>
                 <div id="topRightContainer">
-                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Profilo</button>
+                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Home</button>
                     <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
                 </div>
             </div>
             <div class="row">
-                <div class="col-8">
-                    <div class="row">
-                        <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
+                <div class="col-6">
+                    
+                    <div class="card ">
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-210">
-                                        <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
-                                    </div>
-                                    <div class="col">
-                                        <h4 class="card-title" id="usernameField"></h4>
-                                        <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
-                                        <hr>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur maximus pretium lacinia. Curabitur et varius neque. Aliquam tincidunt tortor eget felis rhoncus, et commodo ex vulputate. Cras tristique id arcu non condimentum. Fusce non dignissim lorem. Ut porttitor mattis nisl quis interdum. Aliquam tortor orci, interdum in gravida faucibus, auctor sit amet tellus. Aliquam vulputate enim quis rhoncus eleifend. Maecenas id orci est. Mauris at rutrum velit. Nunc posuere leo eget nisl lacinia semper. Fusce interdum, neque at suscipit tristique, tellus sem elementum quam, quis placerat justo orci eget nunc. Nam eget turpis ut elit sollicitudin ornare ac id lorem. Cras facilisis enim et eros suscipit, ut convallis ante suscipit. Nunc luctus diam at sollicitudin ornare. Mauris vel pharetra dolor. </p>
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title">Informazioni Personali</h4>
+                                    <button class="btn btn-secondary btn-sm" onclick="editInfo()">Modifica</button>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
-                            <div class="card-body">
-                                <h4 class="card-title">Trofei</h4>
                                 <hr>
-                                <div style="height:44.2vh; overflow-y: auto">
+                                
+                                    <div class="profile-container">
+                                        <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                                        <div class="profile-info">
+                                            <div class="name-container">
+                                                <div>
+                                                    <h4 >
+                                                        <p id="firstNameField"></p> <!-- Nome -->
+                                                        <p id="lastNameField"></p>  <!-- Cognome -->
+                                                        <p id="usernameField"></p>
+                                                    </h4>
+                                                </div>
+                                                <div>
+                                                   <!-- <button id="editButton" class="btn btn-primary">Modifica informazioni</button>--> 
+                                                </div>
+                                            </div>
+                                            <h6 class="card-subtitle mb-2 text-body-secondary" >
+                                                <p id="studiesField"></p>
+                                            </h6>
+                                            
+                                            
+                                            
+                                        </div>
+                                    </div>
+                                
+                            </div>
+                    </div>
+                    
+                    
+                        <div class="card ">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title">Achievements</h4>
+                                    <button class="btn btn-secondary btn-sm" onclick="viewAllAchievements()">Visualizza tutti gli achievements</button>
+                                </div>
+                                <hr>
+                                <div class="achievements-container">
                                     <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
                                     <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
                                         <div class="row">
@@ -69,22 +206,54 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    
                 </div>
-                <div class="col">
-                    <div class="card" style="height:92vh">
+                <div class="col-6">
+                    <div class="card ">
                         <div class="card-body">
                             <h4 class="card-title">Statistiche</h4>
                             <hr>
-                            <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
-                                <!--<div class="col-1">
-                                    I
-                                </div>-->
-                                <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
-                                    Nome statistica
+                            <div class="statistics-container">
+                                <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
+                                    <!--<div class="col-1">
+                                        I
+                                    </div>-->
+                                    <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
+                                        Nome statistica
+                                    </div>
+                                    <div class="col text-right" th:text="${element.Progress}">
+                                        1000
+                                    </div>
                                 </div>
-                                <div class="col text-right" th:text="${element.Progress}">
-                                    1000
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Lista Seguiti</h4>
+                                <button class="btn btn-secondary btn-sm" onclick="searchPlayer()">Ricerca Player</button>
+                                
+                            </div>
+                            <hr>
+                            <div class="followed-list-container">
+                                <div class="followed-item" >
+                                    <p>Nome Seguito 1</p>
+                                </div>
+                                <div class="followed-item" >
+                                    <p>Nome Seguito 2</p>
+                                </div>
+                                <div class="followed-item" >
+                                    <p>Nome Seguito 3</p>
+                                </div>
+                                <div class="followed-item" >
+                                    <p>Nome Seguito 4</p>
+                                </div>
+                                <div class="followed-item">
+                                    <p>Nome Seguito 5</p>
+                                </div>
+                                <div class="followed-item">
+                                    <p>Nome Seguito 6</p>
                                 </div>
                             </div>
                         </div>
