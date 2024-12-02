@@ -143,9 +143,9 @@ func (Robot) TableName() string {
 
 type PlayerStats struct {
 	ID               int64  `gorm:"primaryKey;autoIncrement"`
-    PlayerID         string `gorm:"default:null"`
-	SfidaWonGames    int64  
-	SfidaPlayedGames int64  
+	PlayerID         string `gorm:"default:null"`
+	SfidaWonGames    int64  `gorm:index`
+	SfidaPlayedGames int64  `gorm:index`
 }
 
 func (PlayerStats) TableName() string {
