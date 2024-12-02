@@ -11,8 +11,8 @@
         <!--Modifica (21/05) Adding JQuery-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!--Fine Modifica-->
-
-        <script src="/t5/js/profile.js"></script>
+        <script src="/t5/bootstrap-4/js/bootstrap.min.js"></script>
+        <!--<script src="/t5/js/profile.js"></script>--> 
 
         <title>Profilo utente</title>
         <style>
@@ -137,8 +137,8 @@
             <div class="top-bar">
                 <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" ></p>
                 <div id="topRightContainer">
-                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Home</button>
-                    <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
+                    <a href="/main" class="logout-button">Home</a>
+                    <a href="/logout" class="logout-button">Logout</a>
                 </div>
             </div>
             <div class="row">
@@ -148,7 +148,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">Informazioni Personali</h4>
-                                    <button class="btn btn-secondary btn-sm" onclick="editInfo()">Modifica</button>
+                                    <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#editModal">Modifica</button>
                                 </div>
                                 <hr>
                                 
@@ -161,6 +161,7 @@
                                                         <p th:text="${user.name}"></p> <!-- Nome -->
                                                         <p th:text="${user.surname}"></p>  <!-- Cognome -->
                                                         <p th:text="${user.email}"></p>
+                                                        <p th:text="${#strings.repeat('*', user.password.length())}"></p>
                                                     </h4>
                                                 </div>
                                                 <div>
@@ -184,21 +185,31 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">Achievements</h4>
-                                    <button class="btn btn-secondary btn-sm" onclick="viewAllAchievements()">Visualizza tutti gli achievements</button>
+                                    <button class="btn btn-secondary btn-sm" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
                                 </div>
                                 <hr>
                                 <div class="achievements-container">
                                     <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
-                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
+                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}"
+                                        class="achievement-container"
+                                        style="overflow: hidden; margin: 2px"
+                                        th:data-completed="${element.Progress} >= ${element.ProgressRequired} ? 'true' : 'false'">
                                         <div class="row">
                                             <div class="col-2">
-                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px"
+                                                 th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
                                             </div>
                                             <div class="col">
                                                 <h4 th:text="${element.Name}">Nome achievement</h4>
                                                 <p th:text="${element.Description}">Descrizione achievement</p>
                                                 <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
-                                                    <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
+                                                    <div class="progress-bar" role="progressbar"
+                                                    th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" 
+                                                    aria-valuenow="${element.Progress}" 
+                                                    aria-valuemin="0" 
+                                                    aria-valuemax="100" 
+                                                    th:text="${element.Progress}+'/'+${element.ProgressRequired}">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -232,7 +243,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h4 class="card-title mb-0">Lista Seguiti</h4>
-                                <button class="btn btn-secondary btn-sm" onclick="searchPlayer()">Ricerca Player</button>
+                                <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#searchPlayerModal">Ricerca Player</button>
                                 
                             </div>
                             <hr>
@@ -247,7 +258,111 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Modifica Informazioni</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="nameInput">Nome</label>
+                                <input type="text" class="form-control" id="nameInput" placeholder="Inserisci il nome">
+                            </div>
+                            <div class="form-group">
+                                <label for="surnameInput">Cognome</label>
+                                <input type="text" class="form-control" id="surnameInput" placeholder="Inserisci il cognome">
+                            </div>
+                            <div class="form-group">
+                                <label for="emailInput">Email</label>
+                                <input type="email" class="form-control" id="emailInput" placeholder="Inserisci l'email">
+                            </div>
+                            <div class="form-group">
+                                <label for="emailInput">Password</label>
+                                <input type="email" class="form-control" id="passwordInput" placeholder="Inserisci la password">
+                            </div>
+                            <div class="form-group">
+                                <label for="studiesInput">Studi</label>
+                                <input type="text" class="form-control" id="studiesInput" placeholder="Inserisci il campo di studi">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                        <button type="button" class="btn btn-primary">Salva modifiche</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="searchPlayerModal" tabindex="-1" role="dialog" aria-labelledby="searchPlayerModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="searchPlayerModalLabel">Ricerca Player</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="playerIDInput">ID Player</label>
+                                <input type="text" class="form-control" id="playerIDInput" placeholder="Inserisci l'ID del player">
+                            </div>
+                            <div class="form-group">
+                                <label for="playerEmailInput">Email Player</label>
+                                <input type="email" class="form-control" id="playerEmailInput" placeholder="Inserisci l'email del player">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                        <button type="button" class="btn btn-primary">Cerca</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!--<span id="user_id" style="display: none;" th:text="${userID}"></span> -->
     </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        // Mostra solo gli achievement completati all'avvio
+        viewCompletedAchievements();
+    });
+
+
+         function viewCompletedAchievements() {
+        const achievements = document.querySelectorAll('.achievement-container');
+        achievements.forEach(achievement => {
+            const isCompleted = achievement.getAttribute('data-completed') === 'true';
+            achievement.style.display = isCompleted ? '' : 'none';
+        });
+    }
+
+    // Funzione per mostrare tutti gli achievement
+    function viewAllAchievements() {
+        const achievements = document.querySelectorAll('.achievement-container');
+        achievements.forEach(achievement => {
+            achievement.style.display = '';
+        });
+    }
+    function toggleAchievements() {
+        const button = document.getElementById('toggle-button');
+        const showAll = button.textContent === 'Visualizza tutti gli achievements';
+
+        if (showAll) {
+            viewAllAchievements();
+            button.textContent = 'Visualizza solo achievements completati';
+        } else {
+            viewCompletedAchievements();
+            button.textContent = 'Visualizza tutti gli achievements';
+        }
+    }
+
+    </script>
 </html>

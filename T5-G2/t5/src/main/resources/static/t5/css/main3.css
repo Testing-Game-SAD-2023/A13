@@ -1,0 +1,110 @@
+.achievements-container {
+    max-height: 200px; /* Altezza massima per il contenuto */
+    overflow-y: auto; /* Abilita lo scroll verticale */
+    padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
+}
+
+.container-fluid {
+    height: 100vh; /* Usa tutta l'altezza dello schermo */
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+.top-bar {
+    height: 50px; /* Riduce l'altezza */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    background-color: #1c1c2b; /* Sfondo scuro */
+}
+
+/* Layout a due colonne */
+.row {
+    flex: 1;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.col-6 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribuisce le card equamente */
+    height: 100%;
+    padding: 0;
+}
+
+/* Card con altezza bilanciata */
+.card {
+    flex: 1; /* Ogni card occupa metà della colonna */
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    flex: 1; /* Occupa tutto lo spazio disponibile nella card */
+    overflow-y: auto; /* Scroll interno se il contenuto eccede */
+}
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+.btn-sm {
+    font-size: 0.875rem;
+    padding: 0.4rem 0.8rem;
+}
+.followed-list-container {
+    max-height: 150px; /* Altezza massima per limitare l'espansione */
+    overflow-y: auto; /* Scroll verticale se il contenuto eccede */
+    padding-right: 10px; /* Spazio per evitare sovrapposizione con lo scroll */
+}
+
+.followed-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Separatore tra gli elementi */
+    font-size: 0.9rem; /* Riduci leggermente il testo se necessario */
+}
+
+/* Immagine profilo */
+.propic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Sezione informazioni profilo */
+.profile-container {
+    display: flex;
+    align-items: center;
+}
+
+.profile-info {
+    margin-left: 20px;
+}
+
+.profile-info .name-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.statistics-container {
+    max-height: 200px; /* Altezza massima per il contenuto */
+    overflow-y: auto; /* Abilita lo scroll verticale */
+    padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
+}
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .col-6 {
+        height: auto; /* Consenti alle colonne di adattarsi */
+    }
+}

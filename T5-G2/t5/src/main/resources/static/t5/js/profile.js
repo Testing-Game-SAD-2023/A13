@@ -16,32 +16,41 @@ const parseJwt = (token) => {
 
 //TODO: questo è solo per DEMO, i dati del profilo devono essere contenuti in un model
 
-document.addEventListener("DOMContentLoaded", (e) => {
-  /*
-
-      var userId = document.getElementById("user_id").innerHTML;
-      console.log(userId)
-
-      var userAPIString = '/students_list/{0}'.replace('{0}', userId);
-
-      // Get user infos
-      $.ajax({
-        url: userAPIString,
-        type: 'GET',
-        timeout: 30000,
-        success: function (data, textStatus, xhr) {
-          document.getElementById("usernameField").innerText = data.email;
-          document.getElementById("firstNameField").innerText =  data.name ;
-          document.getElementById("lastNameField").innerText = data.surname;
 
 
-          document.getElementById("studiesField").innerText = data.studies;
-        },
-        error: function (xhr, textStatus, errorThrown) {
-          console.error("Errore durante il recupero dei dati utente:", errorThrown);
-          swal("Errore","Errore durante il recupero dei dati utente","error");
-        }
-      });
-  */
+document.addEventListener('DOMContentLoaded', (e) => {
+  // Mostra solo gli achievement completati all'avvio
+  viewCompletedAchievements();
+  const toggleButton = document.getElementById('toggle-button');
+    toggleButton.addEventListener('click', toggleAchievements);
 });
+
+
+   function viewCompletedAchievements() {
+  const achievements = document.querySelectorAll('.achievement-container');
+  achievements.forEach(achievement => {
+      const isCompleted = achievement.getAttribute('data-completed') === 'true';
+      achievement.style.display = isCompleted ? '' : 'none';
+  });
+}
+
+// Funzione per mostrare tutti gli achievement
+function viewAllAchievements() {
+  const achievements = document.querySelectorAll('.achievement-container');
+  achievements.forEach(achievement => {
+      achievement.style.display = '';
+  });
+}
+function toggleAchievements() {
+  const button = document.getElementById('toggle-button');
+  const showAll = button.textContent === 'Visualizza tutti gli achievements';
+
+  if (showAll) {
+      viewAllAchievements();
+      button.textContent = 'Visualizza solo achievements completati';
+  } else {
+      viewCompletedAchievements();
+      button.textContent = 'Visualizza tutti gli achievements';
+  }
+}
 
