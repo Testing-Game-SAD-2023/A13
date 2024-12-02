@@ -1,14 +1,36 @@
-<!--Creazione 29/11/2024: Giuleppe-->
+<!--CARMINE: Inserimento della pagina di gestione di teams-->
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagina di Prova</title>
+    <title>Student Teams</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel='stylesheet' href="/t1/css/teams.css"><!--aggiunta del css della pagina-->
 </head>
 <body>
-    <h1>Benvenuto nella pagina di prova!</h1>
-    <p>Questa è una pagina di esempio per testare Spring MVC.</p>
-    <a href="/">Torna alla Home</a>
+    <div class="header">
+        
+        <span class="icon">
+                <a href="/index.html">
+                <img src="/t1/css/Images/admin-logo-1.png" alt="icon">
+            </a> 
+        </span>
+        <p>Student Team Management</p>
+
+        <button class="button-header" id="openModalButton">
+            <p id="button-header-p">Add Team</p>
+        </button>
+        </div>  
+   
+    <div id="folders" class="folder-container"></div>
+
+    </div>
+    <div id="modalContainer"></div>
+
+    
+
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/t1/js/teams.js"></script>
 </body>
 </html>
