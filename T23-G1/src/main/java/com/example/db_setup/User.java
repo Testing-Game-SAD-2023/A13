@@ -35,6 +35,8 @@ public class User {
 
     public String password;
 
+    public String biography;
+
     //MODIFICA
     public boolean isRegisteredWithFacebook;
     //FINE MODIFICA

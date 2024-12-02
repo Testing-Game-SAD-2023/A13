@@ -10,6 +10,7 @@ public class User {
     private String surname;
     private String email;
     private String password;
+    private String biography;
     private List<User> following;
     private List<User> followers;
     private boolean isRegisteredWithFacebook;
@@ -46,6 +47,14 @@ public class User {
 
     public void setId(Integer ID) {
         this.ID = ID;
+    }
+
+    public String getBiography(){
+        return biography;
+    }
+
+    public void setBiography(String biography){
+        this.biography = biography;
     }
 
     public String getName() {

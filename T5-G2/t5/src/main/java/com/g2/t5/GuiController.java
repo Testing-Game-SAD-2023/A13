@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.GenericObjectComponent;
@@ -130,13 +131,35 @@ public class GuiController {
     public String profilePage(Model model,
                               @PathVariable(value="playerID") String playerID,
                               @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
-        profile.SetAuth(jwt);
-
+        PageBuilder profile = null;
+ 
         int userId = Integer.parseInt(playerID);
-
         User user = userService.getUserbyID(userId);
 
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+ 
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String jwt_userId = map.get("userId").toString();
+
+            if(jwt_userId.equals(playerID)){
+                profile = new PageBuilder(serviceManager, "profile", model);
+            }else if(userService.isUserInFollower(user,Integer.parseInt(jwt_userId))){
+                profile = new PageBuilder(serviceManager, "profile_followed", model);
+            }else{
+                //CASO IN CUI NON SEGUO QUELLA PERSONA MI RIPORTA AL MAIN DELLA PAGINA... Si potrebbe fare qualcosa con una pagina di errore
+                return GUIController(model,jwt);
+            }
+        }
+        catch (Exception e) {
+            System.out.println("(/profile) Error requesting profile: " + e.getMessage());
+        }
+ 
+        profile.SetAuth(jwt);
+ 
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
         List<Statistic> allStatistics = achievementService.getStatistics();
