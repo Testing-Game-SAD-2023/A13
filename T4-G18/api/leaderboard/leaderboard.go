@@ -3,13 +3,13 @@ package leaderboard
 import "strconv"
 
 type Row struct {
-	UserID int64
-	Stat   int64
+	UserID int64 `json:"userId"`
+	Stat   int64 `json:"statistic"`
 }
 
 type Leaderboard struct {
-	Positions   []Row
-	TotalLenght int64
+	Positions   []Row `json:"positions"`
+	TotalLength int64 `json:"totalLength"`
 }
 
 type CustomString string
@@ -29,25 +29,6 @@ func (c KeyType) Parse(s string) (KeyType, error) {
 	return KeyType(a), err
 }
 
-func (k KeyType) AsInt64() int64 {
-	return int64(k)
+func (k KeyType) AsInt() int {
+	return int(k)
 }
-
-// func fromModel(g *model.Game) Game {
-// 	return Game{
-// 		ID:           g.ID,
-// 		CurrentRound: g.CurrentRound,
-// 		Username:     g.Username,
-// 		Difficulty:   g.Difficulty,
-// 		Description:  g.Description,
-// 		Score:        g.Score,
-// 		CreatedAt:    g.CreatedAt,
-// 		UpdatedAt:    g.UpdatedAt,
-// 		Name:         g.Name,
-// 		IsWinner:     g.IsWinner,
-// 		StartedAt:    g.StartedAt,
-// 		ClosedAt:     g.ClosedAt,
-// 		Players:      parsePlayers(g.Players),
-// 	}
-//
-// }

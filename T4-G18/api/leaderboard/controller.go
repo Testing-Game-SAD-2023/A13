@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	FindByInterval(mode string, stat string, startPos int64, endPos int64) (Leaderboard, error)
+	FindByInterval(mode string, stat string, startPos int, endPos int) (Leaderboard, error)
 }
 
 type Controller struct {
@@ -38,7 +38,7 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	leaderboard, err := gc.service.FindByInterval(gameMode.AsString(), stat.AsString(), startPos.AsInt64(), endPos.AsInt64())
+	leaderboard, err := gc.service.FindByInterval(gameMode.AsString(), stat.AsString(), startPos.AsInt(), endPos.AsInt())
 	if err != nil {
 		return api.MakeHttpError(err)
 	}
