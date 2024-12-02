@@ -27,10 +27,10 @@ function folder_view() {
 
                 const img = document.createElement("img");
                 img.src = "/t1/css/Images/cartella_gialla.png";
-                img.alt = item.className;
+                img.alt = item.teamId;
 
                 const span = document.createElement("span");
-                span.textContent = item.className;
+                span.textContent = item.teamId;
 
                 const deleteButton = document.createElement("button");
                 deleteButton.classList.add("delete-button");
@@ -44,15 +44,16 @@ function folder_view() {
                 // Event listener per eliminazione
                 deleteButton.addEventListener("click", (event) => {
                     event.stopPropagation();
-                    if (confirm(`Sei sicuro di voler eliminare ${item.className}?`)) {
+                    if (confirm(`Sei sicuro di voler eliminare ${item.teamId}?`)) {
                         folder.remove();
-                        fetch(`url_api/elimina/${item.id}`, {
-                            method: "DELETE",
-                            headers: { "Content-Type": "application/json" }
+                        fetch(`/deleteTeam`, {
+                            method: "POST",
+                            headers: { "Content-Type": "text/plain" },
+                            body: item.teamId // Invia la stringa direttamente
                         })
                             .then((response) => {
                                 if (response.ok) {
-                                    console.log(`Cartella ${item.className} eliminata.`);
+                                    console.log(`Cartella ${item.teamId} eliminata.`);
                                 } else {
                                     console.error("Errore durante l'eliminazione.");
                                 }
@@ -82,14 +83,7 @@ function openModal() {
                     <label for="teamCode">Codice Team:</label>
                     <input type="text" id="teamCode" name="teamCode" required>
                     
-                    <label for="studentSearch">Cerca Studenti:</label>
-                    <div class="search-container">
-                        <input type="text" id="studentSearch" placeholder="Nome o Cognome">
-                        <button type="button" id="searchButton">Cerca</button>
-                    </div>
-                    <div class="search-results" id="searchResults"></div>
-                    <div id="selectedStudents"></div>
-                    <button type="submit">Crea Team</button>
+                    <button type="button" id="createTeamButton">Crea Team</button>
                 </form>
             </div>
         </div>
@@ -100,101 +94,76 @@ function openModal() {
 
     modal.style.display = "block";
 
+    // Chiudi la modale
     closeButton.onclick = () => (modal.style.display = "none");
 
     window.onclick = (event) => {
         if (event.target == modal) modal.style.display = "none";
     };
 
-    setupSearch(); // Configura la ricerca
+    // Aggiungi il listener per il pulsante "Crea Team"
+    const createTeamButton = document.getElementById("createTeamButton");
+    createTeamButton.addEventListener("click", () => createTeam(modal));
 }
 
-// Configurazione della ricerca
-function setupSearch() {
-    const searchInput = document.getElementById("studentSearch");
-    const searchButton = document.getElementById("searchButton");
-    const resultsContainer = document.getElementById("searchResults");
-    const selectedStudentsContainer = document.createElement("div");
-    selectedStudentsContainer.id = "selectedStudents";
-    selectedStudentsContainer.style.marginTop = "10px";
-    resultsContainer.parentElement.appendChild(selectedStudentsContainer);
+function createTeam(modal) {
+    // Ottieni i dati dagli input
+    const teamName = document.getElementById("teamName").value.trim();
+    const teamCode = document.getElementById("teamCode").value.trim();
+    window.alert(teamCode)
+    // Validazione dei dati
+    if (!teamName || !teamCode) {
+        alert("Entrambi i campi sono obbligatori!");
+        return;
+    }
 
-    const selectedStudents = new Set(); // Set per evitare duplicati
+    // Verifica lunghezza del nome del team
+    if (teamName.length < 3 || teamName.length > 30) {
+        alert("Il nome del team deve essere tra 3 e 30 caratteri.");
+        return;
+    }
 
-    const performSearch = () => {
-        const query = searchInput.value.trim();
-        resultsContainer.innerHTML = "";
-        if (query.length === 0) {
-            resultsContainer.style.display = "none";
-            return;
-        }
-
-        // Simula una fetch al database
-        fetch(`url_api/students?search=${query}`)
-            .then((response) => response.json())
-            .then((data) => {
-                resultsContainer.innerHTML = "";
-                resultsContainer.style.display = data.length > 0 ? "block" : "none";
-
-                if (data.length === 0) {
-                    resultsContainer.innerHTML = `<div>Nessun risultato trovato</div>`;
-                    return;
-                }
-
-                data.forEach((student) => {
-                    const result = document.createElement("div");
-                    result.className = "search-result";
-                    result.innerHTML = `
-                        <input type="checkbox" id="student_${student.id}" value="${student.id}">
-                        <label for="student_${student.id}">${student.firstName} ${student.lastName}</label>
-                    `;
-
-                    // Aggiungi evento al checkbox per selezionare lo studente
-                    const checkbox = result.querySelector("input[type='checkbox']");
-                    checkbox.addEventListener("change", () => {
-                        if (checkbox.checked) {
-                            selectedStudents.add(student.id);
-
-                            const selected = document.createElement("div");
-                            selected.className = "selected-student";
-                            selected.textContent = `${student.firstName} ${student.lastName}`;
-                            selected.dataset.studentId = student.id;
-
-                            // Pulsante per rimuovere uno studente selezionato
-                            const removeButton = document.createElement("button");
-                            removeButton.textContent = "Rimuovi";
-                            removeButton.className = "remove-student";
-                            removeButton.addEventListener("click", () => {
-                                selectedStudents.delete(student.id);
-                                selected.remove();
-                                checkbox.checked = false; // Deseleziona il checkbox
-                            });
-
-                            selected.appendChild(removeButton);
-                            selectedStudentsContainer.appendChild(selected);
-                        } else {
-                            // Rimuovi lo studente dal set se il checkbox viene deselezionato
-                            selectedStudents.delete(student.id);
-
-                            const toRemove = [...selectedStudentsContainer.children].find(
-                                (el) => el.dataset.studentId == student.id
-                            );
-                            if (toRemove) toRemove.remove();
-                        }
-                    });
-
-                    resultsContainer.appendChild(result);
-                });
-            })
-            .catch((error) => {
-                console.error("Errore durante la ricerca:", error);
-                resultsContainer.innerHTML = `<div>Errore durante la ricerca</div>`;
+    // Effettua la richiesta al backend
+    fetch("/creaTeam", { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include', // Include i cookie (JWT) se necessario
+        body: JSON.stringify({
+            name: teamName,
+            idTeam: teamCode
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return response.text().then(errorMessage => {
+                throw new Error(errorMessage || "Errore nella creazione del team.");
             });
-    };
+        }
+    })
+    .then(data => {
+        // Successo
+        alert("Team creato con successo!");
+        console.log("Risultato della creazione:", data);
 
-    // Assegna l'evento di ricerca al pulsante
-    searchButton.addEventListener("click", performSearch);
+        // Chiudi la modale
+        if (modal) {
+            modal.style.display = "none";
+        }
+        if (typeof folder_view === 'function') {
+            folder_view();
+        }
+    })
+    .catch(error => {
+        // Gestione errori
+        console.error("Errore durante la creazione del team:", error);
+        alert(`Errore: ${error.message}`);
+    });
 }
+
 
 
 // Event listener per il bottone modale
