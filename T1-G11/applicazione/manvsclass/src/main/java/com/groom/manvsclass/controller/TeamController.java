@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.service.TeamService;
-import com.groom.manvsclass.service.JwtService;
 import com.groom.manvsclass.service.TeamModificationRequest;
 
 @CrossOrigin
@@ -21,32 +20,27 @@ public class TeamController {
     // Endpoint per aggiungere un nuovo team
     @PostMapping("/creaTeam")
     @ResponseBody
-    
     public ResponseEntity<?> creaTeam(@RequestBody Team team,@CookieValue(name = "jwt", required = false) String jwt) {
-        System.out.println(jwt);
         return teamService.creaTeam(team,jwt);
+    }
+
+    @GetMapping("/visualizzaTeams")
+    @ResponseBody
+    public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.visualizzaTeams(jwt);
     }
 
     // Endpoint per aggiungere un nuovo team
     @PostMapping("/deleteTeam")
     @ResponseBody
-    //@CookieValue(name = "jwt", required = false) String jwt
-    public ResponseEntity<?> deleteTeam(@RequestBody String idTeam) {
-        System.out.println("TeamController.");
-        return teamService.deleteTeam(idTeam);
+    public ResponseEntity<?> deleteTeam(@RequestBody String idTeam,@CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.deleteTeam(idTeam,jwt);
     }
 
     // Endpoint per modificare il nome di un team
     @PutMapping("/modificaTeam")
     @ResponseBody
-    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request) {
-        return teamService.modificaNomeTeam(request);
+    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request,@CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.modificaNomeTeam(request,jwt);
     }
-
-    @GetMapping("/visualizzaTeams")
-    @ResponseBody
-    public ResponseEntity<?> visualizzaTeams() {
-        return teamService.visualizzaTeams();
-    }
-
 }

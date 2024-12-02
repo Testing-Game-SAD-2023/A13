@@ -10,8 +10,11 @@ import java.util.List;
 public interface TeamAdminRepository extends MongoRepository<TeamAdmin, String> {
 
     // Trova tutte le associazioni per un determinato Admin
-    List<TeamAdmin> findByAdminId(String adminId);
+    TeamAdmin findByAdminId(String adminId);
 
-    // Trova tutte le associazioni per un determinato Team
-    List<TeamAdmin> findByTeamId(String teamId);
+    // Trova tutte l'associazione relativa ad un determinato Team
+    TeamAdmin findByTeamId(String teamId);
+
+    // Trova tutte le associazioni per un determinato Admin (questa è una versione più generica)
+    List<TeamAdmin> findAllByAdminId(String adminId);  // metodo che restituisce tutte le associazioni per un admin
 }

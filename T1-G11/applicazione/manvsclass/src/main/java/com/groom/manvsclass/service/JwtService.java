@@ -55,8 +55,9 @@ public class JwtService {
                                 .parseClaimsJws(jwt)
                                 .getBody();
 
+            System.out.println("JWT:"+claims);
             // Estrae l'ID dell'admin dalla claim
-            return claims.get("admin_email", String.class); // Restituisce l'username dell'admin come stringa
+            return claims.getSubject();
         } catch (Exception e) {
             System.err.println("Errore nell'estrazione dell'email dell'admin: " + e);
             return null; // Ritorna null se non riesce a estrarre l'ID

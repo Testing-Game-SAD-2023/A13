@@ -44,10 +44,10 @@ public class TeamService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
 
-        // 2. Estrai l'ID dell'Admin dal token JWT -> Sarebbe l'email
-        String adminID = jwtService.getAdminFromJwt(jwt);
-        System.out.println("Admin email: "+adminID);
-        if (adminID == null || adminID.isEmpty()) {
+        // 2. Estrai l'username dell'Admin dal token JWT 
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
+        
+        if (adminUsername == null || adminUsername.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'Admin dal token JWT.");
         }
 
@@ -71,7 +71,7 @@ public class TeamService {
 
         // 7. Crea una relazione tra Admin e Team
         TeamAdmin teamManagement = new TeamAdmin(
-                adminID,                      // ID dell'Admin -- Email.
+                adminUsername,                      // ID dell'Admin -- Ussername.
                 savedTeam.getIdTeam(),        // ID del Team appena creato
                 "Owner",                      // Ruolo (può essere parametrizzato)
                 true                          // Relazione attiva
@@ -90,57 +90,100 @@ public class TeamService {
     }
 
     
-     // Elimina un team dato il nome del team
-      //, @CookieValue(name = "jwt", required = false) String jwt
-    public ResponseEntity<?> deleteTeam(String id) {
-        // Verifica se esiste un team con l'ID fornito
-        Team teamToDelete = teamRepository.findById(id).orElse(null); 
+    // Elimina un team dato il nome del team
+    public ResponseEntity<?> deleteTeam(String idTeam, String jwt) {
+        
+        // 1. Verifica se il token JWT è valido
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+        
+        // 2. Estrai l'ID dell'admin dal JWT
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
+
+        System.out.print("Id da eliminare: "+idTeam);
+
+        // 3. Verifica che il team esista
+        Team teamToDelete = teamRepository.findById(idTeam).orElse(null); 
         if (teamToDelete == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + id + "' non trovato.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
         }
 
-        // Elimina il team
+        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
+        TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam); //`findByTeamId` restituisca una sola associazione
+        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per eliminare questo team.");
+        }
+
+        // 5. Elimina il team
         teamRepository.delete(teamToDelete);
 
+        // 6. Elimina l'associazione
+        teamAdminRepository.delete(teamAdmin);
+
         // Restituisci una risposta di successo
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Team con ID '" + id + "' eliminato con successo.");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Team con ID '" + idTeam + "' eliminato con successo.");
     }
 
-
     // Modifica il nome di un team
-     //, @CookieValue(name = "jwt", required = false) String jwt
-    public ResponseEntity<?> modificaNomeTeam(TeamModificationRequest request) {
+    public ResponseEntity<?> modificaNomeTeam(TeamModificationRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         String idTeam = request.getIdTeam();
         String newName = request.getNewName();
 
-        // Verifica se il team esiste
+        // 1. Verifica se il token JWT è valido
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        // 2. Estrai l'ID dell'admin dal JWT
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
+
+        // 3. Verifica se il team esiste
         Team existingTeam = teamRepository.findById(idTeam).orElse(null);
         if (existingTeam == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
         }
 
-        // Modifica il nome del team
+        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
+        TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam); // Assumiamo che `findByTeamId` restituisca una sola associazione
+        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+        }
+
+        // 5. Modifica il nome del team
         existingTeam.setName(newName);
 
-        // Salva il team aggiornato
+        // 6. Salva il team aggiornato
         Team updatedTeam = teamRepository.save(existingTeam);
 
-        // Restituisci il team aggiornato
+        // 7. Restituisci il team aggiornato
         return ResponseEntity.ok().body(updatedTeam);
     }
 
-    // Metodo per visualizzare tutti i team
-    public ResponseEntity<?> visualizzaTeams() {
-        // Recupera tutti i team dal database
-        List<Team> teams = teamRepository.findAll();
-        
-        // Verifica se ci sono team nel database
-        if (teams.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team trovato.");
-        }
+    // Metodo per visualizzare i team associati a un admin specifico
+    public ResponseEntity<?> visualizzaTeams(String jwt) {
+        try {
+            // Estrae l'username dell'admin dal JWT
+            String adminUsername = jwtService.getAdminFromJwt(jwt);
 
-        // Restituisci i team
-        return ResponseEntity.ok().body(teams);
+            if (adminUsername == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o scaduto.");
+            }
+
+            // Recupera i team associati a quell'admin
+            List<TeamAdmin> teamAssociati = teamAdminRepository.findAllByAdminId(adminUsername);
+
+             // Se non ci sono associazioni
+            if (teamAssociati.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team associato trovato.");
+            } 
+
+            // Restituisce i team associati
+            return ResponseEntity.ok().body(teamAssociati);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
+        }
     }
 
 }
