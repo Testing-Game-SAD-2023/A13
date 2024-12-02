@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.groom.manvsclass.model.Team;
@@ -12,6 +13,7 @@ import com.groom.manvsclass.model.repository.TeamSearchImpl;
 import com.groom.manvsclass.service.JwtService;
 import java.util.List;
 import java.util.Optional;
+import com.groom.manvsclass.service.RestTemplateConfig;
 
 @Service
 public class TeamService {
@@ -24,6 +26,9 @@ public class TeamService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private RestTemplate restTemplate; // Per effettuare chiamate HTTP
 
     /*
       Crea un nuovo Team.
@@ -100,6 +105,47 @@ public class TeamService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         return ResponseEntity.ok(searchRepository.findTeamsByLeader(leaderId));
+    }
+
+    // Metodo per aggiungere un membro al team
+    public ResponseEntity<String> addMemberToTeam(String teamName, String memberId, String jwt) {
+        // Verifica la validità del token JWT
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        // Chiamata al container T2-3 per verificare il membro
+        String t2_3Url = "http://t23-g1-app-1:8080" + memberId; // URL dell'API T2-3
+        try {
+            ResponseEntity<String> t2_3Response = restTemplate.getForEntity(t2_3Url, String.class);
+
+            if (t2_3Response.getStatusCode() != HttpStatus.OK) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found in T2-3");
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error connecting to T2-3");
+        }
+
+        // Aggiungi il membro al team in MongoDB (T1)
+        try {
+            searchRepository.addMemberToTeam(teamName, memberId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating the team");
+        }
+
+        return ResponseEntity.ok("Member added successfully");
+    }
+
+
+    // Rimuove un membro dal team
+    public ResponseEntity<String> removeMemberFromTeam(String teamName, String memberId, String jwt) {
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        searchRepository.removeMemberFromTeam(teamName, memberId);
+        return ResponseEntity.ok("Member removed successfully");
     }
 
     /**

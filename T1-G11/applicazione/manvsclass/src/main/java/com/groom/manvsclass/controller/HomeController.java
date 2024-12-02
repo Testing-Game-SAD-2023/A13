@@ -479,12 +479,30 @@ import org.springframework.web.bind.annotation.RequestBody;
         return teamService.findTeamsByLeader(leaderId, jwt);
     }
     
-    
-
-    @GetMapping("/teams/view")
-    public ModelAndView showAllTeams(@CookieValue(name = "jwt", required = false) String jwt) {
-    return teamService.showAllTeams(jwt);
+        // Aggiungere un membro al team
+    @PostMapping("/team/{teamName}/add-member")
+    @ResponseBody
+    public ResponseEntity<String> addMemberToTeam(
+            @PathVariable String teamName,
+            @RequestBody String memberId,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.addMemberToTeam(teamName, memberId, jwt);
     }
+
+    // Rimuovere un membro dal team
+    @DeleteMapping("/team/{teamName}/remove-member")
+    @ResponseBody
+    public ResponseEntity<String> removeMemberFromTeam(
+            @PathVariable String teamName,
+            @RequestBody String memberId,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.removeMemberFromTeam(teamName, memberId, jwt);
+    }
+
+        @GetMapping("/teams/view")
+        public ModelAndView showAllTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.showAllTeams(jwt);
+        }
 
     @GetMapping("/team/view/{teamName}")
     public ModelAndView showTeamDetails(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {

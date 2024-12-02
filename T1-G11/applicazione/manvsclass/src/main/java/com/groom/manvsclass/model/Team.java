@@ -70,7 +70,7 @@ public class Team {
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
-
+    
     
     @Override
     public String toString() {

@@ -89,7 +89,37 @@ public class TeamSearchImpl {
         Bson filter = Filters.eq("teamName", teamName); // Filtra per teamName
         collection.deleteOne(filter);
     }
-     //Fine Modifica
+     //30/11/2024
+
+      // Metodo per aggiungere un membro al team
+    public void addMemberToTeam(String teamName, String memberId) {
+        MongoDatabase database = client.getDatabase("manvsclass");
+        MongoCollection<Document> collection = database.getCollection("Team");
+
+        // Filtra il documento del team
+        Bson filter = Filters.eq("teamName", teamName);
+
+        // Aggiungi il nuovo membro alla lista dei membri
+        Bson update = new Document("$addToSet", new Document("member", memberId));
+
+        // Aggiorna il documento del team
+        collection.updateOne(filter, update);
+    }
+
+    // Metodo per rimuovere un membro dal team
+    public void removeMemberFromTeam(String teamName, String memberId) {
+        MongoDatabase database = client.getDatabase("manvsclass");
+        MongoCollection<Document> collection = database.getCollection("Team");
+
+        // Filtra il documento del team
+        Bson filter = Filters.eq("teamName", teamName);
+
+        // Rimuovi il membro dalla lista dei membri
+        Bson update = new Document("$pull", new Document("member", memberId));
+
+        // Aggiorna il documento del team
+        collection.updateOne(filter, update);
+    }
 
 }
     
