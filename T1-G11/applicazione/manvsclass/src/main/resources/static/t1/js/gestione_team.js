@@ -21,26 +21,23 @@ function returnToHome() {
     window.location.href = "/home_admin";
 }
 
-function addTeam() {
-    alert('Funzionalità per aggiungere un team.');
-}
 
-function removeTeam() {
-    alert('Funzionalità per rimuovere un team.');
-}
 
-function modifyTeam() {
-    const modifyOptions = document.getElementById('modify-options');
-    modifyOptions.style.display = modifyOptions.style.display === 'none' ? 'block' : 'none';
-}
+    function showSection(sectionId) {
+        // Nasconde tutte le sezioni
+        document.querySelectorAll('.section').forEach(function(section) {
+            section.classList.remove('active');
+        });
 
-function addPlayer() {
-    alert('Funzionalità per aggiungere un giocatore.');
-}
+        // Mostra la sezione selezionata
+        document.getElementById(sectionId).classList.add('active');
+    }
 
-function removePlayer() {
-    alert('Funzionalità per rimuovere un giocatore.');
-}
+    // Mostra la prima sezione di default
+    document.addEventListener('DOMContentLoaded', function() {
+        showSection('add-team');
+    });
+
 
 // function aggiungiTeam() {
 //     fetch('/aggiungi_team', {

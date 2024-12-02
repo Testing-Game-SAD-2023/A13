@@ -18,7 +18,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
 
-
+@Component
 public class TeamSearchImpl {
 
     @Autowired
@@ -74,8 +74,8 @@ public class TeamSearchImpl {
 
         Bson filter = Filters.eq("teamName", team.getTeamName()); // Filtra per teamName
         Document updatedDoc = new Document()
-            .append("description", team.getDescription())
-            .append("leaderId", team.getLeaderId());
+            .append("description", team.getDescription());
+            //.append("leaderId", team.getLeaderId());
             //.append("member", team.getMember());
             //.append("creationDate", team.getCreationDate());
 
