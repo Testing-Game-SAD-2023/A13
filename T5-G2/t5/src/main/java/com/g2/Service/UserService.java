@@ -23,4 +23,15 @@ public class UserService {
     public User getUserbyID(int user_id){
         return (User) serviceManager.handleRequest("T23", "GetUserbyID", user_id);
     }
+
+    public boolean isUserInFollower(User user, Integer targetUserId) {
+        if (user == null || user.getFollowers() == null) {
+            return false;
+        }
+    
+        return user.getFollowers()
+                   .stream()
+                   .anyMatch(followed -> followed.getId().equals(targetUserId));
+    }
+
 }
