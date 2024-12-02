@@ -5,24 +5,13 @@
  package com.groom.manvsclass.controller;
 
  import java.io.IOException;
- import java.io.File;
- import java.time.Instant;
- import java.time.LocalDate;
- import java.time.format.DateTimeFormatter;
- import java.time.temporal.ChronoUnit;
  import java.util.*;
- import java.util.regex.Pattern;
- 
- import javax.servlet.http.Cookie;
  import javax.servlet.http.HttpServletRequest;
  import javax.servlet.http.HttpServletResponse;
  import org.springframework.http.ResponseEntity;
  import com.groom.manvsclass.model.ClassUT;
  import org.springframework.web.multipart.MultipartFile;
  import com.groom.manvsclass.model.filesystem.upload.FileUploadResponse;
- import com.groom.manvsclass.model.filesystem.upload.FileUploadUtil;
- import com.groom.manvsclass.model.filesystem.RobotUtil;
- import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
  import com.groom.manvsclass.model.Admin; 
  import com.groom.manvsclass.model.Achievement; 
  import com.groom.manvsclass.model.Statistic; 
@@ -45,16 +34,9 @@
  import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestParam;
  import org.springframework.web.bind.annotation.ResponseBody;
- import org.springframework.web.multipart.MultipartFile;
  import org.springframework.web.servlet.ModelAndView;
- import org.springframework.web.servlet.view.RedirectView;
  import org.springframework.http.HttpStatus;
- 
- import javax.servlet.http.HttpServletRequest;
- 
- import org.springframework.data.mongodb.core.query.Criteria;
- import org.springframework.data.mongodb.core.query.Update;
- import org.springframework.data.mongodb.core.query.Query;
+
  
  @CrossOrigin
  @Controller
@@ -129,18 +111,15 @@
     @GetMapping("/teams")
     @ResponseBody
     public ModelAndView showGestioneTeams(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
-        System.out.println("DIOOOO");
         return adminService.showGestioneTeams(request,jwt);
     }
 
     @GetMapping("/assignments")
     @ResponseBody
     public ModelAndView showGestioneAssignments(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
-        System.out.println("DIOOOO");
         return adminService.showGestioneAssignments(request,jwt);
     }
 
-    
      //Solo x testing
      @GetMapping("/getLikes/{name}")
      @ResponseBody
