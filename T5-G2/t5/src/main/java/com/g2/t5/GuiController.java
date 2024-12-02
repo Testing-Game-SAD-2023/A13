@@ -130,11 +130,30 @@ public class GuiController {
     public String profilePage(Model model,
                               @PathVariable(value="playerID") String playerID,
                               @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
+        PageBuilder profile = null;
+ 
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+ 
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String jwt_userId = map.get("userId").toString();
+ 
+            if(jwt_userId.equals(playerID)){
+                profile = new PageBuilder(serviceManager, "profile", model);
+            }else{
+                profile = new PageBuilder(serviceManager, "profile_followed", model);
+            }
+        }
+        catch (Exception e) {
+            System.out.println("(/profile) Error requesting profile: " + e.getMessage());
+        }
+ 
         profile.SetAuth(jwt);
-
+ 
         int userId = Integer.parseInt(playerID);
-
         User user = userService.getUserbyID(userId);
 
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
