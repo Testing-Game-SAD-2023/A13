@@ -5,6 +5,7 @@
 package com.groom.manvsclass.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -163,40 +164,48 @@ public class TeamService {
         return ResponseEntity.ok().body(updatedTeam);
     }
 
+  
     // Metodo per visualizzare i team associati a un admin specifico
-    public ResponseEntity<?> visualizzaTeams(String jwt) {
-        try {
-            // Estrae l'username dell'admin dal JWT
-            String adminUsername = jwtService.getAdminFromJwt(jwt);
+public ResponseEntity<?> visualizzaTeams(String jwt) {
+    try {
+        // Estrae l'username dell'admin dal JWT
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
 
-            if (adminUsername == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o scaduto.");
-            }
-
-            // Recupera i team associati a quell'admin
-            List<TeamAdmin> teamAssociati = teamAdminRepository.findAllByAdminId(adminUsername);
-            
-
-             // Se non ci sono associazioni
-            if (teamAssociati.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team associato trovato.");
-            }
-
-            // Recupera gli ID dei team associati
-            List<String> teamIds = teamAssociati.stream()
-            .map(TeamAdmin::getTeamId)
-            .toList();
-
-             // Recupera i team corrispondenti dai loro ID
-            List<Team> teams = (List<Team>) teamRepository.findAllById(teamIds);
-
-            // Restituisce i team associati
-            return ResponseEntity.ok().body(teams);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
+        if (adminUsername == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o scaduto.");
         }
+
+        // Recupera i team associati a quell'admin
+        List<TeamAdmin> teamAssociati = teamAdminRepository.findAllByAdminId(adminUsername);
+
+        // Se non ci sono associazioni
+        if (teamAssociati.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team associato trovato.");
+        }
+
+        // Estrai gli ID dei team associati
+        List<String> teamIds = teamAssociati.stream() //crea uno stream a partire dalla lista
+                                          .map(TeamAdmin::getTeamId) //ogni oggetto TeamAdmin nello stream viene trasformato nel valore restituito da getTeamId 
+                                          .collect(Collectors.toList()); //L'operazione collect terminale converte lo stream risultante in una lista.
+
+        // Recupera tutti i team in un'unica query
+        List<Team> teams = (List<Team>) teamRepository.findAllById(teamIds);
+
+        // Se non ci sono team trovati (possibile mismatch)
+        if (teams.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team trovato per gli ID specificati.");
+        }
+
+        // Restituisce i team associati
+        return ResponseEntity.ok(teams);
+
+    } catch (Exception e) {
+        // Log dell'eccezione
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
     }
+}
+
     
     
     //Modifica 03/12/2024: Aggiunta della visualizzazione del singolo team
