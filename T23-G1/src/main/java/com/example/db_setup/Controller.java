@@ -809,27 +809,38 @@ public class Controller {
     }
     }
 
-    // by GabMan: Endpoint per ottenere la lista degli amici
-@PostMapping("/getFriends")
-public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = "jwt", required = false) String jwt) {
-    try {
-        // Verifica il token JWT
-        if (jwt == null || jwt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-
-        // Decodifica il token JWT per ottenere l'ID utente
-        Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
-        Integer userId = (Integer) claims.get("userId");
-
-        // Recupera l'utente dal database
-        List<Map<String, String>> friends = userRepository.findFriendsByUserId(userId);
-            return ResponseEntity.ok(friends);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+  // by GabMan: 03/24 - Endpoint per ottenere la lista degli amici
+  @GetMapping("/getFriendlist")
+  public ResponseEntity<List<Map<String, String>>> getFriendlist(
+          @CookieValue(name = "jwt", required = false) String jwt) {
+      try {
+          // Verifica il token JWT
+          if (jwt == null || jwt.isEmpty()) {
+              return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+          }
+  
+          // Decodifica il token JWT per ottenere l'ID utente
+          byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+          String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+  
+          ObjectMapper mapper = new ObjectMapper();
+          Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+          String userId = userData.get("userId").toString();
+  
+          // Recupera la lista degli amici dal database
+          List<Map<String, String>> friends = userRepository.findFriendsByUserId(Integer.parseInt(userId));
+  
+          if (friends.isEmpty()) {
+              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+          }
+  
+          return ResponseEntity.ok(friends);
+      } catch (Exception e) {
+          e.printStackTrace();
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+      }
+  }
+  
 
 // by GabMan: Endpoint per aggiungere un amico
 @PostMapping("/addFriend")

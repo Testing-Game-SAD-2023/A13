@@ -836,59 +836,57 @@ button.btn:hover {
 }
 
 /* Modifica (30/11) by GabMan 'Sezione Amici' */
-
-.friend-item:hover {
-  background-color: #007bff;
-  cursor: pointer;
-}
-
-/* Sezione amici */
+/* Stile per la lista amici */
 #friendsContainer {
-  padding: 10px;
-  border: 1px solid #444;
-  background-color: #333;
-  border-radius: 5px;
-  overflow-y: auto;
+  background-color: #ffffff; /* Sfondo bianco */
+  border: 1px solid #ddd; /* Bordo sottile */
+  border-radius: 8px; /* Angoli arrotondati */
+  padding: 10px; /* Spaziatura interna */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra leggera */
 }
 
-/* Stile per singolo amico */
-.friend-item {
-  padding: 10px;
-  margin-bottom: 5px;
-  background-color: #444;
-  color: white;
-  border: 1px solid #555;
-  border-radius: 5px;
-  font-size: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.list-group-item {
+  display: flex; /* Layout flessibile per allineare immagine e testo */
+  align-items: center; /* Allineamento verticale */
+  padding: 10px; /* Spaziatura interna */
+  margin-bottom: 10px; /* Spaziatura tra gli elementi */
+  background-color: #f9f9f9; /* Sfondo chiaro */
+  border: 1px solid #ddd; /* Bordo sottile */
+  border-radius: 5px; /* Angoli arrotondati */
+  transition: background-color 0.3s ease; /* Transizione al passaggio del mouse */
 }
 
-/* Input e pulsante per aggiungere amici */
-#friendIdInput {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #444;
-  border-radius: 5px;
-  background-color: #333;
-  color: white;
+.list-group-item:hover {
+  background-color: #f1f1f1; /* Colore al passaggio del mouse */
 }
 
+/* Immagine del profilo amico */
+.friend-avatar {
+  width: 50px; /* Dimensioni immagine */
+  height: 50px;
+  object-fit: cover; /* Ritaglio dell'immagine */
+  margin-right: 15px; /* Spaziatura accanto all'immagine */
+  border: 2px solid #ddd; /* Bordo sottile */
+}
+
+/* Nome del profilo amico */
+.friend-nickname {
+  font-size: 1.2rem; /* Dimensione del testo */
+  font-weight: bold; /* Grassetto */
+  color: #333; /* Colore del testo */
+  margin-right: 15px; /* Spaziatura accanto al nome */
+}
+
+/* Pulsante elimina */
+.list-group-item .btn-danger {
+  padding: 5px 10px; /* Spaziatura del pulsante */
+  font-size: 0.9rem; /* Dimensione testo pulsante */
+  border-radius: 4px; /* Angoli arrotondati */
+}
+
+/* Pulsante aggiungi amico */
 #addFriendButton {
-  width: 100%;
-  background-color: #28a745;
-  border: none;
-  padding: 10px;
-  font-size: 16px;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+  margin-left: 10px; /* Spaziatura accanto all'input */
+  padding: 10px 20px; /* Spaziatura pulsante */
+  font-size: 1rem; /* Dimensione testo */
 }
-
-#addFriendButton:hover {
-  background-color: #218838;
-}
-
-

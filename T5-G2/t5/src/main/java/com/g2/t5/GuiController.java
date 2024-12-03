@@ -577,5 +577,38 @@ public ResponseEntity<String> removeFriend(
     }
     }
 
+    //GabMan 03/12 (Ottengo lista amici)
+    @GetMapping("/getFriendlist")
+public ResponseEntity<List<Map<String, String>>> getFriendlist(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica che il token JWT esista
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Utente non autenticato
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al servizio T23 per ottenere la lista amici
+        List<Map<String, String>> friendlist = t23Service.getFriendlist(userId);
+        if (friendlist != null && !friendlist.isEmpty()) {
+            return ResponseEntity.ok(friendlist);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Nessun amico trovato
+        }
+    } catch (Exception e) {
+        System.out.println("Errore durante il recupero della lista amici: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore del server
+    }
+}
+
+
+
 
 }
