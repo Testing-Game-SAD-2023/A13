@@ -26,7 +26,7 @@ public class TeamController {
     }
     
     // Endpoint per aggiungere un nuovo team
-    @PostMapping("/deleteTeam")
+    @DeleteMapping("/deleteTeam")
     @ResponseBody
     public ResponseEntity<?> deleteTeam(@RequestBody String idTeam,@CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.deleteTeam(idTeam,jwt);

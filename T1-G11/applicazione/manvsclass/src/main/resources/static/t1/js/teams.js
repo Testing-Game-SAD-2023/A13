@@ -27,10 +27,10 @@ function folder_view() {
 
                 const img = document.createElement("img");
                 img.src = "/t1/css/Images/cartella_gialla.png";
-                img.alt = item.teamId;
+                img.alt = item.teamName;
 
                 const span = document.createElement("span");
-                span.textContent = item.teamId;
+                span.textContent = item.teamName;
 
                 const deleteButton = document.createElement("button");
                 deleteButton.classList.add("delete-button");
@@ -47,7 +47,7 @@ function folder_view() {
                     if (confirm(`Sei sicuro di voler eliminare ${item.teamId}?`)) {
                         folder.remove();
                         fetch(`/deleteTeam`, {
-                            method: "POST",
+                            method: "DELETE",
                             headers: { "Content-Type": "text/plain" },
                             body: item.teamId // Invia la stringa direttamente
                         })

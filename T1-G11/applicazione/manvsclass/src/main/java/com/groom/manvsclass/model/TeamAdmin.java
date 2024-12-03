@@ -10,13 +10,15 @@ public class TeamAdmin {
 
     private String adminId; // Riferimento all'Admin (ID)
     private String teamId;  // Riferimento al Team (ID)
+    private String teamName; //Nome della classe
     private String role; // Ruolo dell'Admin nel Team
     private boolean isActive; // Stato attuale della relazione
 
     // Costruttore
-    public TeamAdmin(String adminId, String teamId, String role, boolean isActive) {
+    public TeamAdmin(String adminId, String teamId, String teamName,String role, boolean isActive) {
         this.adminId = adminId;
         this.teamId = teamId;
+        this.teamName=teamName;
         this.role = role;
         this.isActive = isActive;
     }
@@ -44,6 +46,13 @@ public class TeamAdmin {
 
     public void setTeamId(String teamId) {
         this.teamId = teamId;
+    }
+
+    public String getTeamName() {
+        return this.teamName;
+    }
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 
     public String getRole() {

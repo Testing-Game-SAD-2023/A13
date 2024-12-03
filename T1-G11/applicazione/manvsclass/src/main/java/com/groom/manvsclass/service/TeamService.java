@@ -74,6 +74,7 @@ public class TeamService {
         TeamAdmin teamManagement = new TeamAdmin(
                 adminUsername,                      // ID dell'Admin -- Ussername.
                 savedTeam.getIdTeam(),        // ID del Team appena creato
+                savedTeam.getName(),            //Nome Team
                 "Owner",                      // Ruolo (può essere parametrizzato)
                 true                          // Relazione attiva
         );
@@ -153,10 +154,11 @@ public class TeamService {
 
         // 5. Modifica il nome del team
         existingTeam.setName(newName);
+        teamAdmin.setTeamName(newName);
 
         // 6. Salva il team aggiornato
         Team updatedTeam = teamRepository.save(existingTeam);
-
+        TeamAdmin updatedTeamAdmin = teamAdminRepository.save(teamAdmin);
         // 7. Restituisci il team aggiornato
         return ResponseEntity.ok().body(updatedTeam);
     }
@@ -173,6 +175,7 @@ public class TeamService {
 
             // Recupera i team associati a quell'admin
             List<TeamAdmin> teamAssociati = teamAdminRepository.findAllByAdminId(adminUsername);
+            
 
              // Se non ci sono associazioni
             if (teamAssociati.isEmpty()) {
