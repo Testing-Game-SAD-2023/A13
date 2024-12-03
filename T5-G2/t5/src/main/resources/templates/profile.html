@@ -49,7 +49,12 @@
                 <div class="card-body" style="height: 150px; overflow-y: auto;">
                     <p th:if="${notifications == null || notifications.isEmpty()}">Nessuna notifica disponibile.</p>
                     <ul th:if="${notifications != null && !notifications.isEmpty()}">
-                        <li th:each="notification : ${notifications}" th:text="${notification}"></li>
+                        <li th:each="notification : ${notifications}">
+                            <strong th:text="${notification.title}"></strong>: <span th:text="${notification.message}"></span><br>
+                            <small th:text="${formattedDate}"></small><br>
+                            <span th:if="${notification.isRead}">Letta</span>
+                            <span th:unless="${notification.isRead}">Non letta</span>
+                        </li>
                     </ul>
                 </div>
             </div>
