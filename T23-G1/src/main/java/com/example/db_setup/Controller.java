@@ -7,6 +7,8 @@ import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+import java.util.HashMap;
+
 
  
 import io.jsonwebtoken.Claims;
@@ -239,7 +241,7 @@ public class Controller {
         }
  
         System.out.println("Utente registrato, email trovata nel database (login)");
-        boolean passwordMatches = myPasswordEncoder.matches(password, user.password);
+        boolean passwordMatches = myPasswordEncoder.matches(password, user.getPassword());
         if (!passwordMatches) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
         }
@@ -732,6 +734,43 @@ public class Controller {
 }
  
 /*Modifiche GabMan 29/11/2024 : Gestione biografia in sezione separata dal profilo  */
+
+    @GetMapping("/getBiography")
+    public ResponseEntity<Map<String, String>> getBiography(
+    @CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica il token JWT
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+        String userId = userData.get("userId").toString();
+
+        // Recupera l'utente dal database
+        Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+
+        if (!optionalUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Recupera la biografia
+        User user = optionalUser.get();
+        Map<String, String> response = new HashMap<>();
+        response.put("biography", user.getBiography());
+
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+    }
+
     @PostMapping("/updateBiography")
     public ResponseEntity<String> updateBiography(
         @CookieValue(name = "jwt", required = false) String jwt,
@@ -768,7 +807,7 @@ public class Controller {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating biography.");
     }
-}
+    }
 
     // by GabMan: Endpoint per ottenere la lista degli amici
 @PostMapping("/getFriends")
@@ -784,20 +823,13 @@ public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = 
         Integer userId = (Integer) claims.get("userId");
 
         // Recupera l'utente dal database
-        User user = userRepository.findById(userId).orElse(null);
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        // Ottieni la lista di amici
         List<Map<String, String>> friends = userRepository.findFriendsByUserId(userId);
-        return ResponseEntity.ok(friends);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.ok(friends);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
-}
 
 // by GabMan: Endpoint per aggiungere un amico
 @PostMapping("/addFriend")
@@ -812,24 +844,19 @@ public ResponseEntity<String> addFriend(
         Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
         Integer userId = (Integer) claims.get("userId");
 
-        // Recupera l'utente e l'amico dal database
-        User user = userRepository.findById(userId).orElse(null);
-        User friend = userRepository.findById(friendId).orElse(null);
+        // Verifica se gli utenti esistono
+            if (!userRepository.existsById(userId) || !userRepository.existsById(friendId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
+            }
 
-        if (user == null || friend == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
+            userRepository.addFriend(userId, friendId);
+
+            return ResponseEntity.ok("Friend added successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while adding the friend.");
         }
-
-        // Aggiungi l'amico alla lista
-        user.getFriends().add(friend);
-        userRepository.save(user);
-
-        return ResponseEntity.ok("Friend added successfully!");
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while adding the friend.");
     }
-}
 
 //byGabMan: Endpoint per rimuovere un amico
 @PostMapping("/removeFriend")
@@ -844,26 +871,61 @@ public ResponseEntity<String> removeFriend(
         Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
         Integer userId = (Integer) claims.get("userId");
 
-        // Recupera l'utente e l'amico dal database
-        User user = userRepository.findById(userId).orElse(null);
-        User friend = userRepository.findById(friendId).orElse(null);
+        // Verifica se gli utenti esistono
+            if (!userRepository.existsById(userId) || !userRepository.existsById(friendId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
+            }
 
-        if (user == null || friend == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
+            userRepository.removeFriend(userId, friendId);
+
+            return ResponseEntity.ok("Friend removed successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the friend.");
+        }
+    }
+    //cami 02/12--> modifica profilo
+    @GetMapping("/getUserInfo")
+    public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica il token JWT
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        // Rimuovi l'amico dalla lista
-        user.getFriends().remove(friend);
-        userRepository.save(user);
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
 
-        return ResponseEntity.ok("Friend removed successfully!");
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+        String userId = userData.get("userId").toString();
+
+        // Recupera l'utente dal database
+        Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+
+        if (!optionalUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Prepara la risposta con nome, cognome e nickname
+        User user = optionalUser.get();
+        Map<String, String> response = new HashMap<>();
+        response.put("name", user.getName());
+        response.put("surname", user.getSurname());
+        response.put("nickname", user.getNickname()); 
+
+        return ResponseEntity.ok(response);
     } catch (Exception e) {
         e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the friend.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+    }
+
+
+
 }
 
 
 
  
-}

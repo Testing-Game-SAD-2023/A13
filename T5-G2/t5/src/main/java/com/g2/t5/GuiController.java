@@ -161,6 +161,34 @@ public class GuiController {
     }
     }
 
+    @GetMapping("/getBiography")
+    public ResponseEntity<Map<String, String>> getBiography(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Recupera la biografia dal servizio
+        String biography = t23Service.getBiography(userId);
+        if (biography != null) {
+            Map<String, String> response = new HashMap<>();
+            response.put("biography", biography);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(404).body(null);
+        }
+    } catch (Exception e) {
+        System.out.println("Error fetching biography: " + e.getMessage());
+        return ResponseEntity.status(500).body(null);
+    }
+}
+
+
     //fine modifiche 
 
     /*@PostMapping("/updateAvatar")
@@ -518,6 +546,36 @@ public ResponseEntity<String> removeFriend(
         return ResponseEntity.status(500).body("Errore interno del server.");
     }
 }
+    //cami (02/12)
+    @GetMapping("/getUserInfo")
+    public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica che il token JWT esista
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Utente non autenticato
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al servizio T23 per ottenere le informazioni utente
+        Map<String, String> userInfo = t23Service.getUserInfo(userId);
+        if (userInfo != null) {
+            return ResponseEntity.ok(userInfo);
+        } else {
+            return ResponseEntity.status(404).body(null); // Informazioni utente non trovate
+        }
+    } catch (Exception e) {
+        System.out.println("Errore durante il recupero delle informazioni utente: " + e.getMessage());
+        return ResponseEntity.status(500).body(null); // Errore del server
+    }
+    }
 
 
 }

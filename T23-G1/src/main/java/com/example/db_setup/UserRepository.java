@@ -23,6 +23,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findAll();
 
     // MODIFICA 18/06/2024
+    User findByNickname(String nickname);
+
     User findByisRegisteredWithFacebook(boolean isRegisteredWithFacebook);
     User findByisRegisteredWithGoogle(boolean isRegisteredWithGoogle);
 
@@ -40,7 +42,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     //byGabman --- GESTIONE AMICI ---
 
-    // Recupera gli amici di un utente dato il suo ID
+    /*// Recupera gli amici di un utente dato il suo ID
     @Query("SELECT new map(f.name as name, f.status as status) FROM User u JOIN u.friends f WHERE u.ID = :userId")
     List<Map<String, String>> findFriendsByUserId(@Param("userId") Integer userId);
 
@@ -54,5 +56,25 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM user_friends WHERE user_id = :userId AND friend_id = :friendId", nativeQuery = true)
+    void removeFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);*/
+    
+    // Recupera gli amici di un utente dato il suo ID
+    @Query(value = "SELECT f.name, f.surname FROM students f " +
+                   "JOIN user_friends uf ON f.id = uf.friend_id " +
+                   "WHERE uf.user_id = :userId", nativeQuery = true)
+    List<Map<String, String>> findFriendsByUserId(@Param("userId") Integer userId);
+
+    // Aggiungi un amico a un utente
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO user_friends (user_id, friend_id) VALUES (:userId, :friendId)", nativeQuery = true)
+    void addFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
+    // Rimuovi un amico da un utente
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM user_friends WHERE user_id = :userId AND friend_id = :friendId", nativeQuery = true)
     void removeFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
 }
+
