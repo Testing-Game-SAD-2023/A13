@@ -57,6 +57,8 @@ import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
+import com.g2.Model.UserProfile;
+import com.g2.Model.Achievement;
 import com.g2.Service.AchievementService;
 import com.g2.Service.UserProfileService;
 
@@ -329,6 +331,9 @@ public class GuiController {
                                                 @RequestParam("bio") String bio,
                                                 @RequestParam("profilePicturePath") String profilePicturePath){
 
+        System.out.println("Email: " + email);
+        System.out.println("Bio: " + bio);
+        System.out.println("Profile Picture Path: " + profilePicturePath);
         // Chiamata al servizio T23 per modificare il profilo
         Boolean result = (Boolean) serviceManager.handleRequest("T23", "EditProfile", email, bio, profilePicturePath);
 
@@ -443,7 +448,18 @@ public class GuiController {
         }
 
         System.out.println("Checking achievements...");
-        achievementService.updateProgressByPlayer(playerId);
+
+        //Voglio notificare l'utente dei nuovi achievement
+        
+        // Mi prendo prima tutti gli utenti
+        @SuppressWarnings("unchecked")
+        List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
+
+        // Mi prendo l'utente che mi interessa con l'id
+        User user = users.stream().filter(u -> u.getId() == playerId).findFirst().orElse(null);
+        String email = user.getEmail();
+        List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(playerId);
+        achievementService.updateNotificationsForAchievements(email,newAchievements);
 
         return ResponseEntity.ok(ids.toString());
     }

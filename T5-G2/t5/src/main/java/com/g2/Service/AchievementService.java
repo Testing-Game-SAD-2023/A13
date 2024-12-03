@@ -112,12 +112,12 @@ public class AchievementService {
         return statisticProgresses;
     }
 
-    public void updateNotificationsForAchievements(String userEmail, List<String> newAchievements) {
+    public void updateNotificationsForAchievements(String userEmail, List<AchievementProgress> newAchievements) {
 
-        for (String achievement : newAchievements) {
+        for (AchievementProgress achievement : newAchievements) {
             String titolo = "Nuovo Achievement";
             String message = "Congratulazioni! Hai ottenuto il nuovo achievement: " + achievement;
-            serviceManager.handleRequest("T23", "new_notification", userEmail, titolo, message);
+            serviceManager.handleRequest("T23", "NewNotification", userEmail, titolo, message);
     
         }
     }

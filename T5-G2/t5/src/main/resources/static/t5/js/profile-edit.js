@@ -3,7 +3,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const profilePictures = document.querySelectorAll(".profile-picture");
     const bioInput = document.getElementById("bio-input");
     const saveButton = document.getElementById("save-button");
-    const userEmail = document.getElementById("profile-button"); // Inserisce l'email direttamente dal server
+    const userEmailElement = document.getElementById("user-email"); // Inserisce l'email direttamente dal server
+    const userEmail = userEmailElement ? userEmailElement.textContent.trim() : null;
+
+    if (!userEmail) {
+        console.error("Errore: l'email non è stata trovata nel DOM.");
+    }
+
     let selectedImage = null;
 
     // Gestione della selezione delle immagini
@@ -14,8 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
             // Aggiungi la classe "selected" all'immagine cliccata
             this.classList.add("selected");
 
-            // Ottieni solo il nome del file dall'attributo src
-            selectedImage = this.getAttribute("src").split("/").pop();
+            // Ottieni solo il nome del file senza hash finale
+            selectedImage = this.getAttribute("src").split("/").pop().replace(/-\w{32}\.png$/, ".png");
         });
     });
 

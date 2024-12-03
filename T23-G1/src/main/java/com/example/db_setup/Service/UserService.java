@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.db_setup.OAuthUserGoogle;
 import com.example.db_setup.User;
 import com.example.db_setup.UserProfile;
+import com.example.db_setup.UserProfileRepository;
 import com.example.db_setup.UserRepository;
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
@@ -25,9 +26,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 // è usato per creare un nuovo utente, recuperare un utente esistente e generare un token JWT per l'utente
 @Service
 public class UserService {
-    @Autowired
+
     // Usa la dipendenza UserRepository per accedere ai dati dell'utente sul DB
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserProfileRepository userProfileRepository;
+
     private UserProfile userProfile;
     // Stessa cosa di sopra
     @Autowired
@@ -82,18 +88,26 @@ public class UserService {
     }
     // Genera un token JWT per l'utente specificato, forse si deve cambiare
     public static String generateToken(User user) {
-    Instant now = Instant.now();
-    Instant expiration = now.plus(1, ChronoUnit.HOURS);
-    // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
-    String token = Jwts.builder()
-            .setSubject(user.getEmail())
-            .setIssuedAt(Date.from(now))
-            .setExpiration(Date.from(expiration))
-            .claim("userId", user.getID())
-            .claim("role", "user")
-            .signWith(SignatureAlgorithm.HS256, "mySecretKey")
-            .compact();
+        Instant now = Instant.now();
+        Instant expiration = now.plus(1, ChronoUnit.HOURS);
+        // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
+        String token = Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiration))
+                .claim("userId", user.getID())
+                .claim("role", "user")
+                .signWith(SignatureAlgorithm.HS256, "mySecretKey")
+                .compact();
 
-    return token;
+        return token;
     }
+
+    public void saveProfile(UserProfile userProfile) {
+        if (userProfile == null){
+            throw new IllegalArgumentException("Profile not found");
+        }
+        userProfileRepository.save(userProfile);
+    }
+
 }
