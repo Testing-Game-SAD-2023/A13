@@ -760,5 +760,10 @@ public class AdminService {
         return new ModelAndView("redirect:/loginAdmin");
     }
 
+    public ModelAndView showTeamSpecifico(HttpServletRequest request, String jwt) {
+        if (jwtService.isJwtValid(jwt)) {return new ModelAndView("teamDetail");}
+        return new ModelAndView("redirect:/loginAdmin");
+    }
+
 
 }

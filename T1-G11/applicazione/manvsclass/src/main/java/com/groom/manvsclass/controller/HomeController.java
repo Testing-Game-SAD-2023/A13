@@ -113,6 +113,12 @@
     public ModelAndView showGestioneTeams(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
         return adminService.showGestioneTeams(request,jwt);
     }
+    
+    @GetMapping("/visualizzaTeam/{idTeam}")
+    @ResponseBody
+    public ModelAndView showTeamSpecifico(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
+        return adminService.showTeamSpecifico(request,jwt);
+    }
 
     @GetMapping("/assignments")
     @ResponseBody

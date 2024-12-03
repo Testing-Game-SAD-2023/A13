@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.groom.manvsclass.model.Team;
@@ -189,32 +187,26 @@ public class TeamService {
         }
     }
     
-    //Modifica 02/12/2024: Aggiunta della visualizzazione del singolo team
-    public ModelAndView visualizzaTeam(String idTeam,String jwt) {
-        ModelAndView modelAndView = new ModelAndView();
+    
+    //Modifica 03/12/2024: Aggiunta della visualizzazione del singolo team
+    public  ResponseEntity<?> visualizzaTeam(String idTeam, String jwt) {    
 
         // Verifica se il token JWT è presente
-        if (jwt == null || jwt.isEmpty()) {
-            modelAndView.setViewName("login"); // Reindirizza alla pagina di login
-            return modelAndView;
+        // 1. Verifica se il token JWT è valido
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+        
+        // 3. Verifica se il team esiste
+        Team existingTeam = teamRepository.findById(idTeam).orElse(null);
+        if (existingTeam == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
         }
 
-        // Recupera il team dal database
-        Team team = teamRepository.getTeamById(idTeam);
-
-        // Gestione del caso in cui il team non viene trovato
-        if (team == null) {
-            modelAndView.setViewName("error"); // Mostra una pagina di errore
-            modelAndView.addObject("message", "Il team con ID " + idTeam + " non è stato trovato.");
-            return modelAndView;
-        }
-
-        // Configura la view con il nome e i dati
-        modelAndView.setViewName("teamDetail"); // Nome del template
-        modelAndView.addObject("team", team);  
-
-        return modelAndView;
+          // Restituisce il team
+          return ResponseEntity.ok().body(existingTeam);
     }
 
+    
 }
 

@@ -45,12 +45,10 @@ public class TeamController {
         return teamService.visualizzaTeams(jwt);
     }
 
-    @GetMapping("/visualizzaTeam/{id}")
+    @GetMapping("/cercaTeam/{idTeam}")
     @ResponseBody
-    public ModelAndView visualizzaTeam(@PathVariable("id") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> visualizzaTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.visualizzaTeam(idTeam, jwt);
     }
-
-    
 
 }
