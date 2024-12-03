@@ -23,7 +23,6 @@ public class User {
    public String surname;
    public String email;
    public String password;
-   
    //MODIFICA
    public boolean isRegisteredWithFacebook;
    //FINE MODIFICA
@@ -37,7 +36,6 @@ public class User {
    public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
    */
 
-
     @Column(name = "nickname", unique = true)
     private String nickname;
     @Column(name = "biography", length = 500)
@@ -46,8 +44,7 @@ public class User {
     @Column(name = "avatar")
     private String avatar; // Campo per il percorso dell'immagine profilo o URL
  
-
-   @Column(name = "reset_token")
+    @Column(name = "reset_token")
    private String resetToken;
    public void setResetToken(String resetToken) {
        this.resetToken = resetToken;
@@ -59,7 +56,6 @@ public class User {
     public String getBiography() {
         return biography;
     }
-
  
     public void setBiography(String biography) {
         this.biography = biography;
@@ -72,6 +68,3 @@ public class User {
     this.nickname = nickname;
     }
 }
-
-
-//////////NUOVA TABELLA PER GLI AMICI////////////
