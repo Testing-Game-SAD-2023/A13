@@ -579,7 +579,7 @@ public ResponseEntity<String> removeFriend(
 
     //GabMan 03/12 (Ottengo lista amici)
     @GetMapping("/getFriendlist")
-public ResponseEntity<List<Map<String, String>>> getFriendlist(@CookieValue(name = "jwt", required = false) String jwt) {
+public ResponseEntity<List<Map<String, String>>> getFriend(@CookieValue(name = "jwt", required = false) String jwt) {
     try {
         // Verifica che il token JWT esista
         if (jwt == null || jwt.isEmpty()) {
@@ -596,7 +596,7 @@ public ResponseEntity<List<Map<String, String>>> getFriendlist(@CookieValue(name
         String userId = map.get("userId").toString();
 
         // Chiamata al servizio T23 per ottenere la lista amici
-        List<Map<String, String>> friendlist = t23Service.getFriendlist(userId);
+        List<Map<String, String>> friendlist = t23Service.getFriends(userId);
         if (friendlist != null && !friendlist.isEmpty()) {
             return ResponseEntity.ok(friendlist);
         } else {

@@ -41,6 +41,22 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // FINE MODIFICA avatar
 
     //MODIFICHE AMICIZIE DA FARE
+    @Query("SELECT f FROM Friend f WHERE f.user_id = :userId")
+    List<Friend> findFriendsByUserId(@Param("userId") int userId);
+
+    @Modifying
+    @Query(value = "INSERT INTO Friend (user_id, friend_id, friend_username, friend_avatar) VALUES (:userId, :friendId, :friendUsername, :friendAvatar)", nativeQuery = true)
+    void addFriend(@Param("userId") Integer userId,
+               @Param("friendId") Integer friendId,
+               @Param("friendUsername") String friendUsername,
+               @Param("friendAvatar") String friendAvatar);
+
+    @Modifying
+    @Query("DELETE FROM Friend f WHERE f.user_id = :userId AND f.friend_id = :friendId")
+    void removeFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
+
+
  
 }
 

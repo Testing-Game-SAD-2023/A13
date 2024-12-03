@@ -118,13 +118,25 @@
 
         <div id="trophies" class="section">
             <div class="row">
-                <div class="col-8">
-                    <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
-                        <div class="card-body">
-                            <h4 class="card-title">Trofei</h4>
-                            <hr>
-                            <div style="height:44.2vh; overflow-y: auto">
-                                <!-- Contenuto Trofei -->
+                <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
+                    <div class="card-body">
+                        <h4 class="card-title">Trofei</h4>
+                        <hr>
+                        <div style="height:44.2vh; overflow-y: auto">
+                            <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
+                            <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                    </div>
+                                    <div class="col">
+                                        <h4 th:text="${element.Name}">Nome achievement</h4>
+                                        <p th:text="${element.Description}">Descrizione achievement</p>
+                                        <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
+                                            <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

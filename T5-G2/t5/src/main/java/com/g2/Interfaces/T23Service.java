@@ -70,7 +70,7 @@ import org.springframework.web.util.UriComponentsBuilder;
          ));
 
          registerAction("getFriendlist", new ServiceActionDefinition(
-                 params -> getFriendlist((String) params[0])
+                 params -> getFriends((String) params[0])
          ));
 
          /////NON TESTATO
