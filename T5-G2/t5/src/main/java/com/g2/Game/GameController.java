@@ -17,6 +17,7 @@
 package com.g2.Game;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +42,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
+import com.g2.Model.AchievementProgress;
+import com.g2.Model.User;
 import com.g2.Service.AchievementService;
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
@@ -48,7 +51,7 @@ import com.g2.Service.AchievementService;
 @RestController
 public class GameController {
 
-    //Gestisco qui tutti i giochi aperti 
+    //Gestisco qui tutti i giochi aperti
     private final Map<String, GameLogic> activeGames;
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
@@ -56,7 +59,7 @@ public class GameController {
     @Autowired
     private AchievementService achievementService;
 
-    //Logger 
+    //Logger
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(RestTemplate restTemplate) {
@@ -89,7 +92,7 @@ public class GameController {
 
     /*
      *  Prendo da t1 la classe UT, poi fornisco al T7 tutto ciò di cui ha bisogno per fare una compilazione
-     *  infine controllo che tutto sia andato a buon fine e fornisco i dati 
+     *  infine controllo che tutto sia andato a buon fine e fornisco i dati
      */
     private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
         try {
@@ -128,7 +131,7 @@ public class GameController {
     }
 
     /*
-     *  Sfrutto T4 per avere i risultati dei robot 
+     *  Sfrutto T4 per avere i risultati dei robot
      */
     private int GetRobotScore(String testClass, String robot_type, String difficulty) {
         try {
@@ -145,7 +148,7 @@ public class GameController {
     }
 
     /*
-     *  Partendo dai dati dell'utente ottengo la sua percentuale di coverage 
+     *  Partendo dai dati dell'utente ottengo la sua percentuale di coverage
      */
     public int LineCoverage(String cov) {
         try {
@@ -198,7 +201,7 @@ public class GameController {
 
     /*
      *  Chiamata che l'editor fa appena instanzia un nuovo gioco, controllo se la partita quindi esisteva già o meno
-     *  
+     *
      */
     @PostMapping("/StartGame")
     public ResponseEntity<String> StartGame(@RequestParam String playerId,
@@ -215,9 +218,9 @@ public class GameController {
             }
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
-                //Creo la nuova partita 
+                //Creo la nuova partita
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode);
-                //gameLogic.CreateGame();
+                gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");
                 return ResponseEntity.ok().build();
@@ -237,12 +240,12 @@ public class GameController {
             } else {
                 errorMessage = "errore l'utente ha cambiato le impostazioni della partita";
                 errorCode = "1";
-                //Rimuovo il vecchio game e ne creo uno nuovo 
+                //Rimuovo il vecchio game e ne creo uno nuovo
                 activeGames.remove(playerId);
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode);
                 activeGames.put(playerId, gameLogic);
             }
-            //Setto messaggio d'errore e codice di conseguenza 
+            //Setto messaggio d'errore e codice di conseguenza
             logger.error("[GAMECONTROLLER][StartGame] " + errorMessage);
             return createErrorResponse(errorMessage, errorCode);
         } catch (Exception e) {
@@ -252,7 +255,7 @@ public class GameController {
     }
 
     /*
-     *  chiamata Rest di debug, serve solo per vedere le partite attive 
+     *  chiamata Rest di debug, serve solo per vedere le partite attive
      */
     @GetMapping("/StartGame")
     public Map<String, GameLogic> GetGame() {
@@ -260,8 +263,8 @@ public class GameController {
     }
 
     /*
-     *  Chiamata principale del game engine, l'utente ogni volta può comunicare la sua richiesta di 
-     *  calcolare la coverage/compilazione, il campo isGameEnd è da utilizzato per indicare se è anche un submit e 
+     *  Chiamata principale del game engine, l'utente ogni volta può comunicare la sua richiesta di
+     *  calcolare la coverage/compilazione, il campo isGameEnd è da utilizzato per indicare se è anche un submit e
      *  quindi vuole terminare la partita ed ottenere i risultati del robot
      */
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -329,8 +332,19 @@ public class GameController {
 
             // Controllo fine partita
             if (isGameEnd || gameLogic.isGameEnd()) {
+                //gameLogic.EndRound(playerId);
+                //gameLogic.EndGame(playerId, userScore, userScore > robotScore);
                 activeGames.remove(playerId);
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
+
+                // Aggiornamento progressi e notifiche
+                List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
+                Long userId = Long.parseLong(playerId);
+                User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+                String email = user.getEmail();
+                List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(userId.intValue());
+                achievementService.updateNotificationsForAchievements(email,newAchievements);
+
                 return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
@@ -388,13 +402,13 @@ public class GameController {
                 .body(result.toString());
     }
 
-    // Metodo per creare una risposta di errore 
+    // Metodo per creare una risposta di errore
     /*
-     * ERROR CODE che mando al client 
+     * ERROR CODE che mando al client
      *  0 - modalità non esiste
      *  1 -  l'utente ha cambiato le impostazioni della partita
      *  2 -  esiste già la partita
-     *  3 -  è avvenuta un eccezione 
+     *  3 -  è avvenuta un eccezione
      *  4 -  non esiste la partita
      *  5 -  partita eliminata
      */

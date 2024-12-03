@@ -17,7 +17,8 @@
 
 package com.g2.Interfaces;
 
-import java.util.List;
+import java.util.*;
+import javax.management.Notification;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,31 @@ public class T23Service extends BaseService {
         registerAction("EditProfile", new ServiceActionDefinition(
                 params -> EditProfile((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class
+        ));
+
+        registerAction("NewNotification", new ServiceActionDefinition(
+                params -> NewNotification((String) params[0], (String) params[1], (String) params[2]),
+                String.class, String.class, String.class
+        ));
+
+        registerAction("GetNotifications", new ServiceActionDefinition(
+                params -> getNotifications((String) params[0]),
+                String.class
+        ));
+
+        registerAction("UpdateNotification", new ServiceActionDefinition(
+                params -> updateNotification((String) params[0], (String) params[1]),
+                String.class, String.class
+        ));
+
+        registerAction("DeleteNotification", new ServiceActionDefinition(
+                params -> deleteNotification((String) params[0], (String) params[1]),
+                String.class, String.class
+        ));
+
+        registerAction("ClearNotifications", new ServiceActionDefinition(
+                params -> clearNotifications((String) params[0]),
+                String.class
         ));
 
     }
@@ -83,4 +109,61 @@ public class T23Service extends BaseService {
 
         return callRestPost(endpoint, map, null, Boolean.class);
     }
+
+    // Metodo per la creazione di una notifica
+    private String NewNotification(String userEmail, String title, String message) {
+        final String endpoint = "/new_notification";
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("email", userEmail);
+        map.add("title", title);
+        map.add("message", message);
+
+        return callRestPost(endpoint, map, null, String.class);
+    }
+
+    public List<Notification> getNotifications(String userEmail) {
+        final String endpoint = "/notifications";
+
+        Map<String, String> queryParams = Map.of("email", userEmail);
+
+        // Effettua la chiamata GET e restituisce una lista di notifiche
+        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<Notification>>() {});
+    }
+
+    public String updateNotification(String userEmail, String notificationID) {
+        final String endpoint = "/update_notification";
+    
+        // Imposta i dati del form
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("email", userEmail);
+        formData.add("id notifica", notificationID);
+    
+        // Effettua una chiamata POST per aggiornare lo stato della notifica
+        return callRestPost(endpoint, formData, null, String.class);
+    }
+
+    // Metodo per eliminare una singola notifica
+    public String deleteNotification(String userEmail, String notificationID) {
+        final String endpoint = "/delete_notification";
+
+        Map<String, String> queryParams = Map.of(
+            "email", userEmail,
+            "id notifica", notificationID
+        );
+
+        return callRestDelete(endpoint, queryParams);
+    }
+
+    // Metodo per eliminare tutte le notifiche
+    public String clearNotifications(String userEmail) {
+        final String endpoint = "/clear_notifications";
+
+        Map<String, String> queryParams = Map.of("email", userEmail);
+
+        return callRestDelete(endpoint, queryParams);
+    }
+        
+    
+
 }
