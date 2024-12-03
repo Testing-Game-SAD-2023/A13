@@ -16,20 +16,20 @@
  */
 package com.g2.Interfaces;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.g2.Model.Game;
-import com.g2.Model.StatisticProgress;
-import org.springframework.core.ParameterizedTypeReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import com.g2.Model.Game;
+import com.g2.Model.StatisticProgress;
 
 @Service
 public class T4Service extends BaseService {
@@ -120,7 +120,7 @@ public class T4Service extends BaseService {
         String response = callRestPut(endpoint, obj, null, null, String.class);
         return response;
     }
-    
+
 /*
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
         try {
@@ -140,8 +140,8 @@ public class T4Service extends BaseService {
         }
     }
 */
-    
-    // usa /robots per ottenere dati 
+
+    // usa /robots per ottenere dati
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
         formData.put("testClassId", className); // Nome della classe
@@ -171,7 +171,7 @@ public class T4Service extends BaseService {
         return jsonObject.getInt("id");
     }
 
-    /*
+
     private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner) {
         final String endpoint = "/games/" + String.valueOf(gameid);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -182,8 +182,7 @@ public class T4Service extends BaseService {
         String respose = callRestPost(endpoint, formData, null, String.class);
         return respose;
     }
-    */
-
+    /*
     private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner){
         final String endpoint = "/games/" + String.valueOf(gameid);
         JSONObject formData = new JSONObject();
@@ -198,6 +197,7 @@ public class T4Service extends BaseService {
             throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
         }
     }
+        */
 
     private int CreateRound(int game_id, String ClasseUT, String Time) {
         final String endpoint = "/rounds";
@@ -212,7 +212,7 @@ public class T4Service extends BaseService {
         return jsonObject.getInt("id");
     }
 
-    /* 
+    /*
     private String EndRound(String Time, int roundId) {
         // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
         // costruito a mano
