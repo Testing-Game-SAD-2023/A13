@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.TeamAdmin;
@@ -184,6 +187,33 @@ public class TeamService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
         }
+    }
+    
+    //Modifica 02/12/2024: Aggiunta della visualizzazione del singolo team
+    public ModelAndView visualizzaTeam(String idTeam,String jwt) {
+        ModelAndView modelAndView = new ModelAndView();
+
+        // Verifica se il token JWT è presente
+        if (jwt == null || jwt.isEmpty()) {
+            modelAndView.setViewName("login"); // Reindirizza alla pagina di login
+            return modelAndView;
+        }
+
+        // Recupera il team dal database
+        Team team = teamRepository.getTeamById(idTeam);
+
+        // Gestione del caso in cui il team non viene trovato
+        if (team == null) {
+            modelAndView.setViewName("error"); // Mostra una pagina di errore
+            modelAndView.addObject("message", "Il team con ID " + idTeam + " non è stato trovato.");
+            return modelAndView;
+        }
+
+        // Configura la view con il nome e i dati
+        modelAndView.setViewName("teamDetail"); // Nome del template
+        modelAndView.addObject("team", team);  
+
+        return modelAndView;
     }
 
 }
