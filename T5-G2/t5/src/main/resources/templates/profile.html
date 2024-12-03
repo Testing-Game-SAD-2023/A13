@@ -4,18 +4,14 @@
     <link href="/t5/css/main2.css" rel="stylesheet" />
     <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!--Modifica (05/04) by GabMan 'Pulsanti di navigazione per le sezioni'-->
+    <!-- Librerie -->
     <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
-    <!--Modifica (20/05) by GabMan 'Aggiunta libreria SweetAlert'-->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <!--Modifica (21/05) by GabMan 'Aggiunta libreria JQuery'-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!--Fine Modifica-->
-   
+
     <script src="/t5/js/profile.js"></script>
     <script src="/t5/js/Util_Editor.js"></script>
     <script src="/t5/js/Amici.js"></script>
-
 
     <title>Profilo utente</title>
 </head>
@@ -24,10 +20,6 @@
     <div class="container-fluid">
         <!-- Barra di Navigazione -->
         <div class="row">
-            <div class="col text-center">
-                <!--Modifica (3/12) by GabMan 'Pulsanti di navigazione per le sezioni'-->
-                <!-- Pulsanti di navigazione -->
-        <div class="row mb-4">
             <div class="col text-center">
                 <div class="btn-group" role="group">
                     <button id="btnProfile" class="btn btn-primary" onclick="showSection('profile')">Profilo</button>
@@ -40,11 +32,7 @@
             </div>
         </div>
 
-            </div>
-        </div>
-
         <!-- Sezioni -->
-        <!--Modifica (02/12)camilla -->
         <div id="profile" class="section active">
             <div id="userInfo">
                 <p id="userFullName" class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;font-size: 2rem;">
@@ -55,37 +43,68 @@
                 </p>
             </div>
 
-        
-            
-
-
-
-            <!--Modifica (30/11) by GabMan 'Aggiunta sezione amici'-->
-        <!-- Sezione Amici -->
-        <div id="friends" class="section">
+            <!-- Biografia -->
             <div class="row">
                 <div class="col-8">
-                    <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
+                    <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
                         <div class="card-body">
-                            <h4 class="card-title">Amici</h4>
-                            <hr>
+                            <div class="row">
+                                <div class="col-210">
+                                    <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                                </div>
+                                <div class="col">
+                                    <h4 class="card-title" id="usernameField"></h4>
+                                    <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
+                                    <hr>
 
-                            <!-- Contenitore Lista Amici -->
-                            <div id="friendsContainer" style="height:44.2vh; overflow-y: auto">
-                                <!-- Il contenuto sarà aggiunto dinamicamente da Amici.js -->
+                                    <!-- Visualizzazione della biografia -->
+                                    <div id="bioDisplaySection">
+                                        <p id="bioText" style="white-space: pre-wrap; color: #180101;font-size: 1.2rem;">La tua biografia...</p>
+                                        <button id="editBioButton" class="btn btn-primary mt-4" style="position: absolute; bottom: 10px; right: 10px;">Modifica Biografia</button>
+                                    </div>
+
+                                    <!-- Modifica della biografia -->
+                                    <div id="bioEditSection" style="display: none;">
+                                        <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
+                                        <button id="saveBioButton" class="btn btn-success mt-2">Salva Biografia</button>
+                                        <button id="cancelBioButton" class="btn btn-secondary">Annulla Modifiche</button>
+                                        <div id="saveMessage" class="mt-2" style="display: none; color: green;">Biografia salvata con successo!</div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <!-- Modulo per aggiungere amici -->
-                            <div style="margin-top: 20px;">
+        <div id="friends" class="section">
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <!-- Lista Amici -->
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h4 class="card-title text-center mb-4">Lista Amici</h4>
+                            <div id="friendsContainer" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Amici caricati dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Aggiungi Amico -->
+                    <div class="card mt-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Aggiungi un Amico</h5>
+                            <div class="input-group">
                                 <input
                                     type="text"
                                     id="friendIdInput"
                                     class="form-control"
-                                    placeholder="Inserisci ID amico"
+                                    placeholder="Inserisci il nickname dell'amico"
                                 />
                                 <button
                                     id="addFriendButton"
-                                    class="btn btn-success mt-2"
+                                    class="btn btn-success"
                                     onclick="addFriend()"
                                 >
                                     Aggiungi Amico
@@ -96,46 +115,7 @@
                 </div>
             </div>
         </div>
-    
-            
-        <!--Modifica (30/11) by GabMan 'Aggiunta al profilo area di modifica della biografia'-->
-       
-<div class="row">
-    <div class="col-8">
-        <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-210">
-                        <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
-                    </div>
-                    <div class="col">
-                        <h4 class="card-title" id="usernameField"></h4>
-                        <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
-                        <hr>
 
-                        <!-- Visualizzazione della biografia -->
-                        <div id="bioDisplaySection">
-                            <p id="bioText" style="white-space: pre-wrap; color: #180101;font-size: 1.2rem;">La tua biografia...</p>
-                            <button id="editBioButton" class="btn btn-primary mt-4" style="position: absolute; bottom: 10px; right: 10px;">Modifica Biografia</button>
-                        </div>
-
-                        <!-- Modifica della biografia -->
-                        <div id="bioEditSection" style="display: none;">
-                            <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
-                            <button id="saveBioButton" class="btn btn-success mt-2">Salva Biografia</button>
-                            <button id="cancelBioButton" class="btn btn-secondary">Annulla Modifiche</button>
-                            <div id="saveMessage" class="mt-2" style="display: none; color: green;">Biografia salvata con successo!</div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-        <!--Modifica (28/11) by GabMan 'Aggiunta sezione Trofei'-->
         <div id="trophies" class="section">
             <div class="row">
                 <div class="col-8">
@@ -152,20 +132,15 @@
             </div>
         </div>
 
-        <!--Modifica (28/11) by GabMan 'Aggiunta sezione Statistiche'-->
         <div id="stats" class="section">
             <div class="col">
                 <div class="card" style="height:92vh">
                     <div class="card-body">
                         <h4 class="card-title">Statistiche</h4>
                         <hr>
-                        <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
-                            <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
-                                Nome statistica
-                            </div>
-                            <div class="col text-right" th:text="${element.Progress}">
-                                1000
-                            </div>
+                        <div class="row">
+                            <div class="col-8">Nome statistica</div>
+                            <div class="col text-right">1000</div>
                         </div>
                     </div>
                 </div>
@@ -173,22 +148,17 @@
         </div>
     </div>
 
-    <!--Modifica (28/11) by GabMan 'Script per la gestione delle sezioni'-->
+    <!-- Script per la gestione delle sezioni -->
     <script>
         function showSection(sectionId) {
-            // Nascondi tutte le sezioni
             document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            // Mostra solo la sezione selezionata
             document.getElementById(sectionId).classList.add('active');
         }
+
         function goToHome() {
-        
-         window.location.href = "/main";
+            window.location.href = "/main";
         }
 
-        
-
-        //Modifica (28/11) by GabMan 'Script per salvare la biografia'
         document.addEventListener("DOMContentLoaded", () => {
             const saveButton = document.getElementById("saveBioButton");
 

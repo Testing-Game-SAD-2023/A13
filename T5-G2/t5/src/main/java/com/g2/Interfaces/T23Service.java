@@ -64,14 +64,16 @@ import org.springframework.web.util.UriComponentsBuilder;
                  params -> updateBiography((String) params[0], (String) params[1])
          ));
         
-        registerAction("GetBiography", new ServiceActionDefinition(
-        params -> getBiography((String) params[0]),
-        String.class
-        ));
-
-         registerAction("GetFriends", new ServiceActionDefinition(
-                 params -> getFriends((String) params[0])
+         registerAction("GetBiography", new ServiceActionDefinition(
+         params -> getBiography((String) params[0]),
+         String.class
          ));
+
+         registerAction("getFriendlist", new ServiceActionDefinition(
+                 params -> getFriendlist((String) params[0])
+         ));
+
+         /////NON TESTATO
          registerAction("AddFriend", new ServiceActionDefinition(
                  params -> addFriend((String) params[0], (String) params[1])
          ));
@@ -187,10 +189,10 @@ import org.springframework.web.util.UriComponentsBuilder;
     );
     return response.getBody();
 }
-
+//GabMan 03/12
      // Metodo per ottenere la lista degli amici
      public List<Map<String, String>> getFriends(String userId) {
-        final String endpoint = "/getFriends";
+        final String endpoint = "/getFriendlist";
            // Creazione del payload come MultiValueMap
         MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();
         payload.add("userId", userId);
@@ -198,7 +200,7 @@ import org.springframework.web.util.UriComponentsBuilder;
         // Chiamata al metodo callRestPost
         return callRestPost(endpoint, payload, null, new ParameterizedTypeReference<List<Map<String, String>>>() {});
      }
- 
+/////////NON TESTATI/////////////////////////////////////////////////////////
      // Metodo per aggiungere un amico
      public Boolean addFriend(String userId, String friendId) {
          final String endpoint = "/addFriend";
