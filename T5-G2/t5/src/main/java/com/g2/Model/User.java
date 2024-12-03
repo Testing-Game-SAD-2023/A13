@@ -14,7 +14,8 @@ public class User {
     
     //modifiche cami
     private String avatar;
-    private String biography; // Nuovo campo
+    private String biography;
+    private String nickname;  
     //fine modifiche
 
     public User(Long id, String name, String surname, String email, String password,
@@ -29,7 +30,8 @@ public class User {
         this.resetToken = resetToken;
         //cami
         this.biography = "";
-        this.avatar="" ;// Nuovo campo
+        this.avatar="" ;
+        this.nickname = "";
         //fine
         
     }
@@ -116,5 +118,13 @@ public class User {
 
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
+    }
+    //cami (02/12)
+       public String getNickname() { // Getter per nickname
+        return nickname;
+    }
+
+    public void setNickname(String nickname) { // Setter per nickname
+        this.nickname = nickname;
     }
 }

@@ -744,6 +744,43 @@ padding-left: 8%;
 .section.active {
   display: block;
 }
+/* Pulsanti di navigazione - stato predefinito */
+/* Pulsanti di navigazione - stato predefinito */
+button.btn {
+  background-color: #007bff !important; /* Grigio */
+  color: white !important;
+  border: 1px solid #007bff !important;
+}
+
+/* Pulsante attivo */
+button.btn-active {
+  background-color: #007bff !important; /* Blu */
+  color: white !important;
+  font-weight: bold !important;
+  border: 2px solid #0056b3 !important;
+}
+/*cami*/
+/* Hover sul pulsante */
+button.btn:hover {
+  background-color: #0056b3 !important; /* Grigio scuro */
+  color: white !important;
+}
+
+/* Stile per "Modifica Biografia" */
+#editBioButton {
+  background-color: #28a745 !important; /* Blu fisso */
+  color: white !important;
+  font-weight: bold;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover per "Modifica Biografia" */
+#editBioButton:hover {
+  background-color: #218838 !important; /* Blu scuro */
+}
+
+
 
 /* Stili per i pulsanti */
 .btn {
@@ -752,21 +789,19 @@ padding-left: 8%;
 
 /* Modifica (28/11) by GabMan 'Stile per il pulsante Salva Biografia' */
 #saveBioButton {
-  background-color: #28a745; /* Verde Bootstrap */
-  color: white; /* Testo bianco */
-  font-weight: bold; /* Testo in grassetto */
-  border: none; /* Rimuove il bordo di default */
-  border-radius: 5px; /* Angoli arrotondati */
-  transition: background-color 0.3s ease; /* Transizione per il cambio colore */
+  background-color: #28a745 !important; /* Verde */
+  color: white !important;
+  font-weight: bold;
+  border: none;
 }
 
 #saveBioButton:hover {
-  background-color: #218838; /* Colore più scuro per hover */
-  cursor: pointer; /* Mostra la mano sul hover */
+  background-color: #218838 !important; /* Verde più scuro */
 }
 
+
 #saveBioButton:active {
-  background-color: #1e7e34; /* Colore ancora più scuro per il click */
+  background-color: #1e7e34 !important; /* Colore ancora più scuro per il click */
 }
 
 /* Modifica (30/11) by GabMan 'Stile per il box della biografia' */
@@ -855,4 +890,5 @@ padding-left: 8%;
 #addFriendButton:hover {
   background-color: #218838;
 }
+
 

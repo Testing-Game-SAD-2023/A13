@@ -215,3 +215,42 @@ body {
   display: block;
   margin: 0 auto;
 }
+
+/* Pulsanti di navigazione - stato predefinito */
+/* Stile per i pulsanti di navigazione */
+.btn {
+  background-color: #007bff !important; /* Grigio di default */
+  color: white !important;
+  border: 1px solid #007bff !important;
+}
+
+/* Stile del pulsante attivo */
+.btn-active {
+  background-color: #007bff !important; /* Blu */
+  color: white !important;
+  font-weight: bold;
+  border: 2px solid #0056b3 !important;
+}
+
+/* Stile al passaggio del mouse sui pulsanti */
+.btn:hover {
+  background-color: #0056b3 !important; /* Grigio scuro */
+  color: white !important;
+}
+
+/* Stile per "Modifica Biografia" */
+#editBioButton {
+  background-color: #28a745 !important; /* Blu fisso */
+  color: white !important;
+  font-weight: bold;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover per "Modifica Biografia" */
+#editBioButton:hover {
+  background-color: #218838 !important; /* Blu scuro */
+}
+
+
+

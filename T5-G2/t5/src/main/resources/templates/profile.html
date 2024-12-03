@@ -11,7 +11,7 @@
     <!--Modifica (21/05) by GabMan 'Aggiunta libreria JQuery'-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!--Fine Modifica-->
-
+   
     <script src="/t5/js/profile.js"></script>
     <script src="/t5/js/Util_Editor.js"></script>
     <script src="/t5/js/Amici.js"></script>
@@ -26,24 +26,34 @@
         <div class="row">
             <div class="col text-center">
                 <!--Modifica (28/11) by GabMan 'Pulsanti di navigazione per le sezioni'-->
-                <button class="btn btn-primary" onclick="showSection('profile')">Profilo</button>
-                <button class="btn btn-primary" onclick="showSection('trophies')">Trofei</button>
-                <button class="btn btn-primary" onclick="showSection('stats')">Statistiche</button>
-                <button class="btn btn-primary" onclick="showSection('friends')">Amici</button>
-                <button class="btn btn-primary" onclick="showSection('leaderboard')">Classifica</button>
+                <!-- Pulsanti di navigazione -->
+<div class="row">
+    <div class="col text-center">
+        <button id="btnProfile" class="btn btn-primary" onclick="showSection('profile')">Profilo</button>
+        <button id="btnTrophies" class="btn btn-primary" onclick="showSection('trophies')">Trofei</button>
+        <button id="btnStats" class="btn btn-primary" onclick="showSection('stats')">Statistiche</button>
+        <button id="btnFriends" class="btn btn-primary" onclick="showSection('friends')">Amici</button>
+        <button id="btnLeaderboard" class="btn btn-primary" onclick="showSection('leaderboard')">Classifica</button>
+        <button id="btnHome" class="btn btn-success" onclick="goToHome()">Home</button>
+
+    </div>
+</div>
+
             </div>
         </div>
 
         <!-- Sezioni -->
-        <!--Modifica (28/11) by GabMan 'Aggiunta sezione Profilo'-->
+        <!--Modifica (02/12)camilla -->
         <div id="profile" class="section active">
-            <div class="row">
-                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;">Profilo</p>
-                <div id="topRightContainer">
-                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Profilo</button>
-                    <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
-                </div>
+            <div id="userInfo">
+                <p id="userFullName" class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;font-size: 2rem;">
+                    Nome Cognome
+                </p>
+                <p id="userNickname" style="color: gray; font-family: Arial, Helvetica, sans-serif; font-style: italic;">
+                    @nickname
+                </p>
             </div>
+            
             <!--Modifica (30/11) by GabMan 'Aggiunta sezione amici'-->
         <!-- Sezione Amici -->
 <div id="friends" class="section">
@@ -99,14 +109,15 @@
 
                         <!-- Visualizzazione della biografia -->
                         <div id="bioDisplaySection">
-                            <p id="bioText" style="white-space: pre-wrap; color: #fff;">La tua biografia...</p>
-                            <button id="editBioButton" class="btn btn-primary mt-2">Modifica Biografia</button>
+                            <p id="bioText" style="white-space: pre-wrap; color: #180101;font-size: 1.2rem;">La tua biografia...</p>
+                            <button id="editBioButton" class="btn btn-primary mt-4" style="position: absolute; bottom: 10px; right: 10px;">Modifica Biografia</button>
                         </div>
 
                         <!-- Modifica della biografia -->
                         <div id="bioEditSection" style="display: none;">
                             <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
                             <button id="saveBioButton" class="btn btn-success mt-2">Salva Biografia</button>
+                            <button id="cancelBioButton" class="btn btn-secondary">Annulla Modifiche</button>
                             <div id="saveMessage" class="mt-2" style="display: none; color: green;">Biografia salvata con successo!</div>
                         </div>
 
@@ -164,6 +175,12 @@
             // Mostra solo la sezione selezionata
             document.getElementById(sectionId).classList.add('active');
         }
+        function goToHome() {
+        
+         window.location.href = "/main";
+        }
+
+        
 
         //Modifica (28/11) by GabMan 'Script per salvare la biografia'
         document.addEventListener("DOMContentLoaded", () => {
