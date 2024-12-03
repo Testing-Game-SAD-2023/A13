@@ -25,19 +25,20 @@
         <!-- Barra di Navigazione -->
         <div class="row">
             <div class="col text-center">
-                <!--Modifica (28/11) by GabMan 'Pulsanti di navigazione per le sezioni'-->
+                <!--Modifica (3/12) by GabMan 'Pulsanti di navigazione per le sezioni'-->
                 <!-- Pulsanti di navigazione -->
-<div class="row">
-    <div class="col text-center">
-        <button id="btnProfile" class="btn btn-primary" onclick="showSection('profile')">Profilo</button>
-        <button id="btnTrophies" class="btn btn-primary" onclick="showSection('trophies')">Trofei</button>
-        <button id="btnStats" class="btn btn-primary" onclick="showSection('stats')">Statistiche</button>
-        <button id="btnFriends" class="btn btn-primary" onclick="showSection('friends')">Amici</button>
-        <button id="btnLeaderboard" class="btn btn-primary" onclick="showSection('leaderboard')">Classifica</button>
-        <button id="btnHome" class="btn btn-success" onclick="goToHome()">Home</button>
-
-    </div>
-</div>
+        <div class="row mb-4">
+            <div class="col text-center">
+                <div class="btn-group" role="group">
+                    <button id="btnProfile" class="btn btn-primary" onclick="showSection('profile')">Profilo</button>
+                    <button id="btnTrophies" class="btn btn-primary" onclick="showSection('trophies')">Trofei</button>
+                    <button id="btnStats" class="btn btn-primary" onclick="showSection('stats')">Statistiche</button>
+                    <button id="btnFriends" class="btn btn-primary" onclick="showSection('friends')">Amici</button>
+                    <button id="btnLeaderboard" class="btn btn-primary" onclick="showSection('leaderboard')">Classifica</button>
+                    <button id="btnHome" class="btn btn-success" onclick="goToHome()">Home</button>
+                </div>
+            </div>
+        </div>
 
             </div>
         </div>
@@ -53,46 +54,51 @@
                     @nickname
                 </p>
             </div>
+
+        
             
+
+
+
             <!--Modifica (30/11) by GabMan 'Aggiunta sezione amici'-->
         <!-- Sezione Amici -->
-<div id="friends" class="section">
-    <div class="row">
-        <div class="col-8">
-            <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
-                <div class="card-body">
-                    <h4 class="card-title">Amici</h4>
-                    <hr>
+        <div id="friends" class="section">
+            <div class="row">
+                <div class="col-8">
+                    <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
+                        <div class="card-body">
+                            <h4 class="card-title">Amici</h4>
+                            <hr>
 
-                    <!-- Contenitore Lista Amici -->
-                    <div id="friendsContainer" style="height:44.2vh; overflow-y: auto">
-                        <!-- Il contenuto sarà aggiunto dinamicamente da Amici.js -->
-                    </div>
+                            <!-- Contenitore Lista Amici -->
+                            <div id="friendsContainer" style="height:44.2vh; overflow-y: auto">
+                                <!-- Il contenuto sarà aggiunto dinamicamente da Amici.js -->
+                            </div>
 
-                    <!-- Modulo per aggiungere amici -->
-                    <div style="margin-top: 20px;">
-                        <input
-                            type="text"
-                            id="friendIdInput"
-                            class="form-control"
-                            placeholder="Inserisci ID amico"
-                        />
-                        <button
-                            id="addFriendButton"
-                            class="btn btn-success mt-2"
-                            onclick="addFriend()"
-                        >
-                            Aggiungi Amico
-                        </button>
+                            <!-- Modulo per aggiungere amici -->
+                            <div style="margin-top: 20px;">
+                                <input
+                                    type="text"
+                                    id="friendIdInput"
+                                    class="form-control"
+                                    placeholder="Inserisci ID amico"
+                                />
+                                <button
+                                    id="addFriendButton"
+                                    class="btn btn-success mt-2"
+                                    onclick="addFriend()"
+                                >
+                                    Aggiungi Amico
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
     
             
-            <!--Modifica (30/11) by GabMan 'Aggiunta area di modifica della biografia'-->
+        <!--Modifica (30/11) by GabMan 'Aggiunta al profilo area di modifica della biografia'-->
        
 <div class="row">
     <div class="col-8">
