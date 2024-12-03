@@ -180,10 +180,18 @@ public class TeamService {
              // Se non ci sono associazioni
             if (teamAssociati.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team associato trovato.");
-            } 
+            }
+
+            // Recupera gli ID dei team associati
+            List<String> teamIds = teamAssociati.stream()
+            .map(TeamAdmin::getTeamId)
+            .toList();
+
+             // Recupera i team corrispondenti dai loro ID
+            List<Team> teams = (List<Team>) teamRepository.findAllById(teamIds);
 
             // Restituisce i team associati
-            return ResponseEntity.ok().body(teamAssociati);
+            return ResponseEntity.ok().body(teams);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
