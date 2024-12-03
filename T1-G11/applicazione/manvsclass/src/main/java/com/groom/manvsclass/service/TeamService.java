@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.TeamAdmin;
@@ -92,7 +91,6 @@ public class TeamService {
         return java.util.UUID.randomUUID().toString();
     }
 
-    
     // Elimina un team dato il nome del team
     public ResponseEntity<?> deleteTeam(String idTeam, String jwt) {
         
@@ -164,50 +162,47 @@ public class TeamService {
         return ResponseEntity.ok().body(updatedTeam);
     }
 
-  
     // Metodo per visualizzare i team associati a un admin specifico
-public ResponseEntity<?> visualizzaTeams(String jwt) {
-    try {
-        // Estrae l'username dell'admin dal JWT
-        String adminUsername = jwtService.getAdminFromJwt(jwt);
+    public ResponseEntity<?> visualizzaTeams(String jwt) {
+        try {
+            // Estrae l'username dell'admin dal JWT
+            String adminUsername = jwtService.getAdminFromJwt(jwt);
 
-        if (adminUsername == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o scaduto.");
+            if (adminUsername == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o scaduto.");
+            }
+
+            // Recupera i team associati a quell'admin
+            List<TeamAdmin> teamAssociati = teamAdminRepository.findAllByAdminId(adminUsername);
+
+            // Se non ci sono associazioni
+            if (teamAssociati.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team associato trovato.");
+            }
+
+            // Estrai gli ID dei team associati
+            List<String> teamIds = teamAssociati.stream() //crea uno stream a partire dalla lista
+                                            .map(TeamAdmin::getTeamId) //ogni oggetto TeamAdmin nello stream viene trasformato nel valore restituito da getTeamId 
+                                            .collect(Collectors.toList()); //L'operazione collect terminale converte lo stream risultante in una lista.
+
+            // Recupera tutti i team in un'unica query
+            List<Team> teams = (List<Team>) teamRepository.findAllById(teamIds);
+
+            // Se non ci sono team trovati (possibile mismatch)
+            if (teams.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team trovato per gli ID specificati.");
+            }
+
+            // Restituisce i team associati
+            return ResponseEntity.ok(teams);
+
+        } catch (Exception e) {
+            // Log dell'eccezione
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
         }
-
-        // Recupera i team associati a quell'admin
-        List<TeamAdmin> teamAssociati = teamAdminRepository.findAllByAdminId(adminUsername);
-
-        // Se non ci sono associazioni
-        if (teamAssociati.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team associato trovato.");
-        }
-
-        // Estrai gli ID dei team associati
-        List<String> teamIds = teamAssociati.stream() //crea uno stream a partire dalla lista
-                                          .map(TeamAdmin::getTeamId) //ogni oggetto TeamAdmin nello stream viene trasformato nel valore restituito da getTeamId 
-                                          .collect(Collectors.toList()); //L'operazione collect terminale converte lo stream risultante in una lista.
-
-        // Recupera tutti i team in un'unica query
-        List<Team> teams = (List<Team>) teamRepository.findAllById(teamIds);
-
-        // Se non ci sono team trovati (possibile mismatch)
-        if (teams.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team trovato per gli ID specificati.");
-        }
-
-        // Restituisce i team associati
-        return ResponseEntity.ok(teams);
-
-    } catch (Exception e) {
-        // Log dell'eccezione
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
     }
-}
 
-    
-    
     //Modifica 03/12/2024: Aggiunta della visualizzazione del singolo team
     public  ResponseEntity<?> visualizzaTeam(String idTeam, String jwt) {    
 
@@ -226,7 +221,47 @@ public ResponseEntity<?> visualizzaTeams(String jwt) {
           // Restituisce il team
           return ResponseEntity.ok().body(existingTeam);
     }
+        
+    //Modifica 03/12/2024: Aggiunta dell'aggiungiStudente
+    public ResponseEntity<?> aggiungiStudente(String idTeam, String idStudente, String jwt) {
+        // 1. Verifica se il token JWT è valido
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
 
-    
-}
+        // 2. Estrai l'ID dell'admin dal JWT
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
+
+        // 3. Verifica se il team esiste
+        Team existingTeam = teamRepository.findById(idTeam).orElse(null);
+        if (existingTeam == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
+        }
+
+        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
+        TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
+        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+        }
+
+        // 5. Verifica che lo studente non sia già nel team
+        if (existingTeam.getStudenti().contains(idStudente)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Lo studente è già associato al team.");
+        }
+
+        // 6. Aggiungi lo studente al team
+        existingTeam.getStudenti().add(idStudente);
+
+        // 7. Incrementa il numero di studenti
+        existingTeam.setNumStudenti(existingTeam.getNumStudenti() + 1);
+
+        // 8. Salva il team aggiornato
+        Team updatedTeam = teamRepository.save(existingTeam);
+
+        // 9. Restituisci il team aggiornato come risposta
+        return ResponseEntity.ok().body(updatedTeam);
+    }
+
+    }
+
 

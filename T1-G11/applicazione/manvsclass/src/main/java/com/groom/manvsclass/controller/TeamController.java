@@ -51,6 +51,10 @@ public class TeamController {
         return teamService.visualizzaTeam(idTeam, jwt);
     }
 
-
+    @PostMapping("/aggiungiStudente/{idTeam}")
+    @ResponseBody
+    public ResponseEntity<?> aggiungiStudente(@PathVariable("idTeam") String idTeam, @RequestBody String idStudente, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.aggiungiStudente(idTeam,idStudente,jwt);
+    }
 }
 
