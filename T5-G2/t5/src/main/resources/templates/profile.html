@@ -56,6 +56,15 @@
                                     <h4 class="card-title" id="usernameField"></h4>
                                     <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
                                     <hr>
+                                <div>
+                                        <h5>Seleziona una nuova immagine:</h5>
+                                    <div id="avatarSelection">
+                                        <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')">
+                                        <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')">
+                                    </div>
+                                        <button class="btn btn-primary mt-2" onclick="saveAvatar()">Salva</button>
+                                </div>
+
 
                                     <!-- Visualizzazione della biografia -->
                                     <div id="bioDisplaySection">
