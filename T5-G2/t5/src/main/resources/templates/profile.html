@@ -43,27 +43,38 @@
                 </p>
             </div>
 
-            <!-- Biografia -->
-            <div class="row">
-                <div class="col-8">
-                    <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-210">
-                                    <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+           <!-- Biografia -->
+           <div class="row">
+            <div class="col-8">
+                <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-210">
+                                <!-- Immagine attuale dell'avatar -->
+                                <img src="/t5/images/sample_propic.jpg" id="currentProfilePicture" class="rounded float-start propic" alt="Profile picture">
+                                <!-- Pulsante per mostrare le opzioni -->
+                                <button id="modifyAvatarButton" class="btn btn-secondary mt-2" >Modifica Avatar</button>
+
+                            </div>
+                            <div class="col">
+                                <h4 class="card-title" id="usernameField"></h4>
+                                <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
+                                <hr>
+                                <!-- Sezione nascosta per selezionare un nuovo avatar -->
+                                <div id="avatarSelection" style="display: none; margin-top: 10px;">
+                                    <h5>Seleziona un nuovo avatar:</h5>
+                                    <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')">
+                                    <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')">
+
+                                    <button id="saveAvatarButton" class="btn btn-primary mt-2" >Salva</button>
+
                                 </div>
-                                <div class="col">
-                                    <h4 class="card-title" id="usernameField"></h4>
-                                    <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
-                                    <hr>
-                                <div>
-                                        <h5>Seleziona una nuova immagine:</h5>
-                                    <div id="avatarSelection">
-                                        <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')">
-                                        <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')">
-                                    </div>
-                                        <button class="btn btn-primary mt-2" onclick="saveAvatar()">Salva</button>
-                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
                                     <!-- Visualizzazione della biografia -->

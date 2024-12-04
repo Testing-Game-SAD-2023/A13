@@ -3,9 +3,88 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveBioButton = document.getElementById("saveBioButton");
     const bioDisplaySection = document.getElementById("bioDisplaySection");
     const bioEditSection = document.getElementById("bioEditSection");
+    const modifyAvatarButton = document.getElementById('modifyAvatarButton');
+    const saveAvatarButton = document.getElementById("saveAvatarButton");
     const bioText = document.getElementById("bioText");
     const cancelBioButton = document.getElementById("cancelBioButton");
     const biographyInput = document.getElementById("biography");
+    const avatarSelection = document.getElementById('avatarSelection');
+    const currentProfilePicture = document.getElementById('currentProfilePicture');
+     // Aggiungi questo per il pulsante "Modifica Avatar" cami
+    let selectedAvatar = null;
+
+    // Mostra e nascondi la sezione di selezione dell'avatar
+    if (modifyAvatarButton) {
+        modifyAvatarButton.addEventListener('click', () => {
+            avatarSelection.style.display = avatarSelection.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+       // Funzione per selezionare un avatar
+        const selectAvatar = (path) => {
+        selectedAvatar = path;
+
+        // Rimuovi la selezione da tutte le immagini
+        document.querySelectorAll('.avatar-option').forEach(img => {
+            img.classList.remove('selected');
+        });
+
+        // Aggiungi la classe "selected" all'immagine cliccata
+        const selectedImg = document.querySelector(`img[src='${path}']`);
+        if (selectedImg) {
+            selectedImg.classList.add('selected');
+        }
+
+        // Cambia l'immagine di profilo corrente
+        if (currentProfilePicture) {
+            currentProfilePicture.src = path;
+        } else {
+            console.error("Immagine di profilo non trovata.");
+        }
+    };
+
+    // Salva l'avatar selezionato
+    const saveAvatar = async () => {
+        if (!selectedAvatar) {
+            alert('Seleziona un avatar prima di salvare.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/updateAvatar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ avatarPath: selectedAvatar })
+            });
+
+            if (response.ok) {
+                alert('Avatar salvato con successo!');
+            } else {
+                const error = await response.text();
+                alert(`Errore nel salvataggio dell'avatar: ${error}`);
+            }
+        } catch (error) {
+            console.error('Errore nella connessione al server:', error);
+            alert('Errore nella connessione al server.');
+        }
+    };
+
+    // Gestisci il pulsante "Salva Avatar"
+    if (saveAvatarButton) {
+        saveAvatarButton.addEventListener('click', saveAvatar);
+    }
+
+    // Gestisci la selezione dell'avatar
+    const avatarImages = document.querySelectorAll('.avatar-option');
+    avatarImages.forEach(img => {
+        img.addEventListener('click', () => {
+            const avatarPath = img.src; // Ottieni il percorso dell'immagine
+            selectAvatar(avatarPath);
+            });
+        });
+   
+
 
     // Funzione per caricare la biografia dal database
     const loadBiography = async () => {
@@ -21,7 +100,11 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('Errore nella connessione al server:', error);
         }
     };
+  
+   
+    
 
+    
     // Funzione per caricare le informazioni dell'utente
     const loadUserInfo = async () => {
         try {
@@ -163,4 +246,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     activateButton("profile");
     showSection("profile");
+
 });
+
