@@ -66,7 +66,6 @@ public class TeamController {
         return teamService.ottieniStudentiTeam(idTeam,jwt);
     }
 
-    /*Implementa */ 
     @GetMapping("/cercaStudente")
     @ResponseBody
     public ResponseEntity<?> cercaStudente(String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {

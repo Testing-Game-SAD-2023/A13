@@ -629,9 +629,9 @@ public class Controller {
     
     //Modifica 04/12/2024: Aggiunta rotta
     @PostMapping("/studentiTeam")
-    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idUtenti){
+    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){
         System.out.println("AAAAA");
-        return userService.getStudentiTeam(idUtenti);
+        return userService.getStudentiTeam(idsStudenti);
     }
 
     @GetMapping("/students_list/{ID}")

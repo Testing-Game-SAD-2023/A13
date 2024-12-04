@@ -222,47 +222,47 @@ public class TeamService {
     //Modifica 03/12/2024: Aggiunta dell'aggiungiStudenti
     public ResponseEntity<?> aggiungiStudenti(String idTeam, List<String> idStudenti, String jwt) {
     
-    // 1. Verifica se il token JWT è valido
-    if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        // 1. Verifica se il token JWT è valido
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        // 2. Estrai l'ID dell'admin dal JWT
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
+
+        // 3. Verifica se il team esiste
+        Team existingTeam = teamRepository.findById(idTeam).orElse(null);
+        if (existingTeam == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
+        }
+
+        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
+        TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
+        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+        }
+
+        // 5. Filtra gli studenti già presenti nel team
+        List<String> nuoviStudenti = idStudenti.stream()
+            .filter(idStudente -> !existingTeam.getStudenti().contains(idStudente))
+            .collect(Collectors.toList()); // Modifica per utilizzare Collectors.toList()
+
+        if (nuoviStudenti.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tutti gli studenti forniti sono già associati al team.");
+        }
+
+        // 6. Aggiungi gli studenti validi al team
+        existingTeam.getStudenti().addAll(nuoviStudenti);
+
+        // 7. Aggiorna il numero di studenti
+        existingTeam.setNumStudenti(existingTeam.getStudenti().size());
+
+        // 8. Salva il team aggiornato
+        Team updatedTeam = teamRepository.save(existingTeam);
+
+        // 9. Restituisci il team aggiornato come risposta
+        return ResponseEntity.ok().body(updatedTeam);
     }
-
-    // 2. Estrai l'ID dell'admin dal JWT
-    String adminUsername = jwtService.getAdminFromJwt(jwt);
-
-    // 3. Verifica se il team esiste
-    Team existingTeam = teamRepository.findById(idTeam).orElse(null);
-    if (existingTeam == null) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
-    }
-
-    // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
-    TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
-    if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
-    }
-
-    // 5. Filtra gli studenti già presenti nel team
-    List<String> nuoviStudenti = idStudenti.stream()
-        .filter(idStudente -> !existingTeam.getStudenti().contains(idStudente))
-        .collect(Collectors.toList()); // Modifica per utilizzare Collectors.toList()
-
-    if (nuoviStudenti.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tutti gli studenti forniti sono già associati al team.");
-    }
-
-    // 6. Aggiungi gli studenti validi al team
-    existingTeam.getStudenti().addAll(nuoviStudenti);
-
-    // 7. Aggiorna il numero di studenti
-    existingTeam.setNumStudenti(existingTeam.getStudenti().size());
-
-    // 8. Salva il team aggiornato
-    Team updatedTeam = teamRepository.save(existingTeam);
-
-    // 9. Restituisci il team aggiornato come risposta
-    return ResponseEntity.ok().body(updatedTeam);
-}
 
     //Modifica 04/12/2024: Aggiunta ottieniStudentiTeam
     public ResponseEntity<?> ottieniStudentiTeam(String idTeam, String jwt) {
@@ -298,6 +298,6 @@ public class TeamService {
         return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentiIds,jwt));
     }
 
-    }
+}
 
 
