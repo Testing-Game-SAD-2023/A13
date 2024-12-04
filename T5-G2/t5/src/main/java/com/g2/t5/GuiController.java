@@ -62,6 +62,7 @@ import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.AchievementProgress;
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
+import com.g2.Model.Mission;
 import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
@@ -182,6 +183,16 @@ public class GuiController {
         List<Statistic> allStatistics = achievementService.getStatistics();
         Map<String, Statistic> IdToStatistic = new HashMap<>();
 
+        Mission mission1 = new Mission(1,"Copri l'89% di coverage in una partita", "Contro qualsiasi robot raggiungi la coverage stabilita", 50);
+        Mission mission2 = new Mission(1,"Gioca 5 partite in modalità singola", "Gioca il numero di partite prestabilito", 30);
+        Mission mission3 = new Mission(1,"Vinci contro un Giocatore online", "Vinci una partita nella modalità multiplayer", 100);
+
+        List<Mission> missions = new ArrayList<>();
+
+        missions.add(mission1);
+        missions.add(mission2);
+        missions.add(mission3);
+
         for (Statistic stat : allStatistics)
             IdToStatistic.put(stat.getID(), stat);
         
@@ -190,12 +201,16 @@ public class GuiController {
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
         //GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
         GenericObjectComponent objUser = new GenericObjectComponent("user", user);
+        GenericObjectComponent objMissions = new GenericObjectComponent("missions", missions);
 
+
+        
         profile.setObjectComponents(objAchievementProgresses);
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
         //profile.setObjectComponents(objUserID);
         profile.setObjectComponents(objUser);
+        profile.setObjectComponents(objMissions);
 
         return profile.handlePageRequest();
     }

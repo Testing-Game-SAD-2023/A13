@@ -79,6 +79,12 @@ const saveChanges = () => {
   updateUserObject(); // Aggiorna l'oggetto con i dati del modulo
 
   const oldPassword = $('#passwordoldInput').val();
+
+  if(!oldPassword){
+    alert("Non è stata inserita l'attuale password per l'autenticazione.");
+    return;
+  }
+
   const jwt = getCookie('jwt');
 
   if (!jwt) {
@@ -120,6 +126,11 @@ const search = () => {
   if (!keySearch) {
       alert("Inserisci una chiave di ricerca.");
       return;
+  }
+
+  if(keySearch === user.id || keySearch === user.email){
+    alert("Non puoi cercare te stesso!");
+    return;
   }
 
   $.ajax({

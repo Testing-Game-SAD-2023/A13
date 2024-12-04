@@ -54,7 +54,9 @@
 }
 .btn-sm {
     font-size: 0.875rem;
-    padding: 0.4rem 0.8rem;
+    padding: 0 10px; /* Riduce il padding per mantenere la stessa altezza */
+    height: 30px; /* Altezza esplicita, uguale a quella della box */
+    line-height: 1.5; /* Allinea il testo al centro */
 }
 .followed-list-container {
     max-height: 150px; /* Altezza massima per limitare l'espansione */
@@ -140,18 +142,40 @@
 }
 
 .token-display {
-    display: inline-block;
+    display: flex; /* Usa Flexbox per centrare il contenuto */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra orizzontalmente */
     margin-left: 10px; /* Spazio tra il bottone e il riquadro */
-    padding: 5px 10px; /* Margine interno per dare spazio alla scritta */
+    padding: 0 10px; /* Margine interno solo ai lati */
     background-color: #f0f0f0; /* Sfondo chiaro */
     border: 1px solid #ccc; /* Bordo sottile */
     border-radius: 5px; /* Angoli arrotondati */
     font-size: 14px; /* Dimensione del testo */
     font-weight: bold; /* Testo in grassetto */
     color: #333; /* Colore del testo */
-    text-align: center; /* Centra il testo */
-    white-space: nowrap; /* Impedisce la rottura della linea */
+    height: 30px; /* Stessa altezza del bottone (modificabile se necessario) */
+    box-sizing: border-box; /* Considera padding e bordo nella dimensione totale */
 }
+
+.topRightContainer{
+    position: absolute; /* Posiziona rispetto al viewport */
+    top: 10px; /* Distanza dall'alto */
+    right: 10px; /* Distanza dal bordo destro */
+    display: flex; /* Allinea gli elementi in fila */
+    align-items: center; /* Centra verticalmente gli elementi */
+    gap: 10px; /* Spazio tra gli elementi */
+}
+
+.topRightContainer .item {
+    background-color: #1c1c2b; /* Sfondo scuro */
+    color: #fff; /* Colore del testo */
+    padding: 10px 15px; /* Spaziatura interna */
+    border-radius: 5px; /* Angoli arrotondati */
+    font-size: 14px; /* Dimensione del testo */
+    text-align: center; /* Centra il testo */
+    cursor: pointer; /* Indica che sono cliccabili */
+}
+
 
 
 

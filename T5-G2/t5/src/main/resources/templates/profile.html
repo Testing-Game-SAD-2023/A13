@@ -27,10 +27,10 @@
         <div class="container-fluid">
             <div class="top-bar">
                 <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" ></p>
-                <div id="topRightContainer">
-                    <button class="logout-button" data-toggle="modal" data-target="#missionsModal">Missioni</button>
-                    <a href="/main" class="logout-button">Home</a>
-                    <a href="/logout" class="logout-button">Logout</a>
+                <div class="topRightContainer">
+                    <button class="logout-button" data-toggle="modal" data-target="#missionsModal" id="item">Missioni</button>
+                    <a href="/main" class="logout-button" id="item">Home</a>
+                    <a href="/logout" class="logout-button" id="item">Logout</a>
                 </div>
             </div>
             <div class="row">
@@ -49,7 +49,7 @@
                                         <div class="profile-info">
                                             <div class="name-container">
                                                 <div>
-                                                    <h5 >
+                                                    <h5>
                                                         <p th:text="${user.name + ' ' + user.surname}   "></p> <!-- Nome -->
                                                         <p th:text="${user.email}"></p>
                                                     </h5>
@@ -58,10 +58,7 @@
                                             <h6 class="card-subtitle mb-2 text-body-secondary" >
                                                 <p th:text="${user.studies}"></p>
                                                 <p th:text="${user.biography != null && !#strings.isEmpty(user.biography) ? user.biography : 'Qui è presente la mia biografia'}"></p>
-                                            </h6>
-                                            
-                                            
-                                            
+                                            </h6>                                        
                                         </div>
                                     </div>
                                 
@@ -76,7 +73,7 @@
                                     <div class="d-flex align-items-center">
                                         <button class="btn btn-secondary btn-sm" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
                                         <div class="token-display">
-                                            <p th:text="'Token: ' + '' + ${user.missionToken}">numero token</p>
+                                            <p style="margin-top: 0; margin-bottom: 0;" th:text="'Token: ' + '' + ${user.missionToken}">numero token</p>
                                         </div>
                                     </div>
                                 </div>
@@ -137,13 +134,14 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <h4 class="card-title mb-0">Lista Seguiti</h4>
                                 <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#searchPlayerModal">Ricerca Player</button>
-                                
                             </div>
                             <hr>
                             <div class="followed-list-container">
                                 <div th:each="element: ${user.following}" class="row">
-                                    <div class="followed-item" th:text="${element.name} + ' ' + ${element.surname}">
-                                    </div>                                    
+                                    <a class="followed-item" 
+                                       th:href="@{'/profile/' + ${element.id}}" 
+                                       th:text="${element.name} + ' ' + ${element.surname}">
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -175,12 +173,8 @@
                                 <input type="email" class="form-control" id="emailInput" placeholder="Inserisci l'email">
                             </div>
                             <div class="form-group">
-                                <label for="passwordInput">Password</label>
+                                <label for="passwordInput">Password Nuova</label>
                                 <input type="email" class="form-control" id="passwordInput" placeholder="Inserisci la password">
-                            </div>
-                            <div class="form-group">
-                                <label for="passwordoldInput">Password Attuale</label>
-                                <input type="email" class="form-control" id="passwordoldInput" placeholder="Inserisci la password">
                             </div>
                             <div class="form-group">
                                 <label for="studiesInput">Studi</label>
@@ -189,6 +183,10 @@
                             <div class="form-group">
                                 <label for="biographyInput">Biografia</label>
                                 <input type="text" class="form-control" id="biographyInput" placeholder="Inserisci la biografia">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordoldInput">Password Attuale</label>
+                                <input type="email" class="form-control" id="passwordoldInput" placeholder="Inserisci obbligatoriamente la password attuale">
                             </div>
                         </form>
                     </div>
@@ -237,21 +235,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <ul id="missionsList" class="list-group">
-                            <!-- Elementi statici della lista -->
+                        <div th:each="element: ${missions}">
                             <li class="list-group-item">
-                                <h5>Missione 1</h5>
-                                <p>Descrizione della prima missione.</p>
+                                <h5 th:text="${element.name}"></h5>
+                                <p th:text="${element.description}"></p>
+                                <p th:text="'Premio: ' + ${element.numToken} + ' Token'">Descrizione della prima missione.</p>
                             </li>
-                            <li class="list-group-item">
-                                <h5>Missione 2</h5>
-                                <p>Descrizione della seconda missione.</p>
-                            </li>
-                            <li class="list-group-item">
-                                <h5>Missione 3</h5>
-                                <p>Descrizione della terza missione.</p>
-                            </li>
-                        </ul>
+                        </div>
+                    </ul>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
@@ -270,6 +261,4 @@
         </script>
         <script src="t5/js/profile.js"></script>
     </body>
-
-    
 </html>
