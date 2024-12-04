@@ -56,12 +56,17 @@ public class StudentService {
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             System.out.println("Risposta HTTP ricevuta. Status code: " + statusCode);
 
-            // 5. Gestisci la risposta
+           // 5. Gestisci la risposta
             if (statusCode >= 200 && statusCode < 300) { // Successo
                 HttpEntity responseEntity = httpResponse.getEntity();
                 String responseBody = EntityUtils.toString(responseEntity, StandardCharsets.UTF_8);
-                System.out.println("Risposta positiva ricevuta: " + responseBody);
-                return ResponseEntity.ok(responseBody);
+
+                // Converte la stringa in un oggetto JSON (array)
+                JSONArray jsonResponse = new JSONArray(responseBody);
+
+                // Restituisci l'array come è (Spring lo serializzerà in JSON correttamente)
+                System.out.println("Risposta positiva ricevuta: " + jsonResponse.toString());
+                return ResponseEntity.ok(jsonResponse.toList());
             } else { // Errore
                 HttpEntity responseEntity = httpResponse.getEntity();
                 String errorResponse = responseEntity != null ? EntityUtils.toString(responseEntity, StandardCharsets.UTF_8) : "Errore sconosciuto";

@@ -766,7 +766,10 @@ public class AdminService {
     }
 
     public String getUsernameAdmin(String jwt) {
-        if(jwtService.isJwtValid(jwt)){return jwtService.getAdminFromJwt(jwt);}
+        if(jwtService.isJwtValid(jwt)){
+            String usernameAdmin= jwtService.getAdminFromJwt(jwt);
+            return usernameAdmin;
+        }
         return "devi prima loggarti!";
     }
 
