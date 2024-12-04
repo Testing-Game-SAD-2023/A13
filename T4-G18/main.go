@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,6 +16,7 @@ import (
 
 	"github.com/alarmfox/game-repository/api"
 	"github.com/alarmfox/game-repository/api/game"
+	"github.com/alarmfox/game-repository/api/leaderboard"
 	"github.com/alarmfox/game-repository/api/playerhascategoryachievement"
 	"github.com/alarmfox/game-repository/api/robot"
 	"github.com/alarmfox/game-repository/api/round"
@@ -61,15 +61,12 @@ func createTrigger(db *gorm.DB) error {
 	triggerFunction := `
         CREATE OR REPLACE FUNCTION update_player_stats() RETURNS TRIGGER AS $$
 		BEGIN
-			-- Check if the player exists in player_stats
 			IF EXISTS (SELECT 1 FROM player_stats WHERE player_id = NEW.player_id) THEN
-				-- Increment SfidaPlayedGames
 				UPDATE player_stats
                 SET sfida_played_games = sfida_played_games + 1,
 					sfida_won_games = sfida_won_games + CASE WHEN NEW.is_winner THEN 1 ELSE 0 END
 				WHERE player_id = NEW.player_id;
 			ELSE
-				-- Insert a new row into player_stats
                 INSERT INTO player_stats (player_id, sfida_played_games, sfida_won_games)
 				VALUES (NEW.player_id, 1, CASE WHEN NEW.is_winner THEN 1 ELSE 0 END);
 			END IF;
@@ -156,21 +153,21 @@ func run(ctx context.Context, c Configuration) error {
 	}
 
 	//Start TEST DB
-	tm := time.Now()
-	for i := 0; i < 100000; i++ {
-		playerGame := model.PlayerGame{
-			PlayerID:  fmt.Sprintf("%d", i%50),
-			GameID:    rand.Int63(),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			IsWinner:  rand.Intn(2) == 1,
-		}
-		if err := db.Create(&playerGame).Error; err != nil {
-			//log.Fatalf("Failed to insert: %v", err)
-			log.Println("Errore Insert")
-		}
-	}
-	log.Printf("took %v", time.Since(tm))
+	// tm := time.Now()
+	// for i := 0; i < 100000; i++ {
+	// 	playerGame := model.PlayerGame{
+	// 		PlayerID:  fmt.Sprintf("%d", i%50),
+	// 		GameID:    rand.Int63(),
+	// 		CreatedAt: time.Now(),
+	// 		UpdatedAt: time.Now(),
+	// 		IsWinner:  rand.Intn(2) == 1,
+	// 	}
+	// 	if err := db.Create(&playerGame).Error; err != nil {
+	// 		//log.Fatalf("Failed to insert: %v", err)
+	// 		log.Println("Errore Insert")
+	// 	}
+	// }
+	// log.Printf("took %v", time.Since(tm))
 	//End TEST DB
 
 	if err := os.Mkdir(c.DataDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {
@@ -243,6 +240,9 @@ func run(ctx context.Context, c Configuration) error {
 
 			// phca endpoint
 			phcaController = playerhascategoryachievement.NewController(playerhascategoryachievement.NewRepository(db))
+
+			// leaderboard endpoint
+			leaderboardController = leaderboard.NewController(leaderboard.NewRepository(db))
 		)
 
 		r.Mount(c.ApiPrefix, setupRoutes(
@@ -252,6 +252,7 @@ func run(ctx context.Context, c Configuration) error {
 			robotController,
 			scalataController,
 			phcaController,
+            leaderboardController,
 		))
 	})
 	log.Printf("listening on %s", c.ListenAddress)
@@ -376,7 +377,7 @@ func makeDefaults(c *Configuration) {
 
 }
 
-func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, pc *playerhascategoryachievement.Controller) *chi.Mux {
+func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, pc *playerhascategoryachievement.Controller, lb *leaderboard.Controller) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
@@ -501,6 +502,10 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 
 		// Delete achievement
 		r.Delete("/{pid}/{statistic}", api.HandlerFunc(pc.Delete))
+	})
+
+	r.Route("/leaderboard", func(r chi.Router) {
+		r.Get("/subInterval/{gameMode}/{statistic}/{startPosition}/{endPosition}", api.HandlerFunc(lb.FindByInterval))
 	})
 
 	return r
