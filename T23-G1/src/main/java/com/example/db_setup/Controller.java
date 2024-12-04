@@ -75,6 +75,10 @@ public class Controller {
  
     @Autowired
     private UserRepository userRepository;
+
+    //GabMan 04/12
+    @Autowired
+    private FriendRepository FriendRepository;
  
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
@@ -827,8 +831,17 @@ public class Controller {
           Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
           String userId = userData.get("userId").toString();
   
-          // Recupera la lista degli amici dal database
-          List<Map<String, String>> friends = userRepository.findFriendsByUserId(Integer.parseInt(userId));
+          // Recupera la lista degli amici dal repository
+          List<Friend> friendEntities = FriendRepository.findFriendsByUserId(Integer.parseInt(userId));
+  
+          // Mappa ogni oggetto Friend in una mappa
+          List<Map<String, String>> friends = friendEntities.stream().map(friend -> {
+              Map<String, String> map = new HashMap<>();
+              map.put("id", String.valueOf(friend.getId()));
+              map.put("username", friend.getFriendUsername());
+              map.put("avatar", friend.getFriendAvatar());
+              return map;
+          }).collect(Collectors.toList());
   
           if (friends.isEmpty()) {
               return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -842,6 +855,8 @@ public class Controller {
   }
   
 
+  
+/* 
 // by GabMan: Endpoint per aggiungere un amico
 @PostMapping("/addFriend")
 public ResponseEntity<String> addFriend(
@@ -868,8 +883,9 @@ public ResponseEntity<String> addFriend(
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while adding the friend.");
         }
     }
-
+*/
 //byGabMan: Endpoint per rimuovere un amico
+/* 
 @PostMapping("/removeFriend")
 public ResponseEntity<String> removeFriend(
     @CookieValue(name = "jwt", required = false) String jwt,
@@ -894,7 +910,7 @@ public ResponseEntity<String> removeFriend(
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the friend.");
         }
-    }
+    }*/
     //cami 02/12--> modifica profilo
     @GetMapping("/getUserInfo")
     public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(name = "jwt", required = false) String jwt) {
