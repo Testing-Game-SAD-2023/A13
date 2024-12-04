@@ -30,8 +30,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.swing.Spring;
+
+import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,10 +44,14 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.service.annotation.PutExchange;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.function.EntityResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.GenericObjectComponent;
@@ -113,6 +121,10 @@ public class GuiController {
         byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
         String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
 
+        if(!userService.getAuthenticated(jwt)){
+            return "redirect:/login";
+        }
+
         try {
             ObjectMapper mapper = new ObjectMapper();
             @SuppressWarnings("unchecked")
@@ -131,8 +143,13 @@ public class GuiController {
     public String profilePage(Model model,
                               @PathVariable(value="playerID") String playerID,
                               @CookieValue(name = "jwt", required = false) String jwt) {
+
+        if(!userService.getAuthenticated(jwt)){
+            return "redirect:/login";
+        }
+
         PageBuilder profile = null;
- 
+
         int userId = Integer.parseInt(playerID);
         User user = userService.getUserbyID(userId);
 
@@ -182,6 +199,46 @@ public class GuiController {
 
         return profile.handlePageRequest();
     }
+
+    @PutMapping("/profile/modifyUser")
+    public ResponseEntity<String> modifyUser(@RequestBody User user_updated, @RequestParam("old_psw") String old_psw,
+                                                HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
+
+        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Utente non loggato");
+
+        return ResponseEntity.ok(userService.modifyUser(user_updated, old_psw));
+    }
+
+    @GetMapping("/profile/searchPlayer")
+    public ResponseEntity<User> searchPlayer(@RequestParam("key_search") String key_search,
+                                                HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
+
+        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
+
+        return ResponseEntity.ok(userService.searchPlayer(key_search));
+    }
+
+    @PostMapping("/profile/addFollow")
+    public ResponseEntity<String> addFollow(@RequestParam("userID_1") String userID_1,
+                                            @RequestParam("userID_2") String userID_2,
+                                            HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
+
+        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
+
+        return ResponseEntity.ok(userService.addFollow(userID_1,userID_2));
+    }
+
+    @PostMapping("/profile/rmFollow")
+    public ResponseEntity<String> rmFollow(@RequestParam("userID_1") String userID_1,
+                                            @RequestParam("userID_2") String userID_2,
+                                            HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
+
+        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
+
+        return ResponseEntity.ok(userService.rmFollow(userID_1,userID_2));
+    }
+
+
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model,
@@ -245,6 +302,8 @@ public class GuiController {
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
+
+        //DA IMPLEMENTARE CON UserService.java
         ServiceObjectComponent lista_utenti = new ServiceObjectComponent(serviceManager, "listaPlayers",
                 "T23", "GetUsers");
         leaderboard.setObjectComponents(lista_utenti);
@@ -271,8 +330,7 @@ public class GuiController {
 
     @GetMapping("/report")
     public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if (Auth) {
+        if (userService.getAuthenticated(jwt)) {
             return "report";
         }
         return "redirect:/login";
@@ -379,8 +437,7 @@ public class GuiController {
 
     @GetMapping("/leaderboardScalata")
     public String getLeaderboardScalata(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if (Auth) {
+        if (userService.getAuthenticated(jwt)) {
             return "leaderboardScalata";
         }
         return "redirect:/login";

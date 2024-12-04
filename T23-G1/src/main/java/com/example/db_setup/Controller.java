@@ -186,6 +186,10 @@ public class Controller {
         n.setStudies(studies);
         n.setRegisteredWithFacebook(false);
 
+
+        n.setBiography("");
+        n.setMissionToken(0);
+
         userRepository.save(n);
         Integer ID = n.getID();
 
@@ -623,13 +627,14 @@ public class Controller {
 
     @GetMapping("/students_list")
     public List<User> getAllStudents() {
-        //implemntare la logica dei coockie
+
         return userRepository.findAll();
     }
 
     @GetMapping("/students_list/{ID}")
     @ResponseBody
     public ResponseEntity<User> getStudent(@PathVariable String ID) {
+
         User user = userRepository.findByID(Integer.parseInt(ID));
         if (user != null) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -643,38 +648,14 @@ public class Controller {
 
     //SI PUò TOGLIERE NON CI SERVE
     @GetMapping("/follower_list/{ID}")
-    public List<User> getFollowerListbyUserID(@PathVariable String ID 
-                                                /*
-                                                DA DECOMMENTARE
-                                                ,@CookieValue(name = "jwt", required = false) String jwt*/) {
-        /* 
-        DA DECOMMENTARE
+    public List<User> getFollowerListbyUserID(@PathVariable String ID){
         
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
-        if(isJwtValid(jwt)) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
-        }
-        */        
         return userRepository.findByID(Integer.parseInt(ID)).getFollowing();
     }
 
     @PostMapping("/addFollow")
     public ResponseEntity<String> addFollow(@RequestParam("userID_1") String userID_1,
-                                                @RequestParam("userID_2") String userID_2,
-                                                /*
-                                                DA DECOMMENTARE
-                                                @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
-        
-            /* 
-            DA DECOMMENTARE
-            
-            if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
-            if(isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
-            }
-            */
+                                                @RequestParam("userID_2") String userID_2, HttpServletRequest request) {
             
             User follower = userRepository.findByID(Integer.parseInt(userID_1));
             User followed = userRepository.findByID(Integer.parseInt(userID_2));
@@ -712,19 +693,7 @@ public class Controller {
     @PostMapping("/rmFollow")
     public ResponseEntity<String> rmFollow(@RequestParam("userID_1") String userID_1,
                                                 @RequestParam("userID_2") String userID_2,
-                                                /*
-                                                DA DECOMMENTARE
-                                                @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
-        
-            /* 
-            DA DECOMMENTARE
-            
-            if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
-            if(isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
-            }
-            */
+                                                HttpServletRequest request) {
             
             User follower = userRepository.findByID(Integer.parseInt(userID_1));
             User followed = userRepository.findByID(Integer.parseInt(userID_2));
@@ -755,20 +724,7 @@ public class Controller {
     }
     
     @GetMapping("/searchPlayer")
-    public ResponseEntity<User> searchPlayer (@RequestParam("key_search") String key_search,
-                            /*
-                            DA DECOMMENTARE
-                            @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request){
-            
-        /* 
-        DA DECOMMENTARE
-        
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
-        if(isJwtValid(jwt)) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
-        }
-        */
+    public ResponseEntity<User> searchPlayer (@RequestParam("key_search") String key_search,HttpServletRequest request){
 
         User user = null;
 
@@ -780,7 +736,7 @@ public class Controller {
 
         if(user == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }else{
+        }else{      
             return ResponseEntity.status(HttpStatus.OK).body(user);
         }
 
@@ -789,36 +745,66 @@ public class Controller {
 
     @PutMapping("/modifyUser")
     public ResponseEntity<String> modifyUser (@RequestBody User user_updated, @RequestParam("old_psw") String old_psw,
-                                            /*
-                                            DA DECOMMENTARE
-                                            @CookieValue(name = "jwt", required = false) String jwt,*/ HttpServletRequest request) {
-        /* 
-        DA DECOMMENTARE
-        
-        if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
-        if(isJwtValid(jwt)) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("...");
-        }
-        */
-
+                                                HttpServletRequest request) {
+                
         User user = userRepository.findByID(user_updated.ID);
+        Matcher m = p.matcher(user_updated.password);
 
         if(user != null){
 
-            boolean passwordMatches = myPasswordEncoder.matches(old_psw, user.password);
-
-            if (!passwordMatches) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
+            if (!myPasswordEncoder.matches(old_psw, user.password)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password vecchia sbagliata.");
             }
-            
-            user_updated.password = myPasswordEncoder.encode(user_updated.password);
+
+            if(!(user.name.equals(user_updated.name)) && (!(user_updated.name.length() >= 2) || !(user_updated.name.length() <= 30) || !(Pattern.matches("[a-zA-Z]+(\\s[a-zA-Z]+)*", user_updated.name)))){
+                
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome nuovo non valido");
+
+            }else if(!(user.surname.equals(user_updated.surname)) && (!(user_updated.surname.length() >= 2) || !(user_updated.surname.length() <= 30) || !(Pattern.matches("[a-zA-Z]+(\\s?[a-zA-Z]+\\'?)*", user_updated.surname)))){
+                
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cognome nuovo non valido");
+
+            }else if(!user.email.equals(user_updated.email)){
+
+                if ((user_updated.email.contains("@")) && (user_updated.email.contains("."))) {
+
+                    User user_email = userRepository.findByEmail(user_updated.email);
+
+                    if (user_email != null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utente con questa email nuova già registrato");
+                    }
+                    try {
+                        emailService.sendMailRegister(user_updated.email, user_updated.ID);
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email nuova non valida");
+                }
+
+            }else if(!(user.biography.equals(user_updated.biography)) && (!(user_updated.biography.length() >= 2) || !(user_updated.biography.length() <= 130) || !(Pattern.matches("[a-zA-Z]+(\\s?[a-zA-Z]+\\'?)*", user_updated.biography)))){
+                
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Biografia nuovo non valido");
+
+            }else if((!myPasswordEncoder.matches(old_psw, user_updated.password)) && ((user_updated.password.length() >16) || (user_updated.password.length() < 8) || !(m.matches()))){
+             /*
+                Per controllare se ho cambiato la psw faccio il confronto tra old_psw e quella ipoteticamente nuova
+                Se è vecchia, ho confronto tra la vecchia row e quella criptata e quindi è true
+                Se è nuova, ho confronto tra la vecchia row e la nuova row che dovrebbe restituire un false. 
+             */
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password nuova non valida");
+            }
+
+            if(!myPasswordEncoder.matches(old_psw, user_updated.password)){
+                user_updated.password = myPasswordEncoder.encode(user_updated.password);
+            }
+
 
             userRepository.save(user_updated);
             
-            return ResponseEntity.status(HttpStatus.OK).body("Update completed");
+            return ResponseEntity.status(HttpStatus.OK).body("Agiornamento Completato");
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User doesn't exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utente non esiste");
         }
     }
 

@@ -128,9 +128,9 @@ class T23ServiceTest {
         // Dati di test: Lista di utenti fittizi
         List<User> mockUsers = new ArrayList<>();
         mockUsers.add(
-                new User(1, "John", "Doe", "john.doe@example.com", "password123", false, false, "Computer Science", null, null, null));
+                new User(1, "John", "Doe", "john.doe@example.com", "password123", false, false, "Computer Science", null, null, null,null,null));
         mockUsers
-                .add(new User(2, "Jane", "Smith", "jane.smith@example.com", "password456", true, false, "Mathematics", null, null, null));
+                .add(new User(2, "Jane", "Smith", "jane.smith@example.com", "password456", true, false, "Mathematics", null, null, null,null,null));
 
         // Configurazione del server mock per rispondere con i dati fittizi
         try {

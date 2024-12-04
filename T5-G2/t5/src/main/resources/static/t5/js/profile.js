@@ -194,7 +194,15 @@ const toggleFollow = (playerId, isFollowing) => {
       },
       success: function() {
           alert(`${isFollowing ? 'Unfollow' : 'Follow'} eseguito con successo.`);
-          search(); // Ricarica i risultati della ricerca
+
+          // Aggiorna manualmente il modello utente
+          if (isFollowing) {
+              user.following = user.following.filter(f => f.id !== playerId); // Rimuovi dalla lista
+          } else {
+              user.following.push({ id: playerId }); // Aggiungi alla lista
+          }
+
+          search();
       },
       error: function(xhr) {
           const errorMessage = xhr.responseText || "Errore sconosciuto.";
@@ -202,3 +210,7 @@ const toggleFollow = (playerId, isFollowing) => {
       }
   });
 };
+
+$('#searchPlayerModal').on('hidden.bs.modal', function () {
+  location.reload(); // Ricarica l'intera pagina
+});

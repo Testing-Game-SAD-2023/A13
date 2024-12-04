@@ -17,9 +17,10 @@ public class User {
     private boolean isRegisteredWithGoogle;
     private String studies;
     private String resetToken;
+    private Integer missionToken;
 
     public User(Integer ID, String name, String surname, String email, String password,
-    boolean isRegisteredWithFacebook, boolean isRegisteredWithGoogle, String studies, String resetToken, List<User> following, List<User> followers) {
+    boolean isRegisteredWithFacebook, boolean isRegisteredWithGoogle, String studies, String resetToken, List<User> following, List<User> followers, Integer missionToken, String biography) {
         this.ID = ID;
         this.name = name;
         this.surname = surname;
@@ -31,12 +32,16 @@ public class User {
         this.isRegisteredWithFacebook = isRegisteredWithFacebook;
         this.studies = studies;
         this.resetToken = resetToken;
+        this.missionToken = missionToken;
+        this.biography = biography;
     }
     
     // Costruttore vuoto necessario per thymeleaf
     public User() {
         this.following = new ArrayList<>();
         this.followers = new ArrayList<>();
+        this.biography = "";
+        this.missionToken = 0;
     }
 
 
@@ -136,6 +141,15 @@ public class User {
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
     }
+
+    public Integer getMissionToken() {
+        return missionToken;
+    }
+
+    public void setMissionToken(Integer missionToken) {
+        this.missionToken = missionToken;
+    }
+
 
     @Override
     public String toString() {

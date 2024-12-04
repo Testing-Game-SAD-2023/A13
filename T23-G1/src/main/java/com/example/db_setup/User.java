@@ -46,6 +46,8 @@ public class User {
     @Enumerated (EnumType.STRING)
     public Studies studies;
 
+    public Integer missionToken;
+
     /* Informazioni Personali utente da aggiungere per il profilo
     public String bio;
     public List<User> friendsList;
