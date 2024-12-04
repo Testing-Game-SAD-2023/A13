@@ -9,7 +9,6 @@
             padding: 0;
             background-color: #f5f5f5;
         }
- 
         .dashboard {
             position: fixed;
             top: 100px;
@@ -21,7 +20,6 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
- 
         .dashboard h3 {
             margin: 0;
             font-size: 18px;
@@ -29,14 +27,12 @@
             border-bottom: 1px solid #ecf0f1;
             padding-bottom: 10px;
         }
- 
         .dashboard nav {
             margin-top: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
- 
         .dashboard nav a {
             text-decoration: none;
             font-size: 16px;
@@ -46,41 +42,32 @@
             background-color: #34495e;
             transition: all 0.3s ease-in-out;
         }
- 
         .dashboard nav a:hover {
             background-color: #1abc9c;
             color: #2c3e50;
         }
- 
         .content {
             margin-left: 260px;
             margin-top: 40px;
             padding: 20px;
         }
- 
         .section {
             display: none;
             padding: 20px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: calc(100% - 300px);
-            margin: 0 auto;
             min-height: 300px;
         }
- 
         .section.active {
             display: block;
         }
- 
         h1 {
-            font-family: 'Roboto', sans-serif;
             font-size: 36px;
             text-align: center;
             color: #2c3e50;
             margin-top: 20px;
         }
- 
         button.top-left-button {
             position: fixed;
             width: 100px;
@@ -94,11 +81,8 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
-            font-family: 'Roboto', sans-serif;
             transition: all 0.3s ease-in-out;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
- 
         form {
             display: flex;
             flex-direction: column;
@@ -106,12 +90,10 @@
             max-width: 600px;
             margin: 0 auto;
         }
- 
         label {
             font-weight: 500;
             color: #34495e;
         }
- 
         input, textarea, button {
             width: 100%;
             padding: 10px;
@@ -119,17 +101,14 @@
             border-radius: 5px;
             font-size: 16px;
         }
- 
         input:focus, textarea:focus {
             border-color: #1abc9c;
             box-shadow: 0 0 5px rgba(26, 188, 156, 0.5);
             outline: none;
         }
- 
         textarea {
             resize: none;
         }
- 
         button {
             background-color: #1abc9c;
             color: white;
@@ -138,36 +117,24 @@
             transition: background-color 0.3s ease;
             font-weight: bold;
         }
- 
         button:hover {
             background-color: #16a085;
         }
- 
         button:active {
             background-color: #149174;
             transform: scale(0.98);
         }
- 
-        .note {
-            font-size: 14px;
-            color: #7f8c8d;
-        }
- 
-        .message {
-            margin-top: 15px;
-            font-weight: bold;
-        }
     </style>
- 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gestione Team</title>
 </head>
 <body>
+    <div id="alertMessage" th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <div id="successMessage" th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
     <h1>Gestione Team</h1>
- 
     <button class="top-left-button" onclick="returnToHome()">Home</button>
- 
     <div class="dashboard">
         <h3>Gestione Team</h3>
         <nav>
@@ -175,35 +142,26 @@
             <a href="#list-team" onclick="showSection('list-team')">Lista Team</a>
         </nav>
     </div>
- 
     <div class="content">
         <div id="add-team" class="section">
             <h2>Aggiungi Team</h2>
-            <form id="teamForm">
+            <form id="teamForm" method="post" action="/team">
                 <label for="teamName">Nome Team:</label>
-                <input type="text" id="teamName" name="teamName" placeholder="Inserisci il nome del team" required>
- 
+                <input type="text" id="teamName" name="teamName" required>
                 <label for="description">Descrizione:</label>
-                <textarea id="description" name="description" rows="3" placeholder="Descrivi il team" required></textarea>
- 
+                <textarea id="description" name="description" rows="3" required></textarea>
                 <label for="leaderId">ID Leader:</label>
-                <input type="text" id="leaderId" name="leaderId" placeholder="Inserisci l'ID del leader" required>
- 
+                <input type="text" id="leaderId" name="leaderId" required>
                 <label for="member">Membri del Team:</label>
-                <input type="text" id="member" name="member" placeholder="Es: membro1, membro2, membro3" required>
-                <span class="note">Inserisci i membri separati da virgola</span>
- 
+                <input type="text" id="member" name="member" required>
                 <label for="creationDate">Data di Creazione:</label>
                 <input type="date" id="creationDate" name="creationDate" required>
- 
-                <button type="button" onclick="createTeam()">Aggiungi Team</button>
+                <button type="submit">Aggiungi Team</button>
             </form>
-            <div id="responseMessage" class="message"></div>
         </div>
- 
-        <div id="list-team" class="section active">
+        <div id="list-team" class="section">
             <h2>Lista Team</h2>
-            <table class="team-list">
+            <table>
                 <thead>
                     <tr>
                         <th>Nome Team</th>
@@ -213,91 +171,13 @@
                         <th>Data di Creazione</th>
                     </tr>
                 </thead>
-                <tbody id="teamListBody">
-                    <!-- I dati verranno caricati dinamicamente -->
+                <tbody id="teamListBody" th:utext="${teamTableRows}">
+                    <!-- Le righe saranno generate dinamicamente dal backend -->
                 </tbody>
+                
             </table>
         </div>
     </div>
- 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionId).classList.add('active');
-            if (sectionId === 'list-team') fetchTeams();
-        }
- 
-        function returnToHome() {
-            location.href = '/home';
-        }
- 
-        function createTeam() {
-            const teamData = {
-                teamName: document.getElementById('teamName').value,
-                description: document.getElementById('description').value,
-                leaderId: document.getElementById('leaderId').value,
-                member: document.getElementById('member').value.split(','),
-                creationDate: document.getElementById('creationDate').value
-            };
- 
-            $.ajax({
-                url: '/team',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(teamData),
-                success: function(response) {
-                    document.getElementById('responseMessage').innerText = 'Team creato con successo!';
-                    document.getElementById('responseMessage').style.color = 'green';
-                    document.getElementById('teamForm').reset(); // Reset del modulo
-                    setTimeout(() => {
-                        showSection('list-team'); // Passa automaticamente alla lista team
-                        fetchTeams(); // Aggiorna la lista dei team
-                    }, 1500);
-                },
-                error: function(error) {
-                    console.error('Errore:', error);
-                    document.getElementById('responseMessage').innerText = 'Errore durante la creazione del team.';
-                    document.getElementById('responseMessage').style.color = 'red';
-                }
-            });
-        }
- 
-        function fetchTeams() {
-            $.ajax({
-                url: '/teams',
-                type: 'GET',
-                success: function(teams) {
-                    const teamListBody = document.getElementById('teamListBody');
-                    teamListBody.innerHTML = ''; // Pulisci la tabella
-                    teams.forEach(team => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${team.teamName}</td>
-                            <td>${team.description}</td>
-                            <td>${team.leaderId}</td>
-                            <td>${team.member.join(', ')}</td>
-                            <td>${team.creationDate}</td>
-                        `;
-                        teamListBody.appendChild(row);
-                    });
-                },
-                error: function(error) {
-                    console.error('Errore:', error);
-                    const teamListBody = document.getElementById('teamListBody');
-                    teamListBody.innerHTML = '<tr><td colspan="5">Errore durante il caricamento dei team.</td></tr>';
-                }
-            });
-        }
- 
-        // Carica i team quando si apre la pagina Lista Team
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.location.hash === '#list-team') {
-                showSection('list-team');
-            }
-        });
-    </script>
+    <script src="/gestione_team.js"></script>
 </body>
 </html>

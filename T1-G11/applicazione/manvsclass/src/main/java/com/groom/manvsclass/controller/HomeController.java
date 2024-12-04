@@ -509,6 +509,16 @@ import org.springframework.web.bind.annotation.RequestBody;
     return teamService.showTeamDetails(teamName, jwt);
     }
 
+    @GetMapping("/team/view")
+    public ModelAndView showTeamPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+    return teamService.showTeamPage(request, jwt);
+    }
+
+    @PostMapping("/team/create")
+    public ModelAndView createTeam(@RequestBody Team team, HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.createTeamAndReturnUpdatedList(team, request, jwt);
+    }
+    
     // Fine Modifica 29/11/2024
 
  }
