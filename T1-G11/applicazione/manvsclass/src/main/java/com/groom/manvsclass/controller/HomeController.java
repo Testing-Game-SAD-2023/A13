@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -555,7 +556,8 @@ public class HomeController {
 			//Salva i test nel filesystem condiviso
 			String fileNameTest = StringUtils.cleanPath(testFile.getOriginalFilename());
 			String fileNameTestEvo = StringUtils.cleanPath(testFileEvo.getOriginalFilename());
-			RobotUtil.saveRobots(fileNameClass, fileNameTest,fileNameTestEvo , classe.getName(), classFile ,testFile, testFileEvo);
+			//Edit: passo la classe come parametro invece del nome
+			RobotUtil.saveRobots(fileNameClass, fileNameTest,fileNameTestEvo , classe, classFile ,testFile, testFileEvo);
 	
 			FileUploadResponse response = new FileUploadResponse();
 			response.setFileName(fileNameClass);
@@ -575,8 +577,21 @@ public class HomeController {
 			//Salva i dati sull'operazione fatta nel database
 			orepo.save(operation1);
 			//Salva i dati sulla classe nel database
+
+			//EDIT: inserisco robot e difficoltà nelle rispettive liste
+			List<String>robotList = new ArrayList<String>();
+			robotList.add("Randoop");
+			robotList.add("Evosuite");
+			classe.setRobotList(robotList);
+			List<String>robotDifficultyList = new ArrayList<String>();
+			robotDifficultyList.add("Beginner");
+			robotDifficultyList.add("Intermediate");
+			robotDifficultyList.add("Advanced");
+			classe.setRobotDifficulty(robotDifficultyList);
+			//FINE EDIT
 			repo.save(classe);
-			System.out.println("Operazione completata con successo (uploadTest)");
+			
+			System.out.println(classe.getcoverage());
 			return new ResponseEntity<>(response, HttpStatus.OK);
 
 		} else {
@@ -701,7 +716,10 @@ public class HomeController {
 					.set("date", newContent.getDate())
 					.set("difficulty", newContent.getDifficulty())
 					.set("description", newContent.getDescription())
-					.set("category", newContent.getCategory());
+					.set("category", newContent.getCategory())
+					.set("robot", newContent.getRobotList())
+					.set("difficulty", newContent.getRobotDifficulty())
+					.set("coverage", newContent.getcoverage());//Modifica: aggiunta dei campi
 			long modifiedCount = mongoTemplate.updateFirst(query, update, ClassUT.class).getModifiedCount();
 
 			if (modifiedCount > 0) {
