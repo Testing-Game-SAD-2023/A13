@@ -10,18 +10,30 @@
 </head>
 <body>
     <div class="header">
-        
         <span class="icon">
-                <a href="/home_adm">
+            <a href="/home_adm">
                 <img src="/t1/css/Images/admin-logo-1.png" alt="icon">
-            </a> 
+            </a>
         </span>
         <p>Student Team Management</p>
-
+        <div class="search-container">
+            <button class="search-button">
+                <i class="search">🔍</i>
+            </button>
+            <input type="text" class="search-bar" placeholder="Cerca team">
+        </div>
         <button class="button-header" id="openModalButton">
             <p id="button-header-p">Add Team</p>
         </button>
-        </div>  
+    </div>
+    <div class="menu_tendina">
+        <p>Filter by:</p>
+        <select id="dropdown-container">
+            <option value="default">Default</option>
+            <option value="alphabetical">A-Z</option>
+            <option value="date">Date</option>
+        </select>
+    </div>
    
     <div id="folders" class="folder-container"></div>
 
@@ -31,6 +43,9 @@
     
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="/t1/js/teams.js"></script>
+    <script src="t1/js/teams.js"></script>
+    <footer>
+
+    </footer>
 </body>
 </html>

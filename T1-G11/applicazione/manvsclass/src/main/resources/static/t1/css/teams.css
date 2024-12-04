@@ -1,233 +1,318 @@
 html, body {
-    height: 100%;
-    margin: 0; /* Rimuove i margini predefiniti del browser */
-  }
-  
-  body {
-    background: #f5f5dc;
-  }
-  
-  .header {
-    background-color: #f5f5dc;
-    width: 100%;
-    position: fixed; /* Rimane sempre in alto */
-    top: 0;
-    left: 0;
-    padding: 25px; /* Riduce il padding */
-    height: 70px; /* Altezza totale */
-    display: flex;
-    align-items: center; /* Allinea verticalmente */
-    justify-content: space-between; /* Distribuisce gli altri elementi orizzontalmente */
-    z-index: 1000;
-  }
-  
-  .icon img {
-    max-height: 60px;
-  
-  }
-  
-  .header p {
-    font-size: 35px;
-    /* Rimuove il margine predefinito */
-    text-align: center; /* Allinea il testo al centro */
-  }
-  
-  .button-header {
-    background-color:  #bdbdb3;
-    border: none;
-    padding: 1rem;
-    font-size: 1rem;
-    width: 10em;
-    border-radius: 1rem;
-    color: rgb(198, 111, 111);
-    box-shadow: 0 0.4rem #dfd9d9;
-    cursor: pointer;
-    font-size: 15px;
-     /* Centra orizzontalmente */
-     margin-right: 45px;
-    
-  }
-  
-  .button-header:active {
-    color: white;
-    box-shadow: 0 0.2rem #dfd9d9;
-    transform: translateY(0.2rem);
-  }
-  
-  .button-header:hover:not(:disabled) {
-    background: lightcoral;
-    color: white;
-    text-shadow: 0 0.1rem #bcb4b4;
-  }
-  
-  .button-header:disabled {
-    cursor: auto;
-    color: grey;
-  }
-  
-  #button-header-p {
-    text-align: center;
-    font-size: 20px;
-  }
-  
-  
-  /* Stile per la finestra modale */
-  .modal {
-    display: none; /* Nasconde la modale di default */
-    position: fixed;
-    z-index: 10;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5); /* Sfondo scuro trasparente */
-  }
-  
-  /* Contenuto della finestra modale */
-  .modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 50px;
-    border: 1cap solid #ccc;
-    border-radius: 20px;
-    width: 80%;
-    max-width: 600px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Bottone di chiusura */
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .close:hover,
-  .close:focus {
-    color: #000;
-    text-decoration: none;
-  }
-  
-  /* Intestazione del form */
-  .modal-content h2 {
-    margin: 0 0 20px;
-    font-size: 24px;
-    color: #333;
-    text-align: center;
-  }
-  
-  /* Stile del form */
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  /* Righe del form */
-  form label {
-    font-size: 16px;
-    color: #333;
-  }
-  
-  form input[type="text"] {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Pulsante di creazione */
-  form button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #8f9390;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  form button:hover {
-    background-color:lightcoral;
-  }
-  
-  
-  /* STYLE FOLDER */
-  .folder-container {
+  height: 100%;
+  overflow-x: hidden; /* Previene lo scroll orizzontale */
+}
+
+body {
+  background: #f5f5dc;
+} 
+
+.icon img {
+  max-height: 60px;
+}
+
+/* Header layout */
+.header {
+  background-color: #f5f5dc;
   display: flex;
-  flex-wrap: wrap; /* Fa andare d'accapo quando non c'è piu spazio */
-  gap: 150px;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 50px;
-  margin-top: 130px;
-  margin-left: 200px;
-  margin-right: 200px;
-  }
-  
-  .folder {
-  width: 100px;
-  height: 120px;
+  align-items: center;
+  padding: 25px;
+  height: 70px;
+  gap: 15px; /* Spaziatura tra gli elementi */
+  position: relative; /* Necessario per il posizionamento assoluto della barra di ricerca */
+}
+
+/* Testo del titolo */
+.header p {
+font-size: 35px;
+margin-left:50px;
+}
+
+/* Contenitore della ricerca */
+.search-container {
+  position: relative; /* Per posizionare la barra di ricerca rispetto al pulsante */
   display: flex;
-  flex-direction: column;
+  align-items: center;
+}
+
+/* Pulsante della lente */
+.search-button {
+  background-color: transparent; /* Sfondo trasparente */
+  border: none; /* Rimuove il bordo */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  transition: transform 0.3s ease;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  position: relative;
-  }
-  
-  .folder img {
-  width: 175px;
-  height: 175px;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-  }
-  
-  .folder span {
-  margin-top: 10px;
-  font-size: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 20px; /* Dimensione dell'icona */
+  color: #333; /* Colore dell'icona */
+}
+
+/* Cambia il colore al passaggio del mouse */
+.search-button:hover {
+  background-color: lightcoral; /* Sfondo al passaggio del mouse */
+  color: white;
+}
+
+/* Barra di ricerca nascosta di default */
+.search-bar {
+  position: absolute; /* Evita che spinga gli altri elementi */
+  left: 50px; /* Posiziona la barra rispetto al pulsante */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 40px;
+  opacity: 0;
+  padding: 0 10px;
+  font-size: 16px;
   color: #333;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Mostra la barra al passaggio del mouse */
+.search-container:hover .search-bar,
+.search-bar:focus {
+  width: 400px;
+  opacity: 1;
+}
+.button-header {
+  background-color:  #bdbdb3;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  border-radius: 1rem;
+  color: rgb(198, 111, 111);
+  box-shadow: 0 0.4rem #dfd9d9;
+  cursor: pointer;
+  font-size: 15px;
+  margin-left: 750px;
+  
+  
+}
+
+.button-header:active {
+  color: white;
+  box-shadow: 0 0.2rem #dfd9d9;
+  transform: translateY(0.2rem);
+}
+
+.button-header:hover:not(:disabled) {
+  background: lightcoral;
+  color: white;
+  text-shadow: 0 0.1rem #bcb4b4;
+}
+
+.button-header:disabled {
+  cursor: auto;
+  color: grey;
+}
+
+#button-header-p {
+  margin: 0; /* Rimuove eventuali margini che potrebbero influenzare il layout */
+  text-align: center;
+  font-size: 20px;
+}
+
+
+/* Stile per la finestra modale */
+.modal {
+  display: none; /* Nasconde la modale di default */
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5); /* Sfondo scuro trasparente */
+}
+
+/* Contenuto della finestra modale */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 50px;
+  border: 1cap solid #ccc;
+  border-radius: 20px;
+  width: 80%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Bottone di chiusura */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
   font-weight: bold;
-  display:flex;
-  }
-  
-  .folder:hover img {
-  transform: scale(1.5);
-  }
-  
-  .folder:hover span {
-  display:flex;
-  }
-  
-  .folder:hover {
-  transform: scale(0.95);
-  box-shadow: 1 10px 12px rgba(0, 0, 0, 0.1);
-  }
-  /* Pulsante di eliminazione - nascosto di default */
-  .delete-button {
-    display: none;
-    padding: 5px 10px;
-    background-color: rgb(219, 100, 100);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  /* Mostra il pulsante di eliminazione quando si passa sopra il folder */
-  .folder:hover .delete-button {
-    display: block;
-  }
-  
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Intestazione del form */
+.modal-content h2 {
+  margin: 0 0 20px;
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+}
+
+/* Stile del form */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Righe del form */
+form label {
+  font-size: 16px;
+  color: #333;
+}
+
+form input[type="text"] {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Pulsante di creazione */
+form button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #8f9390;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color:lightcoral;
+}
+
+.menu_tendina{
+display: flex;
+align-items: center;
+margin-left: 1100px;
+}
+/* Posizionamento del contenitore del menu a tendina in alto a destra */
+#dropdown-container {
+position: relative; /* Necessario per posizionare il menu a tendina in base al contenitore */
+}
+
+/* Menu a tendina */
+#dropdown-container {
+padding: 5px;
+font-size: 16px;
+border: 1px;
+border: none;
+background-color: transparent; /* Rimuove lo sfondo */
+color: #333;
+cursor: pointer;
+}
+
+/* Stile per il menu a tendina quando si apre verso l'alto */
+#dropdown-container:focus {
+
+z-index: 1000; /* Assicurati che il menu si sovrapponga correttamente */
+}
+
+/* Stile del menu a tendina */
+select option {
+padding: 10px;
+}
+/* Contenitore delle cartelle */
+.folder-container {
+display: flex;
+flex-wrap: wrap;
+gap: 30px;
+justify-content: center;
+align-items: flex-start;
+padding: 30px;
+margin-left: 200px;
+margin-right: 200px;
+}
+
+/* Cartella */
+.folder {
+width: 175px;
+height: 200px; /* Altezza modificata per includere data e studenti */
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+transition: transform 0.3s ease;
+background: transparent;
+border: none;
+box-shadow: none;
+position: relative;
+}
+
+/* Immagine della cartella */
+.folder img {
+width: 100%;
+height: 100%;
+object-fit: contain;
+transition: transform 0.3s ease;
+}
+
+/* Dati (data e studenti) nascosti di default */
+.folder-info {
+display: none;
+margin-top: 10px;
+font-size: 16px;
+color: #333;
+}
+
+/* Quando si passa sopra la cartella, mostra i dati */
+.folder:hover .folder-info {
+display: block;
+}
+
+/* Stile per i dettagli data e numero di studenti */
+.folder-info span {
+display: block;
+margin-bottom: 5px;
+}
+
+/* Mostra il pulsante di eliminazione quando si passa sopra la cartella */
+.folder:hover .delete-button {
+display: block;
+}
+
+/* Pulsante di eliminazione */
+.delete-button {
+display: none;
+padding: 5px 10px;
+background-color: rgb(219, 100, 100);
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 14px;
+cursor: pointer;
+margin-top: 10px;
+}
+
+.folder:hover {
+transform: scale(0.95);
+box-shadow: 1 10px 12px rgba(0, 0, 0, 0.1);
+}
+ 
