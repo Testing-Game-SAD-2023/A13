@@ -166,3 +166,32 @@ function Assignments() {
     //Aggiungi qui il codice per gestire gli errori
   });
 }
+
+function getAdmin(){
+    // Esegui una richiesta fetch all'endpoint /usernameAdmin
+  fetch("/usernameAdmin", {
+      method: 'GET',
+      headers: {
+      'Content-Type': 'text/plain'
+    },
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`Errore HTTP! Status: ${response.status}`);
+    }
+    return response.text(); // Aspettati una risposta di tipo testo
+  })
+  .then((data) => {
+    // Puoi mostrare il dato nel DOM, ad esempio:
+    document.getElementById("username-display").textContent = `Username: ${data}`;
+  })
+  .catch((error) => {
+    console.error("Errore nella fetch:", error);
+  });
+
+
+
+}
+// Inizializzazione al caricamento della pagina
+document.addEventListener("DOMContentLoaded", () => getAdmin());
+

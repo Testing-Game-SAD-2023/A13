@@ -5,7 +5,7 @@ html, body {
 
 h1 {
   color: whitesmoke;
-  font-family: Alegreya Sans, sans-serif;
+  font-family: 'Poppins', sans-serif;
 	font-size: 100px;
 	text-align: center;
 }
@@ -14,12 +14,14 @@ h2 {
   color: whitesmoke;
 	font-size: 70px;
 	text-align: center;
+  font-family: 'Poppins', sans-serif;
 }
 
 h3 {
   color: whitesmoke;
 	font-size: 50px;
 	text-align: center;
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
@@ -267,7 +269,7 @@ nav.top-right {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background-color: blueviolet;
+    background-color: rgb(118, 145, 243);
     color: black;
     font-size: 25px;
     border: none;
