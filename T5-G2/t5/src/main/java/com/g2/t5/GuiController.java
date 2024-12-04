@@ -53,6 +53,7 @@ import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.AchievementProgress;
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
+import com.g2.Model.PlayerStats;
 import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
@@ -358,4 +359,40 @@ public class GuiController {
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
     }
+
+    @GetMapping("/getPositions")
+    public ResponseEntity<String> getPositions(  Model model, @CookieValue(name = "jwt", required = false) String jwt,
+                                            @RequestParam("gamemode") String gamemode,
+                                            @RequestParam("statistic") String statistic,
+                                            @RequestParam("startPosition") int startPosition,
+                                            @RequestParam("endPosition") int endPosition) {
+        //Prendo playerID e statistica
+        String playerStatsList= (String) serviceManager.handleRequest("T4", "GetPositions",jwt, gamemode, statistic, startPosition, endPosition);
+        JSONObject playerStatsJson=new JSONObject(playerStatsList);
+        
+        //Chiamata al T23 per la lista di utenti -> prendo nomi e cognomi
+        String userList = (String) serviceManager.handleRequest("T23", "GetUsers");
+        JSONObject userListJson= new JSONObject(userList);
+
+        playerStatsJson.get(UserId);
+        
+        //Incrocio sull'ID                                           
+        for (int i=0; i<playerStatsList.size();i++){
+            Long currentPlayerId= playerStatsList.get(i).getPlayerId();
+            for(int e=0; e<userList.size();e++){
+                if(userList.get(e).getId()==currentPlayerId){
+                    playerStatsList.get(i).setName(userList.get(e).getName());
+                    playerStatsList.get(i).setSurname(userList.get(e).getSurname());
+                }
+            }
+        }
+    
+        return ResponseEntity.ok(playerStatsJson.toString());
+        
+    }
+
+
+
+
+
 }

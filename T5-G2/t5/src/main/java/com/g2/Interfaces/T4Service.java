@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.g2.Model.Game;
+import com.g2.Model.PlayerStats;
 import com.g2.Model.StatisticProgress;
 import org.springframework.core.ParameterizedTypeReference;
 import org.json.JSONArray;
@@ -90,7 +91,12 @@ public class T4Service extends BaseService {
         registerAction("GetRisultati", new ServiceActionDefinition(
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class));
-    }
+    
+        registerAction("getPositions", new ServiceActionDefinition(
+            params -> getPositions((String) params [0], (String) params [1], (String) params [2], (int) params [3], (int) params [4]),
+            String.class, String.class, String.class, Integer.class, Integer.class));
+                
+        }
 
     // usa /games per ottenere una lista di giochi
     private List<Game> getGames(int playerId) {
@@ -238,5 +244,35 @@ public class T4Service extends BaseService {
         String respose = callRestPost(endpoint, formData, null, String.class);
         return respose;
     }
+
+    private String getPositions(String jwt,String gameMode, String statistica, int startPosition, int endPosition){
+            String endpoint = "leaderboard/getSubinterval"+"/"+gameMode+"/"+statistica+"/"+startPosition+"/"+endPosition;
+            String jsonResponse = callRestGET(endpoint, null, String.class);
+            
+            return jsonResponse;
+        }
+        
+
+
+
+
+        /*
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("jwt", jwt);
+        queryParams.put("gameMode", gameMode);
+        queryParams.put("statistica", statistica);
+        queryParams.put("startPosition", String.valueOf(startPosition));
+        queryParams.put("endPosition", String.valueOf(startPosition));
+        
+        ParameterizedTypeReference<List<PlayerStats>> typeRef = new ParameterizedTypeReference<>() {};
+        //Aggiungere un altro campo per int lastPosition?
+        
+        return callRestGET("/leaderboard/getPositions", queryParams, typeRef);
+    */
+    }
+
+
+
+
 
 }
