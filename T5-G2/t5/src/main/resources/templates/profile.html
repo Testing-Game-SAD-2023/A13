@@ -97,9 +97,10 @@
                             <div id="friendsContainer" class="list-group" style="max-height: 400px; overflow-y: auto;">
                                 <!-- Amici caricati dinamicamente -->
                             </div>
+                            <p id="errorMessage" class="text-danger text-center mt-3"></p>
                         </div>
                     </div>
-
+        
                     <!-- Form Aggiungi Amico -->
                     <div class="card mt-4 shadow-sm">
                         <div class="card-body">
@@ -114,16 +115,18 @@
                                 <button
                                     id="addFriendButton"
                                     class="btn btn-success"
-                                    onclick="addFriend()"
                                 >
                                     Aggiungi Amico
                                 </button>
                             </div>
+                            <p id="addFriendMessage" class="text-center mt-2"></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        
 
         <div id="trophies" class="section">
             <div class="row">
