@@ -466,32 +466,9 @@ public class GuiController {
     }
 
 //by Gabman 30/11 Endpoint Amici.js-T23Service
-// --- Nuovo Endpoint per Gestire gli Amici ---
-@GetMapping("/getFriends")
-public ResponseEntity<List<Map<String, String>>> getFriends(@CookieValue(name = "jwt", required = false) String jwt) {
-    try {
-        if (jwt == null || jwt.isEmpty()) {
-            return ResponseEntity.status(401).body(null); // Utente non autenticato
-        }
 
-        // Decodifica il token JWT per ottenere l'ID utente
-        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-
-        ObjectMapper mapper = new ObjectMapper();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-        String userId = map.get("userId").toString();
-
-        // Recupero lista amici tramite T23Service
-        List<Map<String, String>> friends = t23Service.getFriends(userId);
-        return ResponseEntity.ok(friends);
-    } catch (Exception e) {
-        System.out.println("Error retrieving friends: " + e.getMessage());
-        return ResponseEntity.status(500).body(null); // Errore server
-    }
 }
-// Metodo per aggiungere un amico
+/*  Metodo per aggiungere un amico
 @PostMapping("/addFriend")
 public ResponseEntity<String> addFriend(
     @CookieValue(name = "jwt", required = false) String jwt,
@@ -545,7 +522,7 @@ public ResponseEntity<String> removeFriend(
         System.out.println("Errore durante la rimozione dell'amico: " + e.getMessage());
         return ResponseEntity.status(500).body("Errore interno del server.");
     }
-}
+}*/
     //cami (02/12)
     @GetMapping("/getUserInfo")
     public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(name = "jwt", required = false) String jwt) {
