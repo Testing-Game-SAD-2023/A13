@@ -139,6 +139,20 @@
     mix-blend-mode: multiply;
 }
 
+.token-display {
+    display: inline-block;
+    margin-left: 10px; /* Spazio tra il bottone e il riquadro */
+    padding: 5px 10px; /* Margine interno per dare spazio alla scritta */
+    background-color: #f0f0f0; /* Sfondo chiaro */
+    border: 1px solid #ccc; /* Bordo sottile */
+    border-radius: 5px; /* Angoli arrotondati */
+    font-size: 14px; /* Dimensione del testo */
+    font-weight: bold; /* Testo in grassetto */
+    color: #333; /* Colore del testo */
+    text-align: center; /* Centra il testo */
+    white-space: nowrap; /* Impedisce la rottura della linea */
+}
+
 
 
 @media (max-width: 768px) {
@@ -150,3 +164,6 @@
         height: auto; /* Consenti alle colonne di adattarsi */
     }
 }
+
+
+ 

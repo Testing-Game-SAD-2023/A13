@@ -19,6 +19,7 @@ const populateForm = () => {
   document.getElementById('surnameInput').value = userUpdate.surname || '';
   document.getElementById('emailInput').value = userUpdate.email || '';
   document.getElementById('studiesInput').value = userUpdate.studies || '';
+  document.getElementById('biographyInput').value = userUpdate.biography || '';
 };
 
 
@@ -28,7 +29,8 @@ const updateUserObject = () => {
       surname: 'surnameInput',
       email: 'emailInput',
       studies: 'studiesInput',
-      password: 'passwordInput'
+      password: 'passwordInput',
+      biography: 'biographyInput'
   };
 
   Object.keys(fields).forEach(key => {

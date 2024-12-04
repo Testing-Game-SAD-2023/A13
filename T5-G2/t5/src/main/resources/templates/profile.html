@@ -19,123 +19,8 @@
 
         <title>Profilo utente</title>
 
-        <!-- 
-        <style>
         
-        .achievements-container {
-            max-height: 200px; /* Altezza massima per il contenuto */
-            overflow-y: auto; /* Abilita lo scroll verticale */
-            padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
-        }
-
-        .container-fluid {
-            height: 100vh; /* Usa tutta l'altezza dello schermo */
-            display: flex;
-            flex-direction: column;
-            margin: 0;
-            padding: 0;
-        }
-        .top-bar {
-            height: 50px; /* Riduce l'altezza */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            background-color: #1c1c2b; /* Sfondo scuro */
-        }
-
-        /* Layout a due colonne */
-        .row {
-            flex: 1;
-            display: flex;
-            margin: 0;
-            padding: 0;
-        }
-
-        .col-6 {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* Distribuisce le card equamente */
-            height: 100%;
-            padding: 0;
-        }
-
-        /* Card con altezza bilanciata */
-        .card {
-            flex: 1; /* Ogni card occupa metà della colonna */
-            margin: 5px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-body {
-            flex: 1; /* Occupa tutto lo spazio disponibile nella card */
-            overflow-y: auto; /* Scroll interno se il contenuto eccede */
-        }
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-        .btn-sm {
-            font-size: 0.875rem;
-            padding: 0.4rem 0.8rem;
-        }
-        .followed-list-container {
-            max-height: 150px; /* Altezza massima per limitare l'espansione */
-            overflow-y: auto; /* Scroll verticale se il contenuto eccede */
-            padding-right: 10px; /* Spazio per evitare sovrapposizione con lo scroll */
-        }
-
-        .followed-item {
-            padding: 10px;
-            border-bottom: 1px solid #ddd; /* Separatore tra gli elementi */
-            font-size: 0.9rem; /* Riduci leggermente il testo se necessario */
-        }
-
-        /* Immagine profilo */
-        .propic {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        /* Sezione informazioni profilo */
-        .profile-container {
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-info {
-            margin-left: 20px;
-        }
-
-        .profile-info .name-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .statistics-container {
-            max-height: 200px; /* Altezza massima per il contenuto */
-            overflow-y: auto; /* Abilita lo scroll verticale */
-            padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
-        }
-
-        /* Media query per schermi piccoli */
-        @media (max-width: 768px) {
-            .row {
-                flex-direction: column;
-            }
-
-            .col-6 {
-                height: auto; /* Consenti alle colonne di adattarsi */
-            }
-        }
-
-        </style>
-    -->
+    
     </head>
 
     <body class="bg-custom">
@@ -143,6 +28,7 @@
             <div class="top-bar">
                 <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" ></p>
                 <div id="topRightContainer">
+                    <button class="logout-button" data-toggle="modal" data-target="#missionsModal">Missioni</button>
                     <a href="/main" class="logout-button">Home</a>
                     <a href="/logout" class="logout-button">Logout</a>
                 </div>
@@ -163,19 +49,15 @@
                                         <div class="profile-info">
                                             <div class="name-container">
                                                 <div>
-                                                    <h4 >
-                                                        <p th:text="${user.name}"></p> <!-- Nome -->
-                                                        <p th:text="${user.surname}"></p>  <!-- Cognome -->
+                                                    <h5 >
+                                                        <p th:text="${user.name + ' ' + user.surname}   "></p> <!-- Nome -->
                                                         <p th:text="${user.email}"></p>
-                                                        <p th:text="${#strings.repeat('*', 5)}"></p>
-                                                    </h4>
-                                                </div>
-                                                <div>
-                                                   <!-- <button id="editButton" class="btn btn-primary">Modifica informazioni</button>--> 
+                                                    </h5>
                                                 </div>
                                             </div>
                                             <h6 class="card-subtitle mb-2 text-body-secondary" >
                                                 <p th:text="${user.studies}"></p>
+                                                <p th:text="${user.biography != null && !#strings.isEmpty(user.biography) ? user.biography : 'Qui è presente la mia biografia'}"></p>
                                             </h6>
                                             
                                             
@@ -191,7 +73,12 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">Achievements</h4>
-                                    <button class="btn btn-secondary btn-sm" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
+                                    <div class="d-flex align-items-center">
+                                        <button class="btn btn-secondary btn-sm" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
+                                        <div class="token-display">
+                                            <p th:text="'Token: ' + '' + ${user.missionToken}">numero token</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <hr>
                                 <div class="achievements-container">
@@ -299,6 +186,10 @@
                                 <label for="studiesInput">Studi</label>
                                 <input type="text" class="form-control" id="studiesInput" placeholder="Inserisci il campo di studi">
                             </div>
+                            <div class="form-group">
+                                <label for="biographyInput">Biografia</label>
+                                <input type="text" class="form-control" id="biographyInput" placeholder="Inserisci la biografia">
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -336,6 +227,40 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="missionsModal" tabindex="-1" role="dialog" aria-labelledby="missionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="missionsModalLabel">Lista Missioni</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="missionsList" class="list-group">
+                            <!-- Elementi statici della lista -->
+                            <li class="list-group-item">
+                                <h5>Missione 1</h5>
+                                <p>Descrizione della prima missione.</p>
+                            </li>
+                            <li class="list-group-item">
+                                <h5>Missione 2</h5>
+                                <p>Descrizione della seconda missione.</p>
+                            </li>
+                            <li class="list-group-item">
+                                <h5>Missione 3</h5>
+                                <p>Descrizione della terza missione.</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
 
         <!--<span id="user_id" style="display: none;" th:text="${userID}"></span> -->
 
@@ -346,42 +271,5 @@
         <script src="t5/js/profile.js"></script>
     </body>
 
-    <!--
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        // Mostra solo gli achievement completati all'avvio
-        viewCompletedAchievements();
-    });
-
-
-         function viewCompletedAchievements() {
-        const achievements = document.querySelectorAll('.achievement-container');
-        achievements.forEach(achievement => {
-            const isCompleted = achievement.getAttribute('data-completed') === 'true';
-            achievement.style.display = isCompleted ? '' : 'none';
-        });
-    }
-
-    // Funzione per mostrare tutti gli achievement
-    function viewAllAchievements() {
-        const achievements = document.querySelectorAll('.achievement-container');
-        achievements.forEach(achievement => {
-            achievement.style.display = '';
-        });
-    }
-    function toggleAchievements() {
-        const button = document.getElementById('toggle-button');
-        const showAll = button.textContent === 'Visualizza tutti gli achievements';
-
-        if (showAll) {
-            viewAllAchievements();
-            button.textContent = 'Visualizza solo achievements completati';
-        } else {
-            viewCompletedAchievements();
-            button.textContent = 'Visualizza tutti gli achievements';
-        }
-    }
-
-    </script>
-    -->
+    
 </html>
