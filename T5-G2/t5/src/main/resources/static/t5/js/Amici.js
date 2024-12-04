@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 friends.forEach(friend => {
                     const friendItem = document.createElement('div');
-                    friendItem.className = 'list-group-item';
+                    friendItem.className = 'list-group';
 
                     friendItem.innerHTML = `
                         <img src="${friend.profilePicture || '/default-avatar.jpg'}" alt="Immagine amico" class="friend-avatar">
