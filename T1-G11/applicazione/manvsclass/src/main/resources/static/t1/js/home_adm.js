@@ -109,7 +109,7 @@ function Scalata() {
 }
 
  function Gestisci_Team() {
-  fetch('/gestione_team', {
+  fetch('/team/view', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -123,7 +123,7 @@ function Scalata() {
         alert("Verrai reindirizzato alla pagina di gestione dei team.");
       });
 
-      window.location.href = "/gestione_team";
+      window.location.href = "/team/view";
     }
     else {
       response.text().then(errorMessage => {

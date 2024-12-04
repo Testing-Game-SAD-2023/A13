@@ -15,7 +15,7 @@ public class Team {
     private List<String> member; // Lista dei membri del team
     private String creationDate; // Data di creazione del team
     
-    public Team(String teamName, String description, String leaderId, List<String> member, String creationDate, String status) {
+    public Team(String teamName, String description, String leaderId, List<String> member, String creationDate) {
         this.teamName = teamName;
         this.description = description;
         this.leaderId = leaderId;

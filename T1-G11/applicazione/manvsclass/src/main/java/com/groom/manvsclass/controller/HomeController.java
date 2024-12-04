@@ -480,9 +480,9 @@ import org.springframework.web.bind.annotation.RequestBody;
     }
     
      // Aggiungere un membro al team
-@PostMapping("/team/{teamName}/add-member")
-@ResponseBody
-public ResponseEntity<String> addMemberToTeam(
+    @PostMapping("/team/{teamName}/add-member")
+    @ResponseBody
+    public ResponseEntity<String> addMemberToTeam(
         @PathVariable String teamName,
         @RequestBody List<String> selectedMemberIds, // Modifica: ora è una lista di membri
         @CookieValue(name = "jwt", required = false) String jwt) {
@@ -500,10 +500,10 @@ public ResponseEntity<String> addMemberToTeam(
         return teamService.removeMemberFromTeam(teamName, memberId, jwt);
     }
 
-        @GetMapping("/teams/view")
+        /* @GetMapping("/teams/view")
         public ModelAndView showAllTeams(@CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.showAllTeams(jwt);
-        }
+        } */
 
     @GetMapping("/team/view/{teamName}")
     public ModelAndView showTeamDetails(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
