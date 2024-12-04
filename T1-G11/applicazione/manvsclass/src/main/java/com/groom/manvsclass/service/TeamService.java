@@ -19,6 +19,8 @@ import com.groom.manvsclass.model.User;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @Service
 public class TeamService {
@@ -209,5 +211,73 @@ public class TeamService {
         modelAndView.addObject("team", team);
         return modelAndView;
     }
+
+    public ModelAndView showTeamPage(HttpServletRequest request, String jwt) {
+    System.out.println("(GET /team/view) Token JWT valido?");
+    
+    if (!jwtService.isJwtValid(jwt)) {
+        System.out.println("(GET /team/view) Token JWT invalido");
+        return new ModelAndView("login_admin");
+    }
+
+    System.out.println("(GET /team/view) Token JWT valido, procedo con il caricamento dei team.");
+    
+    // Recupera la lista dei team dal repository
+    List<Team> allTeams = teamRepository.findAll();
+
+    // Genera le righe HTML per la tabella
+    StringBuilder tableRowsHtml = new StringBuilder();
+    for (Team team : allTeams) {
+        tableRowsHtml.append("<tr>")
+            .append("<td>").append(team.getTeamName()).append("</td>")
+            .append("<td>").append(team.getDescription()).append("</td>")
+            .append("<td>").append(team.getLeaderId()).append("</td>")
+            .append("<td>").append(String.join(", ", team.getMember())).append("</td>")
+            .append("<td>").append(team.getCreationDate()).append("</td>")
+            .append("</tr>");
+    }
+
+    // Crea il ModelAndView
+    ModelAndView model = new ModelAndView("gestione_team");
+
+    // Aggiungi l'HTML generato come attributo
+    model.addObject("teamTableRows", tableRowsHtml.toString());
+
+    return model;
+}
+
+public ModelAndView createTeamAndReturnUpdatedList(Team team, HttpServletRequest request, String jwt) {
+    System.out.println("(POST /team/create) Token JWT valido?");
+
+    if (!jwtService.isJwtValid(jwt)) {
+        System.out.println("(POST /team/create) Token JWT invalido");
+        return new ModelAndView("login_admin");
+    }
+
+    System.out.println("(POST /team/create) Token JWT valido, procedo con la creazione del team.");
+
+    // Verifica se il team esiste già
+    if (teamRepository.existsById(team.getTeamName())) {
+        System.out.println("(POST /team/create) Team già esistente.");
+        ModelAndView model = showTeamPage(request, jwt);
+        model.addObject("errorMessage", "Il team esiste già! Modifica i dati e riprova.");
+        return model;
+    }
+
+    // Salva il team nel database
+    searchRepository.addTeam(team);
+
+    System.out.println("(POST /team/create) Team creato con successo.");
+
+    // Recupera la lista aggiornata dei team e la restituisce
+    ModelAndView model = showTeamPage(request, jwt);
+    model.addObject("successMessage", "Team creato con successo!");
+    return model;
+}
+
+
+
+
+
 }
 
