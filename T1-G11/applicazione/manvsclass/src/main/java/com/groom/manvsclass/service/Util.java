@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.groom.manvsclass.model.interaction; 
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

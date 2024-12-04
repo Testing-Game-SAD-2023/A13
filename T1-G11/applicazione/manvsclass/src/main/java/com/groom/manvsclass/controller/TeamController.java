@@ -1,5 +1,7 @@
 package com.groom.manvsclass.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -51,10 +53,21 @@ public class TeamController {
         return teamService.visualizzaTeam(idTeam, jwt);
     }
 
-    @PostMapping("/aggiungiStudente/{idTeam}")
+
+    //Modifica 04/12/2024: aggiunta di una lista di idStudenti al team
+    @PutMapping("/aggiungiStudenti/{idTeam}")
     @ResponseBody
-    public ResponseEntity<?> aggiungiStudente(@PathVariable("idTeam") String idTeam, @RequestBody String idStudente, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.aggiungiStudente(idTeam,idStudente,jwt);
+    public ResponseEntity<?> aggiungiStudenti(@PathVariable("idTeam") String idTeam, @RequestBody List<String> idStudenti, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.aggiungiStudenti(idTeam, idStudenti, jwt);
     }
+
+    @GetMapping("/ottieniStudentiTeam/{idTeam}")
+    @ResponseBody
+    public ResponseEntity<?> ottieniStudentiTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt){
+        return teamService.ottieniStudentiTeam(idTeam,jwt);
+    }
+
+
+
 }
 
