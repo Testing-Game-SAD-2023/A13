@@ -1,7 +1,10 @@
 <html> 
     <head>
-        <link href="/t5/css/main.css" rel="stylesheet" />
-        <link href="/t5/css/main2.css" rel="stylesheet" />
+        <!--
+                <link href="/t5/css/main.css" rel="stylesheet" />
+                <link href="/t5/css/main2.css" rel="stylesheet" />
+        -->
+        <link href="/t5/css/main3.css" rel="stylesheet" />
         <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
 
         <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
@@ -15,6 +18,8 @@
         <!--<script src="/t5/js/profile.js"></script>--> 
 
         <title>Profilo utente</title>
+
+        <!-- 
         <style>
         
         .achievements-container {
@@ -130,6 +135,7 @@
         }
 
         </style>
+    -->
     </head>
 
     <body class="bg-custom">
@@ -161,7 +167,7 @@
                                                         <p th:text="${user.name}"></p> <!-- Nome -->
                                                         <p th:text="${user.surname}"></p>  <!-- Cognome -->
                                                         <p th:text="${user.email}"></p>
-                                                        <p th:text="${#strings.repeat('*', user.password.length())}"></p>
+                                                        <p th:text="${#strings.repeat('*', 5)}"></p>
                                                     </h4>
                                                 </div>
                                                 <div>
@@ -282,8 +288,12 @@
                                 <input type="email" class="form-control" id="emailInput" placeholder="Inserisci l'email">
                             </div>
                             <div class="form-group">
-                                <label for="emailInput">Password</label>
+                                <label for="passwordInput">Password</label>
                                 <input type="email" class="form-control" id="passwordInput" placeholder="Inserisci la password">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordoldInput">Password Attuale</label>
+                                <input type="email" class="form-control" id="passwordoldInput" placeholder="Inserisci la password">
                             </div>
                             <div class="form-group">
                                 <label for="studiesInput">Studi</label>
@@ -293,7 +303,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
-                        <button type="button" class="btn btn-primary">Salva modifiche</button>
+                        <button type="button" class="btn btn-primary" onclick="saveChanges()">Salva modifiche</button>
                     </div>
                 </div>
             </div>
@@ -310,25 +320,33 @@
                     <div class="modal-body">
                         <form>
                             <div class="form-group">
-                                <label for="playerIDInput">ID Player</label>
-                                <input type="text" class="form-control" id="playerIDInput" placeholder="Inserisci l'ID del player">
-                            </div>
-                            <div class="form-group">
-                                <label for="playerEmailInput">Email Player</label>
-                                <input type="email" class="form-control" id="playerEmailInput" placeholder="Inserisci l'email del player">
+                                <label for="key_search">Chiave di Ricerca</label>
+                                <input type="text" class="form-control" id="key_search" placeholder="Inserisci l'id dell'utente o la sua email">
                             </div>
                         </form>
-                    </div>
+                        <!-- Contenitore per i risultati della ricerca -->
+                        <div id="searchResults" class="mt-3">
+                            <!-- I risultati saranno aggiunti dinamicamente qui -->
+                        </div>
+                    </div>                    
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
-                        <button type="button" class="btn btn-primary">Cerca</button>
+                        <button type="button" class="btn btn-primary" onclick="search()">Cerca</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!--<span id="user_id" style="display: none;" th:text="${userID}"></span> -->
+
+        <script th:inline="javascript">
+            let user = /*[[${user}]]*/ {};
+            let userUpdate = JSON.parse(JSON.stringify(user)); // Copia dell'oggetto
+        </script>
+        <script src="t5/js/profile.js"></script>
     </body>
+
+    <!--
     <script>
         document.addEventListener('DOMContentLoaded', () => {
         // Mostra solo gli achievement completati all'avvio
@@ -365,4 +383,5 @@
     }
 
     </script>
+    -->
 </html>

@@ -99,6 +99,48 @@
     padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
 }
 
+/*PRESI DA ALTRI MAIN*/
+
+.bg-custom {
+    background-color: #1c1c28;
+    /* background-image: url("/t5/images/gamemode_background.jpg"); */
+}
+
+  .user_position_main{
+    padding-top: 1%;
+    padding-left: 8%;
+    
+}
+
+.logout-button {
+    background-color: rgba(57,57,83,1);
+    color: #fff;
+    border: rgba(57,57,83,1);
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    top: 10px;
+    right: 60px;
+}
+  
+  .logout-button:focus {
+    outline:none; /* Rimuove il colore di sfondo dei bordi quando il tasto è attivo (focus) */
+}
+  .logout-button:hover {
+    background-color: white; /* Cambia il colore di sfondo al passaggio del cursore */
+    color: black;
+}
+
+.unobtained {
+    filter: grayscale(1);
+    mix-blend-mode: multiply;
+}
+
+
+
 @media (max-width: 768px) {
     .row {
         flex-direction: column;
