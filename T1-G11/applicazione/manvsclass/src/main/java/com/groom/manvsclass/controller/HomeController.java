@@ -486,7 +486,7 @@ public ResponseEntity<String> addMemberToTeam(
         @PathVariable String teamName,
         @RequestBody List<String> selectedMemberIds, // Modifica: ora è una lista di membri
         @CookieValue(name = "jwt", required = false) String jwt) {
-    return teamService.addMemberToTeam(teamName, selectedMemberIds, jwt);
+        return teamService.addMemberToTeam(teamName, selectedMemberIds, jwt);
 }
 
 
@@ -509,7 +509,7 @@ public ResponseEntity<String> addMemberToTeam(
     public ModelAndView showTeamDetails(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
     return teamService.showTeamDetails(teamName, jwt);
     }
-
+    
     @GetMapping("/team/view")
     public ModelAndView showTeamPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
     return teamService.showTeamPage(request, jwt);
@@ -519,7 +519,7 @@ public ResponseEntity<String> addMemberToTeam(
     public ModelAndView createTeam(@RequestBody Team team, HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.createTeamAndReturnUpdatedList(team, request, jwt);
     }
-    
+
     // Fine Modifica 29/11/2024
 
  }
