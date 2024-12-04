@@ -7,6 +7,7 @@
     <title>Student Teams</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <link rel='stylesheet' href="/t1/css/teams.css"><!--aggiunta del css della pagina-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="header">
@@ -16,21 +17,24 @@
             </a>
         </span>
         <p>Student Team Management</p>
-        <div class="search-container">
-            <button class="search-button">
-                <i class="search">🔍</i>
-            </button>
-            <input type="text" class="search-bar" placeholder="Cerca team">
-        </div>
         <button class="button-header" id="openModalButton">
             <p id="button-header-p">Add Team</p>
         </button>
     </div>
     <div class="menu_tendina">
+        <!-- Barra di ricerca centrale -->
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Cerca team">
+            <button class="search-button">
+                <i class="search">🔍</i>
+            </button>
+        </div>
+    
+        <!-- Filtro e menu a tendina a destra -->
         <p>Filter by:</p>
-        <select id="dropdown-container">
+        <select id="dropdown-container"> 
             <option value="default">Default</option>
-            <option value="alphabetical">A-Z</option>
+            <option value="alphabetical">Name</option>
             <option value="date">Date</option>
         </select>
     </div>

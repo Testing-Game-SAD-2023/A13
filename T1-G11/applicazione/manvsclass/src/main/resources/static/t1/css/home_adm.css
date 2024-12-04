@@ -4,23 +4,26 @@ html, body {
 }
 
 h1 {
+  color: whitesmoke;
   font-family: Alegreya Sans, sans-serif;
 	font-size: 100px;
 	text-align: center;
 }
 
 h2 {
+  color: whitesmoke;
 	font-size: 70px;
 	text-align: center;
 }
 
 h3 {
+  color: whitesmoke;
 	font-size: 50px;
 	text-align: center;
 }
 
 body {
-  background: beige;
+  background: #1b213e;;
   font-family: Alegreya Sans, sans-serif;
 }
 

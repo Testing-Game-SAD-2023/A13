@@ -45,9 +45,12 @@ function renderFolders(data){
         data.forEach((item) => {
             const folder = document.createElement("div");
             folder.className = "folder";
+            
+            const foldercontent = document.createElement("div");
+            foldercontent.classList.add("folder-content");
 
             const img = document.createElement("img");
-            img.src = "/t1/css/Images/cartella_gialla.png";
+            img.src = "/t1/css/Images/icon_team.png";
             img.alt = item.name;
 
             const span = document.createElement("span");
@@ -76,8 +79,9 @@ function renderFolders(data){
             deleteButton.classList.add("delete-button");
             deleteButton.textContent = "Delete";
 
-            folder.appendChild(img);
-            folder.appendChild(span);
+            foldercontent.appendChild(img);
+            foldercontent.appendChild(span);
+            folder.appendChild(foldercontent);
             folder.appendChild(info1);
             folder.appendChild(info2);
             folder.appendChild(info3);
@@ -144,8 +148,12 @@ function searchTeamByName(name) {
         const teamId = info_id.split(":")[1].trim();
         if (teamName.toLowerCase() === name.toLowerCase()) {
             found = true;
-            folderContainer.appendChild(folder.cloneNode(true)); // Mostra solo il team trovato
-            folderContainer.addEventListener("click", () => {
+           // Clona il folder e aggiungilo al container
+            const newFolder = folder.cloneNode(true);
+            folderContainer.appendChild(newFolder);
+
+            // Aggiungi l'evento click direttamente sul nuovo folder
+            newFolder.addEventListener("click", () => {
                 window.location.href = `/visualizzaTeam/${teamId}`;  // Reindirizza alla pagina di dettagli, passando l'ID
             });
         }
@@ -218,6 +226,13 @@ function openModal() {
     // Aggiungi il listener per il pulsante "Crea Team"
     const createTeamButton = document.getElementById("createTeamButton");
     createTeamButton.addEventListener("click", () => createTeam(modal));
+    // Limita i caratteri nel campo di input "Nome del Team" a 15
+    const teamNameInput = document.getElementById("teamName");
+    teamNameInput.addEventListener("input", (event) => {
+        if (event.target.value.length > 15) {
+            event.target.value = event.target.value.substring(0, 15); // Troncamento a 15 caratteri
+        }
+    });
 }
 
 function createTeam(modal) {

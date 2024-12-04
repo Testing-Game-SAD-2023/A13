@@ -1,10 +1,11 @@
 html, body {
   height: 100%;
   overflow-x: hidden; /* Previene lo scroll orizzontale */
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
-  background: #f5f5dc;
+  background: #1b213e;
 } 
 
 .icon img {
@@ -13,88 +14,121 @@ body {
 
 /* Header layout */
 .header {
-  background-color: #f5f5dc;
-  display: flex;
-  align-items: center;
-  padding: 25px;
-  height: 70px;
-  gap: 15px; /* Spaziatura tra gli elementi */
-  position: relative; /* Necessario per il posizionamento assoluto della barra di ricerca */
+background-color: #1b213e;
+display: flex;
+align-items: center;
+justify-content: space-between; /* Centra orizzontalmente */
+padding: 25px;
+height: 70px;
+gap: 15px; /* Spaziatura tra gli elementi */
+position: relative; /* Necessario per il posizionamento assoluto della barra di ricerca */
 }
 
-/* Testo del titolo */
+/* Testo del titolo centrato */
 .header p {
 font-size: 35px;
-margin-left:50px;
+margin: 0; /* Rimuove margini non necessari */
+text-align: center; /* Allinea il testo al centro */
+color:whitesmoke;
 }
 
-/* Contenitore della ricerca */
-.search-container {
-  position: relative; /* Per posizionare la barra di ricerca rispetto al pulsante */
-  display: flex;
-  align-items: center;
+
+/* Contenitore del menu tendina, barra di ricerca, e icona */
+.menu_tendina {
+display: flex;
+justify-content: center; /* Centra orizzontalmente gli elementi */
+align-items: center; /* Allinea verticalmente gli elementi */
+gap: 15px; /* Spaziatura tra gli elementi */
+width: 100%;
+padding: 10px 0;
+margin-top: 30px;
+color:whitesmoke;
 }
+
+/* Contenitore per la barra di ricerca */
+.search-container {
+position: relative;
+display: flex;
+align-items: center;
+flex-grow: 1; /* Permette di occupare lo spazio centrale */
+max-width: 500px; /* Impostiamo una larghezza massima per la barra */
+}
+
+/* Barra di ricerca */
+.search-bar {
+width: 100%;
+height: 40px;
+padding: 0 10px;
+font-size: 16px;
+border: 1px solid rgb(118, 145, 243);
+border-radius: 20px;
+outline: none;
+transition: all 0.3s ease;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+background-color: rgb(118, 145, 243);
+}
+
+.search-bar::placeholder {
+  color: #333; /* Colore del placeholder */
+  font-family: 'Poppins', sans-serif;; /* (Opzionale) Puoi rendere il testo in corsivo */
+  opacity: 1; /* (Opzionale) Regola la trasparenza */
+}
+
 
 /* Pulsante della lente */
 .search-button {
-  background-color: transparent; /* Sfondo trasparente */
-  border: none; /* Rimuove il bordo */
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 20px; /* Dimensione dell'icona */
-  color: #333; /* Colore dell'icona */
+background-color: transparent;
+border: none;
+border-radius: 50%;
+width: 40px;
+height: 40px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+position: absolute;
+right: 5px; /* Posiziona l'icona a destra */
+font-size: 20px;
+color: #333;
 }
 
 /* Cambia il colore al passaggio del mouse */
 .search-button:hover {
-  background-color: lightcoral; /* Sfondo al passaggio del mouse */
-  color: white;
+background-color:rgb(1, 26, 251);
+color: white;
 }
 
-/* Barra di ricerca nascosta di default */
-.search-bar {
-  position: absolute; /* Evita che spinga gli altri elementi */
-  left: 50px; /* Posiziona la barra rispetto al pulsante */
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 40px;
-  opacity: 0;
-  padding: 0 10px;
-  font-size: 16px;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  outline: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+/* Menu a tendina */
+#dropdown-container {
+padding: 5px;
+font-size: 16px;
+border: 1px solid #ccc;
+background-color: transparent;
+color: whitesmoke;
+cursor: pointer;
+border-radius: 5px;
+position: relative; /* Necessario per posizionare il menu a tendina in base al contenitore */
+}
+/* Stile per il menu a tendina quando si apre verso l'alto */
+#dropdown-container:focus { 
+  z-index: 1000; /* Assicurati che il menu si sovrapponga correttamente */
+}
+/* Stile per l'opzione selezionata */
+#dropdown-container option {
+  background-color: white; /* Sfondo bianco per il menu */
+  color: black; /* Testo nero per tutte le opzioni */
 }
 
-/* Mostra la barra al passaggio del mouse */
-.search-container:hover .search-bar,
-.search-bar:focus {
-  width: 400px;
-  opacity: 1;
-}
 .button-header {
-  background-color:  #bdbdb3;
+  background-color:  rgba(53, 17, 231, 0.737);
   border: none;
   padding: 1rem;
   font-size: 1rem;
   border-radius: 1rem;
-  color: rgb(198, 111, 111);
+  color: black;
   box-shadow: 0 0.4rem #dfd9d9;
   cursor: pointer;
-  font-size: 15px;
-  margin-left: 750px;
-  
-  
+  font-size: 15px;    
 }
 
 .button-header:active {
@@ -104,7 +138,7 @@ margin-left:50px;
 }
 
 .button-header:hover:not(:disabled) {
-  background: lightcoral;
+  background: blue;
   color: white;
   text-shadow: 0 0.1rem #bcb4b4;
 }
@@ -204,35 +238,9 @@ form button {
 }
 
 form button:hover {
-  background-color:lightcoral;
+  background-color:black;
 }
 
-.menu_tendina{
-display: flex;
-align-items: center;
-margin-left: 1100px;
-}
-/* Posizionamento del contenitore del menu a tendina in alto a destra */
-#dropdown-container {
-position: relative; /* Necessario per posizionare il menu a tendina in base al contenitore */
-}
-
-/* Menu a tendina */
-#dropdown-container {
-padding: 5px;
-font-size: 16px;
-border: 1px;
-border: none;
-background-color: transparent; /* Rimuove lo sfondo */
-color: #333;
-cursor: pointer;
-}
-
-/* Stile per il menu a tendina quando si apre verso l'alto */
-#dropdown-container:focus {
-
-z-index: 1000; /* Assicurati che il menu si sovrapponga correttamente */
-}
 
 /* Stile del menu a tendina */
 select option {
@@ -250,35 +258,83 @@ margin-left: 200px;
 margin-right: 200px;
 }
 
-/* Cartella */
+/* Cartella con effetto glitchato */
 .folder {
-width: 175px;
-height: 200px; /* Altezza modificata per includere data e studenti */
+width: 260px;
+height: 120px;
 display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
-text-align: center;
-transition: transform 0.3s ease;
-background: transparent;
-border: none;
-box-shadow: none;
+padding-top: 25px; /* Spazio per evitare che il contenuto si sovrapponga */
+background:rgb(118, 145, 243);
+color: #333; /* Testo bianco per contrasto */
+box-sizing: border-box; /* Assicura che padding e margini siano considerati nell'altezza totale */
 position: relative;
-cursor: pointer;
+border-radius: 15px;
+overflow: hidden; /* Per evitare che l'effetto esca dai bordi */
+animation: glitch 5s infinite;
 }
+.folder-content {
+display: flex;
+align-items: center;
+justify-content: flex-start; /* Allinea a sinistra */
+text-align: center;
+gap: 5px; /* Spaziatura tra icona e testo */
+position: absolute;
+top: 10px; /* Posiziona in alto */
+left: 10px; /* Posiziona a sinistra */
 
-/* Immagine della cartella */
-.folder img {
+}
+.folder-content span{
+text-align: center;
+flex-grow: 1;
+display: flex;
+align-items: center; /* Centra verticalmente il testo */
+justify-content: center; /* Centra orizzontalmente il testo */
+
+}
+/* Stile per l'icona */
+.folder-content img {
+width: 70px; /* Dimensioni dell'icona */
+height: 70px;
+border-radius: 45%; /* Forma rotonda */
+object-fit: cover; /* Adatta l'immagine alla dimensione */
+}
+/* Pseudo-elementi per creare i glitch */
+.folder::before,
+.folder::after {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
 width: 100%;
 height: 100%;
-object-fit: contain;
-transition: transform 0.3s ease;
+background: inherit; /* Usa lo stesso sfondo dell'elemento */
+border-radius: inherit;
+z-index: -1; /* Dietro il contenuto */
+mix-blend-mode: screen; /* Crea un effetto di sovrapposizione */
+opacity: 0.7;
+}
+
+/* Colori glitchati */
+.folder::before {
+transform: translate(5px, -5px);
+filter: hue-rotate(250deg);
+animation: glitch-1 5s infinite;
+
+}
+
+.folder::after {
+transform: translate(-5px, 5px);
+filter: hue-rotate(300deg);
+animation: glitch-2 5s infinite;
 }
 
 /* Dati (data e studenti) nascosti di default */
 .folder-info {
 display: none;
-margin-top: 10px;
+margin-top: 20px;
 font-size: 16px;
 color: #333;
 }
@@ -303,7 +359,7 @@ display: block;
 .delete-button {
 display: none;
 padding: 5px 10px;
-background-color: rgb(219, 100, 100);
+background-color:rgb(6, 6, 6);
 color: white;
 border: none;
 border-radius: 5px;
@@ -315,5 +371,6 @@ margin-top: 10px;
 .folder:hover {
 transform: scale(0.95);
 box-shadow: 1 10px 12px rgba(0, 0, 0, 0.1);
+height: 250px; /* Aumenta l'altezza quando viene "hovered" */
 }
- 
+
