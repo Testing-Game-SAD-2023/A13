@@ -837,9 +837,9 @@ public class Controller {
           // Mappa ogni oggetto Friend in una mappa
           List<Map<String, String>> friends = friendEntities.stream().map(friend -> {
               Map<String, String> map = new HashMap<>();
-              map.put("id", String.valueOf(friend.getId()));
-              map.put("username", friend.getFriendUsername());
-              map.put("avatar", friend.getFriendAvatar());
+              map.put("friendId", String.valueOf(friend.getFriendId()));
+              map.put("friendUsername", friend.getFriendUsername());
+              map.put("friendAvatar", friend.getFriendAvatar());
               return map;
           }).collect(Collectors.toList());
   

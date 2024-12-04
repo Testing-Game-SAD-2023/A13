@@ -4,14 +4,14 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+//Created by GabMan 04/12
+@Table(name = "user_friend", schema = "studentsrepo") 
 @Data
 @Entity
-@Table(name = "user_friend", schema = "studentsrepo") // Adatta lo schema se necessario
 public class Friend {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
+//MAPPING NOMI DATABASE - NOMI CODICE
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 

@@ -25,10 +25,10 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
     @Transactional // Necessario per query di modifica
     @Query(value = "INSERT INTO Friend (user_id, friend_id, friend_username, friend_avatar) " +
                    "VALUES (:userId, :friendId, :friendUsername, :friendAvatar)", nativeQuery = true)
-    void addFriend(@Param("userId") Integer userId,
-                   @Param("friendId") Integer friendId,
-                   @Param("friendUsername") String friendUsername,
-                   @Param("friendAvatar") String friendAvatar);
+    void addFriend(@Param("user_id") Integer userId,
+                   @Param("friend_id") Integer friendId,
+                   @Param("friend_username") String friendUsername,
+                   @Param("friend_avatar") String friendAvatar);
     
     @Query("SELECT COUNT(f) > 0 FROM Friend f WHERE f.userId = :userId AND f.friendId = :friendId")
     boolean existsFriendship(@Param("userId") Integer userId, @Param("friendId") Integer friendId);

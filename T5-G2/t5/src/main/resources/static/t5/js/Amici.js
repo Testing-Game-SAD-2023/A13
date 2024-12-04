@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     throw new Error("Non sei autorizzato. Effettua il login.");
                 }
                 if (response.status === 404) {
-                    throw new Error("Nessun amico trovato.");
+                    throw new Error("Non hai ancora degli amici. Aggiungine uno!");
                 }
                 if (!response.ok) {
                     throw new Error("Errore durante il recupero della lista amici.");
