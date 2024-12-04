@@ -29,6 +29,9 @@ public class TeamService {
     @Autowired
     private JwtService jwtService;  // Servizio per la validazione del JWT
 
+    @Autowired
+    private StudentService studentService; //Servizio per mandare query al T23
+
     //Metodo per creare un nuovo Team
     public ResponseEntity<?> creaTeam(Team team, @CookieValue(name = "jwt", required = false) String jwt) {
 
@@ -215,54 +218,51 @@ public class TeamService {
           // Restituisce il team
           return ResponseEntity.ok().body(existingTeam);
     }
-        
-    //Modifica 03/12/2024: Aggiunta dell'aggiungiStudente
   
-    // Modifica 03/12/2024: Aggiunta dell'aggiungiStudente
+    //Modifica 03/12/2024: Aggiunta dell'aggiungiStudenti
     public ResponseEntity<?> aggiungiStudenti(String idTeam, List<String> idStudenti, String jwt) {
-        
-        // 1. Verifica se il token JWT è valido
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
-
-        // 2. Estrai l'ID dell'admin dal JWT
-        String adminUsername = jwtService.getAdminFromJwt(jwt);
-
-        // 3. Verifica se il team esiste
-        Team existingTeam = teamRepository.findById(idTeam).orElse(null);
-        if (existingTeam == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
-        }
-
-        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
-        TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
-        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
-        }
-
-        // 5. Filtra gli studenti già presenti nel team
-        List<String> nuoviStudenti = idStudenti.stream()
-            .filter(idStudente -> !existingTeam.getStudenti().contains(idStudente))
-            .collect(Collectors.toList()); // Modifica per utilizzare Collectors.toList()
-
-        if (nuoviStudenti.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tutti gli studenti forniti sono già associati al team.");
-        }
-
-        // 6. Aggiungi gli studenti validi al team
-        existingTeam.getStudenti().addAll(nuoviStudenti);
-
-        // 7. Aggiorna il numero di studenti
-        existingTeam.setNumStudenti(existingTeam.getStudenti().size());
-
-        // 8. Salva il team aggiornato
-        Team updatedTeam = teamRepository.save(existingTeam);
-
-        // 9. Restituisci il team aggiornato come risposta
-        return ResponseEntity.ok().body(updatedTeam);
+    
+    // 1. Verifica se il token JWT è valido
+    if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
     }
 
+    // 2. Estrai l'ID dell'admin dal JWT
+    String adminUsername = jwtService.getAdminFromJwt(jwt);
+
+    // 3. Verifica se il team esiste
+    Team existingTeam = teamRepository.findById(idTeam).orElse(null);
+    if (existingTeam == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
+    }
+
+    // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
+    TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
+    if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+    }
+
+    // 5. Filtra gli studenti già presenti nel team
+    List<String> nuoviStudenti = idStudenti.stream()
+        .filter(idStudente -> !existingTeam.getStudenti().contains(idStudente))
+        .collect(Collectors.toList()); // Modifica per utilizzare Collectors.toList()
+
+    if (nuoviStudenti.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tutti gli studenti forniti sono già associati al team.");
+    }
+
+    // 6. Aggiungi gli studenti validi al team
+    existingTeam.getStudenti().addAll(nuoviStudenti);
+
+    // 7. Aggiorna il numero di studenti
+    existingTeam.setNumStudenti(existingTeam.getStudenti().size());
+
+    // 8. Salva il team aggiornato
+    Team updatedTeam = teamRepository.save(existingTeam);
+
+    // 9. Restituisci il team aggiornato come risposta
+    return ResponseEntity.ok().body(updatedTeam);
+}
 
     //Modifica 04/12/2024: Aggiunta ottieniStudentiTeam
     public ResponseEntity<?> ottieniStudentiTeam(String idTeam, String jwt) {
@@ -287,16 +287,17 @@ public class TeamService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per visualizzare gli studenti di questo team.");
         }
 
-        // 5. Recupera la lista degli studenti dal team
-        List<String> studenti = existingTeam.getStudenti();
-        if (studenti == null || studenti.isEmpty()) {
+        // 5. Recupera la lista degli id degli studenti dei team
+        List<String> studentiIds = existingTeam.getStudenti(); //Lista di id degli studenti
+        if (studentiIds == null || studentiIds.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Non ci sono studenti associati a questo team.");
         }
 
-        // 6. Restituisci la lista degli studenti
-        return ResponseEntity.ok(studenti);
+    // 6. Invoca il servizio T23 per ottenere i dettagli degli utenti
+       
+        return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentiIds,jwt));
     }
 
-}
+    }
 
 

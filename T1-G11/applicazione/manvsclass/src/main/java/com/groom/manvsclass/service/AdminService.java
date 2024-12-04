@@ -765,5 +765,10 @@ public class AdminService {
         return new ModelAndView("redirect:/loginAdmin");
     }
 
+    public String getUsernameAdmin(String jwt) {
+        if(jwtService.isJwtValid(jwt)){return jwtService.getAdminFromJwt(jwt);}
+        return "devi prima loggarti!";
+    }
+
 
 }

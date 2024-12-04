@@ -47,7 +47,7 @@ public class JwtService {
                 .compact(); //.compact() serve a compattare il token JWT in una stringa valida che può essere facilmente trasferita tramite HTTP o memorizzata in altri luoghi di archiviazione come cookie
     }
 
-    // Estrae l'ID dell'admin dal JWT
+    // Estrae l'username dell'admin dal JWT
     public String getAdminFromJwt(String jwt) {
         try {
             Claims claims = Jwts.parser()
@@ -59,10 +59,12 @@ public class JwtService {
             // Estrae l'ID dell'admin dalla claim
             return claims.getSubject();
         } catch (Exception e) {
-            System.err.println("Errore nell'estrazione dell'email dell'admin: " + e);
+            System.err.println("Errore nell'estrazione dell'username dell'admin: " + e);
             return null; // Ritorna null se non riesce a estrarre l'ID
         }
     }
+
+    
 }
 
     
