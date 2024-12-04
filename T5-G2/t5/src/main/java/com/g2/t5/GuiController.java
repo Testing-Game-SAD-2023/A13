@@ -49,6 +49,7 @@ import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -373,28 +374,25 @@ public class GuiController {
             @PathVariable(value = "statistic") String statistic,
             @PathVariable(value = "startPos") int startPos,
             @PathVariable(value = "endPos") int endPos) {
-        // Prendo playerID e statistica
+
         String playerStatsList = (String) serviceManager.handleRequest("T4", "getPositions", gamemode, statistic,
                 startPos, endPos);
         JSONObject playerStatsJson = new JSONObject(playerStatsList);
 
-        // Chiamata al T23 per la lista di utenti -> prendo nomi e cognomi
-        // String userList = (String) serviceManager.handleRequest("T23", "GetUsers");
-        // JSONObject userListJson= new JSONObject(userList);
+        List<User> userList = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
 
-        // playerStatsJson.get(UserId);
-        //
-        // //Incrocio sull'ID
-        // for (int i=0; i<playerStatsList.size();i++){
-        // Long currentPlayerId= playerStatsList.get(i).getPlayerId();
-        // for(int e=0; e<userList.size();e++){
-        // if(userList.get(e).getId()==currentPlayerId){
-        // playerStatsList.get(i).setName(userList.get(e).getName());
-        // playerStatsList.get(i).setSurname(userList.get(e).getSurname());
-        // }
-        // }
-        // }
-        //
+        JSONArray positions = playerStatsJson.getJSONArray("positions");
+
+        for (int i = 0; i < positions.length(); i++) {
+            JSONObject position = positions.getJSONObject(i);
+            Long currentPlayerId = position.getLong("userId");
+            for (int e = 0; e < userList.size(); e++) {
+                if (userList.get(e).getId() == currentPlayerId) {
+                    position.put("userId", userList.get(e).getEmail());
+                }
+            }
+        }
+
         return ResponseEntity.ok(playerStatsJson.toString());
     }
 
