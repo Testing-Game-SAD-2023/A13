@@ -620,7 +620,7 @@ public class Controller {
     public List<User> getAllStudents() {
         return userRepository.findAll();
     }
-
+    
     @GetMapping("/students_list/{ID}")
     @ResponseBody
     public User getStudent(@PathVariable String ID) {
