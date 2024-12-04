@@ -579,7 +579,7 @@ public ResponseEntity<String> removeFriend(
 
     //GabMan 03/12 (Ottengo lista amici)
     @GetMapping("/getFriendlist")
-public ResponseEntity<List<Map<String, String>>> getFriend(@CookieValue(name = "jwt", required = false) String jwt) {
+public ResponseEntity<List<Map<String, String>>> getFriendlist(@CookieValue(name = "jwt", required = false) String jwt) {
     try {
         // Verifica che il token JWT esista
         if (jwt == null || jwt.isEmpty()) {

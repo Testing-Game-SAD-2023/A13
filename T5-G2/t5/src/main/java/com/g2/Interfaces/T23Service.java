@@ -70,7 +70,7 @@ import org.springframework.web.util.UriComponentsBuilder;
          ));
 
          registerAction("getFriendlist", new ServiceActionDefinition(
-                 params -> getFriends((String) params[0])
+                 params -> getFriendlist((String) params[0])
          ));
 
          /////NON TESTATO
@@ -191,7 +191,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 }
 //GabMan 03/12
      // Metodo per ottenere la lista degli amici
-     public List<Map<String, String>> getFriends(String userId) {
+     public List<Map<String, String>> getFriendlist(String userId) {
         final String endpoint = "/getFriendlist";
            // Creazione del payload come MultiValueMap
         MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();

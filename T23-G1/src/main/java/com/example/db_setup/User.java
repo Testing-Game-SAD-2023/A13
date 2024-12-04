@@ -68,3 +68,4 @@ public class User {
     this.nickname = nickname;
     }
 }
+
