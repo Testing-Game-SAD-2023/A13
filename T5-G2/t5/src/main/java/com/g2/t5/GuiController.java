@@ -185,8 +185,8 @@ public class GuiController {
     } catch (Exception e) {
         System.out.println("Error fetching biography: " + e.getMessage());
         return ResponseEntity.status(500).body(null);
+    }   
     }
-}
 
 
     //fine modifiche 
@@ -362,7 +362,7 @@ public class GuiController {
          * scalataName, dal quale è possibile risalire a tutte le informazioni relative quella specifica "Scalata"
          */
 
- /*
+        /*
         * Verifica dell'autenticità del player controllando che l'header identificato dal: "X-UserID" sia lo stesso
         * associato all'utente identificato da "playerID"
          */
@@ -467,7 +467,6 @@ public class GuiController {
 
 //by Gabman 30/11 Endpoint Amici.js-T23Service
 
-}
 /*  Metodo per aggiungere un amico
 @PostMapping("/addFriend")
 public ResponseEntity<String> addFriend(
