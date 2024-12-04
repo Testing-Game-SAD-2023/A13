@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Notification {
-    
+
     @JsonProperty("id")
     private Long id;
     @JsonProperty("title")
@@ -23,6 +23,9 @@ public class Notification {
         this.message = message;
         this.timestamp = timestamp;
         this.isRead = isRead;
+    }
+
+    public Notification() {
     }
 
     public Long getId() {
@@ -55,5 +58,5 @@ public class Notification {
     public void setIsRead(Boolean isRead) {
         this.isRead = isRead;
     }
-    
+
 }

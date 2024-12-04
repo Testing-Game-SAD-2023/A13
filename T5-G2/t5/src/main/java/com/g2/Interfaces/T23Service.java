@@ -17,8 +17,8 @@
 
 package com.g2.Interfaces;
 
-import java.util.*;
-import javax.management.Notification;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.g2.Model.Notification;
 import com.g2.Model.User;
 
 @Service
@@ -56,22 +57,22 @@ public class T23Service extends BaseService {
                 String.class, String.class, String.class
         ));
 
-        registerAction("GetNotifications", new ServiceActionDefinition(
+        registerAction("getNotifications", new ServiceActionDefinition(
                 params -> getNotifications((String) params[0]),
                 String.class
         ));
 
-        registerAction("UpdateNotification", new ServiceActionDefinition(
+        registerAction("updateNotification", new ServiceActionDefinition(
                 params -> updateNotification((String) params[0], (String) params[1]),
                 String.class, String.class
         ));
 
-        registerAction("DeleteNotification", new ServiceActionDefinition(
+        registerAction("deleteNotification", new ServiceActionDefinition(
                 params -> deleteNotification((String) params[0], (String) params[1]),
                 String.class, String.class
         ));
 
-        registerAction("ClearNotifications", new ServiceActionDefinition(
+        registerAction("clearNotifications", new ServiceActionDefinition(
                 params -> clearNotifications((String) params[0]),
                 String.class
         ));
@@ -133,12 +134,12 @@ public class T23Service extends BaseService {
 
     public String updateNotification(String userEmail, String notificationID) {
         final String endpoint = "/update_notification";
-    
+
         // Imposta i dati del form
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("email", userEmail);
         formData.add("id notifica", notificationID);
-    
+
         // Effettua una chiamata POST per aggiornare lo stato della notifica
         return callRestPost(endpoint, formData, null, String.class);
     }
@@ -163,7 +164,7 @@ public class T23Service extends BaseService {
 
         return callRestDelete(endpoint, queryParams);
     }
-        
-    
+
+
 
 }

@@ -53,12 +53,11 @@ import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.AchievementProgress;
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
+import com.g2.Model.Notification;
 import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
-import com.g2.Model.UserProfile;
-import com.g2.Model.Achievement;
 import com.g2.Service.AchievementService;
 import com.g2.Service.UserProfileService;
 
@@ -157,6 +156,15 @@ public class GuiController {
         String image = userProfileService.getProfilePicture(userId);
         String bio = userProfileService.getProfileBio(userId);
 
+        // Mi prendo le notifiche
+        List<Notification> notifications = (List<Notification>) serviceManager.handleRequest("T23", "getNotifications", email);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        for (Notification notification : notifications) {
+            String formattedate = notification.getTimestamp().format(formatter).toString();
+            model.addAttribute("formattedDate", formattedate);
+        }
+
         // Mi prendo i progressi degli achievement
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
 
@@ -187,6 +195,8 @@ public class GuiController {
         GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
         GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
 
+        GenericObjectComponent objNotifications = new GenericObjectComponent("notifications", notifications);
+
         // Aggiungo i componenti alla pagina
         profile.setObjectComponents(objEmail);
         profile.setObjectComponents(objStudies);
@@ -200,6 +210,7 @@ public class GuiController {
         profile.setObjectComponents(objStatisticProgresses);
         profile.setObjectComponents(objIdToStatistic);
         profile.setObjectComponents(objUserID);
+        profile.setObjectComponents(objNotifications);
         //TODO: Aggiungere componenti missioni e notifiche
 
         return profile.handlePageRequest();
@@ -461,7 +472,7 @@ public class GuiController {
         System.out.println("Checking achievements...");
 
         //Voglio notificare l'utente dei nuovi achievement
-        
+
         // Mi prendo prima tutti gli utenti
         @SuppressWarnings("unchecked")
         List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
