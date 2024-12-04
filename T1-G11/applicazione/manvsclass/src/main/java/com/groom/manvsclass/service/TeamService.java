@@ -5,6 +5,7 @@
 package com.groom.manvsclass.service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,8 +85,9 @@ public class TeamService {
     }
 
     // Metodo per generare un ID univoco (esempio con UUID)
-    private String generateUniqueId() {
-        return java.util.UUID.randomUUID().toString();
+    //Modifica 04/12/2024
+    public static String generateUniqueId() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 
     // Elimina un team dato il nome del team
@@ -294,7 +296,6 @@ public class TeamService {
         }
 
     // 6. Invoca il servizio T23 per ottenere i dettagli degli utenti
-       
         return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentiIds,jwt));
     }
 
