@@ -2,12 +2,8 @@
 
 package com.g2.Service;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,8 +39,8 @@ public class UserProfileService{
    //Prendo tutte le immagini fra le quali posso selezionare la mia
    public List<String> getAllProfilePictures(){
 
-   // Mi prendo le foto 
-   /* 
+   // Mi prendo le foto
+   /*
     List<String> list_images = new ArrayList<>();
     String directoryPath = "profileImages";
     URL resource = getClass().getClassLoader().getResource(directoryPath);
@@ -83,9 +79,15 @@ public class UserProfileService{
     */
 
     List<String> list_images = new ArrayList<>();
-    list_images.add("defaultProfilePicture.png");
-    list_images.add("SimpleFemale.png");
-    list_images.add("SimpleMale.png");
+    list_images.add("default.png");
+    list_images.add("men-1.png");
+    list_images.add("men-2.png");
+    list_images.add("men-3.png");
+    list_images.add("men-4.png");
+    list_images.add("women-1.png");
+    list_images.add("women-2.png");
+    list_images.add("women-3.png");
+    list_images.add("women-4.png");
 
     return list_images;
 }
@@ -100,7 +102,7 @@ public String getProfilePicture(int playerID){
 
    // Mi prendo l'utente che mi interessa con l'id
    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-   
+
    List<String> list_images=this.getAllProfilePictures();
 
     //Verifico la validità del path
@@ -116,7 +118,7 @@ public String getProfilePicture(int playerID){
     if(propicvalid){
         return user.getUserProfile().getProfilePicturePath();
     }
-        
+
    return null;
 }
 

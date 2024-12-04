@@ -36,7 +36,7 @@ public class UserProfile {
     public String bio = "Test addicted...";
 
     // Nome dell'immagine, usata come parte finale del path nel servizio dove sono salvate le immagini
-    public String profilePicturePath = "defaultProfilePicture.png";
+    public String profilePicturePath = "default.png";
 
     @OneToMany
     @JoinTable(
