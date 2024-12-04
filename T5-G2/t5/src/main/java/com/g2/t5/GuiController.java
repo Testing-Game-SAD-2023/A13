@@ -572,7 +572,7 @@ public ResponseEntity<List<Map<String, String>>> getFriendlist(@CookieValue(name
         String userId = map.get("userId").toString();
 
         // Chiamata al servizio T23 per ottenere la lista amici
-        List<Map<String, String>> friendlist = t23Service.getFriends(userId);
+        List<Map<String, String>> friendlist = t23Service.getFriendlist(userId);
         if (friendlist != null && !friendlist.isEmpty()) {
             return ResponseEntity.ok(friendlist);
         } else {
