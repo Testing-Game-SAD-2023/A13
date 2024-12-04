@@ -108,7 +108,7 @@ function Scalata() {
   });
 }
 
-/* function Gestisci_Team() {
+ function Gestisci_Team() {
   fetch('/gestione_team', {
     method: 'GET',
     headers: {
@@ -137,8 +137,5 @@ function Scalata() {
     alert("Si è verificato un errore durante il reindirizzamento alla pagina di gestione dei team.");
   });
 }
- */
 
-function Gestisci_Team() {
-  window.location.href = "/gestione_team.html";
-}
+
