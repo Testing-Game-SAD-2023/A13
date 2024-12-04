@@ -890,3 +890,50 @@ button.btn:hover {
   padding: 10px 20px; /* Spaziatura pulsante */
   font-size: 1rem; /* Dimensione testo */
 }
+#avatarSelection {
+  display: none;
+  position: absolute; /* Posiziona la tendina in modo assoluto */
+  top: 50px; /* Distanza dalla parte superiore della colonna */
+  left: 0;  /* Allineamento a sinistra */
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  width: 200px;  /* Imposta una larghezza fissa per la tendina */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Aggiungi un'ombra per una visibilità migliore */
+  z-index: 10; /* Assicurati che la tendina si sovrapponga agli altri contenuti */
+}
+
+.avatar-option {
+  width: 50px;
+  height: 50px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.avatar-option.selected {
+  border: 2px solid #007bff; /* Aggiungi un bordo per l'immagine selezionata */
+}
+
+#saveAvatarButton {
+  display: block;
+  margin: 10px auto; /* Centra il pulsante */
+  width: 100%; /* Rende il pulsante largo quanto la tendina */
+}
+.col-210 {
+  display: flex;
+  flex-direction: column; /* Allinea gli elementi verticalmente */
+  align-items: center;    /* Centra gli elementi orizzontalmente */
+  justify-content: center; /* Allinea gli elementi al centro */
+  padding: 10px;
+}
+
+#currentProfilePicture {
+  width: 100px; /* Imposta la larghezza dell'immagine */
+  height: 100px; /* Imposta l'altezza dell'immagine */
+}
+
+#modifyAvatarButton {
+  margin-top: 10px; /* Aggiungi uno spazio tra l'immagine e il pulsante */
+}
