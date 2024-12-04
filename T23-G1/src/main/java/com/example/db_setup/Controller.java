@@ -623,6 +623,7 @@ public class Controller {
         return userRepository.findByID(Integer.parseInt(ID));
     }
 
+    //MODIFICA 26/11/24 per il profilo
     @GetMapping("/profile_by_email")
     @ResponseBody
     public UserProfile getProfileByEmail(@RequestParam("email") String email) {
@@ -637,7 +638,6 @@ public class Controller {
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false); // Ritorna false in caso di errore
         }
-
         profile.setBio(bio);
         profile.setProfilePicturePath(profilePicturePath);
         userService.saveProfile(profile);
@@ -645,6 +645,7 @@ public class Controller {
         return ResponseEntity.ok(true); // Ritorna true se l'operazione ha avuto successo
     }
 
+    //MODIFICA 26/11/24 per le notifiche
     @PostMapping("/new_notification")
     public ResponseEntity<String> updateNotifications(@RequestParam("email") String email,
                                                     @RequestParam("title") String title,
