@@ -1,16 +1,21 @@
 package com.groom.manvsclass.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.repository.TeamRepository;
 import com.groom.manvsclass.model.repository.TeamSearchImpl;
 import com.groom.manvsclass.service.JwtService;
+import com.groom.manvsclass.model.User;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,35 +112,63 @@ public class TeamService {
         return ResponseEntity.ok(searchRepository.findTeamsByLeader(leaderId));
     }
 
-    // Metodo per aggiungere un membro al team
-    public ResponseEntity<String> addMemberToTeam(String teamName, String memberId, String jwt) {
+    
+    public ResponseEntity<String> addMemberToTeam(String teamName, List<String> selectedMemberIds, String jwt) {
         // Verifica la validità del token JWT
         if (!jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
-
-        // Chiamata al container T2-3 per verificare il membro
-        String t2_3Url = "http://t23-g1-app-1:8080" + memberId; // URL dell'API T2-3
+    
+        // Chiamata al container T2-3 per ottenere tutti gli studenti
+        String t2_3Url = "http://t23-g1-app-1:8080/students_list"; // URL per ottenere tutti gli studenti
+        List<User> allStudents;
+    
         try {
-            ResponseEntity<String> t2_3Response = restTemplate.getForEntity(t2_3Url, String.class);
-
-            if (t2_3Response.getStatusCode() != HttpStatus.OK) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found in T2-3");
+            // Crea l'header con il JWT usando il metodo di JwtService
+            HttpEntity<Void> entity = jwtService.createJwtRequestEntity(jwt);  // Qui non è necessario fare altro, è già un HttpEntity
+    
+            // Esegui la chiamata GET per ottenere gli studenti
+            ResponseEntity<List<User>> response = restTemplate.exchange(
+                t2_3Url,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<List<User>>() {}
+            );
+    
+            if (response.getStatusCode() != HttpStatus.OK) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving students from T2-3");
             }
-
+    
+            allStudents = response.getBody();
+    
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error connecting to T2-3");
         }
-
-        // Aggiungi il membro al team in MongoDB (T1)
-        try {
-            searchRepository.addMemberToTeam(teamName, memberId);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating the team");
+    
+        // Visualizza tutti gli studenti e aggiungi i selezionati al team in MongoDB (T1)
+        for (String memberId : selectedMemberIds) {
+            // Verifica che il membro selezionato esista tra gli studenti di T2-3
+            boolean memberFound = allStudents.stream()
+                .anyMatch(student -> student.getID().equals(Integer.parseInt(memberId)));
+    
+            if (!memberFound) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found in T2-3: " + memberId);
+            }
+    
+            // Aggiungi il membro al team in MongoDB (T1)
+            try {
+                searchRepository.addMemberToTeam(teamName, memberId);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating the team with member " + memberId);
+            }
         }
-
-        return ResponseEntity.ok("Member added successfully");
+    
+        return ResponseEntity.ok("Members added successfully");
     }
+    
+
+
+
 
 
     // Rimuove un membro dal team

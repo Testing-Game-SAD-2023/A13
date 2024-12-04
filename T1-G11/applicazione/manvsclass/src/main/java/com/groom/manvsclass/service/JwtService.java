@@ -3,6 +3,8 @@
  */
 package com.groom.manvsclass.service;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
@@ -46,4 +48,10 @@ public class JwtService {
                 .compact(); //.compact() serve a compattare il token JWT in una stringa valida che può essere facilmente trasferita tramite HTTP o memorizzata in altri luoghi di archiviazione come cookie
     }
 
+    // Metodo per creare l'header della richiesta con il JWT
+    public HttpEntity<Void> createJwtRequestEntity(String jwt) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwt); // Imposta l'header Authorization con il JWT
+        return new HttpEntity<>(headers);  // Restituisce l'entity con il JWT nell'header
+    }
 }
