@@ -126,6 +126,14 @@
         return adminService.showGestioneAssignments(request,jwt);
     }
 
+    /* Modifica 04/12/2024: Aggiunta endpoint getUsernameAdmin */
+    //Serve al front-end
+    @GetMapping("/usernameAdmin")
+    @ResponseBody
+    public String getUsernameAdmin(@CookieValue(name = "jwt", required = false) String jwt){
+        return adminService.getUsernameAdmin(jwt);
+    }
+
      //Solo x testing
      @GetMapping("/getLikes/{name}")
      @ResponseBody

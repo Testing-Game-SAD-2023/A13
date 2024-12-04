@@ -39,6 +39,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +58,7 @@ import org.springframework.ui.ModelMap;
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 import com.example.db_setup.Service.OAuthUserGoogleService;
+import com.example.db_setup.Service.UserService;
 import com.example.db_setup.Language.*;
 import org.springframework.web.servlet.LocaleResolver;
 //MODIFICA (Deserializzazione risposta JSON)
@@ -65,6 +67,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 public class Controller {
+
+    //Modifica 04/12/2024
+    @Autowired
+    UserService userService;
 
     @Autowired
     private UserRepository userRepository;
@@ -621,6 +627,13 @@ public class Controller {
         return userRepository.findAll();
     }
     
+    //Modifica 04/12/2024: Aggiunta rotta
+    @PostMapping("/studentiTeam")
+    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idUtenti){
+        System.out.println("AAAAA");
+        return userService.getStudentiTeam(idUtenti);
+    }
+
     @GetMapping("/students_list/{ID}")
     @ResponseBody
     public User getStudent(@PathVariable String ID) {

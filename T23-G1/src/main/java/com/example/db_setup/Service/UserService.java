@@ -3,9 +3,13 @@ package com.example.db_setup.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.db_setup.OAuthUserGoogle;
 
@@ -63,20 +67,63 @@ public class UserService {
 
         return token;
     }
+
     // Genera un token JWT per l'utente specificato, forse si deve cambiare
     public static String generateToken(User user) {
-    Instant now = Instant.now();
-    Instant expiration = now.plus(1, ChronoUnit.HOURS);
-    // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
-    String token = Jwts.builder()
-            .setSubject(user.getEmail())
-            .setIssuedAt(Date.from(now))
-            .setExpiration(Date.from(expiration))
-            .claim("userId", user.getID())
-            .claim("role", "user")
-            .signWith(SignatureAlgorithm.HS256, "mySecretKey")
-            .compact();
+        Instant now = Instant.now();
+        Instant expiration = now.plus(1, ChronoUnit.HOURS);
+        // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
+        String token = Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiration))
+                .claim("userId", user.getID())
+                .claim("role", "user")
+                .signWith(SignatureAlgorithm.HS256, "mySecretKey")
+                .compact();
 
-    return token;
-}
-}
+        return token;
+    }
+  
+    //Modifica 04/12/2024
+    public ResponseEntity<?> getStudentiTeam(List<String> idUtenti) {
+        System.out.println("Inizio metodo getStudentiTeam. ID ricevuti: " + idUtenti);
+    
+            // Controlla se la lista di ID è vuota
+        if (idUtenti == null || idUtenti.isEmpty()) {
+            System.out.println("La lista degli ID è vuota.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Lista degli ID vuota.");
+        }
+    
+        try {
+        // Converte gli ID in interi
+            List<Integer> idIntegerList = idUtenti.stream()
+                                                      .map(Integer::valueOf)
+                                                      .toList();
+    
+                // Recupera gli utenti dal database
+                List<User> utenti = userRepository.findAllById(idIntegerList);
+    
+                // Verifica se sono stati trovati utenti
+                if (utenti == null || utenti.isEmpty()) {
+                    System.out.println("Nessun utente trovato per gli ID forniti.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nessun utente trovato.");
+                }
+    
+                System.out.println("Utenti trovati: " + utenti);
+    
+                // Restituisce la lista di utenti trovati
+                return ResponseEntity.ok(utenti);
+    
+            } catch (NumberFormatException e) {
+                System.out.println("Errore durante la conversione degli ID: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                     .body("Formato degli ID non valido. Devono essere numeri interi.");
+            } catch (Exception e) {
+                System.out.println("Errore durante il recupero degli utenti: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                     .body("Errore interno del server.");
+            }
+        }
+        
+    }

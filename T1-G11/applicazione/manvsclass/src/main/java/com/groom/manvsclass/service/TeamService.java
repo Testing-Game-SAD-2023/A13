@@ -29,6 +29,9 @@ public class TeamService {
     @Autowired
     private JwtService jwtService;  // Servizio per la validazione del JWT
 
+    @Autowired
+    private StudentService studentService; //Servizio per mandare query al T23
+
     //Metodo per creare un nuovo Team
     public ResponseEntity<?> creaTeam(Team team, @CookieValue(name = "jwt", required = false) String jwt) {
 
@@ -215,10 +218,8 @@ public class TeamService {
           // Restituisce il team
           return ResponseEntity.ok().body(existingTeam);
     }
-        
-    //Modifica 03/12/2024: Aggiunta dell'aggiungiStudente
   
-    //Modifica 03/12/2024: Aggiunta dell'aggiungiStudente
+    //Modifica 03/12/2024: Aggiunta dell'aggiungiStudenti
     public ResponseEntity<?> aggiungiStudenti(String idTeam, List<String> idStudenti, String jwt) {
     
     // 1. Verifica se il token JWT è valido
@@ -286,14 +287,15 @@ public class TeamService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per visualizzare gli studenti di questo team.");
         }
 
-        // 5. Recupera la lista degli studenti dal team
-        List<String> studenti = existingTeam.getStudenti();
-        if (studenti == null || studenti.isEmpty()) {
+        // 5. Recupera la lista degli id degli studenti dei team
+        List<String> studentiIds = existingTeam.getStudenti(); //Lista di id degli studenti
+        if (studentiIds == null || studentiIds.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Non ci sono studenti associati a questo team.");
         }
 
-        // 6. Restituisci la lista degli studenti
-        return ResponseEntity.ok(studenti);
+    // 6. Invoca il servizio T23 per ottenere i dettagli degli utenti
+       
+        return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentiIds,jwt));
     }
 
     }
