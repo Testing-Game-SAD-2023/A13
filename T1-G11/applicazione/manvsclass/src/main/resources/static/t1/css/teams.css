@@ -264,6 +264,7 @@ background: transparent;
 border: none;
 box-shadow: none;
 position: relative;
+cursor: pointer;
 }
 
 /* Immagine della cartella */

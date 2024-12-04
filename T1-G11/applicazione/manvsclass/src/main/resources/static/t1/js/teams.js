@@ -53,16 +53,25 @@ function renderFolders(data){
             const span = document.createElement("span");
             span.textContent = item.name;
 
-            const info2 = document.createElement("p");
+            const info1 = document.createElement("p");
             // Formattazione della data
             const formattedDate = new Date(item.creationDate).toLocaleDateString('it-IT');
-            info2.textContent = `Creato il: ${formattedDate }`;
-            info2.classList.add("folder-info");
-
-            const info1 = document.createElement("p");
-            info1.textContent = `Totale studenti: ${item.numeroStudenti}`;
+            info1.textContent = `Creato il: ${formattedDate }`;
             info1.classList.add("folder-info");
+            info1.id="info-date";
 
+            const info2 = document.createElement("p");
+            if(!item.numeroStudenti){
+                info2.textContent = `Totale studenti: -`;
+            }else{
+                info2.textContent = `Totale studenti: ${item.numeroStudenti}`;
+            }
+            info2.classList.add("folder-info");
+            info2.id="info-student";
+            const info3 = document.createElement("p");
+            info3.textContent=`Codice Team: ${item.idTeam}`;
+            info3.id="info-id";
+            info3.classList.add("folder-info");
             const deleteButton = document.createElement("button");
             deleteButton.classList.add("delete-button");
             deleteButton.textContent = "Delete";
@@ -71,6 +80,7 @@ function renderFolders(data){
             folder.appendChild(span);
             folder.appendChild(info1);
             folder.appendChild(info2);
+            folder.appendChild(info3);
             folder.appendChild(deleteButton);
             folderContainer.appendChild(folder);
  
@@ -130,12 +140,17 @@ function searchTeamByName(name) {
 
     folders.forEach((folder) => {
         const teamName = folder.querySelector("span").textContent.trim();
+        const info_id = folder.querySelector("#info-id").textContent;
+        const teamId = info_id.split(":")[1].trim();
         if (teamName.toLowerCase() === name.toLowerCase()) {
             found = true;
             folderContainer.appendChild(folder.cloneNode(true)); // Mostra solo il team trovato
+            folderContainer.addEventListener("click", () => {
+                window.location.href = `/visualizzaTeam/${teamId}`;  // Reindirizza alla pagina di dettagli, passando l'ID
+            });
         }
+        
     });
-
     if (!found) {
         alert("Nessun team trovato con questo nome.");
         folderContainer.innerHTML = "<p>Nessun risultato trovato.</p>";
