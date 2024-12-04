@@ -29,8 +29,10 @@
         <textarea id="bio-input" placeholder="Inserisci la tua bio" th:attr="placeholder=${bio}"></textarea>
 
         <!-- Pulsante per salvare -->
-        <button id="save-button">Salva</button>
+        <button id="save-button" th:text="#{editProfile.save}">Salva</button>
     </main>
+
+    <div th:replace="fragments/footer :: footer"></div>
 
     <script src="/t5/js/profile-edit.js"></script>
 </body>

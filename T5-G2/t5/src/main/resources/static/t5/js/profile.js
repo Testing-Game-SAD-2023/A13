@@ -1,18 +1,3 @@
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return null;
-}
-
-const parseJwt = (token) => {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch (e) {
-    return null;
-  }
-};
-
 document.addEventListener("DOMContentLoaded", function () {
   // Gestione dei tab dei trofei
   const trophyTabs = document.querySelectorAll('#trophyTabs button[data-bs-toggle="tab"]');
