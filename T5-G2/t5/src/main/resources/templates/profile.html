@@ -32,13 +32,22 @@
                     <img th:src="${propic != null ? '/t5/images/profileImages/' + propic : '/t5/images/sample_propic.jpg'}"
                          class="rounded me-3" style="width: 80px; height: 80px;" alt="Profile Picture">
                     <div>
-                        <h5 th:text="${username}"></h5>
-                        <p class="text-secondary" th:text="${surname}"></p>
-                        <p th:text="${email}"></p>
-                        <button class="btn btn-custom btn-sm" onclick="location.href='/edit_profile'">Modifica Profilo</button>
+                        <h5 class="user-name" th:text="${username} + ' ' + ${surname}"></h5>
+                        <p id="user-email" th:text="${email}"></p>
+                        <div class="bio-box" th:if="${bio != null}">
+                            <p th:text="${bio}">Inserisci una bio...</p>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn btn-custom btn-sm" onclick="location.href='/edit_profile'">Modifica Profilo</button>
+                            <button class="btn btn-custom btn-sm" onclick="location.href='/profile'">Team</button>
+                        </div>
                     </div>
                     <div class="ms-auto">
-                        <span><i class="fas fa-coins"></i> Token: <span th:text="${tokens}"></span></span>
+                        <!--<span><i class="fas fa-coins"></i> Token: <span th:text="${tokens}"></span></span>-->
+                        <div class="token-container">
+                            <i class="fas fa-coins"></i>
+                            Token: <span th:text="0"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -46,16 +55,33 @@
             <!-- Notifiche -->
             <div class="card mb-3">
                 <div class="card-header">Notifiche</div>
-                <div class="card-body" style="height: 150px; overflow-y: auto;">
-                    <p th:if="${notifications == null || notifications.isEmpty()}">Nessuna notifica disponibile.</p>
-                    <ul th:if="${notifications != null && !notifications.isEmpty()}">
-                        <li th:each="notification : ${notifications}">
-                            <strong th:text="${notification.title}"></strong>: <span th:text="${notification.message}"></span><br>
-                            <small th:text="${formattedDate}"></small><br>
-                            <span th:if="${notification.isRead}">Letta</span>
-                            <span th:unless="${notification.isRead}">Non letta</span>
-                        </li>
-                    </ul>
+                <div class="card-body notifications-container">
+                    <!-- Messaggio se non ci sono notifiche -->
+                    <p th:if="${notifications == null || notifications.isEmpty()}" class="no-notifications">
+                        Nessuna notifica disponibile.
+                    </p>
+
+                    <!-- Lista notifiche -->
+                    <div class="notifications-list" th:if="${notifications != null && !notifications.isEmpty()}">
+                        <div th:each="notification : ${notifications}"
+                             class="notification-item"
+                             th:attr="data-notification-id=${notification.id}">
+                            <div class="notification-content">
+                                <strong th:text="${notification.title}"></strong>
+                                <p th:text="${notification.message}"></p>
+                                <small th:text="${formattedDate}"></small>
+                                <div class="notification-status-badge"
+                                    th:classappend="${notification.isRead != null && notification.isRead ? 'status-read' : 'status-unread'}"
+                                    th:text="${notification.isRead != null ? (notification.isRead ? 'Letta' : 'Non letta') : 'Non letta'}">
+                                </div>
+                            </div>
+                            <!-- Pulsanti -->
+                            <div class="notification-actions">
+                                <button class="action-btn read-btn">Leggi</button>
+                                <button class="action-btn delete-btn">Elimina</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -97,6 +123,12 @@
                                     <div class="achievement-details">
                                         <h5 th:text="${achievement.name}"></h5>
                                         <p th:text="${achievement.description}"></p>
+                                        <div class="progress achievement-progress">
+                                            <div class="progress-bar" role="progressbar"
+                                                 th:style="'width:' + ${achievement.progress}*100/${achievement.progressRequired} + '%'"
+                                                 th:text="${achievement.progress} + '/' + ${achievement.progressRequired}">
+                                            </div>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>

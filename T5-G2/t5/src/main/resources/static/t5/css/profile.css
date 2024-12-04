@@ -71,6 +71,31 @@ body {
 }
 
 /* Profilo Utente */
+.user-name {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Stili per il gruppo di bottoni */
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-custom {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #0056b3;
+}
+
 .card-body.d-flex {
     display: flex;
     align-items: center;
@@ -100,6 +125,40 @@ body {
     background-color: #0056b3;
 }
 
+.token-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+}
+
+.token-container i {
+    color: #ffd700; /* Colore dorato per l'icona delle monete */
+}
+
+/* Bio */
+.card-body p.text-muted {
+    font-size: 0.9rem;
+    color: #fff9f9; /* Colore per la bio */
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.bio-box {
+    background: linear-gradient(145deg, #2d2d45, #323250);
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+}
+
+.bio-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(145deg, #323250, #2d2d45);
+}
+
 /* Achievements Tab */
 .nav-tabs .nav-link {
     color: #ccc;
@@ -118,14 +177,159 @@ body {
     color: #fff;
 }
 
-/* Notifiche */
-.notifications {
-    overflow-y: auto;
-    max-height: 150px;
+/* Stile della card principale */
+.card {
+    background-color: #2a2a42;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
 }
 
-.notifications p {
-    color: #aaa;
+.card-header {
+    background-color: #343a40;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 15px;
+    border-bottom: 2px solid #444;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Container principale delle notifiche */
+.notifications-container {
+    padding: 0;
+    background-color: #2a2a42;
+}
+
+/* Lista delle notifiche */
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+}
+
+/* Singola notifica */
+.notification-item {
+    background: linear-gradient(145deg, #2d2d45, #323250);
+    padding: 16px;
+    border-radius: 12px;
+    border-left: 4px solid #3498db;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Contenuto della notifica */
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notification-content strong {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.notification-content span {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.notification-content small {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+/* Badge di stato */
+.notification-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.status-read {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #2ecc71;
+}
+
+.status-unread {
+    background-color: rgba(243, 156, 18, 0.2);
+    color: #f1c40f;
+}
+
+/* Pulsanti azione */
+.notification-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.read-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.read-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.delete-btn:hover {
+    background-color: #e74c3c;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Messaggio nessuna notifica */
+.no-notifications {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-style: italic;
+}
+
+/* Animazione di entrata */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification-item {
+    animation: slideIn 0.3s ease-out forwards;
 }
 
 /* Statistiche */
@@ -202,6 +406,25 @@ body {
 .achievement-item.unobtained {
     opacity: 0.5; /* Riduce l'opacità per i trofei bloccati */
     background-color: #1a1a2e; /* Colore di sfondo diverso per quelli bloccati */
+}
+
+.achievement-progress {
+    margin-top: 10px;
+    height: 10px;
+    background-color: #1a1a2e;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.achievement-progress .progress-bar {
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
 /* Responsive */

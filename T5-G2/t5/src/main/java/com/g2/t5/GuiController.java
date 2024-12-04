@@ -37,6 +37,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -364,6 +365,32 @@ public class GuiController {
         }
         else{
             return ResponseEntity.badRequest().body("Error updating profile");
+        }
+    }
+
+    @PostMapping("/read-notification")
+    public ResponseEntity<String> readNotification(@RequestParam("email") String userEmail,
+                                                   @RequestParam("id") String notificationID) {
+        String result = (String) serviceManager.handleRequest("T23", "updateNotification", userEmail, notificationID);
+        if(result != null){
+            return ResponseEntity.ok("Notification read successfully");
+        }
+        else{
+            return ResponseEntity.badRequest().body("Error reading notification");
+        }
+    }
+
+    @DeleteMapping("/delete-notification")
+    public ResponseEntity<String> deleteNotification(@RequestParam("email") String userEmail,
+                                                     @RequestParam("id") String notificationID) {
+        System.out.println(notificationID);
+        System.out.println(userEmail);
+        String result = (String) serviceManager.handleRequest("T23", "deleteNotification", userEmail, notificationID);
+        if(result != null){
+            return ResponseEntity.ok("Notification deleted successfully");
+        }
+        else{
+            return ResponseEntity.badRequest().body("Error deleting notification");
         }
     }
 
