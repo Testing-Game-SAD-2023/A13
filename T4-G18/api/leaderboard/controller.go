@@ -1,8 +1,10 @@
 package leaderboard
 
 import (
-	"github.com/alarmfox/game-repository/api"
+	"log"
 	"net/http"
+
+	"github.com/alarmfox/game-repository/api"
 )
 
 type Service interface {
@@ -18,7 +20,8 @@ func NewController(gs Service) *Controller {
 }
 
 func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) error {
-	gameMode, err := api.FromUrlParams[CustomString](r, "gameMode")
+    log.Println("Leaderboard")
+	gameMode, err := api.FromUrlParams[CustomString](r, "gamemode")
 	if err != nil {
 		return err
 	}
@@ -28,12 +31,12 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	startPos, err := api.FromUrlParams[KeyType](r, "startPosition")
+	startPos, err := api.FromUrlParams[KeyType](r, "startPos")
 	if err != nil {
 		return err
 	}
 
-	endPos, err := api.FromUrlParams[KeyType](r, "endPosition")
+	endPos, err := api.FromUrlParams[KeyType](r, "endPos")
 	if err != nil {
 		return err
 	}

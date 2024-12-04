@@ -505,7 +505,7 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 	})
 
 	r.Route("/leaderboard", func(r chi.Router) {
-		r.Get("/subInterval/{gameMode}/{statistic}/{startPosition}/{endPosition}", api.HandlerFunc(lb.FindByInterval))
+		r.Get("/subInterval/{gamemode}/{statistic}/{startPos}/{endPos}", api.HandlerFunc(lb.FindByInterval))
 	})
 
 	return r

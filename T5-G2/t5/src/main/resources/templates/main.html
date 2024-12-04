@@ -1,136 +1,224 @@
 <!DOCTYPE html>
 <html lang="it" data-bs-theme="dark">
+
 <head>
-    <div th:replace ="fragments/header :: header"></div>
+    <div th:replace="fragments/header :: header"></div>
     <title>Home</title>
 </head>
 
-<body >
+<body>
 
-<!-- NAVBAR -->
-<div th:replace="fragments/navbar :: navbar"></div>
+    <!-- NAVBAR -->
+    <div th:replace="fragments/navbar :: navbar"></div>
 
-<div class="row row-cols-1">
-    <div class="container-fluid mb-3">
-        <div class="card text-bg-dark">
-            <img src="/t5/images/Background.jpeg" class="card-img opacity-75" alt="...">
-            <div class="card-img-overlay">
-                <h5 class="card-title display-1 text-center">
-                    Testing Robot Challenge
-                </h5>
-                <p class="card-text" th:text="#{intro}"></p>
+    <!--Classifica-->
+
+
+    <div class="offcanvas offcanvas-end text-bg-dark big-canvas" tabindex="-1" id="offcanvasDarkNavbar"
+        aria-labelledby="offcanvasDarkNavbarLabel">
+
+        <div class="offcanvas-header text-center">
+            <h2 class="offcanvas-title mt-2 mx-auto" id="offcanvasDarkNavbarLabel">Classifiche</h2>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body">
+            <!-- Selettori e search btn -->
+            <div class="row px-5">
+                <div class="col-lg-4 mb-2">
+                    <span>Modalità di gioco</span>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gamemode" id="sfida" checked>
+                        <label class="form-check-label" for="sfida">
+                            Sfida
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gamemode" id="scalata">
+                        <label class="form-check-label" for="scalata">
+                            Scalata
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-2">
+                    <span>Statistica</span>
+                    <div id="statistic-options">
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-2 d-flex align-items-end justify-content-end ">
+                    <form class="d-flex" role="search">
+                        <input class="form-control me-2 search-box" type="search" placeholder="Cerca giocatore"
+                            aria-label="Search">
+                        <button class="btn btn-success" type="submit">Cerca</button>
+                    </form>
+                </div>
             </div>
+            <!-- Fine selettori e search btn -->
+
+            <!-- Tabella -->
+
+            <div class="container my-3">
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Rank</th>
+                                <th scope="col">Giocatore</th>
+                                <th scope="col">Statistica</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="table-body">
+                            <!-- Rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination buttons will be dynamically added here -->
+                </ul>
+            </nav>
+
         </div>
     </div>
+    </div>
 
-    <!-- Sezione Modalità di Gioco -->
-    <div class="container-fluid">
-        <div class="row text-center border-top border-opacity-75 mb-3">
-            <h1 th:text="#{gm}"></h1>
+
+    <!-- Fine Classifica -->
+
+
+
+
+    <div class="row row-cols-1">
+        <div class="container-fluid mb-3">
+            <div class="card text-bg-dark">
+                <img src="/t5/images/Background.jpeg" class="card-img opacity-75" alt="...">
+                <div class="card-img-overlay">
+                    <h5 class="card-title display-1 text-center">
+                        Testing Robot Challenge
+                    </h5>
+                    <p class="card-text" th:text="#{intro}"></p>
+                </div>
+            </div>
         </div>
 
-        <div class="row row-cols-4 g-4 justify-content-center px-4">
-            <!-- Modalità 1 -->
-            <div class="col mb-4 d-flex align-items-stretch">
-                <div class="card shadow-lg bg-dark text-white"> 
-                    <img src="/t5/images/Partita_singola.jpeg" class="card-img-top" alt="Immagine Modalità 1">
-                    <div class="card-body">
-                        <h3 class="card-title text-center" th:text="#{singola}"></h3>
-                        <p th:text="#{singola_desc}"></p>
+        <!-- Sezione Modalità di Gioco -->
+        <div class="container-fluid">
+            <div class="row text-center border-top border-opacity-75 mb-3">
+                <h1 th:text="#{gm}"></h1>
+            </div>
 
-                    </div>
-                    <div class="card-footer">
-                        <div class="row  row-cols-2">
-                            <div class="col">
+            <div class="row row-cols-4 g-4 justify-content-center px-4">
+                <!-- Modalità 1 -->
+                <div class="col mb-4 d-flex align-items-stretch">
+                    <div class="card shadow-lg bg-dark text-white">
+                        <img src="/t5/images/Partita_singola.jpeg" class="card-img-top" alt="Immagine Modalità 1">
+                        <div class="card-body">
+                            <h3 class="card-title text-center" th:text="#{singola}"></h3>
+                            <p th:text="#{singola_desc}"></p>
+
+                        </div>
+                        <div class="card-footer">
+                            <div class="row  row-cols-2">
+                                <div class="col">
                                     <span class="badge bg-primary m-1" th:text="#{tag_veloce}"></span>
                                     <span class="badge bg-info text-dark m-1">1 vs CPU</span>
                                     <span class="badge bg-warning text-dark m-1">Turn</span>
-                            </div>
-                            <div class="col text-end">
-                                <a href="/gamemode?mode=Sfida" class="btn btn-success mx-3 my-2">
-                                    <i class="bi bi-play-fill me-2"></i>
-                                    <span th:text="#{tasto_play}"></span>
-                                </a> 
+                                </div>
+                                <div class="col text-end">
+                                    <a href="/gamemode?mode=Sfida" class="btn btn-success mx-3 my-2">
+                                        <i class="bi bi-play-fill me-2"></i>
+                                        <span th:text="#{tasto_play}"></span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Modalità 2 -->
-            <div class="col mb-4 d-flex align-items-stretch">
-                <div class="card shadow-lg bg-dark text-white">
-                    <img src="/t5/images/Scalata.jpeg" class="card-img-top" alt="Immagine Modalità 2">
+                <!-- Modalità 2 -->
+                <div class="col mb-4 d-flex align-items-stretch">
+                    <div class="card shadow-lg bg-dark text-white">
+                        <img src="/t5/images/Scalata.jpeg" class="card-img-top" alt="Immagine Modalità 2">
 
-                    <div class="card-body">
-                        <h3 class="card-title text-center" th:text="#{scalata}"></h3>
-                        <p th:text="#{scalata_desc}"></p>                      
-                    </div>
-                    <div class="card-footer">
-                        <div class="row  row-cols-2">
-                            <div class="col">
+                        <div class="card-body">
+                            <h3 class="card-title text-center" th:text="#{scalata}"></h3>
+                            <p th:text="#{scalata_desc}"></p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row  row-cols-2">
+                                <div class="col">
                                     <span class="badge bg-primary" th:text="#{tag_lunga}"></span>
                                     <span class="badge bg-info text-dark" th:text="#{tag_competitiva}"></span>
                                     <span class="badge bg-primary" th:text="#{tag_progressiva}"></span>
-                            </div>
-                            <div class="col text-end">
-                                <a href="/gamemode?mode=Scalata" class="btn btn-success mx-3 my-2">
-                                    <i class="bi bi-play-fill me-2"></i>
-                                    <span th:text="#{tasto_play}"></span>
-                                </a> 
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-
-            <!-- Modalità 3 -->
-            <div class="col mb-4 d-flex align-items-stretch">
-                <div class="card shadow-lg bg-dark text-white">
-                    <img src="/t5/images/Allenamento.jpeg" class="card-img-top" alt="Immagine Modalità 3">
-                    <div class="card-body">
-                        <h3 class="card-title text-center" th:text="#{allenamento}"></h3>
-                        <p th:text="#{allenamento_desc}"></p>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row  row-cols-2">
-                            <div class="col">
-                                <span class="badge bg-info text-dark" th:text="#{tag_pratica}"></span>
-                                <span class="badge bg-primary">Casual</span>
-                                <span class="badge bg-info text-dark" th:text="#{tag_veloce}"></span>
-                            </div>
-                            <div class="col text-end">
-                                <a href="/gamemode?mode=Allenamento" class="btn btn-success mx-3 my-2">
-                                    <i class="bi bi-play-fill me-2"></i>
-                                    <span th:text="#{tasto_play}"></span>
-                                </a> 
+                                </div>
+                                <div class="col text-end">
+                                    <a href="/gamemode?mode=Scalata" class="btn btn-success mx-3 my-2">
+                                        <i class="bi bi-play-fill me-2"></i>
+                                        <span th:text="#{tasto_play}"></span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Modalità 3 -->
+                <div class="col mb-4 d-flex align-items-stretch">
+                    <div class="card shadow-lg bg-dark text-white">
+                        <img src="/t5/images/Allenamento.jpeg" class="card-img-top" alt="Immagine Modalità 3">
+                        <div class="card-body">
+                            <h3 class="card-title text-center" th:text="#{allenamento}"></h3>
+                            <p th:text="#{allenamento_desc}"></p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row  row-cols-2">
+                                <div class="col">
+                                    <span class="badge bg-info text-dark" th:text="#{tag_pratica}"></span>
+                                    <span class="badge bg-primary">Casual</span>
+                                    <span class="badge bg-info text-dark" th:text="#{tag_veloce}"></span>
+                                </div>
+                                <div class="col text-end">
+                                    <a href="/gamemode?mode=Allenamento" class="btn btn-success mx-3 my-2">
+                                        <i class="bi bi-play-fill me-2"></i>
+                                        <span th:text="#{tasto_play}"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-            <!-- Modalità 4 -->
-            <div class="col mb-4 d-flex align-items-stretch">
-                <div class="card shadow-lg bg-dark text-white">
-                    <img src="/t5/images/Multiplayer.jpeg" class="card-img-top" alt="Immagine Modalità 4">
-                    <div class="card-body">
-                        <h3 class="card-title text-center" th:text="#{multiplayer}"></h3>
-                        <p th:text="#{multiplayer_desc}"></p>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row  row-cols-2">
-                            <div class="col">
-                                <span class="badge bg-primary">Online</span>
-                                <span class="badge bg-info text-dark">Social</span>
-                                <span class="badge bg-primary" th:text="#{tag_competitiva}"></span>
-                            </div>
-                            <div class="col text-end">
-                                <button type="button" class="btn btn-success mx-3 my-2"
-                                 data-bs-toggle="modal" data-bs-target="#Alert">
-                                    <i class="bi bi-play-fill me-2"></i>
-                                    <span th:text="#{tasto_play}"></span>
-                                </button>
+                <!-- Modalità 4 -->
+                <div class="col mb-4 d-flex align-items-stretch">
+                    <div class="card shadow-lg bg-dark text-white">
+                        <img src="/t5/images/Multiplayer.jpeg" class="card-img-top" alt="Immagine Modalità 4">
+                        <div class="card-body">
+                            <h3 class="card-title text-center" th:text="#{multiplayer}"></h3>
+                            <p th:text="#{multiplayer_desc}"></p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row  row-cols-2">
+                                <div class="col">
+                                    <span class="badge bg-primary">Online</span>
+                                    <span class="badge bg-info text-dark">Social</span>
+                                    <span class="badge bg-primary" th:text="#{tag_competitiva}"></span>
+                                </div>
+                                <div class="col text-end">
+                                    <button type="button" class="btn btn-success mx-3 my-2" data-bs-toggle="modal"
+                                        data-bs-target="#Alert">
+                                        <i class="bi bi-play-fill me-2"></i>
+                                        <span th:text="#{tasto_play}"></span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -138,26 +226,25 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal Multiplayer  -->
-<div class="modal fade" id="Alert" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="alertModalLabel" th:text="#{alert}"></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" th:text="#{disponibile}"></div>
+    <!-- Modal Multiplayer  -->
+    <div class="modal fade" id="Alert" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="alertModalLabel" th:text="#{alert}"></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" th:text="#{disponibile}"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{chiudi}"></button>
             </div>
         </div>
     </div>
-</div>
+    </div>
 
     <div th:replace="fragments/footer :: footer"></div>
 </body>
-</html>
 
+</html>

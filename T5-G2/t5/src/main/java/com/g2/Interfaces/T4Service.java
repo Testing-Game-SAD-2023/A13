@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.g2.Model.Game;
-import com.g2.Model.PlayerStats;
 import com.g2.Model.StatisticProgress;
-import org.springframework.core.ParameterizedTypeReference;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -46,13 +46,11 @@ public class T4Service extends BaseService {
 
         registerAction("getGames", new ServiceActionDefinition(
                 params -> getGames((int) params[0]),
-                Integer.class
-        ));
+                Integer.class));
 
         registerAction("getStatisticsProgresses", new ServiceActionDefinition(
                 params -> getStatisticsProgresses((int) params[0]),
-                Integer.class
-        ));
+                Integer.class));
 
         registerAction("updateStatisticProgress", new ServiceActionDefinition(
                 params -> updateStatisticProgress((int) params[0], (String) params[1], (float) params[2]),
@@ -91,12 +89,11 @@ public class T4Service extends BaseService {
         registerAction("GetRisultati", new ServiceActionDefinition(
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class));
-    
+
         registerAction("getPositions", new ServiceActionDefinition(
-            params -> getPositions((String) params [0], (String) params [1], (String) params [2], (int) params [3], (int) params [4]),
-            String.class, String.class, String.class, Integer.class, Integer.class));
-                
-        }
+                params -> getPositions((String) params[0], (String) params[1], (int) params[2], (int) params[3]),
+                String.class, String.class, Integer.class, Integer.class));
+    }
 
     // usa /games per ottenere una lista di giochi
     private List<Game> getGames(int playerId) {
@@ -111,8 +108,9 @@ public class T4Service extends BaseService {
 
         String endpoint = "/phca/" + playerID;
 
-        List<StatisticProgress> response = callRestGET(endpoint, formData, new ParameterizedTypeReference<List<StatisticProgress>>() {
-        });
+        List<StatisticProgress> response = callRestGET(endpoint, formData,
+                new ParameterizedTypeReference<List<StatisticProgress>>() {
+                });
         return response;
     }
 
@@ -125,28 +123,32 @@ public class T4Service extends BaseService {
         String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
         return response;
     }
-    
-/*
-    private String updateStatisticProgress(int playerID, String statisticID, float progress) {
-        try {
-            MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
-            jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
-            jsonMap.put("statistic", Collections.singletonList(statisticID));
-            jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
 
-            String endpoint = "/phca/" + playerID + "/" + statisticID;
+    /*
+     * private String updateStatisticProgress(int playerID, String statisticID,
+     * float progress) {
+     * try {
+     * MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
+     * jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
+     * jsonMap.put("statistic", Collections.singletonList(statisticID));
+     * jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
+     * 
+     * String endpoint = "/phca/" + playerID + "/" + statisticID;
+     * 
+     * String response = callRestPut(endpoint, jsonMap, new HashMap<>(),
+     * String.class);
+     * 
+     * return response;
+     * } catch (Exception e) {
+     * System.out.
+     * println("[updateStatisticProgress] Errore nell'update delle statistiche: " +
+     * e.getMessage());
+     * return "errore UPDATESTATISTICPROGRESS";
+     * }
+     * }
+     */
 
-            String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
-
-            return response;
-        } catch (Exception e) {
-            System.out.println("[updateStatisticProgress] Errore nell'update delle statistiche: " + e.getMessage());
-            return "errore UPDATESTATISTICPROGRESS";
-        }
-    }
-*/
-    
-    // usa /robots per ottenere dati 
+    // usa /robots per ottenere dati
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
         formData.put("testClassId", className); // Nome della classe
@@ -245,34 +247,26 @@ public class T4Service extends BaseService {
         return respose;
     }
 
-    private String getPositions(String jwt,String gameMode, String statistica, int startPosition, int endPosition){
-            String endpoint = "leaderboard/getSubinterval"+"/"+gameMode+"/"+statistica+"/"+startPosition+"/"+endPosition;
-            String jsonResponse = callRestGET(endpoint, null, String.class);
-            
-            return jsonResponse;
-        }
-        
+    private String getPositions(String gamemode, String statistica, int startPosition, int endPosition) {
+        String endpoint = "leaderboard/subInterval" + "/" + gamemode + "/" + statistica + "/" + startPosition + "/"
+                + endPosition;
+        String jsonResponse = callRestGET(endpoint, null, String.class);
 
-
-
-
-        /*
-        Map<String, String> queryParams = new HashMap<>();
-        queryParams.put("jwt", jwt);
-        queryParams.put("gameMode", gameMode);
-        queryParams.put("statistica", statistica);
-        queryParams.put("startPosition", String.valueOf(startPosition));
-        queryParams.put("endPosition", String.valueOf(startPosition));
-        
-        ParameterizedTypeReference<List<PlayerStats>> typeRef = new ParameterizedTypeReference<>() {};
-        //Aggiungere un altro campo per int lastPosition?
-        
-        return callRestGET("/leaderboard/getPositions", queryParams, typeRef);
-    */
+        return jsonResponse;
     }
 
-
-
-
-
+    /*
+     * Map<String, String> queryParams = new HashMap<>();
+     * queryParams.put("jwt", jwt);
+     * queryParams.put("gameMode", gameMode);
+     * queryParams.put("statistica", statistica);
+     * queryParams.put("startPosition", String.valueOf(startPosition));
+     * queryParams.put("endPosition", String.valueOf(startPosition));
+     * 
+     * ParameterizedTypeReference<List<PlayerStats>> typeRef = new
+     * ParameterizedTypeReference<>() {};
+     * //Aggiungere un altro campo per int lastPosition?
+     * 
+     * return callRestGET("/leaderboard/getPositions", queryParams, typeRef);
+     */
 }
