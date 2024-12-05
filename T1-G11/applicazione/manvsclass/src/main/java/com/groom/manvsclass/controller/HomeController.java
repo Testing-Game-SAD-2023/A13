@@ -589,6 +589,7 @@ public class HomeController {
 			robotDifficultyList.add("Advanced");
 			classe.setRobotDifficulty(robotDifficultyList);
 			//FINE EDIT
+			System.out.println("Operazione completata con successo (uploadTest)");
 			repo.save(classe);
 			
 			System.out.println(classe.getcoverage());
