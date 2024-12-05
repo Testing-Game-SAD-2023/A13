@@ -66,12 +66,12 @@ public class TeamController {
         return teamService.ottieniStudentiTeam(idTeam,jwt);
     }
 
-    @GetMapping("/cercaStudente")
+    //Modifica 05/12/2024: aggiunta rimozione studente da un team
+    @PutMapping("/rimuoviStudenteTeam/{idTeam}")
     @ResponseBody
-    public ResponseEntity<?> cercaStudente(String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.visualizzaTeam(idTeam, jwt);
+    public ResponseEntity<?> rimuoviStudenteTeam(@PathVariable("idTeam") String idTeam,@RequestBody String idStudente,@CookieValue(name = "jwt", required = false) String jwt){
+        return teamService.rimuoviStudenteTeam(idTeam,idStudente,jwt);
     }
-
 
 
 }
