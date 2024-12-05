@@ -765,4 +765,11 @@ public class AdminService {
         return repo.findAll();
     }
 
+
+    public ModelAndView showTeamManagementPage(HttpServletRequest request, String jwt) {
+        if (jwtService.isJwtValid(jwt)) {
+            return new ModelAndView("gestione_team");
+        }
+        return new ModelAndView("login_admin");
+    }
 }
