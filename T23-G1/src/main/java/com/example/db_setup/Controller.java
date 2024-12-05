@@ -710,7 +710,7 @@ public class Controller {
 
     @DeleteMapping("/delete_notification")
     public ResponseEntity<String> deleteNotification(@RequestParam("email") String email,
-                                                    @RequestParam("id notifica") String notificationID) {
+                                                    @RequestParam("idnotifica") String notificationID) {
         // Cerca il profilo dell'utente utilizzando l'email fornita come parametro
         UserProfile profile = userService.findProfileByEmail(email);
 

@@ -48,20 +48,23 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Errore di rete. Riprova più tardi.");
                 }
             }
-
             // Gestione pulsante "Elimina"
             if (e.target.classList.contains('delete-btn')) {
                 try {
+                    // Creazione dei dati in formato URL encoded (application/x-www-form-urlencoded)
                     const formData = new URLSearchParams();
                     formData.append("email", userEmail);
                     formData.append("id", notificationId);
 
-                    const response = await fetch("/delete-notification", {
+                    // Assicurati di usare l'URL completo, compreso l'IP o il nome del container
+                    const backendUrl = '/delete-notification'; // Cambia con l'indirizzo corretto se necessario
+
+                    const response = await fetch(backendUrl, {
                         method: "DELETE",
                         headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Content-Type": "application/x-www-form-urlencoded",  // Tipo di contenuto corretto per x-www-form-urlencoded
                         },
-                        body: formData.toString(),
+                        body: formData.toString(),  // Inviamo i dati in formato URL encoded
                     });
 
                     if (response.ok) {
