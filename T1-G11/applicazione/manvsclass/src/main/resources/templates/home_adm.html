@@ -23,61 +23,47 @@
 <!--Codice HTML qui-->
 <br>
 <br>
-<h2>Welcome Back: </h2>
-<h2 id="username-display"></h2>
-<h3>Choose an option</h3>
+<header>
+    <h1>Pannello Amministratore</h1>
+  </header>
 
-<nav class="top-right open">
-	<a href = "/achievements" class="disc l1">
-		<div>Achievements</div>
-	</a>
-	<a href = "/player" class="disc l2">
-		<div>Players</div>
-	</a>
-	<a href = "class" class="disc l3">
-		<div>Classes</div>
-	</a>
+   <!-- Barra laterale -->
+   <div class="sidebar">
+    <p id="username-display"></p>
+    <a href="info">Info</a>
+    <a href="/player">Players</a>
+	<button onclick="Invita()">Invita</button>
 
-  <!--MODIFICA (15/02/2024): Aggiunta pagina di informazioni riguardo tutti gli amministratori del sistema-->
-	<a href = "info" class="disc l4">
-		<div>Info</div>
-	</a>
-  <!--FINE MODIFICA (15/02/2024)-->
-
-	<a class="disc l5 toggle">
-		Menu
-	</a>
-</nav>
-
-<!--MODIFICA (12/02/2024): Aggiunta opzione di disconnessione-->
-<div class="logout-admin-container">
-  <button type="button" onclick="Disconnessione()">Logout</button>
-</div>
-
-<!--MODIFICA (16/02/2024) : Aggiunta bottone di invito-->
-<div class="invita-admin-container">
-  <button type="button" onclick="Invita()">Invita</button>
-</div>
-
-<!--MODIFICA (17/04/2024) : Aggiunta bottone "Scalata"-->
-<div class="scalata-button-container">
-  <button type="button" onclick="Scalata()"><i class="fas fa-stairs"></i></button>
-</div>
+    <!-- Logout in basso a sinistra -->
+  <button class="logout" onclick="Disconnessione()">Logout</button>
+	</div>
 
 
-<!--MODIFICA(29/11/2024) : Aggiunta bottone Gestione Teams-->
-<!--Giuseppe-->
-<div class="gestione-team-container">
-	<button type="button" onclick="Teams()">Teams</button>
-</div>
-
-<!--MODIFICA(29/11/2024) : Aggiunta bottone Assignments-->
-<!--Giuseppe-->
-<div class="assignment-team-container">
-    <button type="button" onclick="Assignments()">Assignments</button>
-</div>
-
-
+	<!-- Contenitore dei bottoni -->
+	<div class="dashboard-container">
+		<div class="button-team" id="button-generics">
+		<div class="icon">📊</div>
+		<h3>Teams</h3>
+		<p>Gestisci i team</p>
+		</div>
+		<div class="button-scalata" id="button-generics">
+		<div class="icon">🚀</div>
+		<h3>Scalata</h3>
+		<p>Crescita continua</p>
+		</div>
+		<div class="button-achievement" id="button-generics">
+			<div class="icon">🏆</div>
+			<h3>Achievement</h3>
+			<p>Assegna gli Achievement</p>
+		</div>
+		
+		<div class="button-class" id="button-generics">
+			<div class="icon">🤖</div>
+			<h3>Classes</h3>
+			<p>Crea le tue classi di test</p>
+		</div>
+		
+	</div>
 
 
 <!--FINE MODIFICA-->

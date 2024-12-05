@@ -355,7 +355,7 @@
          return adminService.showPlayer(request, jwt);
      }
  
-     @GetMapping("class")
+     @GetMapping("/class")
      public ModelAndView showClass(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
          return adminService.showClass(request, jwt);
      }

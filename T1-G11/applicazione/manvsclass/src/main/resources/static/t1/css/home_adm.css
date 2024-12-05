@@ -1,429 +1,157 @@
-@import url("https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900");
-html, body {
-  height: 100%;
-}
-
-h1 {
-  color: whitesmoke;
-  font-family: 'Poppins', sans-serif;
-	font-size: 100px;
-	text-align: center;
-}
-
-h2 {
-  color: whitesmoke;
-	font-size: 70px;
-	text-align: center;
-  font-family: 'Poppins', sans-serif;
-}
-
-h3 {
-  color: whitesmoke;
-	font-size: 50px;
-	text-align: center;
-  font-family: 'Poppins', sans-serif;
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background: #1b213e;;
-  font-family: Alegreya Sans, sans-serif;
+  font-family: 'Alegreya Sans', sans-serif;
+  background-color: rgb(118, 145, 243);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  padding-top: 20px;
 }
 
-nav {
-  display: block;
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  transform: translate3d(25px, -25px, 0);
-  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9);
+header {
+  margin-bottom: 40px;
 }
 
-nav.open {
-  transform: translate3d(0, 0, 0);
-}
-
-nav.top-right {
-  top: 0px;
-  right: 0px;
-}
-
-.disc {
-  position: absolute;
-  display: inline-block;
+h1 {
+  color: #333;
+  font-size: 3rem;
   text-align: center;
-  cursor: pointer;
-  font: 25px Alegreya Sans, sans-serif;
-  line-height: 40px;
-  padding-top: 10px;
-  border-radius: 250px;
-  transform: scale3d(0.5, 0.5, 0.5) rotate3d(0, 0, 1, 190deg);
-  pointer-events: none;
-  opacity: 0;
-  cursor: pointer;
-  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9), opacity 0.5s;
 }
 
-.disc div {
-  transform: rotate(180deg);
-}
-
-.open .disc {
-  pointer-events: auto;
-  opacity: 1;
-}
-
-.l1 {
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  background: tomato;
-  transition-delay: 0s;
-}
-
-.open .l1 {
-  transition-delay: 0s;
-  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
-  opacity: 1;
-
-}
-.open .l1:hover {
+/* Barra laterale */
+.sidebar {
+  width: 250px;
+  background-color: #1f2937;
   color: white;
-  transition-delay: 0s;
-  background-color: rgb(255, 22, 84);
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 20px;
 }
 
-.open .l1:active {
-  background: shade(tomato, 50%);
-  color: tomato;
+.sidebar a {
+  display: block;
+  padding: 15px;
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  margin: 10px 0;
+  transition: background-color 0.3s ease;
+}
+.sidebar p {
+  display: block;
+  padding: 15px;
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  margin: 10px 0;
+  transition: background-color 0.3s ease;
 }
 
-.open .l1.toggle {
-  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+.sidebar a:hover {
+  background-color: #3b82f6;
 }
 
-.l2 {
-  top: 50px;
-  left: 50px;
-  right: 50px;
-  bottom: 50px;
-  background: #ff7a39;
-  transition-delay: 0.1s;
+/* Stile per i pulsanti nella barra laterale */
+.sidebar button {
+display: block;
+width: 100%; /* Per assicurare che abbiano la stessa larghezza */
+padding: 15px;
+text-align: left; /* Allineamento coerente con i link */
+background: none; /* Rimuove lo stile di default del pulsante */
+border: none;
+color: white;
+font-size: 18px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+margin: 10px 0;
+text-decoration: none; /* Stile coerente con i link */
 }
 
-.open .l2 {
-  transition-delay: 0.1s;
-  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
-  opacity: 1;
+/* Hover per i pulsanti */
+.sidebar button:hover {
+background-color: #3b82f6;
 }
 
-.open .l2:hover {
-  color: rgb(18, 102, 79);
-  transition-delay: 0s;
-  background-color: rgb(243, 255, 189);
+/* Stile specifico per il pulsante Logout */
+.sidebar button.logout {
+position: absolute;
+bottom: 20px;
+left: 20px;
+width: auto; /* Aggiungi se non vuoi che prenda la larghezza piena */
+height: auto; /* Assicurati che le dimensioni siano regolate */
+padding: 10px 20px;
+background-color: #f44336;
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 18px;
+text-align: center;
+cursor: pointer;
+transition: background-color 0.3s;
+box-sizing: border-box; /* Assicura che padding e dimensioni siano corretti */
 }
 
-.open .l2:active {
-  background: shade(#ff7a39, 50%);
-  color: #ff7a39;
+/* Hover per il pulsante Logout */
+.sidebar button.logout:hover {
+background-color: #d32f2f;
 }
 
-.open .l2.toggle {
-  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
+/* Contenitore dei bottoni della dashboard */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: repeat(2, 250px); /* 2 colonne per i bottoni */
+  gap: 30px;
+  justify-items: center;
+ 
+  position: relative;
+  left: 5%;  /* Allinea i bottoni a destra */
+ 
+ 
 }
 
-.l3 {
-  top: 100px;
-  left: 100px;
-  right: 100px;
-  bottom: 100px;
-  background: #ff912b;
-  transition-delay: 0.2s;
-}
-
-.open .l3 {
-  transition-delay: 0.2s;
-  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
-  opacity: 1;
-}
-
-.open .l3:hover {
-  color: rgb(239, 156, 218);
-  transition-delay: 0s;
-  background-color: rgb(178, 219, 191);
-}
-
-.open .l3:active {
-  background: shade(#ff912b, 50%);
-  color: #ff912b;
-}
-
-.open .l3.toggle {
-  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
-}
-
-/*Sfruttiamo lo stile già definito (l4) per caratterizzare il logout*/ 
-.l4 {
-  top: 150px;
-  left: 150px;
-  right: 150px;
-  bottom: 150px;
-  background: #ffa91c;
-  transition-delay: 0.3s;
-}
-
-.open .l4 {
-  transition-delay: 0.3s;
-  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
-  opacity: 1;
-}
-
-.open .l4:hover {
-  color: rgb(219, 153, 90);
-  transition-delay: 0s;
-  background-color: rgb(112, 193, 179);
-}
-
-.open .l4:active {
-  background: shade(#ffa91c, 50%);
-  color: #ffa91c;
-}
-
-.open .l4.toggle {
-  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
-}
-
-.l5 {
-  top: 200px;
-  left: 200px;
-  right: 200px;
-  bottom: 200px;
-  background: #ffc00e;
-  transition-delay: 0.4s;
-}
-
-.open .l5 {
-  transition-delay: 0.4s;
-  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
-  opacity: 1;
-}
-
-.open .l5:hover {
-  color: rgb(219, 153, 90);
-  transition-delay: 0s;
-  background-color: rgb(36, 123, 160);
-}
-
-.open .l5:active {
-  background: shade(#ffc00e, 50%);
-  color: #ffc00e;
-}
-
-.open .l5.toggle {
-  transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, 10deg);
-}
-
-.toggle {
-  line-height: 100px;
-  padding: 0;
-  width: 100px;
-  background: gold;
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-  transition-delay: 0s;
-}
-
-.open .toggle {
-  transform: rotate3d(0, 0, 1, 0deg);
-}
-
-.toggle:hover {
-  text-decoration: underline;
-  background-color: rgb(68, 222, 231);
-}
-
-.toggle:active {
-  background: shade(gold, 50%);
-  color: rgba(255, 215, 0, 0.5);
-  transform: scale(0.9);
-  transition-duration: 0s;
-}
-
-/*MODIFICA (12/02/2024) : Aggiunta bottone logout*/
-.logout-admin-container {
-    position: fixed;
-    top: 75%;
-    left: 15%;
-    transform: translate(-50%, -50%);  /* Allineamento corretto */
-    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
-}
-
-
-
-.logout-admin-container button {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background-color: rgb(118, 145, 243);
-    color: black;
-    font-size: 25px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    font-family: Alegreya Sans, sans-serif;
-    text-align: center;
-}
-
-.logout-admin-container button:hover {
-    background-color: green; /* Color shade of green */
-    font-weight: bold;
-    text-decoration: underline;
-    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
-}
-
-/*MODIIFCA (16/02/2024) : Aggiunta bottone di invito amministratori*/
-.invita-admin-container {
-    position: fixed;
-    top: 60%;
-    left: 30%;
-    transform: translate(-50%, -50%);  /* Allineamento corretto */
-    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
-}
-
-
-
-.invita-admin-container button {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background-color: rgb(226, 43, 110);
-    color: black;
-    font-size: 30px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    font-family: Alegreya Sans, sans-serif;
-    text-align: center;
-   
-}
-
-.invita-admin-container button:hover {
-    background-color: rgb(128, 75, 0); /* Color shade of green */
-    font-weight: bold;
-    text-decoration: underline;
-    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
-}
-
-/*MODIFICA (17/04): Aggiunta bottone "Scalata" per configurare la nuova modalità di gioco*/
-.scalata-button-container {
-    position: fixed;
-    top: 68%;
-    left: 70%;
-    transform: translateY(-50%, -50%);
-    z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
-  }
-
-
-
-.scalata-button-container button {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background-color: rgb(157, 180, 171);
-    color: black;
-    font-size: 30px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    transition: background-color 0.3s, transform 3s; /* Aggiunto transform 0.3s per animare la rotazione */
-    font-family: Alegreya Sans, sans-serif;
-    text-align: center;
-}
-
-.scalata-button-container button:hover {
-    background-color: rgb(187, 219, 155); /* Color shade of green */
-    font-weight: bold;
-    text-decoration: underline;
-    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
-}
-
-.scalata-button-container button i {
-    font-size: 50px; /* Impostare la dimensione dell'icona */
-    transition: transform 0.5s; /* Aggiunto per animare la rotazione */
-}
-
-.scalata-button-container button:hover i {
-    transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
-}
-
-/*Modifica 29/11/2024 : creazione iniziale del bottone Gestione-Team*/
-.gestione-team-container {
-  position:fixed;
-  top: 75%;  /* Modificato per distanziarlo un po' dal bordo inferiore */
-  left: 45%;
-  transform: translate(-50%, -50%);  /* Allineamento corretto */
-  z-index: 9999; /* Assicura che il bottone sia sopra gli altri elementi */
-}
-
-.gestione-team-container button {
-  width: 150px;  /* Aumentato per migliorare la visibilità */
-  height: 150px; /* Stessa altezza per mantenere la forma rotonda */
-  border-radius: 50%;
-  background-color: #48b2be;  /* Colore verde più distintivo */
-  color: rgb(9, 9, 9);  /* Colore del testo bianco per contrasto */
-  font-size: 35px;  /* Aumentato per migliorare la leggibilità */
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-  font-family: Alegreya Sans, sans-serif;
+#button-generics {
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  color: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2), -4px -4px 10px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
 }
 
-.gestione-team-container button:hover {
-  background-color: #036e76;  /* Colore verde scuro per l'hover */
-  font-weight: bold;
-  text-decoration: underline;
-  transform: rotate(360deg); /* Rotazione al passaggio del mouse */
+#button-generics:hover {
+  background: linear-gradient(145deg, #2563eb, #3b82f6);
+  transform: scale(1.1);
+  box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.3), -6px -6px 15px rgba(255, 255, 255, 0.4);
 }
 
-/* Modifica 29/11/2024: Assignments Button */
-.assignment-team-container {
-  position:fixed;
-  top: 60%;  /* Modificato per distanziarlo un po' dal bordo inferiore */
-  left: 60%;
-  transform: translate(-50%, -50%);  /* Allineamento corretto */
-  z-index: 9999; /* Assicura che il bottone sia sopra gli altri elementi */
+#button-generics .icon {
+  font-size: 40px;
+  margin-bottom: 10px;
 }
 
-.assignment-team-container button {
-  width: 150px;  /* Dimensione del bottone */
-  height: 150px;
-  border-radius: 50%;
-  background-color: #aa4fdb;  /* Colore dello sfondo */
-  color: rgb(13, 13, 13);  /* Colore del testo */
-  font-size: 20px;  /* Riduci leggermente la dimensione del testo */
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-  font-family: Alegreya Sans, sans-serif;
-  text-align: center;  /* Centra il testo orizzontalmente */
-  line-height: 150px;  /* Allinea verticalmente il testo con l'altezza del pulsante */
-  white-space: normal;  /* Permette al testo di andare a capo, se necessario */
-  word-break: break-word;  /* Spezza parole lunghe, se necessario */
-  overflow: hidden;  /* Impedisce al testo di uscire dai bordi */
-  padding: 0;  /* Elimina padding extra */
-  box-sizing: border-box;  /* Assicura che il padding non influenzi le dimensioni del bottone */
+#button-generics h3 {
+  font-size: 20px;
+  margin-bottom: 5px;
 }
 
-
-.assignment-team-container button:hover {
-  background-color: #712069;  /* Colore verde scuro per l'hover */
-  font-weight: bold;
-  text-decoration: underline;
-  transform: rotate(360deg); /* Rotazione al passaggio del mouse */
+#button-generics p {
+  font-size: 14px;
+  color: #ddd;
 }
