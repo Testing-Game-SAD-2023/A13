@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profilo Utente</title>
+    <title th:text="#{profile.title}">Profilo Utente</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -18,7 +18,7 @@
             <a href="/main" class="btn btn-link text-light"><i class="fas fa-arrow-left"></i> Indietro</a>
         </div>
         <div class="d-flex">
-            <a href="/main" class="btn btn-link text-light">Home</a> <!-- Modificato qui -->
+            <a href="/main" class="btn btn-link text-light">Home</a>
             <button class="logout-button" onclick="location.href='/logout'">Logout</button>
         </div>
     </div>
@@ -32,30 +32,56 @@
                     <img th:src="${propic != null ? '/t5/images/profileImages/' + propic : '/t5/images/sample_propic.jpg'}"
                          class="rounded me-3" style="width: 80px; height: 80px;" alt="Profile Picture">
                     <div>
-                        <h5 th:text="${username}"></h5>
-                        <p class="text-secondary" th:text="${surname}"></p>
-                        <p th:text="${email}"></p>
-                        <button class="btn btn-custom btn-sm" onclick="location.href='/edit_profile'">Modifica Profilo</button>
+                        <h5 class="user-name" th:text="${username} + ' ' + ${surname}"></h5>
+                        <p id="user-email" th:text="${email}"></p>
+                        <div class="bio-box" th:if="${bio != null}">
+                            <p th:text="${bio}">Inserisci una bio...</p>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn btn-custom btn-sm" onclick="location.href='/edit_profile' " th:text="#{profile.modifyButton}">Modifica Profilo</button>
+                            <button class="btn btn-custom btn-sm" onclick="location.href='/profile'">Team</button>
+                        </div>
                     </div>
                     <div class="ms-auto">
-                        <span><i class="fas fa-coins"></i> Token: <span th:text="${tokens}"></span></span>
+                        <!--<span><i class="fas fa-coins"></i> Token: <span th:text="${tokens}"></span></span>-->
+                        <div class="token-container">
+                            <i class="fas fa-coins"></i>
+                            Token: <span th:text="0"></span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Notifiche -->
             <div class="card mb-3">
-                <div class="card-header">Notifiche</div>
-                <div class="card-body" style="height: 150px; overflow-y: auto;">
-                    <p th:if="${notifications == null || notifications.isEmpty()}">Nessuna notifica disponibile.</p>
-                    <ul th:if="${notifications != null && !notifications.isEmpty()}">
-                        <li th:each="notification : ${notifications}">
-                            <strong th:text="${notification.title}"></strong>: <span th:text="${notification.message}"></span><br>
-                            <small th:text="${formattedDate}"></small><br>
-                            <span th:if="${notification.isRead}">Letta</span>
-                            <span th:unless="${notification.isRead}">Non letta</span>
-                        </li>
-                    </ul>
+                <div class="card-header" th:text="#{profile.notifications}"> Notifiche</div>
+                <div class="card-body notifications-container">
+                    <!-- Messaggio se non ci sono notifiche -->
+                    <p th:if="${notifications == null || notifications.isEmpty()}" class="no-notifications" th:text="#{profile.notificationsEmpty}">
+                        Nessuna notifica disponibile.
+                    </p>
+
+                    <!-- Lista notifiche -->
+                    <div class="notifications-list" th:if="${notifications != null && !notifications.isEmpty()}">
+                        <div th:each="notification : ${notifications}"
+                             class="notification-item"
+                             th:attr="data-notification-id=${notification.id}">
+                            <div class="notification-content">
+                                <strong th:text="${notification.title}"></strong>
+                                <p th:text="${notification.message}"></p>
+                                <small th:text="${formattedDate}"></small>
+                                <div class="notification-status-badge"
+                                    th:classappend="${notification.isRead != null && notification.isRead ? 'status-read' : 'status-unread'}"
+                                    th:text="${notification.isRead != null ? (notification.isRead ? 'Letta' : 'Non letta') : 'Non letta'}">
+                                </div>
+                            </div>
+                            <!-- Pulsanti -->
+                            <div class="notification-actions">
+                                <button class="action-btn read-btn" th:text="#{profile.readNotifiy}">Leggi</button>
+                                <button class="action-btn delete-btn" th:text="#{profile.deleteNotifiy}">Elimina</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -64,12 +90,12 @@
                 <div class="card-header">
                     <ul class="nav nav-tabs card-header-tabs" id="trophyTabs" role="tablist">
                         <li class="nav-item">
-                            <button class="nav-link active" id="unlocked-tab" data-bs-toggle="tab" data-bs-target="#unlocked" type="button" role="tab" aria-controls="unlocked" aria-selected="true">
+                            <button class="nav-link active" id="unlocked-tab" data-bs-toggle="tab" data-bs-target="#unlocked" type="button" role="tab" aria-controls="unlocked" aria-selected="true" th:text="#{profile.achievementUnlocked}">
                                 Unlocked
                             </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" id="locked-tab" data-bs-toggle="tab" data-bs-target="#locked" type="button" role="tab" aria-controls="locked" aria-selected="false">
+                            <button class="nav-link" id="locked-tab" data-bs-toggle="tab" data-bs-target="#locked" type="button" role="tab" aria-controls="locked" aria-selected="false" th:text="#{profile.achievementLocked}">
                                 Locked
                             </button>
                         </li>
@@ -78,7 +104,7 @@
                 <div class="card-body">
                     <div class="tab-content" id="trophyTabsContent">
                         <div class="tab-pane fade show active" id="unlocked" role="tabpanel" aria-labelledby="unlocked-tab">
-                            <p th:if="${unlockedAchievements == null || unlockedAchievements.isEmpty()}">Nessun trofeo sbloccato.</p>
+                            <p th:if="${unlockedAchievements == null || unlockedAchievements.isEmpty()}" th:text="#{profile.achievementUnlEmpty}">Nessun trofeo sbloccato.</p>
                             <ul class="achievements-list" th:if="${unlockedAchievements != null && !unlockedAchievements.isEmpty()}">
                                 <li class="achievement-item" th:each="achievement : ${unlockedAchievements}">
                                     <img class="achievement-icon" src="/t5/images/sample_badge.png" alt="Achievement Icon">
@@ -90,13 +116,19 @@
                             </ul>
                         </div>
                         <div class="tab-pane fade" id="locked" role="tabpanel" aria-labelledby="locked-tab">
-                            <p th:if="${lockedAchievements == null || lockedAchievements.isEmpty()}">Nessun trofeo bloccato.</p>
+                            <p th:if="${lockedAchievements == null || lockedAchievements.isEmpty()}" th:text="#{profile.achievementLocEmpty}">Nessun trofeo bloccato.</p>
                             <ul class="achievements-list" th:if="${lockedAchievements != null && !lockedAchievements.isEmpty()}">
                                 <li class="achievement-item unobtained" th:each="achievement : ${lockedAchievements}">
                                     <img class="achievement-icon" src="/t5/images/sample_badge.png" alt="Achievement Icon">
                                     <div class="achievement-details">
                                         <h5 th:text="${achievement.name}"></h5>
                                         <p th:text="${achievement.description}"></p>
+                                        <div class="progress achievement-progress">
+                                            <div class="progress-bar" role="progressbar"
+                                                 th:style="'width:' + ${achievement.progress}*100/${achievement.progressRequired} + '%'"
+                                                 th:text="${achievement.progress} + '/' + ${achievement.progressRequired}">
+                                            </div>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -110,7 +142,7 @@
         <div class="right-column">
             <!-- Statistiche -->
             <div class="card mb-3" style="height: 400px;">
-                <div class="card-header">Statistiche</div>
+                <div class="card-header" th:text="#{profile.stats}">Statistiche</div>
                 <div class="card-body">
                     <div class="row" th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}">
                         <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
@@ -137,15 +169,15 @@
                 </div>
                 <div class="card-body">
                     <p><span th:text="${followers}"></span> Follower, <span th:text="${following}"></span> Following</p>
-                    <button class="btn btn-custom btn-sm">Trova amici tester</button>
+                    <button class="btn btn-custom btn-sm" th:text="#{profile.searchFriend}">Trova amici tester</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div th:replace="fragments/footer :: footer"></div>
+
     <!-- Custom JS -->
     <script src="/t5/js/profile.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
