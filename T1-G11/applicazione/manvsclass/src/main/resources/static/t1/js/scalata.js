@@ -96,6 +96,29 @@ function displayClasses(classes) {
       // Create a new footer for the difficulty
       const difficulty = $('<div>').addClass('card-footer text-muted text-center').text('Difficulty: ' + getStars(classUT.difficulty));
 
+            
+      let coverage = 'Coperture: \n';
+      if (Array.isArray(classUT.robotList) 
+          && classUT.robotList.length > 0 
+          && Array.isArray(classUT.coverage) 
+          && classUT.coverage.length > 0
+          && Array.isArray(classUT.robotDifficulty)) 
+      {
+      for (let i = 0; i < classUT.robotList.length; i++) {
+
+        coverage += classUT.robotList[i] + "\r\n";
+
+        for (let j = 0; j < classUT.robotDifficulty.length; j++) {
+
+          coverage += classUT.robotDifficulty[j] + ": " + classUT.coverage[3*i+j]+ "\r\n";
+
+        }
+      }
+      } else {
+          coverage += 'N/A';
+      }
+      const coverageElement = $('<p>').addClass('card-text').text(coverage);
+
       //Generate the color class for the difficulty
       var colorClass = difficultyColors[classUT.difficulty];
       difficulty.addClass(colorClass);
@@ -104,6 +127,7 @@ function displayClasses(classes) {
       card.append(img);
       cardBody.append(cardTitle);
       cardBody.append(cardText);
+      cardBody.append(coverageElement);
       cardBody.append(difficulty);
       card.append(cardBody);
 

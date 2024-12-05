@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -375,7 +376,7 @@ public class RobotUtil {
 
 		//EDIT: definizione di className e inizializzazione delle liste di stringhe da caricare poi in classe
 		String className = classUT.getName(); 	 
-		List<String> coverageList= new ArrayList<String>();
+		String coverageList[] = new String[6];
 		//FINE EDIT
 
 		/*CARICAMENTO CLASSE NEI VOLUMI T8 E T9*/
@@ -463,7 +464,7 @@ public class RobotUtil {
 			System.out.println("La copertura del livello " + String.valueOf(livello) + " è: " + String.valueOf(score));
 			
 			//Edit: aggiunta coverage
-			coverageList.add(Integer.toString(score));
+			coverageList[livello-1] = String.valueOf(score);
 
 			saveT4(score, livello, className, randoopName);
 
@@ -490,13 +491,13 @@ public class RobotUtil {
 			System.out.println("La copertura del livello " + String.valueOf(livello) + " è: " + String.valueOf(score));
 
 			//Edit: aggiunta coverage
-			coverageList.add(Integer.toString(score));
+			coverageList[2+livello] = String.valueOf(score);
 
 			saveT4(score, livello, className, evosuiteName);
 
 		}
-
-		classUT.setCoverage(coverageList);
+		//Edit: impostazione delle coperture
+		classUT.setCoverage(Arrays.asList(coverageList));
 
 	}
     
