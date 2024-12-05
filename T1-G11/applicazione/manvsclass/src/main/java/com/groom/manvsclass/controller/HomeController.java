@@ -521,5 +521,11 @@ import org.springframework.web.bind.annotation.RequestBody;
     }
 
     // Fine Modifica 29/11/2024
+    @GetMapping("/teams_show")
+    @ResponseBody
+    public ModelAndView showTeamManagementPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+      return adminService.showTeamManagementPage(request, jwt);
+    }
+
 
  }
