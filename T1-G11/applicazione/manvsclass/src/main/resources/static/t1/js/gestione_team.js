@@ -1,16 +1,23 @@
+// Gestione delle sezioni della pagina
+function showSection(sectionId) {
+    // Nascondi tutte le sezioni
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    // Mostra solo la sezione selezionata
+    document.getElementById(sectionId).classList.add('active');
+}
+
+// Funzione per tornare alla home page dell'amministratore
+
+// Quando il DOM è completamente caricato
 document.addEventListener('DOMContentLoaded', function () {
     // Mostra la sezione "Lista Team" di default
     showSection('list-team');
+
+    // Aggiungi eventuali altre logiche di inizializzazione qui
 });
 
-
-// Funzione per tornare alla home page dell'amministratore
-function returnToHome() {
-    window.location.href = "/home_admin";
-}
-
-// Mostra la sezione di default
-showSection('add-team');
 
 // Gestisci il modulo per creare un team
 document.getElementById('teamForm').addEventListener('submit', function (event) {

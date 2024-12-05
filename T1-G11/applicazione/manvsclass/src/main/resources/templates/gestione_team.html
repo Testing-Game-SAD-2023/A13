@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Team</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
         body {
@@ -125,16 +128,14 @@
             transform: scale(0.98);
         }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestione Team</title>
 </head>
 <body>
-    <div id="alertMessage" th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-    <div id="successMessage" th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div id="alertMessage" class="alert alert-danger" style="display: none;"></div>
+    <div id="successMessage" class="alert alert-success" style="display: none;"></div>
 
     <h1>Gestione Team</h1>
-    <button class="top-left-button" onclick="returnToHome()">Home</button>
+    <a href = "/home_adm" data-uia="login-reset-psw"><button class="top-left-button">Home</button></a>
+
     <div class="dashboard">
         <h3>Gestione Team</h3>
         <nav>
@@ -142,24 +143,33 @@
             <a href="#list-team" onclick="showSection('list-team')">Lista Team</a>
         </nav>
     </div>
+
     <div class="content">
+        <!-- Sezione per creare un team -->
         <div id="add-team" class="section">
             <h2>Aggiungi Team</h2>
-            <form id="teamForm" method="post" action="/team/create">
+            <form id="teamForm">
                 <label for="teamName">Nome Team:</label>
                 <input type="text" id="teamName" name="teamName" required>
+
                 <label for="description">Descrizione:</label>
                 <textarea id="description" name="description" rows="3" required></textarea>
+
                 <label for="leaderId">ID Leader:</label>
                 <input type="text" id="leaderId" name="leaderId" required>
+
                 <label for="member">Membri del Team:</label>
-                <input type="text" id="member" name="member" required>
+                <input type="text" id="member" name="member" placeholder="Inserisci i membri separati da virgole" required>
+
                 <label for="creationDate">Data di Creazione:</label>
                 <input type="date" id="creationDate" name="creationDate" required>
+
                 <button type="submit">Aggiungi Team</button>
             </form>
         </div>
-        <div id="list-team" class="section">
+
+        <!-- Sezione per visualizzare i team -->
+        <div id="list-team" class="section active">
             <h2>Lista Team</h2>
             <table>
                 <thead>
@@ -171,10 +181,9 @@
                         <th>Data di Creazione</th>
                     </tr>
                 </thead>
-                <tbody id="teamListBody" th:utext="${teamTableRows}">
-                    <!-- Le righe saranno generate dinamicamente dal backend -->
+                <tbody id="teamListBody">
+                    <!-- Contenuto generato dinamicamente -->
                 </tbody>
-                
             </table>
         </div>
     </div>
