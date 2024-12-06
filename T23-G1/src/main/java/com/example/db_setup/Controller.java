@@ -122,11 +122,10 @@ public class Controller {
         return userService.getStudentsByIds(idsStudenti);
     }
 
-
     //Modifica 06/12/2024 Giuleppe: Aggiunta rotta
-    @GetMapping("/studentByEmail")
+    @GetMapping("/studentByEmail/{emailStudente}")
     @ResponseBody
-    public Map<String,Object> getStudentByEmail(@RequestBody String emailStudent){
+    public Map<String,Object> getStudentByEmail(@PathVariable("emailStudente") String emailStudent){
         return userService.getStudentByEmail(emailStudent);
     }
 
