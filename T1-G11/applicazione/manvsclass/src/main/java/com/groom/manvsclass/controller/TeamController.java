@@ -60,9 +60,9 @@ public class TeamController {
         return teamService.aggiungiStudenti(idTeam, idStudenti, jwt);
     }
     
-    @GetMapping("/ottieniStudentiTeam")
+    @GetMapping("/ottieniStudentiTeam/{idTeam}")
     @ResponseBody
-    public ResponseEntity<?> ottieniStudentiTeam(@RequestBody String idTeam, @CookieValue(name = "jwt", required = false) String jwt){
+    public ResponseEntity<?> ottieniStudentiTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt){
         return teamService.ottieniStudentiTeam(idTeam,jwt);
     }
 
