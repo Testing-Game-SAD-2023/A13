@@ -52,6 +52,11 @@ public class T23Service extends BaseService {
                 String.class, String.class, String.class
         ));
 
+        registerAction("GetUserByEmail", new ServiceActionDefinition(
+                params -> GetUserByEmail((String) params[0]),
+                String.class
+        ));
+
         registerAction("NewNotification", new ServiceActionDefinition(
                 params -> NewNotification((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class
@@ -109,6 +114,14 @@ public class T23Service extends BaseService {
         map.add("profilePicturePath", imagePath);
 
         return callRestPost(endpoint, map, null, Boolean.class);
+    }
+
+    private User GetUserByEmail(String userEmail) {
+        final String endpoint = "/user_by_email";
+
+        Map<String, String> queryParams = Map.of("email", userEmail);
+
+        return callRestGET(endpoint, queryParams, User.class);
     }
 
     // Metodo per la creazione di una notifica

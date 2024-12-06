@@ -7,6 +7,66 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector('#friend-search-input');
+    const suggestionsContainer = document.querySelector('#friend-suggestions');
+
+    if (searchInput && suggestionsContainer) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Gestione input nel campo di ricerca
+        searchInput.addEventListener("input", async function () {
+            const query = searchInput.value.trim();
+
+            // Validazione dell'email
+            if (!emailRegex.test(query)) {
+                suggestionsContainer.style.display = "none";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/getUserByEMail?email=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const profile = await response.json();
+
+                    // Svuota eventuali precedenti risultati
+                    suggestionsContainer.innerHTML = "";
+
+                    if (profile && profile.email) {
+                        const profileInfo = document.createElement('div');
+                        profileInfo.className = 'profile-info';
+                        profileInfo.textContent = `${profile.name} ${profile.surname}`;
+
+                        // Aggiungi gestione click sull'elemento del profilo
+                        profileInfo.addEventListener('click', function () {
+                            alert(`Selezionato: ${profile.name}`);
+                            suggestionsContainer.style.display = "none";
+                        });
+
+                        suggestionsContainer.appendChild(profileInfo);
+                        suggestionsContainer.style.display = "block";
+                    } else {
+                        // Nessun profilo trovato
+                        suggestionsContainer.style.display = "none";
+                    }
+                } else {
+                    console.error("Errore durante la ricerca del profilo:", response.statusText);
+                }
+            } catch (error) {
+                console.error("Errore di rete:", error);
+            }
+        });
+
+        // Nascondi il suggerimento quando si fa clic al di fuori
+        document.addEventListener("click", function (e) {
+            if (!suggestionsContainer.contains(e.target) && e.target !== searchInput) {
+                suggestionsContainer.style.display = "none";
+            }
+        });
+    }
+});
+
+
   // Gestione delle notifiche
   const notificationsList = document.querySelector('.notifications-list');
 

@@ -169,7 +169,13 @@
                 </div>
                 <div class="card-body">
                     <p><span th:text="${followers}"></span> Follower, <span th:text="${following}"></span> Following</p>
-                    <button class="btn btn-custom btn-sm" th:text="#{profile.searchFriend}">Trova amici tester</button>
+                    <!-- Barra di ricerca per amici -->
+                    <div class="friend-search">
+                        <input type="text" id="friend-search-input" class="form-control" placeholder="Cerca per email..." autocomplete="off">
+                        <ul id="friend-suggestions" class="list-group mt-2" style="position: absolute; z-index: 100; display: none;">
+                            <!-- Suggerimenti dinamici verranno aggiunti qui -->
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

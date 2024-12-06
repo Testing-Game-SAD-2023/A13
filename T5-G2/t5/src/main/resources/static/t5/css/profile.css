@@ -427,6 +427,19 @@ body {
     text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
+#friend-suggestions {
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+#friend-suggestions li {
+    cursor: pointer;
+    padding: 10px;
+}
+#friend-suggestions li:hover {
+    background-color: #f0f0f0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .container-fluid {

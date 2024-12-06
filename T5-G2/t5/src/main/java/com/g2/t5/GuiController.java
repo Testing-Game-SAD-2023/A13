@@ -164,6 +164,7 @@ public class GuiController {
         for (Notification notification : notifications) {
             String formattedate = notification.getTimestamp().format(formatter).toString();
             model.addAttribute("formattedDate", formattedate);
+            System.out.println("Notification ID: " + notification.getId() + ", isRead: " + notification.getIsRead());
         }
 
         // Mi prendo i progressi degli achievement
@@ -346,6 +347,12 @@ public class GuiController {
         main.setObjectComponents(bioObject);
         main.SetAuth(jwt);
         return main.handlePageRequest();
+        }
+
+    @GetMapping("/getUserByEMail")
+    public User getUserByEMail(Model model, @RequestParam(value = "email", required = true) String email) {
+        User user = (User) serviceManager.handleRequest("T23", "GetUserByEmail", email);
+        return user;
     }
 
     // Salvataggio delle modifiche al profilo

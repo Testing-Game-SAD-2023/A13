@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -623,10 +624,10 @@ public class Controller {
         return userRepository.findByID(Integer.parseInt(ID));
     }
 
-    @GetMapping("/profile_by_email")
+    @GetMapping("/user_by_email")
     @ResponseBody
-    public UserProfile getProfileByEmail(@RequestParam("email") String email) {
-        return userService.findProfileByEmail(email);
+    public User getUserByEmail(@RequestParam("email") String email) {
+        return userService.getUserByEmail(email);
     }
 
     @PostMapping("/edit_profile")
@@ -654,7 +655,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile not found");
         }
         notificationService.saveNotification(profile.getUser().getID(),title,message);
-                                                        
+
         return ResponseEntity.ok("Profile notifications updated successfully");
     }
 
@@ -664,7 +665,11 @@ public class Controller {
         if (profile == null) {
             System.out.println(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found"));
             return null;
-        }                                               
+        }
+        List<Notification> notifications = notificationService.getNotificationsByPlayer(profile.getUser().getID());
+        for (Notification notif : notifications) {
+            System.out.println(notif.isRead());
+        }
         return notificationService.getNotificationsByPlayer(profile.getUser().getID());
     }
 
@@ -680,7 +685,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");
         }
 
-        
+
         Long notifID = Long.parseLong(notificationID); // Converte l'ID della notifica da stringa a tipo Long
         boolean found = false; // Inizializza una variabile booleana per determinare se la notifica è stata trovata
         // Recupera tutte le notifiche associate all'utente utilizzando il suo ID
@@ -825,6 +830,12 @@ public class Controller {
     String referer = request.getHeader("Referer");
     return "redirect:" + (referer != null ? referer : "/");
 }
+
+    //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
+    @PostMapping("/studentsByIds")
+    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){
+        return userService.getStudentiTeam(idsStudenti);
+    }
 
 }
 
