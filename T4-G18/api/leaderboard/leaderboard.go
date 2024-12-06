@@ -4,7 +4,7 @@ import "strconv"
 
 type Row struct {
 	UserID int64 `json:"userId"`
-	Stat   int64 `json:"statistic"`
+	Stat   int32 `json:"statistic"`
 }
 
 type Leaderboard struct {

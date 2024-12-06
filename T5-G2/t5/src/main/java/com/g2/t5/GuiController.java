@@ -43,13 +43,15 @@ import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.AchievementProgress;
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
+import com.g2.Model.LeaderboardSubInterval;
 import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
+import com.g2.Service.LeaderboardService;
 
-import org.json.JSONArray;
+import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +63,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -73,6 +76,8 @@ public class GuiController {
 
     @Autowired
     private AchievementService achievementService;
+    @Autowired
+    private LeaderboardService leaderboardService;
 
     @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
@@ -367,33 +372,20 @@ public class GuiController {
         return main.handlePageRequest();
     }
 
-    // @CookieValue(name = "jwt", required = false) String jwt,
-
     @GetMapping("leaderboard/subInterval/{gamemode}/{statistic}/{startPos}/{endPos}")
-    public ResponseEntity<String> getPositions(@PathVariable(value = "gamemode") String gamemode,
+    @ResponseBody
+    public ResponseEntity<?> getPositions(@PathVariable(value = "gamemode") String gamemode,
             @PathVariable(value = "statistic") String statistic,
             @PathVariable(value = "startPos") int startPos,
             @PathVariable(value = "endPos") int endPos) {
-
-        String playerStatsList = (String) serviceManager.handleRequest("T4", "getPositions", gamemode, statistic,
-                startPos, endPos);
-        JSONObject playerStatsJson = new JSONObject(playerStatsList);
-
-        List<User> userList = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-
-        JSONArray positions = playerStatsJson.getJSONArray("positions");
-
-        for (int i = 0; i < positions.length(); i++) {
-            JSONObject position = positions.getJSONObject(i);
-            Long currentPlayerId = position.getLong("userId");
-            for (int e = 0; e < userList.size(); e++) {
-                if (userList.get(e).getId() == currentPlayerId) {
-                    position.put("userId", userList.get(e).getEmail());
-                }
-            }
+        try {
+            LeaderboardSubInterval lbSubInterval = leaderboardService.getLeaderboardSubInterval(gamemode, statistic,
+                    startPos, endPos);
+            return ResponseEntity.ok(lbSubInterval);
+        } catch (Exception e) {
+            HashMap<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Errore nella visualizzazione della classifica");
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);
         }
-
-        return ResponseEntity.ok(playerStatsJson.toString());
     }
-
 }

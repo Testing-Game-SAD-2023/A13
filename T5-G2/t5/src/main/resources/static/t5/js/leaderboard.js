@@ -5,6 +5,7 @@ const pagination = document.getElementById('pagination');
 let totalPages = 60; // #######################################
 let cache = {}
 
+
 const statisticOptions = {
     sfida: [
         { id: 'played_games', label: 'Partite giocate' },
@@ -22,14 +23,15 @@ const statisticOptions = {
 // GET 
 async function fetchRows(gamemode, statistic, startPage, endPage) {
     try {
-        const response = await fetch(`/leaderboard/subInterval/${gamemode}/${statistic}/${startPage}/${endPage}`);
+        const response = await fetch(`api/leaderboard/subInterval/${gamemode}/${statistic}/${startPage}/${endPage}`);
         const responseJson = await response.json();
 
+        console.log(responseJson)
         if (!response.ok) {
             message = responseJson['message'];
-            if (message) 
+            if (message)
                 throw new Error(message);
-            else 
+            else
                 //throw new Error(`HTTP error! Status: ${response.status}`);
                 throw new Error('Errore nel caricamento dei dati :(');
         }
@@ -101,8 +103,9 @@ async function getRows(gamemode, statistic, page) {
     }
 
     // fetch rows
+    let fetchedRows
     try {
-        const fetchedRows = await fetchRows(gamemode, statistic, startPage, endPage);
+        fetchedRows = await fetchRows(gamemode, statistic, startPage, endPage);
     } catch (error) {
         throw (error);
     }
@@ -276,12 +279,12 @@ async function loadPage(page) {
 // Page initialization
 
 // add listener for leaderboard creation
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const gamemode = document.querySelector('input[name="gamemode"]:checked').id;
     updateStatisticOptions(gamemode);
 
     const offcanvasElement = document.getElementById('offcanvasDarkNavbar');
-    offcanvasElement.addEventListener('show.bs.offcanvas', function () {
+    offcanvasElement.addEventListener('show.bs.offcanvas', function() {
         loadPage(1);
     });
 });
@@ -300,4 +303,3 @@ gamemodeSelectors.forEach(selector => {
         }
     });
 });
-

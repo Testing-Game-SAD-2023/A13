@@ -1,31 +1,33 @@
 package com.g2.Model;
 
+
 public class PlayerStats {
     private String email;
-    private Long playerId;
-    private int stats;
+    private Long userId;
+    private int statistic;
 
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public Long getPlayerId(){
-        return playerId;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setPlayerId(Long playerId){
-        this.playerId=playerId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public int getStats(){
-        return stats;
+    public int getStatistic() {
+        return statistic;
     }
 
-    public void setStats(int stats){
-        this.stats = stats;
+    public void setStatistic(int statistic) {
+        this.statistic = statistic;
     }
+ 
 }

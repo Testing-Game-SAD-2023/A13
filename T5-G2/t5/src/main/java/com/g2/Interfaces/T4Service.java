@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.g2.Model.Game;
+import com.g2.Model.LeaderboardSubInterval;
 import com.g2.Model.StatisticProgress;
 
 import org.json.JSONArray;
@@ -247,26 +248,13 @@ public class T4Service extends BaseService {
         return respose;
     }
 
-    private String getPositions(String gamemode, String statistica, int startPosition, int endPosition) {
+    private LeaderboardSubInterval getPositions(String gamemode, String statistica, int startPosition,
+            int endPosition) {
         String endpoint = "leaderboard/subInterval" + "/" + gamemode + "/" + statistica + "/" + startPosition + "/"
                 + endPosition;
-        String jsonResponse = callRestGET(endpoint, null, String.class);
+        LeaderboardSubInterval jsonResponse = callRestGET(endpoint, null, LeaderboardSubInterval.class);
 
         return jsonResponse;
     }
 
-    /*
-     * Map<String, String> queryParams = new HashMap<>();
-     * queryParams.put("jwt", jwt);
-     * queryParams.put("gameMode", gameMode);
-     * queryParams.put("statistica", statistica);
-     * queryParams.put("startPosition", String.valueOf(startPosition));
-     * queryParams.put("endPosition", String.valueOf(startPosition));
-     * 
-     * ParameterizedTypeReference<List<PlayerStats>> typeRef = new
-     * ParameterizedTypeReference<>() {};
-     * //Aggiungere un altro campo per int lastPosition?
-     * 
-     * return callRestGET("/leaderboard/getPositions", queryParams, typeRef);
-     */
 }
