@@ -90,7 +90,7 @@ public class UserService {
     }
   
     //Modifica 04/12/2024
-    public ResponseEntity<?> getStudentiTeam(List<String> idUtenti) {
+    public ResponseEntity<?> getStudentsByIds(List<String> idUtenti) {
         System.out.println("Inizio metodo getStudentiTeam. ID ricevuti: " + idUtenti);
     
             // Controlla se la lista di ID è vuota

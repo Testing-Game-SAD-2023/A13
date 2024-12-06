@@ -117,8 +117,8 @@ public class Controller {
 
     //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
     @PostMapping("/studentsByIds")
-    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){
-        return userService.getStudentiTeam(idsStudenti);
+    public ResponseEntity<?> getStudentsByIds(@RequestBody List<String> idsStudenti){
+        return userService.getStudentsByIds(idsStudenti);
     }
 
 
