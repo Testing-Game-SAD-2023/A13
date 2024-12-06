@@ -163,7 +163,7 @@ public class T23Service extends BaseService {
 
         Map<String, String> queryParams = Map.of(
             "email", userEmail,
-            "id notifica", notificationID
+            "idnotifica", notificationID
         );
 
         return callRestDelete(endpoint, queryParams);

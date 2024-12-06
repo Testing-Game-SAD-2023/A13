@@ -638,7 +638,6 @@ public class Controller {
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false); // Ritorna false in caso di errore
         }
-
         profile.setBio(bio);
         profile.setProfilePicturePath(profilePicturePath);
         userService.saveProfile(profile);
@@ -646,6 +645,7 @@ public class Controller {
         return ResponseEntity.ok(true); // Ritorna true se l'operazione ha avuto successo
     }
 
+    //MODIFICA 26/11/24 per le notifiche
     @PostMapping("/new_notification")
     public ResponseEntity<String> updateNotifications(@RequestParam("email") String email,
                                                     @RequestParam("title") String title,
@@ -714,7 +714,7 @@ public class Controller {
 
     @DeleteMapping("/delete_notification")
     public ResponseEntity<String> deleteNotification(@RequestParam("email") String email,
-                                                    @RequestParam("id notifica") String notificationID) {
+                                                    @RequestParam("idnotifica") String notificationID) {
         // Cerca il profilo dell'utente utilizzando l'email fornita come parametro
         UserProfile profile = userService.findProfileByEmail(email);
 
