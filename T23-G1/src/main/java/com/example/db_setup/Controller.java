@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -125,8 +126,8 @@ public class Controller {
     //Modifica 06/12/2024 Giuleppe: Aggiunta rotta
     @GetMapping("/studentByEmail")
     @ResponseBody
-    public User getStudentByEmail(@RequestBody String emailStudent){
-        return userService.getUserByEmail(emailStudent);
+    public Map<String,Object> getStudentByEmail(@RequestBody String emailStudent){
+        return userService.getStudentByEmail(emailStudent);
     }
 
 
