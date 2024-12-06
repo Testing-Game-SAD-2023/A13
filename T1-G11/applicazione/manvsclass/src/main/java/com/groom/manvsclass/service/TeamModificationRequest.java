@@ -1,5 +1,6 @@
 package com.groom.manvsclass.service;
 //E' giusto una classe per inviare correttamente la richiesta di modifica del nome
+//Da eliminare
 public class TeamModificationRequest {
     private String idTeam;
     private String newName;

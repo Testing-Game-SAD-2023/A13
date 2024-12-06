@@ -35,7 +35,7 @@ public class TeamController {
     }
 
     // Endpoint per modificare il nome di un team
-    @PutMapping("/modificaTeam")
+    @PutMapping("/modificaNomeTeam")
     @ResponseBody
     public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request,@CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.modificaNomeTeam(request,jwt);
