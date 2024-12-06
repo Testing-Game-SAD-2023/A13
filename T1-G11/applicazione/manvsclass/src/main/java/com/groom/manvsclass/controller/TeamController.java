@@ -47,17 +47,17 @@ public class TeamController {
         return teamService.visualizzaTeams(jwt);
     }
 
+    @GetMapping("/cercaTeam/{idTeam}")
+    @ResponseBody
+    public ResponseEntity<?> cercaTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.cercaTeam(idTeam, jwt);
+    }
+
     //Modifica 04/12/2024: aggiunta di una lista di idStudenti al team
     @PutMapping("/aggiungiStudenti/{idTeam}")
     @ResponseBody
     public ResponseEntity<?> aggiungiStudenti(@PathVariable("idTeam") String idTeam, @RequestBody List<String> idStudenti, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.aggiungiStudenti(idTeam, idStudenti, jwt);
-    }
-
-    @GetMapping("/cercaTeam/{idTeam}")
-    @ResponseBody
-    public ResponseEntity<?> visualizzaTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.visualizzaTeam(idTeam, jwt);
     }
     
     @GetMapping("/ottieniStudentiTeam")
@@ -66,17 +66,11 @@ public class TeamController {
         return teamService.ottieniStudentiTeam(idTeam,jwt);
     }
 
-<<<<<<< HEAD
-    
-=======
     //Modifica 05/12/2024: aggiunta rimozione studente da un team
     @PutMapping("/rimuoviStudenteTeam/{idTeam}")
     @ResponseBody
     public ResponseEntity<?> rimuoviStudenteTeam(@PathVariable("idTeam") String idTeam,@RequestBody String idStudente,@CookieValue(name = "jwt", required = false) String jwt){
         return teamService.rimuoviStudenteTeam(idTeam,idStudente,jwt);
     }
->>>>>>> aa58aca9ec06edc46664cf80d755bcef79518ce0
-
-
 }
 

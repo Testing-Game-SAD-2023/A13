@@ -115,6 +115,21 @@ public class Controller {
     Pattern p = Pattern.compile(regex);
 
 
+    //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
+    @PostMapping("/studentsByIds")
+    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){
+        return userService.getStudentiTeam(idsStudenti);
+    }
+
+
+    //Modifica 06/12/2024 Giuleppe: Aggiunta rotta
+    @GetMapping("/studentByEmail")
+    @ResponseBody
+    public User getStudentByEmail(@RequestBody String emailStudent){
+        return userService.getUserByEmail(emailStudent);
+    }
+
+
     // Registrazione
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestParam("name") String name,
@@ -625,12 +640,6 @@ public class Controller {
     @GetMapping("/students_list")
     public List<User> getAllStudents() {
         return userRepository.findAll();
-    }
-    
-    //Modifica 04/12/2024: Aggiunta rotta
-    @PostMapping("/studentiTeam")
-    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){
-        return userService.getStudentiTeam(idsStudenti);
     }
 
     @GetMapping("/students_list/{ID}")

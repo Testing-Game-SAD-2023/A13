@@ -45,7 +45,7 @@ public class StudentService {
 
             // 3. Configura la richiesta HTTP POST
             System.out.println("Configurazione della richiesta HTTP POST...");
-            HttpPost httpPost = new HttpPost("http://t23-g1-app-1:8080/studentiTeam");
+            HttpPost httpPost = new HttpPost("http://t23-g1-app-1:8080/studentsByIds");
             httpPost.setHeader("Authorization", "Bearer " + jwt);
             httpPost.setHeader("Content-Type", "application/json");
             httpPost.setEntity(entity);

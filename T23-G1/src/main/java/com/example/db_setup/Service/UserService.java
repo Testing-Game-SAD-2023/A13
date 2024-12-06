@@ -35,10 +35,15 @@ public class UserService {
     // Stessa cosa di sopra
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
+    
     // Recupera dal DB l'utente con l'email specificata
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+
+    
+    
     // Crea un nuovo utente con i dettagli forniti da OAuthUserGoogle, recuperati dall'accesso OAuth2
     // e lo salva nel DB
     public User createUserFromOAuth(OAuthUserGoogle oauthUser) {
