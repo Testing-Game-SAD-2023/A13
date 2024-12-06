@@ -133,8 +133,6 @@ public class T23Service extends BaseService {
      
         String response = callRestPut(endpoint, requestBody, queryParams, null, String.class);
         
-        System.out.println(response);
-
         return response;
 
     }

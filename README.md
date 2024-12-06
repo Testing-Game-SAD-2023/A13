@@ -4,6 +4,8 @@
         - `User.java` aggiunto i campi di:
           - `List<User> following` [Logica Follow]
           - `List<User> followers` [Logica Follow]
+          - `missionToken`
+          - `biography`
     - Modifiche ai repository:
       - `UserRepository.java` aggiunto il metodo:
         - `existsFollowRelationship`
@@ -15,18 +17,45 @@
         - `modifyPlayer`
 2. Ui Gateway:
     - Aggiunto addFollow, rmFollow, searchPlayer, modifyPlayer, getFollowerListbyUserID a riga 51 di default.conf
+    - Aggiunto profile/modifyUser, profile/searchPlayer, profile/addFollow e profile/rmFollow a riga 58 di default.conf
 3. Modulo T5:
     - Modifiche a:
-      - `User.java`
+      - `User.java`, rispecchiando il model di T23
       - `T23ServiceTest.java`
-    - Mofiche front-end:
+    - Modifiche a Controller `GuiController.java`:
+      - Cambiata `/profile/{playerID}`, per gestire correttamente il prelievo degli utenti e se renderizzare pagina personale o pagina followed
+      - Aggiunta le route `/profile/modifyUser`
+      - Aggiunta le route `/profile/searchPlayer`
+      - Aggiunta le route `/profile/addFollow`
+      - Aggiunta le route `/profile/rmFollow`
+    - Mofiche/Aggiunte front-end:
       - `profile.html`
-      - `profile.js`
+      - `profile.js`:
+        -`populateForm`
+        -`updateUserObject`
+        -`viewCompletedAchievements`
+        -`viewAllAchievements`
+        -`toggleAchievements`
+        -`saveChanges`
+        -`search`
+        -`renderSearchResults`
+        -`isUserFollowing`
+        -`toggleFollow`
+      - `profile_followed.html`
     - Aggiunto il service `UserService.java` con i metodi:
       - `getUserbyID`
+      - `isUserInFollower`
+      - `getAuthenticated`
+      - `modifyUser`
+      - `searchPlayer`
+      - `addFollow`
+      - `rmFollow`
     - Aggiunto al `T23Service.java` i metodi:
       - `GetUserbyID`
-
+      - `ModifyUser`
+      - `SearchPlayer`
+      - `AddFollow`
+      - `RmFollow`
 
 # Come Compilare:
 1. Creare un file .bat contente le righe da `echo "Installing Txxxx"` fino a `exit /b 0`
