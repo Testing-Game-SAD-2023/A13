@@ -14,6 +14,7 @@ function showSection(sectionId) {
 }
 // Quando il DOM è completamente caricato
 document.addEventListener('DOMContentLoaded', function () {
+    let datiTeam=[];
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
@@ -127,15 +128,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const teamForm = document.getElementById('teamForm');
     teamForm.addEventListener('submit', function (event) {
         event.preventDefault();
-
         const teamData = {
             teamName: document.getElementById('teamName').value,
             description: document.getElementById('description').value,
             leaderId: document.getElementById('leaderId').value,
             member: Array.from(memberSelect.selectedOptions).map(option => option.value), // Ottieni gli ID dei membri selezionati
             creationDate: document.getElementById('creationDate').value
-            
         };
+
 
         fetch('/team_create', {
             method: 'POST',
@@ -158,8 +158,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    //CODICE PER AVERE DETTAGLI DAI TEAM:
     const teamSelect = document.getElementById('team'); // Select della sezione "Dettagli Team"
+    const showTeamDetailsButton = document.getElementById('showTeamDetailsButton'); // Bottone "Mostra Dettagli"
+    const teamDetailsContainer = document.createElement('div'); // Contenitore per i dettagli del team
+    document.getElementById('dettagli-team').appendChild(teamDetailsContainer); // Aggiunge il contenitore nella sezione
 
     // Funzione per recuperare i team e popolare la select
     function fetchTeams() {
@@ -176,8 +178,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                // Popola la select con i team
-                teamSelect.innerHTML = ''; // Pulisce la select
+                datiTeam = data; // Salva i dati dei team
+                teamSelect.innerHTML = '<option value="">Seleziona un team</option>'; // Pulisce la select e aggiunge un'opzione iniziale
                 data.forEach(team => {
                     const option = document.createElement('option');
                     option.value = team.teamName; // Usa il nome del team come valore
@@ -191,21 +193,37 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    // Funzione per mostrare i dettagli del team selezionato
+    function displayTeamDetails(teamName) {
+        const team = datiTeam.find(t => t.teamName === teamName); // Cerca il team selezionato nei dati salvati
+        if (team) {
+            // Mostra i dettagli del team
+            teamDetailsContainer.innerHTML = `
+                <h3>Dettagli del Team</h3>
+                <p><strong>Nome:</strong> ${team.teamName}</p>
+                <p><strong>Descrizione:</strong> ${team.description}</p>
+                <p><strong>ID Leader:</strong> ${team.leaderId}</p>
+                <p><strong>Membri:</strong> ${team.member.join(', ')}</p>
+                <p><strong>Data di Creazione:</strong> ${team.creationDate}</p>
+            `;
+        } else {
+            alert('Team non trovato.');
+            teamDetailsContainer.innerHTML = ''; // Pulisce i dettagli in caso di errore
+        }
+    }
+
     // Richiama la funzione per popolare la select al caricamento della pagina
     fetchTeams();
 
-    // Evento per gestire il cambio del team selezionato
-    teamSelect.addEventListener('change', () => {
-        const selectedTeam = teamSelect.value;
+    // Evento per il click sul bottone "Mostra Dettagli"
+    showTeamDetailsButton.addEventListener('click', () => {
+        const selectedTeam = teamSelect.value; // Ottieni il valore del team selezionato
         if (selectedTeam) {
-            console.log(`Team selezionato: ${selectedTeam}`);
-            // Puoi aggiungere qui il codice per gestire ulteriori dettagli
+            displayTeamDetails(selectedTeam); // Mostra i dettagli del team selezionato
+        } else {
+            alert('Seleziona un team prima di visualizzare i dettagli.');
         }
     });
-
-
-
-
 
 
 });
