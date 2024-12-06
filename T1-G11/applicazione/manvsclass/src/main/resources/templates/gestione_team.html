@@ -127,6 +127,17 @@
             background-color: #149174;
             transform: scale(0.98);
         }
+        #selectedStudents {
+            list-style-type: none;
+            padding-left: 0;
+            font-size: 0.8em; /* Stile simile a un h5 */
+            margin: 0;
+        }
+
+        #selectedStudents li {
+            margin-bottom: 5px; /* Spaziatura tra gli elementi */
+        }
+
     </style>
 </head>
 <body>
@@ -159,12 +170,22 @@
                 <input type="text" id="leaderId" name="leaderId" required>
 
                 <label for="member">Membri del Team:</label>
-                <input type="text" id="member" name="member" placeholder="Inserisci i membri separati da virgole" required>
+                <select id="member" name="member[]" multiple class="form-control">
+                <!-- Le opzioni verranno generate dinamicamente -->
+                </select>
+                <div style="margin-left: 20px;">
+                    <h4>Studenti selezionati:</h4>
+                    <ul id="selectedStudents">
+                        <!-- Lista degli studenti selezionati -->
+                    </ul>
+                    
+                    <button id="clearSelectedStudents" type="button" class="btn btn-secondary">Pulisci Lista</button>
+                </div>
 
                 <label for="creationDate">Data di Creazione:</label>
                 <input type="date" id="creationDate" name="creationDate" required>
 
-                <button type="submit">Aggiungi Team</button>
+                <button type="submit" id="CreaTeam">Aggiungi Team</button>
             </form>
         </div>
 

@@ -443,7 +443,7 @@ import org.springframework.web.bind.annotation.RequestBody;
      }
      
         // INIZIO MODIFICA: Rotte per la gestione dei Team 29/11/2024
-    @PostMapping("/team")
+    @PostMapping("/team_create")
     @ResponseBody
     public ResponseEntity<Team> createTeam(@RequestBody Team team, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.createTeam(team, jwt);
@@ -527,5 +527,12 @@ import org.springframework.web.bind.annotation.RequestBody;
       return adminService.showTeamManagementPage(request, jwt);
     }
 
+    //Modifiche 06/12/2024
+    @GetMapping("/students_list")
+    @ResponseBody
+    public ResponseEntity<?> getStudentsList(@CookieValue(name = "jwt", required = false) String jwt) {
+    return teamService.getStudentsList(jwt);
+    }
+    
 
  }

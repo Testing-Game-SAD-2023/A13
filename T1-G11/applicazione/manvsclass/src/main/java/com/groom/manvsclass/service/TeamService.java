@@ -276,7 +276,34 @@ public ModelAndView createTeamAndReturnUpdatedList(Team team, HttpServletRequest
 }
 
 
+    //MODIFICA 06/12/2024
+    public ResponseEntity<?> getStudentsList(String jwt) {
+        String t2_3Url = "http://t23-g1-app-1:8080/students_list";
+        List<User> allStudents;
+    
+        try {
+            HttpEntity<Void> entity = jwtService.createJwtRequestEntity(jwt);
+    
+            ResponseEntity<List<User>> response = restTemplate.exchange(
+                t2_3Url,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<List<User>>() {}
+            );
+    
+            if (response.getStatusCode() != HttpStatus.OK) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error retrieving students from T2-3");
+            }
+    
+            allStudents = response.getBody();
+            return ResponseEntity.ok(allStudents);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error connecting to T2-3");
+        }
+    }
 
+    
+    
 
 
 }
