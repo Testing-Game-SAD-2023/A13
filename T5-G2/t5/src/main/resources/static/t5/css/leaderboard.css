@@ -5,3 +5,9 @@
 .search-box {
     max-width: 250px;
 }
+
+.tableError {
+    color: crimson;
+    font-weight: bold;
+    padding: 20px;
+}

@@ -23,10 +23,25 @@ const statisticOptions = {
 async function fetchRows(gamemode, statistic, startPage, endPage) {
     try {
         const response = await fetch(`/leaderboard/subInterval/${gamemode}/${statistic}/${startPage}/${endPage}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`)
-        }
         const responseJson = await response.json();
+
+        if (!response.ok) {
+            message = responseJson['message'];
+            if (message) 
+                throw new Error(message);
+            else 
+                //throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error('Errore nel caricamento dei dati :(');
+        }
+
+        // validazione
+        if (!responseJson
+            || typeof responseJson !== 'object'
+            || !Array.isArray(responseJson.positions)) {
+            //|| !Number.isInteger(responseJson.totalLength)) {
+            throw new Error('Errore nel caricamento dei dati :(');
+        }
+
         rows = responseJson["positions"];
         //totalLength = responseJson[totalLength]
         let startRow = (startPage - 1) * rowsPerPage
@@ -35,6 +50,7 @@ async function fetchRows(gamemode, statistic, startPage, endPage) {
     }
     catch (error) {
         console.error('Error fetching data:', error);
+        throw error;
     }
 }
 
@@ -85,7 +101,11 @@ async function getRows(gamemode, statistic, page) {
     }
 
     // fetch rows
-    const fetchedRows = await fetchRows(gamemode, statistic, startPage, endPage);
+    try {
+        const fetchedRows = await fetchRows(gamemode, statistic, startPage, endPage);
+    } catch (error) {
+        throw (error);
+    }
     const startRow = (startPage - 1) * rowsPerPage;
 
     if (!cache[gamemode]) {
@@ -169,6 +189,23 @@ function renderPagination(currentPage) {
     pagination.appendChild(lastButton);*/
 }
 
+function renderTableError(error) {
+    tableBody.innerHTML = '';
+
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    const span = document.createElement('span');
+    span.className = 'tableError';
+    span.textContent = `${error}`;
+
+    td.setAttribute('colspan', '100%');
+    td.setAttribute('style', 'text-align:center')
+    td.appendChild(span);
+
+    tr.appendChild(td);
+    tableBody.appendChild(tr);
+}
+
 
 // Render statistic options based on the selected gamemode
 function updateStatisticOptions(gamemode) {
@@ -221,7 +258,12 @@ async function loadPage(page) {
 
     // fetch page if not in cache
     if (!(cache?.[gamemode]?.[statistic]?.[page])) {
-        await getRows(gamemode, statistic, page);
+        try {
+            await getRows(gamemode, statistic, page);
+        } catch (error) {
+            renderTableError(error);
+            return;
+        }
     }
 
     // render table and buttons
@@ -231,17 +273,15 @@ async function loadPage(page) {
 
 
 
-
-
 // Page initialization
 
 // add listener for leaderboard creation
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const gamemode = document.querySelector('input[name="gamemode"]:checked').id;
     updateStatisticOptions(gamemode);
 
     const offcanvasElement = document.getElementById('offcanvasDarkNavbar');
-    offcanvasElement.addEventListener('show.bs.offcanvas', function() {
+    offcanvasElement.addEventListener('show.bs.offcanvas', function () {
         loadPage(1);
     });
 });
