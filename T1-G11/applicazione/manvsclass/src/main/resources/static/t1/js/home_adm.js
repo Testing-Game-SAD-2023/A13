@@ -1,4 +1,5 @@
-
+// ---REFACTORING TOTALE 5/12/2024---
+//Function per la disconnessione 
 function Disconnessione() {
 
   fetch('/logout_admin', {
@@ -31,7 +32,7 @@ function Disconnessione() {
   });
 }
 
-
+//Function invita 
 function Invita() {
 
   fetch('/invite_admins', {
@@ -94,7 +95,7 @@ function Scalata() {
   });
 }
 
-//Modifica 29/11/2024: Creazione chiamate Teams per reindirizzare alla view
+//Modifica 05/12/2024: Creazione chiamate Teams per reindirizzare alla view
 document.querySelector('.button-team').addEventListener('click', Teams);
 
 function Teams() {
@@ -125,36 +126,7 @@ function Teams() {
   });
 }
 
-//Modifica 29/11/2024: creazione funzione Assignments per reinderizzare alla view.
-function Assignments() {
-  fetch('/assignments', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  })
-  .then(response => {
-    console.log('Response:', response);
-    if(response.status == 200) {
-      
-      response.text().then(okMessage => {
-        alert("Verrai reindirizzato alla pagina degli assignments.");
-      })
-
-      window.location.href = "/assignments";  // Reindirizza alla pagina degli assignments
-    }
-    else {
-      response.text().then(errorMessage => {
-        alert(errorMessage);
-      })
-    }
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-    //Aggiungi qui il codice per gestire gli errori
-  });
-}
-
+//Funzione get admin per la visualizzazione del nome utente 
 function getAdmin() {
   // Controlla se il nome dell'utente è già memorizzato nel localStorage
   const username = localStorage.getItem('usernameAdmin');
@@ -181,7 +153,7 @@ function getAdmin() {
           localStorage.setItem('usernameAdmin', data);
 
           // Mostra il nome utente nel DOM
-          document.getElementById("username-display").textContent = `Username: ${data}`;
+          document.getElementById("username-display").textContent = `${data}`;
       })
       .catch((error) => {
           console.error("Errore nella fetch:", error);

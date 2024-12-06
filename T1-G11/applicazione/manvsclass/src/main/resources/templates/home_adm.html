@@ -1,4 +1,4 @@
-<!--MODIFICA (12/02/2024): Restyling pagina-->
+<!--REFACTORING TOTALE (5/12/2024): Restyling pagina-->
 <!DOCTYPE html>
 <html lang="en" >
 <head>
@@ -14,6 +14,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 <link rel="stylesheet" href="/t1/css/home_adm.css">
+<!--Nuovo font per gli elementi-->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900" class="rel">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -29,10 +30,10 @@
 
    <!-- Barra laterale -->
    <div class="sidebar">
-    <p id="username-display"></p>
-    <a href="info">Info</a>
-    <a href="/player">Players</a>
-	<button onclick="Invita()">Invita</button>
+    <p id="username-display"></p><!--Inserimento dinamico del nome dell'admin-->
+    <a href="info">Info</a><!--Rimando alla pagina di info admin-->
+    <a href="/player">Players</a><!--Rimando alla pagina dei players-->
+	<button onclick="Invita()">Invita</button><!--Rimando alla pagina di invito-->
 
     <!-- Logout in basso a sinistra -->
   <button class="logout" onclick="Disconnessione()">Logout</button>
@@ -41,23 +42,23 @@
 
 	<!-- Contenitore dei bottoni -->
 	<div class="dashboard-container">
-		<div class="button-team" id="button-generics">
+		<div class="button-team" id="button-generics"><!--Folder di rimando alla pagina di gestione teams-->
 		<div class="icon">📊</div>
 		<h3>Teams</h3>
 		<p>Gestisci i team</p>
 		</div>
-		<div class="button-scalata" id="button-generics">
+		<div class="button-scalata" id="button-generics"><!--Rimando alla pagina scalata -->
 		<div class="icon">🚀</div>
 		<h3>Scalata</h3>
 		<p>Crescita continua</p>
 		</div>
-		<div class="button-achievement" id="button-generics">
+		<div class="button-achievement" id="button-generics"><!--Rimando alla pagina di visualizzazione achievement-->
 			<div class="icon">🏆</div>
 			<h3>Achievement</h3>
 			<p>Assegna gli Achievement</p>
 		</div>
 		
-		<div class="button-class" id="button-generics">
+		<div class="button-class" id="button-generics"><!--Rimando alla pagina delle classi-->
 			<div class="icon">🤖</div>
 			<h3>Classes</h3>
 			<p>Crea le tue classi di test</p>

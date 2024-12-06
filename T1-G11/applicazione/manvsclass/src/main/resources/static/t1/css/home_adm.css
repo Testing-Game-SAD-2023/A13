@@ -13,11 +13,11 @@ body {
   justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  padding-top: 20px;
 }
 
 header {
   margin-bottom: 40px;
+  text-align: center;
 }
 
 h1 {
@@ -66,7 +66,7 @@ h1 {
 display: block;
 width: 100%; /* Per assicurare che abbiano la stessa larghezza */
 padding: 15px;
-text-align: left; /* Allineamento coerente con i link */
+text-align: left; 
 background: none; /* Rimuove lo stile di default del pulsante */
 border: none;
 color: white;
@@ -74,7 +74,8 @@ font-size: 18px;
 cursor: pointer;
 transition: background-color 0.3s ease;
 margin: 10px 0;
-text-decoration: none; /* Stile coerente con i link */
+text-decoration: none; 
+font-family: 'Alegreya Sans', sans-serif;
 }
 
 /* Hover per i pulsanti */
@@ -112,11 +113,8 @@ background-color: #d32f2f;
   grid-template-columns: repeat(2, 250px); /* 2 colonne per i bottoni */
   gap: 30px;
   justify-items: center;
- 
-  position: relative;
+  justify-content: center; /* Centra gli elementi */
   left: 5%;  /* Allinea i bottoni a destra */
- 
- 
 }
 
 #button-generics {
