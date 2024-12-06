@@ -6,9 +6,8 @@ import java.util.List;
 
 @Document(collection = "Team")
 public class Team {
-    
-    //private String id;
     @Id
+    private String id;
     private String teamName;
     private String description;
     private String leaderId; // ID dell'amministratore o leader del team

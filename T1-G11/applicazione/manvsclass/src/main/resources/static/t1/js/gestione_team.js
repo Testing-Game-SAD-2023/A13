@@ -4,13 +4,55 @@ function showSection(sectionId) {
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
     });
-    // Mostra solo la sezione selezionata
-    document.getElementById(sectionId).classList.add('active');
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    } else {
+        console.error(`Sezione con ID '${sectionId}' non trovata.`);
+    }
+
 }
 // Quando il DOM è completamente caricato
 document.addEventListener('DOMContentLoaded', function () {
-    // Mostra la sezione "Lista Team" di default
+    document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const targetId = link.getAttribute('href').replace('#', '');
+            showSection(targetId);
+        });
+    });
+
+    // Imposta la sezione di default (ad esempio, "lista team")
     showSection('list-team');
+
+    const teamListBody = document.getElementById('teamListBody');
+
+    // Effettua la richiesta GET per ottenere il contenuto HTML della tabella
+    fetch('/teams_view', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${document.cookie.split('jwt=')[1]}`
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    alert('Accesso non autorizzato. Verifica il tuo JWT.');
+                } else {
+                    throw new Error('Errore nel recupero dei team.');
+                }
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Inserisci l'HTML direttamente nella tabella
+            teamListBody.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            alert('Si è verificato un errore durante il caricamento dei team.');
+        });
+
     const memberSelect = document.getElementById('member');
     const selectedStudentsList = document.getElementById('selectedStudents');
     const clearButton = document.getElementById('clearSelectedStudents');
@@ -78,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Svuota la lista degli studenti selezionati
         selectedStudentsList.innerHTML = '';
     });
-});
+
 
 
     // Gestisci il modulo per creare un team
@@ -114,3 +156,56 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Errore:', error));
     });
+
+
+    //CODICE PER AVERE DETTAGLI DAI TEAM:
+    const teamSelect = document.getElementById('team'); // Select della sezione "Dettagli Team"
+
+    // Funzione per recuperare i team e popolare la select
+    function fetchTeams() {
+        fetch('/team_view', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${document.cookie.split('jwt=')[1]}` // Estrae il JWT dal cookie
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore nel recupero della lista dei team.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Popola la select con i team
+                teamSelect.innerHTML = ''; // Pulisce la select
+                data.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team.teamName; // Usa il nome del team come valore
+                    option.textContent = team.teamName; // Mostra il nome del team
+                    teamSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                alert('Si è verificato un errore durante il caricamento della lista dei team.');
+            });
+    }
+
+    // Richiama la funzione per popolare la select al caricamento della pagina
+    fetchTeams();
+
+    // Evento per gestire il cambio del team selezionato
+    teamSelect.addEventListener('change', () => {
+        const selectedTeam = teamSelect.value;
+        if (selectedTeam) {
+            console.log(`Team selezionato: ${selectedTeam}`);
+            // Puoi aggiungere qui il codice per gestire ulteriori dettagli
+        }
+    });
+
+
+
+
+
+
+});

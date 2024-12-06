@@ -67,7 +67,7 @@ public class TeamService {
     }
 
     /**
-     * Prendi tutti i team.
+     * Prendi tutti i team. --> restituisce la lista: utile per la select
      */
     public ResponseEntity<List<Team>> getAllTeams(String jwt) {
         if (!jwtService.isJwtValid(jwt)) {
@@ -212,7 +212,7 @@ public class TeamService {
         return modelAndView;
     }
 
-    public ModelAndView showTeamPage(HttpServletRequest request, String jwt) {
+    /* public ModelAndView showTeamPage(HttpServletRequest request, String jwt) {
     System.out.println("(GET /team/view) Token JWT valido?");
     
     if (!jwtService.isJwtValid(jwt)) {
@@ -244,9 +244,9 @@ public class TeamService {
     model.addObject("teamTableRows", tableRowsHtml.toString());
 
     return model;
-}
+} */
 
-public ModelAndView createTeamAndReturnUpdatedList(Team team, HttpServletRequest request, String jwt) {
+/* public ModelAndView createTeamAndReturnUpdatedList(Team team, HttpServletRequest request, String jwt) {
     System.out.println("(POST /team/create) Token JWT valido?");
 
     if (!jwtService.isJwtValid(jwt)) {
@@ -274,7 +274,7 @@ public ModelAndView createTeamAndReturnUpdatedList(Team team, HttpServletRequest
     model.addObject("successMessage", "Team creato con successo!");
     return model;
 }
-
+ */
 
     //MODIFICA 06/12/2024
     public ResponseEntity<?> getStudentsList(String jwt) {
@@ -302,7 +302,28 @@ public ModelAndView createTeamAndReturnUpdatedList(Team team, HttpServletRequest
         }
     }
 
+    public ResponseEntity<String> getAllTeamsAsHtml(String jwt) {
+        // Controlla se il JWT è valido
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Accesso non autorizzato");
+        }
     
+        // Recupera tutti i team dal repository
+        List<Team> teams = teamRepository.findAll();
+    
+        // Genera il contenuto HTML per il corpo della tabella
+        StringBuilder htmlBuilder = new StringBuilder();
+        for (Team team : teams) {
+            htmlBuilder.append("<tr>")
+                .append("<td>").append(team.getTeamName()).append("</td>")
+                .append("<td>").append(team.getDescription()).append("</td>")
+                .append("<td>").append(team.getLeaderId()).append("</td>")
+                .append("<td>").append(String.join(", ", team.getMember())).append("</td>")
+                .append("<td>").append(team.getCreationDate().toString()).append("</td>")
+                .append("</tr>");
+        }
+        return ResponseEntity.ok(htmlBuilder.toString());
+    }
     
 
 

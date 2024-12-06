@@ -57,14 +57,17 @@ public class TeamSearchImpl {
     public void addTeam(Team team) {
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("Team");
-
+    
+        // Converti la lista di membri in un formato compatibile con MongoDB
+        List<String> members = team.getMember(); // Assumi che `getMember` restituisca una lista di stringhe
+    
         Document teamDoc = new Document()
             .append("teamName", team.getTeamName()) // Usato teamName come identificatore
             .append("description", team.getDescription())
             .append("leaderId", team.getLeaderId())
-            .append("member", team.getMember())
+            .append("member", members) // Inserisci direttamente l'array dei membri
             .append("creationDate", team.getCreationDate());
-
+    
         collection.insertOne(teamDoc);
     }
 

@@ -152,6 +152,7 @@
         <nav>
             <a href="#add-team" onclick="showSection('add-team')">Crea Team</a>
             <a href="#list-team" onclick="showSection('list-team')">Lista Team</a>
+            <a href="#dettagli-team" onclick="showSection('dettagli-team')">Dettagli Team</a>
         </nav>
     </div>
 
@@ -207,6 +208,15 @@
                 </tbody>
             </table>
         </div>
+
+        <!--Sezione per avere i dettagli del team-->
+        <div id="dettagli-team" class="section">
+            <h2>Scegli il team di cui vuoi visualizzare i dettagli</h2>
+            <select id="team">
+                <!-- Le opzioni verranno generate dinamicamente -->
+            </select>
+        </div>
+
     </div>
     <script src="/t1/js/gestione_team.js"></script>
 </body>

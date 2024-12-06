@@ -46,7 +46,8 @@ import com.groom.manvsclass.service.Util;
  import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
- import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
  import org.springframework.web.bind.annotation.ResponseBody;
  import org.springframework.web.multipart.MultipartFile;
  import org.springframework.web.servlet.ModelAndView;
@@ -455,7 +456,8 @@ import org.springframework.web.bind.annotation.RequestBody;
         return teamService.getTeamByName(teamName, jwt);
     }
 
-    @GetMapping("/teams")
+    //usata per visualizzare la select con tutta la lista di team.
+    @GetMapping("/team_view")
     @ResponseBody
     public ResponseEntity<List<Team>> getAllTeams(@CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.getAllTeams(jwt);
@@ -510,15 +512,15 @@ import org.springframework.web.bind.annotation.RequestBody;
     return teamService.showTeamDetails(teamName, jwt);
     }
     
-    @GetMapping("/team/view")
+   /*  @GetMapping("/team/view")
     public ModelAndView showTeamPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
     return teamService.showTeamPage(request, jwt);
-    }
+    } */
 
-    @PostMapping("/team/create")
+    /* @PostMapping("/team/create")
     public ModelAndView createTeam(@RequestBody Team team, HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.createTeamAndReturnUpdatedList(team, request, jwt);
-    }
+    } */
 
     // Fine Modifica 29/11/2024
     @GetMapping("/teams_show")
@@ -534,5 +536,10 @@ import org.springframework.web.bind.annotation.RequestBody;
     return teamService.getStudentsList(jwt);
     }
     
+    @GetMapping("/teams_view")
+    public ResponseEntity<String> getAllTeamsAsHtml(@RequestHeader("Authorization") String jwt) {
+        String token = jwt.replace("Bearer ", ""); // Rimuove il prefisso Bearer
+        return teamService.getAllTeamsAsHtml(token);
+    }
 
  }
