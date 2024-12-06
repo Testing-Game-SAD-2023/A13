@@ -204,7 +204,7 @@ public class TeamService {
     }
 
     //Modifica 03/12/2024: Aggiunta della visualizzazione del singolo team
-    public  ResponseEntity<?> visualizzaTeam(String idTeam, String jwt) {    
+    public  ResponseEntity<?> cercaTeam(String idTeam, String jwt) {    
 
         // Verifica se il token JWT è presente
         // 1. Verifica se il token JWT è valido
