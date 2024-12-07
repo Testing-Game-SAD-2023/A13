@@ -3,10 +3,11 @@ version: '3.1'
 services:
   app:
     build: .
-    expose:
-      - 8080
-    # ports:
-    #   - "8081:8080"
+    container_name: t23-b12-app-1
+    #expose:
+    #  - 8080
+    ports:
+       - "8081:8080"
     depends_on:
       - db
     environment:
@@ -18,6 +19,7 @@ services:
 
   db:
     image: mysql:latest
+    container_name: t23-b12-db-1
     environment:
       MYSQL_ROOT_PASSWORD: 'password'
       MYSQL_DATABASE: studentsrepo
