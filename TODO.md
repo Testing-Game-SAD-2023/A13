@@ -3,6 +3,7 @@
 3-Valutare se è necessario utilizzare jwt all'interno della rotta getPositions del T5
 4-Implementare logica di selezione corretta delle risorse all'interno del T4 (switch-case)
 5-Rivedere correttezza del trigger sulla tabella (probabilmente è necessario utilizzare on UPDATE anziché on Insert)
+6-Valutare lo stato attuale delle query su T4 (perché spesso vengono gestite come transactions)
 
 
 Estensioni possibili dei precedenti punti 

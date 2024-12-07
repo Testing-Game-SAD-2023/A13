@@ -142,10 +142,12 @@ func (Robot) TableName() string {
 }
 
 type PlayerStats struct {
-	ID               int64  `gorm:"primaryKey;autoIncrement"`
-	PlayerID         string `gorm:"default:null"`
-	SfidaWonGames    int64  `gorm:index`
-	SfidaPlayedGames int64  `gorm:index`
+	ID       int64 `gorm:"primaryKey;autoIncrement"`
+	PlayerID int64 `gorm:"default:null"` // precedentemente stavamo gestendo come string `gorm:"default:null"`
+	                                     // non dovrebbe cambiare nulla perché dovrebbe essere comunque castato al tipo
+                                    	 // di userId nella query
+	SfidaWonGames    int64 `gorm:"index"`
+	SfidaPlayedGames int64 `gorm:"index"`
 }
 
 func (PlayerStats) TableName() string {

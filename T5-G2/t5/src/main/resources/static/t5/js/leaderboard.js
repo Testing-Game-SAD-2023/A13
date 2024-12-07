@@ -23,7 +23,9 @@ const statisticOptions = {
 // GET 
 async function fetchRows(gamemode, statistic, startPage, endPage) {
     try {
-        const response = await fetch(`api/leaderboard/subInterval/${gamemode}/${statistic}/${startPage}/${endPage}`);
+        let startPos = (startPage - 1) * rowsPerPage
+        let endPos = endPage * rowsPerPage;
+        const response = await fetch(`api/leaderboard/subInterval/${gamemode}/${statistic}/${startPos}/${endPos}`);
         const responseJson = await response.json();
 
         console.log(responseJson)
@@ -46,9 +48,8 @@ async function fetchRows(gamemode, statistic, startPage, endPage) {
 
         rows = responseJson["positions"];
         //totalLength = responseJson[totalLength]
-        let startRow = (startPage - 1) * rowsPerPage
-        let endRow = endPage * rowsPerPage;
-        return rows.slice(startRow, endRow + 1);
+
+        return rows.slice(startPos, endPos + 1);
     }
     catch (error) {
         console.error('Error fetching data:', error);
