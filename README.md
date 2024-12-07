@@ -19,6 +19,8 @@
     - Aggiunto addFollow, rmFollow, searchPlayer, modifyPlayer, getFollowerListbyUserID a riga 51 di default.conf
     - Aggiunto profile/modifyUser, profile/searchPlayer, profile/addFollow e profile/rmFollow a riga 58 di default.conf
 3. Modulo T5:
+    - Aggiunto il model:
+      - `Ratio.java`
     - Modifiche a:
       - `User.java`, rispecchiando il model di T23
       - `T23ServiceTest.java`
@@ -50,6 +52,9 @@
       - `searchPlayer`
       - `addFollow`
       - `rmFollow`
+    - Aggiunto ad `AchivmentService.java` con i metodi:
+      - `calculateRatiosForPlayer`
+      - `getStatisticsByPlayer` [MODIFICATO]
     - Aggiunto al `T23Service.java` i metodi:
       - `GetUserbyID`
       - `ModifyUser`
