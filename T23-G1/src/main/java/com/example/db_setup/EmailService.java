@@ -38,4 +38,29 @@ public class EmailService {
 
     javaMailSender.send(message);
   }
+
+  public void sendMailUpdate(String email, Integer id) throws MessagingException {
+    MimeMessage message = javaMailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+    helper.setTo(email);
+    helper.setSubject("Email updated successfully ");
+
+    helper.setText("Welcome to GamesApp! This is your ID: " + id);
+
+    javaMailSender.send(message);
+  }
+
+  public void sendMailPassword(String email, Integer id) throws MessagingException{
+
+    MimeMessage message = javaMailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+    helper.setTo(email);
+    helper.setSubject("Password updated successfully ");
+
+    helper.setText("Welcome to GamesApp! This is your ID: " + id);
+
+    javaMailSender.send(message);
+  }
 }

@@ -749,6 +749,7 @@ public class Controller {
                 
         User user = userRepository.findByID(user_updated.ID);
         Matcher m = p.matcher(user_updated.password);
+        Boolean change_psw = false;
 
         if(user != null){
 
@@ -773,11 +774,6 @@ public class Controller {
                     if (user_email != null) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utente con questa email nuova già registrato");
                     }
-                    try {
-                        emailService.sendMailRegister(user_updated.email, user_updated.ID);
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
-                    }
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email nuova non valida");
                 }
@@ -797,11 +793,28 @@ public class Controller {
 
             if(!myPasswordEncoder.matches(old_psw, user_updated.password)){
                 user_updated.password = myPasswordEncoder.encode(user_updated.password);
+                change_psw = true;
             }
 
-
+            String old_email = user.email;
             userRepository.save(user_updated);
+
+            if(!old_email.equals(user_updated.email)){
+                try {
+                    emailService.sendMailUpdate(user_updated.email, user_updated.ID);
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+            }
             
+            if(change_psw){
+                try {
+                    emailService.sendMailPassword(user_updated.email, user_updated.ID);
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+            }
+
             return ResponseEntity.status(HttpStatus.OK).body("Agiornamento Completato");
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utente non esiste");
