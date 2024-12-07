@@ -14,7 +14,6 @@ function showSection(sectionId) {
 }
 // Quando il DOM è completamente caricato
 document.addEventListener('DOMContentLoaded', function () {
-    let datiTeam=[];
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const teamListBody = document.getElementById('teamListBody');
 
     // Effettua la richiesta GET per ottenere il contenuto HTML della tabella
-    fetch('/teams_view', {
+        fetch('/teams_view', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${document.cookie.split('jwt=')[1]}`
@@ -127,12 +126,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Gestisci il modulo per creare un team
     const teamForm = document.getElementById('teamForm');
     teamForm.addEventListener('submit', function (event) {
+
         event.preventDefault();
         const teamData = {
             teamName: document.getElementById('teamName').value,
             description: document.getElementById('description').value,
             leaderId: document.getElementById('leaderId').value,
-            member: Array.from(memberSelect.selectedOptions).map(option => option.value), // Ottieni gli ID dei membri selezionati
+            member: Array.from(selectedStudentsList.children).map(li => li.textContent), // Ottieni gli ID dei membri selezionati
             creationDate: document.getElementById('creationDate').value
         };
 
@@ -157,12 +157,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Errore:', error));
     });
 
-
     const teamSelect = document.getElementById('team'); // Select della sezione "Dettagli Team"
-    const showTeamDetailsButton = document.getElementById('showTeamDetailsButton'); // Bottone "Mostra Dettagli"
     const teamDetailsContainer = document.createElement('div'); // Contenitore per i dettagli del team
     document.getElementById('dettagli-team').appendChild(teamDetailsContainer); // Aggiunge il contenitore nella sezione
-
+    let datiTeam = []; // Variabile per salvare i dati dei team
     // Funzione per recuperare i team e popolare la select
     function fetchTeams() {
         fetch('/team_view', {
@@ -215,15 +213,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Richiama la funzione per popolare la select al caricamento della pagina
     fetchTeams();
 
-    // Evento per il click sul bottone "Mostra Dettagli"
-    showTeamDetailsButton.addEventListener('click', () => {
+    // Evento per il cambio di selezione del team
+    teamSelect.addEventListener('change', () => {
         const selectedTeam = teamSelect.value; // Ottieni il valore del team selezionato
         if (selectedTeam) {
             displayTeamDetails(selectedTeam); // Mostra i dettagli del team selezionato
         } else {
-            alert('Seleziona un team prima di visualizzare i dettagli.');
+            teamDetailsContainer.innerHTML = ''; // Pulisce i dettagli se nessun team è selezionato
         }
     });
-
-
 });

@@ -319,7 +319,6 @@ public class TeamService {
                 .append("<td>").append(team.getDescription()).append("</td>")
                 .append("<td>").append(team.getLeaderId()).append("</td>")
                 .append("<td>").append(String.join(", ", team.getMember())).append("</td>")
-                .append("<td>").append(team.getCreationDate().toString()).append("</td>")
                 .append("</tr>");
         }
         return ResponseEntity.ok(htmlBuilder.toString());

@@ -137,6 +137,29 @@
         #selectedStudents li {
             margin-bottom: 5px; /* Spaziatura tra gli elementi */
         }
+        .table-container {
+    max-height: 400px; /* Imposta l'altezza massima del contenitore */
+    overflow-y: auto; /* Abilita lo scrolling verticale */
+    border: 1px solid #ccc; /* Aggiungi un bordo per evidenziare l'area scrollabile */
+}
+
+table {
+    width: 100%; /* La tabella occupa tutta la larghezza del contenitore */
+    border-collapse: collapse; /* Rimuove gli spazi tra i bordi delle celle */
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Linea di separazione tra le righe */
+}
+
+th {
+    background-color: #f4f4f4; /* Colore di sfondo per l'intestazione */
+    position: sticky; /* Rende l'intestazione sempre visibile */
+    top: 0; /* Necessario per sticky */
+    z-index: 1; /* Mantiene l'intestazione sopra al contenuto */
+}
 
     </style>
 </head>
@@ -151,7 +174,7 @@
         <h3>Gestione Team</h3>
         <nav>
             <a href="#add-team" onclick="showSection('add-team')">Crea Team</a>
-            <a href="#list-team" onclick="showSection('list-team')">Lista Team</a>
+            <a id="list-team-link" href="#list-team" onclick="showSection('list-team')">Lista Team</a>
             <a href="#dettagli-team" onclick="showSection('dettagli-team')">Dettagli Team</a>
         </nav>
     </div>
@@ -190,25 +213,24 @@
             </form>
         </div>
 
-        <!-- Sezione per visualizzare i team -->
         <div id="list-team" class="section active">
             <h2>Lista Team</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome Team</th>
-                        <th>Descrizione</th>
-                        <th>ID Leader</th>
-                        <th>Membri</th>
-                        <th>Data di Creazione</th>
-                    </tr>
-                </thead>
-                <tbody id="teamListBody">
-                    <!-- Contenuto generato dinamicamente -->
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome Team</th>
+                            <th>Descrizione</th>
+                            <th>ID Leader</th>
+                            <th>Membri</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teamListBody">
+                        <!-- Contenuto generato dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
         </div>
-
         <!--Sezione per avere i dettagli del team-->
         <div id="dettagli-team" class="section">
             <h2>Scegli il team di cui vuoi visualizzare i dettagli</h2>
