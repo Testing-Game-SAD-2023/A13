@@ -1,7 +1,6 @@
 <html>
     <head>
-        <link href="/t5/css/main.css" rel="stylesheet" />
-        <link href="/t5/css/main2.css" rel="stylesheet" />
+        <link href="/t5/css/main3.css" rel="stylesheet" />
         <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
  
         <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
@@ -12,8 +11,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!--Fine Modifica-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-        <script src="/t5/bootstrap-4/js/bootstrap.min.js"></script>
-        
+        <script src="/t5/bootstrap-4/js/bootstrap.min.js"></script>        
  
         <title>Profilo utente</title>
         <style>
@@ -298,8 +296,7 @@
         </div>
         
         <!--<span id="user_id" style="display: none;" th:text="${userID}"></span> -->
-        <script>
-            
+<script>   
 const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -314,13 +311,6 @@ const getCookie = (name) => {
       return null;
     }
   };
-  
-  
-  
-  
-  
-   
-  
   
   document.addEventListener('DOMContentLoaded', () => {
     // Mostra solo gli achievement completati all'avvio
@@ -356,14 +346,6 @@ const getCookie = (name) => {
         button.textContent = 'Visualizza tutti gli achievements';
     }
   };
-  
- 
-  
-  
- 
-  
- 
-  
   
  /* const toggleFollow = (playerId, isFollowing) => {
     const jwt = getCookie('jwt');

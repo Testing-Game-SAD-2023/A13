@@ -12,14 +12,7 @@ const getCookie = (name) => {
     } catch (e) {
       return null;
     }
-  };
-  
-  
-  
-  
-  
-   
-  
+  };  
   
   document.addEventListener('DOMContentLoaded', () => {
     // Mostra solo gli achievement completati all'avvio
@@ -56,50 +49,6 @@ const getCookie = (name) => {
     }
   };
   
- 
-  
-  
- 
-  
- 
-  
-  
- /* const toggleFollow = (playerId, isFollowing) => {
-    const jwt = getCookie('jwt');
-  
-    if (!jwt) {
-        alert("Utente non autenticato. Effettua il login.");
-        return;
-    }
-  
-    const action = isFollowing ? 'rmFollow' : 'addFollow';
-    $.ajax({
-        url: `/profile/${action}?userID_1=${user.id}&userID_2=${playerId}`,
-        type: 'POST',
-        xhrFields: {
-            withCredentials: true // Include i cookie nella richiesta
-        },
-        success: function() {
-            alert(`${isFollowing ? 'Unfollow' : 'Follow'} eseguito con successo.`);
-  
-            // Aggiorna manualmente il modello utente
-            if (isFollowing) {
-                user.following = user.following.filter(f => f.id !== playerId); // Rimuovi dalla lista
-            } else {
-                user.following.push({ id: playerId }); // Aggiungi alla lista
-            }
-  
-            search();
-        },
-        error: function(xhr) {
-            const errorMessage = xhr.responseText || "Errore sconosciuto.";
-            alert("Errore durante l'operazione: " + errorMessage);
-        }
-    });
-  };
-  */
- 
-  
   let currentRobot = 'None'; // Filtro iniziale per Robot
   let currentGameMode = 'All'; // Filtro iniziale per GameMode
   function filterStatistics(robotType, gameMode) {
@@ -125,7 +74,7 @@ const getCookie = (name) => {
             row.style.display = 'none'; // Nascondi la riga
         }
     });
-  }
+  };
   
   function clearFilter() {
     currentRobot = 'None';

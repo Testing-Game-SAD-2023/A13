@@ -63,6 +63,7 @@ import com.g2.Model.AchievementProgress;
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
 import com.g2.Model.Mission;
+import com.g2.Model.Ratio;
 import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
@@ -181,7 +182,10 @@ public class GuiController {
         List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
         List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
         List<Statistic> allStatistics = achievementService.getStatistics();
+        List<Ratio> allRatio = achievementService.calculateRatiosForPlayer(userId,allStatistics,statisticProgresses);
+
         Map<String, Statistic> IdToStatistic = new HashMap<>();
+
 
         Mission mission1 = new Mission(1,"Copri l'89% di coverage in una partita", "Contro qualsiasi robot raggiungi la coverage stabilita", 50);
         Mission mission2 = new Mission(1,"Gioca 5 partite in modalità singola", "Gioca il numero di partite prestabilito", 30);
@@ -202,6 +206,7 @@ public class GuiController {
         //GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
         GenericObjectComponent objUser = new GenericObjectComponent("user", user);
         GenericObjectComponent objMissions = new GenericObjectComponent("missions", missions);
+        GenericObjectComponent objRatios = new GenericObjectComponent("ratios", allRatio);
 
 
         
@@ -211,7 +216,8 @@ public class GuiController {
         //profile.setObjectComponents(objUserID);
         profile.setObjectComponents(objUser);
         profile.setObjectComponents(objMissions);
-
+        profile.setObjectComponents(objRatios);
+        //profile.setErrorPage() Può darsi che questa ci gestisce bene gli errori?
         return profile.handlePageRequest();
     }
 
