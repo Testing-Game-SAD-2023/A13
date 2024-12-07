@@ -523,6 +523,74 @@ public ResponseEntity<String> removeFriend(
     }
 }*/
     //cami (02/12)
+    @PostMapping("/updateAvatar")
+    public ResponseEntity<String> updateAvatar(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam("avatar") String avatar) {
+    try {
+        // Verifica se il token JWT è presente
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+        Integer userIdAsInteger = Integer.parseInt(userId);
+        // Chiamata al metodo del T23Service per aggiornare l'avatar
+        Boolean updateSuccess = (Boolean) t23Service.updateAvatar(userIdAsInteger, avatar);
+
+        if (updateSuccess) {
+            return ResponseEntity.ok("Avatar updated successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update avatar.");
+        }
+    } catch (Exception e) {
+        System.err.println("Error updating avatar: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error.");
+    }
+    }
+
+    @GetMapping("/getAvatar")
+    public ResponseEntity<String> getAvatar(
+    @CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica se il token JWT è presente
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al servizio di T23 per recuperare l'avatar
+        String avatar = t23Service.getAvatar(userId);
+
+        // Restituisci il valore dell'avatar
+        if (avatar != null) {
+            return ResponseEntity.ok(avatar);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found");
+        }
+    } catch (Exception e) {
+        System.err.println("Error fetching avatar: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error.");
+    }
+    }
+
+
+
     @GetMapping("/getUserInfo")
     public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(name = "jwt", required = false) String jwt) {
     try {
@@ -555,34 +623,57 @@ public ResponseEntity<String> removeFriend(
 
     //GabMan 03/12 (Ottengo lista amici)
     @GetMapping("/getFriendlist")
-public ResponseEntity<List<Map<String, String>>> getFriendlist(@CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<List<Map<String, String>>> getFriendlist(
+        @CookieValue(name = "jwt", required = false) String jwt) {
     try {
-        // Verifica che il token JWT esista
+        // 1. Verifica il JWT
         if (jwt == null || jwt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Utente non autenticato
         }
 
-        // Decodifica il token JWT per ottenere l'ID utente
+        // 2. Decodifica del JWT
+        Integer userId = extractUserIdFromJwt(jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // JWT non valido
+        }
+
+        // 3. Chiamata al T23Service per ottenere la lista amici
+        List<Map<String, String>> friendlist = t23Service.getFriendlist(userId.toString());
+        if (friendlist == null || friendlist.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Nessun amico trovato
+        }
+
+        return ResponseEntity.ok(friendlist); // Restituisci la lista amici
+    } catch (Exception e) {
+        // 4. Log degli errori per debugging
+        System.err.println("Errore durante il recupero della lista amici: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+    }
+
+/**
+ * Metodo per estrarre l'ID utente dal JWT.
+ */
+    private Integer extractUserIdFromJwt(String jwt) {
+    try {
+        // Decodifica il JWT
         byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
         String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
 
+        // Converte il payload del JWT in una mappa
         ObjectMapper mapper = new ObjectMapper();
         @SuppressWarnings("unchecked")
         Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-        String userId = map.get("userId").toString();
 
-        // Chiamata al servizio T23 per ottenere la lista amici
-        List<Map<String, String>> friendlist = t23Service.getFriendlist(userId);
-        if (friendlist != null && !friendlist.isEmpty()) {
-            return ResponseEntity.ok(friendlist);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Nessun amico trovato
-        }
+        // Restituisce l'ID utente
+        return Integer.parseInt(map.get("userId").toString());
     } catch (Exception e) {
-        System.out.println("Errore durante il recupero della lista amici: " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore del server
+        System.err.println("Errore nella decodifica del JWT: " + e.getMessage());
+        return null; // Ritorna null in caso di errore
     }
-}
+    }
+
+
 
 
 

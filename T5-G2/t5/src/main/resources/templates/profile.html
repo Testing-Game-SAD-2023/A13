@@ -52,7 +52,7 @@
                             <div class="row">
                                 <div class="col-210">
                                     <!-- Immagine attuale dell'avatar -->
-                                    <img src="/t5/images/sample_propic.jpg" id="currentProfilePicture" class="rounded float-start propic" alt="Profile picture">
+                                    <img src="/t5/images/sampleavatar.jpg" id="currentProfilePicture" class="rounded float-start propic" alt="Profile picture">
                                     <!-- Pulsante per mostrare le opzioni -->
                                     <button id="modifyAvatarButton" class="btn btn-secondary mt-2" >Modifica Avatar</button>
 
@@ -65,10 +65,14 @@
                                     <div id="avatarSelection" style="display: none; margin-top: 10px;">
                                         <h5>Seleziona un nuovo avatar:</h5>
                                         <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')">
-                                        <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')">
-
-                                        <button id="saveAvatarButton" class="btn btn-primary mt-2" >Salva</button>
-
+                                        <img src="/t5/images/sampleavatar.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')">
+                                        <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default  Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatar.jpg')">
+                                    <form action="/updateAvatar" method="POST">
+                                            <input type="hidden" id="selectedAvatar" name="avatar" value="">
+                                            <button id="saveAvatarButton" class="btn btn-primary mt-2" type="submit">Salva</button>
+                                        
+                                       
+                                    </form>
                                     </div>
                                 
                                     <!-- Visualizzazione della biografia -->
@@ -101,7 +105,7 @@
                         <div class="card-body">
                             <h4 class="card-title text-center mb-4">Lista Amici</h4>
                             <div id="friendsContainer" class="list-group" style="max-height: 400px; overflow-y: auto;">
-                                <!-- Amici caricati dinamicamente -->
+                                <!-- Gli amici verranno caricati dinamicamente qui -->
                             </div>
                             <p id="errorMessage" class="text-danger text-center mt-3"></p>
                         </div>
@@ -118,10 +122,7 @@
                                     class="form-control"
                                     placeholder="Inserisci il nickname dell'amico"
                                 />
-                                <button
-                                    id="addFriendButton"
-                                    class="btn btn-success"
-                                >
+                                <button id="addFriendButton" class="btn btn-success">
                                     Aggiungi Amico
                                 </button>
                             </div>
@@ -131,7 +132,6 @@
                 </div>
             </div>
         </div>
-        
         
 
         <div id="trophies" class="section">

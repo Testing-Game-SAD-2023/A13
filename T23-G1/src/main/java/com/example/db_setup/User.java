@@ -41,7 +41,7 @@ public class User {
     @Column(name = "biography", length = 500)
     private String biography; // Campo per la descrizione personale
  
-    @Column(name = "avatar")
+    @Column(name = "avatar", nullable = true, length = 255)
     private String avatar; // Campo per il percorso dell'immagine profilo o URL
  
     @Column(name = "reset_token")

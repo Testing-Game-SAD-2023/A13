@@ -18,6 +18,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
  
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -78,7 +80,7 @@ public class Controller {
 
     //GabMan 04/12
     @Autowired
-    private FriendRepository FriendRepository;
+    private FriendRepository friendRepository;
  
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
@@ -488,39 +490,35 @@ public class Controller {
  
     //Modifiche cam:Metodo per aggiornare i dati personali dell'utente
      
-    @PostMapping("/updateProfile")
+  @PostMapping("/updateProfile")
     public ResponseEntity<String> updateProfile(
-        @CookieValue(name = "jwt", required = false) String jwt,
-        @RequestParam("name") String name,
-        @RequestParam("surname") String surname,
-        @RequestParam("email") String email,
-      //@RequestParam("biography") String biography,
-        @RequestParam("avatar") String avatar) {
- 
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("name") String name,
+    @RequestParam("surname") String surname,
+    @RequestParam("email") String email) { // Aggiunta parentesi aperta qui
+
     if (!isJwtValid(jwt)) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
     }
- 
+
     // Recupera l'ID utente dal token JWT
     Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
     Integer userId = (Integer) claims.get("userId");
- 
+
     // Trova l'utente nel database
     User user = userRepository.findById(userId).orElse(null);
     if (user == null) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
- 
+
     // Aggiorna i campi
     user.setName(name);
     user.setSurname(surname);
     user.setEmail(email);
-// user.setBiography(biography);
-    user.setAvatar(avatar);
- 
+
     userRepository.save(user); // Salva i cambiamenti nel database
     return ResponseEntity.ok("Profile updated successfully");
-}
+    } 
 // FINE MODIFICHE
  
     
@@ -736,6 +734,84 @@ public class Controller {
     String referer = request.getHeader("Referer");
     return "redirect:" + (referer != null ? referer : "/");
 }
+//cami 06/12
+  @PostMapping("/updateAvatar")
+    public ResponseEntity<String> updateAvatar(
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam("avatar") String avatar) { // Modifica da "avatar" a "avatarPath"
+    try {
+        // Verifica il token JWT
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+        String userId = userData.get("userId").toString();
+
+        // Recupera l'utente dal database
+        Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+
+        if (!optionalUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        // Aggiorna l'avatar dell'utente
+        User user = optionalUser.get();
+        user.setAvatar(avatar); // Salva il nuovo avatar
+        userRepository.updateAvatar(Integer.parseInt(userId), avatar);
+
+        return ResponseEntity.ok("Avatar updated successfully!");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating avatar.");
+    }
+    }
+    @GetMapping("/getAvatar")
+    public ResponseEntity<String> getAvatar(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica se il token JWT è presente
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+        String userId = userData.get("userId").toString();
+
+        // Recupera l'utente dal database
+        Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+        if (!optionalUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        // Ottieni l'avatar
+        User user = optionalUser.get();
+        String avatarPath = user.getAvatar();
+
+        // Verifica se l'avatar è presente
+        if (avatarPath == null || avatarPath.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No avatar found");
+        }
+
+        // Restituisci il percorso dell'avatar
+        return ResponseEntity.ok(avatarPath);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving avatar");
+    }
+    }
+
+
+
  
 /*Modifiche GabMan 29/11/2024 : Gestione biografia in sezione separata dal profilo  */
 
@@ -813,50 +889,50 @@ public class Controller {
     }
     }
 
-  // by GabMan: 03/24 - Endpoint per ottenere la lista degli amici
-  @GetMapping("/getFriendlist")
-  public ResponseEntity<List<Map<String, String>>> getFriendlist(
-          @CookieValue(name = "jwt", required = false) String jwt) {
-      try {
-          // Verifica il token JWT
-          if (jwt == null || jwt.isEmpty()) {
-              return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-          }
-  
-          // Decodifica il token JWT per ottenere l'ID utente
-          byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-          String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-  
-          ObjectMapper mapper = new ObjectMapper();
-          Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
-          String userId = userData.get("userId").toString();
-  
-          // Recupera la lista degli amici dal repository
-          List<Friend> friendEntities = FriendRepository.findFriendsByUserId(Integer.parseInt(userId));
-  
-          // Mappa ogni oggetto Friend in una mappa
-          List<Map<String, String>> friends = friendEntities.stream().map(friend -> {
-              Map<String, String> map = new HashMap<>();
-              map.put("friendId", String.valueOf(friend.getFriendId()));
-              map.put("friendUsername", friend.getFriendUsername());
-              map.put("friendAvatar", friend.getFriendAvatar());
-              return map;
-          }).collect(Collectors.toList());
-  
-          if (friends.isEmpty()) {
-              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-          }
-  
-          return ResponseEntity.ok(friends);
-      } catch (Exception e) {
-          e.printStackTrace();
-          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-      }
-  }
+    // by GabMan: 03/24 - Endpoint per ottenere la lista degli amici
+    @GetMapping("/getFriendlist")
+    public ResponseEntity<List<Map<String, String>>> getFriendlist(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica che il token JWT esista
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // Decodifica del JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        int userId = Integer.parseInt(map.get("userId").toString());
+
+        // Recupera la lista degli amici con i dettagli (nickname e avatar) dal repository
+        List<Map<String, Object>> friends = friendRepository.findFriendDetailsByUserId(userId);
+
+        // Trasforma i dati degli amici in una lista di mappe da restituire come JSON
+        List<Map<String, String>> friendListResponse = new ArrayList<>();
+        for (Map<String, Object> friend : friends) {
+            Map<String, String> friendData = new HashMap<>();
+            friendData.put("nickname", friend.get("nickname").toString());
+            friendData.put("avatar", friend.get("avatar").toString()); // Recuperato dalla tabella students
+            friendListResponse.add(friendData);
+        }
+
+        return ResponseEntity.ok(friendListResponse);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+    }
+
+
+
   
 
   
-/* 
+    /*  
 // by GabMan: Endpoint per aggiungere un amico
 @PostMapping("/addFriend")
 public ResponseEntity<String> addFriend(
@@ -883,9 +959,8 @@ public ResponseEntity<String> addFriend(
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while adding the friend.");
         }
     }
-*/
+
 //byGabMan: Endpoint per rimuovere un amico
-/* 
 @PostMapping("/removeFriend")
 public ResponseEntity<String> removeFriend(
     @CookieValue(name = "jwt", required = false) String jwt,
@@ -911,6 +986,7 @@ public ResponseEntity<String> removeFriend(
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the friend.");
         }
     }*/
+    
     //cami 02/12--> modifica profilo
     @GetMapping("/getUserInfo")
     public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(name = "jwt", required = false) String jwt) {
@@ -948,10 +1024,11 @@ public ResponseEntity<String> removeFriend(
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
     }
-
-
-
 }
+
+
+
+
 
 
 

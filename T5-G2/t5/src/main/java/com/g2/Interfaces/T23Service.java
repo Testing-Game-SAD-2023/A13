@@ -83,6 +83,34 @@ import org.springframework.web.util.UriComponentsBuilder;
         
      }
     //cami
+    // Metodo per aggiornare l'avatar
+    public Boolean updateAvatar(Integer userId, String avatar) {
+    final String endpoint = "/updateAvatar";
+    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+    formData.add("avatar", avatar); // Parametro avatar
+
+    try {
+        // Chiamata al servizio T23
+        return callRestPost(endpoint, formData, null, Boolean.class);
+    } catch (Exception e) {
+        System.err.println("Errore durante l'aggiornamento dell'avatar: " + e.getMessage());
+        return false;
+    }
+    }
+
+    // Metodo per recuperare l'avatar da T23
+    public String getAvatar(String userId) {
+    final String endpoint = "/getAvatar?userId=" + userId;
+    try {
+        return callRestGet(endpoint, null, String.class); // Ritorna direttamente il corpo
+    } catch (Exception e) {
+        System.err.println("Errore durante il recupero dell'avatar: " + e.getMessage());
+        return null;
+    }
+    }
+
+
+
     // Metodo per recuperare la biografia
     public String getBiography(String userId) {
     final String endpoint = "/getBiography";
@@ -191,15 +219,24 @@ import org.springframework.web.util.UriComponentsBuilder;
 }
 //GabMan 03/12
      // Metodo per ottenere la lista degli amici
-     public List<Map<String, String>> getFriendlist(String userId) {
-        final String endpoint = "/getFriendlist";
-           // Creazione del payload come MultiValueMap
-        MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();
-        payload.add("userId", userId);
+    public List<Map<String, String>> getFriendlist(String userId) {
+    final String endpoint = "/getFriendlist"; // Endpoint nel controller di T23
 
-        // Chiamata al metodo callRestPost
-        return callRestPost(endpoint, payload, null, new ParameterizedTypeReference<List<Map<String, String>>>() {});
-     }
+    // Parametri per la richiesta
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+    queryParams.add("userId", userId);
+
+    try {
+        // Effettua una richiesta GET per ottenere la lista amici
+        System.out.println("Calling endpoint: " + BASE_URL + endpoint);
+        return callRestGet(endpoint, queryParams, new ParameterizedTypeReference<List<Map<String, String>>>() {});
+    } catch (Exception e) {
+        System.err.println("Errore durante la chiamata a " + endpoint + ": " + e.getMessage());
+        return new ArrayList<>(); // Ritorna una lista vuota come fallback
+    }
+    }
+
+
 /////////NON TESTATI/////////////////////////////////////////////////////////
      // Metodo per aggiungere un amico
      public Boolean addFriend(String userId, String friendId) {

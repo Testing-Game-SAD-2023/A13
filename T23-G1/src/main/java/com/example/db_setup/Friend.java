@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 
 //Created by GabMan 04/12
-@Table(name = "user_friend", schema = "studentsrepo") 
+@Table(name = "user_friends", schema = "studentsrepo") 
 @Data
 @Entity
 public class Friend {
@@ -18,9 +18,4 @@ public class Friend {
     @Column(name = "friend_id", nullable = false)
     private Integer friendId;
 
-    @Column(name = "friend_username", nullable = false)
-    private String friendUsername;
-
-    @Column(name = "friend_avatar")
-    private String friendAvatar;
 }

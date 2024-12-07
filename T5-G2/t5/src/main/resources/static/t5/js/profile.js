@@ -19,70 +19,123 @@ document.addEventListener("DOMContentLoaded", () => {
             avatarSelection.style.display = avatarSelection.style.display === 'none' ? 'block' : 'none';
         });
     }
-       // Funzione per selezionare un avatar
-        const selectAvatar = (path) => {
+    
+    // Funzione per selezionare un avatar
+    const selectAvatar = (path) => {
         selectedAvatar = path;
-
+    
         // Rimuovi la selezione da tutte le immagini
         document.querySelectorAll('.avatar-option').forEach(img => {
             img.classList.remove('selected');
         });
-
+    
         // Aggiungi la classe "selected" all'immagine cliccata
         const selectedImg = document.querySelector(`img[src='${path}']`);
         if (selectedImg) {
             selectedImg.classList.add('selected');
         }
-
+    
         // Cambia l'immagine di profilo corrente
         if (currentProfilePicture) {
             currentProfilePicture.src = path;
+        }
+    
+        // Aggiorna il valore del campo nascosto
+        const hiddenInput = document.getElementById('selectedAvatar');
+        if (hiddenInput) {
+            hiddenInput.value = path; // Sincronizza con il campo nascosto
         } else {
-            console.error("Immagine di profilo non trovata.");
+            console.error("Il campo nascosto selectedAvatar non è stato trovato.");
         }
     };
-
+    
+    // Salva l'avatar selezionato
     // Salva l'avatar selezionato
     const saveAvatar = async () => {
-        if (!selectedAvatar) {
-            alert('Seleziona un avatar prima di salvare.');
-            return;
-        }
-
-        try {
-            const response = await fetch('/updateAvatar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ avatarPath: selectedAvatar })
-            });
-
-            if (response.ok) {
-                alert('Avatar salvato con successo!');
-            } else {
-                const error = await response.text();
-                alert(`Errore nel salvataggio dell'avatar: ${error}`);
-            }
-        } catch (error) {
-            console.error('Errore nella connessione al server:', error);
-            alert('Errore nella connessione al server.');
-        }
-    };
-
-    // Gestisci il pulsante "Salva Avatar"
-    if (saveAvatarButton) {
-        saveAvatarButton.addEventListener('click', saveAvatar);
+    if (!selectedAvatar) {
+        alert('Seleziona un avatar prima di salvare.');
+        return;
     }
 
+    console.log('Avatar selezionato:', selectedAvatar); // Debug
+
+    try {
+        const response = await fetch('/updateAvatar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `avatar=${encodeURIComponent(selectedAvatar)}` // Dati in formato URL encoded
+        });
+
+        if (response.ok) {
+            alert('Avatar salvato con successo!');
+
+            // Nascondi la finestra degli avatar
+            const avatarSelection = document.getElementById('avatarSelection');
+            if (avatarSelection) {
+                avatarSelection.style.display = 'none';
+            }
+        } else {
+            const error = await response.text();
+            alert(`Errore nel salvataggio dell'avatar: ${error}`);
+        }
+    } catch (error) {
+        console.error('Errore nella connessione al server:', error);
+        alert('Errore nella connessione al server.');
+    }
+    };
+
+    
+    // Gestisci il pulsante "Salva Avatar"
+    // Intercetta il submit del form per evitare il ricaricamento della pagina
+    const avatarForm = document.querySelector('form[action="/updateAvatar"]');
+    if (avatarForm) {
+    avatarForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Interrompe il comportamento predefinito del form
+        await saveAvatar(); // Chiama la funzione per salvare l'avatar
+    });
+    }
+
+    
     // Gestisci la selezione dell'avatar
     const avatarImages = document.querySelectorAll('.avatar-option');
     avatarImages.forEach(img => {
         img.addEventListener('click', () => {
             const avatarPath = img.src; // Ottieni il percorso dell'immagine
             selectAvatar(avatarPath);
-            });
         });
+    });
+
+    // Funzione per caricare l'avatar al caricamento della pagina
+    // Funzione per caricare l'avatar dal backend
+    const loadAvatar = async () => {
+    try {
+        const response = await fetch('/getAvatar', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (response.ok) {
+            const avatarPath = await response.text(); // Ottieni l'avatar dal backend
+            if (currentProfilePicture) {
+                currentProfilePicture.src = avatarPath; // Aggiorna l'immagine di profilo
+            }
+        } else {
+            console.error('Errore nel caricamento dell\'avatar:', await response.text());
+        }
+    } catch (error) {
+        console.error('Errore durante la connessione al backend:', error);
+    }
+    };
+
+    // Carica l'avatar al caricamento della pagina
+    window.addEventListener('load', loadAvatar);
+
+
+    
    
 
 
