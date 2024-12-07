@@ -133,3 +133,33 @@ const getCookie = (name) => {
     filterStatistics(currentRobot, currentGameMode);
   }
   
+
+  function unfollowPlayer() {
+    const jwt = getCookie('jwt');
+
+    if (!jwt) {
+        alert("Utente non autenticato. Effettua il login.");
+        return;
+    }
+
+    $.ajax({
+        url: `/profile/rmFollow?userID_1=${user.id}&userID_2=${playerId}`,
+        type: 'POST',
+        xhrFields: {
+            withCredentials: true // Include i cookie nella richiesta
+        },
+        success: function() {
+            alert('Unfollow eseguito con successo.');
+
+            // Aggiorna manualmente il modello utente
+            user.following = user.following.filter(f => f.id !== playerId); // Rimuovi dalla lista
+
+            // Reindirizza alla route profile
+            window.location.href = '/profile';
+        },
+        error: function(xhr) {
+            const errorMessage = xhr.responseText || "Errore sconosciuto.";
+            alert("Errore durante l'operazione: " + errorMessage);
+        }
+    });
+};
