@@ -25,9 +25,6 @@ public class Admin {
 	//FINE MODIFICA (15/02/2024)
 	private String password;
 
-
-	private List<Team> teamAssociati;
-
 	
 	public Admin(String nome, String cognome, String username, String email,String password) {
 		this.nome = nome;
@@ -35,7 +32,6 @@ public class Admin {
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.teamAssociati = new ArrayList<Team>();
 	}
 	 
 	public String getNome() {
@@ -83,16 +79,6 @@ public class Admin {
 
     public void setInvitationToken(String invitationToken) {
         this.invitationToken = invitationToken;
-    }
-
-	//MODIFICA 01/12/2024: Aggiunta dei Team Associati agli admin.
-
-	public List<Team> getTeamsAssociati() {
-        return this.teamAssociati;
-    }
-
-    public void getTeamsAssociati(List<Team> teams) {
-        this.teamAssociati = teams;
     }
 
 	
