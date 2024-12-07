@@ -14,6 +14,7 @@
         <!--Modifica (21/05) Adding JQuery-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!--Fine Modifica-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
         <script src="/t5/bootstrap-4/js/bootstrap.min.js"></script>
         <!--<script src="/t5/js/profile.js"></script>--> 
 
@@ -112,10 +113,40 @@
                 <div class="col-6">
                     <div class="card ">
                         <div class="card-body">
-                            <h4 class="card-title">Statistiche</h4>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Statistiche</h4>
+                                <div class="d-flex gap-2">
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="robotFilterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Robot
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="robotFilterDropdown">
+                                            <button class="dropdown-item" onclick="filterStatistics('None')">None</button>
+                                            <button class="dropdown-item" onclick="filterStatistics('Randoop')">Randoop</button>
+                                            <button class="dropdown-item" onclick="filterStatistics('EvoSuite')">EvoSuite</button>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="gameModeFilterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            GameMode
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="gameModeFilterDropdown">
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'All')">All</button>
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Sfida')">Sfida</button>
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Multiplayer')">Multiplayer</button>
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Scalata')">Scalata</button>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary" onclick="clearFilter()">Rimuovi Filtro</button>
+                                </div>
+                            </div>
                             <hr>
                             <div class="statistics-container">
-                                <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
+                                <div th:each="element: ${statisticProgresses}" 
+                                    th:id="'statistic-' + ${element.StatisticID}" 
+                                    class="row statistic-row"
+                                    th:data-robot="${IdToStatistic.get(element.StatisticID).robot}"
+                                    th:data-gamemode="${IdToStatistic.get(element.StatisticID).gamemode}">
                                     <!--<div class="col-1">
                                         I
                                     </div>-->

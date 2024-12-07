@@ -31,26 +31,33 @@
 .col-6 {
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribuisce le card equamente */
+    
     height: 100%;
-    padding: 0;
+    
 }
 
 /* Card con altezza bilanciata */
 .card {
     flex: 1; /* Ogni card occupa metà della colonna */
-    margin: 5px;
+    margin: 5px 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .card-body {
     flex: 1; /* Occupa tutto lo spazio disponibile nella card */
     overflow-y: auto; /* Scroll interno se il contenuto eccede */
+    -ms-overflow-style: none; /* Rimuovi le scrollbar su Internet Explorer e Edge */
+    scrollbar-width: none; /* Rimuovi le scrollbar su Firefox */
+}
+.card-body::-webkit-scrollbar {
+    display: none; /* Rimuovi le scrollbar su Chrome, Safari e Edge */
 }
 .card-title {
     font-size: 1.25rem;
     font-weight: bold;
+    margin-bottom: 0;
 }
 .btn-sm {
     font-size: 0.875rem;
@@ -190,4 +197,21 @@
 }
 
 
- 
+.d-flex.gap-2 > * {
+    margin-left: 0.5rem;
+}
+
+/* Rimuove il margine iniziale al primo elemento */
+.d-flex.gap-2 > *:first-child {
+    margin-left: 0;
+}
+
+.d-flex.justify-content-between.align-items-center {
+    gap: 1rem; /* Aggiunge un po' di spazio orizzontale */
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Evita lo scrolling della pagina */
+}

@@ -227,3 +227,36 @@ const toggleFollow = (playerId, isFollowing) => {
 $('#searchPlayerModal').on('hidden.bs.modal', function () {
   location.reload(); // Ricarica l'intera pagina
 });
+
+let currentRobot = 'None'; // Filtro iniziale per Robot
+let currentGameMode = 'All'; // Filtro iniziale per GameMode
+function filterStatistics(robotType, gameMode) {
+  // Aggiorna i filtri correnti
+  if (robotType !== undefined) currentRobot = robotType;
+  if (gameMode !== undefined) currentGameMode = gameMode;
+
+  // Recupera tutte le statistiche
+  const statisticsRows = document.querySelectorAll('.statistic-row');
+
+  // Filtra in base al tipo di robot e modalità di gioco
+  statisticsRows.forEach(row => {
+      const robot = row.getAttribute('data-robot');
+      const gamemode = row.getAttribute('data-gamemode');
+
+      const robotMatch = (currentRobot === 'None' || robot === currentRobot);
+      const gameModeMatch = (currentGameMode === 'All' || gamemode === currentGameMode);
+
+      // Mostra o nascondi la riga in base ai filtri
+      if (robotMatch && gameModeMatch) {
+          row.style.display = ''; // Mostra la riga
+      } else {
+          row.style.display = 'none'; // Nascondi la riga
+      }
+  });
+}
+
+function clearFilter() {
+  currentRobot = 'None';
+  currentGameMode = 'All';
+  filterStatistics(currentRobot, currentGameMode);
+}

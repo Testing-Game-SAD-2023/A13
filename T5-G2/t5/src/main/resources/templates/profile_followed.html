@@ -11,8 +11,9 @@
         <!--Modifica (21/05) Adding JQuery-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!--Fine Modifica-->
- 
-        <script src="/t5/js/profile.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="/t5/bootstrap-4/js/bootstrap.min.js"></script>
+        
  
         <title>Profilo utente</title>
         <style>
@@ -137,8 +138,9 @@
             <div class="top-bar">
                 <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" ></p>
                 <div id="topRightContainer">
-                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Home</button>
-                    <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
+                    <a href="/profile" class="logout-button" id="item">Back</a>
+                    <a href="/logout" class="logout-button" id="item">Logout</a>
+                    <!--<button class="logout-button" onclick="unfollow()">Unfollow</button> -->
                 </div>
             </div>
             <div class="row">
@@ -183,21 +185,36 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">Achievements</h4>
-                                    <button class="btn btn-secondary btn-sm" onclick="viewAllAchievements()">Visualizza tutti gli achievements</button>
+                                    <div class="d-flex align-items-center">
+                                        <button class="btn btn-secondary btn-sm" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
+                                        <div class="token-display">
+                                            <p style="margin-top: 0; margin-bottom: 0;" th:text="'Token: ' + '' + ${user.missionToken}">numero token</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <hr>
                                 <div class="achievements-container">
                                     <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
-                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
+                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}"
+                                        class="achievement-container"
+                                        style="overflow: hidden; margin: 2px"
+                                        th:data-completed="${element.Progress} >= ${element.ProgressRequired} ? 'true' : 'false'">
                                         <div class="row">
                                             <div class="col-2">
-                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px"
+                                                 th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
                                             </div>
                                             <div class="col">
                                                 <h4 th:text="${element.Name}">Nome achievement</h4>
                                                 <p th:text="${element.Description}">Descrizione achievement</p>
                                                 <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
-                                                    <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
+                                                    <div class="progress-bar" role="progressbar"
+                                                    th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" 
+                                                    aria-valuenow="${element.Progress}" 
+                                                    aria-valuemin="0" 
+                                                    aria-valuemax="100" 
+                                                    th:text="${element.Progress}+'/'+${element.ProgressRequired}">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -210,10 +227,40 @@
                 <div class="col-6">
                     <div class="card ">
                         <div class="card-body">
-                            <h4 class="card-title">Statistiche</h4>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Statistiche</h4>
+                                <div class="d-flex gap-2">
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="robotFilterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Robot
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="robotFilterDropdown">
+                                            <button class="dropdown-item" onclick="filterStatistics('None')">None</button>
+                                            <button class="dropdown-item" onclick="filterStatistics('Randoop')">Randoop</button>
+                                            <button class="dropdown-item" onclick="filterStatistics('EvoSuite')">EvoSuite</button>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="gameModeFilterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            GameMode
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="gameModeFilterDropdown">
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'All')">All</button>
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Sfida')">Sfida</button>
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Multiplayer')">Multiplayer</button>
+                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Scalata')">Scalata</button>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary" onclick="clearFilter()">Rimuovi Filtro</button>
+                                </div>
+                            </div>
                             <hr>
                             <div class="statistics-container">
-                                <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
+                                <div th:each="element: ${statisticProgresses}" 
+                                    th:id="'statistic-' + ${element.StatisticID}" 
+                                    class="row statistic-row"
+                                    th:data-robot="${IdToStatistic.get(element.StatisticID).robot}"
+                                    th:data-gamemode="${IdToStatistic.get(element.StatisticID).gamemode}">
                                     <!--<div class="col-1">
                                         I
                                     </div>-->
@@ -245,7 +292,8 @@
                 </div>
             </div>
         </div>
- 
+        
         <!--<span id="user_id" style="display: none;" th:text="${userID}"></span> -->
+        <script src="t5/js/profile_followed.js"></script>
     </body>
 </html>
