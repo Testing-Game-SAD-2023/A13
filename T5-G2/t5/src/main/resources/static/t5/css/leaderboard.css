@@ -11,3 +11,16 @@
     font-weight: bold;
     padding: 20px;
 }
+
+.col-rank {
+    width: 5%;
+}
+
+.col-data {
+    width: 47.5%;
+}
+
+.leaderboard-table {
+    table-layout: fixed;
+    width: 100%;
+}

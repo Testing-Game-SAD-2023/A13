@@ -1,6 +1,5 @@
 package com.g2.Model;
 
-
 public class PlayerStats {
     private String email;
     private Long userId;
@@ -28,6 +27,15 @@ public class PlayerStats {
 
     public void setStatistic(int statistic) {
         this.statistic = statistic;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerStats{" +
+                "email='" + email + '\'' +
+                ", userId=" + userId +
+                ", statistic=" + statistic +
+                '}';
     }
  
 }

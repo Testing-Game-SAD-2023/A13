@@ -1,5 +1,7 @@
 package com.g2.Model;
 
+import java.util.Arrays;
+
 public class LeaderboardSubInterval {
     private PlayerStats[] positions;
     private Long totalLength;
@@ -19,5 +21,13 @@ public class LeaderboardSubInterval {
     public void setTotalLength(Long totalLength) {
         this.totalLength = totalLength;
     }
- 
+
+    @Override
+    public String toString() {
+        return "LeaderboardSubInterval{" +
+                "positions=" + Arrays.toString(positions) +
+                ", totalLength=" + totalLength +
+                '}';
+    }
+
 }

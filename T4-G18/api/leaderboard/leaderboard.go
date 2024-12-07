@@ -4,12 +4,16 @@ import "strconv"
 
 type Row struct {
 	UserID int64 `json:"userId"`
-	Stat   int32 `json:"statistic"`
+	Stat   int64 `json:"statistic"`
 }
 
 type Leaderboard struct {
 	Positions   []Row `json:"positions"`
 	TotalLength int64 `json:"totalLength"`
+}
+
+type PlayerPosition struct {
+	Position int64 `json:"position"`
 }
 
 type CustomString string

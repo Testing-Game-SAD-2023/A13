@@ -7,7 +7,7 @@ import (
 
 type Service interface {
 	FindByInterval(mode string, stat string, startPos int, endPos int) (Leaderboard, error)
-	FindPlayerPosition(mode string, stat string, playerId int) (int, error)
+	FindPlayerPosition(mode string, stat string, playerId int) (PlayerPosition, error)
 }
 
 type Controller struct {
@@ -65,10 +65,10 @@ func (gc *Controller) FindPlayerPosition(w http.ResponseWriter, r *http.Request)
 		return err
 	}
 
-	row, err := gc.service.FindPlayerPosition(gameMode.AsString(), stat.AsString(), playerId.AsInt())
+	position, err := gc.service.FindPlayerPosition(gameMode.AsString(), stat.AsString(), playerId.AsInt())
 	if err != nil {
 		return api.MakeHttpError(err)
 	}
-
-	return api.WriteJson(w, http.StatusOK, row)
+    
+	return api.WriteJson(w, http.StatusOK, position)
 }

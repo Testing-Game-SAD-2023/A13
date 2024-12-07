@@ -37,9 +37,10 @@ public class LeaderboardService {
                     }
                 }
             }
+
             return playerStatsList;
         } catch (Exception e) {
-            return new LeaderboardSubInterval();
+            throw e;
         }
     }
 

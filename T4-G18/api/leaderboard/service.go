@@ -44,10 +44,10 @@ func (gs *Repository) FindByInterval(mode string, stat string, startPos int, end
 	}
 
 	err := gs.db.Table("player_stats").
-		Select("player_id AS user_id, ? AS stat", columnName).
+		Select(fmt.Sprintf("player_id AS user_id, %s AS stat", columnName)).
 		Order(fmt.Sprintf("%s DESC", columnName)).
 		Offset(startPos - 1).
-		Limit(endPos - startPos).
+		Limit(endPos - startPos + 1).
 		Scan(&rows).Error
 
 	if err != nil {
@@ -66,10 +66,9 @@ func (gs *Repository) FindByInterval(mode string, stat string, startPos int, end
 	return leaderboard, nil
 }
 
-func (gs *Repository) FindPlayerPosition(mode string, stat string, playerId int) (int, error) {
+func (gs *Repository) FindPlayerPosition(mode string, stat string, playerId int) (PlayerPosition, error) {
 
-	var position int
-
+	var position PlayerPosition
 	columnName, ok := api.GetLeaderboardColName(modeMap, statMap, mode, stat)
 
 	if !ok {
@@ -77,16 +76,23 @@ func (gs *Repository) FindPlayerPosition(mode string, stat string, playerId int)
 	}
 
 	query := fmt.Sprintf(`
-		SELECT ROW_NUMBER() OVER (ORDER BY %s) AS rn
-		FROM player_stats
-		WHERE player_id = ?
-	`, columnName)
+        SELECT position FROM(
+                SELECT *, row_number() OVER (ORDER BY %s DESC) AS position FROM player_stats
+                )
+                AS sub_q WHERE player_id = ?`, columnName)
 
-	err := gs.db.Raw(query, playerId).Scan(&position).Error
+	// playerId convertito in stringa per mantenere la coerenza con il tipo in PlayerStats (model)
+	// scelta obbligata dal tipo di PlayerGames...
+
+	err := gs.db.Raw(query, fmt.Sprintf("%d", playerId)).Scan(&position.Position).Error
 
 	if err != nil {
 		return position, err
 	}
+
+    if position.Position == 0{
+        return position, api.ErrNotFound
+    }
 
 	return position, nil
 }

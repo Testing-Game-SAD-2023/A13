@@ -156,7 +156,7 @@ func run(ctx context.Context, c Configuration) error {
 	// tm := time.Now()
 	// for i := 0; i < 100000; i++ {
 	// 	playerGame := model.PlayerGame{
-	// 		PlayerID:  fmt.Sprintf("%d", i%50),
+	// 		PlayerID:  fmt.Sprintf("%d", i%250),
 	// 		GameID:    rand.Int63(),
 	// 		CreatedAt: time.Now(),
 	// 		UpdatedAt: time.Now(),
@@ -168,7 +168,7 @@ func run(ctx context.Context, c Configuration) error {
 	// 	}
 	// }
 	// log.Printf("took %v", time.Since(tm))
-	//End TEST DB
+	//	End TEST DB
 
 	if err := os.Mkdir(c.DataDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {
 		return fmt.Errorf("cannot create data directory: %w", err)

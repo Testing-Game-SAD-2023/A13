@@ -2,14 +2,15 @@ const rowsPerPage = 10;
 const pageOffset = 5;
 const tableBody = document.getElementById('table-body');
 const pagination = document.getElementById('pagination');
-let totalPages = 60; // #######################################
+let lastPage = 0;
+let totalLength = 0; // #######################################
 let cache = {}
 
 
 const statisticOptions = {
     sfida: [
-        { id: 'played_games', label: 'Partite giocate' },
-        { id: 'won_games', label: 'Partite vinte' },
+        { id: 'partite_giocate', label: 'Partite giocate' },
+        { id: 'partite_vinte', label: 'Partite vinte' },
         { id: '', label: 'Classi testate' }
     ],
     scalata: [
@@ -23,12 +24,11 @@ const statisticOptions = {
 // GET 
 async function fetchRows(gamemode, statistic, startPage, endPage) {
     try {
-        let startPos = (startPage - 1) * rowsPerPage
+        let startPos = (startPage - 1) * rowsPerPage + 1
         let endPos = endPage * rowsPerPage;
         const response = await fetch(`api/leaderboard/subInterval/${gamemode}/${statistic}/${startPos}/${endPos}`);
         const responseJson = await response.json();
 
-        console.log(responseJson)
         if (!response.ok) {
             message = responseJson['message'];
             if (message)
@@ -47,9 +47,9 @@ async function fetchRows(gamemode, statistic, startPage, endPage) {
         }
 
         rows = responseJson["positions"];
-        //totalLength = responseJson[totalLength]
+        totalLength = responseJson["totalLength"]
 
-        return rows.slice(startPos, endPos + 1);
+        return rows;
     }
     catch (error) {
         console.error('Error fetching data:', error);
@@ -137,11 +137,12 @@ function renderTable(gamemode, statistic, page) {
     tableBody.innerHTML = '';
 
     // rendering table rows
-    cache[gamemode][statistic][page].forEach(row => {
+    cache[gamemode][statistic][page].forEach((row, i) => {
         const tr = document.createElement('tr');
+        const position = (page - 1) * rowsPerPage + i + 1
         tr.innerHTML = `
-          <td>${row.rank}</td>
-          <td>${row.userId}</td>
+          <td>${position}</td>
+          <td>${row.email}</td>
           <td>${row.statistic}</td>
         `;
         tableBody.appendChild(tr);
@@ -152,6 +153,12 @@ function renderPagination(currentPage) {
 
     pagination.innerHTML = '';
 
+    if (totalLength === 0) {
+        lastPage = 1
+    }
+    else {
+        lastPage = Math.floor((totalLength - 1) / rowsPerPage) + 1
+    }
     // "Page 1" button
     const firstButton = document.createElement('li');
     firstButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
@@ -178,19 +185,20 @@ function renderPagination(currentPage) {
 
     // "Next" button
     const nextButton = document.createElement('li');
-    nextButton.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextButton.className = `page-item ${currentPage === lastPage ? 'disabled' : ''}`;
     nextButton.innerHTML = `
         <button class="page-link" onclick="loadPage(${currentPage + 1})" aria-label="Next">Next &raquo;</button>
       `;
     pagination.appendChild(nextButton);
 
     // "Page last" button
-    /*const lastButton = document.createElement('li');
-    lastButton.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    console.log(lastPage)
+    const lastButton = document.createElement('li');
+    lastButton.className = `page-item ${currentPage === lastPage ? 'disabled' : ''}`;
     lastButton.innerHTML = `
-        <button class="page-link" onclick="loadPage(${totalPages})" aria-label="First">&laquo; Last page</button>
+        <button class="page-link" onclick="loadPage(${lastPage})" aria-label="First">&laquo; Last page</button>
       `;
-    pagination.appendChild(lastButton);*/
+    pagination.appendChild(lastButton);
 }
 
 function renderTableError(error) {
@@ -200,7 +208,7 @@ function renderTableError(error) {
     const td = document.createElement('td');
     const span = document.createElement('span');
     span.className = 'tableError';
-    span.textContent = `${error}`;
+    span.textContent = `${error.message}`;
 
     td.setAttribute('colspan', '100%');
     td.setAttribute('style', 'text-align:center')
@@ -297,7 +305,6 @@ const gamemodeSelectors = document.querySelectorAll('input[name="gamemode"]');
 gamemodeSelectors.forEach(selector => {
     selector.addEventListener('change', (event) => {
         if (event.target.checked) {
-            console.log(event.target.id);
 
             updateStatisticOptions(event.target.id);
             loadPage(1);

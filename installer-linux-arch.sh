@@ -4,7 +4,7 @@
 echo "Installazione avviata"
 
 cd ./commons
-mvn install 1>/dev/null
+mvn install
 cd ..
 
 # Creazione del volume Docker 'VolumeT9'
@@ -24,9 +24,9 @@ for dir in "${list[@]}"; do
    pushd .
    cd "$dir"
    echo "Installazione in corso in $dir"
-   mvn package 1>/dev/null
+   mvn package 
    # Avvio dei container Docker e gestione degli errori
-   docker compose up -d --build 1>/dev/null || echo "Errore nell'installazione del Task $dir"
+   docker compose up -d --build || echo "Errore nell'installazione del Task $dir"
    
    popd 
 done
@@ -47,7 +47,7 @@ db.Admin.createIndex({ username: 1 });
 EOF
 )
 
-echo "$commands" | docker exec -i manvsclass-mongo_db-1 mongosh 1>/dev/null
+echo "$commands" | docker exec -i manvsclass-mongo_db-1 mongosh 
 
 
 # Messaggio di completamento dell'installazione
