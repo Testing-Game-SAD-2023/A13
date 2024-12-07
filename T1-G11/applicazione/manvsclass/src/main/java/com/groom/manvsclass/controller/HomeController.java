@@ -106,7 +106,7 @@
          return adminService.ordinaClassiNomi(jwt);
      }
 
-    /* MODIFICA 29/11/2024: Aggiunta EndPoint: /teams e /assignments*/
+    /* MODIFICA 29/11/2024: Aggiunta EndPoint: /teams */
 
     @GetMapping("/teams")
     @ResponseBody
@@ -118,12 +118,6 @@
     @ResponseBody
     public ModelAndView showTeamSpecifico(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
         return adminService.showTeamSpecifico(request,jwt);
-    }
-
-    @GetMapping("/assignments")
-    @ResponseBody
-    public ModelAndView showGestioneAssignments(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
-        return adminService.showGestioneAssignments(request,jwt);
     }
 
     /* Modifica 04/12/2024: Aggiunta endpoint getUsernameAdmin */
