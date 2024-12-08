@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.User;
+import com.g2.Model.UserProfile;
 
 @Service
 public class UserProfileService{
@@ -93,7 +94,7 @@ public class UserProfileService{
 }
 
 public String getProfilePicture(int playerID){
-    // Mi prendo l'id del giocatore, così forse carico la foto e la bio che già ci sono
+    // Mi prendo l'id del giocatore, così carico la foto e la bio che già ci sono
    int userId = playerID;
 
    // Mi prendo prima tutti gli utenti
@@ -122,6 +123,51 @@ public String getProfilePicture(int playerID){
    return null;
 }
 
+public Integer getProfileID(int playerID){
+
+    // Mi prendo l'id del giocatore
+    int userId = playerID;
+
+    // Mi prendo prima tutti gli utenti
+    @SuppressWarnings("unchecked")
+    List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
+
+    // Mi prendo l'utente che mi interessa con l'id
+    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+
+    return user.getUserProfile().getID();
+
+    }
+
+public List<UserProfile> getFollowingList(int playerID){
+    // Mi prendo l'id del giocatore
+    int userId = playerID;
+
+    // Mi prendo prima tutti gli utenti
+    @SuppressWarnings("unchecked")
+    List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
+
+    // Mi prendo l'utente che mi interessa con l'id
+    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+
+    return user.getUserProfile().getFollowingList();
+
+    }
+
+public List<UserProfile> getFollowersList(int playerID){
+    // Mi prendo l'id del giocatore
+    int userId = playerID;
+
+    // Mi prendo prima tutti gli utenti
+    @SuppressWarnings("unchecked")
+    List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
+
+    // Mi prendo l'utente che mi interessa con l'id
+    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+
+    return user.getUserProfile().getFollowersList();
+
+    }
 
 }
 
