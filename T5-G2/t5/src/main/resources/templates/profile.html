@@ -77,31 +77,28 @@
             
             <!-- Sezione per la visualizzazione e modifica dell'avatar -->
 
-            <div class="row">
+    
                 <!-- Avatar -->
-                <div class="col-4">
-                    <div class="card" style="width: 100%; margin-bottom: 20px;">
-                        <div class="card-body text-center">
-                            <!-- Immagine attuale dell'avatar -->
-                            <img src="/t5/images/sampleavatar.jpg" id="currentProfilePicture" class="rounded-circle propic" alt="Profile picture" style="width: 200px; height: 200px; margin-bottom: 15px;">
-                            
-                            <!-- Pulsante per mostrare le opzioni -->
-                            <button id="modifyAvatarButton" class="btn btn-secondary mb-2">Modifica Avatar</button>
-                            
-                            <!-- Sezione nascosta per selezionare un nuovo avatar -->
-                            <div id="avatarSelection" style="display: none;">
-                                <h5>Seleziona un nuovo avatar:</h5>
-                                <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')" style="width: 50px; height: 50px; margin-right: 5px;">
-                                <img src="/t5/images/sampleavatar.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
-                                <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatar.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
-                                <form action="/updateAvatar" method="POST">
-                                    <input type="hidden" id="selectedAvatar" name="avatar" value="">
-                                    <button id="saveAvatarButton" class="btn btn-primary mt-2" type="submit">Salva</button>
-                                </form>
-                            </div>
-                        </div>
+                <div class="col-4 text-center" style="margin-bottom: 20px;">
+                    <!-- Immagine attuale dell'avatar -->
+                    <img src="/t5/images/sampleavatar.jpg" id="currentProfilePicture" class="rounded-circle propic" alt="Profile picture" style="width: 200px; height: 200px; margin-bottom: 15px;">
+                    
+                    <!-- Pulsante per mostrare le opzioni -->
+                    <button id="modifyAvatarButton" class="btn btn-secondary mb-2">Modifica Avatar</button>
+                    
+                    <!-- Sezione nascosta per selezionare un nuovo avatar -->
+                    <div id="avatarSelection" style="display: none;">
+                        <h5>Seleziona un nuovo avatar:</h5>
+                        <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')" style="width: 50px; height: 50px; margin-right: 5px;">
+                        <img src="/t5/images/sampleavatar.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
+                        <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatar.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
+                        <form action="/updateAvatar" method="POST">
+                            <input type="hidden" id="selectedAvatar" name="avatar" value="">
+                            <button id="saveAvatarButton" class="btn btn-primary mt-2" type="submit">Salva</button>
+                        </form>
                     </div>
                 </div>
+
             
                 <!-- Biografia -->
 
@@ -128,9 +125,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            
         </div>
-        
+
         <div id="friends" class="section">
             <div class="row justify-content-center">
                 <div class="col-8">
