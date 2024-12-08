@@ -46,26 +46,26 @@
                 <!-- Pulsante per mostrare il form -->
                 <button id="editInfoButton" class="btn btn-info mt-3">Modifica Info Personali</button>
 
-                <!-- Form per modificare le informazioni personali (inizialmente nascosto) -->
+                <!-- Form per modificare le informazioni personali -->
                 <form id="editInfoForm" style="display: none; margin-top: 20px;">
                     <div class="form-group">
                         <label for="newName">Nome</label>
-                        <input type="text" class="form-control" id="newName" value="Nome" placeholder="Inserisci il nuovo nome">
+                        <input type="text" class="form-control" id="newName" placeholder="Nome">
                     </div>
                     <div class="form-group">
                         <label for="newSurname">Cognome</label>
-                        <input type="text" class="form-control" id="newSurname" value="Cognome" placeholder="Inserisci il nuovo cognome">
+                        <input type="text" class="form-control" id="newSurname" placeholder="Cognome">
                     </div>
                     <div class="form-group">
                         <label for="newNickname">Nickname</label>
-                        <input type="text" class="form-control" id="newNickname" value="@nickname" placeholder="Inserisci il nuovo nickname">
+                        <input type="text" class="form-control" id="newNickname" placeholder="Nickname">
                     </div>
-                    <!-- Pulsanti per il salvataggio e annullamento -->
                     <div class="d-flex justify-content-between mt-3">
                         <button type="button" id="cancelEditInfoButton" class="btn btn-secondary">Annulla</button>
                         <button type="submit" class="btn btn-primary">Salva modifiche</button>
                     </div>
                 </form>
+
                         
             </div>
             
@@ -84,7 +84,7 @@
                             <div class="row">
                                 <div class="col-210">
                                     <!-- Immagine attuale dell'avatar -->
-                                    <img src="/t5/images/sampleavatar.jpg" id="currentProfilePicture" class="rounded float-start propic" alt="Profile picture">
+                                    <img src="/t5/images/sampleavatar.jpg" id="currentProfilePicture" class="rounded float-start propic" alt="Profile picture" style="width: 150px; height: 150px;">
                                     <!-- Pulsante per mostrare le opzioni -->
                                     <button id="modifyAvatarButton" class="btn btn-secondary mt-2" >Modifica Avatar</button>
 
@@ -94,7 +94,7 @@
                                     <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
                                     <hr>
                                     <!-- Sezione nascosta per selezionare un nuovo avatar -->
-                                    <div id="avatarSelection" style="display: none; margin-top: 10px;">
+                                    <div id="avatarSelection" style="display: none; margin-top: 10px; ">
                                         <h5>Seleziona un nuovo avatar:</h5>
                                         <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')">
                                         <img src="/t5/images/sampleavatar.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')">

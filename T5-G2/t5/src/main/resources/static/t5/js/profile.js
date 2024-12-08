@@ -18,52 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
      // Aggiungi questo per il pulsante "Modifica Avatar" cami
     let selectedAvatar = null;
     
-    // GabMan 08/12: Gestione del form per la modifica delle informazioni personali
-    // Mostra il form e nasconde il pulsante "Modifica Info Personali"
-    editInfoButton.addEventListener("click", () => {
-        editInfoForm.style.display = "block"; // Mostra il form
-        editInfoButton.style.display = "none"; // Nasconde il pulsante
-    });
-
-    // Nasconde il form e ripristina il pulsante "Modifica Info Personali"
-    cancelEditInfoButton.addEventListener("click", () => {
-        editInfoForm.style.display = "none"; // Nasconde il form
-        editInfoButton.style.display = "inline-block"; // Mostra il pulsante
-    });
-
+   
     
-
-    // GabMan 08/12: Funzione per salvare le modifiche profilo utente
-    if (editInfoForm) {
-        editInfoForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const name = newName.value;
-            const surname = newSurname.value;
-            const nickname = newNickname.value;
-
-            try {
-                const response = await fetch("/updateUserInfo", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: new URLSearchParams({ name, surname, nickname })
-                });
-
-                if (response.ok) {
-                    // Aggiorna le informazioni nel profilo
-                    document.getElementById("userFullName").textContent = `${name} ${surname}`;
-                    document.getElementById("userNickname").textContent = `@${nickname}`;
-                    $(editInfoModal).modal('hide'); // Chiude la modale
-                } else {
-                    const error = await response.text();
-                    alert("Errore nel salvataggio delle informazioni: " + error);
-                }
-            } catch (error) {
-                alert("Errore nella connessione al server.");
-            }
-        });
-    }
 
     // Mostra e nascondi la sezione di selezione dell'avatar
     if (modifyAvatarButton) {
@@ -217,6 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.ok) {
                 const data = await response.json();
 
+                // Popola i campi del form per la modifica delle informazioni utente
+                document.getElementById("newName").value = data.name || ""; // Valore attuale o stringa vuota
+                document.getElementById("newSurname").value = data.surname || ""; // Valore attuale o stringa vuota
+                document.getElementById("newNickname").value = data.nickname || ""; // Valore attuale o stringa vuota
+
                 // Aggiorna gli elementi HTML con i dati utente
                 document.getElementById('userFullName').textContent = `${data.name} ${data.surname}`;
                 document.getElementById('userNickname').textContent = data.nickname;
@@ -231,6 +192,55 @@ document.addEventListener("DOMContentLoaded", () => {
     // Carica le informazioni al caricamento della pagina
     loadBiography();
     loadUserInfo();
+
+    //GabMan 08/12 Gestione del form per la modifica delle informazioni utente
+    // Mostra il form e nasconde il pulsante "Modifica Info Personali"
+    editInfoButton.addEventListener("click", () => {
+        editInfoForm.style.display = "block";
+        editInfoButton.style.display = "none";
+    });
+
+    // Nasconde il form e ripristina il pulsante "Modifica Info Personali"
+    cancelEditInfoButton.addEventListener("click", () => {
+        editInfoForm.style.display = "none";
+        editInfoButton.style.display = "inline-block";
+    });
+
+    // Gestisce il salvataggio del form
+    editInfoForm.addEventListener("submit", async (event) => {
+        event.preventDefault(); // Previene il comportamento predefinito del form
+
+        const name = document.getElementById("newName").value;
+        const surname = document.getElementById("newSurname").value;
+        const nickname = document.getElementById("newNickname").value;
+
+        try {
+            const response = await fetch('/updateUserInfo', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ name, surname, nickname }) // Invia i dati
+            });
+
+            if (response.ok) {
+                alert("Informazioni aggiornate con successo!");
+
+                // Aggiorna la visualizzazione nel profilo
+                document.getElementById("userFullName").textContent = `${name} ${surname}`;
+                document.getElementById("userNickname").textContent = `@${nickname}`;
+
+                // Nascondi il form
+                editInfoForm.style.display = "none";
+                editInfoButton.style.display = "inline-block";
+            } else {
+                const error = await response.text();
+                alert("Errore nel salvataggio delle informazioni: " + error);
+            }
+        } catch (error) {
+            alert("Errore nella connessione al server.");
+        }
+    });
 
     const testAchievementsAPI = async () => {
         try {
