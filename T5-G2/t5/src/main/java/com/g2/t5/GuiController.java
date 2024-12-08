@@ -350,9 +350,9 @@ public class GuiController {
         }
 
     @GetMapping("/getUserByEMail")
-    public User getUserByEMail(Model model, @RequestParam(value = "email", required = true) String email) {
+    public ResponseEntity<User> getUserByEMail(Model model, @RequestParam(value = "email", required = true) String email) {
         User user = (User) serviceManager.handleRequest("T23", "GetUserByEmail", email);
-        return user;
+        return ResponseEntity.ok(user);
     }
 
     // Salvataggio delle modifiche al profilo

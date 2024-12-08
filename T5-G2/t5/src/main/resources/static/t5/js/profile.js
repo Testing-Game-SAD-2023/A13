@@ -1,17 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Gestione dei tab dei trofei
-  const trophyTabs = document.querySelectorAll('#trophyTabs button[data-bs-toggle="tab"]');
-  trophyTabs.forEach(tab => {
-      tab.addEventListener('shown.bs.tab', function (event) {
-          console.log(`Tab attivo: ${event.target.id}`);
-      });
-  });
+    // Log di verifica
+    console.log("DOM completamente caricato e analizzato");
 
-  document.addEventListener("DOMContentLoaded", function () {
+    // Trova gli elementi necessari per la funzionalità di ricerca amici
     const searchInput = document.querySelector('#friend-search-input');
     const suggestionsContainer = document.querySelector('#friend-suggestions');
 
+    console.log(searchInput);
+    console.log(suggestionsContainer);
+
     if (searchInput && suggestionsContainer) {
+        // Regex per validare l'email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         // Gestione input nel campo di ricerca
@@ -20,33 +19,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Validazione dell'email
             if (!emailRegex.test(query)) {
+                console.log("Email non valida per regex");
                 suggestionsContainer.style.display = "none";
                 return;
             }
 
             try {
-                const response = await fetch(`/getUserByEMail?email=${encodeURIComponent(query)}`);
+                // Effettua la richiesta al server
+                const url = new URL("/getUserByEMail", window.location.origin);
+                url.searchParams.append("email", query);
+
+                const response = await fetch(url, {
+                    method: "GET", 
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    }
+                });
+                
                 if (response.ok) {
-                    const profile = await response.json();
+                    console.log("la GET è andata a buon fine, ora vediamo cosa c'è dentro");
+                    const user = await response.json();
+                    console.log(user);
+                    const profile = user.userProfile;
+                    console.log(profile);
+                    console.log(user.email);
 
                     // Svuota eventuali precedenti risultati
                     suggestionsContainer.innerHTML = "";
 
-                    if (profile && profile.email) {
+                    if (profile && user.email) {
+                        console.log("Esistono sia profile che user.email");
                         const profileInfo = document.createElement('div');
                         profileInfo.className = 'profile-info';
-                        profileInfo.textContent = `${profile.name} ${profile.surname}`;
+                        profileInfo.textContent = `${user.name} ${user.surname}`;
 
                         // Aggiungi gestione click sull'elemento del profilo
                         profileInfo.addEventListener('click', function () {
-                            alert(`Selezionato: ${profile.name}`);
-                            suggestionsContainer.style.display = "none";
+                            alert(`Selezionato: ${user.name}`);
+                            
                         });
 
                         suggestionsContainer.appendChild(profileInfo);
                         suggestionsContainer.style.display = "block";
                     } else {
                         // Nessun profilo trovato
+                        console.log("Mi dispiace riprova");
                         suggestionsContainer.style.display = "none";
                     }
                 } else {
@@ -56,20 +73,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Errore di rete:", error);
             }
         });
-
-        // Nascondi il suggerimento quando si fa clic al di fuori
-        document.addEventListener("click", function (e) {
-            if (!suggestionsContainer.contains(e.target) && e.target !== searchInput) {
-                suggestionsContainer.style.display = "none";
-            }
-        });
     }
-});
 
+    // Gestione dei tab dei trofei
+    const trophyTabs = document.querySelectorAll('#trophyTabs button[data-bs-toggle="tab"]');
+    trophyTabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (event) {
+            console.log(`Tab attivo: ${event.target.id}`);
+        });
+    });
 
-  // Gestione delle notifiche
-  const notificationsList = document.querySelector('.notifications-list');
-
+    // Gestione delle notifiche
+    const notificationsList = document.querySelector('.notifications-list');
     if (notificationsList) {
         const userEmail = document.querySelector('#user-email')?.textContent.trim();
 
@@ -78,7 +93,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const notificationItem = e.target.closest('.notification-item');
             if (!notificationItem) return;
 
-            const notificationId = notificationItem ? notificationItem.getAttribute('data-notification-id') : null;
+            const notificationId = notificationItem.getAttribute('data-notification-id');
+            if (!notificationId) return;
+
             // Gestione pulsante "Leggi"
             if (e.target.classList.contains('read-btn')) {
                 try {
@@ -88,9 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const response = await fetch("/read-notification", {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: formData.toString(),
                     });
 
@@ -108,23 +123,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Errore di rete. Riprova più tardi.");
                 }
             }
+
             // Gestione pulsante "Elimina"
             if (e.target.classList.contains('delete-btn')) {
                 try {
-                    // Creazione dei dati in formato URL encoded (application/x-www-form-urlencoded)
                     const formData = new URLSearchParams();
                     formData.append("email", userEmail);
                     formData.append("id", notificationId);
 
-                    // Assicurati di usare l'URL completo, compreso l'IP o il nome del container
-                    const backendUrl = '/delete-notification'; // Cambia con l'indirizzo corretto se necessario
-
-                    const response = await fetch(backendUrl, {
+                    const response = await fetch("/delete-notification", {
                         method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",  // Tipo di contenuto corretto per x-www-form-urlencoded
-                        },
-                        body: formData.toString(),  // Inviamo i dati in formato URL encoded
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: formData.toString(),
                     });
 
                     if (response.ok) {
