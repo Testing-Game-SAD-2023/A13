@@ -42,42 +42,36 @@
                 <p id="userNickname" style="color: rgb(86, 85, 85); font-family: Arial, Helvetica, sans-serif; font-style: italic;">
                     @nickname
                 </p>
-                <!-- Pulsante per aprire la modale -->
+
+                <!-- Pulsante per mostrare il form -->
                 <button id="editInfoButton" class="btn btn-info mt-3">Modifica Info Personali</button>
+
+                <!-- Form per modificare le informazioni personali (inizialmente nascosto) -->
+                <form id="editInfoForm" style="display: none; margin-top: 20px;">
+                    <div class="form-group">
+                        <label for="newName">Nome</label>
+                        <input type="text" class="form-control" id="newName" value="Nome" placeholder="Inserisci il nuovo nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="newSurname">Cognome</label>
+                        <input type="text" class="form-control" id="newSurname" value="Cognome" placeholder="Inserisci il nuovo cognome">
+                    </div>
+                    <div class="form-group">
+                        <label for="newNickname">Nickname</label>
+                        <input type="text" class="form-control" id="newNickname" value="@nickname" placeholder="Inserisci il nuovo nickname">
+                    </div>
+                    <!-- Pulsanti per il salvataggio e annullamento -->
+                    <div class="d-flex justify-content-between mt-3">
+                        <button type="button" id="cancelEditInfoButton" class="btn btn-secondary">Annulla</button>
+                        <button type="submit" class="btn btn-primary">Salva modifiche</button>
+                    </div>
+                </form>
+                        
             </div>
             
-
-                <!-- Modale per modificare le informazioni personali -->
-	        <div id="editInfoModal" class="modal" tabindex="-1" role="dialog">
-		        <div class="modal-dialog" role="document">
-			        <div class="modal-content">
-				        <div class="modal-header">
-					        <h5 class="modal-title">Modifica informazioni personali</h5>
-					        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						        <span aria-hidden="true">&times;</span>
-					        </button>
-				        </div>
-				        <div class="modal-body">
-					        <form id="editInfoForm">
-						        <div class="form-group">
-							        <label for="newName">Nome</label>
-							        <input type="text" class="form-control" id="newName" placeholder="Inserisci il nuovo nome">
-						        </div>
-						        <div class="form-group">
-							        <label for="newSurname">Cognome</label>
-							        <input type="text" class="form-control" id="newSurname" placeholder="Inserisci il nuovo cognome">
-						        </div>
-						        <div class="form-group">
-							        <label for="newNickname">Nickname</label>
-							        <input type="text" class="form-control" id="newNickname" placeholder="Inserisci il nuovo nickname">
-						        </div>
-						        <button type="submit" class="btn btn-primary">Salva modifiche</button>
-						        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-					        </form>
-				        </div>
-			        </div>
-		        </div>
-	        </div>
+                
+            
+            
 
             
             

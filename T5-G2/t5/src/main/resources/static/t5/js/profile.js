@@ -12,26 +12,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentProfilePicture = document.getElementById('currentProfilePicture');
     //GabMan08/12 - Modifica info profilo
     const editInfoButton = document.getElementById("editInfoButton");
-    const editInfoModal = document.getElementById("editInfoModal");
     const editInfoForm = document.getElementById("editInfoForm");
-    const newName = document.getElementById("newName");
-    const newSurname = document.getElementById("newSurname");
-    const newNickname = document.getElementById("newNickname");
+    const cancelEditInfoButton = document.getElementById("cancelEditInfoButton");
+
      // Aggiungi questo per il pulsante "Modifica Avatar" cami
     let selectedAvatar = null;
+    
+    // GabMan 08/12: Gestione del form per la modifica delle informazioni personali
+    // Mostra il form e nasconde il pulsante "Modifica Info Personali"
+    editInfoButton.addEventListener("click", () => {
+        editInfoForm.style.display = "block"; // Mostra il form
+        editInfoButton.style.display = "none"; // Nasconde il pulsante
+    });
 
-    // GabMan 08/12: Funzione per aprire la finestra modale
-    if (editInfoButton) {
-        editInfoButton.addEventListener("click", () => {
-            // Imposta i valori correnti nei campi di input
-            newName.value = document.getElementById("userFullName").textContent.split(" ")[0];
-            newSurname.value = document.getElementById("userFullName").textContent.split(" ")[1];
-            newNickname.value = document.getElementById("userNickname").textContent.slice(1); // Rimuove '@'
-            
-            // Mostra la modale
-            $(editInfoModal).modal('show');
-        });
-    }
+    // Nasconde il form e ripristina il pulsante "Modifica Info Personali"
+    cancelEditInfoButton.addEventListener("click", () => {
+        editInfoForm.style.display = "none"; // Nasconde il form
+        editInfoButton.style.display = "inline-block"; // Mostra il pulsante
+    });
+
+    
 
     // GabMan 08/12: Funzione per salvare le modifiche profilo utente
     if (editInfoForm) {
