@@ -92,8 +92,8 @@ public class T4Service extends BaseService {
                 String.class, String.class, String.class));
 
         registerAction("getPositions", new ServiceActionDefinition(
-                params -> getPositions((String) params[0], (String) params[1], (int) params[2], (int) params[3]),
-                String.class, String.class, Integer.class, Integer.class));
+                params -> getPositions((String) params[0], (String) params[1], (Integer) params[2], (Integer) params[3], (Integer) params[4], (Integer) params[5]),
+                String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class));
     }
 
     // usa /games per ottenere una lista di giochi
@@ -248,11 +248,19 @@ public class T4Service extends BaseService {
         return respose;
     }
 
-    private LeaderboardSubInterval getPositions(String gamemode, String statistica, int startPosition,
-            int endPosition) {
-        String endpoint = "leaderboard/subInterval" + "/" + gamemode + "/" + statistica + "/" + startPosition + "/"
-                + endPosition;
-        LeaderboardSubInterval jsonResponse = callRestGET(endpoint, null, LeaderboardSubInterval.class);
+    private LeaderboardSubInterval getPositions(String gamemode, String statistica, Integer pageSize,
+            Integer numPages, Integer startPage, Integer playerId) {
+                
+        String endpoint = "leaderboard/subInterval" + "/" + gamemode + "/" + statistica;
+
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("pageSize", String.valueOf(pageSize));
+        queryParams.put("numPages", String.valueOf(numPages));
+        queryParams.put("startPage", String.valueOf(startPage));
+        queryParams.put("playerId", String.valueOf(playerId));
+        
+
+        LeaderboardSubInterval jsonResponse = callRestGET(endpoint, queryParams, LeaderboardSubInterval.class);
 
         return jsonResponse;
     }

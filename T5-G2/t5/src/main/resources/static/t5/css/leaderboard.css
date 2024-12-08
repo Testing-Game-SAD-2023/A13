@@ -1,5 +1,38 @@
 .big-canvas {
-    width: 75vw !important;
+    width: 55vw !important;
+    padding: 0px 100px;
+}
+
+.btn-close-offcanvas {
+    position:absolute;
+    top: 50px;
+    right: 80px;
+}
+
+.form-check {
+    padding: 0 !important;
+}
+
+.form-check-input {
+    display: none;
+}
+
+.form-check-input:checked + .form-check-label {
+    background-color: #fdb838;
+    color: white;
+    border-color: #fdb838;
+}
+
+.btn-filter {
+    color: #fdb838 ;
+    border-color: #fdb838;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-filter:hover {
+    color: white !important;
+    border-color: #fdb838 !important;
 }
 
 .search-box {
@@ -24,3 +57,5 @@
     table-layout: fixed;
     width: 100%;
 }
+
+

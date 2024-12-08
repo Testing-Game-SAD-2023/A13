@@ -14,12 +14,12 @@
     <!--Classifica-->
 
 
-    <div class="offcanvas offcanvas-end text-bg-dark big-canvas px-5" tabindex="-1" id="offcanvasDarkNavbar"
+    <div class="offcanvas offcanvas-end text-bg-dark big-canvas" tabindex="-1" id="offcanvasDarkNavbar"
         aria-labelledby="offcanvasDarkNavbarLabel">
 
-        <div class="offcanvas-header text-center">
-            <h2 class="offcanvas-title mt-2 mx-auto" id="offcanvasDarkNavbarLabel">Classifiche</h2>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+        <div class="offcanvas-header">
+            <h2 class="offcanvas-title mt-4 mb-2 mx-auto" id="offcanvasDarkNavbarLabel">Classifiche</h2>
+            <button type="button" class="btn-close btn-close-white btn-close-offcanvas" data-bs-dismiss="offcanvas"
                 aria-label="Close"></button>
         </div>
 
@@ -27,25 +27,25 @@
             <!-- Selettori e search btn -->
             <div class="row px-5">
                 <div class="col-lg-4 mb-2">
-                    <span>Modalità di gioco</span>
+                    <span><b>Modalità di gioco</b></span>
 
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="gamemode" id="sfida" checked>
-                        <label class="form-check-label" for="sfida">
+                        <label class="form-check-label btn btn-filter" for="sfida">
                             Sfida
                         </label>
                     </div>
-
+                    
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="gamemode" id="scalata">
-                        <label class="form-check-label" for="scalata">
+                        <label class="form-check-label btn btn-filter" for="scalata">
                             Scalata
                         </label>
                     </div>
                 </div>
 
                 <div class="col-lg-4 mb-2">
-                    <span>Statistica</span>
+                    <span><b>Statistica</b></span>
                     <div id="statistic-options">
                     </div>
                 </div>

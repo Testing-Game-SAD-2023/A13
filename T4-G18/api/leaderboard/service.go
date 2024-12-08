@@ -33,7 +33,7 @@ func NewRepository(db *gorm.DB) *Repository {
 
 //FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error)
 
-func (gs *Repository)  FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error){
+func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error){
 	var (
 		rows        []Row
 		leaderboard Leaderboard
@@ -46,7 +46,7 @@ func (gs *Repository)  FindIntervalByPage(reader LeaderboardReader, startPage in
 		return leaderboard, api.ErrInvalidParam
 	}
 
-    offset := (startPage * reader.pageSize) -1
+    offset := ((startPage - 1 ) * reader.pageSize) 
     limit := reader.pageSize * reader.numPages
 
 	err := gs.db.Table("player_stats").

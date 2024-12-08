@@ -1,8 +1,8 @@
-const rowsPerPage = 10;
-const pageOffset = 5;
+const pageSize = 10;
+const numPages = 5;
 const tableBody = document.getElementById('table-body');
 const pagination = document.getElementById('pagination');
-let lastPage = 0;
+let lastPage = Infinity;
 let totalLength = 0; // #######################################
 let cache = {}
 
@@ -22,11 +22,12 @@ const statisticOptions = {
 
 
 // GET 
-async function fetchRows(gamemode, statistic, startPage, endPage) {
+async function fetchRows(gamemode, statistic, startPage) {
     try {
-        let startPos = (startPage - 1) * rowsPerPage + 1
-        let endPos = endPage * rowsPerPage;
-        const response = await fetch(`api/leaderboard/subInterval/${gamemode}/${statistic}/${startPos}/${endPos}`);
+        const endpoint = `api/leaderboard/subInterval/${gamemode}/${statistic}`;
+        const queryParams = `?pageSize=${pageSize}&numPages=${numPages}&startPage=${startPage}`;
+
+        const response = await fetch(`${endpoint}${queryParams}`);
         const responseJson = await response.json();
 
         if (!response.ok) {
@@ -61,16 +62,20 @@ async function fetchRows(gamemode, statistic, startPage, endPage) {
 Logica di fetching
 
 Si chiede la pagina X che non è in cache:
-if X==1 prendo intervallo (X, X+pageOffset) // prima pagina -> prendo le y successive
+if X==1 prendo intervallo (X, X+numPages) // prima pagina -> prendo le y successive
 else // pagina intermedia -> prendo un intorno di y pagine
-    if X+1 è in cache prendo l'intervallo prima (X-pageOffset, X) (senza scendere sotto pagina 1, quindi max(1, x-pageOffset))
-    elif X-1 è in cache prendo l'intervallo dopo (X, X+pageOffset) (senza eccedere oltre l'ultima pagina (la conosco?))
+    if X+1 è in cache prendo l'intervallo prima (X-numPages, X) (senza scendere sotto pagina 1, quindi max(1, x-numPages))
+    elif X-1 è in cache prendo l'intervallo dopo (X, X+numPages) (senza eccedere oltre l'ultima pagina (la conosco?))
     else // se è una pagina "isolata"
-        prendo l'intorno (X-floor(pageOffset/2), X+floor(pageOffset/2))         //es. se pageOffset==5 prendo intervallo (X-2, X+2)
+        prendo l'intorno (X-floor(numPages/2), X+floor(numPages/2))         //es. se numPages==5 prendo intervallo (X-2, X+2)
 */
 
 // fetch rows and update cache
 async function getRows(gamemode, statistic, page) {
+
+    let startPage;
+    let fetchedRows;
+
     // loading spinner
     tableBody.innerHTML = `
       <tr>
@@ -81,37 +86,33 @@ async function getRows(gamemode, statistic, page) {
         </td>
       </tr>
     `;
-    let startPage, endPage;
+    
 
     // define what page interval to fetch
     if (page == 1) {
         startPage = 1;
-        endPage = startPage + pageOffset - 1;
     } else {    // pagina intermedia
-        if (cache?.[gamemode]?.[statistic]?.[page + 1]) { // se la pagina x+1 è in cache, prendo le pagine precedenti 
-            startPage = Math.max(1, page - pageOffset + 1); // es. page = 5, pageOffset = 5, prendo pagine 1,2,3,4,5
-            // es. page = 2, pageOffset = 5, prendo pagine 1,2
-            endPage = page;
+        if (cache?.[gamemode]?.[statistic]?.[page + 1]) { // se la pagina x+1 è in cache, prendo le pagine precedenti
+            startPage = Math.max(1, page - numPages + 1); 
         } else if (cache?.[gamemode]?.[statistic]?.[page - 1]) { // se la pagina x-1 è in cache, prendo le pagine successive 
             startPage = page;
-
-            endPage = page + pageOffset - 1;  // ############## gestire totalPages 
         } else {
-            offset = Math.floor(pageOffset / 2);
+            offset = Math.floor(numPages / 2);
             startPage = Math.max(1, page - offset);
-            endPage = page + offset;
         }
     }
 
     // fetch rows
-    let fetchedRows
     try {
-        fetchedRows = await fetchRows(gamemode, statistic, startPage, endPage);
+        fetchedRows = await fetchRows(gamemode, statistic, startPage);
     } catch (error) {
         throw (error);
     }
-    const startRow = (startPage - 1) * rowsPerPage;
-
+    
+    // set last page
+    lastPage = totalLength === 0 ? 1 : Math.floor((totalLength - 1) / pageSize) + 1;
+    
+    // store fetched rows in cache
     if (!cache[gamemode]) {
         cache[gamemode] = {};
     }
@@ -119,13 +120,18 @@ async function getRows(gamemode, statistic, page) {
         cache[gamemode][statistic] = {}
     }
 
-    // store fetched rows in cache
+    const startRow = (startPage - 1) * pageSize;
+    let endPage = Math.min(startPage+numPages-1, lastPage)
+
     for (let page = startPage; page <= endPage; page++) {
-        const pageStartIndex = (page - 1) * rowsPerPage;
-        cache[gamemode][statistic][page] = fetchedRows.slice(
+        const pageStartIndex = (page - 1) * pageSize;
+        const pageSlice = fetchedRows.slice(
             pageStartIndex - startRow,
-            pageStartIndex - startRow + rowsPerPage
+            pageStartIndex - startRow + pageSize
         );
+        if (pageSlice.length == 0)
+            break;
+        cache[gamemode][statistic][page] = pageSlice
     }
     console.log('Cache updated', cache);
 }
@@ -139,7 +145,7 @@ function renderTable(gamemode, statistic, page) {
     // rendering table rows
     cache[gamemode][statistic][page].forEach((row, i) => {
         const tr = document.createElement('tr');
-        const position = (page - 1) * rowsPerPage + i + 1
+        const position = (page - 1) * pageSize + i + 1
         tr.innerHTML = `
           <td>${position}</td>
           <td>${row.email}</td>
@@ -153,12 +159,6 @@ function renderPagination(currentPage) {
 
     pagination.innerHTML = '';
 
-    if (totalLength === 0) {
-        lastPage = 1
-    }
-    else {
-        lastPage = Math.floor((totalLength - 1) / rowsPerPage) + 1
-    }
     // "Page 1" button
     const firstButton = document.createElement('li');
     firstButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
@@ -192,7 +192,6 @@ function renderPagination(currentPage) {
     pagination.appendChild(nextButton);
 
     // "Page last" button
-    console.log(lastPage)
     const lastButton = document.createElement('li');
     lastButton.className = `page-item ${currentPage === lastPage ? 'disabled' : ''}`;
     lastButton.innerHTML = `
@@ -237,7 +236,7 @@ function updateStatisticOptions(gamemode) {
         input.value = option.label;
 
         const label = document.createElement('label');
-        label.className = 'form-check-label';
+        label.className = 'form-check-label btn btn-filter';
         label.htmlFor = option.id;
         label.textContent = option.label;
 

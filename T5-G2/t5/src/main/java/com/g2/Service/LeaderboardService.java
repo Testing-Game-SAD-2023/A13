@@ -20,13 +20,18 @@ public class LeaderboardService {
         this.serviceManager = new ServiceManager(restTemplate);
     }
 
-    public LeaderboardSubInterval getLeaderboardSubInterval(String gamemode, String statistic, int startPos,
-            int endPos) {
+    public LeaderboardSubInterval getLeaderboardSubInterval(String gamemode, String statistic, Integer pageSize,
+            Integer numPages, Integer startPage, Integer playerId) {
         try {
+            if (startPage == null)
+                startPage = 0;
+            if (playerId == null)
+                playerId = -1;
 
             LeaderboardSubInterval playerStatsList = (LeaderboardSubInterval) serviceManager.handleRequest("T4",
                     "getPositions", gamemode, statistic,
-                    startPos, endPos);
+                    pageSize, numPages, startPage, playerId);
+
             List<User> userList = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
 
             for (PlayerStats playerStats : playerStatsList.getPositions()) {

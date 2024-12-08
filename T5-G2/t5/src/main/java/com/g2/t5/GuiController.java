@@ -372,15 +372,19 @@ public class GuiController {
         return main.handlePageRequest();
     }
 
-    @GetMapping("leaderboard/subInterval/{gamemode}/{statistic}/{startPos}/{endPos}")
+    @GetMapping("leaderboard/subInterval/{gamemode}/{statistic}")
     @ResponseBody
     public ResponseEntity<?> getPositions(@PathVariable(value = "gamemode") String gamemode,
             @PathVariable(value = "statistic") String statistic,
-            @PathVariable(value = "startPos") int startPos,
-            @PathVariable(value = "endPos") int endPos) {
+            @RequestParam(value = "pageSize") Integer pageSize,
+            @RequestParam(value = "numPages") Integer numPages,
+            @RequestParam(value = "startPage", required = false) Integer startPage,
+            @RequestParam(value = "playerId", required = false) Integer playerId) {
         try {
+
             LeaderboardSubInterval lbSubInterval = leaderboardService.getLeaderboardSubInterval(gamemode, statistic,
-                    startPos, endPos);
+            pageSize, numPages, startPage, playerId);
+            
             return ResponseEntity.ok(lbSubInterval);
         } catch (Exception e) {
             HashMap<String, String> errorResponse = new HashMap<>();
