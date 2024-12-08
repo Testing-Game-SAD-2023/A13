@@ -2,7 +2,6 @@ package leaderboard
 
 import (
 	"fmt"
-
 	"github.com/alarmfox/game-repository/api"
 	"gorm.io/gorm"
 )
@@ -30,14 +29,13 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-
-//FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error)
-
-func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error){
+func (gs *Repository) FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error) {
 	var (
-		rows        []Row
-		leaderboard Leaderboard
-		totalLength int64
+		rows           []Row
+		leaderboard    Leaderboard
+		playerPosition int
+		totalLength    int64
+		err            error
 	)
 
 	columnName, ok := api.GetLeaderboardColName(modeMap, statMap, reader.mode, reader.stat)
@@ -46,15 +44,30 @@ func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int
 		return leaderboard, api.ErrInvalidParam
 	}
 
-    offset := ((startPage - 1 ) * reader.pageSize) 
-    limit := reader.pageSize * reader.numPages
+	err = gs.db.Transaction(func(tx *gorm.DB) error {
+		query := fmt.Sprintf(`
+        SELECT position FROM(
+                SELECT *, row_number() OVER (ORDER BY %s DESC) AS position FROM player_stats
+                )
+                AS sub_q WHERE player_id = ?`, columnName)
 
-	err := gs.db.Table("player_stats").
-		Select(fmt.Sprintf("player_id AS user_id, %s AS stat", columnName)).
-		Order(fmt.Sprintf("%s DESC", columnName)).
-		Offset(offset).
-		Limit(limit).
-		Scan(&rows).Error
+		err := gs.db.Raw(query, fmt.Sprintf("%d", playerId)).Scan(&playerPosition).Error
+
+		if err != nil {
+			return err
+		}
+		startPage := playerPosition / reader.pageSize
+		offset := (startPage - 1) * reader.pageSize
+		limit := reader.pageSize * reader.numPages
+
+		query = buildQuery(columnName)
+		err = gs.db.Raw(query, limit, offset).Scan(&rows).Error
+		if err != nil {
+			return err
+		}
+
+		return err
+	})
 
 	if err != nil {
 		return leaderboard, api.MakeServiceError(err)
@@ -72,33 +85,50 @@ func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int
 	return leaderboard, nil
 }
 
-func (gs *Repository) FindPlayerPosition(mode string, stat string, playerId int) (PlayerPosition, error) {
+func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error) {
+	var (
+		rows        []Row
+		leaderboard Leaderboard
+		totalLength int64
+	)
 
-	var position PlayerPosition
-	columnName, ok := api.GetLeaderboardColName(modeMap, statMap, mode, stat)
+	columnName, ok := api.GetLeaderboardColName(modeMap, statMap, reader.mode, reader.stat)
 
 	if !ok {
-		return position, api.ErrInvalidParam
+		return leaderboard, api.ErrInvalidParam
 	}
 
-	query := fmt.Sprintf(`
-        SELECT position FROM(
-                SELECT *, row_number() OVER (ORDER BY %s DESC) AS position FROM player_stats
-                )
-                AS sub_q WHERE player_id = ?`, columnName)
+	query := buildQuery(columnName)
 
-	// playerId convertito in stringa per mantenere la coerenza con il tipo in PlayerStats (model)
-	// scelta obbligata dal tipo di PlayerGames...
+	offset := ((startPage - 1) * reader.pageSize)
+	limit := reader.pageSize * reader.numPages
 
-	err := gs.db.Raw(query, fmt.Sprintf("%d", playerId)).Scan(&position.Position).Error
+	err := gs.db.Raw(query, limit, offset).Scan(&rows).Error
+	
+	if err != nil {
+		return leaderboard, api.MakeServiceError(err)
+	}
+
+	err = gs.db.Table("player_stats").Count(&totalLength).Error
 
 	if err != nil {
-		return position, err
+		return leaderboard, api.MakeServiceError(err)
 	}
 
-    if position.Position == 0{
-        return position, api.ErrNotFound
-    }
+	leaderboard.Positions = rows
+	leaderboard.TotalLength = totalLength
 
-	return position, nil
+	return leaderboard, nil
+}
+
+
+func buildQuery(columnName string) string {
+	query := fmt.Sprintf(`
+    SELECT 
+        player_id AS user_id,
+        %s AS stat,
+        ROW_NUMBER() OVER (ORDER BY %s DESC) AS rank
+    FROM player_stats
+    LIMIT ? OFFSET ?`, columnName, columnName)
+	return query
 }

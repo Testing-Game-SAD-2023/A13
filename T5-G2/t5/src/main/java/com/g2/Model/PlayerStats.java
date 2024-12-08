@@ -3,6 +3,7 @@ package com.g2.Model;
 public class PlayerStats {
     private String email;
     private Long userId;
+    private int rank;
     private int statistic;
 
     public String getEmail() {
@@ -27,6 +28,14 @@ public class PlayerStats {
 
     public void setStatistic(int statistic) {
         this.statistic = statistic;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     @Override

@@ -1,16 +1,13 @@
 package leaderboard
 
 import (
-	"fmt"
 	"net/http"
-
 	"github.com/alarmfox/game-repository/api"
 )
 
 type Service interface {
-	//FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error)
+	FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error)
 	FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error)
-	FindPlayerPosition(mode string, stat string, playerId int) (PlayerPosition, error)
 }
 
 type Controller struct {
@@ -73,8 +70,7 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 	var leaderboard Leaderboard
 
 	if playerId >= 0 {
-		//leaderboard, err = gc.service.FindIntervalByPlayerID(reader, int(playerId))
-		fmt.Println("PLACEHOLDER PLAYERID")
+		leaderboard, err = gc.service.FindIntervalByPlayerID(reader, int(playerId))
 	} else {
 		leaderboard, err = gc.service.FindIntervalByPage(reader, int(startPage))
 	}
@@ -84,28 +80,4 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 	}
 
 	return api.WriteJson(w, http.StatusOK, leaderboard)
-}
-
-func (gc *Controller) FindPlayerPosition(w http.ResponseWriter, r *http.Request) error {
-	gameMode, err := api.FromUrlParams[CustomString](r, "gamemode")
-	if err != nil {
-		return err
-	}
-
-	stat, err := api.FromUrlParams[CustomString](r, "statistic")
-	if err != nil {
-		return err
-	}
-
-	playerId, err := api.FromUrlParams[KeyType](r, "playerID")
-	if err != nil {
-		return err
-	}
-
-	position, err := gc.service.FindPlayerPosition(gameMode.AsString(), stat.AsString(), playerId.AsInt())
-	if err != nil {
-		return api.MakeHttpError(err)
-	}
-
-	return api.WriteJson(w, http.StatusOK, position)
 }

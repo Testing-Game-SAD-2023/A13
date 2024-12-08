@@ -4,7 +4,8 @@ import "strconv"
 
 type Row struct {
 	UserID int64 `json:"userId"`
-	Stat   int64 `json:"statistic"`
+	Stat   int32 `json:"statistic"`
+	Rank   int32 `json:"rank"`
 }
 
 type Leaderboard struct {
@@ -12,15 +13,11 @@ type Leaderboard struct {
 	TotalLength int64 `json:"totalLength"`
 }
 
-type LeaderboardReader struct{
-    mode string; 
-    stat string; 
-    pageSize int; 
-    numPages int; 
-}
-
-type PlayerPosition struct {
-	Position int64 `json:"position"`
+type LeaderboardReader struct {
+	mode     string
+	stat     string
+	pageSize int
+	numPages int
 }
 
 type CustomString string
