@@ -337,5 +337,99 @@ body {
   padding: 5px 10px; /* Aggiusta padding del pulsante */
 }
 
+/*GabMan 08-12 Sezione Profilo */
+/* Stile per la modale di modifica informazioni */
+.modal {
+  display: none; /* La modale è nascosta di default */
+  position: fixed;
+  z-index: 1050;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4); /* Sfondo semitrasparente */
+}
 
+.modal-dialog {
+  margin: 10% auto;
+  max-width: 500px;
+}
+
+.modal-header {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  padding: 10px;
+  text-align: center;
+}
+
+.close {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Aggiunge un effetto hover per il pulsante "Annulla" */
+.btn-secondary:hover {
+  background-color: #6c757d;
+}
+
+/* Aggiunge un effetto hover per il pulsante "Salva modifiche" */
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Stile per il contenitore delle informazioni utente */
+#userInfo {
+  background-color: #f8f9fa; /* Aggiungi uno sfondo chiaro */
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#userFullName {
+  font-size: 2rem;
+  color: #333;
+  font-weight: bold;
+}
+
+#userNickname {
+  font-size: 1.2rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Stile per il pulsante di modifica informazioni */
+#editInfoButton {
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+}
+
+#editInfoButton:hover {
+  background-color: #0056b3;
+}
+
+
+/* Nascondi tutte le sezioni per impostazione predefinita */
+.section {
+  display: none;
+}
+
+/* Mostra solo la sezione attiva */
+.section.active {
+  display: block;
+}
 

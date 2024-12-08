@@ -34,15 +34,52 @@
 
         <!-- Sezioni -->
         <div id="profile" class="section active">
-            <div id="userInfo">
+            <div id="userInfo" class="text-center mb-4">
                 <p id="userFullName" class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;font-size: 2rem;">
                     Nome Cognome
                 </p>
                 <p id="userNickname" style="color: gray; font-family: Arial, Helvetica, sans-serif; font-style: italic;">
                     @nickname
                 </p>
+                <!-- Pulsante per aprire la modale -->
+                <button id="editInfoButton" class="btn btn-info mt-3">Modifica Info Personali</button>
             </div>
-       
+            
+
+                <!-- Modale per modificare le informazioni personali -->
+	        <div id="editInfoModal" class="modal" tabindex="-1" role="dialog">
+		        <div class="modal-dialog" role="document">
+			        <div class="modal-content">
+				        <div class="modal-header">
+					        <h5 class="modal-title">Modifica informazioni personali</h5>
+					        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						        <span aria-hidden="true">&times;</span>
+					        </button>
+				        </div>
+				        <div class="modal-body">
+					        <form id="editInfoForm">
+						        <div class="form-group">
+							        <label for="newName">Nome</label>
+							        <input type="text" class="form-control" id="newName" placeholder="Inserisci il nuovo nome">
+						        </div>
+						        <div class="form-group">
+							        <label for="newSurname">Cognome</label>
+							        <input type="text" class="form-control" id="newSurname" placeholder="Inserisci il nuovo cognome">
+						        </div>
+						        <div class="form-group">
+							        <label for="newNickname">Nickname</label>
+							        <input type="text" class="form-control" id="newNickname" placeholder="Inserisci il nuovo nickname">
+						        </div>
+						        <button type="submit" class="btn btn-primary">Salva modifiche</button>
+						        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+					        </form>
+				        </div>
+			        </div>
+		        </div>
+	        </div>
+
+            
+            
             
             <!-- Biografia e Avatar -->
             <div class="row">

@@ -10,8 +10,60 @@ document.addEventListener("DOMContentLoaded", () => {
     const biographyInput = document.getElementById("biography");
     const avatarSelection = document.getElementById('avatarSelection');
     const currentProfilePicture = document.getElementById('currentProfilePicture');
+    //GabMan08/12 - Modifica info profilo
+    const editInfoButton = document.getElementById("editInfoButton");
+    const editInfoModal = document.getElementById("editInfoModal");
+    const editInfoForm = document.getElementById("editInfoForm");
+    const newName = document.getElementById("newName");
+    const newSurname = document.getElementById("newSurname");
+    const newNickname = document.getElementById("newNickname");
      // Aggiungi questo per il pulsante "Modifica Avatar" cami
     let selectedAvatar = null;
+
+    // GabMan 08/12: Funzione per aprire la finestra modale
+    if (editInfoButton) {
+        editInfoButton.addEventListener("click", () => {
+            // Imposta i valori correnti nei campi di input
+            newName.value = document.getElementById("userFullName").textContent.split(" ")[0];
+            newSurname.value = document.getElementById("userFullName").textContent.split(" ")[1];
+            newNickname.value = document.getElementById("userNickname").textContent.slice(1); // Rimuove '@'
+            
+            // Mostra la modale
+            $(editInfoModal).modal('show');
+        });
+    }
+
+    // GabMan 08/12: Funzione per salvare le modifiche profilo utente
+    if (editInfoForm) {
+        editInfoForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const name = newName.value;
+            const surname = newSurname.value;
+            const nickname = newNickname.value;
+
+            try {
+                const response = await fetch("/updateUserInfo", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ name, surname, nickname })
+                });
+
+                if (response.ok) {
+                    // Aggiorna le informazioni nel profilo
+                    document.getElementById("userFullName").textContent = `${name} ${surname}`;
+                    document.getElementById("userNickname").textContent = `@${nickname}`;
+                    $(editInfoModal).modal('hide'); // Chiude la modale
+                } else {
+                    const error = await response.text();
+                    alert("Errore nel salvataggio delle informazioni: " + error);
+                }
+            } catch (error) {
+                alert("Errore nella connessione al server.");
+            }
+        });
+    }
 
     // Mostra e nascondi la sezione di selezione dell'avatar
     if (modifyAvatarButton) {
