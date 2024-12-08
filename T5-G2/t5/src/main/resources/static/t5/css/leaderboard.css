@@ -25,9 +25,10 @@
 
 .btn-filter {
     color: #fdb838 ;
-    border-color: #fdb838;
+    border-color: rgba(255, 255, 255, 0.2) !important;
     background-color: transparent;
     transition: all 0.3s ease;
+    width: 100%;
 }
 
 .btn-filter:hover {
@@ -36,7 +37,8 @@
 }
 
 .search-box {
-    max-width: 250px;
+    width: 300px;
+    max-width: 90%;
 }
 
 .tableError {
@@ -46,11 +48,11 @@
 }
 
 .col-rank {
-    width: 5%;
+    width: 10%;
 }
 
 .col-data {
-    width: 47.5%;
+    width: 45%;
 }
 
 .leaderboard-table {

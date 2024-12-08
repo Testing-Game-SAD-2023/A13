@@ -147,7 +147,7 @@ function renderTable(gamemode, statistic, page) {
         const tr = document.createElement('tr');
         const position = (page - 1) * pageSize + i + 1
         tr.innerHTML = `
-          <td>${position}</td>
+          <td class="text-center">${position}</td>
           <td>${row.email}</td>
           <td>${row.statistic}</td>
         `;
