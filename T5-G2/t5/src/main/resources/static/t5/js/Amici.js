@@ -1,146 +1,183 @@
-// Funzione per caricare gli amici
-function loadFriends() {
+document.addEventListener("DOMContentLoaded", () => {
     const friendsContainer = document.getElementById("friendsContainer");
     const errorMessage = document.getElementById("errorMessage");
+    const searchFriendInput = document.getElementById("searchFriendInput");
+    const searchFriendMessage = document.getElementById("searchFriendMessage");
+    const searchResult = document.getElementById("searchResult");
+    const friendName = document.getElementById("friendName");
+    const addFriendButton = document.getElementById("addFriendButton");
+    const searchFriendButton = document.getElementById("searchFriendButton");
 
-    // Pulisce il contenuto precedente
-    friendsContainer.innerHTML = "";
-    errorMessage.textContent = "";
+    // Funzione per caricare gli amici
+    function loadFriends() {
+        friendsContainer.innerHTML = "";
+        errorMessage.textContent = "";
 
-    // Recupera la lista amici dal server
-    fetch("/getFriendlist", {
-        method: "GET",
-        credentials: "include", // Include i cookie nella richiesta
-    })
-        .then(response => {
-            if (response.status === 401) {
-                throw new Error("Non sei autorizzato. Effettua il login.");
-            }
-            if (response.status === 404) {
-                throw new Error("Non hai ancora degli amici. Aggiungine uno!");
-            }
-            if (!response.ok) {
-                throw new Error("Errore durante il recupero della lista amici.");
-            }
-            return response.json();
+        fetch("/getFriendlist", {
+            method: "GET",
+            credentials: "include",
         })
-        .then(data => {
-            // Controlla se la lista è vuota
-            if (data.length === 0) {
-                errorMessage.textContent = "Non hai ancora degli amici. Aggiungine uno!";
-                return;
-            }
+            .then((response) => {
+                if (response.status === 401) {
+                    throw new Error("Non sei autorizzato. Effettua il login.");
+                }
+                if (!response.ok) {
+                    throw new Error("Errore durante il recupero della lista amici.");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.length === 0) {
+                    errorMessage.textContent = "Non hai ancora degli amici. Aggiungine uno!";
+                    return;
+                }
 
-            // Popola la lista degli amici
-            data.forEach(friend => {
-                // Crea il contenitore per ogni amico
-                const friendItem = document.createElement("div");
-                friendItem.className = "friend-item";
+                data.forEach((friend) => {
+                    const friendItem = document.createElement("div");
+                    friendItem.className = "friend-item list-group-item d-flex align-items-center";
 
-                // Avatar dell'amico
-                const avatar = document.createElement("img");
-                avatar.src = friend.avatar || '/t5/images/profilo/sampleavatar.jpg '; // Usa il campo 'avatar' restituito dal backend
-                avatar.alt = "Avatar";
-                avatar.className = "friend-avatar";
+                    const avatar = document.createElement("img");
+                    avatar.src = friend.avatar || "/t5/images/profilo/sampleavatar.jpg";
+                    avatar.alt = "Avatar";
+                    avatar.className = "friend-avatar";
 
-                // Informazioni sull'amico
-                const friendInfo = document.createElement("div");
-                friendInfo.className = "friend-info";
+                    const friendInfo = document.createElement("div");
+                    friendInfo.className = "friend-info flex-grow-1";
 
-                const friendName = document.createElement("p");
-                friendName.className = "friend-name";
-                friendName.textContent = friend.nickname; // Usa il campo 'username' restituito dal backend
+                    const friendName = document.createElement("p");
+                    friendName.className = "friend-name";
+                    friendName.textContent = friend.nickname;
 
-                friendInfo.appendChild(friendName);
+                    friendInfo.appendChild(friendName);
 
-                // Pulsante per eliminare l'amico
-                const deleteButton = document.createElement("button");
-                deleteButton.className = "btn btn-danger btn-sm delete-friend-btn";
-                deleteButton.textContent = "Elimina";
-                deleteButton.onclick = () => deleteFriend(friend.friendId); // Funzione per eliminare l'amico
+                    const deleteButton = document.createElement("button");
+                    deleteButton.className = "btn btn-danger btn-sm delete-friend-btn ms-auto";
+                    deleteButton.textContent = "Elimina";
+                    deleteButton.onclick = () => deleteFriend(friend.friendId);
+                    
+                    if(friend.friendId) {
+                        deleteButton.onclick = () => deleteFriend(friend.friendId);
+                    } else {
+                        console.error("friendId is missing for this friend");
+                    }
 
-                // Assembla il contenitore
-                friendItem.appendChild(avatar);
-                friendItem.appendChild(friendInfo);
-                friendItem.appendChild(deleteButton);
 
-                // Aggiunge l'elemento alla lista
-                friendsContainer.appendChild(friendItem);
+                    friendItem.appendChild(avatar);
+                    friendItem.appendChild(friendInfo);
+                    friendItem.appendChild(deleteButton);
+
+                    friendsContainer.appendChild(friendItem);
+                });
+            })
+            .catch((error) => {
+                errorMessage.textContent = error.message;
+                errorMessage.className = "text-danger";
             });
-        })
-        .catch(error => {
-            // Mostra messaggio di errore
-            errorMessage.textContent = error.message;
-            errorMessage.className = "text-danger";
-        });
     }
 
+    // Funzione per cercare un amico
+    function searchFriend() {
+        searchFriendMessage.textContent = "";
+        searchResult.style.display = "none";
 
-// Funzione per aggiungere un amico
-function addFriend() {
-    const friendIdInput = document.getElementById("friendIdInput");
-    const addFriendMessage = document.getElementById("addFriendMessage");
+        const friendIdentifier = searchFriendInput.value.trim();
+        if (!friendIdentifier) {
+            searchFriendMessage.textContent = "Per favore, inserisci un nickname o ID valido.";
+            searchFriendMessage.className = "text-danger";
+            return;
+        }
 
-    // Pulisce il messaggio precedente
-    addFriendMessage.textContent = "";
+        fetch(`/searchFriend?identifier=${encodeURIComponent(friendIdentifier)}`, {
+            method: "GET",
+            credentials: "include",
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Amico non trovato.");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                friendName.textContent = `${data.nickname} (ID: ${data.id})`;
+                searchResult.style.display = "block";
+                addFriendButton.setAttribute("data-friend-id", data.id);
+            })
+            .catch((error) => {
+                searchFriendMessage.textContent = error.message;
+                searchFriendMessage.className = "text-danger";
+            });
+    }
 
-    const friendId = friendIdInput.value.trim();
-    if (!friendId) {
-        addFriendMessage.textContent = "Per favore, inserisci un nickname valido.";
-        addFriendMessage.className = "text-danger";
+    // Funzione per aggiungere un amico
+    function addFriend() {
+        const friendId = addFriendButton.getAttribute("data-friend-id");
+        if (!friendId) {
+            searchFriendMessage.textContent = "Errore: nessun amico selezionato.";
+            searchFriendMessage.className = "text-danger";
+            return;
+        }
+
+        fetch("/addFriend", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ friendId }),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Errore durante l'aggiunta dell'amico.");
+                }
+                return response.text();
+            })
+            .then((message) => {
+                searchFriendMessage.textContent = message || "Amico aggiunto con successo!";
+                searchFriendMessage.className = "text-success";
+                loadFriends();
+                searchResult.style.display = "none";
+            })
+            .catch((error) => {
+                searchFriendMessage.textContent = error.message;
+                searchFriendMessage.className = "text-danger";
+            });
+    }
+
+    // Funzione per eliminare un amico
+    function deleteFriend(friendId) {
+    // Assicurati che friendId sia un valore valido
+    if (friendId === undefined || friendId === null) {
+        console.error("friendId is undefined or null");
         return;
     }
 
-    // Invia la richiesta per aggiungere un amico
-    fetch("/addFriend", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ friendId }),
-    })
-        .then(response => {
-            if (response.status === 401) {
-                throw new Error("Non sei autorizzato. Effettua il login.");
-            }
-            if (!response.ok) {
-                throw new Error("Errore durante l'aggiunta dell'amico.");
-            }
-            return response.json();
-        })
-        .then(data => {
-            addFriendMessage.textContent = "Amico aggiunto con successo!";
-            addFriendMessage.className = "text-success";
-            friendIdInput.value = ""; // Pulisce il campo di input
-            loadFriends(); // Ricarica la lista degli amici
-        })
-        .catch(error => {
-            addFriendMessage.textContent = error.message;
-            addFriendMessage.className = "text-danger";
-        });
-}
-
-// Funzione per eliminare un amico
-function deleteFriend(friendId) {
     fetch(`/deleteFriend/${friendId}`, {
         method: "DELETE",
         credentials: "include",
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Errore durante l'eliminazione dell'amico.");
-            }
-            return response.json();
-        })
-        .then(() => {
-            alert("Amico eliminato con successo!");
-            loadFriends(); // Aggiorna la lista degli amici
-        })
-        .catch(error => {
-            alert("Errore: " + error.message);
-        });
-}
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("Errore durante l'eliminazione dell'amico.");
+        }
+        return response.text();
+    })
+    .then((message) => {
+        alert(message || "Amico eliminato con successo!");
+        loadFriends(); // Aggiorna la lista degli amici
+    })
+    .catch((error) => {
+        alert("Errore: " + error.message);
+    });
+    }
 
-// Carica la lista amici al caricamento della pagina
-document.addEventListener("DOMContentLoaded", loadFriends);
+
+
+    // Aggiungi i listener ai bottoni
+    searchFriendButton.addEventListener("click", searchFriend);
+    addFriendButton.addEventListener("click", addFriend);
+
+    // Carica gli amici al caricamento della pagina
+    loadFriends();
+});
+
+

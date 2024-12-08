@@ -34,6 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
  
+import org.springframework.web.bind.annotation.DeleteMapping;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
@@ -932,10 +934,10 @@ public class Controller {
   
 
   
-    /*  
-// by GabMan: Endpoint per aggiungere un amico
-@PostMapping("/addFriend")
-public ResponseEntity<String> addFriend(
+     
+    //by GabMan: Endpoint per aggiungere un amico
+    @PostMapping("/addFriend")
+    public ResponseEntity<String> addFriend(
     @CookieValue(name = "jwt", required = false) String jwt,
     @RequestParam("friendId") Integer friendId) {
     try {
@@ -951,7 +953,8 @@ public ResponseEntity<String> addFriend(
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
             }
 
-            userRepository.addFriend(userId, friendId);
+            friendRepository.addFriend(userId, friendId);
+
 
             return ResponseEntity.ok("Friend added successfully!");
         } catch (Exception e) {
@@ -961,31 +964,32 @@ public ResponseEntity<String> addFriend(
     }
 
 //byGabMan: Endpoint per rimuovere un amico
-@PostMapping("/removeFriend")
-public ResponseEntity<String> removeFriend(
+
+   @DeleteMapping("/deleteFriend/{friendId}")
+    public ResponseEntity<String> deleteFriend(
     @CookieValue(name = "jwt", required = false) String jwt,
-    @RequestParam("friendId") Integer friendId) {
+    @PathVariable Integer friendId) {
     try {
+        // Verifica che il token JWT esista
         if (jwt == null || jwt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
         }
 
+        // Decodifica il token JWT per ottenere l'ID utente
         Claims claims = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
         Integer userId = (Integer) claims.get("userId");
 
-        // Verifica se gli utenti esistono
-            if (!userRepository.existsById(userId) || !userRepository.existsById(friendId)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Friend not found");
-            }
+        // Elimina la relazione di amicizia
+        friendRepository.deleteFriend(userId, friendId);
 
-            userRepository.removeFriend(userId, friendId);
+        return ResponseEntity.ok("Friendship removed successfully");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the friend.");
+    }
+    }
 
-            return ResponseEntity.ok("Friend removed successfully!");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while removing the friend.");
-        }
-    }*/
+
     
     //cami 02/12--> modifica profilo
     @GetMapping("/getUserInfo")
@@ -1024,7 +1028,42 @@ public ResponseEntity<String> removeFriend(
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
     }
+
+    //cami 07/12
+    @GetMapping("/searchFriend")
+    public ResponseEntity<Map<String, String>> searchFriend(@RequestParam String identifier) {
+    try {
+        // Cerca l'utente tramite nickname o ID
+        User user = userRepository.findByNickname(identifier);
+        if (user == null) {
+            try {
+                user = userRepository.findByID(Integer.parseInt(identifier));
+            } catch (NumberFormatException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        }
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Restituisci i dettagli dell'utente trovato
+        Map<String, String> userDetails = new HashMap<>();
+        userDetails.put("id", user.getID().toString());
+        userDetails.put("nickname", user.getNickname());
+        return ResponseEntity.ok(userDetails);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+    }
+
+    
+
+
 }
+
+
 
 
 

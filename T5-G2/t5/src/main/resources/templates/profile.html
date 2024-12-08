@@ -107,32 +107,38 @@
                             <div id="friendsContainer" class="list-group" style="max-height: 400px; overflow-y: auto;">
                                 <!-- Gli amici verranno caricati dinamicamente qui -->
                             </div>
+                            
                             <p id="errorMessage" class="text-danger text-center mt-3"></p>
                         </div>
                     </div>
         
-                    <!-- Form Aggiungi Amico -->
+                    <!-- Form Cerca Amico -->
                     <div class="card mt-4 shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title">Aggiungi un Amico</h5>
+                            <h5 class="card-title">Cerca Amico</h5>
                             <div class="input-group">
                                 <input
                                     type="text"
-                                    id="friendIdInput"
+                                    id="searchFriendInput"
                                     class="form-control"
-                                    placeholder="Inserisci il nickname dell'amico"
+                                    placeholder="Inserisci il nickname o l'ID dell'amico"
                                 />
+                                <button id="searchFriendButton" class="btn btn-primary">
+                                    Cerca
+                                </button>
+                            </div>
+                            <p id="searchFriendMessage" class="text-center mt-2"></p>
+                            <div id="searchResult" class="mt-3" style="display: none;">
+                                <p>Amico trovato: <span id="friendName"></span></p>
                                 <button id="addFriendButton" class="btn btn-success">
                                     Aggiungi Amico
                                 </button>
                             </div>
-                            <p id="addFriendMessage" class="text-center mt-2"></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
 
         <div id="trophies" class="section">
             <div class="row">

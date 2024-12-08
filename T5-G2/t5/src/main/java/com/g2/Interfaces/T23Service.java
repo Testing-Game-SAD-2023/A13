@@ -24,6 +24,9 @@ import com.g2.Model.User;
 import java.util.HashMap;
 
 //noi
+
+import org.springframework.http.HttpStatus;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +46,8 @@ import org.springframework.web.util.UriComponentsBuilder;
  public class T23Service extends BaseService {
  
      private static final String BASE_URL = "http://t23-g1-app-1:8080";
- 
-     public T23Service(RestTemplate restTemplate) {
+     
+    public T23Service(RestTemplate restTemplate) {
          super(restTemplate, BASE_URL);
  
          // Registrazione delle azioni
@@ -77,8 +80,8 @@ import org.springframework.web.util.UriComponentsBuilder;
          registerAction("AddFriend", new ServiceActionDefinition(
                  params -> addFriend((String) params[0], (String) params[1])
          ));
-         registerAction("RemoveFriend", new ServiceActionDefinition(
-                 params -> removeFriend((String) params[0], (String) params[1])
+         registerAction("deleteFriend", new ServiceActionDefinition(
+                params -> deleteFriend((Integer) params[0], (String) params[1])
          ));
         
      }
@@ -216,8 +219,8 @@ import org.springframework.web.util.UriComponentsBuilder;
         responseType
     );
     return response.getBody();
-}
-//GabMan 03/12
+    }
+    //GabMan 03/12
      // Metodo per ottenere la lista degli amici
     public List<Map<String, String>> getFriendlist(String userId) {
     final String endpoint = "/getFriendlist"; // Endpoint nel controller di T23
@@ -237,24 +240,62 @@ import org.springframework.web.util.UriComponentsBuilder;
     }
 
 
-/////////NON TESTATI/////////////////////////////////////////////////////////
+        /////////NON TESTATI/////////////////////////////////////////////////////////
      // Metodo per aggiungere un amico
-     public Boolean addFriend(String userId, String friendId) {
-         final String endpoint = "/addFriend";
-         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-         formData.add("userId", userId);
-         formData.add("friendId", friendId);
-         return callRestPost(endpoint, formData, null, Boolean.class);
-     }
- 
-     // Metodo per rimuovere un amico
-     public Boolean removeFriend(String userId, String friendId) {
-         final String endpoint = "/removeFriend";
-         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-         formData.add("userId", userId);
-         formData.add("friendId", friendId);
-         return callRestPost(endpoint, formData, null, Boolean.class);
-     } //fine
+
+    public Map<String, String> searchFriend(String identifier) {
+    final String endpoint = "/searchFriend"; // Endpoint in T23
+
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+    queryParams.add("identifier", identifier);
+
+    try {
+        return callRestGet(endpoint, queryParams, new ParameterizedTypeReference<Map<String, String>>() {});
+    } catch (Exception e) {
+        System.err.println("Errore durante la ricerca dell'amico: " + e.getMessage());
+        return null;
+    }
+    }
+    public String addFriend(String userId, String friendId) {
+    final String endpoint = "/addFriend"; // Endpoint nel controller di T23
+
+    // Creazione del payload per la richiesta POST
+    MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();
+    payload.add("userId", userId);
+    payload.add("friendId", friendId);
+
+    try {
+        // Effettua la richiesta POST al servizio T23
+        return callRestPost(endpoint, payload, null, String.class);
+    } catch (Exception e) {
+        System.err.println("Errore durante l'aggiunta dell'amico: " + e.getMessage());
+        return "Errore durante l'aggiunta dell'amico.";
+    }
+    }
+
+    public boolean deleteFriend(Integer friendId, String jwt) {
+    final String endpoint = "/deleteFriend/" + friendId;
+
+    try {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwt); // Se richiesto
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        // Chiamata DELETE al backend di T23
+        ResponseEntity<String> response = restTemplate.exchange(
+            BASE_URL + endpoint,
+            HttpMethod.DELETE,
+            requestEntity,
+            String.class
+        );
+
+        return response.getStatusCode() == HttpStatus.OK;
+    } catch (Exception e) {
+        System.err.println("Errore durante l'eliminazione dell'amico: " + e.getMessage());
+        return false;
+    }
+    }
+
 
      //cami (02/12)
      // Metodo per ottenere informazioni dell'utente (name, surname, nickname)
@@ -268,6 +309,6 @@ import org.springframework.web.util.UriComponentsBuilder;
     // Chiamata all'endpoint usando callRestGet
     return callRestGet(endpoint, queryParams, new ParameterizedTypeReference<Map<String, String>>() {});
     }
+}
 
- }
  
