@@ -506,7 +506,7 @@ func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller,
 
 	r.Route("/leaderboard", func(r chi.Router) {
 		// Get global leaderboard positions (for a given gamemode/statistic pair) from startPos to endPos
-		r.Get("/subInterval/{gamemode}/{statistic}/{startPos}/{endPos}", api.HandlerFunc(lb.FindByInterval))
+		r.Get("/subInterval/{gamemode}/{statistic}", api.HandlerFunc(lb.FindByInterval))
 
 		// Get position of a player (for a given gamemode/statistic pair)
 		r.Get("/playerPosition/{gamemode}/{statistic}/{playerID}", api.HandlerFunc(lb.FindPlayerPosition))

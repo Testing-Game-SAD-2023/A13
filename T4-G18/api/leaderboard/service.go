@@ -30,24 +30,30 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (gs *Repository) FindByInterval(mode string, stat string, startPos int, endPos int) (Leaderboard, error) {
+
+//FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error)
+
+func (gs *Repository)  FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error){
 	var (
 		rows        []Row
 		leaderboard Leaderboard
 		totalLength int64
 	)
 
-	columnName, ok := api.GetLeaderboardColName(modeMap, statMap, mode, stat)
+	columnName, ok := api.GetLeaderboardColName(modeMap, statMap, reader.mode, reader.stat)
 
 	if !ok {
 		return leaderboard, api.ErrInvalidParam
 	}
 
+    offset := (startPage * reader.pageSize) -1
+    limit := reader.pageSize * reader.numPages
+
 	err := gs.db.Table("player_stats").
 		Select(fmt.Sprintf("player_id AS user_id, %s AS stat", columnName)).
 		Order(fmt.Sprintf("%s DESC", columnName)).
-		Offset(startPos - 1).
-		Limit(endPos - startPos + 1).
+		Offset(offset).
+		Limit(limit).
 		Scan(&rows).Error
 
 	if err != nil {

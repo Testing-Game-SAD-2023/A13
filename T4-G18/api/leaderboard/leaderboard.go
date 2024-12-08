@@ -12,6 +12,13 @@ type Leaderboard struct {
 	TotalLength int64 `json:"totalLength"`
 }
 
+type LeaderboardReader struct{
+    mode string; 
+    stat string; 
+    pageSize int; 
+    numPages int; 
+}
+
 type PlayerPosition struct {
 	Position int64 `json:"position"`
 }
