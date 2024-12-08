@@ -160,8 +160,7 @@ public class TeamService {
         // 7. Restituisci il team aggiornato
         return ResponseEntity.ok().body(existingTeam);
     }
-    
-   
+      
     // Metodo per visualizzare i team associati a un admin specifico
     public ResponseEntity<?> visualizzaTeams(String jwt) {
         try {
@@ -300,7 +299,6 @@ public class TeamService {
         return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentiIds,jwt));
     }
 
-    
     // Modifica 04/12/2024: Aggiunta rimuoviStudenteTeam
     public ResponseEntity<?> rimuoviStudenteTeam(String idTeam, String idStudente, String jwt) {
         
@@ -342,7 +340,12 @@ public class TeamService {
         return ResponseEntity.ok().body(updatedTeam);
     }
 
+
+//-------------------------------------------------------------------------------------------------------------------
+
+    
 }
+
 
 
 

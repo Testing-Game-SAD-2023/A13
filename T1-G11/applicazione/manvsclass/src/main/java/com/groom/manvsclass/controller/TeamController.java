@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.service.TeamService;
 import com.groom.manvsclass.service.TeamModificationRequest;
@@ -72,5 +71,6 @@ public class TeamController {
     public ResponseEntity<?> rimuoviStudenteTeam(@PathVariable("idTeam") String idTeam,@RequestBody String idStudente,@CookieValue(name = "jwt", required = false) String jwt){
         return teamService.rimuoviStudenteTeam(idTeam,idStudente,jwt);
     }
-}
+   
+}   
 

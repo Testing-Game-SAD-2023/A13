@@ -1,22 +1,27 @@
 package com.groom.manvsclass.model;
 
 import java.util.Date;
+import java.util.UUID;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "Assignment")
 public class Assignment {
-
-    // Attributi
+    @Id
     private String idAssignment;
+
     private String titolo;
     private String descrizione;
     private Date dataCreazione;
     private Date dataScadenza;
 
     // Costruttore
-    public Assignment(String idAssignment, String titolo, String descrizione, Date dataCreazione, Date dataScadenza) {
-        this.idAssignment = idAssignment;
+    public Assignment(String titolo, String descrizione, Date dataScadenza) {
+        this.idAssignment = UUID.randomUUID().toString();
         this.titolo = titolo;
         this.descrizione = descrizione;
-        this.dataCreazione = dataCreazione;
+        this.dataCreazione = new Date(); //Creazione all'istante corrente
         this.dataScadenza = dataScadenza;
     }
 
