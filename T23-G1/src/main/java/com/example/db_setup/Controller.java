@@ -831,9 +831,11 @@ public class Controller {
     return "redirect:" + (referer != null ? referer : "/");
 }
 
-@PostMapping("/follow/{targetUserId}")
-public ResponseEntity<?> toggleFollow(@PathVariable String targetUserId,
-                                    @RequestParam String authUserId) {
+@PostMapping("/add-follow")
+public ResponseEntity<?> toggleFollow(@RequestParam("targetUserId") String targetUserId,
+                                    @RequestParam("authUserId") String authUserId) {
+    System.out.println(targetUserId);
+    System.out.println(authUserId);
     return userService.toggleFollow(targetUserId, authUserId);
 }
 

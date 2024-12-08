@@ -163,12 +163,16 @@ public class UserService {
             Integer userId = Integer.parseInt(UserId);
             Integer authUserId = Integer.parseInt(AuthUserId);
 
+            // Recupero gli utenti dal db
+            User autUser = userRepository.findById(authUserId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            User followUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
             //Recupera i profili dal db
-            UserProfile authUserProfile = userProfileRepository.findById(authUserId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-            UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            UserProfile authUserProfile = autUser.getUserProfile(); 
+            UserProfile userProfile = followUser.getUserProfile();
 
             //Controlla se l'utente è già seguito
-            boolean wasFollowing = userProfile.getFollowersList().stream().anyMatch(u -> u.getID().equals(authUserId));
+            boolean wasFollowing = userProfile.getFollowersList().stream().anyMatch(u -> u.getID().equals(authUserProfile.getID()));
 
             //Se l'utente è già seguito, lo rimuove dalla lista dei follower
             if(wasFollowing){
@@ -185,7 +189,7 @@ public class UserService {
             userProfileRepository.save(userProfile);
             userProfileRepository.save(authUserProfile);
 
-            return ResponseEntity.ok("Follow status changed");
+            return ResponseEntity.ok(/* "Follow status changed"*/);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }

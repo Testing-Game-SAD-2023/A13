@@ -14,9 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (followButton) {
         followButton.addEventListener('click', async function() {
             const userId = this.getAttribute('data-user-id');
+            console.log('Clicked! UserId:', userId); // Verifica il valore quando si clicca
 
             try {
-                const response = await fetch(`follow/${userId}`, {
+                const response = await fetch(`/follow/${userId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

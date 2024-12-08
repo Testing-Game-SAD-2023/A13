@@ -83,8 +83,8 @@ public class T23Service extends BaseService {
         ));
 
         registerAction("followUser", new ServiceActionDefinition(
-                params -> followUser((String) params[0], (String) params[1]),
-                String.class, String.class
+                params -> followUser((Integer) params[0], (Integer) params[1]),
+                Integer.class, Integer.class
         ));
     }
 
@@ -183,11 +183,12 @@ public class T23Service extends BaseService {
     }
 
     // Metodo per follow/unfollow di un utente
-    public String followUser(String targetUserId, String authUserId) {
-        final String endpoint = "/follow/" + targetUserId;
+    public String followUser(Integer targetUserId, Integer authUserId) {
+        final String endpoint = "/add-follow";
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("authUserId", authUserId);
+        map.add("targetUserId", String.valueOf(targetUserId));
+        map.add("authUserId", String.valueOf(authUserId));
 
         return callRestPost(endpoint, map, null, String.class);
     }

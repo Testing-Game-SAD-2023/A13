@@ -302,7 +302,7 @@ public class GuiController {
             GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
             GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
             GenericObjectComponent objIsFollowing = new GenericObjectComponent("isFollowing", isFollowing);
-            GenericObjectComponent objUserId = new GenericObjectComponent("userID", userId); //frienId
+            GenericObjectComponent objUserId = new GenericObjectComponent("userId", userId); //frienId
 
             // Aggiungo i componenti alla pagina
             profile.setObjectComponents(objUsername);
@@ -335,15 +335,17 @@ public class GuiController {
                                           @CookieValue(name = "jwt", required = false) String jwt) {
 
         try{
-            // Converto l'ID del giocatore
-            int userId = Integer.parseInt(playerID);
+            // Converto l'ID del giocatore di cui voglio fare il follow/unfollow
+            Integer userId = Integer.parseInt(playerID);
 
             // Recupero l'utente
+            /* 
             List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
             User user = users.stream()
                 .filter(u -> u.getId() == userId)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+                */
 
             // Decodifica JWT per ottener l'ID dell'utente autenticato
             byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
@@ -351,7 +353,8 @@ public class GuiController {
             ObjectMapper mapper = new ObjectMapper();
             @SuppressWarnings("unchecked")
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-            String authUserId = map.get("userId").toString();
+            String authUserIdString = map.get("userId").toString();
+            Integer authUserId = Integer.parseInt(authUserIdString);
 
             // Chiamo il servizio per seguire o smettere di seguire l'utente
             String result = (String) serviceManager.handleRequest("T23", "followUser", userId, authUserId);

@@ -53,6 +53,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         profileInfo.className = 'profile-info';
                         profileInfo.textContent = `${user.name} ${user.surname}`;
 
+                        // Crea il bottone con le caratteristiche richieste
+                        const profileBtn = document.createElement('button');
+                        profileBtn.className = 'btn btn-custom btn-sm';  // Le classi CSS per lo stile
+                        profileBtn.textContent = "Visualizza Profilo";  // Imposta il testo del bottone
+                        profileBtn.onclick = function() {
+                            location.href = `/friend/${user.id}`;  // Aggiungi l'evento onclick per redirigere
+                        };
+
+                        // Aggiungi il bottone all'interno di profileInfo
+                        profileInfo.appendChild(profileBtn);
+
                         // Aggiungi gestione click sull'elemento del profilo
                         profileInfo.addEventListener('click', function () {
                             alert(`Selezionato: ${user.name}`);

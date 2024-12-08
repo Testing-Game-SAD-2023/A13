@@ -37,10 +37,10 @@
                         </div>
                         <!--Bottone follow/unfollw-->
                         <button id="followButton"
-                                class="btn"
-                                th:classappend="${isFollowing ? 'btn-danger' : 'btn-primary'}"
-                                th:text="${isFollowing ? 'Unfollow' : 'Follow'}"
-                                th:data-userid="${userId}">
+                        class="btn"
+                        th:classappend="${isFollowing ? 'btn-danger' : 'btn-primary'}"
+                        th:text="${isFollowing ? 'Unfollow' : 'Follow'}"
+                        th:attr="data-user-id=${userId}">
                             Follow
                         </button>
                     </div>
