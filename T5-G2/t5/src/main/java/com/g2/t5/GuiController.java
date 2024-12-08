@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -213,9 +214,154 @@ public class GuiController {
         profile.setObjectComponents(objIdToStatistic);
         profile.setObjectComponents(objUserID);
         profile.setObjectComponents(objNotifications);
-        //TODO: Aggiungere componenti missioni e notifiche
+        //TODO: Aggiungere componenti missioni
 
         return profile.handlePageRequest();
+    }
+
+    @GetMapping("/friend/{playerID}")
+    public String friendProfilePage(Model model, @PathVariable(value="playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
+        try {
+            // Istanzio il profilo come PageBuilder
+            PageBuilder profile = new PageBuilder(serviceManager, "friend_profile", model);
+
+            // Autenticazione
+            profile.SetAuth(jwt);
+
+            // Converto l'ID del giocatore
+            int userId = Integer.parseInt(playerID);
+
+            // Recupero l'utente
+            List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
+            User user = users.stream()
+                .filter(u -> u.getId() == userId)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+            // Recupero i dati pubblici da visualizzare
+            String username = user.getName();
+            String surname = user.getSurname();
+
+            // Recupero immagine e bio pubbliche
+            String image = userProfileService.getProfilePicture(userId);
+            String bio = userProfileService.getProfileBio(userId);
+
+            // Recupero i progressi degli achievement pubblici
+            List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
+
+            // Divido i progressi degli achievement in "unlocked" e "locked"
+            List<AchievementProgress> unlockedAchievements = achievementProgresses.stream()
+                .filter(a -> a.getProgress() >= a.getProgressRequired())
+                .toList();
+            List<AchievementProgress> lockedAchievements = achievementProgresses.stream()
+                .filter(a -> a.getProgress() < a.getProgressRequired())
+                .toList();
+
+            // Recupero le statistiche pubbliche del giocatore
+            List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
+            List<Statistic> allStatistics = achievementService.getStatistics();
+            Map<String, Statistic> IdToStatistic = new HashMap<>();
+
+            for (Statistic stat : allStatistics) {
+                IdToStatistic.put(stat.getID(), stat);
+            }
+
+            // Decodifica JWT per ottener l'ID dell'utente autenticato
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String authUserId = map.get("userId").toString();
+
+            //Ottengo il profilo dell'utente autenticato
+            User authUser = users.stream()
+                .filter(u -> u.getId() == Integer.parseInt(authUserId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+            // Ottengo l'ID dello UserProfile dell'utente autenticato
+            Integer authUserProfileID = userProfileService.getProfileID(Integer.parseInt(authUserId));
+            // Ottengo l'ID del profilo dell'utente visualizzato
+            Integer userProfileID = userProfileService.getProfileID(userId);
+
+            // Verifichiamo se l'utente autenticato è tra i follower dell'utente visualizzato
+            boolean isFollowing = userProfileService.getFollowersList(userId) != null &&
+                            userProfileService.getFollowersList(userId).stream()
+                                .anyMatch(f -> f.getID().equals(authUserProfileID));
+
+
+            // Creo i componenti per passare i dati pubblici alla pagina
+            GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
+            GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
+            GenericObjectComponent objImage = new GenericObjectComponent("propic", image);
+            GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
+
+            GenericObjectComponent objUnlockedAchievements = new GenericObjectComponent("unlockedAchievements", unlockedAchievements);
+            GenericObjectComponent objLockedAchievements = new GenericObjectComponent("lockedAchievements", lockedAchievements);
+            GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
+            GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
+            GenericObjectComponent objIsFollowing = new GenericObjectComponent("isFollowing", isFollowing);
+            GenericObjectComponent objUserId = new GenericObjectComponent("userID", userId); //frienId
+
+            // Aggiungo i componenti alla pagina
+            profile.setObjectComponents(objUsername);
+            profile.setObjectComponents(objSurname);
+            profile.setObjectComponents(objImage);
+            profile.setObjectComponents(objBio);
+            profile.setObjectComponents(objUnlockedAchievements);
+            profile.setObjectComponents(objLockedAchievements);
+            profile.setObjectComponents(objStatisticProgresses);
+            profile.setObjectComponents(objIdToStatistic);
+            profile.setObjectComponents(objIsFollowing);
+            profile.setObjectComponents(objUserId);
+
+            return profile.handlePageRequest();
+        } catch (NumberFormatException e) {
+            System.out.println("(/friend) ID utente non valido: " + e.getMessage());
+            return "error";
+        } catch (RuntimeException e) {
+            System.out.println("(/friend) Utente non trovato: " + e.getMessage());
+            return "error";
+        } catch (Exception e) {
+            System.out.println("(/friend) Errore generico: " + e.getMessage());
+            return "error";
+        }
+    }
+
+    @PostMapping("/follow/{playerID}")
+    @ResponseBody
+    public ResponseEntity<?> toggleFollow(@PathVariable(value="playerID") String playerID,
+                                          @CookieValue(name = "jwt", required = false) String jwt) {
+
+        try{
+            // Converto l'ID del giocatore
+            int userId = Integer.parseInt(playerID);
+
+            // Recupero l'utente
+            List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
+            User user = users.stream()
+                .filter(u -> u.getId() == userId)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+            // Decodifica JWT per ottener l'ID dell'utente autenticato
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String authUserId = map.get("userId").toString();
+
+            // Chiamo il servizio per seguire o smettere di seguire l'utente
+            String result = (String) serviceManager.handleRequest("T23", "followUser", userId, authUserId);
+
+            return ResponseEntity.ok(result);
+
+        }catch(Exception e){
+            System.out.println("(/follow) Errore generico: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Errore generico");
+        }
     }
 
     @GetMapping("/gamemode")

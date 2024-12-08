@@ -831,6 +831,12 @@ public class Controller {
     return "redirect:" + (referer != null ? referer : "/");
 }
 
+@PostMapping("/follow/{targetUserId}")
+public ResponseEntity<?> toggleFollow(@PathVariable String targetUserId,
+                                    @RequestParam String authUserId) {
+    return userService.toggleFollow(targetUserId, authUserId);
+}
+
     //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
     @PostMapping("/studentsByIds")
     public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){

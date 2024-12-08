@@ -155,4 +155,40 @@ public class UserService {
             }
         }
 
+    public ResponseEntity<?> toggleFollow(String UserId, String AuthUserId){
+
+        try{
+
+            //Converto gli id in interi
+            Integer userId = Integer.parseInt(UserId);
+            Integer authUserId = Integer.parseInt(AuthUserId);
+
+            //Recupera i profili dal db
+            UserProfile authUserProfile = userProfileRepository.findById(authUserId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            UserProfile userProfile = userProfileRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            //Controlla se l'utente è già seguito
+            boolean wasFollowing = userProfile.getFollowersList().stream().anyMatch(u -> u.getID().equals(authUserId));
+
+            //Se l'utente è già seguito, lo rimuove dalla lista dei follower
+            if(wasFollowing){
+                //Unfollow
+                userProfile.getFollowersList().remove(authUserProfile);
+                authUserProfile.getFollowingList().remove(userProfile);
+            } else {
+                //Altrimenti lo aggiunge - Follow
+                userProfile.getFollowersList().add(authUserProfile);
+                authUserProfile.getFollowingList().add(userProfile);
+            }
+
+            //Salva le modifiche
+            userProfileRepository.save(userProfile);
+            userProfileRepository.save(authUserProfile);
+
+            return ResponseEntity.ok("Follow status changed");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
+    }
+
 }
