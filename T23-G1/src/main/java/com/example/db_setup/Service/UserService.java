@@ -1,17 +1,17 @@
 package com.example.db_setup.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.db_setup.OAuthUserGoogle;
 import com.example.db_setup.User;
@@ -200,24 +200,140 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<?> getFollowers(String UserId){
-        try{
-            //Converto l'id in intero
-            Integer userId = Integer.parseInt(UserId);
+    /*
+    public List<User> getFollowers(String UserId){
+            Integer userIdInt = Integer.parseInt(UserId);
 
-            //Recupero l'utente dal db
-            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+            User user = userRepository.findById(userIdInt)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-            //Recupero gli id dei follower
             List<Integer> followerIds = user.getUserProfile().getFollowerIds();
-
-            //Recupero gli utenti dal db
             List<User> followers = userRepository.findAllById(followerIds);
+            System.out.println(followers);
 
-            return ResponseEntity.ok(followers);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+            return followers;
+    }
+    */
+
+    /*
+    public List<User> getFollowers(String UserId) {
+        Integer userIdInt = Integer.parseInt(UserId);
+        User user = userRepository.findById(userIdInt)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Verifica che userProfile non sia null
+        if (user.getUserProfile() == null) {
+            System.out.println("UserProfile is null for user: " + user.getID());
+            return new ArrayList<>(); // Ritorna lista vuota invece di null
         }
+
+        List<Integer> followerIds = user.getUserProfile().getFollowerIds();
+
+        // Verifica che followerIds non sia null
+        if (followerIds == null) {
+            System.out.println("FollowerIds is null for user: " + user.getID());
+            return new ArrayList<>();
+        }
+
+        // Verifica che followerIds non sia vuoto
+        if (followerIds.isEmpty()) {
+            System.out.println("No followers found for user: " + user.getID());
+            return new ArrayList<>();
+        }
+
+        // Debug print per vedere gli ID dei follower
+        System.out.println("Follower IDs: " + followerIds);
+
+        List<User> followers = userRepository.findAllById(followerIds);
+
+        // Debug print per vedere i follower trovati
+        System.out.println("Found followers: " + followers);
+
+        // Non ritornare mai null
+        return followers != null ? followers : new ArrayList<>();
+    } */
+
+    public List<User> getFollowers(String UserId) {
+        Integer userIdInt = Integer.parseInt(UserId);
+
+        // Trova l'utente
+        User user = userRepository.findById(userIdInt)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Ottieni gli ID dei following
+        List<Integer> followerIds = user.getUserProfile().getFollowerIds();
+        System.out.println("Following IDs: " + followerIds);
+
+        if (followerIds == null || followerIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Prova a trovare ogni utente singolarmente per debug
+        List<User> followers = new ArrayList<>();
+        for (Integer followerId : followerIds) {
+            UserProfile userProfile = userProfileRepository.findById(followerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserProfile not found"));
+            User followerUser = userRepository.findByUserProfile(userProfile);
+            //Optional<User> followerUser = userRepository.findById(userRepository.findByUserProfile(userProfile).getID());
+            if (followerUser != null) {
+                followers.add(followerUser);
+                System.out.println("Found user with id " + followerId + ": " + followerUser.getName());
+            } else {
+                System.out.println("User with id " + followerId + " not found");
+            }
+        }
+
+        System.out.println("Found following: " + followers);
+        return followers;
+    }
+
+    /*
+    public List<User> getFollowing(String UserId){
+        Integer userIdInt = Integer.parseInt(UserId);
+
+        User user = userRepository.findById(userIdInt)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        List<Integer> followingIds = user.getUserProfile().getFollowingIds();
+        List<User> following = userRepository.findAllById(followingIds);
+        System.out.println(following);
+
+        return following;
+    }
+    */
+
+    public List<User> getFollowing(String UserId) {
+        Integer userIdInt = Integer.parseInt(UserId);
+
+        // Trova l'utente
+        User user = userRepository.findById(userIdInt)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Ottieni gli ID dei following
+        List<Integer> followingIds = user.getUserProfile().getFollowingIds();
+        System.out.println("Following IDs: " + followingIds);
+
+        if (followingIds == null || followingIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Prova a trovare ogni utente singolarmente per debug
+        List<User> following = new ArrayList<>();
+        for (Integer followingId : followingIds) {
+            UserProfile userProfile = userProfileRepository.findById(followingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserProfile not found"));
+            User followingUser = userRepository.findByUserProfile(userProfile);
+            //Optional<User> followerUser = userRepository.findById(userRepository.findByUserProfile(userProfile).getID());
+            if (followingUser != null) {
+                following.add(followingUser);
+                System.out.println("Found user with id " + followingId + ": " + followingUser.getName());
+            } else {
+                System.out.println("User with id " + followingId + " not found");
+            }
+        }
+
+        System.out.println("Found following: " + following);
+        return following;
     }
 
 }

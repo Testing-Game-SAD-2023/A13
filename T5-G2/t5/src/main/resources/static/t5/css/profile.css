@@ -427,17 +427,100 @@ body {
     text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(145deg, #2d2d45, #323250);
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.friend-item:hover {
+    background: linear-gradient(145deg, #323250, #2d2d45);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.friend-info {
+    flex-grow: 1;
+}
+
+.friend-info h5 {
+    color: #fff;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.friend-info p {
+    color: #aaa;
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+}
+
+.btn-custom {
+    background-color: #007bff;
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-custom:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.nav-tabs .nav-link {
+    color: #ccc;
+    border: none;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    color: #fff;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.friend-search input {
+    background-color: #2d2d45;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 10px 15px;
+}
+
+.friend-search input:focus {
+    background-color: #2d2d45;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    color: #fff;
+}
+
 #friend-suggestions {
+    position: absolute;
+    width: 100%;
+    background-color: #2d2d45;
+    border: 1px solid #444;
+    border-radius: 0 0 5px 5px;
+    z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
-    width: 100%;
-}
-#friend-suggestions li {
-    cursor: pointer;
-    padding: 10px;
-}
-#friend-suggestions li:hover {
-    background-color: #f0f0f0;
 }
 
 /* Responsive */

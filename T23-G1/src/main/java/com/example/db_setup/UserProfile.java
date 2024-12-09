@@ -59,5 +59,23 @@ public class UserProfile {
         this.user = user;
     }
 
+    public List<Integer> getFollowingIds(){
+        return followingIds;
+    }
+
+    public List<Integer> getFollowerIds(){
+        return followerIds;
+    }
+
+    @Override
+    public String toString() {
+        return "UserProfile{" +
+            "id=" + ID +
+            ", bio='" + bio + '\'' +
+            ", followingIds=" + followingIds +
+            ", followerIds=" + followerIds +
+            '}';
+    }
+
     //List<Statistic> allStatistics;
 }

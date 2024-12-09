@@ -831,13 +831,23 @@ public class Controller {
     return "redirect:" + (referer != null ? referer : "/");
 }
 
-@PostMapping("/add-follow")
-public ResponseEntity<?> toggleFollow(@RequestParam("targetUserId") String targetUserId,
-                                    @RequestParam("authUserId") String authUserId) {
-    System.out.println(targetUserId);
-    System.out.println(authUserId);
-    return userService.toggleFollow(targetUserId, authUserId);
-}
+    @PostMapping("/add-follow")
+    public ResponseEntity<?> toggleFollow(@RequestParam("targetUserId") String targetUserId,
+                                        @RequestParam("authUserId") String authUserId) {
+        System.out.println(targetUserId);
+        System.out.println(authUserId);
+        return userService.toggleFollow(targetUserId, authUserId);
+    }
+
+    @GetMapping("/get-followers")
+    public List<User> getFollowers(@RequestParam("userId") String userId) {
+        return userService.getFollowers(userId);
+    }
+
+    @GetMapping("/get-following")
+    public List<User> getFollowing(@RequestParam("userId") String userId) {
+        return userService.getFollowing(userId);
+    }
 
     //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
     @PostMapping("/studentsByIds")

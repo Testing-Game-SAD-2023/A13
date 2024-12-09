@@ -183,6 +183,16 @@ public class GuiController {
         for (Statistic stat : allStatistics)
             IdToStatistic.put(stat.getID(), stat);
 
+        // Mi prendo la lista dei follower e dei following
+        List<User> followersList = new ArrayList<>();
+        List<User> followingList = new ArrayList<>();
+        followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", String.valueOf(userId));
+        followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", String.valueOf(userId));
+
+        //DEBUG
+        System.out.println("Following list: " + followingList);
+        System.out.println("Followers list: " + followersList);
+
         // Creo i componenti per passare i dati alla pagina
         GenericObjectComponent objEmail = new GenericObjectComponent("email", email);
         GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies);
@@ -190,6 +200,8 @@ public class GuiController {
         GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
         GenericObjectComponent objImage = new GenericObjectComponent("propic", image);
         GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
+        GenericObjectComponent objFollowingList = new GenericObjectComponent("followingList", followingList);
+        GenericObjectComponent objFollowersList = new GenericObjectComponent("followersList", followersList);
 
         GenericObjectComponent objUnlockedAchievements = new GenericObjectComponent("unlockedAchievements", unlockedAchievements);
         GenericObjectComponent objLockedAchievements = new GenericObjectComponent("lockedAchievements", lockedAchievements);
@@ -207,6 +219,8 @@ public class GuiController {
         profile.setObjectComponents(objSurname);
         profile.setObjectComponents(objImage);
         profile.setObjectComponents(objBio);
+        profile.setObjectComponents(objFollowingList);
+        profile.setObjectComponents(objFollowersList);
         profile.setObjectComponents(objUnlockedAchievements);
         profile.setObjectComponents(objLockedAchievements);
         profile.setObjectComponents(objAchievementProgresses);
@@ -344,7 +358,7 @@ public class GuiController {
             Integer userId = Integer.parseInt(playerID);
 
             // Recupero l'utente
-            /* 
+            /*
             List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
             User user = users.stream()
                 .filter(u -> u.getId() == userId)

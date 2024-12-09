@@ -1,5 +1,6 @@
 package com.example.db_setup;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,11 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -56,7 +52,7 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfile userProfile;
 
-    
+
     @Column(name = "reset_token")
     private String resetToken;
 
@@ -73,4 +69,17 @@ public class User {
         return resetToken;
     }
 
+    public void getUserProfile(UserProfile userProfile){
+        this.userProfile = userProfile;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+            "id=" + ID +
+            ", name='" + name + '\'' +
+            ", surname='" + surname + '\'' +
+            ", email='" + email + '\'' +
+            '}';
+    }
 }

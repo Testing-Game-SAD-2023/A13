@@ -160,25 +160,63 @@
                 <div class="card-header">
                     <ul class="nav nav-tabs card-header-tabs">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">Follower</a>
+                            <a class="nav-link active" id="followers-tab" data-bs-toggle="tab" href="#followers-content">Follower</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Following</a>
+                            <a class="nav-link" id="following-tab" data-bs-toggle="tab" href="#following-content">Following</a>
                         </li>
                     </ul>
                 </div>
                 <div class="card-body">
-                    <p><span th:text="${followers}"></span> Follower, <span th:text="${following}"></span> Following</p>
-                    <!-- Barra di ricerca per amici -->
-                    <div class="friend-search">
+                    <div class="text-white mb-3">
+                        <span th:text="${followers != null ? followers.size() : 0}"></span> Follower,
+                        <span th:text="${following != null ? following.size() : 0}"></span> Following
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Tab Followers -->
+                        <div class="tab-pane fade show active" id="followers-content">
+                            <div class="friends-list">
+                                <!-- Check if followers exists and is not empty -->
+                                <div th:if="${followers != null and !followers.empty}"
+                                    th:each="follower : ${followers}"
+                                    class="friend-item">
+                                    <div class="friend-info">
+                                        <h5 th:text="${follower.name + ' ' + follower.surname}" class="mb-1"></h5>
+                                        <p th:text="${follower.email}" class="text-muted"></p>
+                                    </div>
+                                    <a th:href="@{'/friend/' + ${follower.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
+                                </div>
+                                <div th:if="${followers == null or followers.empty}" class="text-muted">
+                                    Nessun follower trovato
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Following -->
+                        <div class="tab-pane fade" id="following-content">
+                            <div class="friends-list">
+                                <!-- Check if following exists and is not empty -->
+                                <div th:if="${following != null and !following.empty}"
+                                    th:each="follow : ${following}"
+                                    class="friend-item">
+                                    <div class="friend-info">
+                                        <h5 th:text="${follow.name + ' ' + follow.surname}" class="mb-1"></h5>
+                                        <p th:text="${follow.email}" class="text-muted"></p>
+                                    </div>
+                                    <a th:href="@{'/friend/' + ${follow.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
+                                </div>
+                                <div th:if="${following == null or following.empty}" class="text-muted">
+                                    Nessun following trovato
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barra di ricerca -->
+                    <div class="friend-search mt-3">
                         <input type="text" id="friend-search-input" class="form-control" placeholder="Cerca per email..." autocomplete="off">
-                        <ul id="friend-suggestions" class="list-group mt-2" style="position: absolute; z-index: 100; display: none; width: 100%;">
-                            <!-- Esempio di suggerimento statico per test -->
-                            <!-- Rimuovi questo esempio o modificalo in base alle necessità -->
-                            <li class="list-group-item suggestion-item d-flex align-items-center">
-                                <!--Qui ci vanno dinamicamente le box dei suggerimenti-->
-                            </li>
-                        </ul>
+                        <ul id="friend-suggestions" class="list-group mt-2"></ul>
                     </div>
                 </div>
             </div>

@@ -86,6 +86,16 @@ public class T23Service extends BaseService {
                 params -> followUser((Integer) params[0], (Integer) params[1]),
                 Integer.class, Integer.class
         ));
+
+        registerAction("getFollowers", new ServiceActionDefinition(
+                params -> getFollowers((String) params[0]),
+                String.class
+        ));
+
+        registerAction("getFollowing", new ServiceActionDefinition(
+                params -> getFollowing((String) params[0]),
+                String.class
+        ));
     }
 
     // Metodo per l'autenticazione
@@ -191,5 +201,21 @@ public class T23Service extends BaseService {
         map.add("authUserId", String.valueOf(authUserId));
 
         return callRestPost(endpoint, map, null, String.class);
+    }
+
+    public List<User> getFollowers(String userId) {
+        final String endpoint = "/get-followers";
+
+        Map<String, String> queryParams = Map.of("userId", userId);
+
+        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {});
+    }
+
+    public List<User> getFollowing(String userId) {
+        final String endpoint = "/get-following";
+
+        Map<String, String> queryParams = Map.of("userId", userId);
+
+        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {});
     }
 }
