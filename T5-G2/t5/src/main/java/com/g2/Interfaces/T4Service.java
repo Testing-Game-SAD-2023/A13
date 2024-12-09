@@ -239,4 +239,17 @@ public class T4Service extends BaseService {
         return respose;
     }
 
+    //GETALLPLAYERS
+    private List<Player> GetAllPlayers() {
+        final String endpoint = "/player";
+        try {
+            // Chiamata GET utilizzando il metodo della classe base per ottenere una lista di utenti
+            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Player>>() {
+            });
+        } catch (RuntimeException e) {
+            // Gestione degli errori durante la richiesta
+            throw new IllegalArgumentException("[GetAllPlayers()] Errore durante il recupero degli utenti: " + e.getMessage());
+        }
+    }
+
 }
