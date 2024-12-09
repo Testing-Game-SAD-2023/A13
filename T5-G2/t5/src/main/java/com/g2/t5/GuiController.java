@@ -379,16 +379,17 @@ public class GuiController {
             @RequestParam(value = "pageSize") Integer pageSize,
             @RequestParam(value = "numPages") Integer numPages,
             @RequestParam(value = "startPage", required = false) Integer startPage,
-            @RequestParam(value = "playerId", required = false) Integer playerId) {
+            @RequestParam(value = "email", required = false) String email) {
         try {
 
             LeaderboardSubInterval lbSubInterval = leaderboardService.getLeaderboardSubInterval(gamemode, statistic,
-            pageSize, numPages, startPage, playerId);
+            pageSize, numPages, startPage, email);
             
             return ResponseEntity.ok(lbSubInterval);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             HashMap<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("message", "Errore nella visualizzazione della classifica");
+            errorResponse.put("message", "Errore nel caricamento della classifica");
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);
         }
     }

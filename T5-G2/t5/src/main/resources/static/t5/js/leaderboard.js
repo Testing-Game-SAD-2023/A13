@@ -20,7 +20,8 @@ const statisticOptions = {
     ]
 };
 
-
+//fetch('api/leaderboard/subInterval/sfida/partite_giocate?pageSize=10&numPages=1&email=andrea_unina@gmail.com')
+//response = await fetch('api/leaderboard/subInterval/sfida/partite_giocate?pageSize=10&numPages=1&email=andrea_unina@gmail.com'); response = await response.json(); console.log(response);
 // GET 
 async function fetchRows(gamemode, statistic, startPage) {
     try {

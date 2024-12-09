@@ -644,7 +644,7 @@ public class Controller {
         return userRepository.findByID(Integer.parseInt(ID));
     }
 
-    @GetMapping("/students_list/{email}")
+    @GetMapping("/students_list/getByEmail/{email}")
     @ResponseBody
     public User getStudentByEmail(@PathVariable String email) {
         return userRepository.findByEmail(email);

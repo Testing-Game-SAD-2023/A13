@@ -91,9 +91,9 @@ public class T4Service extends BaseService {
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class));
 
-        registerAction("getPositions", new ServiceActionDefinition(
-                params -> getPositions((String) params[0], (String) params[1], (Integer) params[2], (Integer) params[3], (Integer) params[4], (Integer) params[5]),
-                String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class));
+        registerAction("getLeaderboardSubinterval", new ServiceActionDefinition(
+                params -> getLeaderboardSubinterval((String) params[0], (String) params[1], (Integer) params[2], (Integer) params[3], (Integer) params[4], (Long) params[5]),
+                String.class, String.class, Integer.class, Integer.class, Integer.class, Long.class));
     }
 
     // usa /games per ottenere una lista di giochi
@@ -248,8 +248,8 @@ public class T4Service extends BaseService {
         return respose;
     }
 
-    private LeaderboardSubInterval getPositions(String gamemode, String statistica, Integer pageSize,
-            Integer numPages, Integer startPage, Integer playerId) {
+    private LeaderboardSubInterval getLeaderboardSubinterval(String gamemode, String statistica, Integer pageSize,
+            Integer numPages, Integer startPage, Long playerId) {
                 
         String endpoint = "leaderboard/subInterval" + "/" + gamemode + "/" + statistica;
 
