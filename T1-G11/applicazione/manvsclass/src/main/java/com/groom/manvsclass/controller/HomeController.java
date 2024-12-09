@@ -482,30 +482,15 @@ import org.springframework.web.bind.annotation.RequestParam;
     }
     
      // Aggiungere un membro al team
-    @PostMapping("/team/{teamName}/add-member")
+     @PostMapping("/team_add_member")
     @ResponseBody
     public ResponseEntity<String> addMemberToTeam(
-        @PathVariable String teamName,
-        @RequestBody List<String> selectedMemberIds, // Modifica: ora è una lista di membri
+        @RequestBody Map<String, String> payload,
         @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.addMemberToTeam(teamName, selectedMemberIds, jwt);
-}
-
-
-    // Rimuovere un membro dal team
-    @DeleteMapping("/team/{teamName}/remove-member")
-    @ResponseBody
-    public ResponseEntity<String> removeMemberFromTeam(
-            @PathVariable String teamName,
-            @RequestBody String memberId,
-            @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.removeMemberFromTeam(teamName, memberId, jwt);
+        String teamName = payload.get("teamName");
+        String memberId = payload.get("memberId");
+        return teamService.addMemberToTeam(teamName, memberId, jwt);
     }
-
-        /* @GetMapping("/teams/view")
-        public ModelAndView showAllTeams(@CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.showAllTeams(jwt);
-        } */
 
     @GetMapping("/team/view/{teamName}")
     public ModelAndView showTeamDetails(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -541,5 +526,41 @@ import org.springframework.web.bind.annotation.RequestParam;
         String token = jwt.replace("Bearer ", ""); // Rimuove il prefisso Bearer
         return teamService.getAllTeamsAsHtml(token);
     }
+
+    @PostMapping("/team_remove_member")
+    @ResponseBody
+    public ResponseEntity<String> removeMemberFromTeam(@RequestBody Map<String, String> requestBody, @CookieValue(name = "jwt", required = false) String jwt){
+        // Estrai i dati dalla richiesta
+        String teamName = requestBody.get("teamName");
+        String memberId = requestBody.get("memberId");
+        // Verifica che i parametri siano presenti
+        if (teamName == null || memberId == null) {
+            return ResponseEntity.badRequest().body("Team name or member ID is missing.");
+        }
+        // Chiama il TeamService per rimuovere il membro
+        return teamService.removeMemberFromTeam(teamName, memberId, jwt);
+    }
+
+    @PostMapping("/team_delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteTeam(@RequestBody Map<String, String> requestBody, @CookieValue(name = "jwt", required = false) String jwt) {
+    // Estrai i dati dalla richiesta
+        String teamName = requestBody.get("teamName");
+        // Verifica che il parametro sia presente
+        if (teamName == null || teamName.isEmpty()) {
+            return ResponseEntity.badRequest().body("Nome team mancante.");
+        }
+        // Chiama il TeamService per cancellare il team
+        return teamService.deleteTeam(teamName, jwt);
+    }
+
+
+
+
+
+
+
+
+
 
  }

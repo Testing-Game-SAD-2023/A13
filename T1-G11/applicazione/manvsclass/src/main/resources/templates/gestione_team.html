@@ -173,13 +173,65 @@ th {
     <div class="dashboard">
         <h3>Gestione Team</h3>
         <nav>
-            <a href="#add-team" onclick="showSection('add-team')">Crea Team</a>
-            <a id="list-team-link" href="#list-team" onclick="showSection('list-team')">Lista Team</a>
+            <a href="#add-team" onclick="showSection('add-team');  ">Crea Team</a>
+            <a href="#add-member" onclick="showSection('add-member') ">Aggiungi Membro</a>
+            <a href="#remove-member" onclick="showSection('remove-member')">Rimuovi Membro</a>
+            <a href="#list-team" onclick="showSection('list-team')">Lista Team</a>
             <a href="#dettagli-team" onclick="showSection('dettagli-team')">Dettagli Team</a>
+            <a href="#delete-team" onclick="showSection('delete-team')">Cancella Team</a>
         </nav>
     </div>
 
     <div class="content">
+        <!-- Sezione Aggiungi Membro -->
+
+        <div id="add-member" class="section hidden">
+            <h2>Aggiungi Studente a un Team</h2>
+            <form id="add-member-form">
+                <label for="team-add">Seleziona Team:</label>
+                <select id="team-add">
+                    <!-- Opzioni team generate dinamicamente -->
+                </select>
+                <label for="member-add">Seleziona Studente:</label>
+                <select id="member-add">
+                    <!-- Opzioni studenti generate dinamicamente -->
+                </select>
+        
+                <button type="submit" id="add-member-btn" class="btn">Aggiungi Membro</button>
+            </form>
+        </div>
+        
+        <!-- Sezione Rimuovi Membro -->
+        <div id="remove-member" class="section hidden">
+            <h2>Rimuovi Studente da un Team</h2>
+            <form id="remove-member-form">
+                <label for="team-remove-member">Seleziona Team:</label>
+                <select id="team-remove-member">
+                    <!-- Opzioni team generate dinamicamente -->
+                </select>
+        
+                <label for="memberToremove">Seleziona Studente:</label>
+                <select id="memberToremove">
+                    <!-- Opzioni membri generate dinamicamente -->
+                </select>
+        
+                <button id="remove-member-btn" class="btn">Rimuovi Membro</button>
+            </form>
+        </div>
+        
+        <!-- Sezione Cancella Team -->
+        <div id="delete-team" class="section hidden">
+            <h2>Cancella un Team</h2>
+            <form id="delete-team-form">
+                <label for="team-delete">Seleziona Team:</label>
+                <select id="team-delete">
+                    <!-- Opzioni team generate dinamicamente -->
+                </select>
+        
+                <button id="delete-team-btn" class="btn danger">Cancella Team</button>
+            </form>
+        </div>
+
         <!-- Sezione per creare un team -->
         <div id="add-team" class="section">
             <h2>Aggiungi Team</h2>
@@ -237,7 +289,6 @@ th {
             <select id="team">
                 <!-- Le opzioni verranno generate dinamicamente -->
             </select>
-            <button id="showTeamDetailsButton" class="btn btn-primary" style="margin-top: 10px;">Mostra Dettagli</button>
         </div>
 
     </div>

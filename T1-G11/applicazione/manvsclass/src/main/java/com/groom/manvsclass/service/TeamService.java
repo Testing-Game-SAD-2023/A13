@@ -90,23 +90,6 @@ public class TeamService {
         return ResponseEntity.ok(updatedTeam);
     }
 
-    /**
-     * Cancella un team .
-     */
-    public ResponseEntity<String> deleteTeam(String teamName, String jwt) {
-        if (!jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-        if (!teamRepository.existsById(teamName)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team not found");
-        }
-        searchRepository.deleteTeam(teamName);
-        return ResponseEntity.ok("Team deleted successfully");
-    }
-
-    /**
-     * Trova team basandoti sul leader ID
-     */
     public ResponseEntity<List<Team>> findTeamsByLeader(String leaderId, String jwt) {
         if (!jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -168,20 +151,6 @@ public class TeamService {
         return ResponseEntity.ok("Members added successfully");
     }
     
-
-
-
-
-
-    // Rimuove un membro dal team
-    public ResponseEntity<String> removeMemberFromTeam(String teamName, String memberId, String jwt) {
-        if (!jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-
-        searchRepository.removeMemberFromTeam(teamName, memberId);
-        return ResponseEntity.ok("Member removed successfully");
-    }
 
     /**
      * Mostra tutti i team in una View
@@ -324,6 +293,69 @@ public class TeamService {
         return ResponseEntity.ok(htmlBuilder.toString());
     }
     
+    public ResponseEntity<String> addMemberToTeam(String teamName, String memberId, String jwt) {
+        // Verifica la validità del token JWT
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+    
+        // Recupera il team dal repository
+        Team team = searchRepository.findTeamByName(teamName);
+    
+        // Verifica se il membro è già nel team
+        if (team.getMember().contains(memberId)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Membro già nel team: " + memberId);
+        }
+    
+        // Aggiungi il membro al team
+        try {
+            searchRepository.addMemberToTeam(teamName, memberId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating the team with member " + memberId);
+        }
+    
+        return ResponseEntity.ok("Studente aggiunto con successo!");
+    }
+    
+    public ResponseEntity<String> removeMemberFromTeam(String teamName, String memberId, String jwt) {
+        // Verifica la validità del token JWT
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+        try {
+             // Recupera il team dal repository
+            Team team = searchRepository.findTeamByName(teamName);
+            // Controlla se il membro è nel team
+            if (!team.getMember().contains(memberId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Studente non presente nel team!");
+            }
+            // Rimuovi il membro dal team
+            searchRepository.removeMemberFromTeam(teamName, memberId);
+            return ResponseEntity.ok("Studente rimosso con successo!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing member: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+    public ResponseEntity<String> deleteTeam(String teamName, String jwt) {
+        // Verifica la validità del token JWT
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+        try {
+            // Elimina il team
+            searchRepository.deleteTeam(teamName);
+            return ResponseEntity.ok("Team cancellato con successo!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nella cancellazione del team: " + e.getMessage());
+        }
+    }
+    
+
 
 
 }
