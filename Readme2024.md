@@ -18,15 +18,6 @@ L'amministratore del Gioco può:
 - Caricare nuove classi in Java su cui i giocatori potranno allenarsi e sfidare i Robot
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
 
-# Stato del progetto
-Il Progetto è in fase di sviluppo ed evoluzione. 
-
-# Contributori del Branch/ Fork corrente 
-
-
-# Breve Descrizione delle Nuove Feature aggiunte nel Branch/ Fork corrente
-
-
 
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
 Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
@@ -145,6 +136,15 @@ Inserire il comando nel prompt sostituendo il __*token*__ e il __*dominio static
 A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comandi.
 
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
+
+# Stato del progetto
+Il Progetto è in fase di sviluppo ed evoluzione. 
+
+# Contributori del Branch/ Fork corrente 
+Nomi degli autori dei nuovi contributi presenti in questo repository 
+
+# Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
+
 
 
 
