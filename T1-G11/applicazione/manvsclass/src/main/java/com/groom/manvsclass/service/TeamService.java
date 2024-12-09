@@ -155,45 +155,47 @@ public class TeamService {
     }
       
     // Metodo per visualizzare i team associati a un admin specifico
-    public ResponseEntity<?> visualizzaTeams(String jwt) {
-        try {
-            // Estrae l'username dell'admin dal JWT
-            String adminUsername = jwtService.getAdminFromJwt(jwt);
+public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+    System.out.println("Recupero dei team associati all'Admin in corso...");
 
-            if (adminUsername == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o scaduto.");
-            }
-
-            // Recupera i team associati a quell'admin
-            List<TeamAdmin> teamAssociati = teamAdminRepository.findAllByAdminId(adminUsername);
-
-            // Se non ci sono associazioni
-            if (teamAssociati.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team associato trovato.");
-            }
-
-            // Estrai gli ID dei team associati
-            List<String> teamIds = teamAssociati.stream() //crea uno stream a partire dalla lista
-                                            .map(TeamAdmin::getTeamId) //ogni oggetto TeamAdmin nello stream viene trasformato nel valore restituito da getTeamId 
-                                            .collect(Collectors.toList()); //L'operazione collect terminale converte lo stream risultante in una lista.
-
-            // Recupera tutti i team in un'unica query
-            List<Team> teams = (List<Team>) teamRepository.findAllById(teamIds);
-
-            // Se non ci sono team trovati (possibile mismatch)
-            if (teams.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nessun team trovato per gli ID specificati.");
-            }
-
-            // Restituisce i team associati
-            return ResponseEntity.ok(teams);
-
-        } catch (Exception e) {
-            // Log dell'eccezione
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel recupero dei team: " + e.getMessage());
+    try {
+        // 1. Verifica se il token JWT è valido
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
+
+        // 2. Estrai l'ID dell'Admin dal JWT
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
+        if (adminUsername == null || adminUsername.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'Admin dal token JWT.");
+        }
+
+        // 3. Recupera tutti i team associati all'Admin
+        List<TeamAdmin> teamAssociations = teamAdminRepository.findAllByAdminId(adminUsername);
+        if (teamAssociations == null || teamAssociations.isEmpty()) {
+            return ResponseEntity.ok("Non sei associato ad alcun team.");
+        }
+
+        // 4. Estrai gli ID dei team associati
+        List<String> teamIds = teamAssociations.stream()
+                .map(TeamAdmin::getTeamId)
+                .collect(Collectors.toList());
+
+        // 5. Recupera tutti i team associati
+        List<Team> teams = (List<Team>) teamRepository.findAllById(teamIds);
+        if (teams == null || teams.isEmpty()) {
+            return ResponseEntity.ok("Nessun team trovato per gli ID specificati.");
+        }
+
+        // 6. Restituisce i team trovati
+        return ResponseEntity.ok(teams);
+
+    } catch (Exception e) {
+        // Gestione di eventuali errori inaspettati
+        System.err.println("Errore durante il recupero dei team: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore durante il recupero dei team.");
     }
+}
 
     //Modifica 03/12/2024: Aggiunta della visualizzazione del singolo team
     public  ResponseEntity<?> cercaTeam(String idTeam, String jwt) {    

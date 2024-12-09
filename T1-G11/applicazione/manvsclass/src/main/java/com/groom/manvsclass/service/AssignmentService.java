@@ -168,6 +168,7 @@ public class AssignmentService {
                 return ResponseEntity.ok("Non sei associato ad alcun team.");
             }
 
+            //Non sei associato ad alcun team.
             // 4. Recupera gli ID dei team associati
             List<String> teamIds = teamAdminAssociations.stream()
                     .map(TeamAdmin::getTeamId)
