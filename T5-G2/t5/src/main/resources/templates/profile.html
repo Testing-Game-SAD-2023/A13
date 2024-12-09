@@ -69,7 +69,7 @@
                             <div class="notification-content">
                                 <strong th:text="${notification.title}"></strong>
                                 <p th:text="${notification.message}"></p>
-                                <small th:text="${formattedDate}"></small>
+                                <!--<small th:text="${formattedDate}"></small>-->
                                 <div class="notification-status-badge"
                                     th:classappend="${notification.isRead != null && notification.isRead ? 'status-read' : 'status-unread'}"
                                     th:text="${notification.isRead != null ? (notification.isRead ? 'Letta' : 'Non letta') : 'Non letta'}">
