@@ -288,7 +288,7 @@ public class GuiController {
             // Verifichiamo se l'utente autenticato è tra i follower dell'utente visualizzato
             boolean isFollowing = userProfileService.getFollowersList(userId) != null &&
                             userProfileService.getFollowersList(userId).stream()
-                                .anyMatch(f -> f.getID().equals(authUserProfileID));
+                                .anyMatch(f -> f.equals(authUserProfileID));
 
 
             // Creo i componenti per passare i dati pubblici alla pagina

@@ -13,11 +13,11 @@ public class UserProfile {
     @JsonProperty("profilePicturePath")
     private String profilePicturePath;
     @JsonProperty("followingList")
-    private List<UserProfile> followingList;
+    private List<Integer> followingList;
     @JsonProperty("followersList")
-    private List<UserProfile> followersList;
+    private List<Integer> followersList;
 
-    public UserProfile(Integer ID, String bio, String profilePicturePath, List<UserProfile> followingList, List<UserProfile> followersList) {
+    public UserProfile(Integer ID, String bio, String profilePicturePath, List<Integer> followingList, List<Integer> followersList) {
         this.ID = ID;
         this.bio = bio;
         this.profilePicturePath = profilePicturePath;
@@ -54,19 +54,19 @@ public class UserProfile {
         this.profilePicturePath = profilePicturePath;
     }
 
-    public List<UserProfile> getFollowingList() {
+    public List<Integer> getFollowingList() {
         return followingList;
     }
 
-    public void setFollowingList(List<UserProfile> followingList) {
+    public void setFollowingList(List<Integer> followingList) {
         this.followingList = followingList;
     }
 
-    public List<UserProfile> getFollowersList() {
+    public List<Integer> getFollowersList() {
         return followersList;
     }
 
-    public void setFollowersList(List<UserProfile> followersList) {
+    public void setFollowersList(List<Integer> followersList) {
         this.followersList = followersList;
     }
 

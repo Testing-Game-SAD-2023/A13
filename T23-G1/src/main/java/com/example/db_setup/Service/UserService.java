@@ -189,7 +189,7 @@ public class UserService {
             userProfileRepository.save(userProfile);
             userProfileRepository.save(authUserProfile);
 
-            return ResponseEntity.ok(/* "Follow status changed"*/);
+            return ResponseEntity.ok( "Follow status changed");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }

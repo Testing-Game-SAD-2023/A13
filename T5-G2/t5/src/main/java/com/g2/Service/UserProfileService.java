@@ -139,7 +139,7 @@ public Integer getProfileID(int playerID){
 
     }
 
-public List<UserProfile> getFollowingList(int playerID){
+public List<Integer> getFollowingList(int playerID){
     // Mi prendo l'id del giocatore
     int userId = playerID;
 
@@ -154,7 +154,7 @@ public List<UserProfile> getFollowingList(int playerID){
 
     }
 
-public List<UserProfile> getFollowersList(int playerID){
+public List<Integer> getFollowersList(int playerID){
     // Mi prendo l'id del giocatore
     int userId = playerID;
 

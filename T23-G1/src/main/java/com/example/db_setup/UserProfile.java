@@ -1,8 +1,11 @@
 package com.example.db_setup;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,21 +41,21 @@ public class UserProfile {
     // Nome dell'immagine, usata come parte finale del path nel servizio dove sono salvate le immagini
     public String profilePicturePath = "default.png";
 
-    @OneToMany
-    @JoinTable(
+    @ElementCollection
+    @CollectionTable(
         name = "user_following",
-        joinColumns = @JoinColumn(name = "profile_id"),
-        inverseJoinColumns = @JoinColumn(name = "following_id")
+        joinColumns = @JoinColumn(name = "profile_id")
     )
-    public List<UserProfile> followingList;
-
-    @OneToMany
-    @JoinTable(
+    @Column(name = "following_id")
+    private List<Integer> followingIds = new ArrayList<>();
+    
+    @ElementCollection
+    @CollectionTable(
         name = "user_followers",
-        joinColumns = @JoinColumn(name = "profile_id"),
-        inverseJoinColumns = @JoinColumn(name = "follower_id")
+        joinColumns = @JoinColumn(name = "profile_id")
     )
-    public List<UserProfile> followersList;
+    @Column(name = "follower_id")
+    private List<Integer> followerIds = new ArrayList<>();
 
     public void setUser(User user){
         this.user = user;
