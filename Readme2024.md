@@ -150,7 +150,7 @@ Nomi degli autori dei nuovi contributi presenti in questo repository
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
 TBD 
 
-# Documentazione della Versione corrente
+# Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti
 
 
