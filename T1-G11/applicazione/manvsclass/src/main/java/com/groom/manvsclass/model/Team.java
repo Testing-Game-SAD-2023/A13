@@ -14,7 +14,7 @@ public class Team {
     private Date creationDate; //Data di creazione del team
     private int numeroStudenti;
     private List<String> idStudenti; // Lista di ID o nomi degli studenti
-    private List<String> idAssignments; // Lista di ID o nomi degli assignment
+    
 
     // Costruttore
     public Team(String idTeam, String name) {
@@ -23,7 +23,6 @@ public class Team {
         this.numeroStudenti=0; //Default
         this.creationDate = new Date(); //Data attuale
         this.idStudenti = new ArrayList<>();
-        this.idAssignments = new ArrayList<>();
     }
 
     // Getter e Setter
@@ -67,22 +66,13 @@ public class Team {
         this.idStudenti = studenti;
     }
 
-    public List<String> getAssignments() {
-        return this.idAssignments;
-    }
-
-    public void setAssignments(List<String> assignments) {
-        this.idAssignments = assignments;
-    }
-
     @Override
     public String toString() {
         return "Team{" +
                 "idTeam='" + idTeam + '\'' +
                 ", name='" + name + '\'' +
                 ", dataCreazione='" + creationDate+'\''+
-                ", studenti=" + idStudenti +
-                ", assignments=" + idAssignments +
-                '}';
+                ", studenti=" + idStudenti 
+                +"}";
     }
 }

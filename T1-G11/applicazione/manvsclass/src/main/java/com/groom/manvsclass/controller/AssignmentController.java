@@ -43,8 +43,8 @@ public class AssignmentController {
     }
 
     @DeleteMapping("/deleteAssignment/{idAssignment}")
-    @ResponseBody ResponseEntity<?> deleteAssignment(@RequestBody String idTeam ,@PathVariable("idAssignment") String idAssignment,@CookieValue(name = "jwt", required = false) String jwt){
-        return assignmentService.deleteAssignment(idTeam,idAssignment,jwt);
+    @ResponseBody ResponseEntity<?> deleteAssignment(@PathVariable("idAssignment") String idAssignment,@CookieValue(name = "jwt", required = false) String jwt){
+        return assignmentService.deleteAssignment(idAssignment,jwt);
     }
 
 

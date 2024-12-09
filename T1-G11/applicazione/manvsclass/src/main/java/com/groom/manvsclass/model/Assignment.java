@@ -11,17 +11,24 @@ public class Assignment {
     @Id
     private String idAssignment;
 
+    // Per la visualizzazione
+    private String teamId;
+    private String nomeTeam;
+    
     private String titolo;
     private String descrizione;
     private Date dataCreazione;
     private Date dataScadenza;
+    
 
     // Costruttore
     public Assignment(String titolo, String descrizione, Date dataScadenza) {
         this.idAssignment = UUID.randomUUID().toString();
+        this.teamId = null;
+        this.nomeTeam = null;
         this.titolo = titolo;
         this.descrizione = descrizione;
-        this.dataCreazione = new Date(); //Creazione all'istante corrente
+        this.dataCreazione = new Date(); // Creazione all'istante corrente
         this.dataScadenza = dataScadenza;
     }
 
@@ -66,10 +73,28 @@ public class Assignment {
         this.dataScadenza = dataScadenza;
     }
 
+    public String getTeamId() {
+        return teamId;
+    }
+
+    public void setIdTeam(String idTeam) {
+        this.teamId = idTeam;
+    }
+
+    public String getNomeTeam() {
+        return nomeTeam;
+    }
+
+    public void setNomeTeam(String nomeTeam) {
+        this.nomeTeam = nomeTeam;
+    }
+
     @Override
     public String toString() {
         return "Assignment{" +
                 "idAssignment='" + idAssignment + '\'' +
+                ", idTeam='" + teamId + '\'' +
+                ", nomeTeam='" + nomeTeam + '\'' +
                 ", titolo='" + titolo + '\'' +
                 ", descrizione='" + descrizione + '\'' +
                 ", dataCreazione=" + dataCreazione +
