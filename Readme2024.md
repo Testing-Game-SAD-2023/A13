@@ -22,6 +22,14 @@ L'amministratore del Gioco può:
 
 # Funzionalità dell'Applicazione in fase di Sviluppo
 
+Sono in fase di sviluppo ulteriori funzionalità sia per l'amministratore che per il giocatore (TBD).
+
+
+# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
+Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
+
+# Come 
+
 
 
 
