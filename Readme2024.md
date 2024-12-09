@@ -142,7 +142,7 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Stato del progetto
-Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master 
+Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente 
 Nomi degli autori dei nuovi contributi presenti in questo repository 
