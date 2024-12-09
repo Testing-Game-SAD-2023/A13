@@ -7,6 +7,7 @@ The Testing_Challenge_Game Web Application was developed, in part, by the studen
 # Stato del progetto
 Il Progetto è in fase di sviluppo ed evoluzione.
 
+
 # Funzionalità dell'Applicazione 
 
 L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi. 
@@ -23,6 +24,12 @@ L'amministratore del Gioco può:
 # Funzionalità dell'Applicazione in fase di Sviluppo
 
 Sono in fase di sviluppo ulteriori funzionalità sia per l'amministratore che per il giocatore (TBD).
+
+# Contributori del Branch/ Fork corrente 
+
+
+# Breve Descrizione delle Nuove Feature aggiunte nel Branch/ Fork corrente
+
 
 
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
