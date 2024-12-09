@@ -11,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.User;
-import com.g2.Model.UserProfile;
 
 @Service
 public class UserProfileService{
@@ -150,8 +149,7 @@ public List<Integer> getFollowingList(int playerID){
     // Mi prendo l'utente che mi interessa con l'id
     User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
-    return user.getUserProfile().getFollowingList();
-
+    return user.getUserProfile().getFollowersList();
     }
 
 public List<Integer> getFollowersList(int playerID){

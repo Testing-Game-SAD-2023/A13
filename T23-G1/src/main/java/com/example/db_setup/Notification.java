@@ -1,19 +1,19 @@
 package com.example.db_setup;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.persistence.PrePersist;
+import javax.persistence.Table;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
 @Entity
-@Table(name = "Notifications", schema = "studentsrepo") 
+@Table(name = "Notifications", schema = "studentsrepo")
 public class Notification {
 
     @Id
@@ -24,11 +24,11 @@ public class Notification {
     private String titolo;
     private String message;
     private LocalDateTime timestamp;
-    private boolean isRead;
+    private Boolean isRead;
 
     public Notification() {}
 
-    public Notification(int playerID, String titolo, String message, LocalDateTime timestamp, boolean isRead) {
+    public Notification(int playerID, String titolo, String message, LocalDateTime timestamp, Boolean isRead) {
         this.playerID = playerID;
         this.titolo = titolo;
         this.message = message;

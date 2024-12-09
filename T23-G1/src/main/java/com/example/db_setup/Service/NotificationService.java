@@ -1,14 +1,14 @@
 package com.example.db_setup.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.db_setup.NotificationRepository;
 import com.example.db_setup.Notification;
+import com.example.db_setup.NotificationRepository;
 
 @Service
 public class NotificationService {
@@ -30,7 +30,7 @@ public class NotificationService {
         Optional<Notification> optionalNotification = notificationRepository.findById(notificationID);
         if (optionalNotification.isPresent()) {
             Notification notification = optionalNotification.get();
-            notification.setRead(true);
+            notification.setIsRead(true);
             notificationRepository.save(notification);
         } else {
             throw new RuntimeException("Notifica con ID " + notificationID + " non trovata.");
