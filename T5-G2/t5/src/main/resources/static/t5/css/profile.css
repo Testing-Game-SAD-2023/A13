@@ -507,7 +507,7 @@ body {
 .friend-search input {
     background-color: #e9e9f1;
     border: 1px solid #444;
-    color: #fff;
+    color: #000000;
     padding: 10px 15px;
 }
 
@@ -515,7 +515,7 @@ body {
     background-color: #ffffff;
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    color: #fff;
+    color: #000000;
 }
 
 #friend-suggestions {
