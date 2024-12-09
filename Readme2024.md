@@ -101,7 +101,7 @@ Tali script dovranno essere avviati unicamnete con Docker in esecuzione, altrime
    
 NOTA: il container relativo al Task 9 ("Progetto-SAD-G19-master") si sospenderà autonomamente dopo l'avvio. Esso viene utilizzato solo per "popolare" il volume "VolumeT9" condiviso con il Task 1.
 
-# ATTENZIONE
+# Risoluzione di Problemi ricorrenti
 Nel corso dell'installazione dello script: "installer.bat", è possibile incappare nell'errore:
 <pre>
 E: invalid operation update
@@ -144,8 +144,10 @@ Il Progetto è in fase di sviluppo ed evoluzione.
 Nomi degli autori dei nuovi contributi presenti in questo repository 
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
+TBD 
 
-
+# Documentazione della Versione corrente
+Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti
 
 
 
