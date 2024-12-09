@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
 
+import com.groom.manvsclass.model.Assignment;
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.TeamAdmin;
+import com.groom.manvsclass.model.repository.AssignmentRepository;
 import com.groom.manvsclass.model.repository.TeamAdminRepository;
 import com.groom.manvsclass.model.repository.TeamRepository;
 
@@ -31,6 +33,9 @@ public class TeamService {
 
     @Autowired
     private StudentService studentService; //Servizio per mandare query al T23
+
+    @Autowired
+    private AssignmentRepository assignmentRepository; 
 
     //Metodo per creare un nuovo Team
     public ResponseEntity<?> creaTeam(Team team, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -113,6 +118,13 @@ public class TeamService {
 
         // 6. Elimina l'associazione
         teamAdminRepository.delete(teamAdmin);
+
+        // 7. Elimina gli Assignment associati al team
+        List<Assignment> assignmentsToDelete = assignmentRepository.findByTeamId(idTeam);
+        if (assignmentsToDelete != null && !assignmentsToDelete.isEmpty()) {
+            assignmentRepository.deleteAll(assignmentsToDelete);
+            System.out.println("Eliminati " + assignmentsToDelete.size() + " assignment associati al team.");
+        }
 
         // Restituisci una risposta di successo
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Team con ID '" + idTeam + "' eliminato con successo.");
