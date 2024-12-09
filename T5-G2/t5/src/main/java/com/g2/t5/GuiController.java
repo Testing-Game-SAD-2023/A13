@@ -189,9 +189,14 @@ public class GuiController {
         followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", String.valueOf(userId));
         followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", String.valueOf(userId));
 
+        Integer followersListSize = followersList.size();
+        Integer followingListSize = followingList.size();
+
         //DEBUG
         System.out.println("Following list: " + followingList);
         System.out.println("Followers list: " + followersList);
+        System.out.println("Following list size: " + followingListSize);
+        System.out.println("Followers list size: " + followersListSize);
 
         // Creo i componenti per passare i dati alla pagina
         GenericObjectComponent objEmail = new GenericObjectComponent("email", email);
@@ -202,6 +207,8 @@ public class GuiController {
         GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
         GenericObjectComponent objFollowingList = new GenericObjectComponent("followingList", followingList);
         GenericObjectComponent objFollowersList = new GenericObjectComponent("followersList", followersList);
+        GenericObjectComponent objFollowingListSize = new GenericObjectComponent("followingListSize", followingListSize);
+        GenericObjectComponent objFollowersListSize = new GenericObjectComponent("followersListSize", followersListSize);
 
         GenericObjectComponent objUnlockedAchievements = new GenericObjectComponent("unlockedAchievements", unlockedAchievements);
         GenericObjectComponent objLockedAchievements = new GenericObjectComponent("lockedAchievements", lockedAchievements);
@@ -221,6 +228,8 @@ public class GuiController {
         profile.setObjectComponents(objBio);
         profile.setObjectComponents(objFollowingList);
         profile.setObjectComponents(objFollowersList);
+        profile.setObjectComponents(objFollowingListSize);
+        profile.setObjectComponents(objFollowersListSize);
         profile.setObjectComponents(objUnlockedAchievements);
         profile.setObjectComponents(objLockedAchievements);
         profile.setObjectComponents(objAchievementProgresses);

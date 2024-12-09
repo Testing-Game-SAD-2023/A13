@@ -157,37 +157,42 @@
 
             <!-- Amici -->
             <div class="card">
-                <div class="card-header">
+                <div class="card-header">Amici</div>
+                <div class="card-body">
+                    <!-- Barra di ricerca spostata sopra -->
+                    <div class="friend-search">
+                        <input type="text" id="friend-search-input" class="form-control" placeholder="Cerca amico per email..." autocomplete="off">
+                        <ul id="friend-suggestions" class="list-group mt-2"></ul>
+                    </div>
+
+                    <!-- Tab navigation -->
                     <ul class="nav nav-tabs card-header-tabs">
                         <li class="nav-item">
-                            <a class="nav-link active" id="followers-tab" data-bs-toggle="tab" href="#followers-content">Follower</a>
+                            <a class="nav-link active" id="followers-tab" data-bs-toggle="tab" href="#followers-content">
+                                Follower <span class="badge bg-primary" th:text="${followersList.size()}">0</span>
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="following-tab" data-bs-toggle="tab" href="#following-content">Following</a>
+                            <a class="nav-link" id="following-tab" data-bs-toggle="tab" href="#following-content">
+                                Following <span class="badge bg-primary" th:text="${followingList.size()}">0</span>
+                            </a>
                         </li>
                     </ul>
-                </div>
-                <div class="card-body">
-                    <div class="text-white mb-3">
-                        <span th:text="${followers != null ? followers.size() : 0}"></span> Follower,
-                        <span th:text="${following != null ? following.size() : 0}"></span> Following
-                    </div>
 
                     <div class="tab-content">
                         <!-- Tab Followers -->
                         <div class="tab-pane fade show active" id="followers-content">
                             <div class="friends-list">
-                                <!-- Check if followers exists and is not empty -->
-                                <div th:if="${followers != null and !followers.empty}"
-                                    th:each="follower : ${followers}"
+                                <div th:if="${followersList != null and !followersList.empty}"
+                                    th:each="follower : ${followersList}"
                                     class="friend-item">
                                     <div class="friend-info">
                                         <h5 th:text="${follower.name + ' ' + follower.surname}" class="mb-1"></h5>
-                                        <p th:text="${follower.email}" class="text-muted"></p>
+                                        <p th:text="${follower.email}" class="mb-1"></p>
                                     </div>
                                     <a th:href="@{'/friend/' + ${follower.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${followers == null or followers.empty}" class="text-muted">
+                                <div th:if="${followersList == null or followersList.empty}" class="text-muted">
                                     Nessun follower trovato
                                 </div>
                             </div>
@@ -196,27 +201,20 @@
                         <!-- Tab Following -->
                         <div class="tab-pane fade" id="following-content">
                             <div class="friends-list">
-                                <!-- Check if following exists and is not empty -->
-                                <div th:if="${following != null and !following.empty}"
-                                    th:each="follow : ${following}"
+                                <div th:if="${followingList != null and !followingList.empty}"
+                                    th:each="follow : ${followingList}"
                                     class="friend-item">
                                     <div class="friend-info">
                                         <h5 th:text="${follow.name + ' ' + follow.surname}" class="mb-1"></h5>
-                                        <p th:text="${follow.email}" class="text-muted"></p>
+                                        <p th:text="${follow.email}"></p>
                                     </div>
                                     <a th:href="@{'/friend/' + ${follow.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${following == null or following.empty}" class="text-muted">
+                                <div th:if="${followingList == null or followingList.empty}" class="text-muted">
                                     Nessun following trovato
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Barra di ricerca -->
-                    <div class="friend-search mt-3">
-                        <input type="text" id="friend-search-input" class="form-control" placeholder="Cerca per email..." autocomplete="off">
-                        <ul id="friend-suggestions" class="list-group mt-2"></ul>
                     </div>
                 </div>
             </div>
