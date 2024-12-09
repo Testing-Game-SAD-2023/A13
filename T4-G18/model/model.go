@@ -60,6 +60,8 @@ func (Game) TableName() string {
 type PlayerGame struct {
 	PlayerID  string    `gorm:"primaryKey"`
 	GameID    int64     `gorm:"primaryKey"`
+	Points 	  float64   `gorm:"default:0"`
+	GamesWon int64      `gorm:"default:0"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 	IsWinner  bool      `gorm:"default:false"`
@@ -140,4 +142,23 @@ type Robot struct {
 
 func (Robot) TableName() string {
 	return "robots"
+}
+
+func (g *Game) AfterSave(tx *gorm.DB) (err error) {
+    // Ricarica i giocatori associati
+    var players []Player
+    if err := tx.Model(g).Association("Players").Find(&players); err != nil {
+        return err
+    }
+
+    // Logica per aggiornare i dati dei giocatori
+    for _, player := range players {
+        // Ad esempio, aggiornare il campo Punti in base al punteggio del gioco
+        player.Points += g.Score // Supponendo che "Score" sia il punteggio che contribuisce ai punti
+        if err := tx.Save(&player).Error; err != nil {
+            return err
+        }
+    }
+
+    return nil
 }
