@@ -5,7 +5,6 @@
 package com.groom.manvsclass.service;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class TeamService {
 
         // 5. Aggiungi un ID univoco al team (se non specificato)
         if (team.getIdTeam() == null || team.getIdTeam().isEmpty()) {
-            team.setIdTeam(generateUniqueId());
+            team.setIdTeam(Util.generateUniqueId());
         }
 
         // 6. Salva il team nel database
@@ -82,12 +81,6 @@ public class TeamService {
 
         // 9. Restituisci una risposta con il team creato
         return ResponseEntity.ok().body(savedTeam);
-    }
-
-    // Metodo per generare un ID univoco (esempio con UUID)
-    //Modifica 04/12/2024
-    public static String generateUniqueId() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 
     // Elimina un team dato il nome del team

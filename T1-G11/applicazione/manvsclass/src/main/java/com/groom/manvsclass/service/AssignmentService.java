@@ -1,7 +1,6 @@
 //Modifica 08/12/2024: Creazione Service per Assignment
 package com.groom.manvsclass.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,10 +77,15 @@ public class AssignmentService {
         assignment.setIdTeam(idTeam); // Imposta l'ID del team
         assignment.setNomeTeam(existingTeam.getName()); // Imposta il nome del team (assumendo che sia presente nella classe Team)
 
-        // 7. Salva l'Assignment
+        // 7. Aggiungi un ID univoco al team (se non specificato)
+        if (assignment.getIdAssignment() == null || assignment.getIdAssignment().isEmpty()) {
+            assignment.setIdAssignment(Util.generateUniqueId());
+        }
+
+        // 8. Salva l'Assignment
         assignmentRepository.save(assignment);
 
-        // 8. Invia notifica agli utenti del team
+        // 9. Invia notifica agli utenti del team
         List<String> idsStudentiTeam = existingTeam.getStudenti();
         inviaNotificaStudenti(idsStudentiTeam);
 

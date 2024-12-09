@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Component
 public class Util {
@@ -99,5 +100,11 @@ public class Util {
         Query query = new Query();
         query.addCriteria(Criteria.where("id_i").is(id_i));
         return mongoTemplate.findAndRemove(query, interaction.class);
+    }
+    
+    // Metodo per generare un ID univoco (esempio con UUID)
+    //Modifica 04/12/2024
+    public static String generateUniqueId() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 }

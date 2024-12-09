@@ -1,7 +1,6 @@
 package com.groom.manvsclass.model;
 
 import java.util.Date;
-import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,7 +22,7 @@ public class Assignment {
 
     // Costruttore
     public Assignment(String titolo, String descrizione, Date dataScadenza) {
-        this.idAssignment = UUID.randomUUID().toString();
+        this.idAssignment = null;
         this.teamId = null;
         this.nomeTeam = null;
         this.titolo = titolo;
