@@ -12,17 +12,17 @@ public class UserProfile {
     private String bio;
     @JsonProperty("profilePicturePath")
     private String profilePicturePath;
-    @JsonProperty("followingList")
-    private List<Integer> followingList;
-    @JsonProperty("followersList")
-    private List<Integer> followersList;
+    @JsonProperty("followingIds")
+    private List<Integer> followingIds;
+    @JsonProperty("followerIds")
+    private List<Integer> followerIds;
 
-    public UserProfile(Integer ID, String bio, String profilePicturePath, List<Integer> followingList, List<Integer> followersList) {
+    public UserProfile(Integer ID, String bio, String profilePicturePath, List<Integer> followingIds, List<Integer> followerIds) {
         this.ID = ID;
         this.bio = bio;
         this.profilePicturePath = profilePicturePath;
-        this.followingList = followingList;
-        this.followersList = followersList;
+        this.followingIds = followingIds;
+        this.followerIds = followerIds;
     }
 
 
@@ -55,19 +55,19 @@ public class UserProfile {
     }
 
     public List<Integer> getFollowingList() {
-        return followingList;
+        return followingIds;
     }
 
-    public void setFollowingList(List<Integer> followingList) {
-        this.followingList = followingList;
+    public void setFollowingList(List<Integer> followingIds) {
+        this.followingIds = followingIds;
     }
 
     public List<Integer> getFollowersList() {
-        return followersList;
+        return followerIds;
     }
 
-    public void setFollowersList(List<Integer> followersList) {
-        this.followersList = followersList;
+    public void setFollowersList(List<Integer> followerIds) {
+        this.followerIds = followerIds;
     }
 
     @Override
@@ -76,8 +76,8 @@ public class UserProfile {
                 "ID=" + ID +
                 ", bio='" + bio + '\'' +
                 ", profilePicturePath='" + profilePicturePath + '\'' +
-                ", followingList=" + followingList +
-                ", followersList=" + followersList +
+                ", followingList=" + followingIds +
+                ", followersList=" + followerIds +
                 '}';
     }
 }

@@ -290,6 +290,11 @@ public class GuiController {
                             userProfileService.getFollowersList(userId).stream()
                                 .anyMatch(f -> f.equals(authUserProfileID));
 
+            System.out.println("Sto cercando le informazioni dell'utente: "+userId);
+            System.out.println("Id profilo: "+userProfileID);
+            System.out.println("Lista dei follower:"+userProfileService.getFollowersList(userId));
+            System.out.println("Lista dei following: "+userProfileService.getFollowingList(userId));
+            System.out.println("isFollowing: " + isFollowing);
 
             // Creo i componenti per passare i dati pubblici alla pagina
             GenericObjectComponent objUsername = new GenericObjectComponent("username", username);

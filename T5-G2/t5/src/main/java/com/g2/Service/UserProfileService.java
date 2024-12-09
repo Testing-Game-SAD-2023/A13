@@ -150,6 +150,8 @@ public List<Integer> getFollowingList(int playerID){
     // Mi prendo l'utente che mi interessa con l'id
     User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
+    System.out.println(user.toString());
+
     return user.getUserProfile().getFollowingList();
 
     }

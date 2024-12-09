@@ -112,4 +112,19 @@ public class User {
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
     }
+
+    public String toString(){
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", isRegisteredWithFacebook=" + isRegisteredWithFacebook +
+                ", studies='" + studies + '\'' +
+                ", userProfile=" + userProfile +
+                ", resetToken='" + resetToken + '\'' +
+                '}';
+
+    }
 }
