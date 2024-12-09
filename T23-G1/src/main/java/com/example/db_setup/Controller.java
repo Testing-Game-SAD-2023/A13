@@ -668,7 +668,7 @@ public class Controller {
         }
         List<Notification> notifications = notificationService.getNotificationsByPlayer(profile.getUser().getID());
         for (Notification notif : notifications) {
-            System.out.println(notif.isRead());
+            System.out.println(notif.getIsRead());
         }
         return notificationService.getNotificationsByPlayer(profile.getUser().getID());
     }
