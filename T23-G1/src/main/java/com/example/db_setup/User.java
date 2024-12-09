@@ -1,71 +1,101 @@
-
-
-
 package com.example.db_setup;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+
+import javax.persistence.*;
 import lombok.Data;
 
-@Table (name = "Students", schema = "studentsrepo")
+//Updated by Gabman 09/12
+@Table(name = "Students", schema = "studentsrepo")
 @Data
 @Entity
 public class User {
-   @Id
-   @GeneratedValue(strategy=GenerationType.AUTO)
-   public Integer ID;
-   public String name;
-   public String surname;
-   public String email;
-   public String password;
-   //MODIFICA
-   public boolean isRegisteredWithFacebook;
-   //FINE MODIFICA
-   //MODIFICA 18/06/2024
-   public boolean isRegisteredWithGoogle;
-   @Enumerated (EnumType.STRING)
-   public Studies studies;
-   /* Informazioni Personali utente da aggiungere per il profilo
-   public String bio;
-   public List<User> friendsList;
-   public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
-   */
 
-    @Column(name = "nickname", unique = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer ID;
+
+    @Column(name = "name", nullable = false, length = 100) // Nome non nullo, lunghezza massima 100 caratteri
+    public String name;
+
+    @Column(name = "surname", nullable = false, length = 100) // Cognome non nullo, lunghezza massima 100 caratteri
+    public String surname;
+
+    @Column(name = "email", nullable = false, unique = true)
+    public String email;
+
+    @Column(name = "password", nullable = false)
+    public String password;
+
+    // MODIFICA: Registrazione via social
+    public boolean isRegisteredWithFacebook;
+
+    public boolean isRegisteredWithGoogle;
+
+    // Campo per gli studi, se applicabile
+    @Enumerated(EnumType.STRING)
+    public Studies studies;
+
+    // Nickname univoco
+    @Column(name = "nickname", unique = true, nullable = false, length = 50)
     private String nickname;
+
+    // Biografia con lunghezza limitata
     @Column(name = "biography", length = 500)
-    private String biography; // Campo per la descrizione personale
- 
+    private String biography;
+
+    // Percorso o URL per l'immagine avatar
     @Column(name = "avatar", nullable = true, length = 255)
-    private String avatar; // Campo per il percorso dell'immagine profilo o URL
- 
+    private String avatar;
+
+    // Token per il reset della password
     @Column(name = "reset_token")
-   private String resetToken;
-   public void setResetToken(String resetToken) {
-       this.resetToken = resetToken;
-   }
-   public String getResetToken() {
-       return resetToken;
-   }
-    
+    private String resetToken;
+
+    // Getter e Setter per i campi aggiornabili
     public String getBiography() {
         return biography;
     }
- 
+
     public void setBiography(String biography) {
         this.biography = biography;
     }
+
     public String getNickname() {
-    return nickname;
+        return nickname;
     }
 
     public void setNickname(String nickname) {
-    this.nickname = nickname;
+        this.nickname = nickname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
-

@@ -309,6 +309,27 @@ import org.springframework.web.util.UriComponentsBuilder;
     // Chiamata all'endpoint usando callRestGet
     return callRestGet(endpoint, queryParams, new ParameterizedTypeReference<Map<String, String>>() {});
     }
+
+    //Gabman 09/12 : Metodo per aggiornare le informazioni dell'utente (name, surname, nickname)
+    public Boolean updateUserInfo(String userId, String name, String surname, String nickname) {
+        final String endpoint = "/updateUserInfo";
+
+        // Creazione del payload per la richiesta POST
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("userId", userId); 
+        formData.add("name", name);
+        formData.add("surname", surname);
+        formData.add("nickname", nickname);
+
+        try {
+            // Effettua la richiesta POST al servizio T23
+            return callRestPost(endpoint, formData, null, Boolean.class);
+        } catch (Exception e) {
+            System.err.println("Errore durante l'aggiornamento delle informazioni dell'utente: " + e.getMessage());
+            return false;
+        }
+    }
+
 }
 
  

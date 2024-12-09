@@ -56,8 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Il campo nascosto selectedAvatar non è stato trovato.");
         }
     };
-    
-    // Salva l'avatar selezionato
+
     // Salva l'avatar selezionato
     const saveAvatar = async () => {
     if (!selectedAvatar) {
@@ -206,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
         editInfoButton.style.display = "inline-block";
     });
 
-    // Gestisce il salvataggio del form
+    // GabMan 8/12  Gestisce il salvataggio del form
     editInfoForm.addEventListener("submit", async (event) => {
         event.preventDefault(); // Previene il comportamento predefinito del form
 

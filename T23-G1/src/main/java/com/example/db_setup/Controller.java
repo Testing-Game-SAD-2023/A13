@@ -1028,6 +1028,48 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
     }
+    //GabMan 09/12 --> updateUserInfo
+    @PostMapping("/updateUserInfo")
+    public ResponseEntity<String> updateUserInfo(
+            @CookieValue(name = "jwt", required = false) String jwt,
+            @RequestParam("name") String name,
+            @RequestParam("surname") String surname,
+            @RequestParam("nickname") String nickname) {
+        try {
+            // Verifica il token JWT
+            if (jwt == null || jwt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+
+            // Decodifica il token JWT per ottenere l'ID utente
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+            String userId = userData.get("userId").toString();
+
+            // Recupera l'utente dal database
+            Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+
+            if (!optionalUser.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            // Aggiorna i dati dell'utente
+            User user = optionalUser.get();
+            user.setName(name);
+            user.setSurname(surname);
+            user.setNickname(nickname);
+            userRepository.save(user); // Salva le modifiche nel database
+
+            return ResponseEntity.ok("User information updated successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+        }
+    }
+
 
     //cami 07/12
     @GetMapping("/searchFriend")

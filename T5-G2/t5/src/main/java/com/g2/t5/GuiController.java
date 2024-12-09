@@ -639,6 +639,36 @@ public class GuiController {
     }
     }
 
+    //Gabman 09/12 (Update user info)
+    @PostMapping("/updateUserInfo")
+    public ResponseEntity<String> updateUserInfo(
+            @CookieValue(name = "jwt", required = false) String jwt,
+            @RequestParam("name") String name,
+            @RequestParam("surname") String surname,
+            @RequestParam("nickname") String nickname) {
+        try {
+            // Decodifica il token JWT per ottenere l'ID utente
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String userId = map.get("userId").toString();
+
+            // Chiamata al metodo del T23Service
+            Boolean updateSuccess = t23Service.updateUserInfo(userId, name, surname, nickname);
+            if (updateSuccess) {
+                return ResponseEntity.ok("User information updated successfully!");
+            } else {
+                return ResponseEntity.status(400).body("Failed to update user information.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error updating user information: " + e.getMessage());
+            return ResponseEntity.status(500).body("Internal server error.");
+        }
+    }
+
     //GabMan 03/12 (Ottengo lista amici)
     @GetMapping("/getFriendlist")
     public ResponseEntity<List<Map<String, String>>> getFriendlist(

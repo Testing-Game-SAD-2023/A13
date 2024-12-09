@@ -34,9 +34,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u.avatar FROM User u WHERE u.ID = :userId")
     String findAvatarByUserId(@Param("userId") Integer userId);
 }
-
-
-
     // FINE MODIFICA avatar
 
 
