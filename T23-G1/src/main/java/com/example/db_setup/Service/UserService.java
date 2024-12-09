@@ -1,8 +1,11 @@
 package com.example.db_setup.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,9 +194,9 @@ public class UserService {
             userProfileRepository.save(autUser.getUserProfile());
             userProfileRepository.save(followUser.getUserProfile());
 
-            return ResponseEntity.ok( "Follow status changed");
+            return ResponseEntity.ok().body(Collections.singletonMap("message","Follow status changed"));
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error","Internal server error"));
         }
     }
 
