@@ -33,15 +33,20 @@ body {
 }
 
 #userFullName {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #343a40;
+    font-family: 'Roboto', sans-serif; /*Link a roboto nell html*/
+    font-size: 2rem; /* Dimensione più grande */
+    font-weight: 700; /* Grassetto */
+    color: #2c3e50; /* Un colore più elegante */
+    margin-bottom: 5px; /* Spazio sotto il nome */
 }
 
 #userNickname {
-    font-size: 1rem;
-    color: #6c757d;
+    font-family: 'Roboto', sans-serif; 
+    font-size: 1.2rem; 
+    font-style: italic; 
+    color: #7f8c8d; 
 }
+
 
 #currentProfilePicture {
     width: 150px;

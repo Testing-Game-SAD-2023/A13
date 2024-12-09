@@ -115,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Funzione per caricare l'avatar al caricamento della pagina
-    // Funzione per caricare l'avatar dal backend
     const loadAvatar = async () => {
     try {
         const response = await fetch('/getAvatar', {
