@@ -39,98 +39,54 @@
 
         <!-- Sezioni -->
         <div id="profile" class="section active">
-            <div id="userInfo" class="text-center mb-4">
-                <p id="userFullName" class="user_position_main" style="color: rgb(1, 0, 0); font-family:Arial, Helvetica, sans-serif; font-weight: bold;font-size: 2rem;">
-                    Nome Cognome
-                </p>
-                <p id="userNickname" style="color: rgb(86, 85, 85); font-family: Arial, Helvetica, sans-serif; font-style: italic;">
-                    @nickname
-                </p>
-
-                <!-- Pulsante per mostrare il form -->
-                <button id="editInfoButton" class="btn btn-info mt-3">Modifica </button>
-
-                <!-- Form per modificare le informazioni personali -->
-                <form id="editInfoForm" style="display: none; margin-top: 20px;">
-                    <div class="form-group">
-                        <label for="newName">Nome</label>
-                        <input type="text" class="form-control" id="newName" placeholder="Nome">
-                    </div>
-                    <div class="form-group">
-                        <label for="newSurname">Cognome</label>
-                        <input type="text" class="form-control" id="newSurname" placeholder="Cognome">
-                    </div>
-                    <div class="form-group">
-                        <label for="newNickname">Nickname</label>
-                        <input type="text" class="form-control" id="newNickname" placeholder="Nickname">
-                    </div>
-                    <div class="d-flex justify-content-between mt-3">
-                        <button type="button" id="cancelEditInfoButton" class="btn btn-secondary">Annulla</button>
-                        <button type="submit" class="btn btn-primary">Salva modifiche</button>
-                    </div>
-                </form>
-
-                        
-            </div>
-            
-                
-            
-            
-
-            
-            
-            <!-- Sezione per la visualizzazione e modifica dell'avatar -->
-             
-    
+            <div id="userInfo" class="profile-container">
                 <!-- Avatar -->
-                <div class="col-4 text-center" style="margin-bottom: 20px;">
-                    <!-- Immagine attuale dell'avatar -->
-                    <img src="/t5/images/sampleavatar.jpg" id="currentProfilePicture" class="rounded-circle propic" alt="Profile picture" style="width: 200px; height: 200px; margin-bottom: 15px;">
-                    
-                    <!-- Pulsante per mostrare le opzioni -->
-                    <button id="modifyAvatarButton" class="btn btn-secondary mb-2">Modifica Avatar</button>
-                    
-                    <!-- Sezione nascosta per selezionare un nuovo avatar -->
-                    <div id="avatarSelection" style="display: none;">
-                        <h5>Seleziona un nuovo avatar:</h5>
-                        <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')" style="width: 50px; height: 50px; margin-right: 5px;">
-                        <img src="/t5/images/sampleavatar.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
-                        <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatar.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
-                        <form action="/updateAvatar" method="POST">
-                            <input type="hidden" id="selectedAvatar" name="avatar" value="">
-                            <button id="saveAvatarButton" class="btn btn-primary mt-2" type="submit">Salva</button>
-                        </form>
-                    </div>
+                <div class="avatar-section">
+                    <img src="/t5/images/sampleavatar.jpg" id="currentProfilePicture" alt="Profile picture">
+                    <button id="modifyAvatarButton" class="btn modify-avatar-btn">Modifica Avatar</button>
                 </div>
-
-            
+        
+                <!-- Informazioni Utente -->
+                <div class="user-info-section">
+                    <h1 id="userFullName" class="user-fullname">Nome Cognome</h1>
+                    <p id="userNickname" class="user-nickname">@nickname</p>
+                    <button id="editInfoButton" class="btn edit-info-btn">Modifica Info</button>
+        
+                    <form id="editInfoForm" class="edit-info-form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="newName" placeholder="Nome">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="newSurname" placeholder="Cognome">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="newNickname" placeholder="Nickname">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancelEditInfoButton" class="btn cancel-btn">Annulla</button>
+                            <button type="submit" class="btn save-btn">Salva</button>
+                        </div>
+                    </form>
+                </div>
+        
                 <!-- Biografia -->
-
-                <div class="col-8">
-                    <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
-                        <div class="card-body">
-                            <h4 class="card-title" id="usernameField"></h4>
-                            <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
-                            <hr>
-                            
-                            <!-- Visualizzazione della biografia -->
-                            <div id="bioDisplaySection">
-                                <p id="bioText" style="white-space: pre-wrap; color: #180101;font-size: 1.2rem;">La tua biografia...</p>
-                                <button id="editBioButton" class="btn btn-primary mt-4" style="position: absolute; bottom: 10px; right: 10px;">Modifica Biografia</button>
-                            </div>
-            
-                            <!-- Modifica della biografia -->
-                            <div id="bioEditSection" style="display: none;">
-                                <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
-                                <button id="saveBioButton" class="btn btn-success mt-2">Salva Biografia</button>
-                                <button id="cancelBioButton" class="btn btn-secondary">Annulla Modifiche</button>
-                                <div id="saveMessage" class="mt-2" style="display: none; color: green;">Biografia salvata con successo!</div>
-                            </div>
+                <div class="bio-section">
+                    <h2>Biografia</h2>
+                    <div id="bioDisplaySection">
+                        <p id="bioText">La tua biografia...</p>
+                        <button id="editBioButton" class="btn edit-bio-btn">Modifica</button>
+                    </div>
+                    <div id="bioEditSection">
+                        <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
+                        <div class="form-actions">
+                            <button id="cancelBioButton" class="btn cancel-btn">Annulla</button>
+                            <button id="saveBioButton" class="btn save-btn">Salva</button>
                         </div>
                     </div>
                 </div>
-            
+            </div>
         </div>
+        
 
         <div id="friends" class="section">
             <div class="row justify-content-center">

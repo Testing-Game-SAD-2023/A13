@@ -1,145 +1,159 @@
-/* Created by GabMan per la sola grafica del profilo*/
-
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f9;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f4f8;
     color: #333;
     margin: 0;
     padding: 0;
 }
 
-.container-fluid {
-    padding: 20px;
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 40px auto;
 }
 
-/* Navbar */
-.row .btn-group .btn {
-    margin: 2px;
-    border-radius: 5px;
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
 }
-
-.row .btn-group .btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-}
-
-/* Profilo */
-#userInfo {
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-#userFullName {
-    font-family: 'Roboto', sans-serif; /*Link a roboto nell html*/
-    font-size: 2rem; /* Dimensione più grande */
-    font-weight: 700; /* Grassetto */
-    color: #2c3e50; /* Un colore più elegante */
-    margin-bottom: 5px; /* Spazio sotto il nome */
-}
-
-#userNickname {
-    font-family: 'Roboto', sans-serif; 
-    font-size: 1.2rem; 
-    font-style: italic; 
-    color: #7f8c8d; 
-}
-
 
 #currentProfilePicture {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    border: 2px solid #007bff;
+    border: 4px solid #007bff;
     margin-bottom: 10px;
 }
 
-#avatarSelection {
-    display: none;
-    padding: 10px;
-    background-color: #ffffff;
-    border: 1px solid #dddddd;
-    border-radius: 10px;
-    margin-top: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.avatar-option {
-    width: 50px;
-    height: 50px;
-    border: 2px solid transparent;
-    border-radius: 50%;
-    margin: 5px;
-    cursor: pointer;
-    transition: 0.3s ease;
-}
-
-.avatar-option:hover, .avatar-option.selected {
-    border-color: #007bff;
-}
-
-/* Card */
-.card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    margin-bottom: 20px;
-}
-
-/* Pulsanti */
-.btn {
-    border-radius: 5px;
-    transition: 0.3s ease;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
-
-.btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-}
-
-.btn-success:hover {
-    background-color: #218838;
-    border-color: #218838;
-}
-
-/* Bio */
-#bioText {
-    white-space: pre-wrap;
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.5;
-}
-
-#editBioButton {
+.modify-avatar-btn {
     background-color: #007bff;
     color: #fff;
     border: none;
-    margin-top: 10px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-#editBioButton:hover {
+.modify-avatar-btn:hover {
     background-color: #0056b3;
 }
 
-/* Sezioni */
-.section {
+.user-info-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.user-fullname {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.user-nickname {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.edit-info-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-info-btn:hover {
+    background-color: #0056b3;
+}
+
+.edit-info-form {
     display: none;
     margin-top: 20px;
 }
 
-.section.active {
-    display: block;
+.edit-info-form .form-group {
+    margin-bottom: 15px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.cancel-btn, .save-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-btn {
+    background-color: #cccccc;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background-color: #aaaaaa;
+}
+
+.save-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+}
+
+.bio-section {
+    width: 100%;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.bio-section h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+#bioText {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+.edit-bio-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.edit-bio-btn:hover {
+    background-color: #0056b3;
+}
+
+#bioEditSection {
+    display: none;
+    margin-top: 10px;
 }
