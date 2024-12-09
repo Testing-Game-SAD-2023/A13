@@ -58,6 +58,7 @@ import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
+import com.g2.Service.LeaderboardService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,6 +79,9 @@ public class GuiController {
         this.serviceManager = new ServiceManager(restTemplate);
         this.localeResolver = localeResolver;
     }
+
+    @Autowired
+    private LeaderboardService leaderboardService;
 
     //Gestione lingua 
     @PostMapping("/changeLanguage")
@@ -213,12 +217,51 @@ public class GuiController {
     
     @GetMapping("/leaderboard")
     public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        try{
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+      
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+
+            Long userId = Long.valueOf(map.get("userId").toString());
+
+
+
         PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
-        ServiceObjectComponent lista_utenti = new ServiceObjectComponent(serviceManager, "listaPlayers",
-                "T23", "GetUsers");
-        leaderboard.setObjectComponents(lista_utenti);
+        
+        //servizio per ottenere lista complessiva
+        leaderboardService.getList();
+            
+        //lista filtrata per punti
+        List <PlayerDTO> lista_players_points = leaderboardService.getLeaderboardFilteredByPoints();
+        GenericObjectComponent lista_player_gen_points = new GenericObjectComponent("listaPlayersPoints",lista_players_points);
+        leaderboard.setObjectComponents(lista_player_gen_points);
+            
+        //posizione user nella lista filtrata per punti
+        int rank_points= leaderboardService.getPlayerRankByPoints(userId);
+        GenericObjectComponent rank_gen_points = new GenericObjectComponent("rankByPoints",rank_points);
+        leaderboard.setObjectComponents(rank_gen_points);
+            
+        //lista filtrata per partite vinte
+        List <PlayerDTO> lista_players_games = leaderboardService.getLeaderboardFilteredByGames();
+        GenericObjectComponent lista_player_gen_games = new GenericObjectComponent("listaPlayersGames",lista_players_games);
+        leaderboard.setObjectComponents(lista_player_gen_games);
+            
+        //posizione user nella lsita filtrata per games
+        int rank_games= leaderboardService.getPlayerRankByGames(userId);
+        GenericObjectComponent rank_gen_games = new GenericObjectComponent("rankByGames",rank_games);
+        leaderboard.setObjectComponents(rank_gen_games);
+
         leaderboard.SetAuth(jwt);
         return leaderboard.handlePageRequest();
+        } catch (NullPointerException e){
+            return "login";
+        }catch (Exception e) {
+            model.addAttribute("error", e);
+            return "error";
+        }
     }
 
     @GetMapping("/edit_profile")
