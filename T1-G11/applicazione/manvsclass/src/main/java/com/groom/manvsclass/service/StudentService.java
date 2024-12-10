@@ -71,7 +71,7 @@ public class StudentService {
                 HttpEntity responseEntity = httpResponse.getEntity();
                 String errorResponse = responseEntity != null ? EntityUtils.toString(responseEntity, StandardCharsets.UTF_8) : "Errore sconosciuto";
                 System.out.println("Errore durante la richiesta: " + errorResponse);
-                return ResponseEntity.status(statusCode).body(errorResponse);
+                return ResponseEntity.ok(errorResponse); //Da modificare
             }
 
         } catch (IOException e) {
