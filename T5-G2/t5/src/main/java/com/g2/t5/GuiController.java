@@ -758,46 +758,39 @@ public class GuiController {
     @RequestParam("profilePicture") MultipartFile file,
     @CookieValue(name = "jwt", required = false) String jwt) {
     try {
-        // Verifica se il token JWT è valido e decodifica per ottenere l'ID utente
+        // Estrarre l'ID utente dal token JWT
         Integer userId = extractUserIdFromJwt(jwt);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Utente non autenticato."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                 .body(Map.of("error", "Utente non autenticato."));
         }
 
-        // Validazione del file
+        // Validare il file (assicurarsi che sia un'immagine)
         String fileType = file.getContentType();
         if (fileType == null || !fileType.startsWith("image/")) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Il file caricato non è un'immagine valida."));
+            return ResponseEntity.badRequest()
+                                 .body(Map.of("error", "File non valido. Selezionare un'immagine."));
         }
 
-        // Genera un nome file univoco basato sull'ID utente
-        String fileName = "user_" + userId + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get("uploads/profile_pictures/" + fileName);
+        // Convertire l'immagine in Base64 per inviarla a T23
+        String base64Image = Base64.getEncoder().encodeToString(file.getBytes());
 
-        // Crea la directory se non esiste
-        Files.createDirectories(filePath.getParent());
+        // Creare il payload con l'immagine e l'ID utente
+        Boolean updateSuccess = t23Service.updateAvatarWithImage(userId, base64Image);
 
-        // Salva il file nel percorso specificato
-        Files.write(filePath, file.getBytes());
-
-        // Genera l'URL del file per l'accesso pubblico
-        String imageUrl = "/uploads/profile_pictures/" + fileName;
-
-        // Aggiorna il profilo utente con l'URL dell'immagine
-        t23Service.updateAvatar(userId, imageUrl);
-
-        // Restituisce l'URL dell'immagine al client
-        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+        if (updateSuccess) {
+            return ResponseEntity.ok(Map.of("message", "Immagine caricata con successo!"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", "Errore durante l'aggiornamento dell'immagine."));
+        }
     } catch (IOException e) {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Errore durante il salvataggio dell'immagine."));
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Errore durante l'elaborazione della richiesta."));
+                             .body(Map.of("error", "Errore durante il salvataggio del file."));
     }
 }
+
 
 }
 

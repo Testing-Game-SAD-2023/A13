@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
@@ -1147,6 +1148,33 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
     }
+
+    //10/12 Update profile picture
+    @PostMapping("/updateProfilePicture")
+    public ResponseEntity<Boolean> updateProfilePicture(
+    @RequestParam("userId") Integer userId,
+    @RequestParam("image") String base64Image) {
+    try {
+        // Decodifica l'immagine da Base64
+        byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+
+        // Salva l'immagine come file o direttamente nel database
+        String fileName = "user_" + userId + ".jpg";
+        Path filePath = Paths.get("uploads/profile_pictures/" + fileName);
+        Files.createDirectories(filePath.getParent());
+        Files.write(filePath, imageBytes);
+
+        // Aggiorna l'URL dell'immagine nel database (esempio)
+        String imageUrl = "/uploads/profile_pictures/" + fileName;
+        studentService.updateProfilePicture(userId, imageUrl);
+
+        return ResponseEntity.ok(true);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+    }
+}
+
 
     
 

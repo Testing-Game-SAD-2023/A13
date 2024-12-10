@@ -341,6 +341,25 @@ import org.springframework.web.util.UriComponentsBuilder;
         }
     }
 
+    //GabMan 10/12 Caricamento Immagine
+    public Boolean updateAvatarWithImage(Integer userId, String base64Image) {
+        final String endpoint = "/updateProfilePicture";
+    
+        // Creare il payload per la richiesta POST
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("userId", userId.toString());
+        formData.add("image", base64Image); // Immagine codificata in Base64
+    
+        try {
+            // Effettuare la chiamata al servizio T23
+            return callRestPost(endpoint, formData, null, Boolean.class);
+        } catch (Exception e) {
+            System.err.println("Errore durante l'aggiornamento dell'immagine: " + e.getMessage());
+            return false;
+        }
+    }
+    
+
 }
 
  
