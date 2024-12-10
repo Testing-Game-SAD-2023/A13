@@ -230,33 +230,55 @@ $('#searchPlayerModal').on('hidden.bs.modal', function () {
 
 let currentRobot = 'None'; // Filtro iniziale per Robot
 let currentGameMode = 'All'; // Filtro iniziale per GameMode
-function filterStatistics(robotType, gameMode) {
-  // Aggiorna i filtri correnti
-  if (robotType !== undefined) currentRobot = robotType;
-  if (gameMode !== undefined) currentGameMode = gameMode;
 
-  // Recupera tutte le statistiche
-  const statisticsRows = document.querySelectorAll('.statistic-row');
-
-  // Filtra in base al tipo di robot e modalità di gioco
-  statisticsRows.forEach(row => {
-      const robot = row.getAttribute('data-robot');
-      const gamemode = row.getAttribute('data-gamemode');
-
-      const robotMatch = (currentRobot === 'None' || robot === currentRobot);
-      const gameModeMatch = (currentGameMode === 'All' || gamemode === currentGameMode);
-
-      // Mostra o nascondi la riga in base ai filtri
-      if (robotMatch && gameModeMatch) {
-          row.style.display = ''; // Mostra la riga
-      } else {
-          row.style.display = 'none'; // Nascondi la riga
-      }
-  });
+// Aggiorna il filtro per Robot e il testo del bottone
+function selectRobotFilter(robotType) {
+    currentRobot = robotType;
+    document.getElementById('robotFilterDropdown').innerText = robotType; // Aggiorna il testo del bottone
+    filterStatistics(); // Applica il filtro
 }
 
+// Aggiorna il filtro per GameMode e il testo del bottone
+function selectGameModeFilter(gameMode) {
+    currentGameMode = gameMode;
+    document.getElementById('gameModeFilterDropdown').innerText = gameMode; // Aggiorna il testo del bottone
+    filterStatistics(); // Applica il filtro
+}
+
+// Applica i filtri alle statistiche
+function filterStatistics() {
+    const statisticsRows = document.querySelectorAll('.statistic-row');
+
+    statisticsRows.forEach(row => {
+        const robot = row.getAttribute('data-robot');
+        const gamemode = row.getAttribute('data-gamemode');
+
+        const robotMatch = 
+            (currentRobot === 'None' && robot === 'None') || 
+            (currentRobot !== 'None' && robot === currentRobot);
+
+        const gameModeMatch = 
+            (currentGameMode === 'All') || 
+            (gamemode === currentGameMode);
+
+        if (robotMatch && gameModeMatch) {
+            row.style.display = ''; // Mostra la riga
+        } else {
+            row.style.display = 'none'; // Nascondi la riga
+        }
+    });
+}
+
+// Resetta i filtri e il testo dei bottoni
 function clearFilter() {
-  currentRobot = 'None';
-  currentGameMode = 'All';
-  filterStatistics(currentRobot, currentGameMode);
+    currentRobot = 'None';
+    currentGameMode = 'All';
+
+    document.getElementById('robotFilterDropdown').innerText = 'Robot'; // Ripristina il testo del bottone
+    document.getElementById('gameModeFilterDropdown').innerText = 'GameMode'; // Ripristina il testo del bottone
+
+    const statisticsRows = document.querySelectorAll('.statistic-row');
+    statisticsRows.forEach(row => {
+        row.style.display = ''; // Mostra tutte le righe
+    });
 }

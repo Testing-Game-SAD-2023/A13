@@ -106,6 +106,7 @@
     max-height: 200px; /* Altezza massima per il contenuto */
     overflow-y: auto; /* Abilita lo scroll verticale */
     padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
+    
 }
 
 /*PRESI DA ALTRI MAIN*/
