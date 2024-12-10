@@ -504,11 +504,21 @@ body {
     font-size: 0.9em;
 }
 
+/* Contenitore per la ricerca amici */
+.friend-search {
+    position: relative;
+    margin-bottom: 20px;
+    z-index: 2; /* Assicura che il dropdown appaia sopra gli altri elementi */
+}
+
+/* Input di ricerca */
 .friend-search input {
+    width: 100%;
     background-color: #e9e9f1;
     border: 1px solid #444;
     color: #000000;
     padding: 10px 15px;
+    border-radius: 5px;
 }
 
 .friend-search input:focus {
@@ -518,15 +528,74 @@ body {
     color: #000000;
 }
 
+/* Lista dei suggerimenti */
 #friend-suggestions {
     position: absolute;
     width: 100%;
+    top: 100%;
+    left: 0;
     background-color: #2d2d45;
     border: 1px solid #444;
     border-radius: 0 0 5px 5px;
-    z-index: 1000;
+    z-index: 3; /* Valore più alto per assicurarsi che appaia sopra tutto */
     max-height: 200px;
     overflow-y: auto;
+}
+
+/* Stile per ogni suggerimento */
+.profile-info {
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    background-color: #2a2a42;
+    transition: background-color 0.2s ease;
+    gap: 20px; /* Aggiungiamo spazio tra le info e il bottone */
+}
+
+.profile-info:hover {
+    background-color: #323250;
+}
+
+/* Contenitore info utente */
+.profile-info .user-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-info .user-details .name {
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.profile-info .user-details .email {
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+/* Stile bottone */
+.profile-info .btn-custom {
+    flex-shrink: 0; /* Previene il restringimento del bottone */
+    min-width: 120px; /* Larghezza minima fissa per il bottone */
+    white-space: nowrap; /* Previene l'andare a capo del testo */
+}
+
+/* Tab navigation - aggiungiamo solo lo spacing necessario */
+.card-body .nav-tabs {
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Aggiustiamo il contenuto dei tab */
+.tab-content {
+    position: relative;
+    z-index: 1;
+    padding-top: 15px;
 }
 
 /* Responsive */

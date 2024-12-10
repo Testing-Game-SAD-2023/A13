@@ -16,11 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // Gestione input nel campo di ricerca
         searchInput.addEventListener("input", async function () {
             const query = searchInput.value.trim();
+            suggestionsContainer.style.display = "none"; //Nascondi subito i suggerimenti
 
             // Validazione dell'email
             if (!emailRegex.test(query)) {
                 console.log("Email non valida per regex");
-                suggestionsContainer.style.display = "none";
                 return;
             }
 
@@ -30,12 +30,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 url.searchParams.append("email", query);
 
                 const response = await fetch(url, {
-                    method: "GET", 
+                    method: "GET",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
                     }
                 });
-                
+
                 if (response.ok) {
                     console.log("la GET è andata a buon fine, ora vediamo cosa c'è dentro");
                     const user = await response.json();
@@ -49,9 +49,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (profile && user.email) {
                         console.log("Esistono sia profile che user.email");
+
                         const profileInfo = document.createElement('div');
                         profileInfo.className = 'profile-info';
-                        profileInfo.textContent = `${user.name} ${user.surname}`;
+
+                        //Creiamo un contenitore per i dettagli dell'utente
+                        const userDetails = document.createElement('div');
+                        userDetails.className = 'user-details';
+
+                        const userName = document.createElement('span');
+                        userName.className = 'name';
+                        userName.textContent = `${user.name} ${user.surname}`;
+
+                        const userEmail = document.createElement('span');
+                        userEmail.className = 'email';
+                        userEmail.textContent = user.email;
+
+                        userDetails.appendChild(userName);
+                        userDetails.appendChild(userEmail);
 
                         // Crea il bottone con le caratteristiche richieste
                         const profileBtn = document.createElement('button');
@@ -61,17 +76,19 @@ document.addEventListener("DOMContentLoaded", function () {
                             location.href = `/friend/${user.id}`;  // Aggiungi l'evento onclick per redirigere
                         };
 
+                        profileInfo.appendChild(userDetails);
                         // Aggiungi il bottone all'interno di profileInfo
                         profileInfo.appendChild(profileBtn);
 
                         // Aggiungi gestione click sull'elemento del profilo
-                        profileInfo.addEventListener('click', function () {
+                        /*profileInfo.addEventListener('click', function () {
                             alert(`Selezionato: ${user.name}`);
-                            
-                        });
+
+                        });*/
 
                         suggestionsContainer.appendChild(profileInfo);
                         suggestionsContainer.style.display = "block";
+
                     } else {
                         // Nessun profilo trovato
                         console.log("Mi dispiace riprova");
@@ -168,5 +185,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
+    }
+});
+
+// Listener per chiudere i suggerimenti quando si clicca fuori
+document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+        suggestionsContainer.style.display = 'none';
     }
 });

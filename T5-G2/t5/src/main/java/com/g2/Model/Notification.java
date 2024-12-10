@@ -8,8 +8,8 @@ public class Notification {
 
     @JsonProperty("id")
     private Long id;
-    @JsonProperty("title")
-    private String title;
+    @JsonProperty("titolo")
+    private String titolo;
     @JsonProperty("message")
     private String message;
     @JsonProperty("timestamp")
@@ -17,9 +17,9 @@ public class Notification {
     @JsonProperty("isRead")
     private Boolean isRead;
 
-    public Notification(Long id, String title, String message, LocalDateTime timestamp, Boolean isRead) {
+    public Notification(Long id, String titolo, String message, LocalDateTime timestamp, Boolean isRead) {
         this.id = id;
-        this.title = title;
+        this.titolo = titolo;
         this.message = message;
         this.timestamp = timestamp;
         this.isRead = isRead;
@@ -35,10 +35,10 @@ public class Notification {
         this.id = id;
     }
     public String getTitle() {
-        return title;
+        return titolo;
     }
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTitle(String titolo) {
+        this.titolo = titolo;
     }
     public String getMessage() {
         return message;

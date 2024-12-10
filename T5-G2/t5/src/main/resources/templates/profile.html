@@ -159,22 +159,23 @@
             <div class="card">
                 <div class="card-header">Amici</div>
                 <div class="card-body">
-                    <!-- Barra di ricerca spostata sopra -->
+                    <!-- Barra di ricerca in un contenitore dedicato -->
                     <div class="friend-search">
-                        <input type="text" id="friend-search-input" class="form-control" placeholder="Cerca amico per email..." autocomplete="off">
-                        <ul id="friend-suggestions" class="list-group mt-2"></ul>
+                        <input type="text" id="friend-search-input" class="form-control"
+                               placeholder="Cerca amico per email..." autocomplete="off">
+                        <ul id="friend-suggestions" class="list-group"></ul>
                     </div>
 
                     <!-- Tab navigation -->
-                    <ul class="nav nav-tabs card-header-tabs">
+                    <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <a class="nav-link active" id="followers-tab" data-bs-toggle="tab" href="#followers-content">
-                                Follower <span class="badge bg-primary" th:text="${followersList.size()}">0</span>
+                                Followers <span class="badge bg-primary" th:text="${followersList.size()}">0</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" id="following-tab" data-bs-toggle="tab" href="#following-content">
-                                Following <span class="badge bg-primary" th:text="${followingList.size()}">0</span>
+                                Followings <span class="badge bg-primary" th:text="${followingList.size()}">0</span>
                             </a>
                         </li>
                     </ul>
@@ -192,7 +193,7 @@
                                     </div>
                                     <a th:href="@{'/friend/' + ${follower.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${followersList == null or followersList.empty}" class="text-muted">
+                                <div th:if="${followersList == null or followersList.empty}" class="mb-1">
                                     Nessun follower trovato
                                 </div>
                             </div>
