@@ -15,10 +15,11 @@ public class Challenge {
     private String startDate; // Data di inizio della challenge
     private String endDate; // Data di fine della challenge
     private String status; // Stato della challenge (es. "In Progress", "Completed", "Pending")
-    //private List<String> objectives; // Lista degli obiettivi della challenge
+    private VictoryConditionType victoryConditionType; // Tipo di condizione di vittoria
+    private String victoryCondition; // Dettaglio della condizione di vittoria (es. numero di partite)
 
-    public Challenge(String challengeName, String description, String teamId, String creatorId, 
-                     String startDate, String endDate, String status, List<String> objectives) {
+    public Challenge(String challengeName, String description, String teamId, String creatorId,
+                     String startDate, String endDate, String status, VictoryConditionType victoryConditionType, String victoryCondition) {
         this.challengeName = challengeName;
         this.description = description;
         this.teamId = teamId;
@@ -26,7 +27,8 @@ public class Challenge {
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
-        //this.objectives = objectives;
+        this.victoryConditionType = victoryConditionType;
+        this.victoryCondition = victoryCondition;
     }
 
     public String getChallengeName() {
@@ -85,13 +87,21 @@ public class Challenge {
         this.status = status;
     }
 
-    /*public List<String> getObjectives() {
-        return objectives;
+    public VictoryConditionType getVictoryConditionType() {
+        return victoryConditionType;
     }
 
-    public void setObjectives(List<String> objectives) {
-        this.objectives = objectives;
-    }*/
+    public void setVictoryConditionType(VictoryConditionType victoryConditionType) {
+        this.victoryConditionType = victoryConditionType;
+    }
+
+    public String getVictoryCondition() {
+        return victoryCondition;
+    }
+
+    public void setVictoryCondition(String victoryCondition) {
+        this.victoryCondition = victoryCondition;
+    }
 
     @Override
     public String toString() {
@@ -102,7 +112,9 @@ public class Challenge {
                 ", creatorId='" + creatorId + '\'' +
                 ", startDate='" + startDate + '\'' +
                 ", endDate='" + endDate + '\'' +
-                ", status='" + status +
+                ", status='" + status + '\'' +
+                ", victoryConditionType='" + victoryConditionType + '\'' +
+                ", victoryCondition='" + victoryCondition + '\'' +
                 '}';
     }
 }

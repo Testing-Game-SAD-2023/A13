@@ -565,17 +565,18 @@ import org.springframework.web.bind.annotation.RequestParam;
     /**
      * Crea una nuova challenge.
      */
-    @PostMapping("/create")
+    @PostMapping("/challenges")
     public ResponseEntity<Challenge> createChallenge(
             @RequestBody Challenge challenge,
             @CookieValue(name = "jwt", required = false) String jwt) {
         return challengeService.createChallenge(challenge, jwt);
     }
 
-    /**
+
+        /**
      * Recupera una challenge tramite il nome.
      */
-    @GetMapping("/{challengeName}")
+    @GetMapping("/challenges/ChallengesByName")
     public ResponseEntity<Challenge> getChallengeByName(
             @PathVariable String challengeName,
             @CookieValue(name = "jwt", required = false) String jwt) {
@@ -592,10 +593,10 @@ import org.springframework.web.bind.annotation.RequestParam;
         return challengeService.getChallengesByTeam(teamId, jwt);
     }
 
-    /**
+        /**
      * Aggiorna lo stato di una challenge.
      */
-    @PutMapping("/{challengeName}/status")
+    @PutMapping("/challenges/ChallengesByName/status")
     public ResponseEntity<String> updateChallengeStatus(
             @PathVariable String challengeName,
             @RequestBody String newStatus,
@@ -603,16 +604,42 @@ import org.springframework.web.bind.annotation.RequestParam;
         return challengeService.updateChallengeStatus(challengeName, newStatus, jwt);
     }
 
-    /**
+
+        /**
      * Elimina una challenge.
      */
-    @DeleteMapping("/{challengeName}")
+    @DeleteMapping("/challenges/ChallengesByName")
     public ResponseEntity<String> deleteChallenge(
             @PathVariable String challengeName,
             @CookieValue(name = "jwt", required = false) String jwt) {
         return challengeService.deleteChallenge(challengeName, jwt);
     }
 
+        /**
+     * Recupera le partite associate a un giocatore specifico.
+     */
+    @GetMapping("/players/player_Id/games")
+    public ResponseEntity<?> getPlayerGames(
+            @PathVariable int playerId,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.getPlayerGames(playerId, jwt);
+    }
+
+        /**
+     * Verifica se una challenge è completata.
+     */
+    @GetMapping("/challenges/challenge_Id}/completion/player_Id")
+    public ResponseEntity<Boolean> isChallengeCompleted(
+            @PathVariable String challengeId,
+            @PathVariable int playerId,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        Challenge challenge = challengeService.getChallengeByName(challengeId, jwt).getBody();
+        if (challenge == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        }
+        boolean completed = challengeService.isChallengeCompleted(challenge, playerId, jwt);
+        return ResponseEntity.ok(completed);
+    }
 
 
  }

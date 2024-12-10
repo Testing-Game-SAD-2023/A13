@@ -8,7 +8,7 @@ import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.stereotype.Component;
-
+import com.groom.manvsclass.model.VictoryConditionType;
 import com.groom.manvsclass.model.Challenge;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -35,7 +35,10 @@ public class ChallengeSearchImpl {
             return null;
         }
 
-        return converter.read(Challenge.class, result);
+        Challenge challenge = converter.read(Challenge.class, result);
+        challenge.setVictoryConditionType(VictoryConditionType.valueOf(result.getString("victoryConditionType")));
+        challenge.setVictoryCondition(result.getString("victoryCondition"));
+        return challenge;
     }
 
     public List<Challenge> findChallengesByTeam(String teamId) {
@@ -45,7 +48,12 @@ public class ChallengeSearchImpl {
         Bson filter = Filters.eq("teamId", teamId); // Filtra per teamId
         List<Challenge> challenges = new ArrayList<>();
 
-        collection.find(filter).forEach(doc -> challenges.add(converter.read(Challenge.class, doc)));
+        collection.find(filter).forEach(doc -> {
+            Challenge challenge = converter.read(Challenge.class, doc);
+            challenge.setVictoryConditionType(VictoryConditionType.valueOf(doc.getString("victoryConditionType")));
+            challenge.setVictoryCondition(doc.getString("victoryCondition"));
+            challenges.add(challenge);
+        });
         return challenges;
     }
 
@@ -60,7 +68,9 @@ public class ChallengeSearchImpl {
             .append("creatorId", challenge.getCreatorId())
             .append("startDate", challenge.getStartDate())
             .append("endDate", challenge.getEndDate())
-            .append("status", challenge.getStatus());
+            .append("status", challenge.getStatus())
+            .append("victoryConditionType", challenge.getVictoryConditionType().toString())
+            .append("victoryCondition", challenge.getVictoryCondition());
 
         collection.insertOne(challengeDoc);
     }
@@ -83,4 +93,3 @@ public class ChallengeSearchImpl {
         collection.deleteOne(filter);
     }
 }
-

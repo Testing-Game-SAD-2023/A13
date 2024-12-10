@@ -1,14 +1,24 @@
 package com.groom.manvsclass.service;
 
 import com.groom.manvsclass.model.Challenge;
+import com.groom.manvsclass.model.VictoryConditionType;
 import com.groom.manvsclass.model.repository.ChallengeRepository;
 import com.groom.manvsclass.model.repository.ChallengeSearchImpl;
 import com.groom.manvsclass.service.JwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import java.util.Map; // Importa Map
+import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List; // Se utilizzi anche List
 
 import java.util.List;
 
@@ -24,6 +34,9 @@ public class ChallengeService {
     @Autowired
     private JwtService jwtService;
 
+     @Autowired
+    private RestTemplate restTemplate; // Per effettuare chiamate HTTP
+
     /**
      * Crea una nuova challenge.
      */
@@ -31,11 +44,16 @@ public class ChallengeService {
         if (!jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-
+    
         if (challengeRepository.existsById(challenge.getChallengeName())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // La challenge esiste già
         }
-
+    
+        // Aggiungi il tipo di condizione di vittoria e la condizione
+        if (challenge.getVictoryConditionType() == null || challenge.getVictoryCondition() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Parametri mancanti
+        }
+    
         searchRepository.addChallenge(challenge);
         return ResponseEntity.status(HttpStatus.CREATED).body(challenge);
     }
@@ -99,4 +117,78 @@ public class ChallengeService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting challenge: " + e.getMessage());
         }
     }
+
+     /**
+     * Recupera le partite associate a un giocatore specifico.
+     */
+    public ResponseEntity<?> getPlayerGames(int playerId, String jwt) {
+        try {
+            // Prepara l'entity con l'header JWT
+            HttpEntity<Void> entity = jwtService.createJwtRequestEntity(jwt);
+
+            // Costruisce l'URL per la richiesta REST
+            String url = "http://t4-service:8080/players" + "/" + playerId + "/games";
+
+            // Esegue la chiamata REST
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+
+            // Restituisce i dati se la chiamata ha successo
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return ResponseEntity.ok(response.getBody());
+            } else {
+                return ResponseEntity.status(response.getStatusCode()).body("Error retrieving games from T4");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error connecting to T4: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Verifica il completamento della challenge.
+     */
+    public boolean isChallengeCompleted(Challenge challenge, int playerId, String jwt) {
+    LocalDateTime challengeStartDate = LocalDateTime.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE_TIME);
+    LocalDateTime challengeEndDate = LocalDateTime.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE_TIME);
+    String victoryCondition = challenge.getVictoryCondition();
+    VictoryConditionType type = challenge.getVictoryConditionType();
+
+    try {
+        ResponseEntity<List<Map<String, Object>>> response = (ResponseEntity<List<Map<String, Object>>>) getPlayerGames(playerId, jwt);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            List<Map<String, Object>> games = response.getBody();
+
+            // Filtra le partite per l'arco temporale della challenge
+            List<Map<String, Object>> gamesInRange = games.stream()
+                .filter(game -> {
+                    String startedAtStr = (String) game.get("startedAt");
+                    if (startedAtStr != null) {
+                        LocalDateTime startedAt = LocalDateTime.parse(startedAtStr, DateTimeFormatter.ISO_DATE_TIME);
+                        return !startedAt.isBefore(challengeStartDate) && !startedAt.isAfter(challengeEndDate);
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+
+            // Logica basata sul tipo di condizione
+            switch (type) {
+                case GAMES_PLAYED:
+                    int requiredGames = Integer.parseInt(victoryCondition);
+                    return gamesInRange.size() >= requiredGames;
+
+                default:
+                    throw new UnsupportedOperationException("Tipo di condizione non supportato: " + type);
+            }
+        }
+    } catch (Exception e) {
+        System.err.println("Errore durante la verifica della challenge: " + e.getMessage());
+    }
+    return false;
+}
+    
 }
