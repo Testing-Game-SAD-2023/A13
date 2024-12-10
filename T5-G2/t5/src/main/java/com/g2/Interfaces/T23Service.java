@@ -85,6 +85,7 @@ import org.springframework.web.util.UriComponentsBuilder;
          ));
         
      }
+    
     //cami
     // Metodo per aggiornare l'avatar
     public Boolean updateAvatar(Integer userId, String avatar) {
@@ -256,45 +257,55 @@ import org.springframework.web.util.UriComponentsBuilder;
         return null;
     }
     }
+    
     public String addFriend(String userId, String friendId) {
-    final String endpoint = "/addFriend"; // Endpoint nel controller di T23
+        final String endpoint = "/addFriend";
+        MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();
+        payload.add("userId", userId);
+        payload.add("friendId", friendId);
 
-    // Creazione del payload per la richiesta POST
-    MultiValueMap<String, String> payload = new LinkedMultiValueMap<>();
-    payload.add("userId", userId);
-    payload.add("friendId", friendId);
-
-    try {
-        // Effettua la richiesta POST al servizio T23
-        return callRestPost(endpoint, payload, null, String.class);
-    } catch (Exception e) {
-        System.err.println("Errore durante l'aggiunta dell'amico: " + e.getMessage());
-        return "Errore durante l'aggiunta dell'amico.";
-    }
+        try {
+            return callRestPost(endpoint, payload, null, String.class);
+        } catch (Exception e) {
+            System.err.println("Errore durante l'aggiunta dell'amico: " + e.getMessage());
+            return null;
+        }
     }
 
     public boolean deleteFriend(Integer friendId, String jwt) {
-    final String endpoint = "/deleteFriend/" + friendId;
+        final String endpoint = "/deleteFriend/" + friendId;
 
-    try {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwt); // Se richiesto
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+        try {
+            // Impostazione degli header con il token JWT
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + jwt);
+            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-        // Chiamata DELETE al backend di T23
-        ResponseEntity<String> response = restTemplate.exchange(
-            BASE_URL + endpoint,
-            HttpMethod.DELETE,
-            requestEntity,
-            String.class
-        );
+            // Esegui la richiesta HTTP POST
+            ResponseEntity<String> response = restTemplate.exchange(
+                BASE_URL + endpoint, // Usa query parameter per passare friendId
+                HttpMethod.DELETE, 
+                requestEntity, 
+                String.class
+            );
 
-        return response.getStatusCode() == HttpStatus.OK;
-    } catch (Exception e) {
-        System.err.println("Errore durante l'eliminazione dell'amico: " + e.getMessage());
-        return false;
+            // Verifica se la risposta è OK (200)
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return true;
+            } else {
+                // Se la risposta non è OK, logga il messaggio di errore
+                System.err.println("Errore durante l'eliminazione dell'amico: " + response.getBody());
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Errore durante l'eliminazione dell'amico: " + e.getMessage());
+            return false;
+        }
     }
-    }
+
+
+
+
 
 
      //cami (02/12)

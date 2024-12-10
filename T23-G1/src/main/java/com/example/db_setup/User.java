@@ -4,26 +4,26 @@ import javax.persistence.*;
 import lombok.Data;
 
 //Updated by Gabman 09/12
-@Table(name = "Students", schema = "studentsrepo")
+@Table(name = "students", schema = "studentsrepo")
 @Data
 @Entity
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Integer ID;
+    private Integer ID;
 
     @Column(name = "name", nullable = false, length = 100) // Nome non nullo, lunghezza massima 100 caratteri
-    public String name;
+    private String name;
 
     @Column(name = "surname", nullable = false, length = 100) // Cognome non nullo, lunghezza massima 100 caratteri
-    public String surname;
+    private String surname;
 
     @Column(name = "email", nullable = false, unique = true)
-    public String email;
+    private String email;
 
     @Column(name = "password", nullable = false)
-    public String password;
+    private String password;
 
     // MODIFICA: Registrazione via social
     public boolean isRegisteredWithFacebook;

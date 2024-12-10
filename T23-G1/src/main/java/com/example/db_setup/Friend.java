@@ -4,18 +4,24 @@ import lombok.Data;
 
 import javax.persistence.*;
 
-//Created by GabMan 04/12
-@Table(name = "user_friends", schema = "studentsrepo") 
-@Data
 @Entity
+@Table(name = "user_friends", schema = "studentsrepo")
 public class Friend {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-//MAPPING NOMI DATABASE - NOMI CODICE
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @EmbeddedId
+    private FriendId id;
 
-    @Column(name = "friend_id", nullable = false)
-    private Integer friendId;
+    public Friend() {}
 
+    public Friend(FriendId id) {
+        this.id = id;
+    }
+
+    // Getter e Setter
+    public FriendId getId() {
+        return id;
+    }
+
+    public void setId(FriendId id) {
+        this.id = id;
+    }
 }

@@ -16,29 +16,36 @@ import java.util.Map;
 public interface FriendRepository extends JpaRepository<Friend, Integer> {
 
     // Metodo per ottenere la lista degli amici con i dettagli (nickname e avatar) dalla tabella students
-    @Query("SELECT new map(f.friendId as friendId, s.nickname as nickname, s.avatar as avatar) " +
-           "FROM Friend f " +
-           "JOIN User s ON f.friendId = s.ID " + // Join con la tabella User (students)
-           "WHERE f.userId = :userId")
+    @Query("SELECT new map(f.id.friendId as friendId, u.nickname as nickname, u.avatar as avatar) " +
+       "FROM Friend f " +
+       "JOIN User u ON f.id.friendId = u.ID " +
+       "WHERE f.id.userId = :userId")
     List<Map<String, Object>> findFriendDetailsByUserId(@Param("userId") int userId);
 
-    // Metodo per verificare se una relazione di amicizia esiste
-    @Query("SELECT COUNT(f) > 0 FROM Friend f WHERE f.userId = :userId AND f.friendId = :friendId")
-    boolean existsFriendship(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
 
-    // Metodo per aggiungere un amico
+      // Aggiunge una relazione
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO user_friends (user_id, friend_id) VALUES (:userId, :friendId)", nativeQuery = true)
+    @Query(value = "INSERT INTO user_friends (user_id, friend_id) " +
+               "SELECT :userId, :friendId " +
+               "WHERE NOT EXISTS (SELECT 1 FROM user_friends WHERE user_id = :userId AND friend_id = :friendId)", 
+       nativeQuery = true)
     void addFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
+    // Metodo per vedere se esiste relazione
+     @Query("SELECT COUNT(f) > 0 FROM Friend f WHERE f.id.userId = :userId AND f.id.friendId = :friendId")
+    boolean existsFriendship(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
 
  
     
-    // Metodo per rimuovere un amico
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM Friend f WHERE f.userId = :userId AND f.friendId = :friendId")
-    void deleteFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+  // Elimina una relazionedimmi 
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM Friend f WHERE f.id.userId = :userId AND f.id.friendId = :friendId")
+  void deleteFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
+
 
 
 
