@@ -6,8 +6,8 @@ import (
 )
 
 type Service interface {
-	FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error)
-	FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error)
+	FindIntervalByPlayerID(reader *LeaderboardReader, playerId int) (Leaderboard, error)
+	FindIntervalByPage(reader *LeaderboardReader, startPage int) (Leaderboard, error)
 }
 
 type Controller struct {
@@ -70,9 +70,9 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 	var leaderboard Leaderboard
 
 	if playerId >= 0 {
-		leaderboard, err = gc.service.FindIntervalByPlayerID(reader, int(playerId))
+		leaderboard, err = gc.service.FindIntervalByPlayerID(&reader, int(playerId))
 	} else {
-		leaderboard, err = gc.service.FindIntervalByPage(reader, int(startPage))
+		leaderboard, err = gc.service.FindIntervalByPage(&reader, int(startPage))
 	}
 
 	if err != nil {

@@ -76,7 +76,7 @@ func createTrigger(db *gorm.DB) error {
 
 	trigger := `
         CREATE OR REPLACE TRIGGER after_player_games_insert
-		AFTER INSERT ON player_games
+		AFTER UPDATE ON player_games
 		FOR EACH ROW
 		EXECUTE FUNCTION update_player_stats();	
 	`

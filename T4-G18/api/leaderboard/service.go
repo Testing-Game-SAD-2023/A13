@@ -29,7 +29,7 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-func (gs *Repository) FindIntervalByPlayerID(reader LeaderboardReader, playerId int) (Leaderboard, error) {
+func (gs *Repository) FindIntervalByPlayerID(reader *LeaderboardReader, playerId int) (Leaderboard, error) {
 	var (
 		rows           []Row
 		leaderboard    Leaderboard
@@ -46,16 +46,18 @@ func (gs *Repository) FindIntervalByPlayerID(reader LeaderboardReader, playerId 
 
 	err = gs.db.Transaction(func(tx *gorm.DB) error {
 		query := fmt.Sprintf(`
-        SELECT position FROM(
-                SELECT *, row_number() OVER (ORDER BY %s, player_id DESC) AS position FROM player_stats
-                )
-                AS sub_q WHERE player_id = ?`, columnName)
+		       SELECT position FROM(
+		               SELECT *, row_number() OVER (ORDER BY %s DESC) AS position FROM player_stats
+		               )
+		               AS sub_q WHERE player_id = ?`, columnName)
 
-		err := gs.db.Raw(query, fmt.Sprintf("%d", playerId)).Scan(&playerPosition).Error
+		err := gs.db.Raw(query, fmt.Sprintf("%d", playerId)).Take(&playerPosition).Error
+
 
 		if err != nil {
 			return err
 		}
+
 		startPage := (playerPosition / reader.pageSize) + 1
 		offset := (startPage - 1) * reader.pageSize
 		limit := reader.pageSize * reader.numPages
@@ -85,7 +87,7 @@ func (gs *Repository) FindIntervalByPlayerID(reader LeaderboardReader, playerId 
 	return leaderboard, nil
 }
 
-func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int) (Leaderboard, error) {
+func (gs *Repository) FindIntervalByPage(reader *LeaderboardReader, startPage int) (Leaderboard, error) {
 	var (
 		rows        []Row
 		leaderboard Leaderboard
@@ -104,7 +106,7 @@ func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int
 	limit := reader.pageSize * reader.numPages
 
 	err := gs.db.Raw(query, limit, offset).Scan(&rows).Error
-	
+
 	if err != nil {
 		return leaderboard, api.MakeServiceError(err)
 	}
@@ -120,7 +122,6 @@ func (gs *Repository) FindIntervalByPage(reader LeaderboardReader, startPage int
 
 	return leaderboard, nil
 }
-
 
 func buildQuery(columnName string) string {
 	query := fmt.Sprintf(`
