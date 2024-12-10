@@ -170,8 +170,7 @@ public class GuiController {
             }else if(userService.isUserInFollower(user,Integer.parseInt(jwt_userId))){
                 profile = new PageBuilder(serviceManager, "profile_followed", model);
             }else{
-                //CASO IN CUI NON SEGUO QUELLA PERSONA MI RIPORTA AL MAIN DELLA PAGINA... Si potrebbe fare qualcosa con una pagina di errore
-                return GUIController(model,jwt);
+                return "redirect:/main";
             }
         }
         catch (Exception e) {
@@ -218,7 +217,6 @@ public class GuiController {
         profile.setObjectComponents(objUser);
         profile.setObjectComponents(objMissions);
         profile.setObjectComponents(objRatios);
-        //profile.setErrorPage() Può darsi che questa ci gestisce bene gli errori?
         return profile.handlePageRequest();
     }
 
@@ -263,12 +261,12 @@ public class GuiController {
                                             @RequestParam("userID_2") String userID_2,
                                             HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
 
-        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
+        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Utente non loggato");
 
         try {
             return ResponseEntity.ok(userService.addFollow(userID_1,userID_2));
         } catch (RestClientException e) { 
-            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(e.getCause().getMessage());
         } catch (Exception e) {
             System.err.println("Errore durante l'add follow: " + e.getMessage());
             e.printStackTrace();
@@ -281,12 +279,12 @@ public class GuiController {
                                             @RequestParam("userID_2") String userID_2,
                                             HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt){
 
-        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
+        if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Utente non loggato");
 
         try {
             return ResponseEntity.ok(userService.rmFollow(userID_1,userID_2));
         } catch (RestClientException e) { 
-            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(e.getCause().getMessage());
         } catch (Exception e) {
             System.err.println("Errore durante il remove follow: " + e.getMessage());
             e.printStackTrace();

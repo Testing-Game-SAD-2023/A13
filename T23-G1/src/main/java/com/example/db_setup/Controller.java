@@ -646,13 +646,6 @@ public class Controller {
     }
     
 
-    //SI PUò TOGLIERE NON CI SERVE
-    @GetMapping("/follower_list/{ID}")
-    public List<User> getFollowerListbyUserID(@PathVariable String ID){
-        
-        return userRepository.findByID(Integer.parseInt(ID)).getFollowing();
-    }
-
     @PostMapping("/addFollow")
     public ResponseEntity<String> addFollow(@RequestParam("userID_1") String userID_1,
                                                 @RequestParam("userID_2") String userID_2, HttpServletRequest request) {
@@ -661,9 +654,9 @@ public class Controller {
             User followed = userRepository.findByID(Integer.parseInt(userID_2));
             
             if( follower == null ){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 not exist");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 non esiste");
             } else if ( followed == null){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 not exist");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 non esiste");
             }
             
             // Controllo per evitare che un utente segua se stesso
@@ -685,7 +678,7 @@ public class Controller {
             userRepository.save(followed);
 
 
-            return ResponseEntity.status(HttpStatus.OK).body("Operation of follow completed");
+            return ResponseEntity.status(HttpStatus.OK).body("Operazione completata con successo");
 
     }
     
@@ -699,11 +692,11 @@ public class Controller {
             User followed = userRepository.findByID(Integer.parseInt(userID_2));
             
             if( follower == null ){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 not exist");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 non esiste");
             } else if ( followed == null){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 not exist");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 non esiste");
             }
-            
+
             //Controlla se io provo a defolloware una persona che già non follow
             if (!(userRepository.existsFollowRelationship(follower.ID, followed.ID) > 0)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower già non segue followed");
@@ -719,7 +712,7 @@ public class Controller {
             userRepository.save(followed);
 
 
-            return ResponseEntity.status(HttpStatus.OK).body("Operation of unfollow completed");
+            return ResponseEntity.status(HttpStatus.OK).body("Operazione eseguita con successo");
 
     }
     
@@ -780,7 +773,7 @@ public class Controller {
 
             }else if(!(user.biography.equals(user_updated.biography)) && (!(user_updated.biography.length() >= 2) || !(user_updated.biography.length() <= 130) || !(Pattern.matches("[a-zA-Z]+(\\s?[a-zA-Z]+\\'?)*", user_updated.biography)))){
                 
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Biografia nuovo non valido");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Biografia nuova non valido");
 
             }else if((!myPasswordEncoder.matches(old_psw, user_updated.password)) && ((user_updated.password.length() >16) || (user_updated.password.length() < 8) || !(m.matches()))){
              /*
@@ -865,7 +858,8 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Session is not active");
     }
 }
-    @GetMapping("/test_prova")
+
+@GetMapping("/test_prova")
     @ResponseBody
     public String test() {
         return "test T23";

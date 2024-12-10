@@ -10,13 +10,12 @@
       - `UserRepository.java` aggiunto il metodo:
         - `existsFollowRelationship`
     - Aggiunto al `Controller.java` i metodi/route:
-        - `getFollowerListbyUserID` *(Ok ma si potrebbe togliere)*
         - `addFollow`
         - `rmFollow`
         - `searchPlayer`
         - `modifyPlayer`
 2. Ui Gateway:
-    - Aggiunto addFollow, rmFollow, searchPlayer, modifyPlayer, getFollowerListbyUserID a riga 51 di default.conf
+    - Aggiunto addFollow, rmFollow, searchPlayer, modifyPlayer a riga 51 di default.conf
     - Aggiunto profile/modifyUser, profile/searchPlayer, profile/addFollow e profile/rmFollow a riga 58 di default.conf
 3. Modulo T5:
     - Aggiunto il model:
