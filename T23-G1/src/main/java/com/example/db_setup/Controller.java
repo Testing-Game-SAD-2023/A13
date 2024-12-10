@@ -831,6 +831,7 @@ public class Controller {
     return "redirect:" + (referer != null ? referer : "/");
 }
 
+    //Rotta per Seguire o smettere di seguire un utente
     @PostMapping("/add-follow")
     public ResponseEntity<?> toggleFollow(@RequestParam("targetUserId") String targetUserId,
                                         @RequestParam("authUserId") String authUserId) {
@@ -839,11 +840,13 @@ public class Controller {
         return userService.toggleFollow(targetUserId, authUserId);
     }
 
+    //Rotta per ottenere i followers di un utente
     @GetMapping("/get-followers")
     public List<User> getFollowers(@RequestParam("userId") String userId) {
         return userService.getFollowers(userId);
     }
 
+    //Rotta per ottenere gli utenti seguiti da un utente
     @GetMapping("/get-following")
     public List<User> getFollowing(@RequestParam("userId") String userId) {
         return userService.getFollowing(userId);

@@ -242,6 +242,7 @@ public class GuiController {
         return profile.handlePageRequest();
     }
 
+    // Visualizzazione profilo di un amico
     @GetMapping("/friend/{playerID}")
     public String friendProfilePage(Model model, @PathVariable(value="playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
         try {
@@ -374,6 +375,7 @@ public class GuiController {
         }
     }
 
+    // Seguire o smettere di seguire un utente
     @PostMapping("/follow/{playerID}")
     @ResponseBody
     public ResponseEntity<?> toggleFollow(@PathVariable(value="playerID") String playerID,
