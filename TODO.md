@@ -1,16 +1,15 @@
-1-Implementare, all'interno di T5, logica per ottenere email degli utenti utilizzando T23
-2-Rivedere gestione delle pagine del frontend (decidere se prima posizione da 0 o da 1)
-3-Valutare se è necessario utilizzare jwt all'interno della rotta getPositions del T5
-4-Implementare logica di selezione corretta delle risorse all'interno del T4 (switch-case)
 5-Rivedere correttezza del trigger sulla tabella (probabilmente è necessario utilizzare on UPDATE anziché on Insert)
-6-Valutare lo stato attuale delle query su T4 (perché spesso vengono gestite come transactions)
+7.EndGame per la gestione della vittoria: serve una callRestPut con application content Json, aggiorando anche i test sul method atteso da EndGame
+8.Gestire le lingue nella leaderboard
+11.Implementare bottone refresh leaderboard
+12.Limitare grandezza della cache leaderboard
 
-
-Estensioni possibili dei precedenti punti 
-
-1-Valutare se è opportuno utilizzare più classi per la gestione della rotta getSubInterval, in quanto al momento si sta ritornando anche userID nel frontend
 
 
 Fatto:
 1-Fatto a meno della possibile estensione
 3-Avendo configurato la rotta nell'API gateway dovrebbe essere lui a gestire l'autenticazione
+4-Implementare, all'interno di T5, logica per ottenere email degli utenti utilizzando T23
+6.Spostare l'UI della leaderboard in un fragment da imporatare nella navbar
+9.Disabilitare bottoni UI relativi a modalità e statistiche non implementate
+10.Implementare la ricerca di un giocatore in leaderboard

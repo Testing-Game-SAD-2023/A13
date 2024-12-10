@@ -11,7 +11,7 @@ const statisticOptions = {
     sfida: [
         { id: 'partite_giocate', label: 'Partite giocate' },
         { id: 'partite_vinte', label: 'Partite vinte' },
-        { id: '', label: 'Classi testate' }
+        { id: '', label: 'Classi testate', disabled: true }
     ],
     scalata: [
         { id: 'statistica1', label: 'Esempio1' },
@@ -20,13 +20,15 @@ const statisticOptions = {
     ]
 };
 
-//fetch('api/leaderboard/subInterval/sfida/partite_giocate?pageSize=10&numPages=1&email=andrea_unina@gmail.com')
-//response = await fetch('api/leaderboard/subInterval/sfida/partite_giocate?pageSize=10&numPages=1&email=andrea_unina@gmail.com'); response = await response.json(); console.log(response);
-// GET 
-async function fetchRows(gamemode, statistic, startPage) {
+
+async function fetchRows(gamemode, statistic, startPage, email) {
     try {
         const endpoint = `api/leaderboard/subInterval/${gamemode}/${statistic}`;
-        const queryParams = `?pageSize=${pageSize}&numPages=${numPages}&startPage=${startPage}`;
+        let queryParams = `?pageSize=${pageSize}&numPages=${numPages}`;
+        if (startPage > 0)
+            queryParams = queryParams.concat(`&startPage=${startPage}`);
+        else if (email.length > 0)
+            queryParams = queryParams.concat(`&email=${email}`);
 
         const response = await fetch(`${endpoint}${queryParams}`);
         const responseJson = await response.json();
@@ -71,8 +73,8 @@ else // pagina intermedia -> prendo un intorno di y pagine
         prendo l'intorno (X-floor(numPages/2), X+floor(numPages/2))         //es. se numPages==5 prendo intervallo (X-2, X+2)
 */
 
-// fetch rows and update cache
-async function getRows(gamemode, statistic, page) {
+// fetch pages and update cache
+async function getRowsByPage(gamemode, statistic, page) {
 
     let startPage;
     let fetchedRows;
@@ -87,14 +89,13 @@ async function getRows(gamemode, statistic, page) {
         </td>
       </tr>
     `;
-    
 
     // define what page interval to fetch
     if (page == 1) {
         startPage = 1;
     } else {    // pagina intermedia
         if (cache?.[gamemode]?.[statistic]?.[page + 1]) { // se la pagina x+1 è in cache, prendo le pagine precedenti
-            startPage = Math.max(1, page - numPages + 1); 
+            startPage = Math.max(1, page - numPages + 1);
         } else if (cache?.[gamemode]?.[statistic]?.[page - 1]) { // se la pagina x-1 è in cache, prendo le pagine successive 
             startPage = page;
         } else {
@@ -109,11 +110,50 @@ async function getRows(gamemode, statistic, page) {
     } catch (error) {
         throw (error);
     }
-    
+
     // set last page
     lastPage = totalLength === 0 ? 1 : Math.floor((totalLength - 1) / pageSize) + 1;
-    
+
     // store fetched rows in cache
+    updateCache(gamemode, statistic, startPage, fetchedRows);
+}
+
+async function getRowsByEmail(gamemode, statistic, email) {
+    if (email.length == 0)
+        return
+
+    let fetchedRows;
+
+    // loading spinner
+    tableBody.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-center">
+              <div class="spinner-grow text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+              </div>
+          </td>
+        </tr>
+      `;
+
+    // fetch rows
+    try {
+        fetchedRows = await fetchRows(gamemode, statistic, 0, email);
+    } catch (error) {
+        throw (error);
+    }
+
+    // set last page
+    lastPage = totalLength === 0 ? 1 : Math.floor((totalLength - 1) / pageSize) + 1;
+
+    // store fetched rows in cache
+    const startPage = Math.floor(fetchedRows[0].rank / pageSize) + 1 // ##################
+    updateCache(gamemode, statistic, startPage, fetchedRows);
+
+    // return page to be shown
+    return startPage;
+}
+
+function updateCache(gamemode, statistic, startPage, fetchedRows) {
     if (!cache[gamemode]) {
         cache[gamemode] = {};
     }
@@ -122,7 +162,7 @@ async function getRows(gamemode, statistic, page) {
     }
 
     const startRow = (startPage - 1) * pageSize;
-    let endPage = Math.min(startPage+numPages-1, lastPage)
+    let endPage = Math.min(startPage + numPages - 1, lastPage)
 
     for (let page = startPage; page <= endPage; page++) {
         const pageStartIndex = (page - 1) * pageSize;
@@ -134,6 +174,7 @@ async function getRows(gamemode, statistic, page) {
             break;
         cache[gamemode][statistic][page] = pageSlice
     }
+
     console.log('Cache updated', cache);
 }
 
@@ -164,7 +205,7 @@ function renderPagination(currentPage) {
     const firstButton = document.createElement('li');
     firstButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
     firstButton.innerHTML = `
-        <button class="page-link" onclick="loadPage(1)" aria-label="First">&laquo; First page</button>
+        <button class="page-link" onclick="showPage(1)" aria-label="First">&laquo; First page</button>
       `;
     pagination.appendChild(firstButton);
 
@@ -172,7 +213,7 @@ function renderPagination(currentPage) {
     const prevButton = document.createElement('li');
     prevButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
     prevButton.innerHTML = `
-        <button class="page-link" onclick="loadPage(${currentPage - 1})" aria-label="Previous">&laquo; Previous</button>
+        <button class="page-link" onclick="showPage(${currentPage - 1})" aria-label="Previous">&laquo; Previous</button>
       `;
     pagination.appendChild(prevButton);
 
@@ -188,7 +229,7 @@ function renderPagination(currentPage) {
     const nextButton = document.createElement('li');
     nextButton.className = `page-item ${currentPage === lastPage ? 'disabled' : ''}`;
     nextButton.innerHTML = `
-        <button class="page-link" onclick="loadPage(${currentPage + 1})" aria-label="Next">Next &raquo;</button>
+        <button class="page-link" onclick="showPage(${currentPage + 1})" aria-label="Next">Next &raquo;</button>
       `;
     pagination.appendChild(nextButton);
 
@@ -196,7 +237,7 @@ function renderPagination(currentPage) {
     const lastButton = document.createElement('li');
     lastButton.className = `page-item ${currentPage === lastPage ? 'disabled' : ''}`;
     lastButton.innerHTML = `
-        <button class="page-link" onclick="loadPage(${lastPage})" aria-label="First">&laquo; Last page</button>
+        <button class="page-link" onclick="showPage(${lastPage})" aria-label="First">&laquo; Last page</button>
       `;
     pagination.appendChild(lastButton);
 }
@@ -235,6 +276,8 @@ function updateStatisticOptions(gamemode) {
         input.name = 'statistic';
         input.id = option.id;
         input.value = option.label;
+        if (option?.disabled == true)
+            input.disabled = true;
 
         const label = document.createElement('label');
         label.className = 'form-check-label btn btn-filter';
@@ -251,18 +294,21 @@ function updateStatisticOptions(gamemode) {
         container.firstChild.querySelector('input').checked = true;
     }
 
-    // add loadPage trigger on selection
+    // add showPage trigger on selection
     const statisticSelectors = document.querySelectorAll('input[name="statistic"]');
     statisticSelectors.forEach(selector => {
         selector.addEventListener('change', (event) => {
             if (event.target.checked) {
-                loadPage(1);
+                const email = document.getElementById('lb-search-box');
+                email.value = "";
+                showPage(1);
             }
         });
     });
 }
 
-async function loadPage(page) {
+// funzioni esterne
+async function showPage(page) {
     if (page < 1) return;
 
     const gamemode = document.querySelector('input[name="gamemode"]:checked').id;
@@ -271,7 +317,7 @@ async function loadPage(page) {
     // fetch page if not in cache
     if (!(cache?.[gamemode]?.[statistic]?.[page])) {
         try {
-            await getRows(gamemode, statistic, page);
+            await getRowsByPage(gamemode, statistic, page);
         } catch (error) {
             renderTableError(error);
             return;
@@ -283,18 +329,53 @@ async function loadPage(page) {
     renderPagination(page);
 }
 
+async function searchPlayer() {
+    const email = document.getElementById('lb-search-box').value;
+    if (email.length == 0)
+        return
+
+    const gamemode = document.querySelector('input[name="gamemode"]:checked').id;
+    const statistic = document.querySelector('input[name="statistic"]:checked').id;
+    let pageToShow = 0;
+
+    // cache look up first
+    const foundCondition = (e) => e === email;
+
+    outer: for (const page in cache[gamemode][statistic]) {
+        for (const value of cache[gamemode][statistic][page]) {
+            if (foundCondition(value.email)) {
+                pageToShow = parseInt(page);
+                break outer;
+            }
+        }
+    }
+
+    // fetch if not found in cache
+    if (pageToShow < 1) {
+        try {
+            pageToShow = await getRowsByEmail(gamemode, statistic, email);
+        } catch (error) {
+            renderTableError(error);
+            return;
+        }}
+
+    // render table and buttons
+    renderTable(gamemode, statistic, pageToShow);
+    renderPagination(pageToShow);
+}
+
 
 
 // Page initialization
 
 // add listener for leaderboard creation
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const gamemode = document.querySelector('input[name="gamemode"]:checked').id;
     updateStatisticOptions(gamemode);
 
     const offcanvasElement = document.getElementById('offcanvasDarkNavbar');
-    offcanvasElement.addEventListener('show.bs.offcanvas', function() {
-        loadPage(1);
+    offcanvasElement.addEventListener('show.bs.offcanvas', function () {
+        showPage(1);
     });
 });
 
@@ -305,9 +386,10 @@ const gamemodeSelectors = document.querySelectorAll('input[name="gamemode"]');
 gamemodeSelectors.forEach(selector => {
     selector.addEventListener('change', (event) => {
         if (event.target.checked) {
-
+            const email = document.getElementById('lb-search-box');
+            email.value = "";
             updateStatisticOptions(event.target.id);
-            loadPage(1);
+            showPage(1);
         }
     });
 });

@@ -54,6 +54,7 @@ import com.g2.Service.LeaderboardService;
 import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -64,6 +65,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -374,7 +377,7 @@ public class GuiController {
 
     @GetMapping("leaderboard/subInterval/{gamemode}/{statistic}")
     @ResponseBody
-    public ResponseEntity<?> getPositions(@PathVariable(value = "gamemode") String gamemode,
+    public ResponseEntity<?> getLeaderboard(@PathVariable(value = "gamemode") String gamemode,
             @PathVariable(value = "statistic") String statistic,
             @RequestParam(value = "pageSize") Integer pageSize,
             @RequestParam(value = "numPages") Integer numPages,
@@ -382,12 +385,44 @@ public class GuiController {
             @RequestParam(value = "email", required = false) String email) {
         try {
 
-            LeaderboardSubInterval lbSubInterval = leaderboardService.getLeaderboardSubInterval(gamemode, statistic,
-            pageSize, numPages, startPage, email);
-            
+            if (startPage == null)
+                startPage = 0;
+            if (email == null)
+                email = "";
+
+            if ((startPage == 0 && email.length() == 0) || (startPage > 0 && email.length() > 0)) {
+                throw new Exception();
+            }
+
+            LeaderboardSubInterval lbSubInterval = new LeaderboardSubInterval();
+
+            if (startPage > 0) {
+                lbSubInterval = leaderboardService.getLeaderboardSubIntervalByPage(gamemode, statistic,
+                        pageSize, numPages, startPage);
+            } else {
+                lbSubInterval = leaderboardService.getLeaderboardSubIntervalByEmail(gamemode, statistic,
+                        pageSize, numPages, email);
+            }
+
             return ResponseEntity.ok(lbSubInterval);
+        } catch (RestClientException e) {
+
+            HashMap<String, String> errorResponse = new HashMap<>();
+
+            if (e.getCause() instanceof HttpClientErrorException) {
+                HttpClientErrorException cause = (HttpClientErrorException) e.getCause();
+                if (cause.getStatusCode().value() == 404) {
+                    errorResponse.put("message", "Non è stato trovato alcun giocatore");
+                }
+            }
+            else
+                errorResponse.put("message", "\"Errore nel caricamento della classifica");
+
+            
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            //System.out.println("Exception " + e.getMessage());
+
             HashMap<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", "Errore nel caricamento della classifica");
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);

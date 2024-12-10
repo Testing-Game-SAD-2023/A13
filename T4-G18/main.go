@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
+	"math/rand"
 	"github.com/alarmfox/game-repository/api"
 	"github.com/alarmfox/game-repository/api/game"
 	"github.com/alarmfox/game-repository/api/leaderboard"
@@ -76,7 +76,7 @@ func createTrigger(db *gorm.DB) error {
 
 	trigger := `
         CREATE OR REPLACE TRIGGER after_player_games_insert
-		AFTER UPDATE ON player_games
+		AFTER INSERT ON player_games
 		FOR EACH ROW
 		EXECUTE FUNCTION update_player_stats();	
 	`
@@ -153,21 +153,21 @@ func run(ctx context.Context, c Configuration) error {
 	}
 
 	//Start TEST DB
-	// tm := time.Now()
-	// for i := 0; i < 100000; i++ {
-	// 	playerGame := model.PlayerGame{
-	// 		PlayerID:  fmt.Sprintf("%d", i%250),
-	// 		GameID:    rand.Int63(),
-	// 		CreatedAt: time.Now(),
-	// 		UpdatedAt: time.Now(),
-	// 		IsWinner:  rand.Intn(2) == 1,
-	// 	}
-	// 	if err := db.Create(&playerGame).Error; err != nil {
-	// 		//log.Fatalf("Failed to insert: %v", err)
-	// 		log.Println("Errore Insert")
-	// 	}
-	// }
-	// log.Printf("took %v", time.Since(tm))
+	tm := time.Now()
+	for i := 0; i < 100000; i++ {
+		playerGame := model.PlayerGame{
+			PlayerID:  fmt.Sprintf("%d", i%250),
+			GameID:    rand.Int63(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			IsWinner:  rand.Intn(2) == 1,
+		}
+		if err := db.Create(&playerGame).Error; err != nil {
+			//log.Fatalf("Failed to insert: %v", err)
+			log.Println("Errore Insert")
+		}
+	}
+	log.Printf("took %v", time.Since(tm))
 	//	End TEST DB
 
 	if err := os.Mkdir(c.DataDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {

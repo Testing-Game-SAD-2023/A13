@@ -20,56 +20,57 @@ public class LeaderboardService {
         this.serviceManager = new ServiceManager(restTemplate);
     }
 
-    public LeaderboardSubInterval getLeaderboardSubInterval(String gamemode, String statistic, Integer pageSize,
-            Integer numPages, Integer startPage, String email) throws Exception {
-
-        if (startPage == null)
-            startPage = 0;
-        if (email == null)
-            email = "";
-        
-        if ((startPage == 0 && email.length() == 0) || (startPage > 0 && email.length() > 0)) {
-            throw new Exception();
-        }
-        
+    private LeaderboardSubInterval getUserEmailsById(LeaderboardSubInterval playerStatsList) throws Exception {
         try {
-            LeaderboardSubInterval playerStatsList = new LeaderboardSubInterval();
-            // get leaderboard interval by page
-            if (startPage > 0) {
-                playerStatsList = (LeaderboardSubInterval) serviceManager.handleRequest("T4",
-                        "getLeaderboardSubinterval", gamemode, statistic,
-                        pageSize, numPages, startPage, (long)-1);
+            List<User> userList = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
 
-                List<User> userList = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-
-                for (PlayerStats playerStats : playerStatsList.getPositions()) {
-                    for (User user : userList) {
-                        if (playerStats.getUserId().equals(user.getId())) {
-                            playerStats.setEmail(user.getEmail());
-                            break;
-                        }
+            for (PlayerStats playerStats : playerStatsList.getPositions()) {
+                for (User user : userList) {
+                    if (playerStats.getUserId().equals(user.getId())) {
+                        playerStats.setEmail(user.getEmail());
+                        break;
                     }
                 }
             }
-            // get leaderboard interval by player email
-            else { 
-                User searchedUser = (User) serviceManager.handleRequest("T23", "GetUserByEmail", email);
-                Long userId = searchedUser.getId();
 
+            return playerStatsList;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public LeaderboardSubInterval getLeaderboardSubIntervalByPage(String gamemode, String statistic, Integer pageSize,
+            Integer numPages, Integer startPage) throws Exception {
+
+        try {
+            LeaderboardSubInterval playerStatsList = new LeaderboardSubInterval();
+
+            playerStatsList = (LeaderboardSubInterval) serviceManager.handleRequest("T4",
+                    "getLeaderboardSubinterval", gamemode, statistic,
+                    pageSize, numPages, startPage, (long) -1);
+
+            playerStatsList = getUserEmailsById(playerStatsList);
+
+            return playerStatsList;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public LeaderboardSubInterval getLeaderboardSubIntervalByEmail(String gamemode, String statistic, Integer pageSize,
+            Integer numPages, String email) throws Exception {
+        try {
+            LeaderboardSubInterval playerStatsList = new LeaderboardSubInterval();
+
+            User searchedUser = (User) serviceManager.handleRequest("T23", "GetUserByEmail", email);
+            
+            if (searchedUser != null) {
+                Long userId = searchedUser.getId();
                 playerStatsList = (LeaderboardSubInterval) serviceManager.handleRequest("T4",
                         "getLeaderboardSubinterval", gamemode, statistic,
                         pageSize, numPages, 0, userId);
 
-                List<User> userList = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-
-                for (PlayerStats playerStats : playerStatsList.getPositions()) {
-                    for (User user : userList) {
-                        if (playerStats.getUserId().equals(user.getId())) {
-                            playerStats.setEmail(user.getEmail());
-                            break;
-                        }
-                    }
-                }
+                playerStatsList = getUserEmailsById(playerStatsList);
             }
 
             return playerStatsList;

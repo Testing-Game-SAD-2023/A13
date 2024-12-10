@@ -645,9 +645,12 @@ public class Controller {
     }
 
     @GetMapping("/students_list/getByEmail/{email}")
-    @ResponseBody
-    public User getStudentByEmail(@PathVariable String email) {
-        return userRepository.findByEmail(email);
+    public ResponseEntity<?> getStudentByEmail(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/password_reset")

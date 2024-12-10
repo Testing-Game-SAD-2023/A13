@@ -17,6 +17,10 @@
     display: none;
 }
 
+.form-check-label {
+    font-size: 0.95em !important;
+}
+
 .form-check-input:checked + .form-check-label {
     background-color: #fdb838;
     color: white;
@@ -37,8 +41,8 @@
 }
 
 .search-box {
-    width: 300px;
-    max-width: 90%;
+    max-width: 100% !important;
+    margin-bottom: .125rem !important;
 }
 
 .tableError {
