@@ -161,6 +161,16 @@
                                         1000
                                     </div>
                                 </div>
+                                <div id="ratio-container" class="mt-3" style="display: none;">
+                                    <div th:each="ratio: ${ratios}" 
+                                         class="row ratio-row" 
+                                         th:data-robot="${ratio.robot}" 
+                                         th:data-gamemode="${ratio.gamemode}">
+                                        <div class="col-8" th:text="'Ratio ' + ${ratio.value}">
+                                            Ratio 0.0
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

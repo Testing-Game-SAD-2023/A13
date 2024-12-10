@@ -228,8 +228,8 @@ $('#searchPlayerModal').on('hidden.bs.modal', function () {
   location.reload(); // Ricarica l'intera pagina
 });
 
-let currentRobot = 'None'; // Filtro iniziale per Robot
-let currentGameMode = 'All'; // Filtro iniziale per GameMode
+let currentRobot = null; // Filtro disattivato per Robot
+let currentGameMode = null; // Filtro disattivato per GameMode
 
 // Aggiorna il filtro per Robot e il testo del bottone
 function selectRobotFilter(robotType) {
@@ -253,14 +253,16 @@ function filterStatistics() {
         const robot = row.getAttribute('data-robot');
         const gamemode = row.getAttribute('data-gamemode');
 
+        // Controllo indipendente per ogni filtro
         const robotMatch = 
-            (currentRobot === 'None' && robot === 'None') || 
-            (currentRobot !== 'None' && robot === currentRobot);
+            (currentRobot === null) || 
+            (robot === currentRobot);
 
         const gameModeMatch = 
-            (currentGameMode === 'All') || 
+            (currentGameMode === null) || 
             (gamemode === currentGameMode);
 
+        // Mostra la riga solo se entrambi i filtri corrispondono (se attivi)
         if (robotMatch && gameModeMatch) {
             row.style.display = ''; // Mostra la riga
         } else {
@@ -271,8 +273,8 @@ function filterStatistics() {
 
 // Resetta i filtri e il testo dei bottoni
 function clearFilter() {
-    currentRobot = 'None';
-    currentGameMode = 'All';
+    currentRobot = null;
+    currentGameMode = null;
 
     document.getElementById('robotFilterDropdown').innerText = 'Robot'; // Ripristina il testo del bottone
     document.getElementById('gameModeFilterDropdown').innerText = 'GameMode'; // Ripristina il testo del bottone
