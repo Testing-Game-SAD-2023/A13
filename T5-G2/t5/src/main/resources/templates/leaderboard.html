@@ -59,11 +59,13 @@
 
     <div class="rectangle-container">
         <div class="rectangle">
-            <div class="section" id="section-1" th:text="${rankByPoints}" 
-                                                th:attr="data-default=${rankByPoints}, 
-                                                        data-checked=${rankByGames}"></div>
-            <div class="section" id="section-2">Giovanna Iovine</div>
-            <div class="section" id="section-3">3</div>
+            <div class="section" id="section-1" th:text="${playerRank.rankByPoints}" 
+                                                th:attr="data-default=${playerRank.rankByPoints}, 
+                                                        data-checked=${playerRank.rankByGames}"></div>
+            <div class="section" id="section-2">YOU</div>
+            <div class="section" id="section-3" th:text="${playerRank.points}" 
+                                                th:attr="data-default=${playerRank.points}, 
+                                                        data-checked=${playerRank.gamesWon}"></div>
         </div>
     </div>
 
