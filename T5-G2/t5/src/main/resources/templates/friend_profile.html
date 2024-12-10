@@ -52,13 +52,13 @@
                 <div class="card-header">
                     <ul class="nav nav-tabs card-header-tabs" id="trophyTabs" role="tablist">
                         <li class="nav-item">
-                            <button class="nav-link active" id="unlocked-tab" data-bs-toggle="tab" data-bs-target="#unlocked" type="button" role="tab" aria-controls="unlocked" aria-selected="true">
-                                Sbloccati
+                            <button class="nav-link active" id="unlocked-tab" data-bs-toggle="tab" data-bs-target="#unlocked" type="button" role="tab" aria-controls="unlocked" aria-selected="true" th:text="#{profile.achievementUnlocked}">
+                                Unlocked
                             </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" id="locked-tab" data-bs-toggle="tab" data-bs-target="#locked" type="button" role="tab" aria-controls="locked" aria-selected="false">
-                                Bloccati
+                            <button class="nav-link" id="locked-tab" data-bs-toggle="tab" data-bs-target="#locked" type="button" role="tab" aria-controls="locked" aria-selected="false" th:text="#{profile.achievementLocked}">
+                                Locked
                             </button>
                         </li>
                     </ul>
@@ -67,7 +67,7 @@
                     <div class="tab-content" id="trophyTabsContent">
                         <!-- Achievement Sbloccati -->
                         <div class="tab-pane fade show active" id="unlocked" role="tabpanel" aria-labelledby="unlocked-tab">
-                            <p th:if="${unlockedAchievements == null || unlockedAchievements.isEmpty()}">
+                            <p th:if="${unlockedAchievements == null || unlockedAchievements.isEmpty()}" th:text="#{profile.achievementUnlEmpty}">
                                 Nessun trofeo sbloccato.
                             </p>
                             <ul class="achievements-list" th:if="${unlockedAchievements != null && !unlockedAchievements.isEmpty()}">
@@ -82,7 +82,7 @@
                         </div>
                         <!-- Achievement Bloccati -->
                         <div class="tab-pane fade" id="locked" role="tabpanel" aria-labelledby="locked-tab">
-                            <p th:if="${lockedAchievements == null || lockedAchievements.isEmpty()}">
+                            <p th:if="${lockedAchievements == null || lockedAchievements.isEmpty()}" th:text="#{profile.achievementLocEmpty}">
                                 Nessun trofeo bloccato.
                             </p>
                             <ul class="achievements-list" th:if="${lockedAchievements != null && !lockedAchievements.isEmpty()}">
@@ -110,21 +110,21 @@
         <div class="right-column">
             <!-- Statistiche -->
             <div class="card mb-3">
-                <div class="card-header">Statistiche</div>
+                <div class="card-header" th:text="#{profile.stats}">Statistiche</div>
                 <div class="card-body">
                     <div class="row" th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}">
                         <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
                             Nome Statistica
                         </div>
                         <div class="col text-end" th:text="${element.Progress}">
-                            0
+                            1000
                         </div>
                     </div>
                 </div>
             </div>
             <!--Amici-->
             <div class="card">
-                <div class="card-header">Amici</div>
+                <div class="card-header"  th:text="#{profile.friends}">Amici</div>
                 <div class="card-body">
                     <!-- Tab navigation -->
                     <ul class="nav nav-tabs">
@@ -146,7 +146,7 @@
                             <div class="tab-search-container">
                                 <input type="text"
                                     class="form-control tab-search"
-                                    placeholder="Cerca tra i followers..."
+                                    th:placeholder="#{profile.followers_search}"
                                     data-search-target="followers">
                             </div>
                             <div class="friends-list">
@@ -159,7 +159,7 @@
                                     </div>
                                     <a th:href="@{'/friend/' + ${follower.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${followersList == null or followersList.empty}" class="mb-1">
+                                <div th:if="${followersList == null or followersList.empty}" class="mb-1" th:text="#{profile.empty_followers}">
                                     Nessun follower trovato
                                 </div>
                             </div>
@@ -170,7 +170,7 @@
                             <div class="tab-search-container">
                                 <input type="text"
                                     class="form-control tab-search"
-                                    placeholder="Cerca tra i following..."
+                                    th:placeholder="#{profile.followings_search}"
                                     data-search-target="following">
                             </div>
                             <div class="friends-list">
@@ -183,7 +183,7 @@
                                     </div>
                                     <a th:href="@{'/friend/' + ${follow.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${followingList == null or followingList.empty}" class="mb-1">
+                                <div th:if="${followingList == null or followingList.empty}" class="mb-1" th:text="#{profile.empty_followings}">
                                     Nessun following trovato
                                 </div>
                             </div>
@@ -202,7 +202,11 @@
 
     <script>
         function goBack() {
-            window.history.back();
+            window.location.href = document.referrer;
+                    // Se document.referrer non dovesse funzionare, usa questo come fallback
+            setTimeout(() => {
+                window.location.href = "/profile";
+            }, 100);
         }
     </script>
 </body>

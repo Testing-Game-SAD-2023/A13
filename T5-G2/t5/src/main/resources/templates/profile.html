@@ -157,13 +157,13 @@
 
             <!-- Amici -->
             <div class="card">
-                <div class="card-header">Amici</div>
+                <div class="card-header" th:text="#{profile.friends}">Amici</div>
                 <div class="card-body">
                     <!-- Barra di ricerca in un contenitore dedicato -->
                     <div class="friend-search">
                         <i class="fas fa-search search-icon"></i>
                         <input type="text" id="friend-search-input" class="form-control"
-                               placeholder="    Cerca amico per email..." autocomplete="off">
+                        th:placeholder="#{profile.friends_search}" autocomplete="off">
                         <ul id="friend-suggestions" class="list-group"></ul>
                     </div>
 
@@ -188,7 +188,7 @@
                             <div class="tab-search-container">
                                 <input type="text"
                                     class="form-control tab-search"
-                                    placeholder="Cerca tra i followers..."
+                                    th:placeholder="#{profile.followers_search}"
                                     data-search-target="followers">
                             </div>
 
@@ -200,9 +200,9 @@
                                         <h5 th:text="${follower.name + ' ' + follower.surname}" class="mb-1"></h5>
                                         <p th:text="${follower.email}" class="mb-1"></p>
                                     </div>
-                                    <a th:href="@{'/friend/' + ${follower.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
+                                    <a th:href="@{'/friend/' + ${follower.id}}" class="btn btn-custom btn-sm" th:text="#{profile.visualize_profile}">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${followersList == null or followersList.empty}" class="mb-1">
+                                <div th:if="${followersList == null or followersList.empty}" class="mb-1" th:text="#{profile.empty_followers}">
                                     Nessun follower trovato
                                 </div>
                             </div>
@@ -214,7 +214,7 @@
                             <div class="tab-search-container">
                                 <input type="text"
                                     class="form-control tab-search"
-                                    placeholder="Cerca tra i following..."
+                                    th:placeholder="#{profile.followings_search}"
                                     data-search-target="following">
                             </div>
                             <div class="friends-list">
@@ -225,10 +225,10 @@
                                         <h5 th:text="${follow.name + ' ' + follow.surname}" class="mb-1"></h5>
                                         <p th:text="${follow.email}"></p>
                                     </div>
-                                    <a th:href="@{'/friend/' + ${follow.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
+                                    <a th:href="@{'/friend/' + ${follow.id}}" class="btn btn-custom btn-sm" th:text="#{profile.visualize_profile}">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${followingList == null or followingList.empty}" class="mb-1">
-                                    Nessun following trovato
+                                <div th:if="${followingList == null or followingList.empty}" class="mb-1" th:text="#{profile.empty_followings}">
+                                    Nessun utente seguito trovato
                                 </div>
                             </div>
                         </div>
