@@ -61,6 +61,74 @@ h1 {
   background-color: #3b82f6;
 }
 
+/* Quando la barra laterale è nascosta (a metà schermo) */
+.sidebar.closed {
+  transform: translateX(-100%);  /* La barra è nascosta */
+}
+
+/* Freccia per riaprire la barra laterale (inizialmente nascosta su schermi piccoli) */
+.sidebar-toggle {
+  display: none;  /* Nascosto di default */
+  position: fixed;  /* Posizionato in modo fisso */
+  top: 10px;  /* Distanza dal top */
+  left: 10px;  /* Distanza dalla sinistra */
+  font-size: 12px;  /* Riduci la dimensione del carattere per l'icona */
+  background-color: #333;  /* Colore di sfondo */
+  color: #fff;  /* Colore del testo (bianco) */
+  border: none;  /* Nessun bordo */
+  padding: 5px;  /* Riduci la spaziatura interna per l'icona */
+  cursor: pointer;  /* Aggiungi il cursore a mano */
+  z-index: 1000;  /* Assicura che il pulsante sia sopra gli altri elementi */
+  border-radius: 5px;  /* Angoli arrotondati per il pulsante */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Aggiungi una leggera ombra */
+  transition: background-color 0.3s ease, transform 0.3s ease;  /* Transizione per il cambiamento di colore e la rotazione */
+}
+
+/* Cambia colore di sfondo quando l'utente passa sopra il pulsante */
+.sidebar-toggle:hover {
+  background-color: #555;  /* Colore più chiaro quando si passa sopra */
+}
+
+/* Quando la barra laterale è aperta, ruota la freccia verso sinistra */
+.sidebar.open + .sidebar-toggle {
+  transform: rotate(180deg);  /* Ruota la freccia */
+}
+
+/* Nascondi la barra laterale su schermi piccoli */
+@media screen and (max-width: 768px) {
+  .sidebar {
+      display: none;  /* Nasconde la barra laterale */
+  }
+
+  /* Freccia in alto a sinistra per riaprire la barra laterale */
+  .sidebar-toggle {
+      display: block;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 12px;
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 5px;
+      cursor: pointer;
+      z-index: 10; /* Per far sì che la freccia sia visibile sopra altri contenuti */
+  }
+}
+
+/* Stile per la barra laterale su schermi grandi */
+@media screen and (min-width: 769px) {
+  .sidebar {
+      display: block;  /* Mostra la barra laterale */
+  }
+
+  .sidebar-toggle {
+      display: none;  /* Nasconde la freccia sui dispositivi più grandi */
+  }
+}
+
+
+
 /* Stile per i pulsanti nella barra laterale */
 .sidebar button {
 display: block;

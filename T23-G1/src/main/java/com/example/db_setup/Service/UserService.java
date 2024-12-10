@@ -13,37 +13,32 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.db_setup.OAuthUserGoogle;
-
 import com.example.db_setup.User;
 import com.example.db_setup.UserRepository;
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 
-//import com.T8.social.temp.Authentication.AuthenticatedUser;
-//import com.T8.social.temp.Authentication.AuthenticatedUserRepository;
-//import com.T8.social.temp.User;
-//import com.T8.social.temp.UserRepository;   
+import java.util.stream.Collectors; // Importa per utilizzare Collectors
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 // Questa classe è un servizio che gestisce le operazioni relative agli utenti
-// è usato per creare un nuovo utente, recuperare un utente esistente e generare un token JWT per l'utente
 @Service
 public class UserService {
+
     @Autowired
-    // Usa la dipendenza UserRepository per accedere ai dati dell'utente sul DB
     private UserRepository userRepository;
-    // Stessa cosa di sopra
+    
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
-    
+
     // Recupera dal DB l'utente con l'email specificata
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-    
-    //Modifica 06/12/2024: Aggiunta end-point per restituire solo i campi non sensibili dello USER
+
+    // Modifica 06/12/2024: Aggiunta end-point per restituire solo i campi non sensibili dello USER
     public Map<String, Object> getStudentByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
@@ -59,11 +54,7 @@ public class UserService {
         return response;
     }
 
-
-    
-    
     // Crea un nuovo utente con i dettagli forniti da OAuthUserGoogle, recuperati dall'accesso OAuth2
-    // e lo salva nel DB
     public User createUserFromOAuth(OAuthUserGoogle oauthUser) {
         User newUser = new User();
         newUser.setEmail(oauthUser.getEmail());
@@ -73,28 +64,24 @@ public class UserService {
         if (nameParts.length > 1) {
             newUser.setSurname(nameParts[nameParts.length - 1]);
         }
-        // Set other user properties as needed
-        
         return userRepository.save(newUser);
     }
-    
+
     // Genera un token JWT per l'utente specificato e lo salva nel DB
     public String saveToken(User user) {
-        // Genera un token JWT per l'utente
         String token = generateToken(user);
 
         AuthenticatedUser authenticatedUser = new AuthenticatedUser(user, token);
-
         authenticatedUserRepository.save(authenticatedUser);
 
         return token;
     }
 
-    // Genera un token JWT per l'utente specificato, forse si deve cambiare
+    // Genera un token JWT per l'utente specificato
     public static String generateToken(User user) {
         Instant now = Instant.now();
         Instant expiration = now.plus(1, ChronoUnit.HOURS);
-        // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
+        
         String token = Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(Date.from(now))
@@ -106,34 +93,34 @@ public class UserService {
 
         return token;
     }
-  
-    //Modifica 04/12/2024
+
+    // Modifica 04/12/2024 - Aggiunta gestione ID studenti
     public ResponseEntity<?> getStudentsByIds(List<String> idUtenti) {
         System.out.println("Inizio metodo getStudentsByIds. ID ricevuti: " + idUtenti);
-    
+
         // Controlla se la lista di ID è vuota
         if (idUtenti == null || idUtenti.isEmpty()) {
             System.out.println("La lista degli ID è vuota.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Lista degli ID vuota.");
         }
-    
+
         try {
-            // Converte gli ID in interi
+            // Converte gli ID in interi (utilizzando Collectors.toList() invece di toList())
             List<Integer> idIntegerList = idUtenti.stream()
                                                   .map(Integer::valueOf)
-                                                  .toList();
-    
+                                                  .collect(Collectors.toList()); // Utilizzo di Collectors.toList()
+
             // Recupera gli utenti dal database
             List<User> utenti = userRepository.findAllById(idIntegerList);
-    
+
             // Verifica se sono stati trovati utenti
             if (utenti == null || utenti.isEmpty()) {
                 System.out.println("Nessun utente trovato per gli ID forniti.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nessun utente trovato.");
             }
-    
+
             System.out.println("Utenti trovati: " + utenti);
-    
+
             // Mappa i dati degli utenti nei campi desiderati
             List<Map<String, Object>> response = utenti.stream().map(user -> {
                 Map<String, Object> jsonMap = new HashMap<>();
@@ -142,11 +129,11 @@ public class UserService {
                 jsonMap.put("surname", user.getSurname());
                 jsonMap.put("email", user.getEmail());
                 return jsonMap;
-            }).toList();
-    
+            }).collect(Collectors.toList()); // Utilizzo di Collectors.toList() per raccogliere i risultati
+
             // Restituisce la lista di utenti filtrati
             return ResponseEntity.ok(response);
-    
+
         } catch (NumberFormatException e) {
             System.out.println("Errore durante la conversione degli ID: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -157,6 +144,5 @@ public class UserService {
                                  .body("Errore interno del server.");
         }
     }
-    
-        
 }
+
