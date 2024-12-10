@@ -1,4 +1,4 @@
-# Testing_Challenge_Game (by UNINA)
+# Testing_Challenge_Game (by UNINA)- Ver. A13
 Web App a supporto dell'insegnamento del Software Testing attraverso la Gamification. 
 
 Questa Web App è descritta anche nel seguente articolo scientifico: 
@@ -8,6 +8,12 @@ Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
 # Descrizione 
 The Testing_Challenge_Game Web Application was developed with the contributions of the students of the University of Naples Federico II in Italy, enrolled in the Software Architecture Design (SAD) courses held by the Prof. Anna Rita Fasolino in the academic years 2022-23, 2023-24, 2024-25.
 It has  an extremely ambitious goal: to enhance the importance of testing, a discipline often mistreated and not explored in depth in university courses, through the innovative strategy of gamification which, as the term suggests, consists in using elements borrowed from games but in non-playful contexts. The result of the application of this mechanism was the design and subsequent development of the interactive game: "Man vs Automated Testing Tools challenges" which sees the students, from here on called players, compete, with tests designed using the JUnit framework, against robots (Randoop or EvoSuite) capable of automatically generating such tests; the challenge can be considered won by the participant capable of completing a certain coverage objective.
+
+# Stato del progetto
+Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
+
+# Contributori del Branch/ Fork corrente 
+Nomi degli autori dei nuovi contributi presenti in questo repository 
 
 
 # Funzionalità dell'Applicazione 
@@ -140,12 +146,6 @@ Inserire il comando nel prompt sostituendo il __*token*__ e il __*dominio static
 A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comandi.
 
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
-
-# Stato del progetto
-Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
-
-# Contributori del Branch/ Fork corrente 
-Nomi degli autori dei nuovi contributi presenti in questo repository 
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
 TBD
