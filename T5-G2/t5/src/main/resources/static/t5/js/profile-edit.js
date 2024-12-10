@@ -1,26 +1,23 @@
-// Selezione immagine e gestione eventi
 document.addEventListener("DOMContentLoaded", function () {
     const profilePictures = document.querySelectorAll(".profile-picture");
     const bioInput = document.getElementById("bio-input");
     const saveButton = document.getElementById("save-button");
+    const userData = document.getElementById("user-data");
     const userEmailElement = document.getElementById("user-email"); // Inserisce l'email direttamente dal server
     const userEmail = userEmailElement ? userEmailElement.textContent.trim() : null;
 
-    if (!userEmail) {
-        console.error("Errore: l'email non è stata trovata nel DOM.");
-    }
+    // Ottieni i dati dell'utente
+    const currentBio = userData.dataset.currentBio;
+    const currentImage = userData.dataset.currentImage;
 
+    // Inizializza le variabili con i valori correnti
     let selectedImage = null;
 
     // Gestione della selezione delle immagini
     profilePictures.forEach((img) => {
         img.addEventListener("click", function () {
-            // Rimuovi la classe "selected" da tutte le immagini
             profilePictures.forEach((img) => img.classList.remove("selected"));
-            // Aggiungi la classe "selected" all'immagine cliccata
             this.classList.add("selected");
-
-            // Ottieni solo il nome del file senza hash finale
             selectedImage = this.getAttribute("src").split("/").pop().replace(/-\w{32}\.png$/, ".png");
         });
     });
@@ -30,19 +27,16 @@ document.addEventListener("DOMContentLoaded", function () {
         saveButton.addEventListener("click", async function () {
             const newBio = bioInput.value.trim();
 
-            if (!newBio || !selectedImage) {
-                alert("Devi selezionare un'immagine e inserire una bio valida.");
-                return;
-            }
+            // Usa i valori correnti se non sono stati modificati
+            const bioToSend = newBio || currentBio;
+            const imageToSend = selectedImage || currentImage;
 
             try {
-                // Prepara i dati nel formato x-www-form-urlencoded
                 const formData = new URLSearchParams();
                 formData.append("email", userEmail);
-                formData.append("bio", newBio);
-                formData.append("profilePicturePath", selectedImage);
+                formData.append("bio", bioToSend);
+                formData.append("profilePicturePath", imageToSend);
 
-                // Effettua la chiamata POST
                 const response = await fetch("/update-profile", {
                     method: "POST",
                     headers: {
@@ -53,7 +47,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (response.ok) {
                     alert("Profilo aggiornato con successo!");
-                    location.reload();
+                    // Torna alla pagina precedente e ricaricala
+                    window.location.href = document.referrer;
+                    // Se document.referrer non dovesse funzionare, usa questo come fallback
+                    setTimeout(() => {
+                        window.location.href = "/profile";
+                    }, 100);
                 } else {
                     const errorMessage = await response.text();
                     alert("Errore nell'aggiornamento del profilo: " + errorMessage);

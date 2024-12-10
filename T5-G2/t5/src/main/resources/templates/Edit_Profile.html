@@ -14,26 +14,27 @@
             <button id="user-email" class="profile-button" th:text="${email}">Torna al profilo utente</button>
         </a>
     </header>
-
+    <!-- Dati utente nascosti -->
+    <div id="user-data"
+        th:data-current-bio="${bio}"
+        th:data-current-image="${propic}"
+        hidden>
+    </div>
     <!-- Contenuto principale -->
     <main class="content">
         <!-- Sezione immagini profilo -->
         <div id="profile-pictures">
             <img th:each="image : ${images}"
-                 th:src="@{/t5/images/profileImages/{image}(image=${image})}"
-                 class="profile-picture"
-                 alt="Profile Picture" />
+                th:src="@{/t5/images/profileImages/{image}(image=${image})}"
+                th:class="${image == propic ? 'profile-picture selected' : 'profile-picture'}"
+                alt="Profile Picture" />
         </div>
-
         <!-- Campo per la bio -->
-        <textarea id="bio-input" placeholder="Inserisci la tua bio" th:attr="placeholder=${bio}"></textarea>
-
+        <textarea id="bio-input" th:text="${bio}"></textarea>
         <!-- Pulsante per salvare -->
         <button id="save-button" th:text="#{editProfile.save}">Salva</button>
     </main>
-
     <div th:replace="fragments/footer :: footer"></div>
-
     <script src="/t5/js/profile-edit.js"></script>
 </body>
 </html>
