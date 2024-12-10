@@ -44,7 +44,7 @@ public class TeamService {
         if (!jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (teamRepository.existsById(team.getTeamName())) {
+        if (teamRepository.existsByTeamName(team.getTeamName())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // Team already exists
         }
         searchRepository.addTeam(team);

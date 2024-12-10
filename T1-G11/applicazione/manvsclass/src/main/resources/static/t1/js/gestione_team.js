@@ -186,11 +186,14 @@ teamForm.addEventListener('submit', function (event) {
                     teamForm.reset();
                     selectedStudentsList.innerHTML = ''; // Resetta la lista degli studenti selezionati
                     location.reload();
+                } else if (response.status === 409) {
+                    alert('Errore: Il team esiste già. Inserisci un nome diverso.');
                 } else {
                     alert('Errore durante la creazione del team.');
                 }
             })
             .catch(error => console.error('Errore:', error));
+        
 });
 teamSelect.addEventListener('change', () => {
         const selectedTeam = teamSelect.value; // Ottieni il valore del team selezionato
