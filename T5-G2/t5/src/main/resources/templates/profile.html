@@ -150,7 +150,8 @@
                                     th:id="'statistic-' + ${element.StatisticID}" 
                                     class="row statistic-row"
                                     th:data-robot="${IdToStatistic.get(element.StatisticID).robot}"
-                                    th:data-gamemode="${IdToStatistic.get(element.StatisticID).gamemode}">
+                                    th:data-gamemode="${IdToStatistic.get(element.StatisticID).gamemode}"
+                                    th:data-role="${IdToStatistic.get(element.StatisticID).role}">
                                     <!--<div class="col-1">
                                         I
                                     </div>-->
@@ -166,8 +167,11 @@
                                          class="row ratio-row" 
                                          th:data-robot="${ratio.robot}" 
                                          th:data-gamemode="${ratio.gamemode}">
-                                        <div class="col-8" th:text="'Ratio ' + ${ratio.value}">
-                                            Ratio 0.0
+                                        <div class="col-8" th:text="'Ratio ' ">
+                                            Ratio 
+                                        </div>
+                                        <div class="col text-right" th:text="${ratio.value}">
+                                            1000
                                         </div>
                                     </div>
                                 </div>

@@ -228,21 +228,24 @@ $('#searchPlayerModal').on('hidden.bs.modal', function () {
   location.reload(); // Ricarica l'intera pagina
 });
 
+// Manteniamo invariato il codice esistente per i filtri delle statistiche
 let currentRobot = null; // Filtro disattivato per Robot
 let currentGameMode = null; // Filtro disattivato per GameMode
 
 // Aggiorna il filtro per Robot e il testo del bottone
 function selectRobotFilter(robotType) {
     currentRobot = robotType;
-    document.getElementById('robotFilterDropdown').innerText = robotType; // Aggiorna il testo del bottone
-    filterStatistics(); // Applica il filtro
+    document.getElementById('robotFilterDropdown').innerText = robotType;
+    filterStatistics();
+    updateRatioVisibility(); // Verifica e aggiorna la visibilità della ratio
 }
 
 // Aggiorna il filtro per GameMode e il testo del bottone
 function selectGameModeFilter(gameMode) {
     currentGameMode = gameMode;
-    document.getElementById('gameModeFilterDropdown').innerText = gameMode; // Aggiorna il testo del bottone
-    filterStatistics(); // Applica il filtro
+    document.getElementById('gameModeFilterDropdown').innerText = gameMode;
+    filterStatistics();
+    updateRatioVisibility(); // Verifica e aggiorna la visibilità della ratio
 }
 
 // Applica i filtri alle statistiche
@@ -271,16 +274,73 @@ function filterStatistics() {
     });
 }
 
+function updateRatioVisibility() {
+    
+    if (currentRobot === null || currentGameMode === null) {
+        document.getElementById('ratio-container').style.display = 'none'; // Nascondi la ratio
+        return;
+    }
+
+    const statisticsRows = document.querySelectorAll('.statistic-row');
+    let hasGamesPlayed = false;
+    let hasGamesWon = false;
+
+    // Verifica se esistono statistiche filtrate con ruolo "GamesPlayed" e "GamesWon"
+    statisticsRows.forEach(row => {
+        const isVisible = row.style.display !== 'none'; // La riga è visibile dopo il filtraggio
+        if (isVisible) {
+            const statisticID = row.id.split('-')[1]; // Estrai l'ID della statistica
+            const role = row.getAttribute('data-role');
+            if (role === 'GamesPlayed') {
+                hasGamesPlayed = true;
+            }
+            if (role === 'GamesWon') {
+                hasGamesWon = true;
+            }
+        }
+    });
+
+    const ratioContainer = document.getElementById('ratio-container');
+    if (hasGamesPlayed && hasGamesWon) {
+        // Mostra la ratio corrispondente ai filtri selezionati
+        const ratioRows = document.querySelectorAll('.ratio-row');
+        let hasVisibleRatio = false;
+
+        ratioRows.forEach(row => {
+            const robot = row.getAttribute('data-robot');
+            const gamemode = row.getAttribute('data-gamemode');
+
+            const robotMatch = (currentRobot === null) || (robot === currentRobot);
+            const gameModeMatch = (currentGameMode === null) || (gamemode === currentGameMode);
+
+            if (robotMatch && gameModeMatch) {
+                row.style.display = ''; // Mostra la riga della ratio
+                hasVisibleRatio = true;
+            } else {
+                row.style.display = 'none'; // Nascondi la riga della ratio
+            }
+        });
+
+        // Mostra il contenitore della ratio solo se esiste almeno una ratio visibile
+        ratioContainer.style.display = hasVisibleRatio ? '' : 'none';
+    } else {
+        // Nascondi il contenitore della ratio se non ci sono statistiche valide
+        ratioContainer.style.display = 'none';
+    }
+}
+
 // Resetta i filtri e il testo dei bottoni
 function clearFilter() {
     currentRobot = null;
     currentGameMode = null;
 
-    document.getElementById('robotFilterDropdown').innerText = 'Robot'; // Ripristina il testo del bottone
-    document.getElementById('gameModeFilterDropdown').innerText = 'GameMode'; // Ripristina il testo del bottone
+    document.getElementById('robotFilterDropdown').innerText = 'Robot';
+    document.getElementById('gameModeFilterDropdown').innerText = 'GameMode';
 
     const statisticsRows = document.querySelectorAll('.statistic-row');
     statisticsRows.forEach(row => {
-        row.style.display = ''; // Mostra tutte le righe
+        row.style.display = '';
     });
+
+    document.getElementById('ratio-container').style.display = 'none'; // Nascondi la ratio
 }
