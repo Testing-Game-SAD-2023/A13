@@ -25,7 +25,6 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-
 	stat, err := api.FromUrlParams[CustomString](r, "statistic")
 	if err != nil {
 		return err
