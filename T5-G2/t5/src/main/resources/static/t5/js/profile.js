@@ -388,5 +388,47 @@ document.addEventListener("DOMContentLoaded", () => {
     activateButton("profile");
     showSection("profile");
 
+    //GabMan 10/12 - Caricamento immagine profilo
+    document.addEventListener("DOMContentLoaded", () => {
+        const uploadButton = document.getElementById("uploadProfilePictureButton");
+        const uploadForm = document.getElementById("uploadProfilePictureForm");
+    
+        // Mostra il form di upload quando si clicca sul pulsante +
+        uploadButton.addEventListener("click", () => {
+            uploadForm.style.display = uploadForm.style.display === "none" ? "block" : "none";
+        });
+    });
+    
+    const uploadProfilePicture = async () => {
+        const fileInput = document.getElementById("profilePictureUploadInput");
+        const formData = new FormData();
+    
+        if (fileInput.files.length > 0) {
+            formData.append("profilePicture", fileInput.files[0]);
+    
+            try {
+                const response = await fetch("/updateProfilePicture", {
+                    method: "POST",
+                    body: formData,
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    alert("Immagine caricata con successo!");
+                    // Aggiorna l'immagine del profilo con quella caricata
+                    document.getElementById("currentProfilePicture").src = data.imageUrl;
+                } else {
+                    alert("Errore durante il caricamento dell'immagine.");
+                }
+            } catch (error) {
+                console.error("Errore durante il caricamento:", error);
+                alert("Errore durante il caricamento.");
+            }
+        } else {
+            alert("Seleziona un file da caricare.");
+        }
+    };
+    
+
 });
 

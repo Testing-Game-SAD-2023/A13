@@ -54,6 +54,16 @@
                         <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')" style="width: 50px; height: 50px; margin-right: 5px;">
                         <img src="/t5/images/sampleavatar.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
                         <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatar.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
+                        <!-- Pulsante + per l'upload immagine -->
+                        <button id="uploadProfilePictureButton" class="btn btn-outline-primary" style="width: 50px; height: 50px; font-size: 1.5rem; line-height: 1;">+</button>
+
+                        <!-- Form di upload immagine -->
+                        <form id="uploadProfilePictureForm" style="display: none;" enctype="multipart/form-data">
+                            <label for="profilePictureUploadInput" style="display: block; margin-top: 15px;">Carica la tua immagine di profilo:</label>
+                            <input type="file" id="profilePictureUploadInput" name="profilePicture" accept="image/*" class="form-control-file">
+                            <button type="button" class="btn btn-primary mt-2" onclick="uploadProfilePicture()">Carica</button>
+                        </form>
+
                         <form action="/updateAvatar" method="POST">
                             <input type="hidden" id="selectedAvatar" name="avatar" value="">
                             <button id="saveAvatarButton" class="btn btn-primary mt-2" type="submit">Salva</button>

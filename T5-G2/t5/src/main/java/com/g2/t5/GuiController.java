@@ -734,7 +734,7 @@ public class GuiController {
 
     //GabMan 09/12 (Ottengo ID utente)
     @GetMapping("/getUserId")
-public ResponseEntity<Map<String, String>> getUserId(@CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<Map<String, String>> getUserId(@CookieValue(name = "jwt", required = false) String jwt) {
     try {
         // Usa il metodo esistente per estrarre l'userId
         Integer userId = extractUserIdFromJwt(jwt);
@@ -751,6 +751,54 @@ public ResponseEntity<Map<String, String>> getUserId(@CookieValue(name = "jwt", 
         System.err.println("Errore durante il recupero dell'userId: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore generico
     }
+
+    //GabMan 10/12  Upload Immagine di Profilo
+    @PostMapping("/updateProfilePicture")
+    public ResponseEntity<Map<String, String>> updateProfilePicture(
+    @RequestParam("profilePicture") MultipartFile file,
+    @CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica se il token JWT è valido e decodifica per ottenere l'ID utente
+        Integer userId = extractUserIdFromJwt(jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Utente non autenticato."));
+        }
+
+        // Validazione del file
+        String fileType = file.getContentType();
+        if (fileType == null || !fileType.startsWith("image/")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Il file caricato non è un'immagine valida."));
+        }
+
+        // Genera un nome file univoco basato sull'ID utente
+        String fileName = "user_" + userId + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get("uploads/profile_pictures/" + fileName);
+
+        // Crea la directory se non esiste
+        Files.createDirectories(filePath.getParent());
+
+        // Salva il file nel percorso specificato
+        Files.write(filePath, file.getBytes());
+
+        // Genera l'URL del file per l'accesso pubblico
+        String imageUrl = "/uploads/profile_pictures/" + fileName;
+
+        // Aggiorna il profilo utente con l'URL dell'immagine
+        t23Service.updateAvatar(userId, imageUrl);
+
+        // Restituisce l'URL dell'immagine al client
+        return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+    } catch (IOException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Errore durante il salvataggio dell'immagine."));
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Errore durante l'elaborazione della richiesta."));
+    }
+}
+
 }
 
 

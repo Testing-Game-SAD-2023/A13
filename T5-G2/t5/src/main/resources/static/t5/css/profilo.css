@@ -180,3 +180,59 @@ body {
     transition: all 0.3s ease-in-out; /* Animazione */
 }
 
+/* Stile per il pulsante + nel caricamento immagine*/
+#uploadProfilePictureButton {
+    border: 2px dashed #007bff; /* Bordo tratteggiato */
+    border-radius: 50%; /* Forma circolare */
+    background-color: transparent; /* Sfondo trasparente */
+    color: #007bff; /* Colore del testo */
+    width: 50px; /* Larghezza del pulsante */
+    height: 50px; /* Altezza del pulsante */
+    display: inline-flex; /* Allinea il contenuto al centro */
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem; /* Dimensione del testo */
+    line-height: 1;
+    cursor: pointer; /* Cursore a forma di mano */
+    transition: all 0.3s ease-in-out; /* Animazione morbida */
+}
+
+/* Hover: evidenziazione quando si passa sopra il pulsante */
+#uploadProfilePictureButton:hover {
+    background-color: #007bff; /* Sfondo blu */
+    color: white; /* Colore del testo bianco */
+}
+
+/* Form di upload immagine */
+#uploadProfilePictureForm {
+    margin-top: 15px; /* Distanza dal pulsante + */
+    padding: 10px;
+    border: 1px solid #ddd; /* Bordo sottile */
+    border-radius: 5px; /* Angoli arrotondati */
+    background-color: #f9f9f9; /* Sfondo chiaro */
+    display: none; /* Nasconde inizialmente */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Effetto ombra */
+}
+
+/* Input di caricamento file */
+#profilePictureUploadInput {
+    display: block; /* Forza un comportamento di blocco */
+    margin-bottom: 10px; /* Spaziatura inferiore */
+    font-size: 1rem; /* Dimensione del testo */
+}
+
+/* Pulsante "Carica" */
+#uploadProfilePictureForm button {
+    background-color: #007bff; /* Sfondo blu */
+    color: white; /* Testo bianco */
+    border: none; /* Rimuove il bordo */
+    padding: 10px 20px; /* Spaziatura interna */
+    border-radius: 5px; /* Angoli arrotondati */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out; /* Animazione morbida */
+}
+
+#uploadProfilePictureForm button:hover {
+    background-color: #0056b3; /* Colore blu più scuro al passaggio del mouse */
+}
+
