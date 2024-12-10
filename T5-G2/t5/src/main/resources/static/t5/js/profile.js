@@ -187,6 +187,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    //User Id GabMan 10/12
+    const displayUserId = async () => {
+        try {
+            // Chiamata all'endpoint per ottenere l'userId
+            const response = await fetch('/getUserId');
+            if (response.ok) {
+                const data = await response.json();
+                const userId = data.userId;
+    
+                // Mostra l'userId in un elemento HTML
+                const userIdElement = document.getElementById('userIdDisplay');
+                if (userIdElement) {
+                    userIdElement.textContent = `User ID: ${userId}`;
+                } else {
+                    console.error("Elemento HTML per visualizzare l'userId non trovato.");
+                }
+            } else {
+                console.error('Errore nel recupero dell\'userId.');
+            }
+        } catch (error) {
+            console.error('Errore nella connessione al server:', error);
+        }
+    };
+    
+    // Esegui la funzione quando la pagina viene caricata
+    window.onload = displayUserId;
+    
+
     // Carica le informazioni al caricamento della pagina
     loadBiography();
     loadUserInfo();

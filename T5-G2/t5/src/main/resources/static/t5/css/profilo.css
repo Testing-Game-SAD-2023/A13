@@ -157,3 +157,26 @@ body {
     display: none;
     margin-top: 10px;
 }
+
+/* Contenitore principale per l'userId */
+#userIdDisplay {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2rem;
+    color: #333; /* Colore testo */
+    background-color: #f9f9f9; /* Colore di sfondo */
+    border: 1px solid #ddd; /* Bordo sottile */
+    border-radius: 8px; /* Angoli arrotondati */
+    padding: 10px 20px; /* Spaziatura interna */
+    margin: 20px auto; /* Spaziatura esterna */
+    text-align: center; /* Allinea il testo al centro */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Effetto ombra */
+    max-width: 400px; /* Larghezza massima */
+}
+
+/* Hover per un effetto interattivo */
+#userIdDisplay:hover {
+    background-color: #eef; /* Colore di sfondo chiaro al passaggio del mouse */
+    border-color: #aaa; /* Cambia il colore del bordo */
+    transition: all 0.3s ease-in-out; /* Animazione */
+}
+

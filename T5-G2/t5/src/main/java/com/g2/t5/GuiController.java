@@ -732,6 +732,28 @@ public class GuiController {
     }
     }
 
+    //GabMan 09/12 (Ottengo ID utente)
+    @GetMapping("/getUserId")
+public ResponseEntity<Map<String, String>> getUserId(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Usa il metodo esistente per estrarre l'userId
+        Integer userId = extractUserIdFromJwt(jwt);
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Utente non autenticato
+        }
+
+        // Restituisci l'userId come risposta JSON
+        Map<String, String> response = new HashMap<>();
+        response.put("userId", userId.toString());
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        System.err.println("Errore durante il recupero dell'userId: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore generico
+    }
+}
+
+
 
 
 
