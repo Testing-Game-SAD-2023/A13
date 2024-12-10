@@ -586,7 +586,7 @@ import org.springframework.web.bind.annotation.RequestParam;
     /**
      * Recupera tutte le challenge associate a un team.
      */
-    @GetMapping("/team/{teamId}")
+    @GetMapping("/team/team_Id")
     public ResponseEntity<List<Challenge>> getChallengesByTeam(
             @PathVariable String teamId,
             @CookieValue(name = "jwt", required = false) String jwt) {
@@ -628,7 +628,7 @@ import org.springframework.web.bind.annotation.RequestParam;
         /**
      * Verifica se una challenge è completata.
      */
-    @GetMapping("/challenges/challenge_Id}/completion/player_Id")
+    @GetMapping("/challenges/challenge_Id/completion/player_Id")
     public ResponseEntity<Boolean> isChallengeCompleted(
             @PathVariable String challengeId,
             @PathVariable int playerId,
