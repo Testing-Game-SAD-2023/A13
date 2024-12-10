@@ -53,7 +53,6 @@ func (gs *Repository) FindIntervalByPlayerID(reader *LeaderboardReader, playerId
 
 		err := gs.db.Raw(query, fmt.Sprintf("%d", playerId)).Take(&playerPosition).Error
 
-
 		if err != nil {
 			return err
 		}
@@ -66,6 +65,10 @@ func (gs *Repository) FindIntervalByPlayerID(reader *LeaderboardReader, playerId
 		err = gs.db.Raw(query, limit, offset).Scan(&rows).Error
 		if err != nil {
 			return err
+		}
+
+		if rows == nil {
+			return api.ErrNotFound
 		}
 
 		return err
@@ -109,6 +112,10 @@ func (gs *Repository) FindIntervalByPage(reader *LeaderboardReader, startPage in
 
 	if err != nil {
 		return leaderboard, api.MakeServiceError(err)
+	}
+
+	if rows == nil {
+		return leaderboard, api.ErrNotFound
 	}
 
 	err = gs.db.Table("player_stats").Count(&totalLength).Error
