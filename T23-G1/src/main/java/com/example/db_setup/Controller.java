@@ -1149,6 +1149,7 @@ public class Controller {
     }
     }
 
+    /*
     //10/12 Update profile picture
     @PostMapping("/updateProfilePicture")
     public ResponseEntity<Boolean> updateProfilePicture(
@@ -1173,13 +1174,14 @@ public class Controller {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
     }
+    */
 }
 
 
     
 
 
-}
+
 
 
 

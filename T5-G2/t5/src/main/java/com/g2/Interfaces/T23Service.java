@@ -341,6 +341,7 @@ import org.springframework.web.util.UriComponentsBuilder;
         }
     }
 
+    /*
     //GabMan 10/12 Caricamento Immagine
     public Boolean updateAvatarWithImage(Integer userId, String base64Image) {
         final String endpoint = "/updateProfilePicture";
@@ -358,6 +359,7 @@ import org.springframework.web.util.UriComponentsBuilder;
             return false;
         }
     }
+    */
     
 
 }

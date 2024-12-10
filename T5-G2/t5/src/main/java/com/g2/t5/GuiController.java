@@ -752,6 +752,7 @@ public class GuiController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore generico
     }
 
+    /*
     //GabMan 10/12  Upload Immagine di Profilo
     @PostMapping("/updateProfilePicture")
     public ResponseEntity<Map<String, String>> updateProfilePicture(
@@ -790,6 +791,7 @@ public class GuiController {
                              .body(Map.of("error", "Errore durante il salvataggio del file."));
     }
 }
+*/
 
 
 }
