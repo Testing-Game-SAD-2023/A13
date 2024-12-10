@@ -516,38 +516,34 @@ public class GuiController {
     }
     }
     
-    @DeleteMapping("/deleteFriend/{friendId}")
-    public ResponseEntity<String> deleteFriend(
-        @CookieValue(name = "jwt", required = false) String jwt, 
-        @PathVariable Integer friendId) {
-        try {
-            // Controlla che il token JWT non sia null o vuoto
-            if (jwt == null || jwt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o mancante.");
-            }
-
-            // Estrai l'ID utente dal token JWT
-            Integer userId = extractUserIdFromJwt(jwt);
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ID utente non valido nel token.");
-            }
-
-            // Chiama il servizio per eliminare l'amico
-            boolean success = t23Service.deleteFriend(friendId, jwt);
-            if (!success) {
-                // In caso di errore durante l'eliminazione dell'amico
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante l'eliminazione dell'amico.");
-            }
-
-            // Se l'eliminazione va a buon fine
-            return ResponseEntity.ok("Amico eliminato con successo.");
-        } catch (Exception e) {
-            // Log dell'errore (aggiungi un logger adeguato, per esempio SLF4J)
-            // logger.error("Errore durante l'eliminazione dell'amico: ", e);
-            
-            // Restituisci una risposta generica in caso di errore
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
+   @DeleteMapping("/deleteFriendByNickname")
+    public ResponseEntity<String> deleteFriendByNickname(
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam(required = false) String nickname) { // Cambia friendId in nickname
+    try {
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o mancante.");
         }
+
+        if (nickname == null || nickname.isEmpty()) {
+            return ResponseEntity.badRequest().body("Nickname non fornito.");
+        }
+
+        Integer userId = extractUserIdFromJwt(jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ID utente non valido nel token.");
+        }
+
+        // Chiama il servizio per eliminare l'amico
+        boolean success = t23Service.deleteFriendByNickname(nickname, jwt);
+        if (!success) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Amicizia non trovata.");
+        }
+
+        return ResponseEntity.ok("Amico eliminato con successo.");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
+    }
     }
 
 

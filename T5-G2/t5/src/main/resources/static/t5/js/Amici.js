@@ -39,13 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     const friendInfo = document.createElement("div");
                     friendInfo.className = "friend-info flex-grow-1";
                     // Mostra il nickname e il friend_id
-                    friendInfo.textContent = `${friend.nickname} (ID: ${friend.friend_id})`;
+                    friendInfo.textContent = `UserID: ${friend.userId} ${friend.nickname} (ID: ${friend.friendId})`;
 
                     const deleteButton = document.createElement("button");
                     deleteButton.className = "btn btn-danger btn-sm ms-auto";
                     deleteButton.textContent = "Elimina";
-                    // Usa il friend_id per eliminare
-                    deleteButton.addEventListener("click", () => deleteFriend(friend.friend_id));
+                    deleteButton.addEventListener("click", () => deleteFriendByNickname(friend.nickname));
 
                     friendItem.append(avatar, friendInfo, deleteButton);
                     friendsContainer.appendChild(friendItem);
@@ -106,28 +105,32 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    function deleteFriend(friendId) {
-        console.log("Tentativo di eliminare amico con ID:", friendId); // Debug
-        if (!friendId) {
-            console.error("Errore: ID non valido:", friendId);
-            return;
-        }
-        fetch(`/deleteFriend/${friendId}`, { // Usa l'ID nell'URL
+    function deleteFriendByNickname(nickname) {
+        fetch(`/deleteFriendByNickname?nickname=${encodeURIComponent(nickname)}`, {
             method: "DELETE",
             credentials: "include",
         })
-            .then(response => {
-                if (!response.ok) throw new Error("Errore durante l'eliminazione dell'amico.");
+            .then((response) => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error("Amicizia non trovata.");
+                    } else if (response.status === 401) {
+                        throw new Error("Non autorizzato. Accedi di nuovo.");
+                    }
+                    throw new Error("Errore durante l'eliminazione dell'amico.");
+                }
                 return response.text();
             })
-            .then(message => {
-                alert(message);
+            .then((message) => {
+                console.log(message);
                 loadFriends();
             })
-            .catch(error => {
-                alert(error.message);
+            .catch((error) => {
+                console.error("Errore:", error.message);
             });
     }
+    
+    
 
     searchFriendButton.addEventListener("click", searchFriend);
     addFriendButton.addEventListener("click", addFriend);

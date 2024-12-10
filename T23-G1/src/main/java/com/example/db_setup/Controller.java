@@ -929,6 +929,7 @@ public class Controller {
             Map<String, String> friendData = new HashMap<>();
             friendData.put("nickname", friend.get("nickname").toString());
             friendData.put("avatar", friend.get("avatar").toString()); // Recuperato dalla tabella students
+            friendData.put("friendId", friend.get("friendId").toString());
             friendListResponse.add(friendData);
         }
 
@@ -1001,38 +1002,32 @@ public class Controller {
         }
     }
 
-    @DeleteMapping("/deleteFriend/{friendId}")
-    public ResponseEntity<String> deleteFriend(
+   @DeleteMapping("/deleteFriendByNickname")
+    public ResponseEntity<String> deleteFriendByNickname(
         @CookieValue(name = "jwt", required = false) String jwt,
-        @PathVariable Integer friendId) {
+        @RequestParam String nickname) { // Cambia Integer in String
         try {
-            // Controllo del token JWT
             if (jwt == null || jwt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o assente.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o mancante.");
             }
 
-            // Estrazione dell'ID utente dal token JWT
+            // Estrai l'ID utente dal token JWT
             Integer userId = extractUserIdFromJwt(jwt);
             if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ID utente non valido nel token.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ID utente non valido.");
             }
 
-            // Controlla se l'amicizia esiste
-            boolean friendshipExists = friendRepository.existsFriendship(userId, friendId);
-            if (!friendshipExists) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Amicizia non trovata.");
-            }
 
-            // Elimina l'amicizia
-            friendRepository.deleteFriend(userId, friendId);
+            // Elimina l'amicizia basata sul nickname
+            friendRepository.deleteByUserIdAndNickname(userId, nickname);
             return ResponseEntity.ok("Amico eliminato con successo.");
         } catch (Exception e) {
-            // Log dell'errore per il debug
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Si è verificato un errore durante l'eliminazione dell'amico.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
         }
     }
+
+    
+
 
 
 

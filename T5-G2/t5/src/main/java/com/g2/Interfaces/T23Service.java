@@ -33,6 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.client.HttpClientErrorException;
 
 //fine noi
 
@@ -80,9 +81,10 @@ import org.springframework.web.util.UriComponentsBuilder;
          registerAction("AddFriend", new ServiceActionDefinition(
                  params -> addFriend((String) params[0], (String) params[1])
          ));
-         registerAction("deleteFriend", new ServiceActionDefinition(
-                params -> deleteFriend((Integer) params[0], (String) params[1])
-         ));
+         registerAction("deleteFriendByNickname", new ServiceActionDefinition(
+                params -> deleteFriendByNickname((String) params[0], (String) params[1])
+        ));
+
         
      }
     
@@ -272,36 +274,36 @@ import org.springframework.web.util.UriComponentsBuilder;
         }
     }
 
-    public boolean deleteFriend(Integer friendId, String jwt) {
-        final String endpoint = "/deleteFriend/" + friendId;
+    public boolean deleteFriendByNickname(String nickname, String jwt) {
+    final String endpoint = "/deleteFriendByNickname?nickname=" + nickname;
 
-        try {
-            // Impostazione degli header con il token JWT
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + jwt);
-            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+    try {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwt);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-            // Esegui la richiesta HTTP POST
-            ResponseEntity<String> response = restTemplate.exchange(
-                BASE_URL + endpoint, // Usa query parameter per passare friendId
-                HttpMethod.DELETE, 
-                requestEntity, 
-                String.class
-            );
+        ResponseEntity<String> response = restTemplate.exchange(
+            BASE_URL + endpoint,
+            HttpMethod.DELETE,
+            requestEntity,
+            String.class
+        );
 
-            // Verifica se la risposta è OK (200)
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return true;
-            } else {
-                // Se la risposta non è OK, logga il messaggio di errore
-                System.err.println("Errore durante l'eliminazione dell'amico: " + response.getBody());
-                return false;
-            }
-        } catch (Exception e) {
-            System.err.println("Errore durante l'eliminazione dell'amico: " + e.getMessage());
-            return false;
-        }
+        return response.getStatusCode() == HttpStatus.OK;
+    } catch (HttpClientErrorException.NotFound e) {
+        System.err.println("Amicizia non trovata per nickname: " + nickname + ". " + e.getMessage());
+        return false;
+    } catch (HttpClientErrorException.Unauthorized e) {
+        System.err.println("Token JWT non valido: " + e.getMessage());
+        return false;
+    } catch (Exception e) {
+        System.err.println("Errore durante l'eliminazione dell'amico con nickname: " + nickname + ". " + e.getMessage());
+        return false;
     }
+    }
+
+
+
 
 
 

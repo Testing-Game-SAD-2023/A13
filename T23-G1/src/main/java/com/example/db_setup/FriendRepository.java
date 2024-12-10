@@ -16,17 +16,20 @@ import java.util.Map;
 public interface FriendRepository extends JpaRepository<Friend, Integer> {
 
     // Metodo per ottenere la lista degli amici con i dettagli (nickname e avatar) dalla tabella students
-    @Query("SELECT new map(f.id.friendId as friendId, u.nickname as nickname, u.avatar as avatar) " +
-       "FROM Friend f " +
-       "JOIN User u ON f.id.friendId = u.ID " +
-       "WHERE f.id.userId = :userId")
+    @Query(value = "SELECT uf.friend_id AS friendId, s.nickname AS nickname, s.avatar AS avatar " +
+               "FROM user_friends uf " +
+               "JOIN students s ON uf.friend_id = s.ID " +
+               "WHERE uf.user_id = :userId", nativeQuery = true)
     List<Map<String, Object>> findFriendDetailsByUserId(@Param("userId") int userId);
+
+
 
 
       // Aggiunge una relazione
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO user_friends (user_id, friend_id) " +
+    @Query(value = "INSERT INTO user_friends (user_id, friend_id, nickname) " +
+               "SELECT :userId, :friendId, s.nickname " +
                "SELECT :userId, :friendId " +
                "WHERE NOT EXISTS (SELECT 1 FROM user_friends WHERE user_id = :userId AND friend_id = :friendId)", 
        nativeQuery = true)
@@ -39,11 +42,11 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
 
  
     
-  // Elimina una relazionedimmi 
   @Modifying
   @Transactional
-  @Query("DELETE FROM Friend f WHERE f.id.userId = :userId AND f.id.friendId = :friendId")
-  void deleteFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+  @Query("DELETE FROM Friend f WHERE f.id.userId = :userId AND f.nickname = :nickname")
+  void deleteByUserIdAndNickname(@Param("userId") Integer userId, @Param("nickname") String nickname);
+
 
 
 
