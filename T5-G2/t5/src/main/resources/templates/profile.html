@@ -161,8 +161,9 @@
                 <div class="card-body">
                     <!-- Barra di ricerca in un contenitore dedicato -->
                     <div class="friend-search">
+                        <i class="fas fa-search search-icon"></i>
                         <input type="text" id="friend-search-input" class="form-control"
-                               placeholder="Cerca amico per email..." autocomplete="off">
+                               placeholder="    Cerca amico per email..." autocomplete="off">
                         <ul id="friend-suggestions" class="list-group"></ul>
                     </div>
 
@@ -183,6 +184,14 @@
                     <div class="tab-content">
                         <!-- Tab Followers -->
                         <div class="tab-pane fade show active" id="followers-content">
+                            <!--Barra di ricerca per followers-->
+                            <div class="tab-search-container">
+                                <input type="text"
+                                    class="form-control tab-search"
+                                    placeholder="Cerca tra i followers..."
+                                    data-search-target="followers">
+                            </div>
+
                             <div class="friends-list">
                                 <div th:if="${followersList != null and !followersList.empty}"
                                     th:each="follower : ${followersList}"
@@ -201,6 +210,13 @@
 
                         <!-- Tab Following -->
                         <div class="tab-pane fade" id="following-content">
+                            <!-- Barra di ricerca per followings -->
+                            <div class="tab-search-container">
+                                <input type="text"
+                                    class="form-control tab-search"
+                                    placeholder="Cerca tra i following..."
+                                    data-search-target="following">
+                            </div>
                             <div class="friends-list">
                                 <div th:if="${followingList != null and !followingList.empty}"
                                     th:each="follow : ${followingList}"
@@ -211,7 +227,7 @@
                                     </div>
                                     <a th:href="@{'/friend/' + ${follow.id}}" class="btn btn-custom btn-sm">Visualizza Profilo</a>
                                 </div>
-                                <div th:if="${followingList == null or followingList.empty}" class="text-muted">
+                                <div th:if="${followingList == null or followingList.empty}" class="mb-1">
                                     Nessun following trovato
                                 </div>
                             </div>

@@ -103,6 +103,68 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    //Funzione per la ricerca amici in tempo reale
+    function setupTabSearch() {
+        const searchInputs = document.querySelectorAll('.tab-search');
+
+        searchInputs.forEach(searchInput => {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const targetTab = this.getAttribute('data-search-target');
+                const container = document.querySelector(`#${targetTab}-content .friends-list`);
+                const friendItems = container.querySelectorAll('.friend-item');
+
+                friendItems.forEach(item => {
+                    const name = item.querySelector('h5').textContent.toLowerCase();
+                    const email = item.querySelector('p').textContent.toLowerCase();
+
+                    if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                        item.classList.remove('hidden');
+                        // Evidenzia il testo che corrisponde alla ricerca
+                        highlightText(item, searchTerm);
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    }
+
+    // Funzione per evidenziare il testo cercato
+    function highlightText(item, searchTerm) {
+        if (searchTerm === '') {
+            // Ripristina il testo originale se la ricerca è vuota
+            item.querySelector('h5').innerHTML = item.querySelector('h5').textContent;
+            item.querySelector('p').innerHTML = item.querySelector('p').textContent;
+            return;
+        }
+
+        const nameElement = item.querySelector('h5');
+        const emailElement = item.querySelector('p');
+
+        const highlightMatch = (text, term) => {
+            const regex = new RegExp(`(${term})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        };
+
+        nameElement.innerHTML = highlightMatch(nameElement.textContent, searchTerm);
+        emailElement.innerHTML = highlightMatch(emailElement.textContent, searchTerm);
+    }
+
+    // Aggiungi stile per il testo evidenziato
+    const style = document.createElement('style');
+    style.textContent = `
+        .highlight {
+            background-color: rgba(0, 123, 255, 0.2);
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Inizializza la ricerca
+    setupTabSearch();
+
     // Gestione dei tab dei trofei
     const trophyTabs = document.querySelectorAll('#trophyTabs button[data-bs-toggle="tab"]');
     trophyTabs.forEach(tab => {
