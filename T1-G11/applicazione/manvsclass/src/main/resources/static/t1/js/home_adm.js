@@ -175,7 +175,37 @@ document.querySelector('.button-class').addEventListener('click', function() {
   window.location.href = "/class";  // Reindirizza alla pagina delle classi
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarToggle = document.querySelector('.sidebar-toggle');
 
+  // Funzione per nascondere/mostrare la sidebar in base alla larghezza dello schermo
+  function handleResize() {
+      if (window.innerWidth <= 768) {
+          sidebar.style.display = 'none';  // Nascondi la sidebar su schermi piccoli
+          sidebarToggle.style.display = 'block';  // Mostra la freccia
+      } else {
+          sidebar.style.display = 'block';  // Mostra la sidebar su schermi grandi
+          sidebarToggle.style.display = 'none';  // Nascondi la freccia
+      }
+  }
+
+  // Funzione per aprire/chiudere la sidebar e ruotare la freccia
+  sidebarToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('open');  // Alterna la classe 'open' sulla sidebar
+      if (sidebar.classList.contains('open')) {
+          sidebar.style.display = 'block';  // Mostra la barra laterale
+      } else {
+          sidebar.style.display = 'none';  // Nascondi la barra laterale
+      }
+  });
+
+  // Ascolta gli eventi di resize per aggiornare la visibilità della barra laterale
+  window.addEventListener('resize', handleResize);
+
+  // Esegui una volta all'inizio per applicare la visibilità corretta
+  handleResize();
+});
 
 
 // Inizializzazione al caricamento della pagina
