@@ -16810,3 +16810,409 @@ Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No q
 2024-12-04 12:44:54 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
 2024-12-04 12:44:54 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
 2024-12-04 12:44:54 [main] ERROR com.g2.Game.GameController - [SERVICE MANAGER] Errore nella creazione del servizio: com.g2.Interfaces.ServiceManagerTest$1IncompatibleService Exception: com.g2.Interfaces.ServiceManagerTest$1IncompatibleService.<init>(org.springframework.web.client.RestTemplate)
+2024-12-09 20:50:24 [main] INFO  com.g2.Components.AuthComponentTest - Starting AuthComponentTest using Java 21.0.5 with PID 13504 (started by Antonio in C:\Users\Antonio\A13-with-Teams\T5-G2\t5)
+2024-12-09 20:50:24 [main] DEBUG com.g2.Components.AuthComponentTest - Running with Spring Boot v3.1.1, Spring v6.0.10
+2024-12-09 20:50:24 [main] INFO  com.g2.Components.AuthComponentTest - No active profile set, falling back to 1 default profile: "default"
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:28 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:29 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-12-09 20:50:29 [main] INFO  com.g2.Components.AuthComponentTest - Started AuthComponentTest in 5.804 seconds (process running for 7.949)
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:31 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:32 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:32 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:32 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:32 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:32 [main] ERROR com.g2.Components.PageBuilder - [PAGEBULDER][executeComponentsLogic] Logica fallita per il componente: ServiceLogicComponent
+2024-12-09 20:50:32 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER][executeComponentsLogic] Lista error code: [mock_error]
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:32 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] ERROR com.g2.Components.PageBuilder - [PAGEBULDER][executeComponentsLogic] Logica fallita per il componente: ServiceLogicComponent
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER][executeComponentsLogic] Lista error code: [Service_Logic_error_1]
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] ERROR com.g2.Components.PageBuilder - [PAGEBULDER][executeComponentsLogic] Logica fallita per il componente: ServiceLogicComponent
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER][executeComponentsLogic] Lista error code: [mock_error]
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER] Builder costruito con successo
+2024-12-09 20:50:33 [main] INFO  com.g2.Components.PageBuilder - [PAGEBULDER][executeComponentsLogic] Lista error code: []
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:33 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:34 [main] INFO  c.g2.Interfaces.ServiceManagerTest - Starting ServiceManagerTest using Java 21.0.5 with PID 13504 (started by Antonio in C:\Users\Antonio\A13-with-Teams\T5-G2\t5)
+2024-12-09 20:50:34 [main] DEBUG c.g2.Interfaces.ServiceManagerTest - Running with Spring Boot v3.1.1, Spring v6.0.10
+2024-12-09 20:50:34 [main] INFO  c.g2.Interfaces.ServiceManagerTest - The following 1 profile is active: "test"
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:35 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2024-12-09 20:50:36 [main] INFO  c.g2.Interfaces.ServiceManagerTest - Started ServiceManagerTest in 2.082 seconds (process running for 14.739)
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] ERROR com.g2.Game.GameController - [SERVICE MANAGER] Errore nella creazione del servizio: com.g2.Interfaces.ServiceManagerTest$1InvalidService Exception: com.g2.Interfaces.ServiceManagerTest$1InvalidService.<init>(org.springframework.web.client.RestTemplate)
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] ERROR com.g2.Game.GameController - [SERVICE MANAGER] Errore nella creazione del servizio: com.g2.Interfaces.ServiceManagerTest$1AbstractService Exception: com.g2.Interfaces.ServiceManagerTest$1AbstractService.<init>(org.springframework.web.client.RestTemplate)
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1Service
+2024-12-09 20:50:36 [main] ERROR com.g2.Game.GameController - [SERVICE MANAGER] Il servizio: T1Service è già registrato.
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:36 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:37 [main] ERROR com.g2.Game.GameController - [SERVICE MANAGER][HandleRequest] ServiceNotFound NonExistentService
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T1Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T1
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T23Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T23
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T4Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T4
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] "ServiceCreation: T7Service
+2024-12-09 20:50:37 [main] INFO  com.g2.Game.GameController - [SERVICE MANAGER] Servizio registrato: T7
+2024-12-09 20:50:37 [main] ERROR com.g2.Game.GameController - [SERVICE MANAGER] Errore nella creazione del servizio: com.g2.Interfaces.ServiceManagerTest$1IncompatibleService Exception: com.g2.Interfaces.ServiceManagerTest$1IncompatibleService.<init>(org.springframework.web.client.RestTemplate)

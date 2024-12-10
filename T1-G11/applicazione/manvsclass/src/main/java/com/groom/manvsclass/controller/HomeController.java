@@ -23,8 +23,9 @@
  import com.groom.manvsclass.model.filesystem.upload.FileUploadUtil;
  import com.groom.manvsclass.model.filesystem.RobotUtil;
  import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
- import com.groom.manvsclass.model.Admin; 
- import com.groom.manvsclass.model.Achievement; 
+ import com.groom.manvsclass.model.Admin;
+ import com.groom.manvsclass.model.Challenge;
+import com.groom.manvsclass.model.Achievement; 
  import com.groom.manvsclass.model.Statistic;
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.interaction; 
@@ -32,7 +33,8 @@ import com.groom.manvsclass.model.interaction;
  
  import com.groom.manvsclass.service.AchievementService;
  import com.groom.manvsclass.service.AdminService;
- import com.groom.manvsclass.service.ScalataService;
+import com.groom.manvsclass.service.ChallengeService;
+import com.groom.manvsclass.service.ScalataService;
 import com.groom.manvsclass.service.TeamService;
 import com.groom.manvsclass.service.Util;
  
@@ -83,6 +85,10 @@ import org.springframework.web.bind.annotation.RequestParam;
      // MODIFICA (29/11/2024) - Inizializzazione dei servizi aggiunti
      @Autowired
     private TeamService teamService;
+
+    // MODIFICA (10/12/2024) - Inizializzazione dei servizi aggiunti
+    @Autowired
+    private ChallengeService challengeService;
  
      @GetMapping("/home_adm")
      public ModelAndView showHomeAdmin(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -554,8 +560,58 @@ import org.springframework.web.bind.annotation.RequestParam;
         return teamService.deleteTeam(teamName, jwt);
     }
 
+    //aggiunta rotte challenges (10/12/2024)
+    
+    /**
+     * Crea una nuova challenge.
+     */
+    @PostMapping("/create")
+    public ResponseEntity<Challenge> createChallenge(
+            @RequestBody Challenge challenge,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.createChallenge(challenge, jwt);
+    }
 
+    /**
+     * Recupera una challenge tramite il nome.
+     */
+    @GetMapping("/{challengeName}")
+    public ResponseEntity<Challenge> getChallengeByName(
+            @PathVariable String challengeName,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.getChallengeByName(challengeName, jwt);
+    }
 
+    /**
+     * Recupera tutte le challenge associate a un team.
+     */
+    @GetMapping("/team/{teamId}")
+    public ResponseEntity<List<Challenge>> getChallengesByTeam(
+            @PathVariable String teamId,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.getChallengesByTeam(teamId, jwt);
+    }
+
+    /**
+     * Aggiorna lo stato di una challenge.
+     */
+    @PutMapping("/{challengeName}/status")
+    public ResponseEntity<String> updateChallengeStatus(
+            @PathVariable String challengeName,
+            @RequestBody String newStatus,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.updateChallengeStatus(challengeName, newStatus, jwt);
+    }
+
+    /**
+     * Elimina una challenge.
+     */
+    @DeleteMapping("/{challengeName}")
+    public ResponseEntity<String> deleteChallenge(
+            @PathVariable String challengeName,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.deleteChallenge(challengeName, jwt);
+    }
 
 
 
