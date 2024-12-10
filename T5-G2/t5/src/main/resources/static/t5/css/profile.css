@@ -652,6 +652,28 @@ body {
     outline: none;
 }
 
+.btn-danger {
+    background-color: #dc3545 !important; /* Rosso */
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+.btn-danger:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+/* Assicuriamoci che il bottone mantenga sempre un aspetto consistente */
+#followButton {
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+#followButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
 
 
 /* Responsive */

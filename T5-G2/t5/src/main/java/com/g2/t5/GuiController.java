@@ -289,6 +289,15 @@ public class GuiController {
                 IdToStatistic.put(stat.getID(), stat);
             }
 
+            // Mi prendo la lista dei follower e dei following
+            List<User> followersList = new ArrayList<>();
+            List<User> followingList = new ArrayList<>();
+            followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", String.valueOf(userId));
+            followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", String.valueOf(userId));
+
+            Integer followersListSize = followersList.size();
+            Integer followingListSize = followingList.size();
+
             // Decodifica JWT per ottener l'ID dell'utente autenticato
             byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
             String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
@@ -324,6 +333,10 @@ public class GuiController {
             GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
             GenericObjectComponent objImage = new GenericObjectComponent("propic", image);
             GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
+            GenericObjectComponent objFollowingList = new GenericObjectComponent("followingList", followingList);
+            GenericObjectComponent objFollowersList = new GenericObjectComponent("followersList", followersList);
+            GenericObjectComponent objFollowingListSize = new GenericObjectComponent("followingListSize", followingListSize);
+            GenericObjectComponent objFollowersListSize = new GenericObjectComponent("followersListSize", followersListSize);
 
             GenericObjectComponent objUnlockedAchievements = new GenericObjectComponent("unlockedAchievements", unlockedAchievements);
             GenericObjectComponent objLockedAchievements = new GenericObjectComponent("lockedAchievements", lockedAchievements);
@@ -337,6 +350,10 @@ public class GuiController {
             profile.setObjectComponents(objSurname);
             profile.setObjectComponents(objImage);
             profile.setObjectComponents(objBio);
+            profile.setObjectComponents(objFollowingList);
+            profile.setObjectComponents(objFollowersList);
+            profile.setObjectComponents(objFollowingListSize);
+            profile.setObjectComponents(objFollowersListSize);
             profile.setObjectComponents(objUnlockedAchievements);
             profile.setObjectComponents(objLockedAchievements);
             profile.setObjectComponents(objStatisticProgresses);
