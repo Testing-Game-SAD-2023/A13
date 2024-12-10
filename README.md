@@ -21,9 +21,10 @@
 3. Modulo T5:
     - Aggiunto il model:
       - `Ratio.java`
+    - Cambi nei test:
+      - `T23ServiceTest.java` [Model di User]
     - Modifiche a:
       - `User.java`, rispecchiando il model di T23
-      - `T23ServiceTest.java`
     - Modifiche a Controller `GuiController.java`:
       - Cambiata `/profile/{playerID}`, per gestire correttamente il prelievo degli utenti e se renderizzare pagina personale o pagina followed
       - Aggiunta le route `/profile/modifyUser`

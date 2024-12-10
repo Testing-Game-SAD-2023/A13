@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.service.annotation.PutExchange;
 import org.springframework.web.servlet.LocaleResolver;
@@ -227,7 +228,16 @@ public class GuiController {
 
         if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Utente non loggato");
 
-        return ResponseEntity.ok(userService.modifyUser(user_updated, old_psw));
+        try {
+            String result = userService.modifyUser(user_updated, old_psw);
+            return ResponseEntity.ok(result);
+        } catch (RestClientException e) { 
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(e.getCause().getMessage());
+        } catch (Exception e) {
+            System.err.println("Errore durante la modifica dell'utente: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
     }
 
     @GetMapping("/profile/searchPlayer")
@@ -236,7 +246,16 @@ public class GuiController {
 
         if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
 
-        return ResponseEntity.ok(userService.searchPlayer(key_search));
+        try {
+            return ResponseEntity.ok(userService.searchPlayer(key_search));
+        } catch (RestClientException e) { 
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            System.err.println("Errore durante la ricerca dell'utente: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
     @PostMapping("/profile/addFollow")
@@ -246,7 +265,15 @@ public class GuiController {
 
         if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
 
-        return ResponseEntity.ok(userService.addFollow(userID_1,userID_2));
+        try {
+            return ResponseEntity.ok(userService.addFollow(userID_1,userID_2));
+        } catch (RestClientException e) { 
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Errore durante l'add follow: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
     }
 
     @PostMapping("/profile/rmFollow")
@@ -256,7 +283,16 @@ public class GuiController {
 
         if(!userService.getAuthenticated(jwt)) return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(null);
 
-        return ResponseEntity.ok(userService.rmFollow(userID_1,userID_2));
+        try {
+            return ResponseEntity.ok(userService.rmFollow(userID_1,userID_2));
+        } catch (RestClientException e) { 
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Errore durante il remove follow: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
+
     }
 
 

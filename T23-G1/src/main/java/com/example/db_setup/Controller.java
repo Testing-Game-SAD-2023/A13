@@ -735,8 +735,8 @@ public class Controller {
         }
 
         if(user == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }else{      
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }else{
             return ResponseEntity.status(HttpStatus.OK).body(user);
         }
 
