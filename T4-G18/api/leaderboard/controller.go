@@ -43,7 +43,7 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 	}
 
 
-	if (pageSize == 0) || (numPages == 0) {
+	if (pageSize <= 0) || (numPages <= 0) {
 		return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
@@ -54,13 +54,12 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
         return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
-
 	startPage, err := api.FromUrlQuery[KeyType](r, "startPage", 0)
 	if err != nil {
         return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
-	if ((startPage <= 0) && (playerId <= -1)) || ((startPage > 0) && (playerId > -1)) {
+	if ((startPage <= 0) && (playerId <= 0)) || ((startPage > 0) && (playerId > 0)) {
 		return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
@@ -68,7 +67,7 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 
 	var leaderboard Leaderboard
 
-	if playerId >= 0 {
+	if playerId > 0 {
 		leaderboard, err = gc.service.FindIntervalByPlayerID(&reader, int(playerId))
 	} else {
 		leaderboard, err = gc.service.FindIntervalByPage(&reader, int(startPage))

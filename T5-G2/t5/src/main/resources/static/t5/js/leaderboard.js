@@ -3,7 +3,7 @@ const numPages = 5;
 const tableBody = document.getElementById('table-body');
 const pagination = document.getElementById('pagination');
 let lastPage = Infinity;
-let totalLength = 0; // #######################################
+let totalLength = 0;
 let cache = {}
 
 
@@ -155,7 +155,7 @@ async function getRowsByEmail(gamemode, statistic, email) {
     lastPage = totalLength === 0 ? 1 : Math.floor((totalLength - 1) / pageSize) + 1;
 
     // store fetched rows in cache
-    const startPage = Math.floor(fetchedRows[0].rank / pageSize) + 1 // ##################
+    const startPage = Math.floor(fetchedRows[0]?.rank / pageSize) + 1
     updateCache(gamemode, statistic, startPage, fetchedRows);
 
     // return page to be shown
@@ -359,7 +359,7 @@ async function searchPlayer() {
         }
     }
 
-    // fetch if not found in cache
+    // fetch if not in cache
     if (pageToShow < 1) {
         try {
             pageToShow = await getRowsByEmail(gamemode, statistic, email);

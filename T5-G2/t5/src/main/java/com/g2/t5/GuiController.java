@@ -383,16 +383,21 @@ public class GuiController {
             @RequestParam(value = "numPages") Integer numPages,
             @RequestParam(value = "startPage", required = false) Integer startPage,
             @RequestParam(value = "email", required = false) String email) {
+
+        // param validation
+        if (startPage == null)
+            startPage = 0;
+        if (email == null)
+            email = "";
+
+        if ((startPage <= 0 && email.length() == 0) || (startPage > 0 && email.length() > 0)) {
+            HashMap<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Errore nel caricamento della classifica");
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(errorResponse);
+        }
+
+        // call service
         try {
-
-            if (startPage == null)
-                startPage = 0;
-            if (email == null)
-                email = "";
-
-            if ((startPage == 0 && email.length() == 0) || (startPage > 0 && email.length() > 0)) {
-                throw new Exception();
-            }
 
             LeaderboardSubInterval lbSubInterval = new LeaderboardSubInterval();
 
@@ -405,6 +410,7 @@ public class GuiController {
             }
 
             return ResponseEntity.ok(lbSubInterval);
+
         } catch (RestClientException e) {
 
             HashMap<String, String> errorResponse = new HashMap<>();
@@ -413,15 +419,18 @@ public class GuiController {
                 HttpClientErrorException cause = (HttpClientErrorException) e.getCause();
                 if (cause.getStatusCode().value() == 404) {
                     errorResponse.put("message", "Non è stato trovato alcun giocatore");
+                    return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);
+                }
+                if (cause.getStatusCode().value() == 400) {
+                    errorResponse.put("message", "Errore nel caricamento della classifica");
+                    return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(errorResponse);
                 }
             }
-            else
-                errorResponse.put("message", "\"Errore nel caricamento della classifica");
 
-            
+            errorResponse.put("message", "Errore nel caricamento della classifica");
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
-            //System.out.println("Exception " + e.getMessage());
+            // System.out.println("Exception " + e.getMessage());
 
             HashMap<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", "Errore nel caricamento della classifica");
