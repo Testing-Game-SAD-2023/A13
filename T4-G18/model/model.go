@@ -2,8 +2,8 @@ package model
 
 import (
 	"database/sql"
-
 	"time"
+	"gorm.io/gorm"
 )
 
 
@@ -60,8 +60,6 @@ func (Game) TableName() string {
 type PlayerGame struct {
 	PlayerID  string    `gorm:"primaryKey"`
 	GameID    int64     `gorm:"primaryKey"`
-	Points 	  float64   `gorm:"default:0"`
-	GamesWon int64      `gorm:"default:0"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 	IsWinner  bool      `gorm:"default:false"`
@@ -74,6 +72,8 @@ func (PlayerGame) TableName() string {
 type Player struct {
 	ID        int64     `gorm:"primaryKey;autoIncrement"`
 	AccountID string    `gorm:"unique"`
+	Points 	  float64 	`gorm:"default:0"`
+	GamesWon int64  	`gorm:"default:0"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 	Turns     []Turn    `gorm:"foreignKey:PlayerID;constraint:OnDelete:SET NULL;"`

@@ -57,6 +57,7 @@ import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
+import com.g2.Model.PlayerDTO;
 import com.g2.Service.AchievementService;
 import com.g2.Service.LeaderboardService;
 
