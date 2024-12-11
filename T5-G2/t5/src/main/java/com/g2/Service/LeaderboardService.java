@@ -1,12 +1,14 @@
 package com.g2.Service; 
+import java.util.ArrayList;
 import java.util.Comparator; 
 import java.util.List; 
 import java.util.Map; 
 import java.util.stream.Collectors; 
  
 import org.springframework.beans.factory.annotation.Autowired; 
-import org.springframework.stereotype.Service; 
- 
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo.None;
 import com.g2.Interfaces.ServiceManager; 
 import com.g2.Model.PlayerDTO; 
 import com.g2.Model.Player; 
@@ -72,7 +74,10 @@ public class LeaderboardService {
     public void getList(){ 
         List<Player> lista_player=getPlayers(); 
         List<User> lista_user= getUsers(); 
-         
+        if(lista_player==null){
+        
+            lista_player = new ArrayList<Player>();
+        }
         try { 
             // Crea una mappa degli utenti per ID 
             Map<Long, User> userMap = lista_user.stream() 
