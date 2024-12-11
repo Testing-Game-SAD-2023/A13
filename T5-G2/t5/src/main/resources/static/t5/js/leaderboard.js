@@ -20,6 +20,13 @@ const statisticOptions = {
     ]
 };
 
+const validateEmail = (email) => {
+    return String(email)
+        .toLowerCase()
+        .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+};
 
 async function fetchRows(gamemode, statistic, startPage, email) {
     try {
@@ -27,8 +34,10 @@ async function fetchRows(gamemode, statistic, startPage, email) {
         let queryParams = `?pageSize=${pageSize}&numPages=${numPages}`;
         if (startPage > 0)
             queryParams = queryParams.concat(`&startPage=${startPage}`);
-        else if (email.length > 0)
+        else if (email.length > 0) {
+            if (!validateEmail(email)) throw new Error('Formato email non valido')
             queryParams = queryParams.concat(`&email=${email}`);
+        }
 
         const response = await fetch(`${endpoint}${queryParams}`);
         const responseJson = await response.json();
@@ -357,7 +366,8 @@ async function searchPlayer() {
         } catch (error) {
             renderTableError(error);
             return;
-        }}
+        }
+    }
 
     // render table and buttons
     renderTable(gamemode, statistic, pageToShow);
@@ -369,12 +379,12 @@ async function searchPlayer() {
 // Page initialization
 
 // add listener for leaderboard creation
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const gamemode = document.querySelector('input[name="gamemode"]:checked').id;
     updateStatisticOptions(gamemode);
 
     const offcanvasElement = document.getElementById('offcanvasDarkNavbar');
-    offcanvasElement.addEventListener('show.bs.offcanvas', function () {
+    offcanvasElement.addEventListener('show.bs.offcanvas', function() {
         showPage(1);
     });
 });

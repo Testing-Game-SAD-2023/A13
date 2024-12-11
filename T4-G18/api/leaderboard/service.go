@@ -57,7 +57,7 @@ func (gs *Repository) FindIntervalByPlayerID(reader *LeaderboardReader, playerId
 			return err
 		}
 
-		startPage := (playerPosition / reader.pageSize) + 1		// 16+1
+		startPage := (playerPosition / reader.pageSize) + 1 // 16+1
 		offset := (startPage - 1) * reader.pageSize
 		limit := reader.pageSize * reader.numPages
 
@@ -132,11 +132,10 @@ func (gs *Repository) FindIntervalByPage(reader *LeaderboardReader, startPage in
 
 func buildQuery(columnName string) string {
 	query := fmt.Sprintf(`
-    SELECT * FROM (SELECT 
+    SELECT 
         player_id AS user_id,
         %s AS stat,
         ROW_NUMBER() OVER (ORDER BY %s DESC, player_id DESC) AS rank
-    FROM player_stats) AS sub_q
-    LIMIT ? OFFSET ?`, columnName, columnName)
+    FROM player_stats LIMIT ? OFFSET ?`, columnName, columnName)
 	return query
 }
