@@ -105,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function addFriend() {
         const friendId = addFriendButton.dataset.friendId;
     
-        // Controlla se friendId è stato correttamente impostato
         if (!friendId) {
             searchFriendMessage.textContent = "Errore: nessun amico selezionato.";
             return;
@@ -116,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
             credentials: "include",
         })
             .then(response => {
-                if (!response.ok) throw new Error("Amico già nella lista");
+                if (!response.ok) throw new Error("Errore durante l'aggiunta dell'amico.");
                 return response.text();
             })
             .then(message => {
@@ -128,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 searchFriendMessage.textContent = error.message;
             });
     }
+    
     
 
     

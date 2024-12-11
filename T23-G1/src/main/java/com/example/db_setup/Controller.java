@@ -977,33 +977,33 @@ public class Controller {
   
      
     //by GabMan: Endpoint per aggiungere un amico
-    @PostMapping("/addFriend")
+   @PostMapping("/addFriend")
     public ResponseEntity<String> addFriend(
-        @CookieValue(name = "jwt", required = false) String jwt,
-        @RequestParam Integer friendId) {
-        try {
-            // Estrai l'ID dell'utente dal token JWT
-            Integer userId = extractUserIdFromJwt(jwt);
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido.");
-            }
-    
-            // Crea la chiave composta FriendId
-            FriendId friendIdObj = new FriendId(userId, friendId);
-    
-            if (friendRepository.customExistsById(userId, friendId)) {
-            return ResponseEntity.badRequest().body("Amicizia già esistente.");
-            }
-
-    
-            // Aggiungi l'amico (usando il metodo personalizzato nel repository)
-            friendRepository.addFriend(userId, friendId);
-            return ResponseEntity.ok("Amico aggiunto con successo.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
+    @CookieValue(name = "jwt", required = false) String jwt,
+    @RequestParam Integer friendId) {
+    try {
+        // Estrai l'ID dell'utente dal JWT
+        Integer userId = extractUserIdFromJwt(jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido.");
         }
+
+        // Controllo esistenza amicizia
+        boolean exists = friendRepository.customExistsById(userId, friendId);
+        if (exists) {
+            return ResponseEntity.badRequest().body("Amicizia già esistente.");
+        }
+
+        // Inserisci amicizia
+        friendRepository.addFriend(userId, friendId);
+
+        return ResponseEntity.ok("Amico aggiunto con successo.");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante l'aggiunta dell'amico: " + e.getMessage());
     }
+    }
+
     
 
     @PostMapping("/removeFriend")
