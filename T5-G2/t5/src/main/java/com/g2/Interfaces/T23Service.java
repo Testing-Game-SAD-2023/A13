@@ -81,9 +81,10 @@ import org.springframework.web.client.HttpClientErrorException;
          registerAction("AddFriend", new ServiceActionDefinition(
                  params -> addFriend((String) params[0], (String) params[1])
          ));
-         registerAction("deleteFriendByNickname", new ServiceActionDefinition(
-                params -> deleteFriendByNickname((String) params[0], (String) params[1])
-        ));
+         registerAction("deleteFriendById", new ServiceActionDefinition(
+                params -> deleteFriendById((Integer) params[0], (String) params[1]) // friendId come Integer
+         ));
+
 
         
      }
@@ -273,9 +274,7 @@ import org.springframework.web.client.HttpClientErrorException;
             return null;
         }
     }
-
-    //GabMan 11/12 
-    public boolean deleteFriendById(String friendId, String jwt) {
+    public boolean deleteFriendById(Integer friendId, String jwt) {
         final String endpoint = "/deleteFriendById";
     
         try {
@@ -283,15 +282,14 @@ import org.springframework.web.client.HttpClientErrorException;
             headers.set("Authorization", "Bearer " + jwt);
     
             // Crea i parametri della richiesta
-            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-            queryParams.add("friendId", friendId);
+            String queryParams = "?friendId=" + friendId; // Integer viene convertito automaticamente in String
     
             // Crea la richiesta
             HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
     
             // Effettua la richiesta DELETE con i parametri
             ResponseEntity<String> response = restTemplate.exchange(
-                BASE_URL + endpoint + "?" + buildQueryString(queryParams),
+                BASE_URL + endpoint + queryParams,
                 HttpMethod.DELETE,
                 requestEntity,
                 String.class
