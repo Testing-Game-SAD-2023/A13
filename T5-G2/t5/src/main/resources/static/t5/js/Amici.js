@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const deleteButton = document.createElement("button");
                     deleteButton.className = "btn btn-danger btn-sm ms-auto";
                     deleteButton.textContent = "Elimina";
-                    deleteButton.addEventListener("click", () => deleteFriendById(friend.friendId));
+                    deleteButton.addEventListener("click", () => removeFriend(friend.friendId));
 
                     friendItem.append(avatar, friendInfo, deleteButton);
                     friendsContainer.appendChild(friendItem);
@@ -119,30 +119,31 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    function deleteFriendById(friendId) {
-        fetch(`/deleteFriendById?friendId=${encodeURIComponent(friendId)}`, {
-            method: "DELETE",
+    function removeFriend(friendId) {
+        if (!friendId) {
+            alert("Errore: ID amico non valido.");
+            return;
+        }
+    
+        fetch(`/removeFriend?friendId=${encodeURIComponent(friendId)}`, {
+            method: "POST", // Cambiato in POST
             credentials: "include",
         })
             .then(response => {
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error("Amicizia non trovata.");
-                    } else if (response.status === 401) {
-                        throw new Error("Non autorizzato. Accedi di nuovo.");
-                    }
-                    throw new Error("Errore durante l'eliminazione dell'amico.");
-                }
+                if (!response.ok) throw new Error("Errore durante la rimozione dell'amico.");
                 return response.text();
             })
             .then(message => {
-                console.log(message);
-                loadFriends();
+                alert(message); 
+                loadFriends(); 
             })
             .catch(error => {
-                console.error("Errore:", error.message);
+                alert(error.message); // Mostra un messaggio di errore
             });
     }
+    
+    
+    
 
     searchFriendButton.addEventListener("click", searchFriend);
     addFriendButton.addEventListener("click", addFriend);

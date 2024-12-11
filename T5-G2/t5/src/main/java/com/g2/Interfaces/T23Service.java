@@ -81,9 +81,10 @@ import org.springframework.web.client.HttpClientErrorException;
          registerAction("AddFriend", new ServiceActionDefinition(
                  params -> addFriend((String) params[0], (String) params[1])
          ));
-         registerAction("deleteFriendById", new ServiceActionDefinition(
-                params -> deleteFriendById((String) params[0], (String) params[1])
+        registerAction("removeFriend", new ServiceActionDefinition(
+        params -> removeFriend((String) params[0], (Integer) params[1])
         ));
+
 
         
      }
@@ -273,39 +274,27 @@ import org.springframework.web.client.HttpClientErrorException;
             return null;
         }
     }
-    public boolean deleteFriendById(String friendId, String jwt) {
-        final String endpoint = "/deleteFriendById";
 
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + jwt);
+     public Boolean removeFriend(String jwt, Integer friendId) {
+    final String endpoint = "/removeFriend";
 
-            // Crea i parametri della richiesta
-            String queryParams = "?friendId=" + friendId; 
+    // Prepara i parametri per la richiesta
+    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+    formData.add("friendId", friendId.toString());
 
-            // Crea la richiesta
-            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Authorization", "Bearer " + jwt);
 
-            // Effettua la richiesta DELETE con i parametri
-            ResponseEntity<String> response = restTemplate.exchange(
-                BASE_URL + endpoint + queryParams,
-                HttpMethod.DELETE,
-                requestEntity,
-                String.class
-            );
 
-            return response.getStatusCode() == HttpStatus.OK;
-        } catch (HttpClientErrorException.NotFound e) {
-            System.err.println("Amicizia non trovata per ID: " + friendId + ". " + e.getMessage());
-            return false;
-        } catch (HttpClientErrorException.Unauthorized e) {
-            System.err.println("Token JWT non valido: " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            System.err.println("Errore durante l'eliminazione dell'amico con ID: " + friendId + ". " + e.getMessage());
-            return false;
-        }
+    try {
+        // Effettua la chiamata POST al backend (T23)
+        return callRestPost(endpoint, formData, headers, Boolean.class);
+    } catch (Exception e) {
+        System.err.println("Errore durante la rimozione dell'amico: " + e.getMessage());
+        return false;
     }
+    }
+
 
 
     

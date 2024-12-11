@@ -516,41 +516,31 @@ public class GuiController {
     }
     }
     
-    //by GabMan 11/12
-    @DeleteMapping("/deleteFriendById")
-    public ResponseEntity<String> deleteFriendById(
+    @PostMapping("/removeFriend")
+    public ResponseEntity<String> removeFriend(
         @CookieValue(name = "jwt", required = false) String jwt,
-        @RequestParam(required = false) Integer friendId) { // Cambiato da nickname a friendId
-        try {
-            // Controllo del token JWT
-            if (jwt == null || jwt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o mancante.");
-            }
-    
-            // Controllo del parametro friendId
-            if (friendId == null) {
-                return ResponseEntity.badRequest().body("FriendId non fornito.");
-            }
-    
-            // Estrazione dell'ID utente dal token JWT
-            Integer userId = extractUserIdFromJwt(jwt);
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ID utente non valido nel token.");
-            }
-    
-            // Chiamata al servizio T23 per eliminare l'amico
-            boolean success = t23Service.deleteFriendById(friendId.toString(), jwt); // Passa friendId come stringa
-            if (!success) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Amicizia non trovata.");
-            }
-    
-            // Risposta di successo
-            return ResponseEntity.ok("Amico eliminato con successo.");
-        } catch (Exception e) {
-            // Gestione degli errori generici
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
+        @RequestParam Integer friendId) {
+    try {
+        // Verifica che il token JWT esista
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato.");
         }
+
+        // Chiama il T23Service per rimuovere l'amico
+        Boolean result = t23Service.removeFriend(jwt, friendId);
+
+        if (result != null && result) {
+            return ResponseEntity.ok("Amico rimosso con successo.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante la rimozione dell'amico.");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
     }
+    }
+
+    
     
     //cami (02/12)
     @PostMapping("/updateAvatar")

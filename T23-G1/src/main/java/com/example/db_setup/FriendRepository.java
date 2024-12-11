@@ -22,8 +22,10 @@ public interface FriendRepository extends JpaRepository<Friend, FriendId> {
                    "WHERE uf.user_id = :userId", nativeQuery = true)
     List<Map<String, Object>> findFriendDetailsByUserId(@Param("userId") int userId);
 
-    // Metodo per verificare se esiste una relazione 
-    boolean existsById(FriendId id);
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END " +
+       "FROM Friend f WHERE f.id.userId = :userId AND f.id.friendId = :friendId")
+    boolean customExistsById(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
 
   
 
@@ -31,10 +33,17 @@ public interface FriendRepository extends JpaRepository<Friend, FriendId> {
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO user_friends (user_id, friend_id) " +
-                   "SELECT :userId, :friendId " +
-                   "WHERE NOT EXISTS (SELECT 1 FROM user_friends WHERE user_id = :userId AND friend_id = :friendId)", 
-           nativeQuery = true)
+               "SELECT :userId, :friendId " +
+               "WHERE NOT EXISTS (SELECT 1 FROM user_friends WHERE user_id = :userId AND friend_id = :friendId)", 
+       nativeQuery = true)
     void addFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Friend f WHERE f.id.userId = :userId AND f.id.friendId = :friendId")
+    void deleteFriend(@Param("userId") Integer userId, @Param("friendId") Integer friendId);
+
+    
 }
 
 
