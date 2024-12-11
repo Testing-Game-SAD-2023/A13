@@ -47,7 +47,7 @@ func (gs *Repository) FindIntervalByPlayerID(reader *LeaderboardReader, playerId
 	err = gs.db.Transaction(func(tx *gorm.DB) error {
 		query := fmt.Sprintf(`
 		       SELECT position FROM(
-		               SELECT *, row_number() OVER (ORDER BY %s DESC) AS position FROM player_stats
+		               SELECT *, row_number() OVER (ORDER BY %s DESC, player_id DESC) AS position FROM player_stats
 		               )
 		               AS sub_q WHERE player_id = ?`, columnName)
 
@@ -57,7 +57,7 @@ func (gs *Repository) FindIntervalByPlayerID(reader *LeaderboardReader, playerId
 			return err
 		}
 
-		startPage := (playerPosition / reader.pageSize) + 1
+		startPage := (playerPosition / reader.pageSize) + 1		// 16+1
 		offset := (startPage - 1) * reader.pageSize
 		limit := reader.pageSize * reader.numPages
 
@@ -132,11 +132,11 @@ func (gs *Repository) FindIntervalByPage(reader *LeaderboardReader, startPage in
 
 func buildQuery(columnName string) string {
 	query := fmt.Sprintf(`
-    SELECT 
+    SELECT * FROM (SELECT 
         player_id AS user_id,
         %s AS stat,
-        ROW_NUMBER() OVER (ORDER BY %s, player_id DESC) AS rank
-    FROM player_stats
+        ROW_NUMBER() OVER (ORDER BY %s DESC, player_id DESC) AS rank
+    FROM player_stats) AS sub_q
     LIMIT ? OFFSET ?`, columnName, columnName)
 	return query
 }

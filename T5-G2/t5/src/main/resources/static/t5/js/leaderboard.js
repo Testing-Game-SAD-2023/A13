@@ -56,7 +56,7 @@ async function fetchRows(gamemode, statistic, startPage, email) {
         return rows;
     }
     catch (error) {
-        console.error('Error fetching data:', error);
+        //console.error('Error fetching data:', error);
         throw error;
     }
 }
@@ -142,7 +142,7 @@ async function getRowsByEmail(gamemode, statistic, email) {
         throw (error);
     }
 
-    // set last page
+    // update last page
     lastPage = totalLength === 0 ? 1 : Math.floor((totalLength - 1) / pageSize) + 1;
 
     // store fetched rows in cache
