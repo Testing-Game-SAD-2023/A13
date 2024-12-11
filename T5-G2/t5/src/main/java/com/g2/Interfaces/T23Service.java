@@ -82,9 +82,8 @@ import org.springframework.web.client.HttpClientErrorException;
                  params -> addFriend((String) params[0], (String) params[1])
          ));
          registerAction("deleteFriendById", new ServiceActionDefinition(
-                params -> deleteFriendById((Integer) params[0], (String) params[1]) // friendId come Integer
-         ));
-
+                params -> deleteFriendById((String) params[0], (String) params[1])
+        ));
 
         
      }
@@ -274,19 +273,19 @@ import org.springframework.web.client.HttpClientErrorException;
             return null;
         }
     }
-    public boolean deleteFriendById(Integer friendId, String jwt) {
+    public boolean deleteFriendById(String friendId, String jwt) {
         final String endpoint = "/deleteFriendById";
-    
+
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + jwt);
-    
+
             // Crea i parametri della richiesta
-            String queryParams = "?friendId=" + friendId; // Integer viene convertito automaticamente in String
-    
+            String queryParams = "?friendId=" + friendId; 
+
             // Crea la richiesta
             HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-    
+
             // Effettua la richiesta DELETE con i parametri
             ResponseEntity<String> response = restTemplate.exchange(
                 BASE_URL + endpoint + queryParams,
@@ -294,7 +293,7 @@ import org.springframework.web.client.HttpClientErrorException;
                 requestEntity,
                 String.class
             );
-    
+
             return response.getStatusCode() == HttpStatus.OK;
         } catch (HttpClientErrorException.NotFound e) {
             System.err.println("Amicizia non trovata per ID: " + friendId + ". " + e.getMessage());
@@ -307,7 +306,7 @@ import org.springframework.web.client.HttpClientErrorException;
             return false;
         }
     }
-    
+
 
     
     private String buildQueryString(MultiValueMap<String, String> queryParams) {
