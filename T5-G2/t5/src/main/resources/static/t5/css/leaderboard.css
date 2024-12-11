@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    background-image: url('/t5/images/foto7.jpeg');
+    background-image: url('/t5/images/foto7.jpg');
     background-size: cover; /* Adatta l'immagine all'intero schermo */
     background-repeat: no-repeat; /* Impedisce la ripetizione dell'immagine */
     background-position: center; /* Centra l'immagine */

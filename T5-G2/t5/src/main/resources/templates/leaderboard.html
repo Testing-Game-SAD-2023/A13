@@ -21,33 +21,44 @@
     <div class="toggle-container">
         <input type="checkbox" id="toggle" class="toggle-input">
         <label for="toggle" class="toggle-label">
-        <span class="toggle-option option-1" th:text="#{punti}" ></span>
-        <span class="toggle-option option-2" th:text="#{partite}"></span>
+            <span class="toggle-option option-1" th:text="#{punti}"></span>
+            <span class="toggle-option option-2" th:text="#{partite}"></span>
         </label>
     </div>
     
     <div class="table-container">
-        <table id="studentTable">
+        <!-- Tabella per i punti -->
+        <table id="pointsTable" class="classification-table" style="display: none;">
             <thead>
                 <tr>
                     <th scope="col" th:text="#{posizione}"></th>
                     <th scope="col" th:text="#{giocatore}"></th>
-                    <th scope="col" 
-                        th:text="#{punti}" 
-                        th:attr="data-default=#{punti}, data-checked=#{partite}"></th>
+                    <th scope="col" th:text="#{punti}"></th>
                 </tr>
             </thead>
             <tbody class="table-group-divider overflow-y-scroll">
-                <tr th:each="player, iterStat: ${listaPlayersPoints}">
+                <tr th:each="player, iterStat : ${listaPlayersPoints}">
                     <td th:text="${iterStat.index + 1}"></td>
-                    <td th:text="${player.name} + ' ' + ${player.surname}" 
-                        th:attr="data-default=${player.name} + ' ' + ${player.surname}, 
-                                  data-checked=${listaPlayersGames[iterStat.index].name} + ' ' + ${listaPlayersGames[iterStat.index].surname}">
-                    </td>
-                    <td th:text="${player.points}" 
-                        th:attr="data-default=${player.points}, 
-                                  data-checked=${listaPlayersGames[iterStat.index].gamesWon}">
-                    </td>
+                    <td th:text="${player.name + ' ' + player.surname}"></td>
+                    <td th:text="${player.points}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Tabella per le partite -->
+        <table id="gamesTable" class="classification-table" style="display: none;">
+            <thead>
+                <tr>
+                    <th scope="col" th:text="#{posizione}"></th>
+                    <th scope="col" th:text="#{giocatore}"></th>
+                    <th scope="col" th:text="#{partite}"></th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider overflow-y-scroll">
+                <tr th:each="player, iterStat : ${listaPlayersGames}">
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${player.name + ' ' + player.surname}"></td>
+                    <td th:text="${player.gamesWon}"></td>
                 </tr>
             </tbody>
         </table>
@@ -57,17 +68,29 @@
         <p th:text="#{la_tua_posizione}"></p>
     </div>
 
-    <div class="rectangle-container">
+    <div id = "rec-points" class="rectangle-container">
         <div class="rectangle">
             <div class="section" id="section-1" th:text="${playerRank.rankByPoints}" 
-                                                th:attr="data-default=${playerRank.rankByPoints}, 
-                                                        data-checked=${playerRank.rankByGames}"></div>
+                                                ></div>
             <div class="section" id="section-2">YOU</div>
             <div class="section" id="section-3" th:text="${playerRank.points}" 
-                                                th:attr="data-default=${playerRank.points}, 
-                                                        data-checked=${playerRank.gamesWon}"></div>
+                                                ></div>
         </div>
     </div>
+    <div id = "rec-games" class="rectangle-container">
+        <div class="rectangle">
+            <div class="section" id="section-1" th:text="${playerRank.rankByGames}" 
+                                                
+                                                       ></div>
+            <div class="section" id="section-2">YOU</div>
+            <div class="section" id="section-3" th:text="${playerRank.gamesWon}" 
+                                                ></div>
+        </div>
+    </div>
+
+
+
+
 
     <script src="t5/js/leaderboard.js"></script>
     

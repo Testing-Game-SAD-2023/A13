@@ -196,6 +196,7 @@ func run(ctx context.Context, c Configuration) error {
 			robotController,
 			scalataController,
 			phcaController,
+			playerController,
 		))
 	})
 	log.Printf("listening on %s", c.ListenAddress)
@@ -320,11 +321,10 @@ func makeDefaults(c *Configuration) {
 
 }
 
-func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, pc *playerhascategoryachievement.Controller) *chi.Mux {
+func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, pc *playerhascategoryachievement.Controller, pcc *player.Controller) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
-
 	r.Route("/player", func(r chi.Router) {
 		// List games
 		r.Get("/", api.HandlerFunc(pcc.GetAllPlayers))
