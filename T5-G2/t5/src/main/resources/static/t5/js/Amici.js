@@ -14,10 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    //by GabMan 11/12
     function loadFriends() {
         friendsContainer.innerHTML = "";
         errorMessage.textContent = "";
-
+    
         fetch("/getFriendlist", {
             method: "GET",
             credentials: "include",
@@ -32,25 +33,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     errorMessage.textContent = "Non hai ancora degli amici. Aggiungine uno!";
                     return;
                 }
-
+    
                 data.forEach(friend => {
                     const friendItem = document.createElement("div");
                     friendItem.className = "friend-item list-group-item d-flex align-items-center";
-
+    
                     const avatar = document.createElement("img");
                     avatar.src = friend.avatar || "/t5/images/profilo/sampleavatar.jpg";
                     avatar.alt = "Avatar";
                     avatar.className = "friend-avatar";
-
+    
                     const friendInfo = document.createElement("div");
                     friendInfo.className = "friend-info flex-grow-1";
-                    friendInfo.textContent = `${friend.nickname} (ID: ${friend.friendId})`;
-
+                    friendInfo.textContent = friend.nickname;
+    
+                    // Crea l'elemento per l'ID dell'amico
+                    const friendId = document.createElement("p");
+                    friendId.className = "friend-id";  // Aggiungi la classe per lo stile
+                    friendId.textContent = `ID: ${friend.friendId}`;
+    
                     const deleteButton = document.createElement("button");
                     deleteButton.className = "btn btn-danger btn-sm ms-auto";
                     deleteButton.textContent = "Elimina";
                     deleteButton.addEventListener("click", () => removeFriend(friend.friendId));
-
+    
+                    // Aggiungi l'ID dell'amico alla sezione delle informazioni
+                    friendInfo.append(friendId);
                     friendItem.append(avatar, friendInfo, deleteButton);
                     friendsContainer.appendChild(friendItem);
                 });
@@ -59,6 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 errorMessage.textContent = error.message;
             });
     }
+    
+    
+    
 
     function searchFriend() {
         const friendIdentifier = searchFriendInput.value.trim();
@@ -91,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 searchFriendMessage.textContent = error.message;
             });
     }
-
+    //GabMan 11/12
     function addFriend() {
         const friendId = addFriendButton.dataset.friendId;
     

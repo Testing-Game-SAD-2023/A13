@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const editInfoButton = document.getElementById("editInfoButton");
     const editInfoForm = document.getElementById("editInfoForm");
     const cancelEditInfoButton = document.getElementById("cancelEditInfoButton");
+    
+    
 
      // Aggiungi questo per il pulsante "Modifica Avatar" cami
     let selectedAvatar = null;
@@ -178,7 +180,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Aggiorna gli elementi HTML con i dati utente
                 document.getElementById('userFullName').textContent = `${data.name} ${data.surname}`;
-                document.getElementById('userNickname').textContent = data.nickname;
+                document.getElementById('userNickname').textContent = `@${data.nickname}`;
+
+                // header che porta info in tutte le sezioni
+                document.getElementById('headerFullName').textContent = `${data.name} ${data.surname}`;
+                document.getElementById('headerNickname').textContent = `@${data.nickname}`;
+
             } else {
                 console.error('Errore nel caricamento delle informazioni utente.');
             }
@@ -373,6 +380,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedSection = document.getElementById(sectionId);
         if (selectedSection) {
             selectedSection.classList.add('active');
+    
+            // Mostra o nascondi l'header utente
+            const userHeader = document.getElementById('userHeader');
+            if (sectionId === "profile") {
+                userHeader.classList.add("d-none"); // Nascondi nel profilo
+            } else {
+                userHeader.classList.remove("d-none"); // Mostra in altre sezioni
+            }
         } else {
             console.error(`Sezione con ID '${sectionId}' non trovata.`);
         }
@@ -428,6 +443,10 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Seleziona un file da caricare.");
         }
     };
+
+    
+   
+
     
 
 });
