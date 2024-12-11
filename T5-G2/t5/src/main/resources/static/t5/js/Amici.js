@@ -105,40 +105,31 @@ document.addEventListener("DOMContentLoaded", () => {
     function addFriend() {
         const friendId = addFriendButton.dataset.friendId;
     
+        // Controlla se friendId è stato correttamente impostato
         if (!friendId) {
             searchFriendMessage.textContent = "Errore: nessun amico selezionato.";
             return;
         }
     
-        getFriendList()
-            .then(friendList => {
-                const isAlreadyFriend = friendList.some(friend => friend.friendId === friendId);
-                if (isAlreadyFriend) {
-                    searchFriendMessage.textContent = "Siete già Amici!";
-                    throw new Error("Amico già nella lista");
-                }
-    
-                fetch(`/addFriend?friendId=${encodeURIComponent(friendId)}`, {
-                    method: "POST",
-                    credentials: "include",
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error("Errore durante l'aggiunta dell'amico.");
-                        return response.text();
-                    })
-                    .then(message => {
-                        alert(message);
-                        loadFriends(); // Ricarica la lista visivamente
-                        searchResult.style.display = "none";
-                    })
-                    .catch(error => {
-                        searchFriendMessage.textContent = error.message;
-                    });
+        fetch(`/addFriend?friendId=${encodeURIComponent(friendId)}`, {
+            method: "POST",
+            credentials: "include",
+        })
+            .then(response => {
+                if (!response.ok) throw new Error("Amico già nella lista");
+                return response.text();
+            })
+            .then(message => {
+                alert(message);
+                loadFriends();
+                searchResult.style.display = "none";
             })
             .catch(error => {
                 searchFriendMessage.textContent = error.message;
             });
     }
+    
+
     
     
 
