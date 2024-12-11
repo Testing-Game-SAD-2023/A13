@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const deleteButton = document.createElement("button");
                     deleteButton.className = "btn btn-danger btn-sm ms-auto";
                     deleteButton.textContent = "Elimina";
+                    alert("Eliminazione amico con ID: " + friendId); //PROVA
                     deleteButton.addEventListener("click", () => deleteFriendById(friend.friendId)); // Usa friendId
 
                     friendItem.append(avatar, friendInfo, deleteButton);
