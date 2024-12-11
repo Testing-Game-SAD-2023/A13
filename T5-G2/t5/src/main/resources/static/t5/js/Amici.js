@@ -29,11 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(data => {
                 console.log("Dati ricevuti dalla lista amici:", data);
+    
                 if (data.length === 0) {
                     errorMessage.textContent = "Non hai ancora degli amici. Aggiungine uno!";
-                    return;
+                    return; // Solo per interrompere qui
                 }
     
+                friendsContainer.innerHTML = ""; // Ripulisce il contenitore
                 data.forEach(friend => {
                     const friendItem = document.createElement("div");
                     friendItem.className = "friend-item list-group-item d-flex align-items-center";
@@ -47,9 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     friendInfo.className = "friend-info flex-grow-1";
                     friendInfo.textContent = friend.nickname;
     
-                    // Crea l'elemento per l'ID dell'amico
                     const friendId = document.createElement("p");
-                    friendId.className = "friend-id";  // Aggiungi la classe per lo stile
+                    friendId.className = "friend-id";
                     friendId.textContent = `ID: ${friend.friendId}`;
     
                     const deleteButton = document.createElement("button");
@@ -57,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     deleteButton.textContent = "Elimina";
                     deleteButton.addEventListener("click", () => removeFriend(friend.friendId));
     
-                    // Aggiungi l'ID dell'amico alla sezione delle informazioni
                     friendInfo.append(friendId);
                     friendItem.append(avatar, friendInfo, deleteButton);
                     friendsContainer.appendChild(friendItem);
@@ -68,8 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
     
-    
-    
+
 
     function searchFriend() {
         const friendIdentifier = searchFriendInput.value.trim();
@@ -106,48 +105,41 @@ document.addEventListener("DOMContentLoaded", () => {
     function addFriend() {
         const friendId = addFriendButton.dataset.friendId;
     
-        // Controlla se friendId è stato correttamente impostato
         if (!friendId) {
             searchFriendMessage.textContent = "Errore: nessun amico selezionato.";
             return;
         }
     
-        // Verifica se l'amico è già nella lista chiamando loadFriends
-        fetch("/getFriendlist", {
-            method: "GET",
-            credentials: "include",
-        })
-            .then(response => {
-                if (!response.ok) throw new Error("Errore durante il controllo della lista amici.");
-                return response.json();
-            })
+        getFriendList()
             .then(friendList => {
-                // Controlla se l'amico è già nella lista
                 const isAlreadyFriend = friendList.some(friend => friend.friendId === friendId);
                 if (isAlreadyFriend) {
                     searchFriendMessage.textContent = "Siete già Amici!";
-                    return;
+                    throw new Error("Amico già nella lista");
                 }
     
-                // Se l'amico non è nella lista, procedi con l'aggiunta
-                return fetch(`/addFriend?friendId=${encodeURIComponent(friendId)}`, {
+                fetch(`/addFriend?friendId=${encodeURIComponent(friendId)}`, {
                     method: "POST",
                     credentials: "include",
-                });
-            })
-            .then(response => {
-                if (response && !response.ok) throw new Error("Errore durante l'aggiunta dell'amico.");
-                return response?.text();
-            })
-            .then(message => {
-                if (message) alert(message);
-                loadFriends(); // Ricarica la lista degli amici
-                searchResult.style.display = "none";
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Errore durante l'aggiunta dell'amico.");
+                        return response.text();
+                    })
+                    .then(message => {
+                        alert(message);
+                        loadFriends(); // Ricarica la lista visivamente
+                        searchResult.style.display = "none";
+                    })
+                    .catch(error => {
+                        searchFriendMessage.textContent = error.message;
+                    });
             })
             .catch(error => {
                 searchFriendMessage.textContent = error.message;
             });
     }
+    
     
 
     function removeFriend(friendId) {
