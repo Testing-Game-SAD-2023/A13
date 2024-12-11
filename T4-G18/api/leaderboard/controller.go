@@ -22,24 +22,24 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 
 	gamemode, err := api.FromUrlParams[CustomString](r, "gamemode")
 	if err != nil {
-		return err
+        return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
 	stat, err := api.FromUrlParams[CustomString](r, "statistic")
 	if err != nil {
-		return err
+        return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
 	//Parametri obbligatorio, se almeno uno è 0 termina
 	pageSize, err := api.FromUrlQuery[KeyType](r, "pageSize", 0)
 	if err != nil {
-		return err
+		return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
 
 	numPages, err := api.FromUrlQuery[KeyType](r, "numPages", 0)
 	if err != nil {
-		return err
+        return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
 
@@ -51,13 +51,13 @@ func (gc *Controller) FindByInterval(w http.ResponseWriter, r *http.Request) err
 
 	playerId, err := api.FromUrlQuery[KeyType](r, "playerId", -1)
 	if err != nil {
-		return err
+        return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
 
 	startPage, err := api.FromUrlQuery[KeyType](r, "startPage", 0)
 	if err != nil {
-		return err
+        return api.MakeHttpError(api.ErrInvalidParam)
 	}
 
 	if ((startPage <= 0) && (playerId <= -1)) || ((startPage > 0) && (playerId > -1)) {

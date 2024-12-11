@@ -1,0 +1,263 @@
+[
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": 1,
+        "playerId": null,
+        "expected_status": 200
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 3,
+        "expected_status": 200
+    },
+    {
+        "gamemode": 10,
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": 5,
+        "playerId": null,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfid@",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": 5,
+        "playerId": null,
+        "expected_status": 400
+    },
+    {
+        "gamemode": null,
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": 5,
+        "playerId": null,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite#vinte",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": -1,
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": null,
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": 0,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": -3,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": "tre",
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": null,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": 3,
+        "numPages": -5,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": 3,
+        "numPages": 0,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": 3,
+        "numPages": "quattro",
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_vinte",
+        "pageSize": 3,
+        "numPages": null,
+        "startPage": null,
+        "playerId": 12,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": 0,
+        "playerId": null,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": -3,
+        "playerId": null,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": "tre",
+        "playerId": null,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": null,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 0,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": -3,
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": "cinque",
+        "expected_status": 400
+    },
+    {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 200,
+        "expected_status": 404
+    },
+     {
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": 200,
+        "playerId": null,
+        "expected_status": 404
+    },
+    {   
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": null,
+        "playerId": 9223372036854775808,
+        "expected_status": 400
+    },
+    {   
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 5,
+        "startPage": 9223372036854775808,
+        "playerId": null,
+        "expected_status": 400
+    },
+     {   
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 9223372036854775808,
+        "numPages": 5,
+        "startPage": 3,
+        "playerId": null,
+        "expected_status": 400
+    },
+     {   
+        "gamemode": "sfida",
+        "statistic": "partite_giocate",
+        "pageSize": 10,
+        "numPages": 9223372036854775808,
+        "startPage": 1,
+        "playerId": null,
+        "expected_status": 400
+    }
+]
