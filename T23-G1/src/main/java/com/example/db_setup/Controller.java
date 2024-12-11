@@ -977,7 +977,7 @@ public class Controller {
   
      
     //by GabMan: Endpoint per aggiungere un amico
-   @PostMapping("/addFriend")
+    @PostMapping("/addFriend")
     public ResponseEntity<String> addFriend(
         @CookieValue(name = "jwt", required = false) String jwt,
         @RequestParam Integer friendId) {
@@ -987,13 +987,16 @@ public class Controller {
             if (userId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido.");
             }
-
+    
+            // Crea la chiave composta FriendId
+            FriendId friendIdObj = new FriendId(userId, friendId);
+    
             // Verifica se l'amicizia già esiste
-            if (friendRepository.existsFriendship(userId, friendId)) {
+            if (friendRepository.existsById(friendIdObj)) {
                 return ResponseEntity.badRequest().body("Amicizia già esistente.");
             }
-
-            // Aggiungi l'amico
+    
+            // Aggiungi l'amico (usando il metodo personalizzato nel repository)
             friendRepository.addFriend(userId, friendId);
             return ResponseEntity.ok("Amico aggiunto con successo.");
         } catch (Exception e) {
@@ -1001,30 +1004,40 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
         }
     }
+    
 
-   @DeleteMapping("/deleteFriendByNickname")
-    public ResponseEntity<String> deleteFriendByNickname(
+    //byGabMan 11/12: Endpoint per eliminare un amico
+    @DeleteMapping("/deleteFriendById")
+    public ResponseEntity<String> deleteFriendById(
         @CookieValue(name = "jwt", required = false) String jwt,
-        @RequestParam String nickname) { // Cambia Integer in String
+        @RequestParam Integer friendId) {
         try {
             if (jwt == null || jwt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido o mancante.");
             }
-
+    
             // Estrai l'ID utente dal token JWT
             Integer userId = extractUserIdFromJwt(jwt);
             if (userId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ID utente non valido.");
             }
-
-
-            // Elimina l'amicizia basata sul nickname
-            friendRepository.deleteByUserIdAndNickname(userId, nickname);
+    
+            // Crea un oggetto FriendId
+            FriendId friendIdObj = new FriendId(userId, friendId);
+    
+            // Verifica se l'amicizia esiste
+            if (!friendRepository.existsById(friendIdObj)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Amicizia non trovata.");
+            }
+    
+            // Elimina l'amicizia
+            friendRepository.deleteById(friendIdObj);
             return ResponseEntity.ok("Amico eliminato con successo.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
         }
     }
+    
 
     
 

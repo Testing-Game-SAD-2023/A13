@@ -38,13 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const friendInfo = document.createElement("div");
                     friendInfo.className = "friend-info flex-grow-1";
-                    // Mostra il nickname e il friend_id
-                    friendInfo.textContent = `UserID: ${friend.userId} ${friend.nickname} (ID: ${friend.friendId})`;
+                    friendInfo.textContent = `${friend.nickname} (ID: ${friend.friendId})`;
 
                     const deleteButton = document.createElement("button");
                     deleteButton.className = "btn btn-danger btn-sm ms-auto";
                     deleteButton.textContent = "Elimina";
-                    deleteButton.addEventListener("click", () => deleteFriendByNickname(friend.nickname));
+                    deleteButton.addEventListener("click", () => deleteFriendById(friend.friendId)); // Usa friendId
 
                     friendItem.append(avatar, friendInfo, deleteButton);
                     friendsContainer.appendChild(friendItem);
@@ -105,8 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    function deleteFriendByNickname(nickname) {
-        fetch(`/deleteFriendByNickname?nickname=${encodeURIComponent(nickname)}`, {
+    function deleteFriendById(friendId) { // Aggiornata per utilizzare friendId
+        fetch(`/deleteFriendById?friendId=${encodeURIComponent(friendId)}`, {
             method: "DELETE",
             credentials: "include",
         })
@@ -129,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Errore:", error.message);
             });
     }
-    
     
 
     searchFriendButton.addEventListener("click", searchFriend);

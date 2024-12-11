@@ -274,40 +274,51 @@ import org.springframework.web.client.HttpClientErrorException;
         }
     }
 
-    public boolean deleteFriendByNickname(String nickname, String jwt) {
-    final String endpoint = "/deleteFriendByNickname?nickname=" + nickname;
-
-    try {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwt);
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-            BASE_URL + endpoint,
-            HttpMethod.DELETE,
-            requestEntity,
-            String.class
-        );
-
-        return response.getStatusCode() == HttpStatus.OK;
-    } catch (HttpClientErrorException.NotFound e) {
-        System.err.println("Amicizia non trovata per nickname: " + nickname + ". " + e.getMessage());
-        return false;
-    } catch (HttpClientErrorException.Unauthorized e) {
-        System.err.println("Token JWT non valido: " + e.getMessage());
-        return false;
-    } catch (Exception e) {
-        System.err.println("Errore durante l'eliminazione dell'amico con nickname: " + nickname + ". " + e.getMessage());
-        return false;
+    //GabMan 11/12 
+    public boolean deleteFriendById(String friendId, String jwt) {
+        final String endpoint = "/deleteFriendById";
+    
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + jwt);
+    
+            // Crea i parametri della richiesta
+            MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+            queryParams.add("friendId", friendId);
+    
+            // Crea la richiesta
+            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+    
+            // Effettua la richiesta DELETE con i parametri
+            ResponseEntity<String> response = restTemplate.exchange(
+                BASE_URL + endpoint + "?" + buildQueryString(queryParams),
+                HttpMethod.DELETE,
+                requestEntity,
+                String.class
+            );
+    
+            return response.getStatusCode() == HttpStatus.OK;
+        } catch (HttpClientErrorException.NotFound e) {
+            System.err.println("Amicizia non trovata per ID: " + friendId + ". " + e.getMessage());
+            return false;
+        } catch (HttpClientErrorException.Unauthorized e) {
+            System.err.println("Token JWT non valido: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.err.println("Errore durante l'eliminazione dell'amico con ID: " + friendId + ". " + e.getMessage());
+            return false;
+        }
     }
+    
+
+    
+    private String buildQueryString(MultiValueMap<String, String> queryParams) {
+        return queryParams.entrySet().stream()
+            .map(entry -> entry.getKey() + "=" + String.join(",", entry.getValue()))
+            .reduce((param1, param2) -> param1 + "&" + param2)
+            .orElse("");
     }
-
-
-
-
-
-
-
+    
 
 
      //cami (02/12)
