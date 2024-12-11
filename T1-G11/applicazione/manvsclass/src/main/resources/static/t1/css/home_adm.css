@@ -395,3 +395,38 @@ nav.top-right {
   transform: scale(0.9); /* Leggera contrazione */
 }
 
+
+/* MODIFICA: Aggiunta stile per il bottone "Challenges" */
+.Gestione-Challenges {
+  position: fixed;
+  bottom: 10%;
+  right: 25%; /* Posizionamento accanto al bottone Team */
+  z-index: 9999; /* Assicura che il bottone sia sopra agli altri elementi */
+}
+
+.Gestione-Challenges button {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: rgb(255, 136, 0); /* Colore iniziale per Challenges */
+  color: white;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  font-family: Alegreya Sans, sans-serif;
+  text-align: center;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.Gestione-Challenges button:hover {
+  background-color: rgb(230, 115, 0); /* Colore più scuro al passaggio del mouse */
+  font-weight: bold;
+  transform: scale(1.1); /* Leggera espansione */
+}
+
+.Gestione-Challenges button:active {
+  background-color: rgb(200, 90, 0); /* Colore più scuro durante il click */
+  transform: scale(0.9); /* Leggera contrazione */
+}
+
+

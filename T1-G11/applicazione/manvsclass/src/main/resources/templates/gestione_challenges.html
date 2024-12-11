@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Challenges</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .dashboard {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 220px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard h3 {
+            margin: 0;
+            font-size: 18px;
+            text-align: center;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        .dashboard nav {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .dashboard nav a {
+            text-decoration: none;
+            font-size: 16px;
+            color: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #34495e;
+            transition: all 0.3s ease-in-out;
+        }
+        .dashboard nav a:hover {
+            background-color: #1abc9c;
+            color: #2c3e50;
+        }
+        .content {
+            margin-left: 260px;
+            margin-top: 40px;
+            padding: 20px;
+        }
+        .section {
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            min-height: 300px;
+        }
+        .section.active {
+            display: block;
+        }
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+        button.top-left-button {
+            position: fixed;
+            width: 100px;
+            height: 40px;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            background-color: #1abc9c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease-in-out;
+        }
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="alertMessage" class="alert alert-danger" style="display: none;"></div>
+    <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+    <h1>Gestione Challenges</h1>
+    <a href="/home_adm"><button class="top-left-button">Home</button></a>
+
+    <div class="dashboard">
+        <h3>Gestione Challenges</h3>
+        <nav>
+            <a href="#add-challenge" onclick="showSection('add-challenge');">Crea Challenge</a>
+            <a href="#list-challenges" onclick="showSection('list-challenges');">Lista Challenges</a>
+            <a href="#challenge-details" onclick="showSection('challenge-details');">Dettagli Challenge</a>
+        </nav>
+    </div>
+
+    <div class="content">
+        <!-- Sezione Crea Challenge -->
+        <div id="add-challenge" class="section">
+            <h2>Crea Challenge</h2>
+            <form id="challengeForm">
+                <label for="challengeName">Nome Challenge:</label>
+                <input type="text" id="challengeName" name="challengeName" required>
+
+                <label for="description">Descrizione:</label>
+                <textarea id="description" name="description" rows="3" required></textarea>
+
+                <label for="teamId">ID Team:</label>
+                <input type="text" id="teamId" name="teamId" required>
+
+                <label for="startDate">Data Inizio:</label>
+                <input type="date" id="startDate" name="startDate" required>
+
+                <label for="endDate">Data Fine:</label>
+                <input type="date" id="endDate" name="endDate" required>
+
+                <button type="submit" id="CreaChallenge">Aggiungi Challenge</button>
+            </form>
+        </div>
+
+        <!-- Sezione Lista Challenges -->
+        <div id="list-challenges" class="section active">
+            <h2>Lista Challenges</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome Challenge</th>
+                            <th>Descrizione</th>
+                            <th>ID Team</th>
+                            <th>Data Inizio</th>
+                            <th>Data Fine</th>
+                            <th>Stato</th>
+                        </tr>
+                    </thead>
+                    <tbody id="challengeListBody">
+                        <!-- Contenuto generato dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sezione Dettagli Challenge -->
+        <div id="challenge-details" class="section">
+            <h2>Dettagli Challenge</h2>
+            <select id="challengeSelect">
+                <!-- Opzioni generate dinamicamente -->
+            </select>
+        </div>
+    </div>
+
+    <script src="/t1/js/gestione_challenges.js"></script>
+</body>
+</html>

@@ -772,4 +772,13 @@ public class AdminService {
         }
         return new ModelAndView("login_admin");
     }
+
+
+    public ModelAndView showChallengeManagementPage(HttpServletRequest request, String jwt) {
+        if (jwtService.isJwtValid(jwt)) {
+            return new ModelAndView("gestione_challenges");
+        }
+        return new ModelAndView("login_admin");
+    }
+    
 }

@@ -48,6 +48,33 @@ function Gestisci() {
   });
 }
 
+function GestisciChallenges() {
+  fetch('/challenges_show', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      response.text().then(okMessage => {
+        alert("Verrai reindirizzato alla pagina di gestione delle challenges.");
+      });
+      window.location.href = "/challenges_show";
+    } else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      });
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    alert("Si è verificato un errore durante il reindirizzamento alla pagina di gestione delle challenges.");
+  });
+}
+
+
 function Disconnessione() {
 
   fetch('/logout_admin', {

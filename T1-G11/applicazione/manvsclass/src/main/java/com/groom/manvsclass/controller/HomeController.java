@@ -642,4 +642,12 @@ import org.springframework.web.bind.annotation.RequestParam;
     }
 
 
+    @GetMapping("/challenges_show")
+    @ResponseBody
+    public ModelAndView showChallengeManagementPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+        return adminService.showChallengeManagementPage(request, jwt);
+    }   
+
+
+
  }
