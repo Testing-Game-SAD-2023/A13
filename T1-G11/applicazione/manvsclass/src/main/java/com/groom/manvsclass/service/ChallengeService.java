@@ -127,7 +127,7 @@ public class ChallengeService {
             HttpEntity<Void> entity = jwtService.createJwtRequestEntity(jwt);
 
             // Costruisce l'URL per la richiesta REST
-            String url = "http://t4-service:8080/players" + "/" + playerId + "/games";
+            String url = "http://t4-g18-app-1:3000/games/player/" + playerId;
 
             // Esegue la chiamata REST
             ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
@@ -159,7 +159,7 @@ public class ChallengeService {
 
     try {
         ResponseEntity<List<Map<String, Object>>> response = (ResponseEntity<List<Map<String, Object>>>) getPlayerGames(playerId, jwt);
-
+        
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             List<Map<String, Object>> games = response.getBody();
 

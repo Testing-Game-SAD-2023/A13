@@ -628,12 +628,13 @@ import org.springframework.web.bind.annotation.RequestParam;
         /**
      * Verifica se una challenge è completata.
      */
-    @GetMapping("/challenges/challenge_Id/completion/player_Id")
+    @GetMapping("/challenges/{challenge_Id}/{player_Id}")
     public ResponseEntity<Boolean> isChallengeCompleted(
-            @PathVariable String challengeId,
-            @PathVariable int playerId,
+            @PathVariable(value = "challenge_Id") String challengeId,
+            @PathVariable(value = "player_Id" ) int playerId,
             @CookieValue(name = "jwt", required = false) String jwt) {
         Challenge challenge = challengeService.getChallengeByName(challengeId, jwt).getBody();
+        
         if (challenge == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
         }
