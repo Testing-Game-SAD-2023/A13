@@ -8,6 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const addFriendButton = document.getElementById("addFriendButton");
     const searchFriendButton = document.getElementById("searchFriendButton");
 
+    // Aggiungi un controllo per vedere se addFriendButton esiste
+    if (!addFriendButton) {
+        console.error("addFriendButton non trovato!");
+        return;
+    }
+
     function loadFriends() {
         friendsContainer.innerHTML = "";
         errorMessage.textContent = "";
@@ -43,8 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const deleteButton = document.createElement("button");
                     deleteButton.className = "btn btn-danger btn-sm ms-auto";
                     deleteButton.textContent = "Elimina";
-                    alert("Eliminazione amico con ID: " + friendId); //PROVA
-                    deleteButton.addEventListener("click", () => deleteFriendById(friend.friendId)); // Usa friendId
+                    deleteButton.addEventListener("click", () => deleteFriendById(friend.friendId));
 
                     friendItem.append(avatar, friendInfo, deleteButton);
                     friendsContainer.appendChild(friendItem);
@@ -73,7 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 friendName.textContent = `${data.nickname} (ID: ${data.id})`;
                 searchResult.style.display = "block";
-                addFriendButton.dataset.friendId = data.id;
+
+                // Aggiungi un controllo per verificare che `data.id` esista
+                if (data && data.id) {
+                    addFriendButton.dataset.friendId = data.id; // Imposta il friendId
+                    console.log("ID dell'amico trovato:", data.id); // Aggiungi un log per il debug
+                } else {
+                    searchFriendMessage.textContent = "Errore: l'ID dell'amico non è valido.";
+                }
             })
             .catch(error => {
                 searchFriendMessage.textContent = error.message;
@@ -82,6 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function addFriend() {
         const friendId = addFriendButton.dataset.friendId;
+
+        // Controlla se friendId è stato correttamente impostato
         if (!friendId) {
             searchFriendMessage.textContent = "Errore: nessun amico selezionato.";
             return;
@@ -105,12 +119,12 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    function deleteFriendById(friendId) { // Aggiornata per utilizzare friendId
+    function deleteFriendById(friendId) {
         fetch(`/deleteFriendById?friendId=${encodeURIComponent(friendId)}`, {
             method: "DELETE",
             credentials: "include",
         })
-            .then((response) => {
+            .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) {
                         throw new Error("Amicizia non trovata.");
@@ -121,15 +135,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 return response.text();
             })
-            .then((message) => {
+            .then(message => {
                 console.log(message);
                 loadFriends();
             })
-            .catch((error) => {
+            .catch(error => {
                 console.error("Errore:", error.message);
             });
     }
-    
 
     searchFriendButton.addEventListener("click", searchFriend);
     addFriendButton.addEventListener("click", addFriend);
