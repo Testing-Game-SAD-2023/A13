@@ -236,3 +236,34 @@ body {
     background-color: #0056b3; /* Colore blu più scuro al passaggio del mouse */
 }
 
+
+#friendsContainer {
+    font-family: 'Segoe UI'; /* Scegli un font moderno e leggibile */
+    font-size: 1.1rem; /* Aumenta la dimensione del font per una migliore leggibilità */
+    line-height: 1.5; /* Migliora la spaziatura tra le righe */
+    color: #333; /* Colore del testo */
+}
+
+#friendsContainer .list-group-item {
+    padding: 10px 15px; /* Aggiungi un po' di padding per un aspetto più pulito */
+    font-weight: 500; /* Imposta un peso del font leggermente più spesso */
+    border-radius: 5px; /* Aggiungi angoli arrotondati per un aspetto più morbido */
+    margin-bottom: 10px; /* Distanza tra gli elementi della lista */
+    transition: background-color 0.3s ease; /* Aggiungi una transizione per un effetto visivo piacevole */
+}
+
+/* Effetto hover sugli amici */
+#friendsContainer .list-group-item:hover {
+    background-color: #f0f0f0; /* Colore di sfondo quando si passa sopra con il mouse */
+    cursor: pointer; /* Cambia il cursore per indicare l'interattività */
+}
+
+/* Messaggio di errore */
+#errorMessage {
+    font-family: 'Segoe UI';
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e74c3c; /* Colore rosso per i messaggi di errore */
+    margin-top: 20px;
+}
+
