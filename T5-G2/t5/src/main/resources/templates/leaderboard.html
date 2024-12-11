@@ -15,20 +15,21 @@
 </head>
 <body>
     <div class="background-overlay"></div>
+    <!-- Gli altri contenuti della pagina seguiranno qui -->
 
     <h1 th:text="#{classifica}"></h1>
 
     <div class="toggle-container">
         <input type="checkbox" id="toggle" class="toggle-input">
         <label for="toggle" class="toggle-label">
-            <span class="toggle-option option-1" th:text="#{punti}"></span>
-            <span class="toggle-option option-2" th:text="#{partite}"></span>
+        <span class="toggle-option option-1" th:text="#{punti}" ></span>
+        <span class="toggle-option option-2" th:text="#{partite}"></span>
         </label>
     </div>
-    
+
     <div class="table-container">
         <!-- Tabella per i punti -->
-        <table id="pointsTable" class="classification-table" style="display: none;">
+        <table id="pointsTable" class="classification-table" style="display: table;">
             <thead>
                 <tr>
                     <th scope="col" th:text="#{posizione}"></th>
@@ -68,29 +69,17 @@
         <p th:text="#{la_tua_posizione}"></p>
     </div>
 
-    <div id = "rec-points" class="rectangle-container">
+    <div class="rectangle-container">
         <div class="rectangle">
-            <div class="section" id="section-1" th:text="${playerRank.rankByPoints}" 
-                                                ></div>
+            <div class="section" id="section-1" th:text="${playerRank.rankByPoints == -1 ? '-' : playerRank.rankByPoints}" 
+                                                th:attr="data-default=${playerRank.rankByPoints == -1 ? '-' : playerRank.rankByPoints}, 
+                                                        data-checked=${playerRank.rankByGames == -1 ? '-' : playerRank.rankByGames}"></div>
             <div class="section" id="section-2">YOU</div>
             <div class="section" id="section-3" th:text="${playerRank.points}" 
-                                                ></div>
+                                                th:attr="data-default=${playerRank.points}, 
+                                                        data-checked=${playerRank.gamesWon}"></div>
         </div>
     </div>
-    <div id = "rec-games" class="rectangle-container">
-        <div class="rectangle">
-            <div class="section" id="section-1" th:text="${playerRank.rankByGames}" 
-                                                
-                                                       ></div>
-            <div class="section" id="section-2">YOU</div>
-            <div class="section" id="section-3" th:text="${playerRank.gamesWon}" 
-                                                ></div>
-        </div>
-    </div>
-
-
-
-
 
     <script src="t5/js/leaderboard.js"></script>
     
