@@ -1,3 +1,8 @@
+.achievements-container::-webkit-scrollbar {
+display: none;
+}
+
+
 .achievements-container {
     max-height: 200px; /* Altezza massima per il contenuto */
     overflow-y: auto; /* Abilita lo scroll verticale */
@@ -31,9 +36,7 @@
 .col-6 {
     display: flex;
     flex-direction: column;
-    
     height: 100%;
-    
 }
 
 /* Card con altezza bilanciata */
@@ -59,12 +62,12 @@
     font-weight: bold;
     margin-bottom: 0;
 }
-.btn-sm {
-    font-size: 0.875rem;
-    padding: 0 10px; /* Riduce il padding per mantenere la stessa altezza */
-    height: 30px; /* Altezza esplicita, uguale a quella della box */
-    line-height: 1.5; /* Allinea il testo al centro */
+
+
+.followed-list-container::-webkit-scrollbar {
+    display: none; /* Nasconde la barra per i browser basati su Webkit */
 }
+
 .followed-list-container {
     max-height: 150px; /* Altezza massima per limitare l'espansione */
     overflow-y: auto; /* Scroll verticale se il contenuto eccede */
@@ -100,6 +103,10 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+}
+
+.statistics-container::-webkit-scrollbar{
+    display: none;
 }
 
 .statistics-container {
@@ -166,7 +173,6 @@
 }
 
 .topRightContainer{
-    position: absolute; /* Posiziona rispetto al viewport */
     top: 10px; /* Distanza dall'alto */
     right: 10px; /* Distanza dal bordo destro */
     display: flex; /* Allinea gli elementi in fila */

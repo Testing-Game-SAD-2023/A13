@@ -41,7 +41,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">Informazioni Personali</h4>
-                                    <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#editModal">Modifica</button>
+                                    <button class="btn btn-secondary" data-toggle="modal" data-target="#editModal">Modifica</button>
                                 </div>
                                 <hr>
                                 
@@ -73,7 +73,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">Achievements</h4>
                                     <div class="d-flex align-items-center">
-                                        <button class="btn btn-secondary btn-sm" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
+                                        <button class="btn btn-secondary" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
                                         <div class="token-display">
                                             <p style="margin-top: 0; margin-bottom: 0;" th:text="'Token: ' + '' + ${user.missionToken}">numero token</p>
                                         </div>
@@ -182,15 +182,17 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h4 class="card-title mb-0">Lista Seguiti</h4>
-                                <button class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#searchPlayerModal">Ricerca Player</button>
+                                <button class="btn btn-secondary" data-toggle="modal" data-target="#searchPlayerModal">Ricerca Player</button>
                             </div>
                             <hr>
                             <div class="followed-list-container">
                                 <div th:each="element: ${user.following}" class="row">
-                                    <a class="col-8" 
-                                       th:href="@{'/profile/' + ${element.id}}" 
-                                       th:text="${element.name} + ' ' + ${element.surname}">
-                                    </a>
+                                    <div class="followed-item">
+                                        <a class="col-8" 
+                                        th:href="@{'/profile/' + ${element.id}}" 
+                                        th:text="${element.name} + ' ' + ${element.surname}">
+                                        </a> 
+                                    </div>
                                 </div>
                             </div>
                         </div>

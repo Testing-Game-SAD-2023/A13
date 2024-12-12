@@ -636,13 +636,9 @@ public class Controller {
     public ResponseEntity<User> getStudent(@PathVariable String ID) {
 
         User user = userRepository.findByID(Integer.parseInt(ID));
-        if (user != null) {
             return ResponseEntity.status(HttpStatus.OK)
                     .header("Content-Type", "application/json")
                     .body(user);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
     }
     
 
