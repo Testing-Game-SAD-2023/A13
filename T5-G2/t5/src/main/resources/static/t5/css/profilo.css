@@ -283,6 +283,22 @@ body {
 .user-header .text-muted {
     font-size: 0.8rem;
 }
+
+.container {
+    display: flex; /* Usa Flexbox */
+    flex-direction: row; /* Disposizione orizzontale */
+    gap: 1%; /* Riduce lo spazio tra le card */
+    width: 96%; /* Riduce i margini laterali per occupare più spazio */
+    max-width: 100%; /* Garantisce che non superi la larghezza della pagina */
+    height: auto; /* Adatta l'altezza al contenuto */
+    min-height: 90vh; /* Occupa la maggior parte dell'altezza della finestra */
+    padding: 1%; /* Margine interno */
+    margin: 2% auto; /* Centra il container e aggiunge un piccolo margine verticale */
+    box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
+    align-items: stretch; /* Uniforma l'altezza delle colonne */
+}
+
+
 /* Lista Amici */
 #friendsContainer {
     height: auto; /* Altezza basata sul contenuto */
