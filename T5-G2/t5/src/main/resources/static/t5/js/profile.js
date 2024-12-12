@@ -474,13 +474,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (uploadSubmitButton) {
         uploadSubmitButton.addEventListener("click", uploadProfilePicture);
     }
-});
-    
-
-    
-   
-
-    
 
 });
 
