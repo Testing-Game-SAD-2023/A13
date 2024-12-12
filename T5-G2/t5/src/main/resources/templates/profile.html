@@ -125,56 +125,57 @@
         
 
         <div id="friends" class="section">
-            <div class="row justify-content-center">
-                <div class="col-8">
+            <div class="container">
+                <div class="row">
                     <!-- Lista Amici -->
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h4 class="card-title text-center mb-4">Lista Amici</h4>
-                            <div id="friendsContainer" class="list-group">
-                              <div class="friend-item">
-                                <img src="/t5/images/profilo/sampleavatar.jpg" class="friend-avatar" alt="Avatar">
-                                <div class="friend-info">
-                                  <p class="friend-nickname">Nickname Esempio</p>
-                                  <p class="friend-id">ID: 12345</p>
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h4 class="card-title text-center mb-4">Lista Amici</h4>
+                                <div id="friendsContainer" class="list-group">
+                                    <div class="friend-item">
+                                        <img src="/t5/images/profilo/sampleavatar.jpg" class="friend-avatar" alt="Avatar">
+                                        <div class="friend-info">
+                                            <p class="friend-nickname">Nickname Esempio</p>
+                                            <p class="friend-id">ID: 12345</p>
+                                        </div>
+                                        <button class="btn btn-danger">Elimina</button>
+                                    </div>
                                 </div>
-                                <button class="btn btn-danger">Elimina</button>
-                              </div>
-                            </div>
-                            <p id="errorMessage" class="text-danger text-center mt-3"></p>
+                                <p id="errorMessage" class="text-danger text-center mt-3"></p>
                             </div>
                         </div>
                     </div>
-                      
-  
-        
-                    <!-- Form Cerca Amico -->
-                    <div class="card mt-4 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">Cerca Amico</h5>
-                            <div class="input-group">
-                                <input
-                                    type="text"
-                                    id="searchFriendInput"
-                                    class="form-control"
-                                    placeholder="Inserisci il nickname o l'ID dell'amico"
-                                />
-                                <button id="searchFriendButton" class="btn btn-primary">
-                                    Cerca
-                                </button>
-                            </div>
-                            <p id="searchFriendMessage" class="text-center mt-2"></p>
-                            <div id="searchResult" class="mt-3" style="display: none;">
-                                <p>Amico trovato: <span id="friendName"></span></p>
-                                <button id="addFriendButton" class="btn btn-success">
-                                    Aggiungi Amico
-                                </button>
+                    <!-- Cerca Amico -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm mt-4 mt-lg-0">
+                            <div class="card-body">
+                                <h5 class="card-title">Cerca Amico</h5>
+                                <div class="input-group">
+                                    <input
+                                        type="text"
+                                        id="searchFriendInput"
+                                        class="form-control"
+                                        placeholder="Inserisci il nickname o l'ID"
+                                    />
+                                    <button id="searchFriendButton" class="btn btn-primary">
+                                        Cerca
+                                    </button>
+                                </div>
+                                <p id="searchFriendMessage" class="text-center mt-2"></p>
+                                <div id="searchResult" class="mt-3" style="display: none;">
+                                    <p>Amico trovato: <span id="friendName"></span></p>
+                                    <button id="addFriendButton" class="btn btn-success">
+                                        Aggiungi Amico
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
 
         <div id="trophies" class="section">
             <div class="row">

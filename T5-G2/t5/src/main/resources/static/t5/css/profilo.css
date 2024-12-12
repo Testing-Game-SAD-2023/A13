@@ -237,26 +237,6 @@ body {
 }
 
 
-#friendsContainer {
-    font-family: 'Segoe UI'; /* Scegli un font moderno e leggibile */
-    font-size: 1.1rem; /* Aumenta la dimensione del font per una migliore leggibilità */
-    line-height: 1.5; /* Migliora la spaziatura tra le righe */
-    color: #333; /* Colore del testo */
-}
-
-#friendsContainer .list-group-item {
-    padding: 10px 15px; /* Aggiungi un po' di padding per un aspetto più pulito */
-    font-weight: 500; /* Imposta un peso del font leggermente più spesso */
-    border-radius: 5px; /* Aggiungi angoli arrotondati per un aspetto più morbido */
-    margin-bottom: 10px; /* Distanza tra gli elementi della lista */
-    transition: background-color 0.3s ease; /* Aggiungi una transizione per un effetto visivo piacevole */
-}
-
-/* Effetto hover sugli amici */
-#friendsContainer .list-group-item:hover {
-    background-color: #f0f0f0; /* Colore di sfondo quando si passa sopra con il mouse */
-    cursor: pointer; /* Cambia il cursore per indicare l'interattività */
-}
 
 /* Messaggio di errore */
 #errorMessage {
@@ -304,77 +284,93 @@ body {
     font-size: 0.8rem;
 }
 
-  /* Contenitore lista amici */
+/* Contenitore generale */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Lista Amici */
 #friendsContainer {
     max-height: 400px;
     overflow-y: auto;
     border: 1px solid #ddd;
     padding: 10px;
     background-color: #f9f9f9;
-  }
-  
-  /* Singolo elemento della lista */
-  #friendsContainer .friend-item {
+}
+
+/* Elementi lista */
+#friendsContainer .friend-item {
     display: flex;
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid #eee;
     transition: background-color 0.2s ease;
-  }
-  
-  #friendsContainer .friend-item:hover {
-    background-color: #f1f1f1;
-  }
-  
-  /* Avatar */
-  #friendsContainer .friend-avatar {
+}
+
+/* Avatar */
+#friendsContainer .friend-avatar {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 15px;
     border: 2px solid #ddd;
-  }
-  
-  /* Informazioni amico */
-  #friendsContainer .friend-info {
+}
+
+/* Informazioni amico */
+#friendsContainer .friend-info {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-  }
-  
-  /* Nickname */
-  #friendsContainer .friend-nickname {
+}
+
+/* Nickname */
+#friendsContainer .friend-nickname {
     font-weight: bold;
     font-size: 1.1rem;
-    color: #333 !important;
+    color: #333;
     margin: 0;
     text-transform: capitalize;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-  
-  /* ID amico */
-  #friendsContainer .friend-id {
-    font-size: 0.9rem;
-    color: #666;
-    margin: 0;
-  }
-  
-  /* Bottone elimina */
-  #friendsContainer .btn-danger {
+}
+
+/* Pulsante elimina */
+#friendsContainer .btn-danger {
+    margin-left: auto;
     font-size: 0.85rem;
     padding: 5px 15px;
-    margin-left: auto;
-  }
-  
-  #friendsContainer.btn-danger:hover {
+}
+#friendsContainer.btn-danger:hover {
     background-color: #0056b3;
     border-color: #0056b3;
   }
 
+/* Cerca Amico */
+.card.shadow-sm {
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
 
+/* Input e pulsante nella sezione Cerca Amico */
+.input-group {
+    display: flex;
+    align-items: center;
+}
 
+.input-group .form-control {
+    flex-grow: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
 
