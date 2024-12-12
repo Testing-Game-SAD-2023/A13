@@ -275,6 +275,73 @@ body {
     font-size: 1.2rem;
 }
 
+/* Stile per la card */
+.card {
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  /* Titolo della card */
+  .card-title {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Contenitore della lista amici */
+  #friendsContainer {
+    max-height: 400px; /* Altezza massima della lista */
+    overflow-y: auto; /* Scorrimento verticale */
+    border: 1px solid #ddd; /* Bordo sottile */
+    border-radius: 5px; /* Angoli arrotondati */
+    padding: 10px; /* Spazio interno */
+    background-color: #f9f9f9; /* Colore di sfondo */
+  }
+  
+  /* Elementi della lista amici */
+  .friend-item {
+    display: flex; /* Allinea gli elementi in fila */
+    align-items: center; /* Centra verticalmente */
+    padding: 10px; /* Spazio interno */
+    border-bottom: 1px solid #eee; /* Linea divisoria tra amici */
+  }
+  
+  /* Avatar */
+  .friend-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Rende l'immagine circolare */
+    object-fit: cover; /* Adatta l'immagine al contenitore */
+    margin-right: 15px; /* Spazio tra avatar e info */
+    border: 2px solid #ddd; /* Bordo intorno all'avatar */
+  }
+  
+  /* Informazioni sull'amico */
+  .friend-info {
+    flex-grow: 1; /* Occupa tutto lo spazio disponibile */
+    display: flex;
+    flex-direction: column; /* Posiziona nickname e ID in colonna */
+    justify-content: center; /* Centra verticalmente */
+  }
+  
+  /* Nickname */
+  .friend-nickname {
+    font-weight: bold; /* Testo in grassetto */
+    font-size: 1.2rem; /* Dimensione più grande */
+    color: #007bff; /* Colore del nickname */
+    text-transform: capitalize; /* Prima lettera maiuscola */
+  }
+  
+  
+  /* Bottone di eliminazione */
+  .btn-danger {
+    font-size: 0.8rem; /* Dimensione più piccola */
+    padding: 5px 10px; /* Margine interno ridotto */
+    margin-left: auto; /* Spinge il bottone all'estremità destra */
+  }
+  
+
 /* Stile per nome cognome e nickname in tutte le sezioni */
 .user-header {
     position: fixed;
