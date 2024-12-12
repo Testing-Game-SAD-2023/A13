@@ -35,6 +35,31 @@
                 <div class="col-lg-3">
                     <span><b th:text="#{leaderboard.statistic}"></b></span>
                     <div id="statistic-options">
+                        <div class="form-check">
+                            <input class="form-check-input statistic" type="radio" name="statistic" id="partite_giocate"
+                                value="Partite giocate">
+                            <label class="form-check-label btn btn-filter" for="partite_giocate" th:text="#{leaderboard.partite_giocate}"></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input statistic" type="radio" name="statistic" id="partite_vinte"
+                                value="Partite vinte">
+                            <label class="form-check-label btn btn-filter" for="partite_vinte" th:text="#{leaderboard.partite_vinte}"></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input statistic" type="radio" name="statistic" id="classi_testate"
+                                value="Classi testate" disabled>
+                            <label class="form-check-label btn btn-filter" for="classi_testate" th:text="#{leaderboard.classi_testate}"></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input statistic" type="radio" name="statistic" id="esempio_1"
+                                value="Esempio 1">
+                            <label class="form-check-label btn btn-filter" for="esempio_1">Esempio 1</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input statistic" type="radio" name="statistic" id="esempio_2"
+                                value="Esempio 2">
+                            <label class="form-check-label btn btn-filter" for="esempio_2">Esempio 2</label>
+                        </div>
                     </div>
                 </div>
 

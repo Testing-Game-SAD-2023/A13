@@ -11,11 +11,11 @@ const statisticOptions = {
     sfida: [
         { id: 'partite_giocate', label: 'Partite giocate' },
         { id: 'partite_vinte', label: 'Partite vinte' },
-        { id: '', label: 'Classi testate', disabled: true }
+        { id: 'classi_testate', label: 'Classi testate', disabled: true }
     ],
     scalata: [
-        { id: 'statistica1', label: 'Esempio1' },
-        { id: 'statistica2', label: 'Esempio2' },
+        { id: 'esempio_1', label: 'Esempio1' },
+        { id: 'esempio_2', label: 'Esempio2' },
 
     ]
 };
@@ -214,7 +214,7 @@ function renderPagination(currentPage) {
     const firstButton = document.createElement('li');
     firstButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
     firstButton.innerHTML = `
-        <button class="page-link" onclick="showPage(1)" aria-label="First">&laquo; First page</button>
+        <button class="page-link" onclick="showPage(1)" aria-label="First"><img src="/t5/Icone/first.svg" alt="First Page"/></button>
       `;
     pagination.appendChild(firstButton);
 
@@ -222,7 +222,7 @@ function renderPagination(currentPage) {
     const prevButton = document.createElement('li');
     prevButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
     prevButton.innerHTML = `
-        <button class="page-link" onclick="showPage(${currentPage - 1})" aria-label="Previous">&laquo; Previous</button>
+        <button class="page-link" onclick="showPage(${currentPage - 1})" aria-label="Previous"><img src="/t5/Icone/previous.svg" alt="Previous"/></button>
       `;
     pagination.appendChild(prevButton);
 
@@ -238,7 +238,7 @@ function renderPagination(currentPage) {
     const nextButton = document.createElement('li');
     nextButton.className = `page-item ${currentPage === lastPage ? 'disabled' : ''}`;
     nextButton.innerHTML = `
-        <button class="page-link" onclick="showPage(${currentPage + 1})" aria-label="Next">Next &raquo;</button>
+        <button class="page-link" onclick="showPage(${currentPage + 1})" aria-label="Next"><img src="/t5/Icone/next.svg" alt="Next"/></button>
       `;
     pagination.appendChild(nextButton);
 
@@ -246,7 +246,7 @@ function renderPagination(currentPage) {
     const lastButton = document.createElement('li');
     lastButton.className = `page-item ${currentPage === lastPage ? 'disabled' : ''}`;
     lastButton.innerHTML = `
-        <button class="page-link" onclick="showPage(${lastPage})" aria-label="First">&laquo; Last page</button>
+        <button class="page-link" onclick="showPage(${lastPage})" aria-label="Last"><img src="/t5/Icone/last.svg" alt="Last"/></button>
       `;
     pagination.appendChild(lastButton);
 }
@@ -271,39 +271,31 @@ function renderTableError(error) {
 
 // Render statistic options based on the selected gamemode
 function updateStatisticOptions(gamemode) {
-    const container = document.getElementById('statistic-options');
-    container.innerHTML = '';
+    const statisticSelector = document.getElementById('statistic-options');
+    const options = statisticSelector.querySelectorAll('.form-check');
 
-    // render selectors
-    statisticOptions[gamemode].forEach(option => {
-        const optionDiv = document.createElement('div');
-        optionDiv.className = 'form-check';
+    // render selectors based on gamemode
+    const statisticsToShow = statisticOptions[gamemode]?.map(option => option.id) || [];
 
-        const input = document.createElement('input');
-        input.className = 'form-check-input statistic';
-        input.type = 'radio';
-        input.name = 'statistic';
-        input.id = option.id;
-        input.value = option.label;
-        if (option?.disabled == true)
-            input.disabled = true;
-
-        const label = document.createElement('label');
-        label.className = 'form-check-label btn btn-filter';
-        label.htmlFor = option.id;
-        label.textContent = option.label;
-
-        optionDiv.appendChild(input);
-        optionDiv.appendChild(label);
-        container.appendChild(optionDiv);
+    options.forEach(option => {
+        const input = option.querySelector('input');
+        if (input && statisticsToShow.includes(input.id)) {
+            option.className = 'form-check';
+        } else {
+            option.className = 'form-check d-none';
+        }
     });
 
-    // Select the first option by default
-    if (container.firstChild) {
-        container.firstChild.querySelector('input').checked = true;
+    // select the first option by default
+    for (const option of options) {
+        if (!option.classList.contains('d-none')) {
+            const input = option.querySelector('input');
+            input.checked = true;
+            break;
+        }
     }
 
-    // add showPage trigger on selection
+    // add listener on select
     const statisticSelectors = document.querySelectorAll('input[name="statistic"]');
     statisticSelectors.forEach(selector => {
         selector.addEventListener('change', (event) => {
@@ -396,8 +388,11 @@ const gamemodeSelectors = document.querySelectorAll('input[name="gamemode"]');
 gamemodeSelectors.forEach(selector => {
     selector.addEventListener('change', (event) => {
         if (event.target.checked) {
+            // clean up search box
             const email = document.getElementById('lb-search-box');
             email.value = "";
+
+            // update selectors and show first page
             updateStatisticOptions(event.target.id);
             showPage(1);
         }
