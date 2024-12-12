@@ -304,18 +304,17 @@ body {
     font-size: 0.8rem;
 }
 
-  /* Contenitore della lista */
-  #friendsContainer {
+  /* Contenitore lista amici */
+#friendsContainer {
     max-height: 400px;
     overflow-y: auto;
     border: 1px solid #ddd;
-    border-radius: 5px;
     padding: 10px;
     background-color: #f9f9f9;
   }
   
   /* Singolo elemento della lista */
-  .friend-item {
+  #friendsContainer .friend-item {
     display: flex;
     align-items: center;
     padding: 10px;
@@ -323,13 +322,12 @@ body {
     transition: background-color 0.2s ease;
   }
   
-  /* Hover per un miglior feedback */
-  .friend-item:hover {
+  #friendsContainer .friend-item:hover {
     background-color: #f1f1f1;
   }
   
   /* Avatar */
-  .friend-avatar {
+  #friendsContainer .friend-avatar {
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -338,8 +336,8 @@ body {
     border: 2px solid #ddd;
   }
   
-  /* Contenitore delle informazioni */
-  .friend-info {
+  /* Informazioni amico */
+  #friendsContainer .friend-info {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -347,10 +345,10 @@ body {
   }
   
   /* Nickname */
-  .friend-nickname {
+  #friendsContainer .friend-nickname {
     font-weight: bold;
     font-size: 1.1rem;
-    color: #333;
+    color: #333 !important;
     margin: 0;
     text-transform: capitalize;
     overflow: hidden;
@@ -358,24 +356,21 @@ body {
     white-space: nowrap;
   }
   
-  /* ID */
-    .friend-id {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-    
+  /* ID amico */
+  #friendsContainer .friend-id {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+  }
+  
   /* Bottone elimina */
-  .btn-danger {
+  #friendsContainer .btn-danger {
     font-size: 0.85rem;
     padding: 5px 15px;
     margin-left: auto;
-    background-color: #007bff;
-    border-color: #007bff;
   }
   
-  .btn-danger:hover {
+  #friendsContainer.btn-danger:hover {
     background-color: #0056b3;
     border-color: #0056b3;
   }
