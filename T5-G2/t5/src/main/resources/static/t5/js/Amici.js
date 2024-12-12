@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
             credentials: "include",
         })
             .then(response => {
-                if (!response.ok) throw new Error("Errore durante l'aggiunta dell'amico.");
+                if (!response.ok) throw new Error("Siete già Amici!");
                 return response.text();
             })
             .then(message => {

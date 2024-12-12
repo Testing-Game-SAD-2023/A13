@@ -353,11 +353,16 @@ body {
 
 /* Cerca Amico */
 .card.shadow-sm {
-    border-radius: 1%; /* Border-radius in percentuale */
+    border-radius: 1%; /* Mantiene angoli arrotondati */
     background-color: #ffffff;
-    box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1); /* Ombra in em */
+    box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1); /* Ombra */
     overflow: hidden;
+    padding: 2%; /* Aumenta lo spazio interno */
+    min-height: 40vh; /* Altezza minima al 40% della finestra */
+    width: 90%; /* Larghezza della card relativa al contenitore */
+    margin: 0 auto; /* Centrata orizzontalmente */
 }
+
 
 /* Input e pulsante nella sezione Cerca Amico */
 .input-group {
