@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,9 @@ public class AssignmentService {
 
     @Autowired
     private AssignmentRepository assignmentRepository;
+
+    @Autowired
+    private StudentService studentService;
 
     //Modifica 07/12/2024 : creazione funzione per la creazione di un assignment
     @Transactional
@@ -236,6 +240,7 @@ public class AssignmentService {
         // 8. Restituisci la risposta di successo
         return ResponseEntity.status(HttpStatus.OK).body("Assignment rimosso con successo dal Team.");
     }
+
 
   
 }

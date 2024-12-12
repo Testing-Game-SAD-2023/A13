@@ -2,6 +2,7 @@ package com.example.db_setup.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -144,5 +145,84 @@ public class UserService {
                                  .body("Errore interno del server.");
         }
     }
+
+    //Modifica 12/12/2024
+    public List<Map<String, Object>> getStudentsBySurnameAndName(Map<String, String> request) {
+        String surname = request.get("surname");
+        String name = request.get("name");
+        List<User> users = new ArrayList<>();
+    
+        // Verifica se surname è "null" o vuoto
+        if (isNullOrEmpty(surname) && !isNullOrEmpty(name)) {
+            users = userRepository.findByName(name);
+        }
+        // Verifica se name è "null" o vuoto
+        else if (!isNullOrEmpty(surname) && isNullOrEmpty(name)) {
+            users = userRepository.findBySurname(surname);
+        }
+        // Se entrambi i parametri sono forniti e non vuoti
+        else if (!isNullOrEmpty(surname) && !isNullOrEmpty(name)) {
+            users = userRepository.findBySurnameAndName(surname, name);
+        }
+        // Gestisci caso in cui entrambi i parametri sono nulli o vuoti
+        else {
+            // Ad esempio, puoi restituire tutti gli utenti se entrambi i parametri sono nulli o vuoti
+            users = userRepository.findAll();
+        }
+    
+        // Restituisci la lista degli utenti mappati in formato JSON
+        return mapUsersToResponseList(users);
+    }
+    
+    // Metodo di utilità per verificare se una stringa è null o vuota
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+    
+    
+    
+
+
+    // Metodo di utilità per mappare una lista di utenti in una lista di mappe
+    private List<Map<String, Object>> mapUsersToResponseList(List<User> users) {
+        List<Map<String, Object>> responseList = new ArrayList<>();
+        for (User user : users) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", user.getID());
+            response.put("name", user.getName());
+            response.put("surname", user.getSurname());
+            response.put("email", user.getEmail());
+            responseList.add(response);
+        }
+        return responseList;
+    }
+
+
+    public List<Map<String, Object>> searchStudents(Map<String, String> request) {
+        String email = request.get("email");
+        String surname = request.get("surname");
+        String name = request.get("name");
+        
+        List<Map<String, Object>> responseList = new ArrayList<>();
+        
+        // Caso 1: Cerca per email
+        if (email != null && !email.isEmpty()) {
+            Map<String, Object> student = getStudentByEmail(email); // Ritorna subito una lista con un solo elemento
+            responseList.add(student);
+            return responseList;
+        }
+        
+        // Caso 2: Cerca per nome o cognome
+        if ((surname != null && !surname.isEmpty()) || (name != null && !name.isEmpty())) {
+            return getStudentsBySurnameAndName(request); // Passa la ricerca al metodo che gestisce nome e cognome
+        }
+        
+        // Caso 3: Nessun parametro valido fornito
+        return responseList;
+    }
+
+    
+
+
 }
 

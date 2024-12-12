@@ -129,6 +129,19 @@ public class Controller {
         return userService.getStudentByEmail(emailStudent);
     }
 
+    //Modifica 12/12/2024
+    @GetMapping("/studentsByNameSurname")
+    @ResponseBody
+    public List<Map<String,Object>> getStudentsBySurnameAndName(@RequestBody Map<String, String> request){
+        return userService.getStudentsBySurnameAndName(request);
+    }
+
+    @GetMapping("/searchStudents")
+    @ResponseBody
+    public List<Map<String,Object>> searchStudents(@RequestBody Map<String, String> request){
+        return userService.searchStudents(request);
+    }
+
 
     // Registrazione
     @PostMapping("/register")

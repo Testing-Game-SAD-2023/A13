@@ -47,5 +47,4 @@ public class AssignmentController {
         return assignmentService.deleteAssignment(idAssignment,jwt);
     }
 
-
 }
