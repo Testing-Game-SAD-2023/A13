@@ -267,13 +267,7 @@ body {
     margin-top: 20px;
 }
 
-/*id nella lista degli amici*/
-.friend-id {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
+
 
 /* Stile per la card */
 .card {
@@ -288,60 +282,7 @@ body {
     font-weight: bold;
     color: #333;
   }
-  
-  /* Contenitore della lista amici */
-  #friendsContainer {
-    max-height: 400px; /* Altezza massima della lista */
-    overflow-y: auto; /* Scorrimento verticale */
-    border: 1px solid #ddd; /* Bordo sottile */
-    border-radius: 5px; /* Angoli arrotondati */
-    padding: 10px; /* Spazio interno */
-    background-color: #f9f9f9; /* Colore di sfondo */
-  }
-  
-  /* Elementi della lista amici */
-  .friend-item {
-    display: flex; /* Allinea gli elementi in fila */
-    align-items: center; /* Centra verticalmente */
-    padding: 10px; /* Spazio interno */
-    border-bottom: 1px solid #eee; /* Linea divisoria tra amici */
-  }
-  
-  /* Avatar */
-  .friend-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%; /* Rende l'immagine circolare */
-    object-fit: cover; /* Adatta l'immagine al contenitore */
-    margin-right: 15px; /* Spazio tra avatar e info */
-    border: 2px solid #ddd; /* Bordo intorno all'avatar */
-  }
-  
-  /* Informazioni sull'amico */
-  .friend-info {
-    flex-grow: 1; /* Occupa tutto lo spazio disponibile */
-    display: flex;
-    flex-direction: column; /* Posiziona nickname e ID in colonna */
-    justify-content: center; /* Centra verticalmente */
-  }
-  
-  /* Nickname */
-  .friend-nickname {
-    font-weight: bold; /* Testo in grassetto */
-    font-size: 1.2rem; /* Dimensione più grande */
-    color: #007bff; /* Colore del nickname */
-    text-transform: capitalize; /* Prima lettera maiuscola */
-  }
-  
-  
-  /* Bottone di eliminazione */
-  .btn-danger {
-    font-size: 0.8rem; /* Dimensione più piccola */
-    padding: 5px 10px; /* Margine interno ridotto */
-    margin-left: auto; /* Spinge il bottone all'estremità destra */
-  }
-  
-
+   
 /* Stile per nome cognome e nickname in tutte le sezioni */
 .user-header {
     position: fixed;
@@ -362,6 +303,82 @@ body {
 .user-header .text-muted {
     font-size: 0.8rem;
 }
+
+  /* Contenitore della lista */
+  #friendsContainer {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Singolo elemento della lista */
+  .friend-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+  }
+  
+  /* Hover per un miglior feedback */
+  .friend-item:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Avatar */
+  .friend-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid #ddd;
+  }
+  
+  /* Contenitore delle informazioni */
+  .friend-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* Nickname */
+  .friend-nickname {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0;
+    text-transform: capitalize;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* ID */
+    .friend-id {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+  /* Bottone elimina */
+  .btn-danger {
+    font-size: 0.85rem;
+    padding: 5px 15px;
+    margin-left: auto;
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-danger:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
 
 
 

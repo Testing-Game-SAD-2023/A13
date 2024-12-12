@@ -130,13 +130,22 @@
                     <!-- Lista Amici -->
                     <div class="card shadow-sm">
                         <div class="card-body">
-                        <h4 class="card-title text-center mb-4">Lista Amici</h4>
-                        <div id="friendsContainer" class="list-group">
-                            <!-- Gli amici verranno caricati dinamicamente qui -->
+                          <h4 class="card-title text-center mb-4">Lista Amici</h4>
+                          <div id="friendsContainer" class="list-group">
+                            <div class="friend-item">
+                              <img src="/t5/images/profilo/sampleavatar.jpg" class="friend-avatar" alt="Avatar">
+                              <div class="friend-info">
+                                <p class="friend-nickname">Nickname Esempio</p>
+                                <p class="friend-id">ID: 12345</p>
+                              </div>
+                              <button class="btn btn-danger">Elimina</button>
+                            </div>
+                            <!-- Altri amici caricati dinamicamente -->
+                          </div>
+                          <p id="errorMessage" class="text-danger text-center mt-3"></p>
                         </div>
-                        <p id="errorMessage" class="text-danger text-center mt-3"></p>
-                        </div>
-                    </div>
+                      </div>
+                      
   
         
                     <!-- Form Cerca Amico -->
