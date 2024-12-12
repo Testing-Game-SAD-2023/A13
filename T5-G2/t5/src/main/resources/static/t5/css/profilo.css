@@ -283,23 +283,10 @@ body {
 .user-header .text-muted {
     font-size: 0.8rem;
 }
-
-/* Contenitore generale */
-.container {
-    display: flex; /* Usa Flexbox */
-    flex-direction: row; /* Disposizione orizzontale */
-    gap: 2%; /* Spazio tra le card */
-    width: 100vw; /* Occupa tutta la larghezza della finestra */
-    height: 100vh; /* Occupa tutta l'altezza della finestra */
-    padding: 1%; /* Margine interno */
-    box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
-    align-items: stretch; /* Uniforma l'altezza delle colonne */
-}
-
 /* Lista Amici */
 #friendsContainer {
-    flex: 3; /* Occupa più spazio rispetto alla sezione Cerca Amico */
-    height: 100%; /* Altezza pari al contenitore */
+    height: auto; /* Altezza basata sul contenuto */
+    max-height: 80vh; /* Altezza massima per prevenire overflow */
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 0.5em;
@@ -343,38 +330,16 @@ body {
     padding: 1% 3%;
 }
 
-/* Cerca Amico */
+/* Card Cerca Amico */
 .card.shadow-sm {
-    flex: 2; /* Occupa meno spazio rispetto alla Lista Amici */
-    height: 100%; /* Altezza pari al contenitore */
+    height: auto; /* Altezza basata sul contenuto */
     background-color: #ffffff;
     border-radius: 0.5em;
     box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    padding: 2%;
+    padding: 2%; /* Margine interno */
     box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-/* Input e pulsante nella sezione Cerca Amico */
-.input-group {
-    display: flex;
-    align-items: center;
-}
-
-.input-group .form-control {
-    flex-grow: 1;
-    font-size: 100%;
-    padding: 1%;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.input-group .btn {
-    font-size: 100%;
-    padding: 1% 2%;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
