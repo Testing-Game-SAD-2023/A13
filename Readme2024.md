@@ -37,7 +37,7 @@ L'amministratore del Gioco può:
 ![Demo Edit Profile](Documentazione/Documentazione_2024/Video_Demo/Demo_Edit_Profile.mp4)
 
 2. Video dimostrativo della funzionalità: "Notifica Achievement"
-![Demo Notifica Achievement](Documentazione/Documentazione_2024/Video_Demo/Demo_Nuovo Achievement.mp4)
+![Demo Notifica Achievement](Documentazione/Documentazione_2024/Video_Demo/Demo_Nuovo_Achievement.mp4)
 
 3. Video dimostrativo delle funzionalità: "Seguire un altro giocatore" e "Notifica Follow"
 ![Demo Follow Player](Documentazione/Documentazione_2024/Video_Demo/Demo_Follow_Player.mp4)
