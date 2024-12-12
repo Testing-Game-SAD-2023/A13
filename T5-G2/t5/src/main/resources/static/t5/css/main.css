@@ -937,42 +937,5 @@ button.btn:hover {
 #modifyAvatarButton {
   margin-top: 10px; /* Aggiungi uno spazio tra l'immagine e il pulsante */
 }
-/*Lista amici style GabMan 04/12*/
-/* Contenitore generale */
-#friendsContainer {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-}
-
-/* Stile per un singolo amico */
-.friend-item {
-  display: flex; /* Utilizza Flexbox per il layout */
-  align-items: center; /* Allinea verticalmente */
-  padding: 10px;
-  border-bottom: 1px solid #ddd; /* Aggiungi una separazione tra gli amici */
-  background-color: #f9f9f9; /* Colore di sfondo */
-  border-radius: 5px;
-  margin-bottom: 5px;
-}
-
-.friend-avatar {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  margin-right: 15px; /* Spazio tra avatar e testo */
-  border-radius: 50%; /* Rendi l'avatar circolare */
-}
-
-.friend-info {
-  flex-grow: 1; /* Fai espandere questa sezione per riempire lo spazio */
-  text-align: left;
-}
-
-.delete-friend-btn {
-  margin-left: auto; /* Sposta il pulsante all'estrema destra */
-  padding: 5px 10px; /* Aggiusta padding del pulsante */
-}
 
 
