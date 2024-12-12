@@ -10,10 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const biographyInput = document.getElementById("biography");
     const avatarSelection = document.getElementById('avatarSelection');
     const currentProfilePicture = document.getElementById('currentProfilePicture');
-    //GabMan08/12 - Modifica info profilo
     const editInfoButton = document.getElementById("editInfoButton");
     const editInfoForm = document.getElementById("editInfoForm");
     const cancelEditInfoButton = document.getElementById("cancelEditInfoButton");
+    const uploadButton = document.getElementById("uploadProfilePictureButton"); // Pulsante "+"
+    const uploadForm = document.getElementById("uploadProfilePictureForm"); // Form di upload
+    const uploadSubmitButton = document.getElementById("uploadProfilePictureSubmitButton"); // Pulsante "Upload"
     
     
 
@@ -403,46 +405,77 @@ document.addEventListener("DOMContentLoaded", () => {
     activateButton("profile");
     showSection("profile");
 
-    //GabMan 10/12 - Caricamento immagine profilo
-    document.addEventListener("DOMContentLoaded", () => {
-        const uploadButton = document.getElementById("uploadProfilePictureButton");
-        const uploadForm = document.getElementById("uploadProfilePictureForm");
     
-        // Mostra il form di upload quando si clicca sul pulsante +
+    //by GabMan 12/12 FORM di Upload Immagine
+    if (uploadButton && uploadForm) {
         uploadButton.addEventListener("click", () => {
             uploadForm.style.display = uploadForm.style.display === "none" ? "block" : "none";
         });
-    });
-    
+    }
+       
+    // by GabMan 12/12 Funzione per il caricamento dell'immagine (chiamata dal pulsante "Upload")
     const uploadProfilePicture = async () => {
         const fileInput = document.getElementById("profilePictureUploadInput");
-        const formData = new FormData();
-    
-        if (fileInput.files.length > 0) {
-            formData.append("profilePicture", fileInput.files[0]);
-    
-            try {
-                const response = await fetch("/updateProfilePicture", {
-                    method: "POST",
-                    body: formData,
-                });
-    
-                if (response.ok) {
-                    const data = await response.json();
-                    alert("Immagine caricata con successo!");
-                    // Aggiorna l'immagine del profilo con quella caricata
-                    document.getElementById("currentProfilePicture").src = data.imageUrl;
-                } else {
-                    alert("Errore durante il caricamento dell'immagine.");
-                }
-            } catch (error) {
-                console.error("Errore durante il caricamento:", error);
-                alert("Errore durante il caricamento.");
-            }
-        } else {
+        const currentProfilePicture = document.getElementById("currentProfilePicture");
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+        if (fileInput.files.length === 0) {
             alert("Seleziona un file da caricare.");
+            return;
+        }
+
+        const file = fileInput.files[0];
+
+        // Controlla il tipo di file
+        if (!file.type.startsWith("image/")) {
+            alert("Il file selezionato non è un'immagine.");
+            return;
+        }
+
+        // Controlla la dimensione del file
+        if (file.size > MAX_FILE_SIZE) {
+            alert("Il file selezionato è troppo grande. Dimensione massima: 5 MB.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("profilePicture", file);
+
+        try {
+            const response = await fetch("/updateProfilePicture", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Aggiorna l'immagine del profilo
+                if (currentProfilePicture) {
+                    currentProfilePicture.src = data.imageUrl;
+                }
+
+                alert("Immagine caricata con successo!");
+
+                // Nascondi il modulo dopo l'upload
+                uploadForm.style.display = "none";
+            } else {
+                const errorText = await response.text();
+                console.error("Errore durante il caricamento:", errorText);
+                alert(`Errore durante il caricamento: ${errorText}`);
+            }
+        } catch (error) {
+            console.error("Errore durante il caricamento:", error);
+            alert("Si è verificato un errore durante il caricamento. Riprova più tardi.");
         }
     };
+
+    // Collega la funzione al clic del pulsante "Upload"
+    if (uploadSubmitButton) {
+        uploadSubmitButton.addEventListener("click", uploadProfilePicture);
+    }
+});
+    
 
     
    

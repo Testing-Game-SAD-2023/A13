@@ -71,8 +71,9 @@
                         <form id="uploadProfilePictureForm" style="display: none;" enctype="multipart/form-data">
                             <label for="profilePictureUploadInput" style="display: block; margin-top: 15px;">Carica la tua immagine di profilo:</label>
                             <input type="file" id="profilePictureUploadInput" name="profilePicture" accept="image/*" class="form-control-file">
-                            <button type="button" class="btn btn-primary mt-2" onclick="uploadProfilePicture()">Carica</button>
+                            <button type="button" class="btn btn-primary mt-2" id="uploadProfilePictureSubmitButton">Upload</button>
                         </form>
+                        
 
                         <form action="/updateAvatar" method="POST">
                             <input type="hidden" id="selectedAvatar" name="avatar" value="">
