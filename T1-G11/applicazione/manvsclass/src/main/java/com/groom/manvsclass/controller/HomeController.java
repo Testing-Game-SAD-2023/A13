@@ -90,6 +90,7 @@ import org.springframework.web.bind.annotation.RequestParam;
     @Autowired
     private ChallengeService challengeService;
  
+
      @GetMapping("/home_adm")
      public ModelAndView showHomeAdmin(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
          return adminService.showHomeAdmin(request, jwt);
@@ -565,7 +566,7 @@ import org.springframework.web.bind.annotation.RequestParam;
     /**
      * Crea una nuova challenge.
      */
-    @PostMapping("/challenges")
+    @PostMapping("/challenge_create")
     public ResponseEntity<Challenge> createChallenge(
             @RequestBody Challenge challenge,
             @CookieValue(name = "jwt", required = false) String jwt) {
@@ -643,11 +644,19 @@ import org.springframework.web.bind.annotation.RequestParam;
     }
 
 
+    //route bottone della challenge
     @GetMapping("/challenges_show")
     @ResponseBody
     public ModelAndView showChallengeManagementPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         return adminService.showChallengeManagementPage(request, jwt);
     }   
+
+
+    @GetMapping("/challenge_view")
+    public ResponseEntity<String> getAllChallengesAsHtml(@RequestHeader("Authorization") String jwt) {
+        String token = jwt.replace("Bearer ", ""); // Rimuove il prefisso Bearer
+        return challengeService.getAllChallengesAsHtml(token);
+    }
 
 
 

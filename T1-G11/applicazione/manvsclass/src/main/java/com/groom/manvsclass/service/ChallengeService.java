@@ -1,6 +1,7 @@
 package com.groom.manvsclass.service;
 
 import com.groom.manvsclass.model.Challenge;
+import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.VictoryConditionType;
 import com.groom.manvsclass.model.repository.ChallengeRepository;
 import com.groom.manvsclass.model.repository.ChallengeSearchImpl;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List; // Se utilizzi anche List
-
 import java.util.List;
 
 @Service
@@ -190,5 +190,34 @@ public class ChallengeService {
     }
     return false;
 }
+
+//funzione di lista challenge:
+ public ResponseEntity<String> getAllChallengesAsHtml(String jwt) {
+        // Controlla se il JWT è valido
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Accesso non autorizzato");
+        }
+    
+        // Recupera tutti i Challenge dal repository
+        List<Challenge> challenges = challengeRepository.findAll();
+    
+        // Genera il contenuto HTML per il corpo della tabella
+        StringBuilder htmlBuilder = new StringBuilder();
+        for (Challenge challenge : challenges) {
+            htmlBuilder.append("<tr>")
+                .append("<td>").append(challenge.getChallengeName()).append("</td>")
+                .append("<td>").append(challenge.getDescription()).append("</td>")
+                .append("<td>").append(challenge.getTeamId()).append("</td>")
+                .append("<td>").append(challenge.getStartDate()).append("</td>")
+                .append("<td>").append(challenge.getEndDate()).append("</td>")
+                .append("<td>").append(challenge.getVictoryCondition()).append("</td>")
+                .append("</tr>");
+        }
+        return ResponseEntity.ok(htmlBuilder.toString());
+    }
+
+
+
+
     
 }

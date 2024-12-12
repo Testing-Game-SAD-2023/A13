@@ -86,25 +86,79 @@
             font-size: 14px;
             transition: all 0.3s ease-in-out;
         }
-        .table-container {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
         }
-        table {
+        label {
+            font-weight: 500;
+            color: #34495e;
+        }
+        input, textarea, button {
             width: 100%;
-            border-collapse: collapse;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
         }
+        input:focus, textarea:focus {
+            border-color: #1abc9c;
+            box-shadow: 0 0 5px rgba(26, 188, 156, 0.5);
+            outline: none;
+        }
+        textarea {
+            resize: none;
+        }
+        button {
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #16a085;
+        }
+        button:active {
+            background-color: #149174;
+            transform: scale(0.98);
+        }
+        #selectedStudents {
+            list-style-type: none;
+            padding-left: 0;
+            font-size: 0.8em; /* Stile simile a un h5 */
+            margin: 0;
+        }
+
+        #selectedStudents li {
+            margin-bottom: 5px; /* Spaziatura tra gli elementi */
+        }
+        .table-container {
+            max-height: 400px; /* Imposta l'altezza massima del contenitore */
+            overflow-y: auto; /* Abilita lo scrolling verticale */
+            border: 1px solid #ccc; /* Aggiungi un bordo per evidenziare l'area scrollabile */
+        }
+
+        table {
+            width: 100%; /* La tabella occupa tutta la larghezza del contenitore */
+            border-collapse: collapse; /* Rimuove gli spazi tra i bordi delle celle */
+        }
+
         th, td {
             padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #ddd; /* Linea di separazione tra le righe */
         }
+
         th {
-            background-color: #f4f4f4;
-            position: sticky;
-            top: 0;
-            z-index: 1;
+            background-color: #f4f4f4; /* Colore di sfondo per l'intestazione */
+            position: sticky; /* Rende l'intestazione sempre visibile */
+            top: 0; /* Necessario per sticky */
+            z-index: 1; /* Mantiene l'intestazione sopra al contenuto */
         }
     </style>
 </head>
@@ -132,18 +186,35 @@
                 <label for="challengeName">Nome Challenge:</label>
                 <input type="text" id="challengeName" name="challengeName" required>
 
+                <label for="creator">Nome Creator:</label>
+                <input type="text" id="creatorId" name="creatorId" required>
+
                 <label for="description">Descrizione:</label>
                 <textarea id="description" name="description" rows="3" required></textarea>
 
-                <label for="teamId">ID Team:</label>
-                <input type="text" id="teamId" name="teamId" required>
+                <select id="teamSelect">
+                    <!-- Opzioni team generate dinamicamente -->
+                </select>
 
                 <label for="startDate">Data Inizio:</label>
                 <input type="date" id="startDate" name="startDate" required>
 
                 <label for="endDate">Data Fine:</label>
                 <input type="date" id="endDate" name="endDate" required>
-
+                
+                <label for="status">Tipo di stato: </label>
+                <select id="status">
+                    <option value="In Attesa">In Attesa</option>
+                    <option value="In Corso">In Corso</option>
+                    <option value="Completata">Completata</option>
+                </select>
+                <label for="challengeType">Tipo di challenge: </label>
+                <select id="victoryConditionType">
+                    <option value="GAMES_PLAYED">GAMES_PLAYED</option>
+                </select>
+                <label for="victoryCondition">Condizione di vittoria:</label>
+                <textarea id="victoryCondition" name="victoryCondition" rows="3" required></textarea>
+                
                 <button type="submit" id="CreaChallenge">Aggiungi Challenge</button>
             </form>
         </div>
