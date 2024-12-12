@@ -3,7 +3,10 @@ package com.groom.manvsclass.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.mail.MessagingException;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 
+import com.groom.manvsclass.controller.EmailService;
 import com.groom.manvsclass.model.Assignment;
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.TeamAdmin;
@@ -37,6 +41,12 @@ public class AssignmentService {
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired 
+    private EmailService emailService;
+
+    @Autowired
+    private TeamService teamService;
 
     //Modifica 07/12/2024 : creazione funzione per la creazione di un assignment
     @Transactional
@@ -93,7 +103,28 @@ public class AssignmentService {
         List<String> idsStudentiTeam = existingTeam.getStudenti();
         inviaNotificaStudenti(idsStudentiTeam);
 
-        // 10. Restituisci la risposta di successo
+        //10. Invio email agli utenti del team
+        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(idsStudentiTeam, jwt);
+        if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
+            return ResponseEntity.status(dettagliStudentiResponse.getStatusCode())
+                    .body("Errore nel recupero delle informazioni sugli studenti: " + dettagliStudentiResponse.getBody());
+        }
+
+        // 11. Recupera i dettagli degli studenti
+        List<Map<String, Object>> studentiDettagli = (List<Map<String, Object>>) dettagliStudentiResponse.getBody();
+        List<String> emails = studentiDettagli.stream()
+            .map(student -> (String) student.get("email"))
+            .collect(Collectors.toList());
+
+        // 12. Invia email di notifica agli studenti aggiunti
+        
+        try {
+            emailService.sendTeamNewAssignment(emails, existingTeam.getName(),assignment.getDataScadenza(),assignment.getTitolo(),assignment.getDescrizione());
+        } catch (MessagingException e) {
+            System.out.println("Errore durante l'invio della email.");
+        }
+
+        // 13. Restituisci la risposta di successo
         return ResponseEntity.status(HttpStatus.CREATED).body("Assignment creato con successo e associato al Team.");
     }
 
