@@ -286,38 +286,46 @@ body {
 
 /* Contenitore generale */
 .container {
-    max-width: 100%;
-    width: 90%;
-    margin: 0 auto;
-    padding: 0 15px;
+    display: flex; /* Usa Flexbox */
+    flex-direction: row; /* Disposizione orizzontale */
+    gap: 2%; /* Spazio tra le card */
+    width: 100vw; /* Occupa tutta la larghezza della finestra */
+    height: 100vh; /* Occupa tutta l'altezza della finestra */
+    padding: 1%; /* Margine interno */
+    box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
+    align-items: stretch; /* Uniforma l'altezza delle colonne */
 }
 
 /* Lista Amici */
 #friendsContainer {
-    max-height: 50vh; /* Altezza massima al 50% dell'altezza della finestra */
-    overflow-y: auto;
-    border: 1% solid #ddd; /* Spessore bordo in percentuale */
-    padding: 2%; /* Padding relativo al contenitore */
+    flex: 3; /* Occupa più spazio rispetto alla sezione Cerca Amico */
+    height: 100%; /* Altezza pari al contenitore */
     background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 0.5em;
+    box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* Scroll verticale per contenuti lunghi */
+    padding: 2%; /* Margine interno */
+    box-sizing: border-box; /* Garantisce che padding non sfori il contenitore */
 }
 
 /* Elementi lista */
 #friendsContainer .friend-item {
     display: flex;
     align-items: center;
-    padding: 2%; /* Padding relativo */
-    border-bottom: 0.1em solid #eee; /* Spessore del bordo in em */
+    padding: 1.5%;
+    border-bottom: 0.1em solid #eee;
     transition: background-color 0.2s ease;
 }
 
 /* Avatar */
 #friendsContainer .friend-avatar {
-    width: 8%; /* Larghezza relativa */
-    height: auto; /* Mantiene le proporzioni */
+    width: 10%; /* Larghezza relativa */
+    height: auto;
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 2%; /* Margine destro relativo */
-    border: 0.2em solid #ddd; /* Spessore del bordo in em */
+    margin-right: 2%;
+    border: 0.2em solid #ddd;
 }
 
 /* Informazioni amico */
@@ -328,41 +336,27 @@ body {
     justify-content: center;
 }
 
-/* Nickname */
-#friendsContainer .friend-nickname {
-    font-weight: bold;
-    font-size: 110%; /* Font-size relativo */
-    color: #333;
-    margin: 0;
-    text-transform: capitalize;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 /* Pulsante elimina */
 #friendsContainer .btn-danger {
     margin-left: auto;
-    font-size: 85%; /* Font-size relativo */
-    padding: 1% 3%; /* Padding relativo */
-}
-#friendsContainer .btn-danger:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
+    font-size: 85%;
+    padding: 1% 3%;
 }
 
 /* Cerca Amico */
 .card.shadow-sm {
-    border-radius: 1%; /* Mantiene angoli arrotondati */
+    flex: 2; /* Occupa meno spazio rispetto alla Lista Amici */
+    height: 100%; /* Altezza pari al contenitore */
     background-color: #ffffff;
-    box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1); /* Ombra */
+    border-radius: 0.5em;
+    box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    padding: 2%; /* Aumenta lo spazio interno */
-    min-height: 40vh; /* Altezza minima al 40% della finestra */
-    width: 90%; /* Larghezza della card relativa al contenitore */
-    margin: 0 auto; /* Centrata orizzontalmente */
+    padding: 2%;
+    box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
-
 
 /* Input e pulsante nella sezione Cerca Amico */
 .input-group {
@@ -372,16 +366,15 @@ body {
 
 .input-group .form-control {
     flex-grow: 1;
-    font-size: 100%; /* Font-size relativo */
-    padding: 1%; /* Padding relativo */
+    font-size: 100%;
+    padding: 1%;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 .input-group .btn {
-    font-size: 100%; /* Font-size relativo */
-    padding: 1% 2%; /* Padding relativo */
+    font-size: 100%;
+    padding: 1% 2%;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
-
