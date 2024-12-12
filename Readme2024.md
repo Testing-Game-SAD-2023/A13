@@ -13,9 +13,9 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente
-- [Vincenzo Luigi Bruno](https://github.com/vlb20)
-- [Salvatore Cangiano](https://github.com/Salvr28)
-- [Cristina Carleo](https://github.com/iris-cmd22)
+- [Vincenzo Luigi Bruno](https://github.com/vlb20): vincenzol.bruno@studenti.unina.it
+- [Salvatore Cangiano](https://github.com/Salvr28): salva.cangiano@studenti.unina.it
+- [Cristina Carleo](https://github.com/iris-cmd22): cr.carleo@studenti.unina.it
 
 
 # Funzionalità dell'Applicazione
