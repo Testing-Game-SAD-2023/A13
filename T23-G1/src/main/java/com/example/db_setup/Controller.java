@@ -52,6 +52,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -1159,32 +1160,55 @@ public class Controller {
     }
     }
 
-    /*
-    //10/12 Update profile picture
     @PostMapping("/updateProfilePicture")
-    public ResponseEntity<Boolean> updateProfilePicture(
-    @RequestParam("userId") Integer userId,
-    @RequestParam("image") String base64Image) {
-    try {
-        // Decodifica l'immagine da Base64
-        byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+    public ResponseEntity<String> updateProfilePicture(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam("profilePicture") String base64Image) {
+        try {
+            // Verifica il token JWT
+            if (jwt == null || jwt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
 
-        // Salva l'immagine come file o direttamente nel database
-        String fileName = "user_" + userId + ".jpg";
-        Path filePath = Paths.get("uploads/profile_pictures/" + fileName);
-        Files.createDirectories(filePath.getParent());
-        Files.write(filePath, imageBytes);
+            // Decodifica il token JWT per ottenere l'ID utente
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
 
-        // Aggiorna l'URL dell'immagine nel database (esempio)
-        String imageUrl = "/uploads/profile_pictures/" + fileName;
-        studentService.updateProfilePicture(userId, imageUrl);
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
+            String userId = userData.get("userId").toString();
 
-        return ResponseEntity.ok(true);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+            // Recupera l'utente dal database
+            Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+            if (!optionalUser.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            // Decodifica l'immagine da Base64
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+
+            // Salva l'immagine come file sul server
+            String fileName = "user_" + userId + ".jpg";
+            Path filePath = Paths.get("uploads/profile_pictures/" + fileName);
+            Files.createDirectories(filePath.getParent()); // Crea la directory se non esiste
+            Files.write(filePath, imageBytes); // Scrivi il file sul disco
+
+            // Aggiorna l'URL dell'immagine nel database
+            String imageUrl = "/uploads/profile_pictures/" + fileName;
+            User user = optionalUser.get();
+            user.setAvatar(imageUrl); // Salva il percorso dell'immagine come avatar
+            userRepository.updateAvatar(Integer.parseInt(userId), imageUrl);
+
+            return ResponseEntity.ok("Profile picture updated successfully!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid image format.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating profile picture.");
+        }
     }
-    */
+
+
 }
 
 

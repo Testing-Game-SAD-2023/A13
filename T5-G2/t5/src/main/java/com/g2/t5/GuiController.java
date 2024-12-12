@@ -743,46 +743,56 @@ public class GuiController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore generico
     }
 
-    /*
-    //GabMan 10/12  Upload Immagine di Profilo
+    //GabMan 12/12 (Aggiornamento immagine profilo)
     @PostMapping("/updateProfilePicture")
     public ResponseEntity<Map<String, String>> updateProfilePicture(
-    @RequestParam("profilePicture") MultipartFile file,
-    @CookieValue(name = "jwt", required = false) String jwt) {
-    try {
-        // Estrarre l'ID utente dal token JWT
-        Integer userId = extractUserIdFromJwt(jwt);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                 .body(Map.of("error", "Utente non autenticato."));
-        }
+        @RequestBody Map<String, String> requestBody, // Riceve un JSON con l'immagine in Base64
+        @CookieValue(name = "jwt", required = false) String jwt) {
 
-        // Validare il file (assicurarsi che sia un'immagine)
-        String fileType = file.getContentType();
-        if (fileType == null || !fileType.startsWith("image/")) {
-            return ResponseEntity.badRequest()
-                                 .body(Map.of("error", "File non valido. Selezionare un'immagine."));
-        }
+        try {
+            // 1. Verifica del token JWT
+            if (jwt == null || jwt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                    .body(Map.of("error", "Utente non autenticato."));
+            }
 
-        // Convertire l'immagine in Base64 per inviarla a T23
-        String base64Image = Base64.getEncoder().encodeToString(file.getBytes());
+            // 2. Estrarre l'ID utente dal token JWT
+            Integer userId = extractUserIdFromJwt(jwt);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                    .body(Map.of("error", "Token JWT non valido."));
+            }
 
-        // Creare il payload con l'immagine e l'ID utente
-        Boolean updateSuccess = t23Service.updateAvatarWithImage(userId, base64Image);
+            // 3. Validazione del payload
+            String base64Image = requestBody.get("profilePicture");
+            if (base64Image == null || base64Image.isEmpty()) {
+                return ResponseEntity.badRequest()
+                                    .body(Map.of("error", "Nessuna immagine fornita."));
+            }
 
-        if (updateSuccess) {
-            return ResponseEntity.ok(Map.of("message", "Immagine caricata con successo!"));
-        } else {
+            // 4. Validazione del formato Base64
+            if (!isValidBase64Image(base64Image)) {
+                return ResponseEntity.badRequest()
+                                    .body(Map.of("error", "Immagine non valida o formato non supportato."));
+            }
+
+            // 5. Aggiornamento dell'immagine tramite servizio T23
+            boolean updateSuccess = t23Service.updateAvatarWithImage(userId, base64Image);
+
+            if (updateSuccess) {
+                return ResponseEntity.ok(Map.of("message", "Immagine caricata con successo!"));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body(Map.of("error", "Errore durante l'aggiornamento dell'immagine."));
+            }
+        } catch (Exception e) {
+            // Log dell'eccezione
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body(Map.of("error", "Errore durante l'aggiornamento dell'immagine."));
+                                .body(Map.of("error", "Si è verificato un errore imprevisto."));
         }
-    } catch (IOException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body(Map.of("error", "Errore durante il salvataggio del file."));
     }
-}
-*/
+
 
 
 }

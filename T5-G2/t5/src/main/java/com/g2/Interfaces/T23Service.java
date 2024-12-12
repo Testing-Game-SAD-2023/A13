@@ -340,25 +340,33 @@ import org.springframework.web.client.HttpClientErrorException;
         }
     }
 
-    /*
-    //GabMan 10/12 Caricamento Immagine
+    // GabMan 12/12 Caricamento Immagine in Base64
     public Boolean updateAvatarWithImage(Integer userId, String base64Image) {
-        final String endpoint = "/updateProfilePicture";
-    
-        // Creare il payload per la richiesta POST
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("userId", userId.toString());
-        formData.add("image", base64Image); // Immagine codificata in Base64
-    
+        final String endpoint = "/updateProfilePicture"; // Endpoint nel servizio T23
+
+        // Creare il payload per la richiesta POST in formato JSON
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("userId", userId);
+        payload.put("profilePicture", base64Image); // Immagine codificata in Base64
+
         try {
-            // Effettuare la chiamata al servizio T23
-            return callRestPost(endpoint, formData, null, Boolean.class);
-        } catch (Exception e) {
-            System.err.println("Errore durante l'aggiornamento dell'immagine: " + e.getMessage());
+            // Effettua la chiamata al servizio T23
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(
+                endpoint, // URL dell'endpoint
+                payload,  // Payload JSON
+                Boolean.class // Tipo di risposta attesa
+            );
+
+            // Restituisci il risultato della chiamata (true se l'aggiornamento ha avuto successo)
+            return response.getBody() != null && response.getBody();
+
+        } catch (RestClientException e) {
+            // Gestione degli errori durante la chiamata REST
+            System.err.println("Errore durante l'aggiornamento dell'immagine nel servizio T23: " + e.getMessage());
             return false;
         }
     }
-    */
+
     
 
 }

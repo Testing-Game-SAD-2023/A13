@@ -418,62 +418,96 @@ document.addEventListener("DOMContentLoaded", () => {
         const fileInput = document.getElementById("profilePictureUploadInput");
         const currentProfilePicture = document.getElementById("currentProfilePicture");
         const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-
+    
         if (fileInput.files.length === 0) {
             alert("Seleziona un file da caricare.");
             return;
         }
-
+    
         const file = fileInput.files[0];
-
+    
         // Controlla il tipo di file
         if (!file.type.startsWith("image/")) {
             alert("Il file selezionato non è un'immagine.");
             return;
         }
-
+    
         // Controlla la dimensione del file
         if (file.size > MAX_FILE_SIZE) {
             alert("Il file selezionato è troppo grande. Dimensione massima: 5 MB.");
             return;
         }
-
-        const formData = new FormData();
-        formData.append("profilePicture", file);
-
-        try {
-            const response = await fetch("/updateProfilePicture", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-
-                // Aggiorna l'immagine del profilo
-                if (currentProfilePicture) {
-                    currentProfilePicture.src = data.imageUrl;
+    
+        // Usa FileReader per convertire il file in Base64
+        const reader = new FileReader();
+    
+        reader.onload = async () => {
+            const base64Image = reader.result.split(",")[1]; // Rimuove il prefisso 'data:image/jpeg;base64,'
+    
+            try {
+                const response = await fetch("/updateProfilePicture", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        profilePicture: base64Image, // Invia l'immagine in Base64
+                    }),
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+    
+                    // Aggiorna l'immagine del profilo
+                    if (currentProfilePicture) {
+                        currentProfilePicture.src = data.imageUrl;
+                    }
+    
+                    alert("Immagine caricata con successo!");
+                } else {
+                    const error = await response.json();
+                    alert(`Errore durante il caricamento: ${error.error}`);
                 }
-
-                alert("Immagine caricata con successo!");
-
-                // Nascondi il modulo dopo l'upload
-                uploadForm.style.display = "none";
-            } else {
-                const errorText = await response.text();
-                console.error("Errore durante il caricamento:", errorText);
-                alert(`Errore durante il caricamento: ${errorText}`);
+            } catch (error) {
+                console.error("Errore durante il caricamento:", error);
+                alert("Si è verificato un errore durante il caricamento. Riprova più tardi.");
             }
-        } catch (error) {
-            console.error("Errore durante il caricamento:", error);
-            alert("Si è verificato un errore durante il caricamento. Riprova più tardi.");
-        }
+        };
+    
+        // Legge il file come URL Base64
+        reader.readAsDataURL(file);
     };
-
+    
     // Collega la funzione al clic del pulsante "Upload"
     if (uploadSubmitButton) {
-        uploadSubmitButton.addEventListener("click", uploadProfilePicture);
+        uploadSubmitButton.addEventListener("click", async () => {
+            const loadingMessage = document.getElementById("loadingMessage");
+    
+            // Verifica che un file sia stato selezionato
+            if (document.getElementById("profilePictureUploadInput").files.length === 0) {
+                alert("Nessun file selezionato.");
+                return;
+            }
+    
+            // Mostra il messaggio di caricamento
+            if (loadingMessage) {
+                loadingMessage.style.display = "block";
+            }
+    
+            try {
+                // Chiama la funzione per eseguire l'upload
+                await uploadProfilePicture();
+            } catch (error) {
+                console.error("Errore durante l'upload:", error);
+            } finally {
+                // Nascondi il messaggio di caricamento dopo il completamento
+                if (loadingMessage) {
+                    loadingMessage.style.display = "none";
+                }
+            }
+        });
     }
-
+    
+    
 });
 
