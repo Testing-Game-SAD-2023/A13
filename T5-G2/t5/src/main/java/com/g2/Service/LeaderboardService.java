@@ -1,6 +1,8 @@
 package com.g2.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.LeaderboardSubInterval;
@@ -24,15 +26,17 @@ public class LeaderboardService {
         try {
             List<User> userList = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
 
-            for (PlayerStats playerStats : playerStatsList.getPositions()) {
-                for (User user : userList) {
-                    if (playerStats.getUserId().equals(user.getId())) {
-                        playerStats.setEmail(user.getEmail());
-                        break;
-                    }
-                }
+            Map<Long,User> userMap=new HashMap<>();
+            for(User user: userList){
+                userMap.put(user.getId(),user);
             }
 
+            for (PlayerStats playerStats : playerStatsList.getPositions()) {
+                User matchingUser = userMap.get(playerStats.getUserId());
+                if(matchingUser!=null){
+                    playerStats.setEmail(matchingUser.getEmail());
+                }
+            }
             return playerStatsList;
         } catch (Exception e) {
             throw e;
