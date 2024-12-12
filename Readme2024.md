@@ -171,5 +171,5 @@ In T5-G2\t5\src\main\resources\lang sono stati modificati i file per la gestione
 
 
 # Documentazione di Progetto della Versione corrente
-Documentazione_2024/Documentazione_TaskR2_GruppoB9/Documentazione_Task__R2.pdf
+[Documentazione_Task_R2](Documentazione_2024/Documentazione_TaskR2_GruppoB9/Documentazione_Task__R2.pdf)
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
