@@ -195,18 +195,19 @@
                                         <div class="profile-info">
                                             <div class="name-container">
                                                 <div>
-                                                    <h4 >
-                                                        <p th:text="${user.name}"></p> <!-- Nome -->
-                                                        <p th:text="${user.surname}"></p>  <!-- Cognome -->
+                                                    <h5>
+                                                        <p th:text="${user.name + ' ' + user.surname}   "></p> <!-- Nome -->
                                                         <p th:text="${user.email}"></p>
-                                                    </h4>
+                                                    </h5>
                                                 </div>
                                                 <div>
                                                    <!-- <button id="editButton" class="btn btn-primary">Modifica informazioni</button>-->
                                                 </div>
                                             </div>
                                             <h6 class="card-subtitle mb-2 text-body-secondary" >
+                                                <p th:text="'ID: ' + '' + ${user.id}"></p>
                                                 <p th:text="${user.studies}"></p>
+                                                <p th:text="${user.biography != null && !#strings.isEmpty(user.biography) ? user.biography : ''}"></p>
                                             </h6>
                                         </div>
                                     </div>
@@ -268,9 +269,9 @@
                                             Robot
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="robotFilterDropdown">
-                                            <button class="dropdown-item" onclick="filterStatistics('None')">None</button>
-                                            <button class="dropdown-item" onclick="filterStatistics('Randoop')">Randoop</button>
-                                            <button class="dropdown-item" onclick="filterStatistics('EvoSuite')">EvoSuite</button>
+                                            <button class="dropdown-item" onclick="selectRobotFilter('None')">None</button>
+                                            <button class="dropdown-item" onclick="selectRobotFilter('Randoop')">Randoop</button>
+                                            <button class="dropdown-item" onclick="selectRobotFilter('EvoSuite')">EvoSuite</button>
                                         </div>
                                     </div>
                                     <div class="dropdown">
@@ -278,10 +279,10 @@
                                             GameMode
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="gameModeFilterDropdown">
-                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'All')">All</button>
-                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Sfida')">Sfida</button>
-                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Multiplayer')">Multiplayer</button>
-                                            <button class="dropdown-item" onclick="filterStatistics(currentRobot, 'Scalata')">Scalata</button>
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('All')">All</button>
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('Sfida')">Sfida</button>
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('Multiplayer')">Multiplayer</button>
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('Scalata')">Scalata</button>
                                         </div>
                                     </div>
                                     <button class="btn btn-secondary" onclick="clearFilter()">Rimuovi Filtro</button>
@@ -293,7 +294,7 @@
                                     th:id="'statistic-' + ${element.StatisticID}" 
                                     class="row statistic-row"
                                     th:data-robot="${IdToStatistic.get(element.StatisticID).robot}"
-                                    th:data-gamemode="${IdToStatistic.get(element.StatisticID).gamemode}">
+                                    th:data-gamemode="${IdToStatistic.get(element.StatisticID).gamemode}" style="font-weight: bold">
                                     <!--<div class="col-1">
                                         I
                                     </div>-->
@@ -302,6 +303,19 @@
                                     </div>
                                     <div class="col text-right" th:text="${element.Progress}">
                                         1000
+                                    </div>
+                                </div>
+                                <div id="ratio-container" class="mt-3" style="display: none;">
+                                    <div th:each="ratio: ${ratios}" 
+                                         class="row ratio-row" 
+                                         th:data-robot="${ratio.robot}" 
+                                         th:data-gamemode="${ratio.gamemode}" style="font-weight: bold">
+                                        <div class="col-8" th:text="'Ratio ' ">
+                                            Ratio 
+                                        </div>
+                                        <div class="col text-right" th:text="${ratio.value}">
+                                            1000
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -414,38 +428,122 @@ const getCookie = (name) => {
   */
  
   
-  let currentRobot = 'None'; // Filtro iniziale per Robot
-  let currentGameMode = 'All'; // Filtro iniziale per GameMode
-  function filterStatistics(robotType, gameMode) {
-    // Aggiorna i filtri correnti
-    if (robotType !== undefined) currentRobot = robotType;
-    if (gameMode !== undefined) currentGameMode = gameMode;
-  
-    // Recupera tutte le statistiche
+  let currentRobot = null; // Filtro disattivato per Robot
+let currentGameMode = null; // Filtro disattivato per GameMode
+
+// Aggiorna il filtro per Robot e il testo del bottone
+function selectRobotFilter(robotType) {
+    currentRobot = robotType;
+    document.getElementById('robotFilterDropdown').innerText = robotType;
+    filterStatistics();
+    updateRatioVisibility(); // Verifica e aggiorna la visibilità della ratio
+}
+
+// Aggiorna il filtro per GameMode e il testo del bottone
+function selectGameModeFilter(gameMode) {
+    currentGameMode = gameMode;
+    document.getElementById('gameModeFilterDropdown').innerText = gameMode;
+    filterStatistics();
+    updateRatioVisibility(); // Verifica e aggiorna la visibilità della ratio
+}
+
+// Applica i filtri alle statistiche
+function filterStatistics() {
     const statisticsRows = document.querySelectorAll('.statistic-row');
-  
-    // Filtra in base al tipo di robot e modalità di gioco
+
     statisticsRows.forEach(row => {
         const robot = row.getAttribute('data-robot');
         const gamemode = row.getAttribute('data-gamemode');
-  
-        const robotMatch = (currentRobot === 'None' || robot === currentRobot);
-        const gameModeMatch = (currentGameMode === 'All' || gamemode === currentGameMode);
-  
-        // Mostra o nascondi la riga in base ai filtri
+
+        // Controllo indipendente per ogni filtro
+        const robotMatch = 
+            (currentRobot === null) || 
+            (robot === currentRobot);
+
+        const gameModeMatch = 
+            (currentGameMode === null) || 
+            (gamemode === currentGameMode);
+
+        // Mostra la riga solo se entrambi i filtri corrispondono (se attivi)
         if (robotMatch && gameModeMatch) {
             row.style.display = ''; // Mostra la riga
         } else {
             row.style.display = 'none'; // Nascondi la riga
         }
     });
-  }
-  
-  function clearFilter() {
-    currentRobot = 'None';
-    currentGameMode = 'All';
-    filterStatistics(currentRobot, currentGameMode);
-  }
+}
+
+function updateRatioVisibility() {
+    
+    if (currentRobot === null || currentGameMode === null) {
+        document.getElementById('ratio-container').style.display = 'none'; // Nascondi la ratio
+        return;
+    }
+
+    const statisticsRows = document.querySelectorAll('.statistic-row');
+    let hasGamesPlayed = false;
+    let hasGamesWon = false;
+
+    // Verifica se esistono statistiche filtrate con ruolo "GamesPlayed" e "GamesWon"
+    statisticsRows.forEach(row => {
+        const isVisible = row.style.display !== 'none'; // La riga è visibile dopo il filtraggio
+        if (isVisible) {
+            const statisticID = row.id.split('-')[1]; // Estrai l'ID della statistica
+            const role = row.getAttribute('data-role');
+            if (role === 'GamesPlayed') {
+                hasGamesPlayed = true;
+            }
+            if (role === 'GamesWon') {
+                hasGamesWon = true;
+            }
+        }
+    });
+
+    const ratioContainer = document.getElementById('ratio-container');
+    if (hasGamesPlayed && hasGamesWon) {
+        // Mostra la ratio corrispondente ai filtri selezionati
+        const ratioRows = document.querySelectorAll('.ratio-row');
+        var hasVisibleRatio = false;
+
+        ratioRows.forEach(row => {
+            const robot = row.getAttribute('data-robot');
+            const gamemode = row.getAttribute('data-gamemode');
+
+            const robotMatch = (currentRobot === null) || (robot === currentRobot);
+            const gameModeMatch = (currentGameMode === null) || (gamemode === currentGameMode);
+
+            if (robotMatch && gameModeMatch) {
+                row.style.display = ''; // Mostra la riga della ratio
+                hasVisibleRatio = true;
+            } else {
+                row.style.display = 'none'; // Nascondi la riga della ratio
+            }
+        });
+
+        // Mostra il contenitore della ratio solo se esiste almeno una ratio visibile
+        ratioContainer.style.display = hasVisibleRatio ? '' : 'none';
+    } else {
+        // Nascondi il contenitore della ratio se non ci sono statistiche valide
+        ratioContainer.style.display = 'none';
+    }
+}
+
+// Resetta i filtri e il testo dei bottoni
+function clearFilter() {
+    currentRobot = null;
+    currentGameMode = null;
+
+    document.getElementById('robotFilterDropdown').innerText = 'Robot';
+    document.getElementById('gameModeFilterDropdown').innerText = 'GameMode';
+
+    const statisticsRows = document.querySelectorAll('.statistic-row');
+    statisticsRows.forEach(row => {
+        row.style.display = '';
+    });
+
+    document.getElementById('ratio-container').style.display = 'none'; // Nascondi la ratio
+}
+
   function unfollowPlayer() {
     // Recupera il JWT dal cookie
     const jwt = getCookie('jwt');
@@ -487,7 +585,7 @@ const getCookie = (name) => {
     });
 };
 
-        </script>
+</script>
          <script th:inline="javascript">
             let user = /*[[${user}]]*/ {};
             let userUpdate = JSON.parse(JSON.stringify(user)); // Copia dell'oggetto
