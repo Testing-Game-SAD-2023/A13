@@ -186,7 +186,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="card-title">Informazioni Personali</h4>
-                                    <button id="unfollowButton" class="btn btn-danger" onclick="unfollowPlayer()">Unfollow</button>
+                                    <button id="unfollowButton" class="logout-button" onclick="confirmUnfollow()">Unfollow</button>
                                 </div>
                                 <hr>
                                
@@ -543,7 +543,15 @@ function clearFilter() {
 
     document.getElementById('ratio-container').style.display = 'none'; // Nascondi la ratio
 }
+    function confirmUnfollow() {
+        // Crea il messaggio di conferma
+        const userConfirmed = confirm("Sei sicuro di voler rimuovere il follow?");
 
+        // Se l'utente conferma, chiama il metodo unfollowPlayer
+        if (userConfirmed) {
+        unfollowPlayer();
+        }
+    }
   function unfollowPlayer() {
     // Recupera il JWT dal cookie
     const jwt = getCookie('jwt');
