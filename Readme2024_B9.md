@@ -171,5 +171,10 @@ In T5-G2\t5\src\main\resources\lang sono stati modificati i file per la gestione
 
 
 # Documentazione di Progetto della Versione corrente
+
 [Documentazione_Task_R2](Documentazione_2024/Documentazione_TaskR2_GruppoB9/Documentazione_Task__R2.pdf)
+video Task R2 gruppo B9: 
 [video](Documentazione_2024/Documentazione_TaskR2_GruppoB9/video)
+
+
+
