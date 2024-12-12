@@ -34,13 +34,14 @@ L'amministratore del Gioco può:
 
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
 1. Video dimostrativo della funzionalità: "Modifica Profilo"
-![Demo Edit Profile]()
+![Demo Edit Profile](Documentazione/Documentazione_2024/Video_Demo/Demo_Edit_Profile.mp4)
 
 2. Video dimostrativo della funzionalità: "Notifica Achievement"
-![Demo Notifica Achievement]()
+![Demo Notifica Achievement](Documentazione/Documentazione_2024/Video_Demo/Demo_Nuovo Achievement.mp4)
 
 3. Video dimostrativo delle funzionalità: "Seguire un altro giocatore" e "Notifica Follow"
-![Demo Follow]()
+![Demo Follow Player](Documentazione/Documentazione_2024/Video_Demo/Demo_Follow_Player.mp4)
+![Demo Notifica Follow](Documentazione/Documentazione_2024/Video_Demo/Demo_Notifica_Follow.mp4)
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di
