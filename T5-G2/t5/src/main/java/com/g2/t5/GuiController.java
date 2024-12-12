@@ -385,15 +385,6 @@ public class GuiController {
             // Converto l'ID del giocatore di cui voglio fare il follow/unfollow
             Integer userId = Integer.parseInt(playerID);
 
-            // Recupero l'utente
-            /*
-            List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-            User user = users.stream()
-                .filter(u -> u.getId() == userId)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
-                */
-
             // Decodifica JWT per ottener l'ID dell'utente autenticato
             byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
             String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
