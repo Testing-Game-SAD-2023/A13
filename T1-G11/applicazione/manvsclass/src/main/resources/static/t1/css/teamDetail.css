@@ -545,3 +545,4 @@ input:checked + .slider .circle {
   left: calc(100% - 30px); /* Muove il cerchio a destra */
 }
 
+

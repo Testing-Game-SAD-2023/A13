@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Teams</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@0.9.7/dist/driver.min.js" defer></script>
+
     <link rel='stylesheet' href="/t1/css/teams.css"><!--aggiunta del css della pagina-->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -50,11 +53,21 @@
         <p id="viewAllLink-Team" class="view-all-link">View All</p>
         </div>
         
-    </div>
+    
     <!--Finestra modale per inserimento di un team-->
     <div id="modalContainerTeam">
 
     </div>
+
+  <!-- Modale per il tour -->
+  <div id="tourModal" class="modal_tour">
+    <div class="modal_tour-content">
+        <h2>Vuoi partecipare al tour guidato?</h2>
+        <p>Il tour ti mostrerà le funzionalità principali della pagina.</p>
+        <button id="startTourModal" class="modal_tour-button accept">Sì, avvia il tour</button>
+        <button id="closeModal" class="modal_tour-button decline">No, grazie</button>
+    </div>
+</div>
     <!--Sezione Assignment-->
     <div id="assignment-section">
         <div class="section-header">
@@ -85,5 +98,6 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="t1/js/teams.js"></script>
+    <script src="t1/js/team_tour.js"></script>
 </body>
 </html>
