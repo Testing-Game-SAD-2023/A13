@@ -403,8 +403,12 @@ function view_assignments(orderBy = "default") {
         // Se la risposta è un oggetto JSON (i dati degli assignment)
         if (Array.isArray(data)) {
             // Ordinamento
-            if (orderBy === "date") {
-                data.sort((a, b) => new Date(a.date) - new Date(b.date));
+            console.log("Valore di orderBy:", orderBy);
+            if (orderBy === "end") {
+                data.sort((a, b) => new Date(a.dataScadenza) - new Date(b.dataScadenza));
+
+            }else if( orderBy==="creation"){
+                data.sort((a, b) => new Date(a.dataCreazione) - new Date(b.dataCreazione));
             }
             console.log("Dati ordinati:", data);
 
@@ -453,10 +457,13 @@ function renderAssignmentFolders(data) {
         info2.id = "info-date";
 
         const info3 = document.createElement("p");
-        info3.textContent = `Classe Assegnata: ${item.nomeTeam}`;
+        info3.textContent = `Classe Assegnata: `;
         info3.classList.add("assignment-folder-info");
         info3.id = "info-class";
-
+        const info4 = document.createElement("p");
+        info4.textContent=`${item.nomeTeam}`;
+        info4.classList.add("assignment-folder-info");
+        info4.id = "info-class";
 
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("delete-button");
@@ -467,6 +474,7 @@ function renderAssignmentFolders(data) {
         folder.appendChild(folderContent);
         folder.appendChild(info1);
         folder.appendChild(info3);
+        folder.appendChild(info4);
         folder.appendChild(info2);
         folder.appendChild(deleteButton);
         folderContainer.appendChild(folder);
@@ -594,7 +602,7 @@ function openModalAssignment() {
                     <input type="text" id="teamName" name="teamName" placeholder="Inserisci il nome del team..." required>
 
                     <!-- Titolo dell'assegnamento -->
-                    <label for="gameSelector">Gioca a:</label>
+                    <label for="gameSelector">Scegli Classe di test da sottoporre:</label>
                     <select id="gameSelector" name="gameSelector" required>
                         <option value="">Caricamento giochi...</option>
                     </select>

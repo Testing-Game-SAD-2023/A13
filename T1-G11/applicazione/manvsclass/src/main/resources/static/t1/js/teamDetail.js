@@ -109,19 +109,30 @@ function populateTable() {
         if (!response.ok) {
             throw new Error('Errore nella risposta del server');
         }
-
-        // Leggi la risposta come JSON
-        return response.json(); // usa .json() per parsare direttamente la risposta JSON
+         // Controlla il tipo di contenuto della risposta
+         const contentType = response.headers.get('Content-Type');
+        
+         if (contentType && contentType.includes('application/json')) {
+             // Se la risposta è JSON, parsificalo
+             return response.json();
+         } else {
+             // Se la risposta è un testo (ad esempio, un messaggio di errore o una risposta vuota), restituiscilo come stringa
+             return response.text();
+         }
     })
     .then(data => {
         // Assicurati che data.body sia un array prima di chiamare forEach
-        if (data && Array.isArray(data.body)) {
+        if (Array.isArray(data.body)) {
             if (data.body.length > 0) {
                 data.body.forEach(student => addRow(tableContainer, student)); // Aggiungi i dati alla tabella
             } else {
                 addEmptyRow(tableContainer);  // Aggiungi la riga vuota se il corpo è vuoto
             }
-        } else {
+         } else if (typeof data === 'string') {
+                // Se la risposta è una stringa (ad esempio, un messaggio del tipo "Nessun assignment trovato")
+                console.log('Risposta testuale ricevuta: ', data);
+                addEmptyRow(tableContainer); // Aggiungi una riga vuota in caso di risposta vuota o messaggio di errore} 
+         }else {
             console.error("Errore: la risposta del server non contiene un array valido di studenti.");
             addEmptyRow(tableContainer); // Aggiungi la riga vuota in caso di errore
         }
@@ -506,7 +517,7 @@ function openModalAssignment() {
                     <label for="teamName">Nome del Team: ${nomeTeam}</label>
 
                     <!-- Titolo dell'assegnamento -->
-                    <label for="gameSelector">Gioca a:</label>
+                    <label for="gameSelector">Scegli Classe di test da sottoporre:</label>
                     <select id="gameSelector" name="gameSelector" required>
                         <option value="">Caricamento giochi...</option>
                     </select>

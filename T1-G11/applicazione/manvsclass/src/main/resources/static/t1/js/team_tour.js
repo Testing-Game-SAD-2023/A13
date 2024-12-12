@@ -1,113 +1,79 @@
+var driverObj;
 
- 
- document.addEventListener('DOMContentLoaded', () => {
-    var driverObj;
-    console.log(window.driver);  // Questo dovrebbe restituire una funzione se driver.js è caricato correttamente.
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Verifica che Driver.js sia caricato correttamente
+    if (typeof driver === 'undefined') {
+        console.error('Driver.js non è stato caricato correttamente.');
+        return;
+    }
 
-    // Configura Driver.js
+    console.log('Driver.js è caricato correttamente!');
+
+    // Inizializzazione di Driver.js
     driverObj = driver({
         showProgress: true,
-        popoverClass: 'driverjs-theme',
+        popoverClass: 'driverjs-theme',  // Puoi personalizzare il tema qui
+
+        // Definizione dei passi per il tour
         steps: [
-            // Sezione Team
             {
                 element: '.header',
                 popover: {
                     title: 'Header',
                     description: 'Contiene il logo e il titolo della pagina.',
-                    side: 'bottom',
-                    align: 'center',
-                },
+                    side: "bottom",
+                    align: 'center'
+                }
             },
             {
                 element: '#search-container',
                 popover: {
                     title: 'Barra di Ricerca',
                     description: 'Usa questa barra per cercare un team specifico.',
-                    side: 'bottom',
-                    align: 'center',
-                },
+                    side: "bottom",
+                    align: 'center'
+                }
             },
             {
                 element: '#team-section',
                 popover: {
                     title: 'Sezione Team',
                     description: 'Qui puoi visualizzare e gestire i tuoi team.',
-                    side: 'top',
-                    align: 'center',
-                },
+                    side: "top",
+                    align: 'center'
+                }
             },
             {
                 element: '#openModalButtonTeam',
                 popover: {
                     title: 'Aggiungi Team',
                     description: 'Clicca qui per aggiungere un nuovo team.',
-                    side: 'left',
+                    side: "left",
                     align: 'center',
-                    allowInteraction: true,
-                },
+                    allowInteraction: true
+                }
             },
             {
                 element: '#dropdown-container',
                 popover: {
                     title: 'Filtra i Team',
                     description: 'Filtra i tuoi team per nome o data di creazione.',
-                    side: 'left',
-                    align: 'center',
-                },
+                    side: "left",
+                    align: 'center'
+                }
             },
-
-            // Sezione Assignment
-            {
-                element: '#assignment-section',
-                popover: {
-                    title: 'Sezione Assignment',
-                    description: 'In questa sezione puoi gestire i tuoi assignment.',
-                    side: 'top',
-                    align: 'center',
-                },
-            },
-            {
-                element: '#openModalButtonAssignment',
-                popover: {
-                    title: 'Aggiungi Assignment',
-                    description: 'Clicca qui per aggiungere un nuovo assignment.',
-                    side: 'left',
-                    align: 'center',
-                    allowInteraction: true,
-                },
-            },
-            {
-                element: '#dropdown-container-assignment',
-                popover: {
-                    title: 'Filtra gli Assignment',
-                    description: 'Filtra i tuoi assignment per data di creazione.',
-                    side: 'left',
-                    align: 'center',
-                },
-            },
-        ],
+            // Altri passi aggiuntivi se necessario
+        ]
     });
 
-    // Mostra il modale al caricamento della pagina
-    const tourModal = document.getElementById('tourModal');
-    const startTourModal = document.getElementById('startTourModal');
-    const closeModal = document.getElementById('closeModal');
+    // Mostra la conferma per avviare il tour quando la pagina viene caricata
+    window.onload = function() {
+        if (confirm('Vuoi partecipare al tour guidato?')) {
+            // Avvia il tour se l'utente accetta
+            driverObj.drive();
+        }
+    };
 
-    tourModal.style.display = 'flex';
-
-    startTourModal.addEventListener('click', () => {
-        tourModal.style.display = 'none';
-        driverObj.drive();
-    });
-
-    closeModal.addEventListener('click', () => {
-        tourModal.style.display = 'none';
-    });
-
-    // Pulsante per riavviare il tour
-    const startTourButton = document.getElementById('startTourModal');
-    startTourButton.addEventListener('click', () => {
-        driverObj.drive();
-    });
+  
 });
+
