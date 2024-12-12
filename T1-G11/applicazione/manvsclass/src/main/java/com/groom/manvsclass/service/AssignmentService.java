@@ -104,26 +104,9 @@ public class AssignmentService {
         inviaNotificaStudenti(idsStudentiTeam);
 
         //10. Invio email agli utenti del team
-        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(idsStudentiTeam, jwt);
-        if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
-            return ResponseEntity.status(dettagliStudentiResponse.getStatusCode())
-                    .body("Errore nel recupero delle informazioni sugli studenti: " + dettagliStudentiResponse.getBody());
-        }
 
-        // 11. Recupera i dettagli degli studenti
-        List<Map<String, Object>> studentiDettagli = (List<Map<String, Object>>) dettagliStudentiResponse.getBody();
-        List<String> emails = studentiDettagli.stream()
-            .map(student -> (String) student.get("email"))
-            .collect(Collectors.toList());
-
-        // 12. Invia email di notifica agli studenti aggiunti
+        emailService.sendTeamNewAssignment(idsStudentiTeam, existingTeam, assignment, jwt);
         
-        try {
-            emailService.sendTeamNewAssignment(emails, existingTeam.getName(),assignment.getDataScadenza(),assignment.getTitolo(),assignment.getDescrizione());
-        } catch (MessagingException e) {
-            System.out.println("Errore durante l'invio della email.");
-        }
-
         // 13. Restituisci la risposta di successo
         return ResponseEntity.status(HttpStatus.CREATED).body("Assignment creato con successo e associato al Team.");
     }

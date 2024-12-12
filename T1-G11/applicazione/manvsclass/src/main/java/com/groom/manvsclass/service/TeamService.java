@@ -277,7 +277,6 @@ public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = f
         Team updatedTeam = teamRepository.save(existingTeam);
 
         //9. Recupero dettagli degli studenti per inviare le email.
-     
         ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(nuoviStudenti, jwt);
         if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
             return ResponseEntity.status(dettagliStudentiResponse.getStatusCode())
