@@ -1,14 +1,15 @@
 var driverObj;
 
 document.addEventListener('DOMContentLoaded', (event) => {
-    // Verifica che Driver.js sia caricato correttamente
+    // Verifica che Driver.js sia caricato correttamente 
+    const driver = window.driver.js.driver;
     if (typeof driver === 'undefined') {
         console.error('Driver.js non è stato caricato correttamente.');
         return;
     }
 
     console.log('Driver.js è caricato correttamente!');
-
+   
     // Inizializzazione di Driver.js
     driverObj = driver({
         showProgress: true,
