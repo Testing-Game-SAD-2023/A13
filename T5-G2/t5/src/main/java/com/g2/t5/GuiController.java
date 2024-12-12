@@ -54,7 +54,6 @@ import com.g2.Service.LeaderboardService;
 import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -426,12 +425,10 @@ public class GuiController {
                     return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body(errorResponse);
                 }
             }
-
             errorResponse.put("message", "Errore nel caricamento della classifica");
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
             // System.out.println("Exception " + e.getMessage());
-
             HashMap<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", "Errore nel caricamento della classifica");
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(errorResponse);
