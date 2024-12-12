@@ -134,7 +134,7 @@ public class AssignmentService {
             List<Assignment> assignments = assignmentRepository.findByTeamId(idTeam);
 
             if (assignments == null || assignments.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nessun assignment trovato per il Team con ID " + idTeam);
+                return ResponseEntity.ok("Nessun assignment trovato per il Team con ID " + idTeam);
             }
 
             // 6. Restituisci gli Assignment trovati
