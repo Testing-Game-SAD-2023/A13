@@ -238,3 +238,26 @@ nav.top-right {
   font-size: 1em;
   margin: 0;
 }
+
+/* Stile del contenitore della lista dei membri */
+.member-display {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.member-display:hover::after {
+  content: attr(title); /* Mostra il contenuto del titolo */
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  top: 100%;
+  left: 0;
+  white-space: pre-wrap;
+  z-index: 1000;
+  display: block;
+  min-width: 150px;
+  max-width: 300px;
+}

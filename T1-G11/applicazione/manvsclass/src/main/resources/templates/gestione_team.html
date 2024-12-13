@@ -245,7 +245,10 @@ th {
                 <label for="leaderId">ID Leader:</label>
                 <input type="text" id="leaderId" name="leaderId" required>
 
-                <label for="member">Membri del Team:</label>
+                
+                <label for="searchStudents">Cerca Studenti:</label>
+                <input type="text" id="searchStudents" placeholder="Cerca per nome..." />
+                <label for="member">Lista Membri:</label>
                 <select id="member" name="member[]" multiple>
                 <!-- Le opzioni verranno generate dinamicamente -->
                 </select>
@@ -257,9 +260,6 @@ th {
                     
                     <button id="clearSelectedStudents" type="button" class="btn btn-secondary">Pulisci Lista</button>
                 </div>
-
-                <label for="creationDate">Data di Creazione:</label>
-                <input type="date" id="creationDate" name="creationDate" required>
 
                 <button type="submit" id="CreaTeam">Aggiungi Team</button>
             </form>

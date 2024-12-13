@@ -283,15 +283,29 @@ public class TeamService {
         // Genera il contenuto HTML per il corpo della tabella
         StringBuilder htmlBuilder = new StringBuilder();
         for (Team team : teams) {
+            List<String> members = team.getMember();
+            String displayedMembers = String.join(", ", members.subList(0, Math.min(2, members.size())));
+            String fullMembersList = String.join(", ", members);
+    
             htmlBuilder.append("<tr>")
                 .append("<td>").append(team.getTeamName()).append("</td>")
                 .append("<td>").append(team.getDescription()).append("</td>")
                 .append("<td>").append(team.getLeaderId()).append("</td>")
-                .append("<td>").append(String.join(", ", team.getMember())).append("</td>")
+                .append("<td>")
+                .append("<div class='member-display' title='").append(fullMembersList).append("'>")
+                .append(displayedMembers);
+            
+            if (members.size() > 2) {
+                htmlBuilder.append(" ...");
+            }
+            
+            htmlBuilder.append("</div>")
+                .append("</td>")
                 .append("</tr>");
         }
         return ResponseEntity.ok(htmlBuilder.toString());
     }
+    
     
     public ResponseEntity<String> addMemberToTeam(String teamName, String memberId, String jwt) {
         // Verifica la validità del token JWT

@@ -121,6 +121,32 @@ function fetchTeams(teamSelect) {
 }
 
 
+function controlData() {
+    const today = new Date();
+    // Formatta la data in modo che sia compatibile con l'input di tipo date
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // I mesi partono da 0
+    const dd = String(today.getDate()).padStart(2, '0');
+    const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+    // Imposta la data minima per startDate
+    const startDateInput = document.getElementById('startDate');
+    startDateInput.setAttribute('min', formattedToday);
+
+    // Imposta la data minima per endDate in base alla startDate
+    const endDateInput = document.getElementById('endDate');
+    endDateInput.setAttribute('min', formattedToday); // Imposta la data minima iniziale
+
+    // Aggiorna dinamicamente il min di endDate quando viene selezionata una startDate
+    startDateInput.addEventListener('input', () => {
+        const selectedStartDate = startDateInput.value;
+        if (selectedStartDate) {
+            endDateInput.setAttribute('min', selectedStartDate); // Aggiorna min per endDate
+        }
+    });
+}
+
+
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -132,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-
+    controlData();
     showSection('list-challenges')
     listHtml();
     fetchTeams(teamSelect);

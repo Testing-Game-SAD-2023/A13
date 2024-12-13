@@ -120,7 +120,7 @@ function toggleSelectedStudentsList() {
             }
         });
 }
-function studentiLista(memberSelect){
+function studentiLista(studentsSelect) {
     fetch('/students_list', { // Modifica della route
         method: 'GET',
         headers: {
@@ -134,18 +134,38 @@ function studentiLista(memberSelect){
             return response.json();
         })
         .then(data => {
-            // Popola la select con gli studenti non assegnati
-            data.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.email; // Usa l'email come valore
-                option.textContent = student.email; // Mostra l'email
-                memberSelect.appendChild(option);
+            // Salva l'elenco completo degli studenti per la ricerca
+            const allStudents = data;
+
+            // Popola la select con gli studenti
+            updateStudentList(studentsSelect, allStudents);
+
+            // Assegna il filtro alla label di ricerca
+            const searchInput = document.getElementById('searchStudents');
+            searchInput.addEventListener('input', () => {
+                const searchQuery = searchInput.value.toLowerCase();
+                const filteredStudents = allStudents.filter(student =>
+                    `${student.nome} ${student.surname} ${student.email}`.toLowerCase().includes(searchQuery)
+                );
+                updateStudentList(studentsSelect, filteredStudents);
             });
         })
         .catch(error => {
             console.error('Errore:', error);
         });
 }
+
+function updateStudentList(studentsSelect, students) {
+    studentsSelect.innerHTML = ''; // Svuota la lista attuale
+    students.forEach(student => {
+        const option = document.createElement('option');
+        option.value = student.email; // Usa l'email come valore
+        option.textContent = `${student.name} ${student.surname} <${student.email}>`; // Mostra nome e email
+        studentsSelect.appendChild(option);
+    });
+}
+
+
 selectMembro.addEventListener('change', () => {
         toggleSelectedStudentsList();
 });
@@ -159,6 +179,9 @@ clearButton.addEventListener('click', () => {
         // Svuota la lista degli studenti selezionati
         selectedStudentsList.innerHTML = '';
 });
+
+
+
 // Quando il DOM è completamente caricato
 teamForm.addEventListener('submit', function (event) {
 
@@ -168,7 +191,7 @@ teamForm.addEventListener('submit', function (event) {
             description: document.getElementById('description').value,
             leaderId: document.getElementById('leaderId').value,
             member: Array.from(selectedStudentsList.children).map(li => li.textContent), // Ottieni gli ID dei membri selezionati
-            creationDate: document.getElementById('creationDate').value
+            creationDate: new Date()
         };
 
 
