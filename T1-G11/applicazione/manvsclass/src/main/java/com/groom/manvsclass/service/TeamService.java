@@ -62,8 +62,8 @@ public class TeamService {
         }
 
         // 3. Controlla se il nome del team è valido
-        if (team.getName() == null || team.getName().isEmpty() || team.getName().length() < 3 || team.getName().length() > 30) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome del team non valido. Deve essere tra 3 e 30 caratteri.");
+        if (team.getName() == null || team.getName().isEmpty() || team.getName().length() < 3 || team.getName().length() > 20) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome del team non valido. Deve essere tra 3 e 20 caratteri.");
         }
 
         // 4. Controlla se esiste già un team con lo stesso nome
@@ -138,59 +138,59 @@ public class TeamService {
     }
 
     // Modifica il nome di un team
-public ResponseEntity<?> modificaNomeTeam(TeamModificationRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-    String idTeam = request.getIdTeam();
-    String newName = request.getNewName();
-    
-    System.out.println("IdTeam: " + idTeam + " newName: " + newName);
-    
-    // 1. Verifica se il token JWT è valido
-    if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+    public ResponseEntity<?> modificaNomeTeam(TeamModificationRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+        String idTeam = request.getIdTeam();
+        String newName = request.getNewName();
+        
+        System.out.println("IdTeam: " + idTeam + " newName: " + newName);
+        
+        // 1. Verifica se il token JWT è valido
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        // 2. Estrai l'ID dell'admin dal JWT
+        String adminUsername = jwtService.getAdminFromJwt(jwt);
+
+        // 3. Verifica se il team esiste
+        Team existingTeam = teamRepository.findById(idTeam).orElse(null);
+        if (existingTeam == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
+        }
+
+        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
+        TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam); // Assumiamo che `findByTeamId` restituisca una sola associazione
+        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+        }
+
+        // 5. Verifica il nuovo nome del team
+
+        //Modifica con nome nullo
+        if (newName == null || newName.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome team obbligatorio");
+        }
+
+        //Modifica con nome troppo lungo (massimo 255 caratteri)
+        if (newName.length() > 20) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome team troppo lungo");
+        }
+
+
+        // 6. Verifica se il nuovo nome è già utilizzato da un altro team
+        if (teamRepository.existsByName(newName)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esiste già un team con il nome '" + newName + "'");
+        }
+
+        // 7. Modifica il nome del team
+        existingTeam.setName(newName);
+
+        // 8. Salva il team aggiornato
+        teamRepository.save(existingTeam);
+
+        // 9. Restituisci il team aggiornato
+        return ResponseEntity.ok().body(existingTeam);
     }
-
-    // 2. Estrai l'ID dell'admin dal JWT
-    String adminUsername = jwtService.getAdminFromJwt(jwt);
-
-    // 3. Verifica se il team esiste
-    Team existingTeam = teamRepository.findById(idTeam).orElse(null);
-    if (existingTeam == null) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
-    }
-
-    // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
-    TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam); // Assumiamo che `findByTeamId` restituisca una sola associazione
-    if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
-    }
-
-    // 5. Verifica il nuovo nome del team
-
-    //Modifica con nome nullo
-    if (newName == null || newName.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome team obbligatorio");
-    }
-
-   //Modifica con nome troppo lungo (massimo 255 caratteri)
-    if (newName.length() > 255) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome team troppo lungo");
-    }
-
-
-    // 6. Verifica se il nuovo nome è già utilizzato da un altro team
-    if (teamRepository.existsByName(newName)) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esiste già un team con il nome '" + newName + "'");
-    }
-
-    // 7. Modifica il nome del team
-    existingTeam.setName(newName);
-
-    // 8. Salva il team aggiornato
-    teamRepository.save(existingTeam);
-
-    // 9. Restituisci il team aggiornato
-    return ResponseEntity.ok().body(existingTeam);
-}
 
     
     // Metodo per visualizzare i team associati a un admin specifico
