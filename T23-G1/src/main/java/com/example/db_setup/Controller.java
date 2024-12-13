@@ -135,7 +135,8 @@ public class Controller {
     public List<Map<String,Object>> getStudentsBySurnameAndName(@RequestBody Map<String, String> request){
         return userService.getStudentsBySurnameAndName(request);
     }
-
+    
+    //Modifica 12/12/2024 Giuleppe: Aggiunta nuova rotta che verrà aggiunta per la ricerca degli studenti. 
     @GetMapping("/searchStudents")
     @ResponseBody
     public List<Map<String,Object>> searchStudents(@RequestBody Map<String, String> request){
