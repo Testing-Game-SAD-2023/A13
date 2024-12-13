@@ -149,15 +149,16 @@ public class ChallengeService {
     }
 
     /**
-     * Verifica il completamento della challenge.
-     */
-    public boolean isChallengeCompleted(Challenge challenge, int playerId, String jwt) {
+ * Verifica il completamento della challenge.
+ */
+public boolean isChallengeCompleted(Challenge challenge, int playerId, String jwt) {
     LocalDateTime challengeStartDate = LocalDateTime.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE_TIME);
     LocalDateTime challengeEndDate = LocalDateTime.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE_TIME);
     String victoryCondition = challenge.getVictoryCondition();
     VictoryConditionType type = challenge.getVictoryConditionType();
 
     try {
+        // Recupera le partite giocate dal giocatore
         ResponseEntity<List<Map<String, Object>>> response = (ResponseEntity<List<Map<String, Object>>>) getPlayerGames(playerId, jwt);
         
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
@@ -175,21 +176,29 @@ public class ChallengeService {
                 })
                 .collect(Collectors.toList());
 
-            // Logica basata sul tipo di condizione
-            switch (type) {
-                case GAMES_PLAYED:
-                    int requiredGames = Integer.parseInt(victoryCondition);
+            // **MODIFICA: Validazione della Victory Condition**
+            if (type == VictoryConditionType.GAMES_PLAYED) {
+                try {
+                    int requiredGames = Integer.parseInt(victoryCondition); // Validazione del numero
                     return gamesInRange.size() >= requiredGames;
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("La victoryCondition deve essere un numero valido.");
+                }
 
-                default:
-                    throw new UnsupportedOperationException("Tipo di condizione non supportato: " + type);
+                
             }
+
+            // **MODIFICA: Gestione di tipi non supportati**
+            throw new UnsupportedOperationException("Tipo di condizione non supportato: " + type);
         }
     } catch (Exception e) {
+        // **MODIFICA: Migliore gestione degli errori**
         System.err.println("Errore durante la verifica della challenge: " + e.getMessage());
+        e.printStackTrace();
     }
     return false;
 }
+
 
 //funzione di lista challenge:
  public ResponseEntity<String> getAllChallengesAsHtml(String jwt) {

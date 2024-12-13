@@ -632,16 +632,33 @@ import org.springframework.web.bind.annotation.RequestParam;
     @GetMapping("/challenges/{challenge_Id}/{player_Id}")
     public ResponseEntity<Boolean> isChallengeCompleted(
             @PathVariable(value = "challenge_Id") String challengeId,
-            @PathVariable(value = "player_Id" ) int playerId,
+            @PathVariable(value = "player_Id") int playerId,
             @CookieValue(name = "jwt", required = false) String jwt) {
-        Challenge challenge = challengeService.getChallengeByName(challengeId, jwt).getBody();
-        
-        if (challenge == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        try {
+            // Recupera la challenge dal servizio
+            Challenge challenge = challengeService.getChallengeByName(challengeId, jwt).getBody();
+            
+            // Se la challenge non esiste, restituisci un 404
+            if (challenge == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+            }
+
+            // Verifica il completamento della challenge
+            boolean completed = challengeService.isChallengeCompleted(challenge, playerId, jwt);
+            return ResponseEntity.ok(completed);
+        } catch (IllegalArgumentException e) {
+            // Risposta per victoryCondition non valida
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false);
+        } catch (UnsupportedOperationException e) {
+            // Risposta per victoryConditionType non supportato
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(false);
+        } catch (Exception e) {
+            // Risposta per errori generali
+            System.err.println("Errore durante la verifica della challenge: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
-        boolean completed = challengeService.isChallengeCompleted(challenge, playerId, jwt);
-        return ResponseEntity.ok(completed);
     }
+
 
 
     //route bottone della challenge
