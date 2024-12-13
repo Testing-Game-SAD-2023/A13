@@ -6,6 +6,8 @@
     <link href="/t5/css/profilo.css" rel="stylesheet" />
 
     <!-- Librerie -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -178,35 +180,62 @@
         </div>
         
         
-
         <div id="trophies" class="section">
             <div class="row">
                 <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
                     <div class="card-body">
                         <h4 class="card-title">Trofei</h4>
+                        <div class="btn-group" role="group" aria-label="Selezione Trofei">
+                            <button id="btnCompleted" class="btn btn-primary" onclick="showCompleted()">Trofei Sbloccati</button>
+                            <button id="btnInProgress" class="btn btn-secondary" onclick="showInProgress()">Trofei in Progresso</button>
+                        </div>
                         <hr>
-                        <div style="height:44.2vh; overflow-y: auto">
-                            <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
-                            <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
+                                
+                                            <!-- Sezione Trofei Sbloccati -->
+                        <div id="completed-trophies" class="hidden">
+                            <h5>Trofei Sbloccati</h5>
+                            <div class="achievement-container" style="overflow: hidden; margin: 2px">
                                 <div class="row">
                                     <div class="col-2">
-                                        <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                        <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px">
                                     </div>
                                     <div class="col">
-                                        <h4 th:text="${element.Name}">Nome achievement</h4>
-                                        <p th:text="${element.Description}">Descrizione achievement</p>
+                                        <h4>100Vittorie</h4>
+                                        <p>Raggiungi 100 vittorie in qualsiasi modalità</p>
                                         <div class="progress">
-                                            <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}"  aria-valuemin="0" aria-valuemax="${element.ProgressRequired}" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
+                                            <div class="progress-bar" role="progressbar" style="width:100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100/100</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+        
+                        <!-- Sezione Trofei in Progresso -->
+                        <div id="in-progress-trophies">
+                            <h5>Trofei in Progresso</h5>
+                            <div class="achievement-container" style="overflow: hidden; margin: 2px">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" class="unobtained">
+                                    </div>
+                                    <div class="col">
+                                        <h4>10partite</h4>
+                                        <p>Gioca 10 partite</p>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width:50%;" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10">5/10</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
                     </div>
                 </div>
             </div>
         </div>
-    
+        
+        
 
         <div id="stats" class="section">
             <div class="col">

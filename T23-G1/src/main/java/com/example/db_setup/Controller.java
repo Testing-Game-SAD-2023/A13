@@ -1161,68 +1161,51 @@ public class Controller {
     }
 
     @PostMapping("/updateProfilePicture")
-    public ResponseEntity<Map<String, String>> updateProfilePicture(
-            @CookieValue(name = "jwt", required = false) String jwt,
-            @RequestBody Map<String, String> payload) {
+    public ResponseEntity<Map<String, String>> updateProfilePicture(@RequestBody Map<String, Object> payload) {
         try {
-            // Verifica il token JWT
-            if (jwt == null || jwt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "User not authenticated"));
-            }
-
-            // Decodifica il token JWT per ottenere l'ID utente
-            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
-            String userId = userData.get("userId").toString();
+            Integer userId = (Integer) payload.get("userId");
+            String base64Image = (String) payload.get("profilePicture");
 
             // Validazione immagine
-            String base64Image = payload.get("profilePicture");
             if (base64Image == null || base64Image.isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "No image provided"));
+                return ResponseEntity.badRequest().body(Map.of("error", "Immagine mancante."));
             }
 
-            // Decodifica l'immagine da Base64
-            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            // Decodifica immagine
+            byte[] decodedImage = Base64.getDecoder().decode(base64Image);
+            if (!isImageValid(decodedImage)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Immagine non valida."));
+            }
 
-            // Configura il percorso per salvare l'immagine
-            String fileName = "user_" + userId + ".jpg";
-            Path filePath = Paths.get("C:/progetti/SAD/A13/T5-G2/t5/src/main/resources/static/t5/images", fileName);
+            // Definisci il percorso dove salvare l'immagine
+            String imagePath ="C:/progetti/SAD/A13/T5-G2/t5/src/main/resources/static/t5/images" + userId + ".png"; // Cambia il percorso a seconda del sistema operativo
 
+            // Salva l'immagine sul file system
+            try (OutputStream os = new FileOutputStream(imagePath)) {
+                os.write(decodedImage);
+            }
 
+            // Genera l'URL di accesso pubblico all'immagine
+            String imageUrl = "/images/user_" + userId + ".png";
 
-            // Crea la directory se non esiste
-            Files.createDirectories(filePath.getParent());
-
-            // Scrivi il file sul disco
-            Files.write(filePath, imageBytes);
-
-            System.out.println("File salvato in: " + filePath.toAbsolutePath());
-
-            // Genera l'URL (relativo, servirà per il frontend dopo)
-            String imageUrl = "/t5/images/profilo/" + fileName;
-
-            // Aggiorna l'avatar dell'utente nel database
-            User user = userRepository.findById(Integer.parseInt(userId))
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-            user.setAvatar(imageUrl);
-            userRepository.updateAvatar(Integer.parseInt(userId), imageUrl);
-
-            // Restituisci il percorso pubblico
-            return ResponseEntity.ok(Map.of("message", "Profile picture updated successfully!", "imageUrl", imageUrl));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Invalid image format"));
+            return ResponseEntity.ok(Map.of("message", "Immagine aggiornata con successo.", "imageUrl", imageUrl));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "An error occurred while updating profile picture"));
+                    .body(Map.of("error", "Errore durante l'aggiornamento dell'immagine."));
         }
     }
+
+    private boolean isImageValid(byte[] imageBytes) {
+        try {
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+            return image != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    
 
 
     @GetMapping("/getImage")

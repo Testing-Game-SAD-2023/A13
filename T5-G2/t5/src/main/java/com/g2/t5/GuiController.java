@@ -765,22 +765,41 @@ public class GuiController {
                                      .body(Map.of("error", "Nessuna immagine fornita."));
             }
 
+            //nuovo cami
+            // Validazione: controlla dimensione dell'immagine
+            if (base64Image.length() > 5_000_000) { // Limite 5MB
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Immagine troppo grande. Dimensione massima: 5MB."));
+            }
+
+            // Decodifica Base64 per verificare il formato dell'immagine
+            byte[] decodedImage = Base64.getDecoder().decode(base64Image);
+            if (!isImageValid(decodedImage)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "File non valido o non supportato."));
+            }
+            
             // 4. Aggiornamento dell'immagine tramite servizio T23
             boolean updateSuccess = t23Service.updateAvatarWithImage(userId, base64Image);
-
-            if (updateSuccess) {
-                return ResponseEntity.ok(Map.of("message", "Immagine caricata con successo!"));
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                     .body(Map.of("error", "Errore durante l'aggiornamento dell'immagine."));
-            }
+            //nuovo
+            return ResponseEntity.ok(Map.of("message", "Immagine aggiornata con successo!", "imageUrl", updatedImageUrl));
         } catch (Exception e) {
-            // Log dell'eccezione
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body(Map.of("error", "Si è verificato un errore imprevisto."));
+                    .body(Map.of("error", "Errore imprevisto durante l'aggiornamento dell'immagine."));
         }
     }
+
+// Metodo per validare il file immagine
+private boolean isImageValid(byte[] imageBytes) {
+    try {
+        // Verifica che il file sia un'immagine valida
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+        return image != null; // Restituisce true solo se il file è un'immagine
+    } catch (IOException e) {
+        return false;
+    }
+}
 
 
     @GetMapping("/getImage")

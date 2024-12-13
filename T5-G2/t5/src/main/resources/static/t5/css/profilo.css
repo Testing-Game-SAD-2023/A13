@@ -387,6 +387,28 @@ body {
     background-color: #ffc107 !important; /* Giallo */
 }
 .custom-progress-bar {
-    background-color: #007bff; /* Azzurro */
+    background-color: #d900ff; /* Azzurro */
     height: 20px;
 }
+/* Stili base delle sezioni */
+#completed-trophies,
+#in-progress-trophies {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Stati di visibilità */
+.hidden {
+    opacity: 0;
+    pointer-events: none; /* Evita clic su sezioni nascoste */
+}
+
+.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+

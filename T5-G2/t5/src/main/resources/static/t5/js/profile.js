@@ -506,7 +506,77 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    document.addEventListener("DOMContentLoaded", async function () {
+        try {
+            const response = await fetch('/api/getAchievements');
+            const achievements = await response.json();
+            console.log("Achievements caricati:", achievements); // Aggiungi questo log
     
+            achievements.forEach(achievement => {
+                console.log("Aggiornamento achievement:", achievement); // Aggiungi questo log
+                const achievementElement = document.getElementById(`achievement-${achievement.ID}`);
+                if (achievementElement) {
+                    const progressBar = achievementElement.querySelector('.progress-bar');
+                    const progressPercent = (achievement.Progress / achievement.ProgressRequired) * 100;
+    
+                    progressBar.style.width = `${progressPercent}%`;
+                    progressBar.innerText = `${achievement.Progress}/${achievement.ProgressRequired}`;
+                    progressBar.setAttribute('aria-valuenow', achievement.Progress);
+                    progressBar.setAttribute('aria-valuemax', achievement.ProgressRequired);
+                } else {
+                    console.warn(`Elemento HTML non trovato per ID: achievement-${achievement.ID}`);
+                }
+            });
+        } catch (error) {
+            console.error("Errore durante il caricamento degli achievement:", error);
+        }
+    });
+        // Mostra Trofei Sbloccati
+    window.showCompleted = function () {
+        document.getElementById("completed-trophies").classList.add("visible");
+        document.getElementById("completed-trophies").classList.remove("hidden");
+        document.getElementById("in-progress-trophies").classList.add("hidden");
+        document.getElementById("in-progress-trophies").classList.remove("visible");
+
+        // Cambia lo stile dei bottoni
+        document.getElementById("btnCompleted").classList.add("btn-primary");
+        document.getElementById("btnCompleted").classList.remove("btn-secondary");
+        document.getElementById("btnInProgress").classList.add("btn-secondary");
+        document.getElementById("btnInProgress").classList.remove("btn-primary");
+          
+        confetti({
+            particleCount: 150,
+            spread: 120,
+            origin: { y: 0.6 }, // Altezza di lancio
+            colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f']
+        });
+        
+        
+    };
+
+    // Mostra Trofei in Progresso
+    window.showInProgress = function () {
+        document.getElementById("in-progress-trophies").classList.add("visible");
+        document.getElementById("in-progress-trophies").classList.remove("hidden");
+        document.getElementById("completed-trophies").classList.add("hidden");
+        document.getElementById("completed-trophies").classList.remove("visible");
+
+        // Cambia lo stile dei bottoni
+        document.getElementById("btnInProgress").classList.add("btn-primary");
+        document.getElementById("btnInProgress").classList.remove("btn-secondary");
+        document.getElementById("btnCompleted").classList.add("btn-secondary");
+        document.getElementById("btnCompleted").classList.remove("btn-primary");
+    };
+
+    // Inizializza la visibilità delle sezioni al caricamento della pagina
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("completed-trophies").classList.add("hidden");
+        document.getElementById("in-progress-trophies").classList.add("visible");
+    });
+
+
+            
+
     
 });
 

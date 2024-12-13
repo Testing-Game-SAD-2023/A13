@@ -371,22 +371,17 @@ import org.springframework.web.client.HttpClientErrorException;
         final String endpoint = "/getImage"; // Endpoint nel servizio T23
 
         try {
-            // Effettua la chiamata GET al servizio T23
-            ResponseEntity<Map> response = restTemplate.getForEntity(endpoint, Map.class);
-
+            // Effettua la chiamata GET al servizio T23 per ottenere l'immagine
+            ResponseEntity<Map> response = restTemplate.getForEntity(BASE_URL + endpoint + "?userId=" + userId, Map.class);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                // Recupera l'URL dell'immagine dal JSON restituito
                 return (String) response.getBody().get("imageUrl");
-            } else {
-                System.err.println("Errore durante il recupero dell'immagine: " + response.getStatusCode());
-                return null;
             }
+            return null;
         } catch (Exception e) {
-            System.err.println("Errore durante la chiamata GET a T23: " + e.getMessage());
+            System.err.println("Errore durante la chiamata a T23: " + e.getMessage());
             return null;
         }
     }
-
 
 
 

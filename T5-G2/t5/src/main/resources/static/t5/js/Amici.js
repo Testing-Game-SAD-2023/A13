@@ -120,6 +120,15 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(message => {
                 alert(message);
+                confetti({
+                    particleCount: 200, // Più particelle
+                    spread: 150, // Spargimento più ampio
+                    angle: 90, // Direzione verso l'alto
+                    origin: { y: 0.6 },
+                    colors: ["#ff69b4", "#00ffff", "#4b0082", "#ff0000"]
+                });
+                
+
                 loadFriends();
                 searchResult.style.display = "none";
             })
