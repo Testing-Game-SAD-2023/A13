@@ -27,7 +27,15 @@ const teamDelete = document.getElementById('team-delete');
 
 document.getElementById('dettagli-team').appendChild(teamDetailsContainer); // Aggiunge il contenitore nella sezione
 let datiTeam = []; // Variabile per salvare i dati dei team
-// Funzione per recuperare i team e popolare la select
+//ottiene la data
+function getCurrentDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // I mesi partono da 0
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`; // Ritorna la data nel formato "yyyy-mm-dd"
+}
+
 function fetchTeams(teamSelect) {
         fetch('/team_view', {
             method: 'GET',
@@ -102,24 +110,31 @@ function listHtml(){
 }
 // Funzione per aggiornare la lista degli studenti selezionati
 function toggleSelectedStudentsList() {
-        // Ottieni la lista corrente degli studenti selezionati
-        const selectedEmails = Array.from(selectedStudentsList.children);
-        // Aggiungi o rimuovi gli studenti selezionati
-        Array.from(selectMembro.selectedOptions).forEach(option => {
-            // Cerca se l'email è già presente nella lista
-            const existingStudent = selectedEmails.find(li => li.textContent === option.textContent);
+    // Ottieni la lista corrente degli studenti selezionati
+    const selectedEmails = Array.from(selectedStudentsList.children).map(li => li.dataset.value);
 
+    // Aggiungi o rimuovi gli studenti selezionati
+    Array.from(selectMembro.selectedOptions).forEach(option => {
+        const email = option.value; // Usa l'email come identificatore
+        const isAlreadySelected = selectedEmails.includes(email);
+
+        if (isAlreadySelected) {
+            // Se l'email è già presente, rimuovila dalla lista
+            const existingStudent = Array.from(selectedStudentsList.children).find(li => li.dataset.value === email);
             if (existingStudent) {
-                // Se presente, rimuovila
                 selectedStudentsList.removeChild(existingStudent);
-            } else {
-                // Se non presente, aggiungila
-                const li = document.createElement('li');
-                li.textContent = option.textContent; // Mostra email dello studente
-                selectedStudentsList.appendChild(li);
             }
-        });
+        } else {
+            // Se l'email non è presente, aggiungila alla lista
+            const li = document.createElement('li');
+            li.textContent = option.textContent; // Mostra il testo visibile (es. nome completo)
+            li.dataset.value = email; // Salva SOLO l'email nel dataset
+            selectedStudentsList.appendChild(li);
+        }
+    });
 }
+
+
 function studentiLista(studentsSelect) {
     fetch('/students_list', { // Modifica della route
         method: 'GET',
@@ -190,8 +205,8 @@ teamForm.addEventListener('submit', function (event) {
             teamName: document.getElementById('teamName').value,
             description: document.getElementById('description').value,
             leaderId: document.getElementById('leaderId').value,
-            member: Array.from(selectedStudentsList.children).map(li => li.textContent), // Ottieni gli ID dei membri selezionati
-            creationDate: new Date()
+            member: Array.from(selectedStudentsList.children).map(li => li.dataset.value), // Ottieni gli ID dei membri selezionati
+            creationDate: getCurrentDate()
         };
 
 

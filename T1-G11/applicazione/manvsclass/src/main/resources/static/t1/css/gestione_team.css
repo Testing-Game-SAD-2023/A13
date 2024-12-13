@@ -239,25 +239,38 @@ nav.top-right {
   margin: 0;
 }
 
-/* Stile del contenitore della lista dei membri */
-.member-display {
+/* Contenitore del tooltip */
+.member-tooltip {
   position: relative;
   display: inline-block;
   cursor: pointer;
+  color: blue;
+  text-decoration: underline;
 }
 
-.member-display:hover::after {
-  content: attr(title); /* Mostra il contenuto del titolo */
+/* Contenuto del tooltip */
+.member-tooltip:hover::after {
+  content: attr(title); /* Usa l'attributo "title" per mostrare il contenuto */
   position: absolute;
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   padding: 5px 10px;
   border-radius: 5px;
-  top: 100%;
+  top: 120%; /* Posiziona sotto l'elemento */
   left: 0;
-  white-space: pre-wrap;
+  white-space: pre-wrap; /* Permette a lungo testo di andare a capo */
   z-index: 1000;
   display: block;
   min-width: 150px;
   max-width: 300px;
 }
+
+/* Nasconde l'attributo "title" come default */
+.member-tooltip::after {
+  display: none;
+}
+
+.member-tooltip:hover::after {
+  display: block;
+}
+
