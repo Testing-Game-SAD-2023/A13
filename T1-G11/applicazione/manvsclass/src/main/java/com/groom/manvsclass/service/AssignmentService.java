@@ -45,9 +45,6 @@ public class AssignmentService {
     @Autowired 
     private EmailService emailService;
 
-    @Autowired
-    private TeamService teamService;
-
     //Modifica 07/12/2024 : creazione funzione per la creazione di un assignment
     @Transactional
     public ResponseEntity<?> creaAssignment(Assignment assignment, 
@@ -105,7 +102,7 @@ public class AssignmentService {
 
         //10. Invio email agli utenti del team
 
-        emailService.sendTeamNewAssignment(idsStudentiTeam, existingTeam, assignment, jwt);
+        //emailService.sendTeamNewAssignment(idsStudentiTeam, existingTeam, assignment, jwt);
         
         // 13. Restituisci la risposta di successo
         return ResponseEntity.status(HttpStatus.CREATED).body("Assignment creato con successo e associato al Team.");
