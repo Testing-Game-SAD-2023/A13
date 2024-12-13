@@ -412,6 +412,32 @@ document.addEventListener("DOMContentLoaded", () => {
             uploadForm.style.display = uploadForm.style.display === "none" ? "block" : "none";
         });
     }
+
+    // Funzione per caricare l'immagine al caricamento della pagina
+    const loadImage = async () => {
+        try {
+            const response = await fetch('/getImage', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json(); // Ottieni il percorso dell'immagine
+                const imagePath = data.imageUrl; // Percorso dell'immagine dal backend
+                const currentProfilePicture = document.getElementById("currentProfilePicture");
+
+                if (currentProfilePicture) {
+                    currentProfilePicture.src = imagePath; // Aggiorna l'immagine di profilo
+                }
+            } else {
+                console.error('Errore nel caricamento dell\'immagine:', await response.json());
+            }
+        } catch (error) {
+            console.error('Errore durante la connessione al backend:', error);
+        }
+    };
        
     // by GabMan 12/12 Funzione per il caricamento dell'immagine (chiamata dal pulsante "Upload")
     const uploadProfilePicture = async () => {
@@ -445,13 +471,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const base64Image = reader.result.split(",")[1]; // Rimuove il prefisso 'data:image/jpeg;base64,'
     
             try {
+                // Modifica per inviare l'immagine come parametro URL
                 const response = await fetch("/updateProfilePicture", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        profilePicture: base64Image, // Invia l'immagine in Base64
+                        profilePicture: base64Image,
                     }),
                 });
     
@@ -460,10 +487,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
                     // Aggiorna l'immagine del profilo
                     if (currentProfilePicture) {
-                        currentProfilePicture.src = data.imageUrl;
+                        currentProfilePicture.src = `${data.imageUrl}?t=${new Date().getTime()}`;
                     }
     
-                    alert("Immagine caricata con successo!");
+                    alert(data.message || "Immagine caricata con successo!");
                 } else {
                     const error = await response.json();
                     alert(`Errore durante il caricamento: ${error.error}`);
@@ -477,6 +504,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Legge il file come URL Base64
         reader.readAsDataURL(file);
     };
+    
+    document.getElementById("uploadProfilePictureSubmitButton").addEventListener("click", uploadProfilePicture);
+
     
     // Collega la funzione al clic del pulsante "Upload"
     if (uploadSubmitButton) {

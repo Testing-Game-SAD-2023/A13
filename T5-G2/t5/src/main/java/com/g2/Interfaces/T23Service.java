@@ -26,6 +26,7 @@ import java.util.HashMap;
 //noi
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestClientException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
@@ -358,8 +359,7 @@ import org.springframework.web.client.HttpClientErrorException;
             );
 
             // Restituisci il risultato della chiamata (true se l'aggiornamento ha avuto successo)
-            return response.getBody() != null && response.getBody();
-
+            return response.getStatusCode() == HttpStatus.OK;      
         } catch (RestClientException e) {
             // Gestione degli errori durante la chiamata REST
             System.err.println("Errore durante l'aggiornamento dell'immagine nel servizio T23: " + e.getMessage());
@@ -367,8 +367,42 @@ import org.springframework.web.client.HttpClientErrorException;
         }
     }
 
-    
+    public String getImage(Integer userId) {
+        final String endpoint = "/getImage"; // Endpoint nel servizio T23
+
+        try {
+            // Effettua la chiamata GET al servizio T23
+            ResponseEntity<Map> response = restTemplate.getForEntity(endpoint, Map.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                // Recupera l'URL dell'immagine dal JSON restituito
+                return (String) response.getBody().get("imageUrl");
+            } else {
+                System.err.println("Errore durante il recupero dell'immagine: " + response.getStatusCode());
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Errore durante la chiamata GET a T23: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
+
+    
+
+
 
  

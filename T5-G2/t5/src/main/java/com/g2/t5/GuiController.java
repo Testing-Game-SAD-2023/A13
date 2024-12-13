@@ -18,8 +18,6 @@
 package com.g2.t5;
 import com.g2.Interfaces.T23Service;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -44,14 +42,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.GenericObjectComponent;
@@ -742,58 +736,83 @@ public class GuiController {
         System.err.println("Errore durante il recupero dell'userId: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore generico
     }
+    }
 
-    //GabMan 12/12 (Aggiornamento immagine profilo)
+
     @PostMapping("/updateProfilePicture")
     public ResponseEntity<Map<String, String>> updateProfilePicture(
-        @RequestBody Map<String, String> requestBody, // Riceve un JSON con l'immagine in Base64
-        @CookieValue(name = "jwt", required = false) String jwt) {
+            @RequestBody Map<String, String> payload,
+            @CookieValue(name = "jwt", required = false) String jwt) {
 
         try {
             // 1. Verifica del token JWT
             if (jwt == null || jwt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                    .body(Map.of("error", "Utente non autenticato."));
+                                     .body(Map.of("error", "Utente non autenticato."));
             }
 
             // 2. Estrarre l'ID utente dal token JWT
             Integer userId = extractUserIdFromJwt(jwt);
             if (userId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                    .body(Map.of("error", "Token JWT non valido."));
+                                     .body(Map.of("error", "Token JWT non valido."));
             }
 
-            // 3. Validazione del payload
-            String base64Image = requestBody.get("profilePicture");
+            // 3. Validazione del parametro 'profilePicture'
+            String base64Image = payload.get("profilePicture");
             if (base64Image == null || base64Image.isEmpty()) {
                 return ResponseEntity.badRequest()
-                                    .body(Map.of("error", "Nessuna immagine fornita."));
+                                     .body(Map.of("error", "Nessuna immagine fornita."));
             }
 
-            // 4. Validazione del formato Base64
-            if (!isValidBase64Image(base64Image)) {
-                return ResponseEntity.badRequest()
-                                    .body(Map.of("error", "Immagine non valida o formato non supportato."));
-            }
-
-            // 5. Aggiornamento dell'immagine tramite servizio T23
+            // 4. Aggiornamento dell'immagine tramite servizio T23
             boolean updateSuccess = t23Service.updateAvatarWithImage(userId, base64Image);
 
             if (updateSuccess) {
                 return ResponseEntity.ok(Map.of("message", "Immagine caricata con successo!"));
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body(Map.of("error", "Errore durante l'aggiornamento dell'immagine."));
+                                     .body(Map.of("error", "Errore durante l'aggiornamento dell'immagine."));
             }
         } catch (Exception e) {
             // Log dell'eccezione
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(Map.of("error", "Si è verificato un errore imprevisto."));
+                                 .body(Map.of("error", "Si è verificato un errore imprevisto."));
         }
     }
 
 
+    @GetMapping("/getImage")
+    public ResponseEntity<Map<String, String>> getImage(@CookieValue(name = "jwt", required = false) String jwt) {
+        try {
+            // 1. Verifica del token JWT
+            if (jwt == null || jwt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                     .body(Map.of("error", "Utente non autenticato."));
+            }
+
+            // 2. Estrazione dell'ID utente dal token JWT
+            Integer userId = extractUserIdFromJwt(jwt);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                     .body(Map.of("error", "Token JWT non valido."));
+            }
+
+            // 3. Recupero dell'immagine tramite T23Service
+            String imagePath = t23Service.getImage(userId);
+            if (imagePath != null) {
+                return ResponseEntity.ok(Map.of("imageUrl", imagePath));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(Map.of("error", "Immagine non trovata per l'utente."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(Map.of("error", "Si è verificato un errore imprevisto."));
+        }
+    }
 
 }
 
@@ -803,4 +822,14 @@ public class GuiController {
 
 
 
-}
+
+
+
+
+
+
+
+
+
+
+
