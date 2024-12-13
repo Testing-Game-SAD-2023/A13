@@ -174,7 +174,7 @@ public class TeamService {
     }
       
     // Metodo per visualizzare i team associati a un admin specifico
-public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
     System.out.println("Recupero dei team associati all'Admin in corso...");
 
     try {
@@ -276,7 +276,7 @@ public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = f
          // 8. Salva il team aggiornato
         Team updatedTeam = teamRepository.save(existingTeam);
 
-        //9. Recupero dettagli degli studenti per inviare le email.
+        // 9. Recupero dettagli degli studenti per inviare le email.
         ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(nuoviStudenti, jwt);
         if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
             return ResponseEntity.status(dettagliStudentiResponse.getStatusCode())
@@ -377,8 +377,6 @@ public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = f
         return ResponseEntity.ok().body(updatedTeam);
     }
 
-
-//-------------------------------------------------------------------------------------------------------------------
 
     
 }
