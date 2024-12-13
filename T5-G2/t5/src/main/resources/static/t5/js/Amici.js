@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
             credentials: "include",
         })
             .then(response => {
-                if (!response.ok) throw new Error("Amico non trovato.");
+                if (!response.ok) throw new Error("Nessun utente trovato");
                 return response.json();
             })
             .then(data => {
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Aggiungi un controllo per verificare che `data.id` esista
                 if (data && data.id) {
                     addFriendButton.dataset.friendId = data.id; // Imposta il friendId
-                    console.log("ID dell'amico trovato:", data.id); // Aggiungi un log per il debug
+                    console.log("E'stato trovato un utente", data.id); // Aggiungi un log per il debug
                 } else {
                     searchFriendMessage.textContent = "Errore: l'ID dell'amico non è valido.";
                 }
