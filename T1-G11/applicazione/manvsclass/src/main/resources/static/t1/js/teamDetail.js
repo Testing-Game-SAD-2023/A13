@@ -72,7 +72,7 @@ function populateTableBasedOnToggle() {
         // Aggiorna il testo del toggle
         toggleText.textContent = "Assignments";
       
-
+        
         populateTableAssignment(); // Popola la tabella degli assignment
     } else {
         // Se il toggle è su "Student"
@@ -90,7 +90,12 @@ function populateTableBasedOnToggle() {
     }
 }
 
-
+    // Event listener per cambiare l'ordinamento
+    document.getElementById("dropdown-container-assignment").addEventListener("change", (event) => {
+        const orderBy = event.target.value; // Recupera il valore selezionato
+        populateTableAssignment(orderBy); // Ricarica la vista con il nuovo ordinamento
+    });
+    
 function populateTable() {
     const tableContainer = document.querySelector("#studentsContainer .responsive-table");
     const idTeam = getTeamCodeFromPath();
@@ -142,7 +147,11 @@ function populateTable() {
         addEmptyRow(tableContainer); // Aggiungi la riga vuota in caso di errore
     });
 }
-function populateTableAssignment() {
+
+let allAssignments = [];  // Memorizziamo tutti gli assignment di un team
+
+
+function populateTableAssignment(orderBy = "default") {
     const tableContainer = document.querySelector("#assignmentsContainer .responsive-table"); // Assicurati che qui venga selezionato il giusto container per gli assignment
     const idTeam = getTeamCodeFromPath();
     clearTable(tableContainer);
@@ -176,6 +185,14 @@ function populateTableAssignment() {
         // Gestiamo la risposta basata sul tipo di dato ricevuto
         if (Array.isArray(data)) {
             if (data.length > 0) {
+                if (orderBy === "end") {
+                    data.sort((a, b) => new Date(a.dataScadenza) - new Date(b.dataScadenza));
+                }else if( orderBy==="creation"){
+                    data.sort((a, b) => new Date(b.dataCreazione) - new Date(a.dataCreazione));
+                }
+                allAssignments = data;  // Memorizziamo tutti gli assignment
+                clearTable(tableContainer);
+                console.log("Dati ordinati:", data);
                 data.forEach(assignment => addRowAssignment(tableContainer, assignment)); // Aggiungi gli assignment
             } else {
                 addEmptyRow(tableContainer);  // Aggiungi una riga vuota se non ci sono assignment
@@ -215,6 +232,7 @@ function addEmptyRow(container) {
         <div class="col-2">-</div>
         <div class="col-3">-</div>
         <div class="col-4">-</div>
+        <div class="col-5">-</div>
         <div class="col-delete"></div>
     `;
 
@@ -234,12 +252,13 @@ function addRow(container, student) {
     const name = student.name || "-";
     const surname = student.surname || "-";
     const email = student.email || "-";
-
+    const assignment = "-"; //relativo a quando prima o poi verranno implementata la logica relativa gli assignment
     row.innerHTML = `
         <div class="col-1">${student.id}</div>
         <div class="col-2">${name}</div>
         <div class="col-3">${surname}</div>
         <div class="col-4">${email}</div>
+        <div class="col-5">${assignment}</div> 
         <div class="col-delete">
             <button class="delete-button">Delete</button>
         </div>
@@ -262,7 +281,7 @@ function formatDate(dateString) {
 function addRowAssignment(container, assignment) {
     const row = document.createElement("li");
     row.classList.add("table-row");
-
+   
     // Verifica e assegna i valori dei campi dell'assegnamento
     const idAssignment = assignment.idAssignment || "-";
     const titolo = assignment.titolo || "-";
@@ -277,185 +296,220 @@ function addRowAssignment(container, assignment) {
         <div class="col-2">${titolo}</div>
         <div class="col-3">${dataCreazione}</div>
         <div class="col-4">${dataScadenza}</div>
+        <div class="col-5"></div>
         <div class="col-delete">
             <button class="delete-button">Delete</button>
         </div>
     `;
-
+     // Aggiungi l'event listener per la visualizzazione dei dettagli quando la riga viene cliccata
+     row.addEventListener("click", () => {
+        viewAssignmentDetails(row);
+    });
     // Aggiungi la riga al contenitore
     container.appendChild(row);
 }
 
-
-
-// Funzione per aprire la modale con la barra di ricerca
-// Funzione per aprire la modale con la barra di ricerca
 function openModal() {
-    // Recupera il contenitore della modale e inserisce il contenuto HTML della finestra modale.
+    // Recupera il contenitore della modale e inserisce il contenuto HTML della finestra modale
     const modalContainer = document.getElementById("modalContainer");
     modalContainer.innerHTML = `
         <div class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h2>Aggiungi Studente</h2>
+                <input type="text" id="search-name" placeholder="Cerca studente per nome..." />
+                <input type="text" id="search-surname" placeholder="Cerca studente per cognome..." />
                 <input type="text" id="search-email" placeholder="Cerca studente per email..." />
                 <p id="selectedCount">Selezionati: 0</p>
-                <ul id="searchResults"></ul>
+                <div id="selectedStudents">
+                <ul id="searchResults"></ul>    
+                    <h3>Studenti Selezionati:</h3>
+                    <ul id="selectedList"></ul>
+                    <p id="viewAllMessage" style="display: none; color: #555;">...Per visionarli tutti premi View All</p>
+                     <button id="viewAllButton">View All</button>
+                </div>
                 <button id="searchButton">Cerca</button>
                 <button id="addButton" disabled>Aggiungi</button>
             </div>
         </div>
+
+        <!-- Modale per "View All" -->
+        <div id="viewAllModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span id="viewAllClose" class="close">&times;</span>
+                <h2>Elenco Completo Studenti Selezionati</h2>
+                <ul id="fullSelectedList"></ul>
+            </div>
+        </div>
+
     `;
 
-    // Recupera i riferimenti agli elementi HTML della modale
-    const searchEmailInput = document.getElementById("search-email"); // Campo input per la ricerca
-    const searchResults = document.getElementById("searchResults"); // Contenitore per i risultati della ricerca
-    const addButton = document.getElementById("addButton"); // Pulsante "Aggiungi", inizialmente disabilitato
-    const selectedCount = document.getElementById("selectedCount"); // Elemento per mostrare il numero di selezionati
+    const searchNameInput = document.getElementById("search-name");
+    const searchSurnameInput = document.getElementById("search-surname");
+    const searchEmailInput = document.getElementById("search-email");
+    const searchResults = document.getElementById("searchResults");
+    const selectedList = document.getElementById("selectedList");
+    const selectedCount = document.getElementById("selectedCount");
+    const viewAllMessage = document.getElementById("viewAllMessage");
+    const viewAllButton = document.getElementById("viewAllButton");
+    const addButton = document.getElementById("addButton");
 
-    // Array per tenere traccia degli studenti selezionati (ID)
     let selectedStudents = [];
 
-    // Funzione per cercare studenti in base all'email inserita
+    // Funzione per aggiornare la lista visibile degli studenti selezionati
+    function updateSelectedList() {
+        selectedList.innerHTML = '';
+        const maxVisible = 5;
+        fullSelectedList.innerHTML = selectedStudents.map(student => `<li>${student.name} ${student.surname} </li>`).join('');
+        // Mostra solo i primi 5 studenti
+        selectedStudents.slice(0, maxVisible).forEach(student => {
+            const li = document.createElement('li');
+            li.textContent = `${student.name} ${student.surname}`;
+            selectedList.appendChild(li);
+        });
+
+        // Mostra il messaggio se ci sono più di 5 studenti
+        if (selectedStudents.length > maxVisible) {
+            viewAllMessage.style.display = 'block';
+        } else {
+            viewAllMessage.style.display = 'none';
+        }
+    }
+
+    // Funzione per cercare studenti
     function searchStudents() {
-        // Recupera e normalizza l'email dall'input
+        const nameQuery = searchNameInput.value.toLowerCase().trim();
+        const surnameQuery = searchSurnameInput.value.toLowerCase().trim();
         const emailQuery = searchEmailInput.value.toLowerCase().trim();
 
-        // Abilita il pulsante "Aggiungi" solo dopo aver avviato una ricerca
-        addButton.disabled = false;
+        // Reset campi di input
+        searchNameInput.value = '';
+        searchSurnameInput.value = '';
+        searchEmailInput.value = '';
 
-        // Se il campo di ricerca è vuoto, mostra un messaggio di errore
-        if (!emailQuery) {
+        if (!nameQuery && !surnameQuery && !emailQuery) {
             searchResults.innerHTML = '<li>Ricerca almeno uno studente!</li>';
             return;
         }
 
-        // Effettua una richiesta al server per cercare uno studente con l'email fornita
-        fetch(`/studentByEmail/${emailQuery}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
+        fetch(`/searchStudents`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: nameQuery, surname: surnameQuery, email: emailQuery })
         })
             .then(response => {
-                // Verifica se la risposta è valida
-                if (!response.ok) {
-                    throw new Error('Errore durante la ricerca degli studenti');
-                }
-                // Converte la risposta in formato JSON
+                if (!response.ok) throw new Error('Errore durante la ricerca degli studenti');
                 return response.json();
             })
-            .then(filteredStudent => {
-                // Se lo studente esiste, mostra i suoi dati
-                if (filteredStudent) {
-                    // Controlla se lo studente è già stato selezionato
-                    const isSelected = selectedStudents.includes(filteredStudent.id);
-
-                    // Crea l'elenco dei risultati con il checkbox
-                    searchResults.innerHTML = `
-                        <li>
-                            <input 
-                                type="checkbox" 
-                                data-id="${filteredStudent.id}" 
-                                data-name="${filteredStudent.name}" 
-                                data-surname="${filteredStudent.surname}" 
-                                ${isSelected ? 'checked' : ''} 
-                            />
-                            ${filteredStudent.name} ${filteredStudent.surname}
-                        </li>
-                    `;
+            .then(filteredStudents => {
+                if (filteredStudents.length > 0) {
+                    searchResults.innerHTML = filteredStudents.map(student => {
+                        const isSelected = selectedStudents.some(s => s.id === student.id);
+                        return `
+                            <li>
+                                <input 
+                                    type="checkbox" 
+                                    data-id="${student.id}" 
+                                    data-name="${student.name}" 
+                                    data-surname="${student.surname}" 
+                                    ${isSelected ? 'checked' : ''} 
+                                />
+                                ${student.name} ${student.surname} (${student.email})
+                            </li>
+                        `;
+                    }).join('');
                 } else {
-                    // Mostra un messaggio se nessuno studente è stato trovato
                     searchResults.innerHTML = '<li>Nessuno studente trovato.</li>';
                 }
 
-                // Aggiunge un listener di evento a tutti i checkbox
+                // Aggiunge un listener ai checkbox
                 document.querySelectorAll('#searchResults input[type="checkbox"]').forEach(checkbox => {
                     checkbox.addEventListener('change', (e) => {
-                        // Recupera l'ID dello studente dal checkbox selezionato
                         const studentId = e.target.dataset.id;
+                        const studentName = e.target.dataset.name;
+                        const studentSurname = e.target.dataset.surname;
 
-                        // Aggiunge o rimuove l'ID dello studente dall'array dei selezionati
                         if (e.target.checked) {
-                            if (!selectedStudents.includes(studentId)) {
-                                selectedStudents.push(studentId);
+                            if (!selectedStudents.some(s => s.id === studentId)) {
+                                selectedStudents.push({ id: studentId, name: studentName, surname: studentSurname});
                             }
                         } else {
-                            selectedStudents = selectedStudents.filter(id => id !== studentId);
+                            selectedStudents = selectedStudents.filter(s => s.id !== studentId);
                         }
 
-                        // Aggiorna il contatore e lo stato del pulsante "Aggiungi"
                         selectedCount.textContent = `Selezionati: ${selectedStudents.length}`;
+                        updateSelectedList();
                         addButton.disabled = selectedStudents.length === 0;
                     });
                 });
             })
             .catch(error => {
-                // Gestisce eventuali errori durante la ricerca
                 console.error('Errore nella fetch:', error);
                 searchResults.innerHTML = '<li>Si è verificato un errore. Riprova.</li>';
             });
     }
-    // Ascoltatore per il pulsante di ricerca
+
     document.getElementById("searchButton").addEventListener("click", searchStudents);
 
-    // Funzione per aggiungere gli studenti selezionati alla tabella
+    // Funzione per aggiungere gli studenti al team
     function addStudentsToTeam() {
-            console.log(selectedStudents);
-            const idTeam = getTeamCodeFromPath();
-            if (!selectedStudents || selectedStudents.length === 0) {
-                return;
-            }
-            // Serializza l'array selectedStudents in formato JSON
-            const requestBody = JSON.stringify(selectedStudents);  // Converti in JSON
-            fetch(`/aggiungiStudenti/${idTeam}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: requestBody, // Invia solo gli ID degli studenti selezionati
+        console.log(selectedStudents);
+        const idTeam = getTeamCodeFromPath();
+        if (!selectedStudents || selectedStudents.length === 0) {
+            return;
+        }
+        const requestBody = JSON.stringify(selectedStudents.map(s => s.id));
+        showLoadingScreen();   
+        fetch(`/aggiungiStudenti/${idTeam}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: requestBody,
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore durante l\'aggiunta degli studenti');
+                }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Errore durante l\'aggiunta degli studenti');
-                    }
-                    return response.json(); // Processa la risposta come JSON
-                })
-                .then(data => {
-                    // Notifica il successo
-                    alert('Studenti aggiunti con successo al team!');
-                    console.log('Risposta del server:', data);
-                    const tableContainer = document.querySelector("#studentsContainer .responsive-table");
-                    clearTable(tableContainer);
-                    populateTable();
-                    
-                })
-                .catch(error => {
-                    console.error('Errore nella fetch:', error);
-                    alert('Si è verificato un errore durante l\'aggiunta degli studenti. Riprova.');
-                });
-                resetModal();
-                
-                
-                modal.style.display= "none";
-        
+            .then(data => {
+                alert('Studenti aggiunti con successo al team!');
+                console.log('Risposta del server:', data);
+                const tableContainer = document.querySelector("#studentsContainer .responsive-table");
+                clearTable(tableContainer);
+                populateTable();
+            })
+            .catch(error => {
+                console.error('Errore nella fetch:', error);
+                alert('Si è verificato un errore durante l\'aggiunta degli studenti. Riprova.');
+            }).finally(() => {
+                // Nascondi la schermata di caricamento sempre, alla fine della richiesta
+                hideLoadingScreen();
+            });
+        resetModal();
+        modal.style.display = "none";
     }
 
-    // Ascoltatore per il pulsante "Aggiungi"
     addButton.addEventListener("click", addStudentsToTeam);
-    
-    // Funzione di chiusura della modale
+    viewAllButton.addEventListener('click', () => {
+        viewAllModal.style.display = 'block';
+    });
+
+    viewAllClose.addEventListener('click', () => {
+        viewAllModal.style.display = 'none';
+    });
+    // Funzione per chiudere la modale
     const closeButton = document.querySelector(".close");
     const modal = document.querySelector(".modal");
     closeButton.onclick = () => modal.style.display = "none";
 
     window.onclick = (event) => {
         if (event.target == modal) modal.style.display = "none";
+        if (event.target === viewAllModal) viewAllModal.style.display = "none";
     };
 
-    // Riapri la modale
     modal.style.display = "block";
 }
+
 
 // Funzione per pulire la modale dopo l'aggiunta
 function resetModal() {
@@ -574,7 +628,8 @@ function openModalAssignment() {
          // Creiamo una data con l'orario di default 00:00:00, se necessario
         const formattedDate = new Date(deadline + "T00:00:00");  // Assicurati che la data venga considerata come inizio giornata
 
-
+        // Mostra la schermata di caricamento prima di inviare la richiesta
+        showLoadingScreen();    
         // Invio della fetch per creare l'assignment
         fetch(`/creaAssignment/${teamId}`, {
             method: "POST",
@@ -596,7 +651,6 @@ function openModalAssignment() {
             // La risposta è una stringa che contiene il messaggio
             if (result === "Assignment creato con successo e associato al Team.") {
                 alert(result); // Mostriamo il messaggio di successo
-                console.log("Risultato della creazione:", result);
                 modal.style.display = "none";  // Chiudi la modale dopo la creazione
                 const tableContainer = document.querySelector("#assignmentsContainer .responsive-table");
                 clearTable(tableContainer);
@@ -608,7 +662,10 @@ function openModalAssignment() {
         })
         .catch((error) => {
             console.error("Errore durante la creazione dell'Assignment:", error);
-            alert("Errore durante la creazione dell'Assignment. Riprova.");
+            alert("Errore durante la creazione dell'assignment! Controlla se la data inserita è anteriore a quella odierna!");
+        }).finally(() => {
+            // Nascondi la schermata di caricamento sempre, alla fine della richiesta
+            hideLoadingScreen();
         });
     });
 }
@@ -842,9 +899,6 @@ function deleteAssignment(event) {
 }
 
 
-
-
-
 // Aggiungi un event listener ai pulsanti "Delete"
 document.querySelector("#studentsContainer .responsive-table").addEventListener("click", event => {
     if (event.target.classList.contains("delete-button")) {
@@ -871,3 +925,48 @@ document.getElementById("backArrow").addEventListener("click", () => {
     // Reindirizza alla pagina desiderata
     window.location.href = "/teams"; 
 });
+
+function showLoadingScreen() {
+    document.getElementById("loadingScreen").style.display = "flex";
+}
+
+function hideLoadingScreen() {
+    document.getElementById("loadingScreen").style.display = "none";
+}
+// Funzione per visualizzare i dettagli di un assignment quando viene cliccato
+function viewAssignmentDetails(row) {
+    // Modifica il selettore in base alla struttura effettiva della tua tabella
+    const assignmentId = row.querySelector(".col-1").textContent.trim();
+    console.log(allAssignments);
+    console.log(assignmentId);
+
+    // Cerca l'assignment corrispondente nell'array allAssignments
+    const assignment = allAssignments.find(assign => assign.idAssignment === assignmentId);
+    if (assignment) {
+        openModalWithDescription(assignment);
+    } else {
+        alert("Assignment non trovato.");
+    }
+}
+
+// Funzione per aprire la modale con la descrizione dell'assignment
+function openModalWithDescription(assignment) {
+    const modalContainer = document.createElement("div");
+    modalContainer.classList.add("modal_assignment_info");
+    modalContainer.style.display="flex";
+    modalContainer.innerHTML = `
+        <div class="modal-content-info-assignment">
+            <span class="close-modal-info-assignment">&times;</span>
+            <h2>Titolo dell'Assignment:</h2>
+            <h2> ${assignment.titolo}</h2>
+            <p><strong>Descrizione:</strong></p>
+            <p><strong></strong> ${assignment.descrizione}</p>
+        </div>
+    `;
+    document.body.appendChild(modalContainer);
+
+    // Aggiungi il comportamento di chiusura della modale
+    const closeButton = modalContainer.querySelector(".close-modal-info-assignment");
+    closeButton.addEventListener("click", () => modalContainer.remove());
+}
+

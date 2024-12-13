@@ -19,7 +19,14 @@
                 <img src="/t1/css/Images/admin-logo-1.png" alt="icon">
             </a>
         </span>
-        <p>Team Manager</p>
+        <div class="title-header">
+            <p >Team Manager</p>
+        </div>
+        
+        <div class="tour">
+             <p id="team_tour">Non sai cosa fare in questa pagina? Clicca qui e segui il tour!</p>
+        </div>
+       
     </div>
     <div class="search-section">
         <!-- Barra di ricerca centrale -->
@@ -59,15 +66,14 @@
 
     </div>
 
-  <!-- Modale per il tour -->
-  <div id="tourModal" class="modal_tour">
-    <div class="modal_tour-content">
-        <h2>Vuoi partecipare al tour guidato?</h2>
-        <p>Il tour ti mostrerà le funzionalità principali della pagina.</p>
-        <button id="startTourModal" class="modal_tour-button accept">Sì, avvia il tour</button>
-        <button id="closeModal" class="modal_tour-button decline">No, grazie</button>
+    <!--Per il caricamento degli assignment, ci mette 6 secondi dato che manda anche email-->
+    <div id="loadingScreen" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading...</p>
     </div>
-</div>
+
+
+
     <!--Sezione Assignment-->
     <div id="assignment-section">
         <div class="section-header">
@@ -99,8 +105,9 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.js" defer></script>
-    <script src="t1/js/team_tour.js"></script>
     <script src="t1/js/teams.js"></script>
+    <script src="t1/js/team_tour.js"></script>
+    
     
 </body>
 </html>

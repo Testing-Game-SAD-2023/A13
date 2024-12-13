@@ -136,7 +136,7 @@ public class Controller {
         return userService.getStudentsBySurnameAndName(request);
     }
 
-    @GetMapping("/searchStudents")
+    @PostMapping("/searchStudents")
     @ResponseBody
     public List<Map<String,Object>> searchStudents(@RequestBody Map<String, String> request){
         return userService.searchStudents(request);

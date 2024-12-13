@@ -21,16 +21,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 element: '.header',
                 popover: {
                     title: 'Header',
-                    description: 'Contiene il logo e il titolo della pagina.',
+                    description: 'Contiene il titolo della pagina e il rimando alla dashboard admin.',
                     side: "bottom",
                     align: 'center'
                 }
             },
             {
-                element: '#search-container',
+                element: '.search-container',
                 popover: {
                     title: 'Barra di Ricerca',
-                    description: 'Usa questa barra per cercare un team specifico.',
+                    description: 'Usa questa barra per cercare un team specifico e visualizzare i relativi assignment.',
                     side: "bottom",
                     align: 'center'
                 }
@@ -63,17 +63,43 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     align: 'center'
                 }
             },
-            // Altri passi aggiuntivi se necessario
+            {
+                element: '#assignment-section',
+                popover: {
+                    title: 'Sezione Assignment',
+                    description: 'Qui puoi visualizzare e gestire gli assignment relativi ai tuoi team.',
+                    side: "top",
+                    align: 'center'
+                }
+            },
+            {
+                element: '#openModalButtonAssignment',
+                popover: {
+                    title: 'Aggiungi Assignment',
+                    description: 'Clicca qui per aggiungere un nuovo assignment e legarlo ad un team.',
+                    side: "left",
+                    align: 'center',
+                    allowInteraction: true
+                },   
+            },
+            {
+                element: '#dropdown-container-assignment',
+                popover: {
+                    title: 'Filtra gli Assignment',
+                    description: 'Filtra i tuoi team per data di scadenza o data di creazione.',
+                    side: "left",
+                    align: 'center'
+                }
+            },
+            
         ]
     });
+    
 
-    // Mostra la conferma per avviare il tour quando la pagina viene caricata
-    window.onload = function() {
-        if (confirm('Vuoi partecipare al tour guidato?')) {
-            // Avvia il tour se l'utente accetta
-            driverObj.drive();
-        }
-    };
+    document.getElementById("team_tour").addEventListener("click", function() {
+        // Logica per il tour o qualsiasi altra funzione che vuoi eseguire
+        driverObj.drive();
+    });
 
   
 });

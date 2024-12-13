@@ -164,6 +164,13 @@ document.getElementById("dropdown-container").addEventListener("change", (event)
 document.addEventListener("DOMContentLoaded", () => folder_view());
 
 
+function showLoadingScreen() {
+    document.getElementById("loadingScreen").style.display = "flex";
+}
+
+function hideLoadingScreen() {
+    document.getElementById("loadingScreen").style.display = "none";
+}
 
 // --- BARRA DI RICERCA---
 function searchTeamByName(name) {
@@ -285,7 +292,7 @@ function createTeam(modal) {
         alert("Il nome del team deve essere tra 3 e 30 caratteri.");
         return;
     }
-
+    showLoadingScreen();  
     // Effettua la richiesta al backend
     fetch("/creaTeam", { 
         method: 'POST',
@@ -323,6 +330,9 @@ function createTeam(modal) {
         // Gestione errori
         console.error("Errore durante la creazione del team:", error);
         alert(`Errore: ${error.message}`);
+    }).finally(() => {
+        // Nascondi la schermata di caricamento sempre, alla fine della richiesta
+        hideLoadingScreen();
     });
 }
 
@@ -659,7 +669,7 @@ function openModalAssignment() {
          // Creiamo una data con l'orario di default 00:00:00, se necessario
         const formattedDate = new Date(deadline + "T00:00:00");  // Assicurati che la data venga considerata come inizio giornata
 
-
+        showLoadingScreen();  
         // Invio della fetch per creare l'assignment
         fetch(`/creaAssignment/${teamId}`, {
             method: "POST",
@@ -692,9 +702,12 @@ function openModalAssignment() {
         .catch((error) => {
             console.error("Errore durante la creazione dell'Assignment:", error);
             alert("Errore durante la creazione dell'Assignment. Riprova.");
+        }).finally(() => {
+            // Nascondi la schermata di caricamento sempre, alla fine della richiesta
+            hideLoadingScreen();
         });
-    });
-}
+    }
+    )}
 
 // Funzione per popolare il menu a tendina dei giochi
 function populateGameSelector() {
