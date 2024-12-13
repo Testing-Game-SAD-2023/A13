@@ -6,6 +6,9 @@ package com.g2.Service;
 
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.*;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,9 @@ public class UserService {
         return (String) serviceManager.handleRequest("T23", "RmFollow", userID_1, userID_2);
     }
 
+    public List<User> getUsers(){
+        return (List<User>) serviceManager.handleRequest("T23", "GetUsers");
+    }
 
     public boolean isUserInFollower(User user, Integer targetUserId) {
         if (user == null || user.getFollowers() == null) {

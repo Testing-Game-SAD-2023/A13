@@ -293,8 +293,6 @@ public class GuiController {
 
     }
 
-
-
     @GetMapping("/gamemode")
     public String gamemodePage(Model model,
             @CookieValue(name = "jwt", required = false) String jwt,
