@@ -41,7 +41,7 @@ const updateUserObject = () => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Mostra solo gli achievement completati all'avvio
+  
   populateForm();
   viewCompletedAchievements();
 });
@@ -54,7 +54,7 @@ function viewCompletedAchievements() {
   });
 };
 
-// Funzione per mostrare tutti gli achievement
+
 function viewAllAchievements() {
   const achievements = document.querySelectorAll('.achievement-container');
   achievements.forEach(achievement => {
@@ -185,7 +185,7 @@ const renderSearchResults = (player) => {
   resultsContainer.appendChild(playerDiv);
 };
 
-// Funzione per determinare se l'utente sta già seguendo un altro utente
+
 const isUserFollowing = (player) => {
   return user.following.some(followedPlayer => followedPlayer.id === player.id);
 };
@@ -228,24 +228,24 @@ $('#searchPlayerModal').on('hidden.bs.modal', function () {
   location.reload(); // Ricarica l'intera pagina
 });
 
-// Manteniamo invariato il codice esistente per i filtri delle statistiche
-let currentRobot = null; // Filtro disattivato per Robot
-let currentGameMode = null; // Filtro disattivato per GameMode
 
-// Aggiorna il filtro per Robot e il testo del bottone
+let currentRobot = null; 
+let currentGameMode = null; 
+
+
 function selectRobotFilter(robotType) {
     currentRobot = robotType;
     document.getElementById('robotFilterDropdown').innerText = robotType;
     filterStatistics();
-    updateRatioVisibility(); // Verifica e aggiorna la visibilità della ratio
+    updateRatioVisibility(); 
 }
 
-// Aggiorna il filtro per GameMode e il testo del bottone
+
 function selectGameModeFilter(gameMode) {
     currentGameMode = gameMode;
     document.getElementById('gameModeFilterDropdown').innerText = gameMode;
     filterStatistics();
-    updateRatioVisibility(); // Verifica e aggiorna la visibilità della ratio
+    updateRatioVisibility(); 
 }
 
 // Applica i filtri alle statistiche
@@ -256,7 +256,7 @@ function filterStatistics() {
         const robot = row.getAttribute('data-robot');
         const gamemode = row.getAttribute('data-gamemode');
 
-        // Controllo indipendente per ogni filtro
+       
         const robotMatch = 
             (currentRobot === null) || 
             (robot === currentRobot);
@@ -265,11 +265,11 @@ function filterStatistics() {
             (currentGameMode === null) || 
             (gamemode === currentGameMode);
 
-        // Mostra la riga solo se entrambi i filtri corrispondono (se attivi)
+       
         if (robotMatch && gameModeMatch) {
-            row.style.display = ''; // Mostra la riga
+            row.style.display = ''; 
         } else {
-            row.style.display = 'none'; // Nascondi la riga
+            row.style.display = 'none'; 
         }
     });
 }
@@ -314,22 +314,22 @@ function updateRatioVisibility() {
             const gameModeMatch = (currentGameMode === null) || (gamemode === currentGameMode);
 
             if (robotMatch && gameModeMatch) {
-                row.style.display = ''; // Mostra la riga della ratio
+                row.style.display = ''; 
                 hasVisibleRatio = true;
             } else {
-                row.style.display = 'none'; // Nascondi la riga della ratio
+                row.style.display = 'none'; 
             }
         });
 
-        // Mostra il contenitore della ratio solo se esiste almeno una ratio visibile
+       
         ratioContainer.style.display = hasVisibleRatio ? '' : 'none';
     } else {
-        // Nascondi il contenitore della ratio se non ci sono statistiche valide
+       
         ratioContainer.style.display = 'none';
     }
 }
 
-// Resetta i filtri e il testo dei bottoni
+
 function clearFilter() {
     currentRobot = null;
     currentGameMode = null;

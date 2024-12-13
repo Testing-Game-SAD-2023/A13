@@ -10,7 +10,7 @@ public class Ratio {
     private Robot robot;
     private Float value;
 
-    // Costruttore
+    
     public Ratio(Integer playerID, Gamemode gamemode, Robot robot, float value) {
         this.playerID = playerID;
         this.gamemode = gamemode;

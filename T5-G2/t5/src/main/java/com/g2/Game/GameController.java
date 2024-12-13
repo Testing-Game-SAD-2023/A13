@@ -334,11 +334,11 @@ public class GameController {
             if (isGameEnd || gameLogic.isGameEnd()) {
                 activeGames.remove(playerId);
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                //List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-                //Integer userId = Integer.parseInt(playerId);
-                //User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
-                //String email = user.getEmail();
-                //List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(userId.intValue());
+                List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
+                Integer userId = Integer.parseInt(playerId);
+                User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+                String email = user.getEmail();
+                List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(userId.intValue());
                 return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
