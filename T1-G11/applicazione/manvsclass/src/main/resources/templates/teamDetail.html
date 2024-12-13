@@ -17,15 +17,20 @@
         <span class="back-arrow" id="backArrow">&larr;</span>
         <!-- Contenitore per il titolo e la matita -->
         <div class="title-container">
-            <p id="title"></p>
-            <span class="edit-icon" id="editIcon">
-                <img src="/t1/css/Images/pencil.png" alt="edit" class="pencil-icon">
-            </span>
+            <div class="title-content">
+                <p id="title"></p>
+                <span class="edit-icon" id="editIcon">
+                    <img src="/t1/css/Images/pencil.png" alt="edit" class="pencil-icon">
+                </span>
+            </div>
+            <div class="tour">
+                <p id="team_tour">Pensavi ti lasciassimo solo? Clicca qui e segui il tour per sapere cosa fare in questa pagina!</p>
+            </div>
         </div>
-        <div class="tour">
-            <p id="team_tour">Pensavi ti lasciassimo solo? Clicca qui e segui il tour per sapere cosa fare in questa pagina!</p>
-       </div>
+        
+       
     </div>
+    
     <!-- Toggle Switch per cambiare tra Assignments e Student -->
     <div class="toggle-container">
         <label class="switch">
@@ -89,6 +94,7 @@
     <!-- Modal Placeholder -->
     <div id="modalContainer"></div>
     <div id="modalContainerAssignment"></div>
+    <div id="modalContainerAssignmentInfo"></div>
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.js" defer></script>

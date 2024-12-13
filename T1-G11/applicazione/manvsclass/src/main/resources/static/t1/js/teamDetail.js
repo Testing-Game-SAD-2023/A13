@@ -951,6 +951,7 @@ function viewAssignmentDetails(row) {
 
 // Funzione per aprire la modale con la descrizione dell'assignment
 function openModalWithDescription(assignment) {
+    const modalInfo = document.getElementById("modalContainerAssignmentInfo");
     const modalContainer = document.createElement("div");
     modalContainer.classList.add("modal_assignment_info");
     modalContainer.style.display="flex";
@@ -963,7 +964,7 @@ function openModalWithDescription(assignment) {
             <p><strong></strong> ${assignment.descrizione}</p>
         </div>
     `;
-    document.body.appendChild(modalContainer);
+    modalInfo.appendChild(modalContainer);
 
     // Aggiungi il comportamento di chiusura della modale
     const closeButton = modalContainer.querySelector(".close-modal-info-assignment");
