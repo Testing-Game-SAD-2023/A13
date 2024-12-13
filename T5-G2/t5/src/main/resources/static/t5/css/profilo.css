@@ -359,3 +359,34 @@ body {
     justify-content: space-between;
 }
 
+.unobtained {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.obtained {
+    opacity: 1;
+    filter: none;
+}
+
+.completed-trophy {
+    color: green;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.progress-bar {
+    transition: width 0.5s ease; /* Animazione del riempimento della barra */
+}
+
+.bg-success {
+    background-color: #28a745 !important; /* Verde */
+}
+
+.bg-warning {
+    background-color: #ffc107 !important; /* Giallo */
+}
+.custom-progress-bar {
+    background-color: #007bff; /* Azzurro */
+    height: 20px;
+}

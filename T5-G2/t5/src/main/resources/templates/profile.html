@@ -195,8 +195,8 @@
                                     <div class="col">
                                         <h4 th:text="${element.Name}">Nome achievement</h4>
                                         <p th:text="${element.Description}">Descrizione achievement</p>
-                                        <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
-                                            <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}"  aria-valuemin="0" aria-valuemax="${element.ProgressRequired}" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -206,6 +206,7 @@
                 </div>
             </div>
         </div>
+    
 
         <div id="stats" class="section">
             <div class="col">

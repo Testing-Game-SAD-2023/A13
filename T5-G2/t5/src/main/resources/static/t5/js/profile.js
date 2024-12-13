@@ -277,41 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    const testAchievementsAPI = async () => {
-        try {
-            // Chiamata all'endpoint del backend
-            const response = await fetch('/api/getAchievements'); // Assicurati che l'URL sia corretto
-            if (response.ok) {
-                const achievements = await response.json(); // Converte la risposta in JSON
-    
-                // Mostra i dati nella console del browser per debug
-                console.log('Achievements:', achievements);
-    
-                // Mostra gli achievement sulla pagina (opzionale)
-                const achievementList = document.getElementById('achievementList');
-                if (achievementList) {
-                    achievementList.innerHTML = ''; // Pulisci eventuali dati precedenti
-                    achievements.forEach(achievement => {
-                        const achievementItem = document.createElement('div');
-                        achievementItem.classList.add('achievement-item');
-                        achievementItem.innerHTML = `
-                            <h3>${achievement.name}</h3>
-                            <p>${achievement.description}</p>
-                            <p>Progress Required: ${achievement.progressRequired}</p>
-                        `;
-                        achievementList.appendChild(achievementItem);
-                    });
-                }
-            } else {
-                console.error('Errore nel recupero degli achievement:', response.status);
-            }
-        } catch (error) {
-            console.error('Errore di connessione:', error);
-        }
-    };
-    
-    // Chiamare questa funzione al caricamento della sezione "Trofei"
-    document.getElementById('btnTrophies').addEventListener('click', testAchievementsAPI);
+
     
 
     // Passa alla modalità modifica
@@ -484,6 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
                 if (response.ok) {
                     const data = await response.json();
+                    
     
                     // Aggiorna l'immagine del profilo
                     if (currentProfilePicture) {
@@ -523,6 +490,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (loadingMessage) {
                 loadingMessage.style.display = "block";
             }
+
+            await loadImage();
     
             try {
                 // Chiama la funzione per eseguire l'upload
