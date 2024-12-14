@@ -29,7 +29,9 @@ function nameTeams() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Errore nel recupero dei dati del team');
+            return response.text().then(errorMessage => {
+                throw new Error(errorMessage);
+     });
         }
         return response.json();  // Parsea la risposta in formato JSON
     })
@@ -39,6 +41,7 @@ function nameTeams() {
     })
     .catch(error => {
         console.error('Errore:', error);
+        alert(error.message);
     });
 }
 
@@ -112,7 +115,9 @@ function populateTable() {
     .then(response => {
         // Verifica se la risposta è vuota o non valida
         if (!response.ok) {
-            throw new Error('Errore nella risposta del server');
+            return response.text().then(errorMessage => {
+                throw new Error(errorMessage);
+            });
         }
          // Controlla il tipo di contenuto della risposta
          const contentType = response.headers.get('Content-Type');
@@ -144,6 +149,7 @@ function populateTable() {
     })
     .catch(error => {
         console.error("Errore:", error);
+        alert(error.message);
         addEmptyRow(tableContainer); // Aggiungi la riga vuota in caso di errore
     });
 }
@@ -398,7 +404,11 @@ function openModal() {
             body: JSON.stringify({ name: nameQuery, surname: surnameQuery, email: emailQuery })
         })
             .then(response => {
-                if (!response.ok) throw new Error('Errore durante la ricerca degli studenti');
+                if (!response.ok){
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+             });
+                }
                 return response.json();
             })
             .then(filteredStudents => {
@@ -459,6 +469,7 @@ function openModal() {
             return;
         }
         const requestBody = JSON.stringify(selectedStudents.map(s => s.id));
+        console.log(requestBody);
         showLoadingScreen();   
         fetch(`/aggiungiStudenti/${idTeam}`, {
             method: 'PUT',
@@ -467,7 +478,9 @@ function openModal() {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Errore durante l\'aggiunta degli studenti');
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+             });
                 }
                 return response.json();
             })
@@ -643,7 +656,9 @@ function openModalAssignment() {
         })
         .then((response) => {
             if (!response.ok) {
-                throw new Error("Errore durante la creazione dell'Assignment");
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+         });
             }
             return response.text();
         })
@@ -662,7 +677,7 @@ function openModalAssignment() {
         })
         .catch((error) => {
             console.error("Errore durante la creazione dell'Assignment:", error);
-            alert("Errore durante la creazione dell'assignment! Controlla se la data inserita è anteriore a quella odierna!");
+                alert(error.message);
         }).finally(() => {
             // Nascondi la schermata di caricamento sempre, alla fine della richiesta
             hideLoadingScreen();
@@ -790,7 +805,10 @@ document.getElementById("editIcon").addEventListener("click", function() {
             })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`Errore HTTP: ${response.status}`);
+                        // Leggi il messaggio di errore dal server
+                    return response.text().then(errorMessage => {
+                       throw new Error(errorMessage);
+            });
                     }
                     return response.json(); // Elabora la risposta
                 })
@@ -799,7 +817,7 @@ document.getElementById("editIcon").addEventListener("click", function() {
                 })
                 .catch(error => {
                     console.error('Errore durante la modifica del nome del team:', error);
-                    alert('Si è verificato un errore durante la modifica del nome del team. Riprova.');
+                    alert(error.message); // Mostra il messaggio di errore specifico del server
                 });
         
             // Chiude la modale
@@ -842,7 +860,9 @@ function deleteStudent(event) {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Errore durante l'eliminazione dello studente con ID: ${studentId}`);
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+         });
             }
             console.log(`Studente con ID ${studentId} eliminato con successo.`);
             // Rimuovi la riga dal DOM
@@ -852,6 +872,7 @@ function deleteStudent(event) {
         })
         .catch(error => {
             console.error("Errore:", error);
+            alert(error.message);
         });
 }
 
@@ -885,7 +906,9 @@ function deleteAssignment(event) {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Errore durante l'eliminazione dell'assignment con ID: ${assignmentId}`);
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+         });
             }
             console.log(`Assignment con ID ${assignmentId} eliminato con successo.`);
             // Rimuovi la riga dal DOM
@@ -895,6 +918,7 @@ function deleteAssignment(event) {
         })
         .catch(error => {
             console.error("Errore:", error);
+            alert(error.message);
         });
 }
 
