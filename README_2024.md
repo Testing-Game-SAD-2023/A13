@@ -39,7 +39,7 @@ Siccome un'immagine vale più di mille parole, è buona norma inserire degli scr
 
 ##Video Dimostrativi
 Parte 1:
-[Video 1](Documentazione/Media/Video/Video_Admin/Tour_1.mp4)
+[Video 1](https://github.com/Giuleppe09/A13/blob/main/Documentazione/Media/Video/Video_Admin/Tour_1.mp4)
 
 Parte 2:
 [Video 2](Documentazione/Media/Video/Video_Admin/Tour_2.mp4)
