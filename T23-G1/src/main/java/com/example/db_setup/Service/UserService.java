@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +41,10 @@ public class UserService {
     }
 
     // Modifica 06/12/2024: Aggiunta end-point per restituire solo i campi non sensibili dello USER
-    public Map<String, Object> getStudentByEmail(String email) {
+    public ResponseEntity<?> getStudentByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new RuntimeException("Utente non trovato per email: " + email);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato per email: " + email);
         }
 
         // Creazione della mappa JSON con i campi desiderati
@@ -52,7 +53,7 @@ public class UserService {
         response.put("name", user.getName());
         response.put("surname", user.getSurname());
         response.put("email", user.getEmail());
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     // Crea un nuovo utente con i dettagli forniti da OAuthUserGoogle, recuperati dall'accesso OAuth2
@@ -207,10 +208,22 @@ public class UserService {
         
         // Caso 1: Cerca per email
         if (email != null && !email.isEmpty()) {
-            Map<String, Object> student = getStudentByEmail(email); // Ritorna subito una lista con un solo elemento
-            responseList.add(student);
+            ResponseEntity<?> response = getStudentByEmail(email); // Chiama il metodo per ottenere lo studente
+
+            // Controlla lo stato della risposta
+            if (response.getStatusCode() == HttpStatus.OK) {
+                // Recupera il corpo della risposta (la mappa JSON con i dati utente)
+                @SuppressWarnings("unchecked")
+                Map<String, Object> student = (Map<String, Object>) response.getBody();
+                responseList.add(student);
+            } else {
+                // Aggiunge un messaggio di errore se l'email non è trovata
+                responseList.add(Map.of("error", "Utente non trovato per email: " + email));
+            }
+
             return responseList;
         }
+
         
         // Caso 2: Cerca per nome o cognome
         if ((surname != null && !surname.isEmpty()) || (name != null && !name.isEmpty())) {

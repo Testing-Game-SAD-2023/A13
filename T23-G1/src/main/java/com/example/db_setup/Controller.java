@@ -5,20 +5,17 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-import java.util.Arrays;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -28,17 +25,12 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -51,16 +43,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
+
 
 
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 import com.example.db_setup.Service.OAuthUserGoogleService;
 import com.example.db_setup.Service.UserService;
-import com.example.db_setup.Language.*;
 import org.springframework.web.servlet.LocaleResolver;
 //MODIFICA (Deserializzazione risposta JSON)
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -125,7 +114,7 @@ public class Controller {
     //Modifica 06/12/2024 Giuleppe: Aggiunta rotta
     @GetMapping("/studentByEmail/{emailStudente}")
     @ResponseBody
-    public Map<String,Object> getStudentByEmail(@PathVariable("emailStudente") String emailStudent){
+    public ResponseEntity<?> getStudentByEmail(@PathVariable("emailStudente") String emailStudent){
         return userService.getStudentByEmail(emailStudent);
     }
 
