@@ -35,11 +35,11 @@ func (suite *LBControllerSuite) SetupSuite() {
 
 	//matcha id 1, oppure 2, oppure 3 con parametri ben formulati
 	lbr.On("FindIntervalByPlayerID", mock.MatchedBy(HelperPass), 1).
-		Return(Leaderboard{[]Row{{0, 1, 7}, {1, 2, 6}, {2, 3, 2}}, 3}, nil).
+		Return(Leaderboard{[]Row{{1, 1, 7}, {2, 2, 6}, {3, 3, 2}}, 3}, nil).
 		On("FindIntervalByPlayerID", mock.MatchedBy(HelperPass), 2).
-		Return(Leaderboard{[]Row{{0, 1, 7}, {1, 2, 6}, {2, 3, 2}}, 3}, nil).
+		Return(Leaderboard{[]Row{{1, 1, 7}, {2, 2, 6}, {3, 3, 2}}, 3}, nil).
 		On("FindIntervalByPlayerID", mock.MatchedBy(HelperPass), 3).
-		Return(Leaderboard{[]Row{{0, 1, 7}, {1, 2, 6}, {2, 3, 2}}, 3}, nil).
+		Return(Leaderboard{[]Row{{1, 1, 7}, {2, 2, 6}, {3, 3, 2}}, 3}, nil).
 
 		//matcha id 1, oppure 2, oppure 3 con parametri mal formulati
 
@@ -61,7 +61,7 @@ func (suite *LBControllerSuite) SetupSuite() {
 
 		//matcha pagina 1 con parametri ben formulati
 		On("FindIntervalByPage", mock.MatchedBy(HelperPass), 1).
-		Return(Leaderboard{[]Row{{0, 1, 7}, {1, 2, 6}, {2, 3, 2}}, 3}, nil).
+		Return(Leaderboard{[]Row{{1, 1, 7}, {2, 2, 6}, {3, 3, 2}}, 3}, nil).
 
 		//match pagina 1 con parametri mal formulati
 
@@ -231,7 +231,7 @@ func (suite *LBControllerSuite) TestFindIntervalByPlayerID() {
 			PlayerID:       "1",
 			StartPage:      "",
         },
-        
+        {        
             Name:           "T00-14-NegativePageSize",
 			ExpectedStatus: http.StatusBadRequest,
 			Mode:           "sfida",
@@ -242,7 +242,6 @@ func (suite *LBControllerSuite) TestFindIntervalByPlayerID() {
 			StartPage:      "",
         },
         
-
 
 	}
 	for _, tc := range tcs {
