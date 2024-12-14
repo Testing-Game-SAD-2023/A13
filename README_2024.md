@@ -28,8 +28,10 @@ Il giocatore può:
 L'amministratore del Gioco può:
 - Caricare nuove classi in Java su cui i giocatori potranno allenarsi e sfidare i Robot
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
-- Creare Team di Giocatori
-- Assegnare un "Assignment" ad un determinato Teamd di Giocaroi 
+- Creare Team di Giocatori.
+- Visualizzare tutte le relative informazioni di un Team, tra cui anche quelle dei Giocatori associati
+- Assegnare un "Assignment" ad un determinato Team di Giocatori
+- Visualizzare tutte le informazioni degli Assignment, tra cui data di Creazione e Scadenza. 
 
 
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
