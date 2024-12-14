@@ -29,23 +29,27 @@ L'amministratore del Gioco può:
 
 # Traccia Task R1
 Migliorare il profilo Giocatore, prevedendo una migliore strutturazione della pagina del profilo in sezioni separate per contenere prioritariamente: 
+<pre>
 a)	le info del profilo (potendo farne Editing);
 b)	Le statistiche del giocatore;
 c)	Achievement ottenuti, con Badge per segnalare il raggiungimento di una soglia di una statistica);
 d)	eventualmente Premi (Token) guadagnati in base a Missioni svolte;
 e)	elenco giocatori seguiti
-
+</pre>
 
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
 
 ![alt text](https://github.com/luigifienga18/A13/blob/main/Registrazioni/SchermataFinale.jpg?raw=true)
 [Risultato finale della pagina Profilo]
 
-[![Visualizzazzione pagina Profilo e Profilo Seguito]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/VisualizzaProfiloVisualizzaProfiloSeguito_Q52yRBcL.mp4)
+[![Watch the video]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/VisualizzaProfiloVisualizzaProfiloSeguito_Q52yRBcL.mp4)
+[Visualizzazzione pagina Profilo e Profilo Seguito]
 
-[![Modifica Informazioni personali]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/ModificaUtente_uzMkYOdX.mp4)
+[![Watch the video]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/ModificaUtente_uzMkYOdX.mp4)
+[Modifica Informazioni personali]
 
-[![Ricerca Player; AddFollow e RmFollow]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/RicercaPlayerFolloweRmFollow_txLq5BTr.mp4)
+[![Watch the video]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/RicercaPlayerFolloweRmFollow_txLq5BTr.mp4)
+[Ricerca Player; AddFollow e RmFollow]
 
 
 
@@ -170,7 +174,7 @@ Per quanto riguarda il modulo T5, sono stati aggiunti i servizi di UserService e
 Ovviamente è stato modificato anche il front-end predisponendo correttamente la pagina del profilo in sezioni ad hoc e creando dei file .js opportuni per implementare la parte dinamica e quindi di interazione con il modulo T5.
 
 
-Per maggiori dettagli delle modifiche effettuate consultare il documento Readme.md: [Link Text](https://github.com/luigifienga18/A13/blob/main/README.md)
+Per maggiori dettagli delle modifiche effettuate consultare il documento [Readme.md](https://github.com/luigifienga18/A13/blob/main/README.md)
 
 # Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
