@@ -216,9 +216,6 @@ public class UserService {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> student = (Map<String, Object>) response.getBody();
                 responseList.add(student);
-            } else {
-                // Aggiunge un messaggio di errore se l'email non è trovata
-                responseList.add(Map.of("error", "Utente non trovato per email: " + email));
             }
 
             return responseList;
