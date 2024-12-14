@@ -12,8 +12,9 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 # Stato del progetto
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
-# Contributori del Branch/ Fork corrente 
+# Contributori del Branch/ Fork corrente
 Carmine Bellotti e Giuseppe Castaldo
+Questo repository contiene il codice sorgente e la documentazione relativi al Task R5 del progetto di Software Architecture Design. Il focus principale di questo task è l'implementazione di funzionalità avanzate per gli amministratori del sistema, con particolare attenzione alla gestione dei team e al monitoraggio delle performance degli studenti.
 
 
 # Funzionalità dell'Applicazione 
@@ -165,7 +166,7 @@ Inoltre, è stata **aggiornata la documentazione del progetto**, inclusi i diagr
 
 # Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
-[Documentazione Ufficiale Task R5](Documentazione/Doc_T1/Documentazione_Task_R5/Tesina_Ufficiale_Task_R5)
+[Documentazione Ufficiale Task R5](/Documentazione/Doc_T1/Documentazione_Task_R5/Tesina_Ufficiale_Task_R5)
 
 
 
