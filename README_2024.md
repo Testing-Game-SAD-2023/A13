@@ -13,7 +13,7 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente 
-Nomi degli autori dei nuovi contributi presenti in questo repository 
+Carmine Bellotti e Giuseppe Castaldo
 
 
 # Funzionalità dell'Applicazione 
@@ -27,6 +27,8 @@ Il giocatore può:
 L'amministratore del Gioco può:
 - Caricare nuove classi in Java su cui i giocatori potranno allenarsi e sfidare i Robot
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
+- Creare Team di Giocatori
+- Assegnare un "Assignment" ad un determinato Teamd di Giocaroi 
 
 
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
@@ -148,7 +150,18 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-TBD
+Le modifiche e le nuove funzionalità aggiunte al repository includono:
+
+*   **Refactoring del componente T1** per allinearlo al pattern architetturale **Model-View-Controller (MVC)**.
+*   **Implementazione di nuove funzionalità per la gestione dei team**, come la creazione, modifica, eliminazione, aggiunta e rimozione di studenti.
+*   **Sviluppo di una dashboard interattiva per gli amministratori**, con metriche dettagliate sulle performance degli studenti.
+*   **Introduzione di un nuovo package Service**, che funge da intermediario tra Controller e Repository e centralizza la logica applicativa.
+*   **Aggiunta di nuovi controller per migliorare la modularità**, come TeamController, ClassUTController e AssignmentController.
+*   **Implementazione di nuove API REST** per supportare le funzionalità avanzate del sistema, come la gestione dei team, degli assignment e degli studenti.
+*   **Utilizzo di Postman per automatizzare il testing delle API**.
+
+Inoltre, è stata **aggiornata la documentazione del progetto**, inclusi i diagrammi UML, per riflettere le modifiche apportate.
+
 
 # Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
