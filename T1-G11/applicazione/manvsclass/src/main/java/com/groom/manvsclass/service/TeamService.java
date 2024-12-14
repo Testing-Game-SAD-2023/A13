@@ -258,6 +258,7 @@ public class TeamService {
     //Modifica 03/12/2024: Aggiunta dell'aggiungiStudenti
     public ResponseEntity<?> aggiungiStudenti(String idTeam, List<String> idStudenti, String jwt) {
 
+
         // 1. Verifica se il token JWT è valido
         if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
@@ -276,6 +277,11 @@ public class TeamService {
         TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
         if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
           return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+        }   
+
+        //4.1 Verifica che non ho un array di id vuoto!
+        if(idStudenti.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Non hai selezionato nessuno studente.");
         }
     
         // 5. Filtra gli studenti già presenti nel team
