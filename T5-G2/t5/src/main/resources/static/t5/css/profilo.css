@@ -411,4 +411,7 @@ body {
     pointer-events: auto;
 }
 
+.edit-info-form input{
+    color : #ececec;
+}
 
