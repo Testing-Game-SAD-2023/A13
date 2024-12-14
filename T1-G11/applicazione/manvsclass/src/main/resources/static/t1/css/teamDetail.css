@@ -29,28 +29,51 @@
 
 .title-container {
   display: flex;
-  justify-content: center;
-  flex-grow: 1; /* Consente al titolo di occupare lo spazio disponibile */
+  align-items: center; /* Allinea verticalmente tutti gli elementi */
+  justify-content: space-between; /* Mantiene il titolo al centro e la tour a destra */
+  width: 100%; /* Assicura che occupi tutta la larghezza */
 }
 
-.title-container p {
+.title-content {
+  flex-grow: 1; /* Consente al titolo di occupare lo spazio centrale */
+  display: flex;
+  justify-content: center; /* Centra il titolo e l'icona */
+  align-items: center;
+  margin-left: 450px;
+}
+
+.title-content p {
   font-size: 35px;
   color: white;
   margin: 0;
-  text-align: center; /* Centra il testo del titolo */
+  text-align: center;
+}
+
+.edit-icon {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.pencil-icon {
+  width: 20px; /* Dimensione dell'icona */
+  height: 20px;
 }
 
 .tour {
-  margin-right: 15px; /* Distanza a destra */
+  max-width: 30%; /* Limita la larghezza del contenitore del tour */
+  margin-left: auto; /* Spinge il contenitore tutto a destra */
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  align-items: center; /* Allinea verticalmente il contenuto */
+  justify-content: flex-end; /* Allinea orizzontalmente il contenuto a destra */
 }
 
 .tour p {
   margin: 0;
+  color: whitesmoke;
   font-size: 16px;
   cursor: pointer;
+  text-align: right; /* Allinea il testo a destra */
+  word-wrap: break-word; /* A capo per testi lunghi */
 }
 
   
@@ -199,6 +222,7 @@
     position: relative;  /* Posizionamento relativo per la X */
     word-wrap: break-word; /* Forza il testo a "rompersi" e andare a capo */
     white-space: normal;  /* Assicurati che il testo non venga troncato */
+    max-height: 350px;
 }
 
 .modal-content-info-assignment h2 {

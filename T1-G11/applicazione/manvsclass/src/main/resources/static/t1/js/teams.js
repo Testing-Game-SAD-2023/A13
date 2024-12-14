@@ -10,7 +10,9 @@ function folder_view(orderBy = "default") {
     })
     .then((response) => {
             if (!response.ok) {
-                throw new Error(`Errore HTTP: ${response.status}`);
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+                });
             }
             
             // Verifica se la risposta è in formato JSON
@@ -60,6 +62,7 @@ function folder_view(orderBy = "default") {
     
         .catch((error) => {
             console.error("Errore durante la fetch:", error);
+            alert(error.message);
         });
     }
 function renderFolders(data){
@@ -138,10 +141,13 @@ function renderFolders(data){
                             
                             
                         } else {
-                            console.error("Errore durante l'eliminazione.");
+                            return response.text().then(errorMessage => {
+                                throw new Error(errorMessage);
+                            });
                         }
                     })
-                    .catch((error) => console.error("Errore di rete:", error));
+                    .catch(
+                        (error) => console.error("Errore di rete:", error));
                 }
             });
             //rimando alla pagina del team specifico
@@ -378,7 +384,9 @@ function view_assignments(orderBy = "default") {
     })
     .then((response) => {
         if (!response.ok) {
-            throw new Error(`Errore HTTP: ${response.status}`);
+            return response.text().then(errorMessage => {
+                throw new Error(errorMessage);
+            });
         }
         
         // Verifica se la risposta è in formato JSON
@@ -428,7 +436,7 @@ function view_assignments(orderBy = "default") {
     })
     .catch((error) => {
         console.error("Errore durante la fetch:", error);
-        alert("Si è verificato un errore durante il recupero degli assignment.");
+        alert(error.message);
     });
 }
 
@@ -503,10 +511,15 @@ function renderAssignmentFolders(data) {
                             console.log(`Assignment "${item.name}" eliminato.`);
                             view_assignments();
                         } else {
-                            console.error("Errore durante l'eliminazione.");
+                            return response.text().then(errorMessage => {
+                                throw new Error(errorMessage);
+                            });
                         }
                     })
-                    .catch((error) => console.error("Errore di rete:", error));
+                    .catch((error)=> {  
+                        console.error("Errore di rete:", error)
+                        alert(error.message);
+                    });
             }
         });
             folder.addEventListener("click", () => {
@@ -683,7 +696,9 @@ function openModalAssignment() {
         })
         .then((response) => {
             if (!response.ok) {
-                throw new Error("Errore durante la creazione dell'Assignment");
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+                });
             }
             return response.text();
         })
@@ -701,7 +716,7 @@ function openModalAssignment() {
         })
         .catch((error) => {
             console.error("Errore durante la creazione dell'Assignment:", error);
-            alert("Errore durante la creazione dell'Assignment. Riprova.");
+            alert(error.message);
         }).finally(() => {
             // Nascondi la schermata di caricamento sempre, alla fine della richiesta
             hideLoadingScreen();
@@ -719,7 +734,9 @@ function populateGameSelector() {
     })
     .then((response) => {
         if (!response.ok) {
-            throw new Error("Errore nel recupero dei giochi");
+            return response.text().then(errorMessage => {
+                throw new Error(errorMessage);
+            });
         }
         return response.json();
     })
@@ -733,6 +750,7 @@ function populateGameSelector() {
     })
     .catch((error) => {
         console.error("Errore nel caricamento dei giochi:", error);
+        alert(error.message);
         gameSelector.innerHTML = `<option value="">Errore nel caricamento dei giochi</option>`;
     });
 }
