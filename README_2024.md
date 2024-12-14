@@ -37,6 +37,16 @@ L'amministratore del Gioco può:
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
 Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
 
+##Video Dimostrativi
+Parte 1:
+[Video 1](Documentazione/Media/Video/Video_Admin/Tour_1.mp4)
+
+Parte 2:
+[Video 2](Documentazione/Media/Video/Video_Admin/Tour_2.mp4)
+
+Parte 3:
+[Video 3](Documentazione/Media/Video/Video_Admin/Tour_3.mp4)
+
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
 scaricare, al seguente indirizzo https://git-scm.com/downloads, ed installare, sul proprio computer, Git (per una guida completa all'installazione fare riferimento al seguente indirizzo: https://github.com/git-guides/install-git).
