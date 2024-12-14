@@ -13,8 +13,7 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente 
-Nomi degli autori dei nuovi contributi presenti in questo repository 
-
+Matteo D'Avino [M63001724], Luigi Fienga [M63001733] e Andrea Roscigno [M63001778]
 
 # Funzionalità dell'Applicazione 
 L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi. 
@@ -28,9 +27,27 @@ L'amministratore del Gioco può:
 - Caricare nuove classi in Java su cui i giocatori potranno allenarsi e sfidare i Robot
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
 
+# Traccia Task R1
+Migliorare il profilo Giocatore, prevedendo una migliore strutturazione della pagina del profilo in sezioni separate per contenere prioritariamente: 
+a)	le info del profilo (potendo farne Editing);
+b)	Le statistiche del giocatore;
+c)	Achievement ottenuti, con Badge per segnalare il raggiungimento di una soglia di una statistica);
+d)	eventualmente Premi (Token) guadagnati in base a Missioni svolte;
+e)	elenco giocatori seguiti
 
-# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
-Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
+
+# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
+
+![alt text](https://github.com/luigifienga18/A13/blob/main/Registrazioni/SchermataFinale.jpg?raw=true)
+[Risultato finale della pagina Profilo]
+
+[![Visualizzazzione pagina Profilo e Profilo Seguito]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/VisualizzaProfiloVisualizzaProfiloSeguito_Q52yRBcL.mp4)
+
+[![Modifica Informazioni personali]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/ModificaUtente_uzMkYOdX.mp4)
+
+[![Ricerca Player; AddFollow e RmFollow]](https://github.com/luigifienga18/A13/blob/main/Registrazioni/RicercaPlayerFolloweRmFollow_txLq5BTr.mp4)
+
+
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
@@ -148,7 +165,14 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-TBD
+Le modifiche principale sono state fatte all'interno dei servizi T5 e T23, per quest'ultimo è stato modificato opportunatamente il model degli Utenti garantendo l'implementazione della logica degli Utenti, ovviamente sono state predisposte delle route API per: modificare le informazioni del profilo, aggiungere una persona all'interno della propria lista dei seguiti, rimuovere una persona dalla propria lista dei seguiti e ricercare una persona per seguirla o togliere il seguito.
+Per quanto riguarda il modulo T5, sono stati aggiunti i servizi di UserService e modificato il già presente T23Service per garantire la corretta comunicazione con il microservizio precedente alle route precedentemente nominate. Sono state create inoltre delle route nel modulo T5 per garantire la corretta comunicazione tra il web browser, il T5 e il T23 rispetto alle possibili interazioni dette prima, in questo modo il Web Browser comunica esclusivamente con il T5, poi quest'ultimo con il T23.
+Ovviamente è stato modificato anche il front-end predisponendo correttamente la pagina del profilo in sezioni ad hoc e creando dei file .js opportuni per implementare la parte dinamica e quindi di interazione con il modulo T5.
+
+
+Per maggiori dettagli delle modifiche effettuate consultare il documento Readme.md: [Link Text](https://github.com/luigifienga18/A13/blob/main/README.md)
 
 # Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
+
+//TODO collegamento con la documentazione.
