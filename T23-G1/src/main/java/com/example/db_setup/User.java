@@ -61,7 +61,7 @@ public class User {
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
     }
-    
+
     // Getter e Setter per i campi aggiornabili
     public String getBiography() {
         return biography;
