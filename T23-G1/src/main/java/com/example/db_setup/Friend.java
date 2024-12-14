@@ -10,15 +10,10 @@ public class Friend {
     @EmbeddedId
     private FriendId id;
 
-    @Column(name = "nickname", nullable = false) // Assicurati che questa colonna esista nel database
-    private String nickname;
-
-
     public Friend() {}
 
-    public Friend(FriendId id,String nickname) {
+    public Friend(FriendId id) {
         this.id = id;
-        this.nickname = nickname;
     }
 
     // Getter e Setter
@@ -30,11 +25,4 @@ public class Friend {
         this.id = id;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
 }
