@@ -48,7 +48,7 @@ e)	elenco giocatori seguiti
 [![Watch the video](https://img.youtube.com/vi/JncBBGXr6l4/0.jpg)](https://youtu.be/JncBBGXr6l4)
 [Modifica Informazioni personali]
 
-[![Watch the video]((https://img.youtube.com/vi/Rk1ngC514kg/0.jpg)](https://youtu.be/Rk1ngC514kg)
+[![Watch the video](https://img.youtube.com/vi/Rk1ngC514kg/0.jpg)](https://youtu.be/Rk1ngC514kg)
 [Ricerca Player; AddFollow e RmFollow]
 
 
