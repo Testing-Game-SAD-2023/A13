@@ -342,47 +342,35 @@ import org.springframework.web.client.HttpClientErrorException;
     }
 
     // GabMan 12/12 Caricamento Immagine in Base64
-    public Boolean updateAvatarWithImage(Integer userId, String base64Image) {
-        final String endpoint = "/updateProfilePicture"; // Endpoint nel servizio T23
-
-        // Creare il payload per la richiesta POST in formato JSON
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("userId", userId);
-        payload.put("profilePicture", base64Image); // Immagine codificata in Base64
+    public Boolean updateProfilePicture(Integer userId, String base64Image) {
+        final String endpoint = "/updateProfilePicture";
+        Map<String, String> payload = new HashMap<>();
+        payload.put("profilePicture", base64Image);
 
         try {
-            // Effettua la chiamata al servizio T23
+            // Chiamata al servizio T23
             ResponseEntity<Boolean> response = restTemplate.postForEntity(
-                endpoint, // URL dell'endpoint
-                payload,  // Payload JSON
-                Boolean.class // Tipo di risposta attesa
+                endpoint,
+                payload,
+                Boolean.class
             );
-
-            // Restituisci il risultato della chiamata (true se l'aggiornamento ha avuto successo)
-            return response.getStatusCode() == HttpStatus.OK;      
+            return response.getStatusCode() == HttpStatus.OK;
         } catch (RestClientException e) {
-            // Gestione degli errori durante la chiamata REST
-            System.err.println("Errore durante l'aggiornamento dell'immagine nel servizio T23: " + e.getMessage());
+            System.err.println("Errore durante l'aggiornamento dell'immagine personalizzata: " + e.getMessage());
             return false;
         }
     }
 
-    public String getImage(Integer userId) {
-        final String endpoint = "/getImage"; // Endpoint nel servizio T23
-
+        public String getImage(Integer userId) {
+        final String endpoint = "/getImage";
         try {
-            // Effettua la chiamata GET al servizio T23
             ResponseEntity<Map> response = restTemplate.getForEntity(endpoint, Map.class);
-
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                // Recupera l'URL dell'immagine dal JSON restituito
                 return (String) response.getBody().get("imageUrl");
-            } else {
-                System.err.println("Errore durante il recupero dell'immagine: " + response.getStatusCode());
-                return null;
             }
-        } catch (Exception e) {
-            System.err.println("Errore durante la chiamata GET a T23: " + e.getMessage());
+            return null;
+        } catch (RestClientException e) {
+            System.err.println("Errore durante il recupero dell'immagine: " + e.getMessage());
             return null;
         }
     }

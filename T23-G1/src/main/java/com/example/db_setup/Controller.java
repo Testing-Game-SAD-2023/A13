@@ -777,6 +777,7 @@ public class Controller {
         // Aggiorna l'avatar dell'utente
         User user = optionalUser.get();
         user.setAvatar(avatar); // Salva il nuovo avatar
+        user.setProfilePicture(null);
         userRepository.updateAvatar(Integer.parseInt(userId), avatar);
 
         return ResponseEntity.ok("Avatar updated successfully!");
@@ -1161,20 +1162,17 @@ public class Controller {
     }
 
     @PostMapping("/updateProfilePicture")
-    public ResponseEntity<Map<String, String>> updateProfilePicture(
-            @CookieValue(name = "jwt", required = false) String jwt,
-            @RequestBody Map<String, String> payload) {
+    public ResponseEntity<String> updateProfilePicture(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestBody Map<String, String> payload) {
         try {
-            // Verifica il token JWT
             if (jwt == null || jwt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "User not authenticated"));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
             }
 
-            // Decodifica il token JWT per ottenere l'ID utente
+            // Decodifica del token JWT
             byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
             String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
             String userId = userData.get("userId").toString();
@@ -1182,45 +1180,27 @@ public class Controller {
             // Validazione immagine
             String base64Image = payload.get("profilePicture");
             if (base64Image == null || base64Image.isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "No image provided"));
+                return ResponseEntity.badRequest().body("No image provided");
             }
 
-            // Decodifica l'immagine da Base64
+            // Decodifica immagine Base64
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
-            // Configura il percorso per salvare l'immagine
-            String fileName = "user_" + userId + ".jpg";
-            Path filePath = Paths.get("C:/progetti/SAD/A13/T5-G2/t5/src/main/resources/static/t5/images", fileName);
+            // Aggiorna la colonna profile_picture (BLOB)
+            Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+            if (!optionalUser.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
 
+            User user = optionalUser.get();
+            user.setProfilePicture(imageBytes);
+            user.setAvatar(null); // Reset del campo avatar
+            userRepository.save(user);
 
-
-            // Crea la directory se non esiste
-            Files.createDirectories(filePath.getParent());
-
-            // Scrivi il file sul disco
-            Files.write(filePath, imageBytes);
-
-            System.out.println("File salvato in: " + filePath.toAbsolutePath());
-
-            // Genera l'URL (relativo, servirà per il frontend dopo)
-            String imageUrl = "/t5/images/profilo/" + fileName;
-
-            // Aggiorna l'avatar dell'utente nel database
-            User user = userRepository.findById(Integer.parseInt(userId))
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-            user.setAvatar(imageUrl);
-            userRepository.updateAvatar(Integer.parseInt(userId), imageUrl);
-
-            // Restituisci il percorso pubblico
-            return ResponseEntity.ok(Map.of("message", "Profile picture updated successfully!", "imageUrl", imageUrl));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Invalid image format"));
+            return ResponseEntity.ok("Profile picture updated successfully!");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "An error occurred while updating profile picture"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating profile picture.");
         }
     }
 
@@ -1228,16 +1208,13 @@ public class Controller {
     @GetMapping("/getImage")
     public ResponseEntity<Map<String, String>> getImage(@CookieValue(name = "jwt", required = false) String jwt) {
         try {
-            // Verifica il token JWT
             if (jwt == null || jwt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                    .body(Map.of("error", "User not authenticated"));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "User not authenticated"));
             }
 
-            // Decodifica il token JWT per ottenere l'ID utente
+            // Decodifica del token JWT
             byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
             String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
             String userId = userData.get("userId").toString();
@@ -1245,25 +1222,23 @@ public class Controller {
             // Recupera l'utente dal database
             Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
             if (!optionalUser.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                    .body(Map.of("error", "User not found"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
             }
 
-            // Ottieni il percorso dell'immagine dell'avatar
             User user = optionalUser.get();
-            String avatarUrl = user.getAvatar(); // Percorso salvato nel database
 
-            if (avatarUrl == null || avatarUrl.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                    .body(Map.of("error", "No image set for this user"));
+            // Controlla se esiste una foto personalizzata
+            if (user.getProfilePicture() != null) {
+                String base64Image = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(user.getProfilePicture());
+                return ResponseEntity.ok(Map.of("imageUrl", base64Image));
+            } else if (user.getAvatar() != null) {
+                return ResponseEntity.ok(Map.of("imageUrl", user.getAvatar()));
+            } else {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("error", "No image found"));
             }
-
-            // Restituisci il percorso dell'immagine
-            return ResponseEntity.ok(Map.of("imageUrl", avatarUrl));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(Map.of("error", "An error occurred while retrieving the image"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Error retrieving image"));
         }
     }
 

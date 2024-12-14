@@ -46,10 +46,22 @@ public class User {
     @Column(name = "avatar", nullable = true, length = 255)
     private String avatar;
 
+    @Lob
+    @Column(name = "profile_picture")
+    private byte[] profilePicture;
+
     // Token per il reset della password
     @Column(name = "reset_token")
     private String resetToken;
 
+    public byte[] getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+    
     // Getter e Setter per i campi aggiornabili
     public String getBiography() {
         return biography;

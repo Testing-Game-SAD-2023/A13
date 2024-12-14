@@ -382,97 +382,77 @@ document.addEventListener("DOMContentLoaded", () => {
     // Funzione per caricare l'immagine al caricamento della pagina
     const loadImage = async () => {
         try {
-            const response = await fetch('/getImage', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
+            const response = await fetch('/getImage');
             if (response.ok) {
-                const data = await response.json(); // Ottieni il percorso dell'immagine
-                const imagePath = data.imageUrl; // Percorso dell'immagine dal backend
+                const data = await response.json();
                 const currentProfilePicture = document.getElementById("currentProfilePicture");
-
-                if (currentProfilePicture) {
-                    currentProfilePicture.src = imagePath; // Aggiorna l'immagine di profilo
+                const imageSourceIndicator = document.getElementById("currentImageSource");
+    
+                if (data.imageUrl.startsWith("data:image")) {
+                    currentProfilePicture.src = data.imageUrl;
+                    imageSourceIndicator.textContent = "Immagine personalizzata";
+                } else {
+                    currentProfilePicture.src = data.imageUrl;
+                    imageSourceIndicator.textContent = "Avatar predefinito";
                 }
             } else {
-                console.error('Errore nel caricamento dell\'immagine:', await response.json());
+                console.error('Errore nel caricamento dell\'immagine:', await response.text());
             }
         } catch (error) {
-            console.error('Errore durante la connessione al backend:', error);
+            console.error('Errore nella connessione al backend:', error);
         }
     };
+    
        
-    // by GabMan 12/12 Funzione per il caricamento dell'immagine (chiamata dal pulsante "Upload")
+    // by cami 14/12 Funzione per il caricamento dell'immagine (chiamata dal pulsante "Upload")
     const uploadProfilePicture = async () => {
         const fileInput = document.getElementById("profilePictureUploadInput");
-        const currentProfilePicture = document.getElementById("currentProfilePicture");
-        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
     
-        if (fileInput.files.length === 0) {
+        if (!fileInput.files.length) {
             alert("Seleziona un file da caricare.");
             return;
         }
     
         const file = fileInput.files[0];
-    
-        // Controlla il tipo di file
-        if (!file.type.startsWith("image/")) {
-            alert("Il file selezionato non è un'immagine.");
-            return;
-        }
-    
-        // Controlla la dimensione del file
-        if (file.size > MAX_FILE_SIZE) {
-            alert("Il file selezionato è troppo grande. Dimensione massima: 5 MB.");
-            return;
-        }
-    
-        // Usa FileReader per convertire il file in Base64
         const reader = new FileReader();
     
         reader.onload = async () => {
-            const base64Image = reader.result.split(",")[1]; // Rimuove il prefisso 'data:image/jpeg;base64,'
+            const base64Image = reader.result.split(",")[1]; // Rimuove il prefisso "data:image/*;base64,"
     
             try {
-                // Modifica per inviare l'immagine come parametro URL
-                const response = await fetch("/updateProfilePicture", {
-                    method: "POST",
+                const response = await fetch('/updateProfilePicture', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        profilePicture: base64Image,
-                    }),
+                    body: JSON.stringify({ profilePicture: base64Image }),
                 });
     
                 if (response.ok) {
-                    const data = await response.json();
-                    
-    
-                    // Aggiorna l'immagine del profilo
-                    if (currentProfilePicture) {
-                        currentProfilePicture.src = `${data.imageUrl}?t=${new Date().getTime()}`;
+                    alert("Immagine caricata con successo!");
+                    loadImage(); // Aggiorna l'immagine
+
+                    if (uploadForm) {
+                        uploadForm.style.display = "none";
                     }
-    
-                    alert(data.message || "Immagine caricata con successo!");
+                     // Nascondi anche il pulsante "Salva"
+                     if (saveAvatarButton) {
+                    saveAvatarButton.style.display = "none";
+                    }
+
                 } else {
-                    const error = await response.json();
-                    alert(`Errore durante il caricamento: ${error.error}`);
+                    const error = await response.text();
+                    alert(`Errore durante il caricamento: ${error}`);
                 }
             } catch (error) {
                 console.error("Errore durante il caricamento:", error);
-                alert("Si è verificato un errore durante il caricamento. Riprova più tardi.");
+                alert("Si è verificato un errore durante il caricamento.");
             }
         };
     
-        // Legge il file come URL Base64
         reader.readAsDataURL(file);
     };
     
-    document.getElementById("uploadProfilePictureSubmitButton").addEventListener("click", uploadProfilePicture);
 
     
     // Collega la funzione al clic del pulsante "Upload"

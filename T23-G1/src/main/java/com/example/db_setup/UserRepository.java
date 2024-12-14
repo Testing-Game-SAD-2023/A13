@@ -28,13 +28,21 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // Modifiche per avatar
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.avatar = :avatar WHERE u.ID = :userId")
+    @Query("UPDATE User u SET u.avatar = :avatar,u.profilePicture = NULL  WHERE u.ID = :userId")
     void updateAvatar(@Param("userId") Integer userId, @Param("avatar") String avatar);
 
     @Query("SELECT u.avatar FROM User u WHERE u.ID = :userId")
     String findAvatarByUserId(@Param("userId") Integer userId);
+    
+    @Query("SELECT u.profilePicture FROM User u WHERE u.ID = :userId")
+    byte[] findProfilePictureByUserId(@Param("userId") Integer userId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.profilePicture = :profilePicture, u.avatar = NULL WHERE u.ID = :userId")
+    void updateProfilePicture(@Param("userId") Integer userId, @Param("profilePicture") byte[] profilePicture);
+
 }
-    // FINE MODIFICA avatar
 
 
 
