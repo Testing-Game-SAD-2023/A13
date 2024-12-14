@@ -48,9 +48,6 @@ public class UserService {
         return (String) serviceManager.handleRequest("T23", "RmFollow", userID_1, userID_2);
     }
 
-    public List<User> getUsers(){
-        return (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-    }
 
     public boolean isUserInFollower(User user, Integer targetUserId) {
         if (user == null || user.getFollowers() == null) {

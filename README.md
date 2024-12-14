@@ -17,6 +17,9 @@ D'Avino Matteo, Fienga Luigi e Roscigno Andrea
         - `rmFollow`
         - `searchPlayer`
         - `modifyPlayer`
+    - Aggiunto a `EmailService.java` i metodi:
+        - `sendMailUpdate`
+        - `sendMailPassword`
 2. Ui Gateway:
     - Aggiunto addFollow, rmFollow, searchPlayer, modifyPlayer a riga 51 di default.conf
     - Aggiunto profile/modifyUser, profile/searchPlayer, profile/addFollow e profile/rmFollow a riga 58 di default.conf
@@ -36,16 +39,16 @@ D'Avino Matteo, Fienga Luigi e Roscigno Andrea
     - Mofiche/Aggiunte front-end:
       - `profile.html`
       - `profile.js`:
-        -`populateForm`
-        -`updateUserObject`
-        -`viewCompletedAchievements`
-        -`viewAllAchievements`
-        -`toggleAchievements`
-        -`saveChanges`
-        -`search`
-        -`renderSearchResults`
-        -`isUserFollowing`
-        -`toggleFollow`
+        - `populateForm`
+        - `updateUserObject`
+        - `viewCompletedAchievements`
+        - `viewAllAchievements`
+        - `toggleAchievements`
+        - `saveChanges`
+        - `search`
+        - `renderSearchResults`
+        - `isUserFollowing`
+        - `toggleFollow`
         - `selectRobotFilter`
         - `selectGameModeFilter`
         - `filterStatistics`
