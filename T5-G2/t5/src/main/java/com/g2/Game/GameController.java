@@ -42,6 +42,7 @@ import org.springframework.web.client.RestTemplate;
 import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Service.AchievementService;
+import com.g2.Service.LeaderboardService;
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
 @CrossOrigin
@@ -52,10 +53,14 @@ public class GameController {
     private final Map<String, GameLogic> activeGames;
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
+    
+    @Autowired
+    private LeaderboardService leaderboardService;
 
     @Autowired
     private AchievementService achievementService;
 
+    
     //Logger 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
@@ -266,6 +271,7 @@ public class GameController {
      */
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> Runner(@RequestParam(value = "testingClassCode", required = false, defaultValue = "") String testingClassCode,
+            @RequestParam("mail") String mail,          //Aggiunta parametro il 13/12/2024: é stato aggiunto per poter avviare il passaggio incrementale dei dati dal database in T4 a quello in T5
             @RequestParam("playerId") String playerId,
             @RequestParam("isGameEnd") Boolean isGameEnd,
             @RequestParam(value = "eliminaGame", required = false, defaultValue = "false") Boolean eliminaGame) {
@@ -282,6 +288,8 @@ public class GameController {
             if (eliminaGame) {
                 return eliminaGame(playerId);
             }
+            logger.info("CHIAMATA A LEADERBOARDSERVICE");
+            leaderboardService.updateLeaderboard("bobbone@gmail.com", 34, true);
 
             // Preparazione dati per i task
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
@@ -297,7 +305,7 @@ public class GameController {
             logger.info("[GAMECONTROLLER] /run: RobotScore {}", robotScore);
 
             // Gestione copertura di linea e punteggio utente
-            return gestisciPartita(userData, gameLogic, isGameEnd, robotScore, playerId);
+            return gestisciPartita(userData, gameLogic, isGameEnd, robotScore, playerId, mail);  //Modifica parametro mail il 13/12/2024: é stato aggiunto per poter avviare il passaggio incrementale dei dati dal database in T4 a quello in T5
         } catch (Exception e) {
             logger.error("[GAMECONTROLLER] /run: errore", e);
             return createErrorResponse("[/RUN] " + e.getMessage(), "2");
@@ -310,10 +318,12 @@ public class GameController {
         return createErrorResponse("[/RUN] partita eliminata", "5");
     }
 
-    private ResponseEntity<String> gestisciPartita(Map<String, String> userData, GameLogic gameLogic, Boolean isGameEnd, int robotScore, String playerId) {
+    private ResponseEntity<String> gestisciPartita(Map<String, String> userData, GameLogic gameLogic, Boolean isGameEnd, int robotScore, String playerId, String mail) {
         if (userData.get("coverage") != null && !userData.get("coverage").isEmpty()) {
             // Calcolo copertura e punteggio utente
             // il primo è covered e il secondo è missed
+            boolean isWinner = false; 
+
             int[] lineCoverage = getCoverage(userData.get("coverage"), "LINE");
             int[] branchCoverage = getCoverage(userData.get("coverage"), "BRANCH");
             int[] instructionCoverage = getCoverage(userData.get("coverage"), "INSTRUCTION");
@@ -331,6 +341,10 @@ public class GameController {
             if (isGameEnd || gameLogic.isGameEnd()) {
                 activeGames.remove(playerId);
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
+                if (userScore > robotScore) {
+                    isWinner = true;
+                }
+                leaderboardService.updateLeaderboard(mail, userScore, isWinner);
                 return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
