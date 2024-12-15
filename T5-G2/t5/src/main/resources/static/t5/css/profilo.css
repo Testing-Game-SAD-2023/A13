@@ -441,7 +441,7 @@ body {
 .stats-card-title {
     font-size: 1.8rem;
     font-weight: 600;
-    color: #4a90e2; /* Colore primario */
+    color: #000000; /* Colore primario */
     margin-bottom: 20px;
 }
 
