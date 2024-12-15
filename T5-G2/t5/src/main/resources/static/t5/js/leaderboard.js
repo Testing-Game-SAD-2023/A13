@@ -30,8 +30,11 @@ const validateEmail = (email) => {
 
 async function fetchRows(gamemode, statistic, startPage, email) {
     try {
+        const defaultErrorMsg = 'Errore nel caricamento dei dati :(';
         const endpoint = `api/leaderboard/subInterval/${gamemode}/${statistic}`;
         let queryParams = `?pageSize=${pageSize}&numPages=${numPages}`;
+
+
         if (startPage > 0)
             queryParams = queryParams.concat(`&startPage=${startPage}`);
         else if (email.length > 0) {
@@ -39,8 +42,16 @@ async function fetchRows(gamemode, statistic, startPage, email) {
             queryParams = queryParams.concat(`&email=${email}`);
         }
 
+        let responseJson;
         const response = await fetch(`${endpoint}${queryParams}`);
-        const responseJson = await response.json();
+        const contentType = response.headers.get("Content-Type");
+
+        if (contentType && contentType.includes("application/json")) {
+            responseJson = await response.json();
+        }
+        else {
+            throw new Error(defaultErrorMsg);
+        }
 
         if (!response.ok) {
             message = responseJson['message'];
@@ -48,7 +59,7 @@ async function fetchRows(gamemode, statistic, startPage, email) {
                 throw new Error(message);
             else
                 //throw new Error(`HTTP error! Status: ${response.status}`);
-                throw new Error('Errore nel caricamento dei dati :(');
+                throw new Error(defaultErrorMsg);
         }
 
         // validazione
@@ -56,7 +67,7 @@ async function fetchRows(gamemode, statistic, startPage, email) {
             || typeof responseJson !== 'object'
             || !Array.isArray(responseJson.positions)) {
             //|| !Number.isInteger(responseJson.totalLength)) {
-            throw new Error('Errore nel caricamento dei dati :(');
+            throw new Error(defaultErrorMsg);
         }
 
         rows = responseJson["positions"];
@@ -366,6 +377,10 @@ async function searchPlayer() {
     renderPagination(pageToShow);
 }
 
+function refreshTable() {
+    cache = {};
+    showPage(1);
+}
 
 
 // Page initialization
