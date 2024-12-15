@@ -137,11 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
     
-    
-
-    
-    
-
     function removeFriend(friendId) {
         if (!friendId) {
             alert("Errore: ID amico non valido.");
@@ -158,13 +153,93 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(message => {
                 alert(message); 
+                createRainWithClouds();
                 loadFriends(); 
             })
             .catch(error => {
                 alert(error.message); // Mostra un messaggio di errore
             });
     }
+    function createRainWithClouds() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        document.body.appendChild(canvas);
     
+        // Configurazione del canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.position = 'fixed';
+        canvas.style.top = 0;
+        canvas.style.left = 0;
+        canvas.style.pointerEvents = 'none';
+    
+        const raindrops = [];
+        const cloudY = 50; // Altezza delle nuvole
+        const cloudColor = 'rgba(200, 200, 200, 0.8)'; // Colore delle nuvole
+    
+        // Genera gocce di pioggia
+        for (let i = 0; i < 100; i++) {
+            raindrops.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height * 0.5 - 50,
+                length: Math.random() * 20 + 10,
+                speed: Math.random() * 3 + 2,
+                opacity: Math.random() * 0.5 + 0.5,
+            });
+        }
+    
+        function drawClouds() {
+            ctx.fillStyle = cloudColor;
+            ctx.beginPath();
+            ctx.arc(150, cloudY, 60, 0, Math.PI * 2); // Nuvola sinistra
+            ctx.arc(200, cloudY, 70, 0, Math.PI * 2); // Nuvola centrale
+            ctx.arc(270, cloudY, 60, 0, Math.PI * 2); // Nuvola destra
+            ctx.closePath();
+            ctx.fill();
+        }
+    
+        function drawRain() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            // Disegna le nuvole
+            drawClouds();
+    
+            // Disegna le gocce di pioggia
+            raindrops.forEach(drop => {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(0, 191, 255, ${drop.opacity})`; // Colore azzurro
+                ctx.lineWidth = 2;
+                ctx.moveTo(drop.x, drop.y);
+                ctx.lineTo(drop.x, drop.y + drop.length);
+                ctx.stroke();
+            });
+    
+            // Aggiorna posizione delle gocce
+            raindrops.forEach(drop => {
+                drop.y += drop.speed;
+                if (drop.y > canvas.height) {
+                    drop.y = -drop.length;
+                    drop.x = Math.random() * canvas.width;
+                }
+            });
+        }
+    
+        let animationFrame;
+        const startTime = Date.now();
+    
+        function animate() {
+            const elapsed = Date.now() - startTime;
+            if (elapsed > 2000) {
+                cancelAnimationFrame(animationFrame);
+                canvas.remove(); // Rimuove il canvas dopo 2 secondi
+            } else {
+                drawRain();
+                animationFrame = requestAnimationFrame(animate);
+            }
+        }
+    
+        animate();
+    }
     
     
 

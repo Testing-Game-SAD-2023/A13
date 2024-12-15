@@ -414,4 +414,12 @@ body {
 .edit-info-form input{
     color : #ececec;
 }
+#currentProfilePicture {
+    width: 200px; /* Imposta la larghezza desiderata */
+    height: 200px; /* Imposta l'altezza desiderata */
+    object-fit: cover; /* Adatta l'immagine senza distorcerla */
+    border-radius: 50%; /* Rende l'immagine circolare */
+    border: 5px solid #007bff; /* Opzionale: Bordo intorno all'immagine */
+}
+
 

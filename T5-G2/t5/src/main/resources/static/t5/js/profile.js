@@ -379,29 +379,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Funzione per caricare l'immagine al caricamento della pagina
     const loadImage = async () => {
         try {
             const response = await fetch('/getImage');
+            console.log("Risposta fetch /getImage:", response); // DEBUG
             if (response.ok) {
                 const data = await response.json();
-                const currentProfilePicture = document.getElementById("currentProfilePicture");
-                const imageSourceIndicator = document.getElementById("currentImageSource");
-    
-                if (data.imageUrl.startsWith("data:image")) {
-                    currentProfilePicture.src = data.imageUrl;
-                    imageSourceIndicator.textContent = "Immagine personalizzata";
+                console.log("Data ricevuta da /getImage:", data); // DEBUG
+                if (data.imageUrl) {
+                    document.getElementById("currentProfilePicture").src = data.imageUrl;
                 } else {
-                    currentProfilePicture.src = data.imageUrl;
-                    imageSourceIndicator.textContent = "Avatar predefinito";
+                    console.warn("Nessuna immagine trovata.");
                 }
             } else {
-                console.error('Errore nel caricamento dell\'immagine:', await response.text());
+                console.error("Errore nel caricamento dell'immagine:", await response.text());
             }
         } catch (error) {
-            console.error('Errore nella connessione al backend:', error);
+            console.error("Errore durante la connessione al backend:", error);
         }
     };
+    
+    // Carica l'avatar al caricamento della pagina
+    window.addEventListener('load', loadImage);
+    
     
        
     // by cami 14/12 Funzione per il caricamento dell'immagine (chiamata dal pulsante "Upload")
@@ -435,11 +435,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (uploadForm) {
                         uploadForm.style.display = "none";
                     }
-                     // Nascondi anche il pulsante "Salva"
-                     if (saveAvatarButton) {
-                    saveAvatarButton.style.display = "none";
+                    
+                    // Nascondi l'intera finestra di selezione avatar
+                    if (avatarSelection) {
+                        avatarSelection.style.display = "none";
                     }
-
                 } else {
                     const error = await response.text();
                     alert(`Errore durante il caricamento: ${error}`);

@@ -1208,39 +1208,38 @@ public class Controller {
     @GetMapping("/getImage")
     public ResponseEntity<Map<String, String>> getImage(@CookieValue(name = "jwt", required = false) String jwt) {
         try {
+            // Verifica autenticazione
             if (jwt == null || jwt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "User not authenticated"));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                    .body(Map.of("error", "User not authenticated"));
             }
 
-            // Decodifica del token JWT
-            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
-            String userId = userData.get("userId").toString();
-
-            // Recupera l'utente dal database
-            Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
-            if (!optionalUser.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
+            // Ottieni l'utente
+            Integer userId = extractUserIdFromJwt(jwt);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                    .body(Map.of("error", "Invalid JWT token"));
             }
 
-            User user = optionalUser.get();
-
-            // Controlla se esiste una foto personalizzata
-            if (user.getProfilePicture() != null) {
-                String base64Image = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(user.getProfilePicture());
-                return ResponseEntity.ok(Map.of("imageUrl", base64Image));
-            } else if (user.getAvatar() != null) {
-                return ResponseEntity.ok(Map.of("imageUrl", user.getAvatar()));
+            // Recupera l'immagine (in Base64) dal database
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isPresent() && userOpt.get().getProfilePicture() != null) {
+                byte[] profilePicture = userOpt.get().getProfilePicture();
+                String base64Image = Base64.getEncoder().encodeToString(profilePicture);
+                return ResponseEntity.ok(Map.of("imageUrl", "data:image/jpeg;base64," + base64Image));
             } else {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Map.of("error", "No image found"));
+                // Se non c'è un'immagine, restituisci un errore
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                                    .body(Map.of("error", "No image available"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Error retrieving image"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(Map.of("error", "Error retrieving image"));
         }
     }
+
+
 
 
 
