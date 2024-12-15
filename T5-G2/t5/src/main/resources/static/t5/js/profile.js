@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const uploadButton = document.getElementById("uploadProfilePictureButton"); // Pulsante "+"
     const uploadForm = document.getElementById("uploadProfilePictureForm"); // Form di upload
     const uploadSubmitButton = document.getElementById("uploadProfilePictureSubmitButton"); // Pulsante "Upload"
-    
+    const cancelAvatarButton = document.getElementById('cancelAvatarButton');
     
 
      // Aggiungi questo per il pulsante "Modifica Avatar" cami
@@ -29,6 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modifyAvatarButton) {
         modifyAvatarButton.addEventListener('click', () => {
             avatarSelection.style.display = avatarSelection.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    
+    if (cancelAvatarButton) {
+        cancelAvatarButton.addEventListener('click', () => {
+            avatarSelection.style.display = 'none';
         });
     }
     
@@ -554,8 +561,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("in-progress-trophies").classList.add("visible");
     });
 
-
-            
+   
 
     
 });
