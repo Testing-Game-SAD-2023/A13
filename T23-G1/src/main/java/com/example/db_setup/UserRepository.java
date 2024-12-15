@@ -31,11 +31,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("UPDATE User u SET u.avatar = :avatar,u.profilePicture = NULL  WHERE u.ID = :userId")
     void updateAvatar(@Param("userId") Integer userId, @Param("avatar") String avatar);
 
-    @Query("SELECT u.avatar FROM User u WHERE u.ID = :userId")
-    String findAvatarByUserId(@Param("userId") Integer userId);
+    //@Query("SELECT u.avatar FROM User u WHERE u.ID = :userId")
+    //String findAvatarByUserId(@Param("userId") Integer userId);
     
-    @Query("SELECT u.profilePicture FROM User u WHERE u.ID = :userId")
-    byte[] findProfilePictureByUserId(@Param("userId") Integer userId);
+    //@Query("SELECT u.profilePicture FROM User u WHERE u.ID = :userId")
+    //byte[] findProfilePictureByUserId(@Param("userId") Integer userId);
 
     @Modifying
     @Transactional
