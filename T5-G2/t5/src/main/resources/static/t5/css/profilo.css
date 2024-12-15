@@ -422,4 +422,66 @@ body {
     border: 5px solid #007bff; /* Opzionale: Bordo intorno all'immagine */
 }
 
+/* Contenitore delle statistiche */
+#stats-section {
+    padding: 20px;
+    margin-top: 20px;
+}
 
+/* Card principale */
+.stats-card {
+    background: #ffffff; /* Sfondo bianco */
+    border-radius: 10px; /* Angoli arrotondati */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Leggera ombra */
+    padding: 20px;
+    overflow-y: auto; /* Scroll se necessario */
+}
+
+/* Titolo della card */
+.stats-card-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #4a90e2; /* Colore primario */
+    margin-bottom: 20px;
+}
+
+/* Separatore */
+.stats-card hr {
+    border-top: 2px solid #eee;
+    margin: 15px 0;
+}
+
+/* Righe delle statistiche */
+.stat-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f9f9f9; /* Sfondo leggero per le righe */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Icone delle statistiche */
+.stat-icon {
+    font-size: 1.5rem;
+    color: #4a90e2; /* Colore primario */
+    margin-right: 15px;
+    display: inline-block;
+}
+
+/* Nome della statistica */
+.stat-name {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #555;
+    flex: 1; /* Occupa lo spazio disponibile */
+}
+
+/* Valore della statistica */
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #4a90e2; /* Colore in evidenza */
+    text-align: right;
+}
