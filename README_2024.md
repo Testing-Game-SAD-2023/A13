@@ -39,13 +39,25 @@ Siccome un'immagine vale più di mille parole, è buona norma inserire degli scr
 
 ##Video Dimostrativi
 Parte 1:
-[Video 1](https://github.com/Giuleppe09/A13/blob/main/Documentazione/Media/Video/Video_Admin/Tour_1.mp4)
+[Video 1]
+
+
+https://github.com/user-attachments/assets/678ea8a4-13f6-461c-9fc3-6c24b22830ba
+
 
 Parte 2:
-[Video 2](Documentazione/Media/Video/Video_Admin/Tour_2.mp4)
+[Video 2]
+
+
+https://github.com/user-attachments/assets/4a1e9b37-95f2-4e72-91fe-86c186bd8ecf
+
 
 Parte 3:
-[Video 3](Documentazione/Media/Video/Video_Admin/Tour_3.mp4)
+[Video 3]
+
+
+https://github.com/user-attachments/assets/6a9d7260-f5a2-45e7-a59a-9e7102b01af1
+
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
