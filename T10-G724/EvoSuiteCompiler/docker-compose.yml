@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  evosuite-compiler:
+    build:
+      context: . # Costruisce l'immagine usando il Dockerfile nella directory corrente
+    restart: always
+    expose:
+      - 8756
+    #ports:
+    #  - "8756:8756"
+    volumes:
+      - VolumeT8:/VolumeT8
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true
+
+volumes:
+  VolumeT8:
+    external: true
