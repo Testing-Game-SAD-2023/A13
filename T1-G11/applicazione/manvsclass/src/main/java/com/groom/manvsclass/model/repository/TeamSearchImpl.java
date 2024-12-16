@@ -43,7 +43,8 @@ public class TeamSearchImpl {
         return converter.read(Team.class, result);
     }
 
-    public List<Team> findTeamsByLeader(String leaderId) {
+    // NON USATO
+    /* public List<Team> findTeamsByLeader(String leaderId) {
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("Team");
 
@@ -52,7 +53,7 @@ public class TeamSearchImpl {
 
         collection.find(filter).forEach(doc -> teams.add(converter.read(Team.class, doc)));
         return teams;
-    }
+    } */
 
     public void addTeam(Team team) {
         MongoDatabase database = client.getDatabase("manvsclass");
@@ -70,20 +71,20 @@ public class TeamSearchImpl {
     
         collection.insertOne(teamDoc);
     }
+    // NON USATO
+    // public void updateTeam(Team team) {
+    //     MongoDatabase database = client.getDatabase("manvsclass");
+    //     MongoCollection<Document> collection = database.getCollection("Team");
 
-    public void updateTeam(Team team) {
-        MongoDatabase database = client.getDatabase("manvsclass");
-        MongoCollection<Document> collection = database.getCollection("Team");
+    //     Bson filter = Filters.eq("teamName", team.getTeamName()); // Filtra per teamName
+    //     Document updatedDoc = new Document()
+    //         .append("description", team.getDescription());
+    //         //.append("leaderId", team.getLeaderId());
+    //         //.append("member", team.getMember());
+    //         //.append("creationDate", team.getCreationDate());
 
-        Bson filter = Filters.eq("teamName", team.getTeamName()); // Filtra per teamName
-        Document updatedDoc = new Document()
-            .append("description", team.getDescription());
-            //.append("leaderId", team.getLeaderId());
-            //.append("member", team.getMember());
-            //.append("creationDate", team.getCreationDate());
-
-        collection.updateOne(filter, new Document("$set", updatedDoc));
-    }
+    //     collection.updateOne(filter, new Document("$set", updatedDoc));
+    // }
 
     public void deleteTeam(String teamName) {
         MongoDatabase database = client.getDatabase("manvsclass");
