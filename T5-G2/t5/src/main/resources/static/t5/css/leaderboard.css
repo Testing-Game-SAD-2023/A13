@@ -27,6 +27,12 @@
     border-color: #fdb838;
 }
 
+.btn-refresh {
+    position: absolute;
+    right:0px;
+    top:-280%;
+}
+
 .btn-filter {
     color: #fdb838 ;
     border-color: rgba(255, 255, 255, 0.2) !important;

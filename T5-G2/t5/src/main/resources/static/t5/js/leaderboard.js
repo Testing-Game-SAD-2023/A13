@@ -1,5 +1,6 @@
 const pageSize = 10;
 const numPages = 5;
+const maximumCachedPages = 20;
 const tableBody = document.getElementById('table-body');
 const pagination = document.getElementById('pagination');
 let lastPage = Infinity;
@@ -173,7 +174,24 @@ async function getRowsByEmail(gamemode, statistic, email) {
     return startPage;
 }
 
+function countCachedPages() {
+    let count = 0;
+    for (const gm in cache) {
+        for (const stat in cache[gm]) {
+            count += Object.keys(cache[gm][stat]).length;
+        }
+    }
+    return count;
+}
+
 function updateCache(gamemode, statistic, startPage, fetchedRows) {
+
+    // invalidate cache if max page limit exceeded
+    if (countCachedPages() > maximumCachedPages) {
+        cache = {};
+        console.log('Cache cleared');
+    }
+
     if (!cache[gamemode]) {
         cache[gamemode] = {};
     }
@@ -386,12 +404,12 @@ function refreshTable() {
 // Page initialization
 
 // add listener for leaderboard creation
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const gamemode = document.querySelector('input[name="gamemode"]:checked').id;
     updateStatisticOptions(gamemode);
 
     const offcanvasElement = document.getElementById('offcanvasDarkNavbar');
-    offcanvasElement.addEventListener('show.bs.offcanvas', function() {
+    offcanvasElement.addEventListener('show.bs.offcanvas', function () {
         showPage(1);
     });
 });
