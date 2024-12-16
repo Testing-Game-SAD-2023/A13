@@ -185,7 +185,8 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 - Benefici: Migliora l’esperienza sociale informando gli utenti delle interazioni con altri membri.
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
+
+La documentazione completa, i powerpoint delle iterazioni ed i diagrammi sono consultabili al link seguente: ![Documentazione](Documentazione/Documentazione_2024/)
 
 
 
