@@ -4,8 +4,11 @@ const challengeForm = document.getElementById('challengeForm');
 const teamSelect = document.getElementById('teamSelect'); // Select della sezione "Dettagli Team"
 const challenge_del = document.getElementById('challengeSelect');
 const challenge_det = document.getElementById('challengeSelectDetails');
-
+const challengeSel=document.getElementById('challengeSelectDetails');
+const ChallengeDetails=document.createElement('Div');
 let datiTeam = []; // Variabile per salvare i dati dei team
+let datiChallenge = [];
+document.getElementById('ChallengeDetailsContainer').appendChild(ChallengeDetails); // Aggiunge il contenitore nella sezione
 
 // Gestione delle sezioni della pagina
 function showSection(sectionId) {
@@ -22,7 +25,14 @@ function showSection(sectionId) {
 
 }
 
-
+challengeSel.addEventListener('change', () => {
+    const selectedChallenge = challengeSel.value; // Ottieni il valore del team selezionato
+    if (selectedChallenge) {
+        displayChallengeDetails(selectedChallenge); // Mostra i dettagli del team selezionato
+    } else {
+        ChallengeDetails.innerHTML = ''; // Pulisce i dettagli se nessun team è selezionato
+    }
+});
 
 // Recupera tutte le challenges per un team mostrando la listaHTML
 function listHtml(){
@@ -51,6 +61,35 @@ function listHtml(){
         alert('Si è verificato un errore durante il caricamento delle challenge.');
     });
 }
+
+
+function displayChallengeDetails(challengeName) {
+    const challenge = datiChallenge.find(c => c.challengeName === challengeName); // Cerca la challenge selezionata nei dati salvati
+    if (challenge) {
+        // Mostra i dettagli della challenge
+        ChallengeDetails.innerHTML = `
+            <h3>Dettagli della Challenge</h3>
+            <p><strong>Nome:</strong> ${challenge.challengeName}</p>
+            <p><strong>Descrizione:</strong> ${challenge.description}</p>
+            <p><strong>ID Team:</strong> ${challenge.teamId}</p>
+            <p><strong>ID Creatore:</strong> ${challenge.creatorId}</p>
+            <p><strong>Data Inizio:</strong> ${challenge.startDate}</p>
+            <p><strong>Data Fine:</strong> ${challenge.endDate}</p>
+            <p><strong>Stato:</strong> ${challenge.status}</p>
+            <p><strong>Tipo Condizione Vittoria:</strong> ${challenge.victoryConditionType}</p>
+            <p><strong>Condizione Vittoria:</strong> ${challenge.victoryCondition}</p>
+        `;
+    } else {
+        alert('Challenge non trovata.');
+        ChallengeDetails.innerHTML = ''; // Pulisce i dettagli in caso di errore
+    }
+}
+
+
+
+
+
+
 
 function controlloStato(){
     const currentDate = new Date(); // Data attuale
@@ -217,6 +256,7 @@ function populateChallengeSelect(selectId) {
             return response.json();
         })
         .then(challenges => {
+            datiChallenge=challenges;
             // Trova la select con l'ID passato come parametro
             if (!selectId) {
                 console.error(`Elemento con ID '${selectId}' non trovato.`);

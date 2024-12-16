@@ -233,6 +233,7 @@ teamForm.addEventListener('submit', function (event) {
             .catch(error => console.error('Errore:', error));
         
 });
+
 teamSelect.addEventListener('change', () => {
         const selectedTeam = teamSelect.value; // Ottieni il valore del team selezionato
         if (selectedTeam) {
