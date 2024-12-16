@@ -221,15 +221,22 @@ function updateCache(gamemode, statistic, startPage, fetchedRows) {
 function renderTable(gamemode, statistic, page) {
 
     tableBody.innerHTML = '';
+    const searchedEmail = document.getElementById('lb-search-box').value;
 
     // rendering table rows
     cache[gamemode][statistic][page].forEach((row, i) => {
         const tr = document.createElement('tr');
         const position = (page - 1) * pageSize + i + 1
+
+        let classTd = '';
+        if (searchedEmail === row.email) {
+            classTd = 'highlight';
+        }
+
         tr.innerHTML = `
-          <td class="text-center">${position}</td>
-          <td>${row.email}</td>
-          <td>${row.statistic}</td>
+          <td class="text-center ${classTd}">${position}</td>
+          <td class="${classTd}">${row.email}</td>
+          <td class="${classTd}">${row.statistic}</td>
         `;
         tableBody.appendChild(tr);
     });

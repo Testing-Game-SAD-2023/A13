@@ -1,10 +1,14 @@
+:root {
+    --custom-yellow: #fdb838;
+}
+
 .big-canvas {
     width: 55vw !important;
     padding: 0px 100px;
 }
 
 .btn-close-offcanvas {
-    position:absolute;
+    position: absolute;
     top: 50px;
     right: 80px;
 }
@@ -21,20 +25,19 @@
     font-size: 0.95em !important;
 }
 
-.form-check-input:checked + .form-check-label {
-    background-color: #fdb838;
+.form-check-input:checked+.form-check-label {
+    background-color: var(--custom-yellow);
     color: white;
-    border-color: #fdb838;
+    border-color: var(--custom-yellow);
 }
 
 .btn-refresh {
     position: absolute;
-    right:0px;
-    top:-280%;
+    right: 0px;
+    top: -280%;
 }
 
 .btn-filter {
-    color: #fdb838 ;
     border-color: rgba(255, 255, 255, 0.2) !important;
     background-color: transparent;
     transition: all 0.3s ease;
@@ -43,13 +46,12 @@
 
 .btn-filter:hover {
     color: white !important;
-    border-color: #fdb838 !important;
+    border-color: var(--custom-yellow) !important;
 }
 
-.search-box {
-    max-width: 100% !important;
-    margin-bottom: .125rem !important;
-}
+
+
+/* Table */
 
 .tableError {
     color: crimson;
@@ -71,3 +73,23 @@
 }
 
 
+/* Search */
+
+.search-box {
+    max-width: 100% !important;
+    margin-bottom: .125rem !important;
+}
+
+@keyframes fadeOutHighlight {
+    0% {
+        color: var(--custom-yellow) !important;
+    }
+
+    100% {
+        color: white !important;
+    }
+}
+
+.highlight {
+    animation: fadeOutHighlight 3s forwards !important;
+}
