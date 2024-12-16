@@ -13,9 +13,9 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente
-- [Vincenzo Luigi Bruno](https://github.com/vlb20)
-- [Salvatore Cangiano](https://github.com/Salvr28)
-- [Cristina Carleo](https://github.com/iris-cmd22)
+- [Vincenzo Luigi Bruno](https://github.com/vlb20): vincenzol.bruno@studenti.unina.it
+- [Salvatore Cangiano](https://github.com/Salvr28): salva.cangiano@studenti.unina.it
+- [Cristina Carleo](https://github.com/iris-cmd22): cr.carleo@studenti.unina.it
 
 
 # Funzionalità dell'Applicazione
@@ -159,7 +159,30 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-TBD
+
+## 1. Aggiunta di un Profilo Utente
+- Descrizione: Gli utenti ora possono creare un profilo personalizzato, con informazioni come immagine di profilo e bio. 
+- Benefici: Migliora l’esperienza utente fornendo un punto centrale per la gestione delle informazioni personali.
+
+## 2. Sistema di Seguiti e Seguaci
+- Descrizione: Introduzione di una funzionalità che permette agli utenti di seguire e essere seguiti da altri utenti.
+- Benefici: Favorisce l’interazione sociale tra utenti.
+
+## 3. Modifica del Profilo Utente
+- Descrizione: Gli utenti possono ora modificare le informazioni del proprio profilo.
+- Benefici: Consente agli utenti di mantenere aggiornati i propri dati personali.
+
+## 4. Sistema di Notifica nel Profilo Utente
+- Descrizione: Aggiunta di un sistema centralizzato di notifiche visibili nel profilo dell'utente.
+- Benefici: Fornisce agli utenti una panoramica chiara delle attività rilevanti.
+
+## 5. Notifica al Conseguimento di un Achievement
+- Descrizione: Gli utenti ricevono notifiche automatiche quando raggiungono un obiettivo (achievement).
+- Benefici: Incentiva il coinvolgimento degli utenti premiando i loro progressi.
+
+## 6. Notifica per Nuovo Follower
+- Descrizione: Gli utenti ricevono notifiche quando qualcuno inizia a seguirli.
+- Benefici: Migliora l’esperienza sociale informando gli utenti delle interazioni con altri membri.
 
 # Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
