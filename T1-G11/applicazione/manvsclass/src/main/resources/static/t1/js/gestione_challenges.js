@@ -276,6 +276,31 @@ function populateChallengeSelect(selectId) {
         });
 }
 
+    function getVictoryConditionType() {
+    const victoryConditionTypeSelect = document.getElementById("victoryConditionType");
+
+    // Chiamata API per ottenere i valori dell'enum
+    fetch('/victoryConditionTypes') // Endpoint creato nel Controller
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Errore nella risposta del server");
+            }
+            return response.json(); // Converte la risposta in JSON
+        })
+        .then(data => {
+            // Popola dinamicamente la select con i valori ricevuti
+            data.forEach(type => {
+                const option = document.createElement("option");
+                option.value = type;        // Imposta il valore dell'opzione
+                option.textContent = type;  // Imposta il testo visibile
+                victoryConditionTypeSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error("Errore nel caricamento delle opzioni:", error);
+        });
+};
+
 
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('nav a').forEach(link => {
@@ -292,5 +317,5 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchTeams(teamSelect);
     populateChallengeSelect(challenge_det);
     populateChallengeSelect(challenge_del);
-
+    getVictoryConditionType();
 });
