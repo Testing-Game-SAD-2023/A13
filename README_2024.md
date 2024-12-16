@@ -190,7 +190,7 @@ Inoltre, è stata **aggiornata la documentazione del progetto**, inclusi i diagr
 
 # Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
-[Documentazione Ufficiale Task R5](/Documentazione/Doc_T1/Documentazione_Task_R5/Tesina_Ufficiale_Task_R5.pdf)
+[Documentazione Ufficiale Task R5](/Documentazione/Doc_T1/Documentazione_Task_R5_GrB16/Tesina_Ufficiale_Task_R5.pdf)
 
 
 
