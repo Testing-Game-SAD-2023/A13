@@ -45,13 +45,21 @@
 				height: 100%; /* Assicura che l'editor utilizzi il 100% dello spazio disponibile */
 			}
 			.covered-line {
-				border-left: 4px solid green; /* Colore del bordo a sinistra */
+				background-color:rgba(216, 247, 216, 0.938); /* Colore del bordo a sinistra */
+					
 			}
 			.uncovered-line {
-				border-left: 4px solid red; /* Colore del bordo a sinistra */
+				background-color:#f6cece; /* Colore del bordo a sinistra */
+				
 			}
 			.partially-covered-line {
-				border-left: 4px solid #FF5733; /* Colore del bordo a sinistra */
+				background-color:#f7ebc8; /* Colore del bordo a sinistra */
+				
+			}
+
+			.CodeMirror-line{
+				position:relative;
+				z-index:1;
 			}
 
 			#card_user,
@@ -555,6 +563,11 @@ public class TestClasse {
 							<span class="navbar-brand lead my-0 py-0" th:text="#{classe_ut}">
 							</span>
 							<div class="">
+								<!-- ROBOT COVERAGE BUTTON -->
+								<button class="btn btn-info ms-2" type="button" id="viewRobotCoverageButton" style="display: none; background-color: rgb(101, 204, 238); color: black; border: none;">
+									<i class="bi bi-eye" aria-hidden="true"></i>
+									<span role="status" data-title="viewRobotCoverage" th:text="#{viewRobotCoverage}"></span>
+								</button>
 								<!-- INFO BUTTON -->
 								<span
 									class="d-inline-block mx-3"

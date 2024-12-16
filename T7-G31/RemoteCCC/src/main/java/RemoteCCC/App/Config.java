@@ -29,6 +29,8 @@ public class Config {
     private final String usrPath;
     private String timestamp;
 
+    private String robotTestDir = null;
+
     /*
         * Questo enum definisce i vari percorsi utilizzati nel progetto, 
         * migliorando la leggibilità e la manutenibilità del codice. 
@@ -114,6 +116,17 @@ public class Config {
 
     public String getsep() {
         return File.separator;
+    }
+
+    public void setRobotTestDir(String path) {
+        this.robotTestDir = path;
+    }
+
+    public String getRobotTestDir() {
+        if (this.robotTestDir == null) {
+            throw new IllegalStateException("[Config] Il path per i test dei robot non è stato configurato.");
+        }
+        return this.robotTestDir;
     }
 
 }

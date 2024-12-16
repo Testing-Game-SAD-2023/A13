@@ -54,6 +54,10 @@ zuul:
       sensitiveHeaders:
       path: /api/compile-and-codecoverage/**
       url: http://remoteccc-app-1:1234/compile-and-codecoverage
+    status-service:
+      sensitiveHeaders:
+      path: /api/status/**
+      url: http://evosuitecompiler-evosuite-compiler-1:8756/status
 eureka:
   client:
     enabled: false

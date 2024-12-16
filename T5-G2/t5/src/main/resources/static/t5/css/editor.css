@@ -292,13 +292,29 @@ body {
 }
 .covered-line {
   background-color: #c8e6c9; /* Colore di sfondo per le righe coperte */
+  width: 100%; /* Larga quanto il contenitore */
+  display: block; /* Assicura che si comporti come un blocco */
+  border: none; /* Rimuove eventuali bordi */
 }
 .uncovered-line {
   background-color: #ffcdd2; /* Colore di sfondo per le righe non coperte */
+  width: 100%; /* Larga quanto il contenitore */
+  display: block; /* Assicura che si comporti come un blocco */
+  border: none; /* Rimuove eventuali bordi */
 }
 .partially-covered-line {
   background-color: #ffecb3; /* Colore di sfondo per le righe parzialmente coperte */
+  width: 100%; /* Larga quanto il contenitore */
+  display: block; /* Assicura che si comporti come un blocco */
+  border: none; /* Rimuove eventuali bordi */
 }
+
+.CodeMirror-line{
+				position:relative;
+				z-index:1;
+			}
+
+
 @media screen and(max-width:800px) {
   .container2{
     width: 100%;

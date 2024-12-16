@@ -18,7 +18,6 @@
 package com.g2.Interfaces;
 
 import com.g2.Model.Achievement;
-import com.g2.Model.AchievementProgress;
 import com.g2.Model.Statistic;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,7 +25,6 @@ import java.util.List;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.g2.Model.ClassUT;
 

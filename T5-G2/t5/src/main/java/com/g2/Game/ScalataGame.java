@@ -20,7 +20,6 @@ package com.g2.Game;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
 
 public class ScalataGame extends GameLogic {
@@ -43,7 +42,7 @@ public class ScalataGame extends GameLogic {
     }
 
     @Override
-    public void playTurn(int userScore, int robotScore) {
+    public void playTurn(double userScore, int robotScore) {
         if (currentGameIndex < games.size()) {
             Sfida currentGame = games.get(currentGameIndex);
             currentGame.playTurn(userScore, robotScore);
@@ -65,11 +64,11 @@ public class ScalataGame extends GameLogic {
     }
 
     @Override
-    public int GetScore(int coverage) {
+    public int GetScore(String underTestClassCode, int coverage, int numPrivateMethods,int privateMethodsCovered, String difficulty) {
         // Implementa la logica per calcolare il punteggio totale tra tutti i giochi
         int totalScore = 0;
         for (Sfida game : games) {
-            totalScore += game.GetScore(coverage); // Calcola il punteggio per ogni gioco
+            totalScore += game.GetScore(underTestClassCode,coverage,numPrivateMethods,privateMethodsCovered,difficulty); // Calcola il punteggio per ogni gioco
         }
         return totalScore;
     }

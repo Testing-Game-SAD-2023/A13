@@ -1,0 +1,3 @@
+# Configurazione server
+server:
+  port: 8756

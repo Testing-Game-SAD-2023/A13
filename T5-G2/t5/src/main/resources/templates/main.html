@@ -50,8 +50,137 @@
                                 <a href="/gamemode?mode=Sfida" class="btn btn-success mx-3 my-2">
                                     <i class="bi bi-play-fill me-2"></i>
                                     <span th:text="#{tasto_play}"></span>
-                                </a> 
+                                </a>
+                                <!-- Pulsante per regolamento -->
+                                <button class="btn btn-outline-info btn-sm mx-1 my-2" data-bs-toggle="modal" data-bs-target="#punteggioModal">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <span th:text="#{punteggio}"></span>
+                                </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal per il punteggio -->
+            <div class="modal fade" id="punteggioModal" tabindex="-1" aria-labelledby="punteggioModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="punteggioModalLabel" th:text="#{punteggio}"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <!-- <div class="modal-body">
+                            <p>
+                                Benvenuto nella nostra sfida di testing gamification! Scopri come puoi ottenere il massimo del punteggio e scalare la classifica. Abbiamo ideato un sistema di calcolo che premia la tua strategia e abilità, bilanciando le difficoltà delle classi da testare.
+                            </p>
+                            <br>
+                            <p>
+                                🎯 <strong>Criteri di Punteggio:</strong>
+                            </p>
+                            <br>
+                            <p>
+                                1️⃣ <strong>Copertura dei Metodi Privati</strong><br>
+                                - Più riesci a coprire i metodi privati di una classe, maggiore sarà il tuo vantaggio.<br>
+                                - Ogni metodo privato coperto viene rapportato al totale dei metodi privati della classe.<br>
+                                <em>(Fai attenzione ai dettagli e otterrai bonus nascosti!)</em>
+                            </p>
+                            <br>
+                            <p>
+                                2️⃣ <strong>Complessità Ciclomatica</strong><br>
+                                - Affrontare classi complesse non è per tutti: se riesci a gestirle bene, il punteggio rifletterà il tuo impegno.<br>
+                                - Valutiamo quanti costrutti iterativi e di selezione hai coperto rispetto al totale della classe.<br>
+                                <em>(The greater the complexity, the bigger the reward)</em>
+                            </p>
+                            <br>
+                            <p>
+                                3️⃣ <strong>Penalità per Turni Aggiuntivi</strong><br>
+                                - Ogni turno extra ti costerà punti.<br>
+                                - Per ogni turno, il tuo punteggio viene ridotto di un fattore autoincrementante.<br>
+                                <em>(Vuoi evitare penalità? Copri il massimo al primo turno!)</em>
+                            </p>
+                            <br>
+                            <p>
+                                4️⃣ <strong>Bonus Copertura al Primo Turno</strong><br>
+                                - Se superi il 75% di copertura al primo turno, otterrai un moltiplicatore extra basato sulla difficoltà:<br>
+                                    - Difficoltà Media: bonus del 10%.<br>
+                                    - Difficoltà Difficile: bonus di 30%.<br>
+                                <em>(Un primo turno esplosivo vale doppio!)</em>
+                            </p>
+                            <br>
+                            <p>
+                                5️⃣ <strong>Fattore di Difficoltà Totale</strong><br>
+                                - Il punteggio tiene conto della difficoltà del bot e della classe sotto test:<br>
+                                    - Bot più difficili ti premiano di più.<br>
+                                    - Classi più complesse, con tanti metodi privati e maggiore numero di righe, aumentano il valore del tuo moltiplicatore.<br>
+                                <em>(Affronta il livello giusto per sfidare te stesso e guadagnare di più!)</em>
+                            </p>
+                            <br>
+                            <p>
+                                🏆 <strong>Punteggio Finale</strong><br>
+                                Il tuo punteggio viene calcolato sommando la tua copertura, i bonus ottenuti e i moltiplicatori applicati. Scala la classifica!
+                            </p>
+                            <br>
+                            <p>
+                                🔑 <strong>Gioca Strategico e Vinci</strong><br>
+                                Punta a coprire il massimo al primo turno, scegliendo con attenzione il livello di difficoltà del bot e delle classi. Ogni decisione conta per conquistare il podio!
+                            </p>
+                        </div>-->
+                        <div class="modal-body">
+                            <p th:text="#{punteggio_intro}"></p>
+                            <p>
+                                🎯 <strong th:text="#{criteri_punteggio}"></strong><br><br>
+                            </p>
+                            <p>
+                                1️⃣ <strong th:text="#{copertura_titolo}"></strong><br>
+                                - <span th:text="#{copertura_descrizione1}"></span><br>
+                                - <span th:text="#{copertura_descrizione2}"></span><br>
+                                <em>(<span th:text="#{copertura_hint}"></span>)</em><br><br>
+                            </p>
+                            <p>
+                                2️⃣ <strong th:text="#{complessita_titolo}"></strong><br>
+                                - <span th:text="#{complessita_descrizione1}"></span><br>
+                                - <span th:text="#{complessita_descrizione2}"></span><br>
+                                <em>(<span th:text="#{complessita_hint}"></span>)</em><br><br>
+                            </p>
+                            <p>
+                                3️⃣ <strong th:text="#{penalita_titolo}"></strong><br>
+                                - <span th:text="#{penalita_descrizione1}"></span><br>
+                                - <span th:text="#{penalita_descrizione2}"></span><br>
+                                <em>(<span th:text="#{penalita_hint}"></span>)</em><br><br>
+                            </p>
+                            <p>
+                                4️⃣ <strong th:text="#{bonus_titolo}"></strong><br>
+                                - <span th:text="#{bonus_descrizione1}"></span><br>
+                                <ul>
+                                    <li> <span th:text="#{bonus_difficolta_media}"></span></li>
+                                    <li> <span th:text="#{bonus_difficolta_difficile}"></span></li>
+                                </ul>
+                                <em>(<span th:text="#{bonus_hint}"></span>)</em><br><br>
+                            </p>
+                            <p>
+                                5️⃣ <strong th:text="#{difficolta_titolo}"></strong><br>
+                                - <span th:text="#{difficolta_descrizione1}"></span><br>
+                                <ul>
+                                    <li> <span th:text="#{difficolta_bot}"></span></li>
+                                    <li> <span th:text="#{difficolta_classi}"></span></li>
+                                </ul>
+                                <em>(<span th:text="#{difficolta_hint}"></span>)</em><br><br>
+                            </p>
+                            <p>
+                                🏆 <strong th:text="#{punteggio_finale_titolo}"></strong><br>
+                                - <span th:text="#{punteggio_finale_descrizione}"></span><br><br>
+                            </p>
+                            <p>
+                                🔑 <strong th:text="#{gioca_strategico_titolo}"></strong><br>
+                                - <span th:text="#{gioca_strategico_descrizione}"></span><br>
+                            </p>
+                        </div>
+                        
+                        
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" th:text="#{chiudi}"></button>
                         </div>
                     </div>
                 </div>

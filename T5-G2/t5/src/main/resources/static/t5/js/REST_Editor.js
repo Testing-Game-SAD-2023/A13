@@ -110,9 +110,10 @@ async function handleGameAction(isGameEnd) {
     isActionInProgress = false; // Reimposta il flag al termine dell'azione
 }
 
+/*MODIFICA*/
 // Gestisce la risposta dal server
 function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
-    const { robotScore, userScore, outCompile, 
+    const { robotScore, robotCoverage, userScore, outCompile, 
             coverage, gameId, roundId,
             coverageDetails} = response;
     // Aggiorna i dati del modulo con gameId e roundId
@@ -126,12 +127,13 @@ function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
         return;
     }
     // Se la copertura è disponibile, la processa
-    processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails);
+    processCoverage(coverage, formData, robotCoverage, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails);
 }
 
+/*MODIFICA*/
 // Processa la copertura del codice e aggiorna i dati di gioco
-async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails) {
-    highlightCodeCoverage($.parseXML(coverage), editor_robot); // Evidenzia la copertura del codice nell'editor
+async function processCoverage(coverage, formData, robotCoverage, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails) {
+    highlightCodeCoverage($.parseXML(coverage), $.parseXML(robotCoverage), editor_robot); // Evidenzia la copertura del codice nell'editor
     orderTurno++; // Incrementa l'ordine del turno
     const csvContent = await fetchCoverageReport(formData); // Recupera il report di coverage
     setStatus("loading"); // Aggiorna lo stato a "loading"
@@ -141,6 +143,8 @@ async function processCoverage(coverage, formData, robotScore, userScore, isGame
     toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
     displayUserPoints(isGameEnd, valori_csv, robotScore, userScore, coverageDetails); // Mostra i punti dell'utente
     if (isGameEnd) { // Se il gioco è finito
+        // Se il gioco è terminato, si abilita il pulsante per visualizzare la copertura del robot
+        viewRobotCoverageButton.style.display = "inline-block"; 
         handleEndGame(userScore); // Gestisce la fine del gioco
     } else {
         resetButtons(); // Reimposta i pulsanti

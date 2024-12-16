@@ -76,15 +76,22 @@ call mvn package || ( echo "Error in T9-G19 installation during mvn package" && 
 docker compose up -d --build || ( echo "Error in T9-G19 installation during docker compose up" && exit /b 1 )
 exit /b 0
 
-REM Installer function for ui_gateway
+REM Installer function for T10-G724
 :function9
+echo "Installing T10-G724"
+cd "./T10-G724\EvoSuiteCompiler"
+docker compose up -d --build || ( echo "Error in T10-G724 installation during docker compose up" && exit /b 1 )
+exit /b 0
+
+REM Installer function for ui_gateway
+:function10
 echo "Installing ui_gateway"
 cd "./ui_gateway"
 docker compose up -d --build || ( echo "Error in ui_gateway installation during docker compose up" && exit /b 1 )
 exit /b 0
 
 REM Installer function for api_gateway
-:function10
+:function11
 echo "Installing api_gateway"
 cd "./api_gateway"
 call mvn package || ( echo "Error in api_gateway installation during mvn package" && exit /b 1 )
@@ -105,7 +112,7 @@ docker volume create VolumeT8 || ( echo "Error in creating the volume T8" && exi
 REM Creazione della rete Docker 'global-network'
 docker network create global-network || ( echo "Error in creating the network global-network" && exit /b 1 )
 
-for /l %%i in (0,1,10) do (
+for /l %%i in (0,1,11) do (
 
    pushd .
    echo "Calling function # %%i:"

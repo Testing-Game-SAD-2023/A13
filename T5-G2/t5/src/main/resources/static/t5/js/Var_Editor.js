@@ -120,3 +120,10 @@ var perc_robot = "0"; // percentuale di copertura del robot scelto
 var userScore = 0;
 var locGiocatore = 0;
 var currentDate = new Date();
+
+//  Variabili per la copertura dei robot
+
+var RobotcoveredLines = [];
+var RobotuncoveredLines = [];
+var RobotpartiallyCoveredLines = [];
+var check = 0;

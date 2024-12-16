@@ -45,6 +45,7 @@ public class ServiceManager {
         registerService("T23", T23Service.class, restTemplate);
         registerService("T4", T4Service.class, restTemplate);
         registerService("T7", T7Service.class, restTemplate);
+        registerService("T10", T10Service.class, restTemplate);
     }
 
     // Metodo helper per registrare i servizi

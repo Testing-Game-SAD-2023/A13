@@ -8,9 +8,18 @@ services:
       - 1234
     # ports:
     #   - 1234:1234
+    volumes:
+      - VolumeT9:/VolumeT9
+      - VolumeT8:/VolumeT8
     networks:
       - global-network
 
 networks:
   global-network:
+    external: true
+
+volumes:
+  VolumeT9:
+    external: true
+  VolumeT8:
     external: true
