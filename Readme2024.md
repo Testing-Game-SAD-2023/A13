@@ -3,7 +3,7 @@ Web App a supporto dell'insegnamento del Software Testing attraverso la Gamifica
 
 Questa Web App è descritta anche nel seguente articolo scientifico: 
 Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
-"Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://doi.org/10.1145/3678869.368568
+"Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://dl.acm.org/doi/10.1145/3678869.3685686
 
 # Descrizione 
 The Testing_Challenge_Game Web Application was developed with the contributions of the students of the University of Naples Federico II in Italy, enrolled in the Software Architecture Design (SAD) courses held by the Prof. Anna Rita Fasolino in the academic years 2022-23, 2023-24, 2024-25.
