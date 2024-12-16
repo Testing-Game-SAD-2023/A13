@@ -69,7 +69,8 @@ public class LeaderboardService {
 
     //metodo utile per ottenere la lista dei giocatori che devono essere mostrati nella pagina
     public List<Map<String, Object>> getPlayersInPage(Classifica lead, String SearchFilter) {
-        List<Map<String, Object>> mappedPlayers = getPlayersToMapList(lead, SearchFilter); //Ottiene tutti i giocatori come liste di mappe, operazione enecessaria per poter lavorare con thymeleaf        
+        //Trasformo la lista di tutti i giocatori in una lista di mappe, operazione enecessaria per poter lavorare con thymeleaf
+        List<Map<String, Object>> mappedPlayers = getPlayersToMapList(lead, SearchFilter);         
         int start = lead.getPage() * lead.getSize();
         int end = Math.min(start + lead.getSize(), mappedPlayers.size());
         return mappedPlayers.subList(start, end); //Ritorna solo la porzione di lista richiesta

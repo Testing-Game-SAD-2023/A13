@@ -289,7 +289,6 @@ public class GameController {
                 return eliminaGame(playerId);
             }
             logger.info("CHIAMATA A LEADERBOARDSERVICE");
-            leaderboardService.updateLeaderboard("bobbone@gmail.com", 34, true);
 
             // Preparazione dati per i task
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
