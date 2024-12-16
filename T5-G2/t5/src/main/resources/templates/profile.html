@@ -47,6 +47,17 @@
             <p id="headerNickname" class="mb-0 text-muted"></p>
         </div>
         
+        <!-- Cambia Lingua -->
+        <div class="language-switcher" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+            <button id="btnItalian" class="btn btn-light" title="Italiano" style="margin-right: 5px;">
+                🇮🇹 Italiano
+            </button>
+            <button id="btnEnglish" class="btn btn-light" title="English">
+                🇬🇧 English
+            </button>
+        </div>
+
+        
         
 
         <!-- Sezioni -->
@@ -263,23 +274,13 @@
 
         <div id="leaderboard" class="section">
             <div class="container">
-                <div class="row">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title text-center">Classifica</h4>
-                                <hr>
-                                <!-- Contenuto vuoto o dinamico -->
-                                <div id="leaderboardContent">
-                                    <!-- Puoi aggiungere qui la logica per generare dinamicamente la classifica -->
-                                    <p class="text-center text-muted">La classifica sarà presto disponibile.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <h4 class="text-center">Classifica</h4>
+                <div id="leaderboardContent">
+                    <p class="text-center">La classifica sarà presto disponibile.</p>
                 </div>
             </div>
         </div>
+        
         
         
     </div>
@@ -295,37 +296,7 @@
             window.location.href = "/main";
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const saveButton = document.getElementById("saveBioButton");
-
-            if (saveButton) {
-                saveButton.addEventListener("click", async () => {
-                    const bio = document.getElementById("biography").value;
-
-                    try {
-                        const response = await fetch("/updateBiography", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/x-www-form-urlencoded"
-                            },
-                            body: new URLSearchParams({ biography: bio })
-                        });
-
-                        if (response.ok) {
-                            document.getElementById("saveMessage").style.display = "block";
-                            setTimeout(() => {
-                                document.getElementById("saveMessage").style.display = "none";
-                            }, 3000);
-                        } else {
-                            const error = await response.text();
-                            alert("Errore nel salvataggio: " + error);
-                        }
-                    } catch (error) {
-                        alert("Errore nella connessione al server.");
-                    }
-                });
-            }
-        });
+        
     </script>
 </body>
 </html>

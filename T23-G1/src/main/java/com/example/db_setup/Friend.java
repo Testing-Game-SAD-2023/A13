@@ -1,6 +1,5 @@
 package com.example.db_setup;
 
-import lombok.Data;
 
 import javax.persistence.*;
 

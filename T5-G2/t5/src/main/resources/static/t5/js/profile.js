@@ -105,22 +105,22 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     
-    // Gestisci il pulsante "Salva Avatar"
-    // Intercetta il submit del form per evitare il ricaricamento della pagina
+    
+    // form per il salvataggio dell'avatar
     const avatarForm = document.querySelector('form[action="/updateAvatar"]');
     if (avatarForm) {
     avatarForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Interrompe il comportamento predefinito del form
-        await saveAvatar(); // Chiama la funzione per salvare l'avatar
+        event.preventDefault(); // Interrompo il comportamento predefinito del form
+        await saveAvatar(); 
     });
     }
 
     
-    // Gestisci la selezione dell'avatar
+    //selezione dell'avatar
     const avatarImages = document.querySelectorAll('.avatar-option');
     avatarImages.forEach(img => {
         img.addEventListener('click', () => {
-            const avatarPath = img.src; // Ottieni il percorso dell'immagine
+            const avatarPath = img.src; // percorso dell'immagine
             selectAvatar(avatarPath);
         });
     });
@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (response.ok) {
-            const avatarPath = await response.text(); // Ottieni l'avatar dal backend
+            const avatarPath = await response.text(); // avatar dal backend
             if (currentProfilePicture) {
                 currentProfilePicture.src = avatarPath; // Aggiorna l'immagine di profilo
             }
@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadUserInfo();
 
     //GabMan 08/12 Gestione del form per la modifica delle informazioni utente
-    // Mostra il form e nasconde il pulsante "Modifica Info Personali"
+    
     editInfoButton.addEventListener("click", () => {
         editInfoForm.style.display = "block";
         editInfoButton.style.display = "none";
@@ -540,6 +540,38 @@ document.addEventListener("DOMContentLoaded", () => {
         
         
     };
+
+    //byGabman
+    const changeLanguage = async (lang) => {
+        try {
+            const response = await fetch('/changeLanguage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ lang })
+            });
+
+            if (response.ok) {
+                alert(`Lingua cambiata con successo a: ${lang === 'it' ? 'Italiano' : 'English'}`);
+                location.reload(); // Ricarica la pagina per applicare la nuova lingua
+            } else {
+                alert('Errore durante il cambio della lingua.');
+            }
+        } catch (error) {
+            console.error('Errore nella connessione al server:', error);
+            alert('Errore durante il cambio della lingua.');
+        }
+    };
+
+    // Event listener per il cambio lingua
+    document.getElementById("btnItalian").addEventListener("click", () => {
+        changeLanguage('it');
+    });
+
+    document.getElementById("btnEnglish").addEventListener("click", () => {
+        changeLanguage('en');
+    });
 
     // Mostra Trofei in Progresso
     window.showInProgress = function () {

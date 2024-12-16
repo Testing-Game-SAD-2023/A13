@@ -57,7 +57,7 @@ import org.springframework.web.client.HttpClientErrorException;
                  params -> GetAuthenticated((String) params[0]),
                  String.class
          ));
-         //cami (02/12)qui
+         //cami (02/12)
         registerAction("GetUserInfo", new ServiceActionDefinition(
         params -> getUserInfo((String) params[0])
         ));
@@ -78,7 +78,7 @@ import org.springframework.web.client.HttpClientErrorException;
                  params -> getFriendlist((String) params[0])
          ));
 
-         /////NON TESTATO
+  
          registerAction("AddFriend", new ServiceActionDefinition(
                  params -> addFriend((String) params[0], (String) params[1])
          ));
@@ -95,7 +95,7 @@ import org.springframework.web.client.HttpClientErrorException;
     public Boolean updateAvatar(Integer userId, String avatar) {
     final String endpoint = "/updateAvatar";
     MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-    formData.add("avatar", avatar); // Parametro avatar
+    formData.add("avatar", avatar); 
 
     try {
         // Chiamata al servizio T23
@@ -180,7 +180,7 @@ import org.springframework.web.client.HttpClientErrorException;
     return response.getBody();
     }
 
-    //fine
+  
      // Metodo per l'autenticazione
      private Boolean GetAuthenticated(String jwt) {
          final String endpoint = "/validateToken";
@@ -228,7 +228,7 @@ import org.springframework.web.client.HttpClientErrorException;
     //GabMan 03/12
      // Metodo per ottenere la lista degli amici
     public List<Map<String, String>> getFriendlist(String userId) {
-    final String endpoint = "/getFriendlist"; // Endpoint nel controller di T23
+    final String endpoint = "/getFriendlist"; 
 
     // Parametri per la richiesta
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -245,11 +245,11 @@ import org.springframework.web.client.HttpClientErrorException;
     }
 
 
-        /////////NON TESTATI/////////////////////////////////////////////////////////
+      
      // Metodo per aggiungere un amico
 
     public Map<String, String> searchFriend(String identifier) {
-    final String endpoint = "/searchFriend"; // Endpoint in T23
+    final String endpoint = "/searchFriend";
 
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.add("identifier", identifier);
@@ -288,7 +288,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 
     try {
-        // Effettua la chiamata POST al backend (T23)
+        // Effettua la chiamata POST 
         return callRestPost(endpoint, formData, headers, Boolean.class);
     } catch (Exception e) {
         System.err.println("Errore durante la rimozione dell'amico: " + e.getMessage());
@@ -333,7 +333,7 @@ import org.springframework.web.client.HttpClientErrorException;
         formData.add("nickname", nickname);
 
         try {
-            // Effettua la richiesta POST al servizio T23
+            // Effettua la richiesta POST 
             return callRestPost(endpoint, formData, null, Boolean.class);
         } catch (Exception e) {
             System.err.println("Errore durante l'aggiornamento delle informazioni dell'utente: " + e.getMessage());
@@ -348,7 +348,7 @@ import org.springframework.web.client.HttpClientErrorException;
         payload.put("profilePicture", base64Image);
 
         try {
-            // Chiamata al servizio T23
+            
             ResponseEntity<Boolean> response = restTemplate.postForEntity(
                 endpoint,
                 payload,

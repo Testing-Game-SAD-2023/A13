@@ -752,7 +752,7 @@ public class Controller {
   @PostMapping("/updateAvatar")
     public ResponseEntity<String> updateAvatar(
     @CookieValue(name = "jwt", required = false) String jwt,
-    @RequestParam("avatar") String avatar) { // Modifica da "avatar" a "avatarPath"
+    @RequestParam("avatar") String avatar) { 
     try {
         // Verifica il token JWT
         if (jwt == null || jwt.isEmpty()) {
@@ -869,7 +869,6 @@ public class Controller {
     @PostMapping("/updateBiography")
     public ResponseEntity<String> updateBiography(
         @CookieValue(name = "jwt", required = false) String jwt,
-        //@RequestParam("userId") Integer userId,
         @RequestParam("biography") String biography) {
     try {
         // Verifica il token JWT
@@ -930,7 +929,7 @@ public class Controller {
         for (Map<String, Object> friend : friends) {
             Map<String, String> friendData = new HashMap<>();
             friendData.put("nickname", friend.get("nickname").toString());
-            friendData.put("avatar", friend.get("avatar").toString()); // Recuperato dalla tabella students
+            friendData.put("avatar", friend.get("avatar").toString()); // Recuperato da students
             friendData.put("friendId", friend.get("friendId").toString());
             friendListResponse.add(friendData);
         }
@@ -959,11 +958,11 @@ public class Controller {
             byte[] decodedBytes = Base64.getDecoder().decode(parts[1]);
             String payload = new String(decodedBytes, StandardCharsets.UTF_8);
 
-            // Usa una libreria come Jackson per convertire il JSON in una mappa
+           
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> payloadMap = objectMapper.readValue(payload, Map.class);
 
-            // Assumi che il payload contenga una chiave "userId"
+            // payload contiene una chiave "userId"
             if (payloadMap.containsKey("userId")) {
                 return Integer.parseInt(payloadMap.get("userId").toString());
             }
@@ -1122,7 +1121,7 @@ public class Controller {
             user.setName(name);
             user.setSurname(surname);
             user.setNickname(nickname);
-            userRepository.save(user); // Salva le modifiche nel database
+            userRepository.save(user); 
 
             return ResponseEntity.ok("User information updated successfully!");
         } catch (Exception e) {

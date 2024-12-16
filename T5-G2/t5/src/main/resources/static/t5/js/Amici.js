@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const addFriendButton = document.getElementById("addFriendButton");
     const searchFriendButton = document.getElementById("searchFriendButton");
 
-    // Aggiungi un controllo per vedere se addFriendButton esiste
+
     if (!addFriendButton) {
         console.error("addFriendButton non trovato!");
         return;
@@ -32,10 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
                 if (data.length === 0) {
                     errorMessage.textContent = "Non hai ancora degli amici. Aggiungine uno!";
-                    return; // Solo per interrompere qui
+                    return; 
                 }
     
-                friendsContainer.innerHTML = ""; // Ripulisce il contenitore
+                friendsContainer.innerHTML = ""; 
                 data.forEach(friend => {
                     const friendItem = document.createElement("div");
                     friendItem.className = "friend-item list-group-item d-flex align-items-center";
