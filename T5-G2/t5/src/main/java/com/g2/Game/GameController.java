@@ -16,6 +16,7 @@
  */
 package com.g2.Game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,6 +54,7 @@ public class GameController {
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
 
+    @SuppressWarnings("unused")
     @Autowired
     private AchievementService achievementService;
 
@@ -91,15 +93,17 @@ public class GameController {
      *  Prendo da t1 la classe UT, poi fornisco al T7 tutto ciò di cui ha bisogno per fare una compilazione
      *  infine controllo che tutto sia andato a buon fine e fornisco i dati 
      */
-    private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
+
+    /*MODIFICA passo allo UserData il codice della classe sottoTest per evitare 3 volte la chiamata a handle */
+    private Map<String, String> GetUserData(String underTestClassCode, String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
         try {
             //Prendo underTestClassCode dal task T1
-            String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest",
-                    underTestClassNameNoJava);
+            //String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest",
+                   // underTestClassNameNoJava);
 
             logger.info("[GAMECONTROLLER] GetUserData - underTestClassCode: {}", underTestClassCode);
 
-            //Chiato T7 per valutare coverage e userscore
+            //Chiamo T7 per valutare coverage, /*MODIFICA */ numero di metodi privati coperti, e userscore
             String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage",
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode);
 
@@ -107,6 +111,7 @@ public class GameController {
             JSONObject responseObj = new JSONObject(response_T7);
             // Restituisce null se "coverage" non esiste
             String xml_string = responseObj.optString("coverage", null);
+            logger.info("[GAMECONTROLLER] xml_string {}",xml_string);
             String outCompile = responseObj.optString("outCompile", null);
 
             if (xml_string == null || xml_string.isEmpty()) {
@@ -123,6 +128,55 @@ public class GameController {
             return return_data;
         } catch (JSONException e) {
             logger.error("[GAMECONTROLLER] GetUserData: Errore nella lettura del JSON", e);
+            return null;
+        }
+    }
+
+    // ***** MODIFICA ***** Funzione che compila la classe del robot e restituisce la copertura
+    /*MODIFICA passo allo UserData il codice della classe sottoTest per evitare 3 volte la chiamata a handle */
+    private Map<String, String> GetRobotData(String underTestClassCode, String path, String underTestClassNameNoJava, String underTestClassName, String robotType) {
+        try {
+            //Prendo underTestClassCode dal task T1
+
+            logger.info("[GAMECONTROLLER] PATH {}",path);
+            //String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest",
+                   // underTestClassNameNoJava);
+
+            logger.info("[GAMECONTROLLER] GetUserData - underTestClassCode: {}", underTestClassCode);
+
+            String response = "";
+            // Se i test sono generati da Randoop, la coverage è richiesta al T7
+            logger.info("[GETROBOTDATA] {}", robotType);
+            if ("Randoop".equals(robotType)){
+                response = (String) serviceManager.handleRequest("T7", "RobotCoverage",
+                path, underTestClassName, underTestClassCode, robotType);
+            } else if ("EvoSuite".equals(robotType)){ // altrimenti al T10 per EvoSuite
+                response = (String) serviceManager.handleRequest("T10", "RobotEvoSuiteCoverage",
+                path, underTestClassName, underTestClassCode, robotType);
+            }   else {
+                response = null;
+            }
+
+            //Leggo la risposta da T7
+            JSONObject responseObj = new JSONObject(response);
+            // Restituisce null se "coverage" non esiste
+            String xml_string = responseObj.optString("coverage", null);
+            String outCompile = responseObj.optString("outCompile", null);
+
+            if (xml_string == null || xml_string.isEmpty()) {
+                logger.error("[GAMECONTROLLER] GetRobotData: Valore 'coverage' vuoto/non valido.");
+            }
+
+            if (outCompile == null || outCompile.isEmpty()) {
+                logger.error("[GAMECONTROLLER] GetRobotData: Valore 'outCompile' vuoto/non valido.");
+            }
+
+            Map<String, String> return_data = new HashMap<>();
+            return_data.put("coverage", xml_string);
+            return_data.put("outCompile", outCompile);
+            return return_data;
+        } catch (JSONException e) {
+            logger.error("[GAMECONTROLLER] GetRobotData: Errore nella lettura del JSON", e);
             return null;
         }
     }
@@ -147,6 +201,7 @@ public class GameController {
     /*
      *  Partendo dai dati dell'utente ottengo la sua percentuale di coverage 
      */
+    
     public int LineCoverage(String cov) {
         try {
             // Parsing del documento XML con Jsoup
@@ -259,6 +314,8 @@ public class GameController {
         return activeGames;
     }
 
+
+    // ***** MODIFICA *****
     /*
      *  Chiamata principale del game engine, l'utente ogni volta può comunicare la sua richiesta di 
      *  calcolare la coverage/compilazione, il campo isGameEnd è da utilizzato per indicare se è anche un submit e 
@@ -289,39 +346,128 @@ public class GameController {
 
             logger.info("[GAMECONTROLLER] /run: {}", testingClassName);
             logger.info("[GAMECONTROLLER] /run: {}", underTestClassName);
+            String underTestClassNameNoJava=gameLogic.getClasseUT();
 
+            /*MODIFICA calcolo qui il codice della classe da testare per evitare la stessa chiamata più volte */
+            String underTestClassCode = (String) serviceManager.handleRequest("T1", "getClassUnderTest",underTestClassNameNoJava);
+            logger.info("[GAMECONTROLLER] /run: underTestClassCode{} ",underTestClassCode);
             // Calcolo dati utente
-            Map<String, String> userData = GetUserData(testingClassName, testingClassCode, gameLogic.getClasseUT(), underTestClassName);
+            Map<String, String> userData = GetUserData(underTestClassCode, testingClassName, testingClassCode, gameLogic.getClasseUT(), underTestClassName);
+        
+            // ***** MODIFICA ***** Calcolo dati robot
+            String robotType = gameLogic.getType_robot();
+            String difficulty = gameLogic.getDifficulty();
+            logger.info("[GAMECONTROLLER] /run: robotType{} ", robotType);
+            logger.info("[GAMECONTROLLER] /run: difficulty{} ", difficulty);
+            
+            String path = definePath(robotType, difficulty, gameLogic.getClasseUT());
+            Map<String, String> robotData = GetRobotData(underTestClassCode, path, gameLogic.getClasseUT(), underTestClassName, robotType);
+
             // Calcolo punteggio robot
             int robotScore = GetRobotScore(gameLogic.getClasseUT(), gameLogic.getType_robot(), gameLogic.getDifficulty());
             logger.info("[GAMECONTROLLER] /run: RobotScore {}", robotScore);
 
             // Gestione copertura di linea e punteggio utente
-            return gestisciPartita(userData, gameLogic, isGameEnd, robotScore, playerId);
+            /*MODIFICA*/
+            /*PER IL CALCOLO DEL PUNTEGGIO GLI PASSO ANCHE LA DIFFICULTY DEL BOT */
+            return gestisciPartita(underTestClassCode, userData, robotData, difficulty, gameLogic, isGameEnd, robotScore, playerId);
         } catch (Exception e) {
             logger.error("[GAMECONTROLLER] /run: errore", e);
             return createErrorResponse("[/RUN] " + e.getMessage(), "2");
         }
     }
 
+
+    /*MODIFICA */
+    private String definePath(String robotType, String difficulty, String className) {
+        String path = null;
+        String level = null;
+     
+        // Verifica il tipo di robot
+        if ("Randoop".equals(robotType)) {
+            // Verifica il livello di difficoltà
+            if ("1".equals(difficulty)) {
+                level = "01Level";
+                path = "/VolumeT9/app/FolderTree/" + className + "/RobotTest/RandoopTest/" + level;
+            } else if ("2".equals(difficulty)) {
+                level = "02Level";
+                path = "/VolumeT9/app/FolderTree/" + className + "/RobotTest/RandoopTest/" + level;
+            } else if ("3".equals(difficulty)) {
+                level = "03Level";
+                path = "/VolumeT9/app/FolderTree/" + className + "/RobotTest/RandoopTest/" + level;
+            } else {
+                throw new IllegalArgumentException("Difficoltà non valida per Randoop: " + difficulty);
+            }
+        } else if ("EvoSuite".equals(robotType)) {
+            // Verifica il livello di difficoltà
+            if ("1".equals(difficulty)) {
+                level = "01Level";
+                path = "/VolumeT8/FolderTreeEvo/" + className + "/RobotTest/EvoSuiteTest/" + level + "/TestSourceCode/evosuite-tests";
+            } else if ("2".equals(difficulty)) {
+                level = "02Level";
+                path = "/VolumeT8/FolderTreeEvo/" + className + "/RobotTest/EvoSuiteTest/" + level + "/TestSourceCode/evosuite-tests";
+            } else if ("3".equals(difficulty)) {
+                level = "03Level";
+                path = "/VolumeT8/FolderTreeEvo/" + className + "/RobotTest/EvoSuiteTest/" + level + "/TestSourceCode/evosuite-tests";
+            } else {
+                throw new IllegalArgumentException("Difficoltà non valida per EvoSuite: " + difficulty);
+            }
+        } else {
+            throw new IllegalArgumentException("Tipo di robot non valido: " + robotType);
+        }
+     
+        return path;
+    }
     private ResponseEntity<String> eliminaGame(String playerId) {
         activeGames.remove(playerId);
         logger.info("[GAMECONTROLLER] /run: partita eliminata con successo");
         return createErrorResponse("[/RUN] partita eliminata", "5");
     }
 
-    private ResponseEntity<String> gestisciPartita(Map<String, String> userData, GameLogic gameLogic, Boolean isGameEnd, int robotScore, String playerId) {
+    // ***** MODIFICA *****
+    private ResponseEntity<String> gestisciPartita(String underTestClassCode, Map<String, String> userData, Map<String, String> robotData,String difficulty, GameLogic gameLogic, Boolean isGameEnd, int robotScore, String playerId) {
         if (userData.get("coverage") != null && !userData.get("coverage").isEmpty()) {
+
             // Calcolo copertura e punteggio utente
             // il primo è covered e il secondo è missed
             int[] lineCoverage = getCoverage(userData.get("coverage"), "LINE");
             int[] branchCoverage = getCoverage(userData.get("coverage"), "BRANCH");
             int[] instructionCoverage = getCoverage(userData.get("coverage"), "INSTRUCTION");
+/* 
+            // Calcolo copertura e punteggio robot
+            int[] lineCoverageRobot = getCoverage(robotData.get("coverage"), "LINE");
+            int[] branchCoverageRobot = getCoverage(robotData.get("coverage"), "BRANCH");
+            int[] instructionCoverageRobot = getCoverage(robotData.get("coverage"), "INSTRUCTION");
+            */
 
             int lineCov = LineCoverage(userData.get("coverage"));
-            logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);
+            /*MODIFICA FUNZIONANTE: prendo un arraylist di elementi che rappresentano le righe dei miei metodi privati*/
+            ArrayList<Integer> privateMethodLines = Punteggio_util.findPrivateMethodLines(underTestClassCode);
 
-            int userScore = gameLogic.GetScore(lineCov);
+            //MODIFICA calcolo il numero di metodi private
+            int numPrivateMethods = Punteggio_util.countPrivateMethods(underTestClassCode);
+            /*logger.info("[GAMECONTROLLER] /run: privateMethodLines {}",privateMethodLines);*/
+            int privateMethodsCovered = 0;
+            try {
+                privateMethodsCovered = Punteggio_util.countCoveredPrivateMethods(privateMethodLines, userData.get("coverage"));
+                logger.info("[GAMECONTROLLER] /run: privateMethodsCovered {}",privateMethodsCovered);
+            } catch (Exception ex) {
+                logger.info("[GAMECONTROLLER] /run: eccezione");
+            }
+            
+            logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);
+            
+            
+            //logger.info("[GAMECONTROLLER] /run: LineTot {}", gameLogic.countCodeLines(underTestClassCode));
+
+            double locPerc = ((double) lineCov) / 100;
+            logger.info("[GAMECONTROLLER] /run: locPerc {}", locPerc);
+
+
+            /*int lineCovRobot = LineCoverage(robotData.get("coverage"));
+            logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);*/
+
+            int userScore = gameLogic.GetScore(underTestClassCode,lineCov, numPrivateMethods,privateMethodsCovered,difficulty);
             logger.info("[GAMECONTROLLER] /run: user_score {}", userScore);
 
             // Salvo i dati del turno
@@ -331,21 +477,21 @@ public class GameController {
             if (isGameEnd || gameLogic.isGameEnd()) {
                 activeGames.remove(playerId);
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
+                return createResponseRun(userData, robotData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
-                return createResponseRun(userData, robotScore, userScore, false, lineCoverage, branchCoverage, instructionCoverage);
+                return createResponseRun(userData,robotData, robotScore, userScore, false, lineCoverage, branchCoverage, instructionCoverage);
             }
         } else {
             // Errori di compilazione
             logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
-            return createResponseRun(userData, 0, 0, false, null, null, null);
+            return createResponseRun(userData,robotData, 0, 0, false, null, null, null);
         }
     }
 
     //metodo di supporto per creare la risposta
     private ResponseEntity<String> createResponseRun(
-            Map<String, String> userData, int robotScore,
+            Map<String, String> userData, Map<String, String> robotData, int robotScore,
             int userScore, boolean gameOver,
             int[] lineCoverageValues,
             int[] branchCoverageValues,
@@ -365,6 +511,7 @@ public class GameController {
         JSONObject result = new JSONObject();
         result.put("outCompile", userData.get("outCompile"));
         result.put("coverage", userData.get("coverage"));
+        result.put("robotCoverage", robotData.get("coverage"));
         result.put("robotScore", robotScore);
         result.put("userScore", userScore);
         result.put("GameOver", gameOver);
@@ -405,4 +552,6 @@ public class GameController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.toString());
     }
 
+    /*MODIFICA FUNZIONANTE metodo che localizza i metodi privati della classeUT e li mette in un array di interi */
+    
 }

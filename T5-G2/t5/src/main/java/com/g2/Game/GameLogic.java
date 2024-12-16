@@ -51,7 +51,7 @@ public abstract class GameLogic {
     /*
      * PlayTurn deve aggiornalo lo stato della partita ad ogni turno, il concetto di turno può esser gestito come si vuole
      */
-    public abstract void playTurn(int userScore, int robotScore);
+    public abstract void playTurn(double userScore, int robotScore);
     /*
      * Si deve personalizzare la condizione di fine del gioco, in generale l'utente può sempre decretarne la fine tramite l'editor.
      */
@@ -60,7 +60,7 @@ public abstract class GameLogic {
      * In base alla modalità va specificato come viene calcolato lo score, solo la COV viene fornita gli altri sono 
      * parametri interni alla classe di gioco.
      */
-    public abstract int GetScore(int cov);
+    public abstract int GetScore(String underTestClassCode, int cov, int numPrivateMethods, int privateMethodsCovered, String difficulty);
 
     /*
      * Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
@@ -140,5 +140,12 @@ public abstract class GameLogic {
         this.gamemode = gamemode;
     }
 
+    
+
+   
+
+
+    
+    
 
 }
