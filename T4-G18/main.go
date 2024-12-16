@@ -7,12 +7,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 	"github.com/alarmfox/game-repository/api"
 	"github.com/alarmfox/game-repository/api/game"
 	"github.com/alarmfox/game-repository/api/leaderboard"
@@ -31,6 +25,12 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 type Configuration struct {
@@ -56,34 +56,60 @@ type Configuration struct {
 //go:embed postman
 var postmanDir embed.FS
 
-func createTrigger(db *gorm.DB) error {
-	triggerFunction := `
-        CREATE OR REPLACE FUNCTION update_player_stats() RETURNS TRIGGER AS $$
+//funzione di utility per creare funzioni utilizzate dai trigger
+func createPGTriggerFunction(name, action string) string {
+	tf := fmt.Sprintf(`
+        CREATE OR REPLACE FUNCTION %s RETURNS TRIGGER AS $$
 		BEGIN
 			IF EXISTS (SELECT 1 FROM player_stats WHERE player_id = NEW.player_id) THEN
 				UPDATE player_stats
-                SET sfida_played_games = sfida_played_games + 1,
-					sfida_won_games = sfida_won_games + CASE WHEN NEW.is_winner THEN 1 ELSE 0 END
+                SET %s
 				WHERE player_id = NEW.player_id;
 			ELSE
                 INSERT INTO player_stats (player_id, sfida_played_games, sfida_won_games)
-				VALUES (NEW.player_id, 1, CASE WHEN NEW.is_winner THEN 1 ELSE 0 END);
+				VALUES (NEW.player_id, 1, 0);
 			END IF;
 			RETURN NEW;
 		END;
-		$$ LANGUAGE plpgsql;`
+		$$ LANGUAGE plpgsql;`, name, action)
+	return tf
+}
 
-	trigger := `
-        CREATE OR REPLACE TRIGGER after_player_games_insert
-		AFTER INSERT ON player_games
+
+//funzione di utility per creare trigger
+func createPGTrigger(name, trigger, action string) string {
+	t := fmt.Sprintf(`
+        CREATE OR REPLACE TRIGGER %s 
+		AFTER %s ON player_games
 		FOR EACH ROW
-		EXECUTE FUNCTION update_player_stats();	
-	`
+		EXECUTE FUNCTION %s;	
+	`, name, trigger, action)
 
-	if err := db.Exec(triggerFunction).Error; err != nil {
+	return t
+}
+
+
+//funzioni per caricare i trigger
+func loadPGTriggers(db *gorm.DB) error {
+	insertFunctionName := "insert_player_stats()"
+	updateFunctionName := "update_player_stats()"
+
+	triggerFunctionInsert := createPGTriggerFunction(insertFunctionName, "sfida_played_games = sfida_played_games + 1")
+	triggerFunctionUpdate := createPGTriggerFunction(updateFunctionName, "sfida_won_games = sfida_won_games + CASE WHEN NEW.is_winner THEN 1 ELSE 0 END")
+
+	triggerInsert := createPGTrigger("pg_insert", "INSERT", insertFunctionName)
+	triggerUpdate := createPGTrigger("pg_update", "UPDATE of is_winner", updateFunctionName)
+
+	if err := db.Exec(triggerFunctionInsert).Error; err != nil {
 		return err
 	}
-	if err := db.Exec(trigger).Error; err != nil {
+	if err := db.Exec(triggerFunctionUpdate).Error; err != nil {
+		return err
+	}
+	if err := db.Exec(triggerInsert).Error; err != nil {
+		return err
+	}
+	if err := db.Exec(triggerUpdate).Error; err != nil {
 		return err
 	}
 	return nil
@@ -147,7 +173,7 @@ func run(ctx context.Context, c Configuration) error {
 		return err
 	}
 
-	if err = createTrigger(db); err != nil {
+	if err = loadPGTriggers(db); err != nil {
 		return err
 	}
 
@@ -167,7 +193,7 @@ func run(ctx context.Context, c Configuration) error {
 	// 	}
 	// }
 	// log.Printf("took %v", time.Since(tm))
-	//	End TEST DB
+	//End TEST DB
 
 	if err := os.Mkdir(c.DataDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {
 		return fmt.Errorf("cannot create data directory: %w", err)
