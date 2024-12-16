@@ -28,6 +28,7 @@
 import com.groom.manvsclass.model.Achievement; 
  import com.groom.manvsclass.model.Statistic;
 import com.groom.manvsclass.model.Team;
+import com.groom.manvsclass.model.VictoryConditionType;
 import com.groom.manvsclass.model.interaction; 
  import com.groom.manvsclass.model.Scalata; 
  
@@ -699,5 +700,11 @@ public ResponseEntity<String> deleteChallenge(
         return challengeService.getAllChallenges(jwt);
     }
 
+    // Route per ottenere la victoryConditionType
+    @GetMapping("/victoryConditionTypes")
+    @ResponseBody
+    public ResponseEntity<VictoryConditionType[]> getVictoryConditionTypes() {
+        return ResponseEntity.ok(VictoryConditionType.values());
+    }
 
  }
