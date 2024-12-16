@@ -175,6 +175,7 @@
             <a href="#add-challenge" onclick="showSection('add-challenge');">Crea Challenge</a>
             <a href="#list-challenges" onclick="showSection('list-challenges');">Lista Challenges</a>
             <a href="#challenge-details" onclick="showSection('challenge-details');">Dettagli Challenge</a>
+            <a href="#challenge-delete" onclick="showSection('challenge-delete');">Cancella Challenge</a>
         </nav>
     </div>
 
@@ -202,12 +203,7 @@
                 <label for="endDate">Data Fine:</label>
                 <input type="date" id="endDate" name="endDate" required>
                 
-                <label for="status">Tipo di stato: </label>
-                <select id="status">
-                    <option value="In Attesa">In Attesa</option>
-                    <option value="In Corso">In Corso</option>
-                    <option value="Completata">Completata</option>
-                </select>
+    
                 <label for="challengeType">Tipo di challenge: </label>
                 <select id="victoryConditionType">
                     <option value="GAMES_PLAYED">GAMES_PLAYED</option>
@@ -231,7 +227,7 @@
                             <th>ID Team</th>
                             <th>Data Inizio</th>
                             <th>Data Fine</th>
-                            <th>victory Condition</th>
+                            <th>Stato</th>
                         </tr>
                     </thead>
                     <tbody id="challengeListBody">
@@ -244,10 +240,27 @@
         <!-- Sezione Dettagli Challenge -->
         <div id="challenge-details" class="section">
             <h2>Dettagli Challenge</h2>
-            <select id="challengeSelect">
+            <select id="challengeSelectDetails">
                 <!-- Opzioni generate dinamicamente -->
             </select>
         </div>
+
+         <!-- Sezione Cancella challenge -->
+         <div id="challenge-delete" class="section hidden">
+            <h2>Cancella una challenge</h2>
+            <form id="delete-challenge-form">
+                <label for="challengeSelect">Seleziona Challenge:</label>
+                <select id="challengeSelect">
+                    <!-- Opzioni challenge generate dinamicamente -->
+                </select>
+        
+                <button id="delete-challenge-btn" class="btn danger">Cancella Challenge</button>
+            </form>
+        </div>
+        
+
+
+
     </div>
 
     <script src="/t1/js/gestione_challenges.js"></script>

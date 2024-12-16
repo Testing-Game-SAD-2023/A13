@@ -219,13 +219,23 @@ public boolean isChallengeCompleted(Challenge challenge, int playerId, String jw
                 .append("<td>").append(challenge.getTeamId()).append("</td>")
                 .append("<td>").append(challenge.getStartDate()).append("</td>")
                 .append("<td>").append(challenge.getEndDate()).append("</td>")
-                .append("<td>").append(challenge.getVictoryCondition()).append("</td>")
+                .append("<td>").append(challenge.getStatus()).append("</td>")
                 .append("</tr>");
         }
         return ResponseEntity.ok(htmlBuilder.toString());
     }
 
-
+    public ResponseEntity<List<Challenge>> getAllChallenges(String jwt) {
+        // Verifica la validità del token JWT
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Token non valido, restituisce 401 Unauthorized
+        }
+    
+        // Recupera tutte le challenge dal repository e restituisce 200 OK con la lista
+        return ResponseEntity.ok(challengeRepository.findAll());
+    }
+    
+    
 
 
     

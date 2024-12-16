@@ -609,12 +609,15 @@ import org.springframework.web.bind.annotation.RequestParam;
         /**
      * Elimina una challenge.
      */
-    @DeleteMapping("/challenges/ChallengesByName")
-    public ResponseEntity<String> deleteChallenge(
-            @PathVariable String challengeName,
-            @CookieValue(name = "jwt", required = false) String jwt) {
-        return challengeService.deleteChallenge(challengeName, jwt);
-    }
+    @PostMapping("/challenges_ChallengesByName")
+@ResponseBody
+public ResponseEntity<String> deleteChallenge(
+        @RequestBody Map<String, String> payload,
+        @CookieValue(name = "jwt", required = false) String jwt) {
+    String challengeName = payload.get("challengeName");
+    return challengeService.deleteChallenge(challengeName, jwt);
+}
+
 
         /**
      * Recupera le partite associate a un giocatore specifico.
@@ -675,6 +678,11 @@ import org.springframework.web.bind.annotation.RequestParam;
         return challengeService.getAllChallengesAsHtml(token);
     }
 
+    @GetMapping("/challenges_view")
+    @ResponseBody
+    public ResponseEntity<List<Challenge>> getAllChallenges(@CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.getAllChallenges(jwt);
+    }
 
 
  }

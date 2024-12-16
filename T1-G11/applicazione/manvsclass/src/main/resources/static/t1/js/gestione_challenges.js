@@ -2,6 +2,9 @@
 const challengeListBody = document.getElementById('challengeListBody');
 const challengeForm = document.getElementById('challengeForm');
 const teamSelect = document.getElementById('teamSelect'); // Select della sezione "Dettagli Team"
+const challenge_del = document.getElementById('challengeSelect');
+const challenge_det = document.getElementById('challengeSelectDetails');
+
 let datiTeam = []; // Variabile per salvare i dati dei team
 
 // Gestione delle sezioni della pagina
@@ -49,10 +52,26 @@ function listHtml(){
     });
 }
 
+function controlloStato(){
+    const currentDate = new Date(); // Data attuale
+
+    // Converte la data inserita in formato stringa in un oggetto Date
+    const startDateInput = new Date(document.getElementById('startDate').value);
+
+    // Determina lo stato del challenge
+    let status;
+    if (startDateInput > currentDate) {
+        status = 'in attesa'; // La data di inizio è futura
+    } else if (startDateInput.toDateString() === currentDate.toDateString()) {
+        status = 'in corso'; // La data di inizio è uguale a quella attuale
+    }
+    return status;
+}
 
 challengeForm.addEventListener('submit', function (event) {
 
     event.preventDefault();
+    const currentDate=dataFormattata();
     const challengeData = {
         challengeName: document.getElementById('challengeName').value,
         description: document.getElementById('description').value,
@@ -60,7 +79,7 @@ challengeForm.addEventListener('submit', function (event) {
         creatorId: document.getElementById('creatorId').value, // Assumendo che ci sia un campo per l'ID del creatore
         startDate: document.getElementById('startDate').value,
         endDate: document.getElementById('endDate').value,
-        status: document.getElementById('status').value,
+        status: controlloStato(),
         victoryConditionType: document.getElementById('victoryConditionType').value,
         victoryCondition: document.getElementById('victoryCondition').value
     };
@@ -120,14 +139,17 @@ function fetchTeams(teamSelect) {
             });
 }
 
-
-function controlData() {
+function dataFormattata(){
     const today = new Date();
     // Formatta la data in modo che sia compatibile con l'input di tipo date
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0'); // I mesi partono da 0
     const dd = String(today.getDate()).padStart(2, '0');
-    const formattedToday = `${yyyy}-${mm}-${dd}`;
+    return formattedToday = `${yyyy}-${mm}-${dd}`;
+}
+
+function controlData() {
+    const formattedToday=dataFormattata();
 
     // Imposta la data minima per startDate
     const startDateInput = document.getElementById('startDate');
@@ -147,6 +169,72 @@ function controlData() {
 }
 
 
+document.getElementById('delete-challenge-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const challengeName = document.getElementById('challengeSelect').value;
+
+    if (!challengeName) {
+        alert('Seleziona una challenge!');
+        return;
+    }
+
+    fetch('/challenges_ChallengesByName', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${document.cookie.split('jwt=')[1]}`
+        },
+        body: JSON.stringify({ challengeName })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
+        }
+        return response.text();
+    })
+    .then(message => {
+        alert("Challenge cancellata! Ricarico...");
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Errore durante la rimozione della challenge:', error);
+        alert('Errore durante la rimozione della challenge: ' + error.message);
+    });
+});
+
+
+function populateChallengeSelect(selectId) {
+    fetch('/challenges_view', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
+        .then(challenges => {
+            // Trova la select con l'ID passato come parametro
+            if (!selectId) {
+                console.error(`Elemento con ID '${selectId}' non trovato.`);
+                return;
+            }
+            selectId.innerHTML = ''; // Resetta le opzioni esistenti
+            challenges.forEach(challenge => {
+                const option = document.createElement('option');
+                option.value = challenge.challengeName; // Usa il nome della challenge come valore
+                option.textContent = challenge.challengeName; // Usa il nome della challenge come etichetta
+                selectId.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Errore durante il recupero delle challenge:', error);
+            alert('Errore durante il caricamento delle challenge.');
+        });
+}
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -162,4 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showSection('list-challenges')
     listHtml();
     fetchTeams(teamSelect);
+    populateChallengeSelect(challenge_det);
+    populateChallengeSelect(challenge_del);
+
 });
