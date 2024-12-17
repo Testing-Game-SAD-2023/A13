@@ -220,6 +220,11 @@
         <!-- Sezione Lista Challenges -->
         <div id="list-challenges" class="section active">
             <h2>Lista Challenges</h2>
+
+            <!-- Barra di ricerca per filtrare le Challenge -->
+            <label for="challegeSearch">Filtra per Nome Challenge:</label>
+            <input type="text" id="challengeSearch" placeholder="Inserisci il nome della Challenge..." oninput="filterChallenge()">
+            
             <div class="table-container">
                 <table>
                     <thead>

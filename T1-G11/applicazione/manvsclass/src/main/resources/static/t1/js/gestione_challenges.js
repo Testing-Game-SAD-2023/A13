@@ -87,6 +87,19 @@ function displayChallengeDetails(challengeName) {
     }
 }
 
+function filterChallenge() {
+    const searchInput = document.getElementById('challengeSearch').value.toLowerCase(); // Testo inserito dall'utente
+    const rows = document.querySelectorAll('#challengeListBody tr'); // Tutte le righe della tabella
+
+    rows.forEach(row => {
+        const challengeName = row.querySelector('td:first-child').textContent.toLowerCase(); // Prima colonna: Nome Challenge
+        if (challengeName.includes(searchInput)) {
+            row.style.display = ''; // Mostra la riga se il testo corrisponde
+        } else {
+            row.style.display = 'none'; // Nasconde la riga se non corrisponde
+        }
+    });
+}
 
 
 
@@ -346,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
     controlData();
     showSection('list-challenges')
     listHtml();
+    filterChallenge();
     fetchTeams(teamSelect);
     populateChallengeSelect(challenge_det);
     populateChallengeSelect(challenge_del);
