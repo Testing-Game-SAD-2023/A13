@@ -1,4 +1,4 @@
-<!--MODIFICA (12/02/2024): Restyling pagina-->
+<!--REFACTORING TOTALE (5/12/2024): Restyling pagina-->
 <!DOCTYPE html>
 <html lang="en" >
 <head>
@@ -13,54 +13,64 @@
 <title>Home Admin</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-<link rel='stylesheet' href="/t1/css/home_adm.css">
+<link rel="stylesheet" href="/t1/css/home_adm.css">
+<!--Nuovo font per gli elementi-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900" class="rel">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 </head>
-<body>
+<body> 
 
 <!--Codice HTML qui-->
 <br>
 <br>
-<h1>Home Admin</h1>
-<h2>Welcome</h2>
-<h3>Choose an option</h3>
+<header>
+    <h1>Pannello Amministratore</h1>
+  </header>
+   <!-- Freccia per riaprire la barra laterale (inizialmente nascosta) -->
+<!-- Codice per il pulsante di toggle -->
+	<button class="sidebar-toggle">
+		☰  <!-- Icona hamburger per la barra laterale -->
+	</button>
 
-<nav class="top-right open">
-	<a href = "/achievements" class="disc l1">
-		<div>Achievements</div>
-	</a>
-	<a href = "/player" class="disc l2">
-		<div>Players</div>
-	</a>
-	<a href = "class" class="disc l3">
-		<div>Classes</div>
-	</a>
+   <!-- Barra laterale -->
+   <div class="sidebar">
+    <p id="username-display"></p><!--Inserimento dinamico del nome dell'admin-->
+    <a href="info">Info</a><!--Rimando alla pagina di info admin-->
+    <a href="/player">Players</a><!--Rimando alla pagina dei players-->
+	<button onclick="Invita()">Invita</button><!--Rimando alla pagina di invito-->
 
-  <!--MODIFICA (15/02/2024): Aggiunta pagina di informazioni riguardo tutti gli amministratori del sistema-->
-	<a href = "info" class="disc l4">
-		<div>Info</div>
-	</a>
-  <!--FINE MODIFICA (15/02/2024)-->
+    <!-- Logout in basso a sinistra -->
+  <button class="logout" onclick="Disconnessione()">Logout</button>
+	</div>
 
-	<a class="disc l5 toggle">
-		Menu
-	</a>
-</nav>
 
-<!--MODIFICA (12/02/2024): Aggiunta opzione di disconnessione-->
-<div class="logout-admin-container">
-  <button type="button" onclick="Disconnessione()">Logout</button>
-</div>
+	<!-- Contenitore dei bottoni -->
+	<div class="dashboard-container">
+		<div class="button-team" id="button-generics"><!--Folder di rimando alla pagina di gestione teams-->
+		<div class="icon">📊</div>
+		<h3>Teams</h3>
+		<p>Gestisci i team</p>
+		</div>
+		<div class="button-scalata" id="button-generics"><!--Rimando alla pagina scalata -->
+		<div class="icon">🚀</div>
+		<h3>Scalata</h3>
+		<p>Crescita continua</p>
+		</div>
+		<div class="button-achievement" id="button-generics"><!--Rimando alla pagina di visualizzazione achievement-->
+			<div class="icon">🏆</div>
+			<h3>Achievement</h3>
+			<p>Assegna gli Achievement</p>
+		</div>
+		
+		<div class="button-class" id="button-generics"><!--Rimando alla pagina delle classi-->
+			<div class="icon">🤖</div>
+			<h3>Classes</h3>
+			<p>Crea le tue classi di test</p>
+		</div>
+		
+	</div>
 
-<!--MODIFICA (16/02/2024) : Aggiunta bottone di invito-->
-<div class="invita-admin-container">
-  <button type="button" onclick="Invita()">Invita</button>
-</div>
-
-<!--MODIFICA (17/04/2024) : Aggiunta bottone "Scalata"-->
-<div class="scalata-button-container">
-  <button type="button" onclick="Scalata()"><i class="fas fa-stairs"></i></button>
-</div>
 
 <!--FINE MODIFICA-->
 </body>

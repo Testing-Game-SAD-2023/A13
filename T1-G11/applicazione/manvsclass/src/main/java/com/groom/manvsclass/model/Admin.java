@@ -19,9 +19,9 @@ public class Admin {
 	//MODIFICA (16/02/2024) : Aggiunta campo invitationToken
 	private String invitationToken;
 
-	//FINE MODIFICA (15/02/2024	)
-
+	//FINE MODIFICA (15/02/2024)
 	private String password;
+
 	
 	public Admin(String nome, String cognome, String username, String email,String password) {
 		this.nome = nome;
@@ -77,6 +77,7 @@ public class Admin {
     public void setInvitationToken(String invitationToken) {
         this.invitationToken = invitationToken;
     }
+
 	
 	@Override
     public String toString() {
