@@ -37,19 +37,19 @@ function getCurrentDate() {
 }
 
 function fetchTeams(teamSelect) {
-        fetch('/team_view', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${document.cookie.split('jwt=')[1]}` // Estrae il JWT dal cookie
+    fetch('/team_view', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${document.cookie.split('jwt=')[1]}` // Estrae il JWT dal cookie
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore nel recupero della lista dei team.');
             }
+            return response.json();
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore nel recupero della lista dei team.');
-                }
-                return response.json();
-            })
-            .then(data => {
+        .then(data => {
                 datiTeam = data; // Salva i dati dei team
                 teamSelect.innerHTML = '<option value="">Seleziona un team</option>'; // Pulisce la select e aggiunge un'opzione iniziale
                 data.forEach(team => {
@@ -57,12 +57,12 @@ function fetchTeams(teamSelect) {
                     option.value = team.teamName; // Usa il nome del team come valore
                     option.textContent = team.teamName; // Mostra il nome del team
                     teamSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                alert('Si è verificato un errore durante il caricamento della lista dei team.');
             });
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            alert('Si è verificato un errore durante il caricamento della lista dei team.');
+        });
 }
 // Funzione per mostrare i dettagli del team selezionato
 function displayTeamDetails(teamName) {
