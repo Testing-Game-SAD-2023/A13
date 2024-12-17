@@ -315,7 +315,12 @@ th {
 
         <div id="list-team" class="section active">
             <h2>Lista Team</h2>
-            <div class="table-container">
+
+                <!-- Barra di ricerca per filtrare i team -->
+        <label for="teamSearch">Filtra per Nome Team:</label>
+        <input type="text" id="teamSearch" placeholder="Inserisci il nome del team..." oninput="filterTeams()">
+
+        <div class="table-container">
                 <table>
                     <thead>
                         <tr>

@@ -108,6 +108,24 @@ function listHtml(){
             alert('Si è verificato un errore durante il caricamento dei team.');
         });
 }
+
+function filterTeams() {
+    const searchInput = document.getElementById('teamSearch').value.toLowerCase(); // Testo inserito dall'utente
+    const rows = document.querySelectorAll('#teamListBody tr'); // Tutte le righe della tabella
+
+    rows.forEach(row => {
+        const teamName = row.querySelector('td:first-child').textContent.toLowerCase(); // Prima colonna: Nome Team
+        if (teamName.includes(searchInput)) {
+            row.style.display = ''; // Mostra la riga se il testo corrisponde
+        } else {
+            row.style.display = 'none'; // Nasconde la riga se non corrisponde
+        }
+    });
+}
+
+
+
+
 // Funzione per aggiornare la lista degli studenti selezionati
 function toggleSelectedStudentsList() {
     // Ottieni la lista corrente degli studenti selezionati
@@ -357,7 +375,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     // Imposta la sezione di default (ad esempio, "lista team")
     showSection('list-team');
-    listHtml();      
+    listHtml();
+    filterTeams();      
     fetchTeams(teamSelect);
     fetchTeams(teamMembro);
     studentiLista(addMembroSelect);
