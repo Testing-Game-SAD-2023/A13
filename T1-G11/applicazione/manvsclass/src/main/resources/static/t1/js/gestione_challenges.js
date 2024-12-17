@@ -264,7 +264,7 @@ function populateChallengeSelect(selectId) {
                 console.error(`Elemento con ID '${selectId}' non trovato.`);
                 return;
             }
-            selectId.innerHTML = ''; // Resetta le opzioni esistenti
+            selectId.innerHTML = '<option value="">Seleziona una challenge</option>';
             challenges.forEach(challenge => {
                 const option = document.createElement('option');
                 option.value = challenge.challengeName; // Usa il nome della challenge come valore
@@ -279,7 +279,6 @@ function populateChallengeSelect(selectId) {
 }
 
     function getVictoryConditionType() {
-
     // Chiamata API per ottenere i valori dell'enum
     fetch('/victoryConditionTypes') // Endpoint creato nel Controller
         .then(response => {
@@ -308,7 +307,6 @@ function populateChallengeSelect(selectId) {
 };
 
  function updateVictoryConditionInput() {
-        
         
         const selectedValue = selectCondType.value;
 
