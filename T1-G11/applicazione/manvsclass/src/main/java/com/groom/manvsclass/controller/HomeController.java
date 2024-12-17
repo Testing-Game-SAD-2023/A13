@@ -626,44 +626,45 @@ import org.springframework.web.bind.annotation.RequestParam;
      * Elimina una challenge.
      */
     @PostMapping("/challenges_ChallengesByName")
-@ResponseBody
-public ResponseEntity<String> deleteChallenge(
+    @ResponseBody
+    public ResponseEntity<String> deleteChallenge(
         @RequestBody Map<String, String> payload,
         @CookieValue(name = "jwt", required = false) String jwt) {
     String challengeName = payload.get("challengeName");
     return challengeService.deleteChallenge(challengeName, jwt);
-}
+    }
 
 
         /**
      * Recupera le partite associate a un giocatore specifico.
      */
-    @GetMapping("/players/player_Id/games")
+    @GetMapping("/players/{playerName}/games")
     public ResponseEntity<?> getPlayerGames(
-            @PathVariable int playerId,
-            @CookieValue(name = "jwt", required = false) String jwt) {
-        return challengeService.getPlayerGames(playerId, jwt);
+        @PathVariable String playerName,
+        @CookieValue(name = "jwt", required = false) String jwt) {
+    return challengeService.getPlayerGames(playerName, jwt);
     }
+
 
         /**
      * Verifica se una challenge è completata.
      */
-    @GetMapping("/challenges/{challenge_Id}/{player_Id}")
+    @GetMapping("/challenges/{challenge_Id}/{playerName}")
     public ResponseEntity<Boolean> isChallengeCompleted(
             @PathVariable(value = "challenge_Id") String challengeId,
-            @PathVariable(value = "player_Id") int playerId,
+            @PathVariable(value = "playerName") String playerName,
             @CookieValue(name = "jwt", required = false) String jwt) {
         try {
             // Recupera la challenge dal servizio
             Challenge challenge = challengeService.getChallengeByName(challengeId, jwt).getBody();
-            
+
             // Se la challenge non esiste, restituisci un 404
             if (challenge == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
             }
 
-            // Verifica il completamento della challenge
-            boolean completed = challengeService.isChallengeCompleted(challenge, playerId, jwt);
+            // Verifica il completamento della challenge usando il nome del giocatore
+            boolean completed = challengeService.isChallengeCompletedByMember(challenge, playerName, jwt);
             return ResponseEntity.ok(completed);
         } catch (IllegalArgumentException e) {
             // Risposta per victoryCondition non valida
@@ -677,6 +678,7 @@ public ResponseEntity<String> deleteChallenge(
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
     }
+
 
 
 
@@ -707,4 +709,4 @@ public ResponseEntity<String> deleteChallenge(
         return ResponseEntity.ok(VictoryConditionType.values());
     }
 
- }
+}
