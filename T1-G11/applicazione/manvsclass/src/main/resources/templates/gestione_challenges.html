@@ -205,11 +205,13 @@
                 
     
                 <label for="challengeType">Tipo di challenge: </label>
-                <select id="victoryConditionType">
+                <select id="victoryConditionType" onchange="updateVictoryConditionInput()">
                     <!-- Le opzioni saranno aggiunte dinamicamente -->
                 </select>
                 <label for="victoryCondition">Condizione di vittoria:</label>
-                <textarea id="victoryCondition" name="victoryCondition" rows="3" required></textarea>
+                <div id="victoryConditionContainer">
+                    <textarea id="victoryCondition" name="victoryCondition" rows="3" required></textarea>
+                </div>
                 
                 <button type="submit" id="CreaChallenge">Aggiungi Challenge</button>
             </form>

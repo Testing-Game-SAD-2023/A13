@@ -6,6 +6,8 @@ const challenge_del = document.getElementById('challengeSelect');
 const challenge_det = document.getElementById('challengeSelectDetails');
 const challengeSel=document.getElementById('challengeSelectDetails');
 const ChallengeDetails=document.createElement('Div');
+const selectCondType = document.getElementById('victoryConditionType');
+const container = document.getElementById('victoryConditionContainer');
 let datiTeam = []; // Variabile per salvare i dati dei team
 let datiChallenge = [];
 document.getElementById('ChallengeDetailsContainer').appendChild(ChallengeDetails); // Aggiunge il contenitore nella sezione
@@ -277,7 +279,6 @@ function populateChallengeSelect(selectId) {
 }
 
     function getVictoryConditionType() {
-    const victoryConditionTypeSelect = document.getElementById("victoryConditionType");
 
     // Chiamata API per ottenere i valori dell'enum
     fetch('/victoryConditionTypes') // Endpoint creato nel Controller
@@ -293,13 +294,46 @@ function populateChallengeSelect(selectId) {
                 const option = document.createElement("option");
                 option.value = type;        // Imposta il valore dell'opzione
                 option.textContent = type;  // Imposta il testo visibile
-                victoryConditionTypeSelect.appendChild(option);
+                selectCondType.appendChild(option);
             });
+            const defaultValue = 'GAMES_PLAYED'; // Puoi modificare il valore predefinito
+            selectCondType.value = defaultValue;
+
+            // Aggiorna l'input in base al valore selezionato
+            updateVictoryConditionInput();
         })
         .catch(error => {
             console.error("Errore nel caricamento delle opzioni:", error);
         });
 };
+
+ function updateVictoryConditionInput() {
+        
+        
+        const selectedValue = selectCondType.value;
+
+        // Svuota il contenitore prima di aggiungere nuovi input
+        container.innerHTML = '';
+
+        if (selectedValue === 'GAMES_PLAYED') {
+            // Mostra un input numerico
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.id = 'victoryCondition';
+            input.name = 'victoryCondition';
+            input.required = true;
+            input.min = 0; // Valore minimo
+            container.appendChild(input);
+        } else {
+            // Mostra un input testuale
+            const textarea = document.createElement('textarea');
+            textarea.id = 'victoryCondition';
+            textarea.name = 'victoryCondition';
+            textarea.rows = 3;
+            textarea.required = true;
+            container.appendChild(textarea);
+        }
+    }
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -318,4 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
     populateChallengeSelect(challenge_det);
     populateChallengeSelect(challenge_del);
     getVictoryConditionType();
+    selectCondType.value = 'GAMES_PLAYED';
+    updateVictoryConditionInput();
+
 });
