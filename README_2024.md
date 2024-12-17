@@ -13,10 +13,10 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente
-- Francesco Prisco: francesco.prisco4@studenti.unina.it
-- Christian Morelli: chr.morelli@studenti.unina.it
-- Antonio Tufo: ant.tufo@studenti.unina.it
-- Matteo Cuomo: matte.cuomo@studenti.unina.it
+- Francesco Prisco [https://github.com/Azzerot]: francesco.prisco4@studenti.unina.it
+- Christian Morelli [https://github.com/KriG33K]: chr.morelli@studenti.unina.it
+- Antonio Tufo [https://github.com/antoniotufo01]: ant.tufo@studenti.unina.it
+- Matteo Cuomo [https://github.com/MatteoCuomo]: matte.cuomo@studenti.unina.it
 
 # Funzionalità dell'Applicazione
 L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi.
