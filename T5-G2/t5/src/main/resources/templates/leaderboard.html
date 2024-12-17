@@ -22,7 +22,7 @@
             </form>
             <form th:action="@{/leaderboard}" method="get">
                 <div>
-                    <label for="sortOrder" th:text="#{SortOrder}"></label>
+                    <label for="sortOrder" th:text="#{ordinamento}"></label>
                     <select id="sortOrder" name="sortOrder" class="form-control" onchange="this.form.submit()">
                         <option value="totalMatches" th:selected="${sortOrder == 'totalMatches'}" th:text="#{totalMatches}"></option>
                         <option value="wins" th:selected="${sortOrder == 'wins'}"th:text="#{wins}"></option>

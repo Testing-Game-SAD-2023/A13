@@ -288,9 +288,7 @@ public class GameController {
             if (eliminaGame) {
                 return eliminaGame(playerId);
             }
-            logger.info("CHIAMATA A LEADERBOARDSERVICE");
-
-            // Preparazione dati per i task
+            
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
             String underTestClassName = gameLogic.getClasseUT() + ".java";
 
@@ -340,7 +338,7 @@ public class GameController {
             if (isGameEnd || gameLogic.isGameEnd()) {
                 activeGames.remove(playerId);
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                if (userScore > robotScore) {
+                if (userScore >= robotScore) {
                     isWinner = true;
                 }
                 leaderboardService.updateLeaderboard(mail, userScore, isWinner);
