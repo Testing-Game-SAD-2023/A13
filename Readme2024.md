@@ -176,8 +176,8 @@ Moduli aggiunti al Task 56:
   - **GuiController.java**: Aggiunta la logica per gestire la pagina /leaderboard.
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
-
+- **[Documentazione Completa (PDF)](Documentazione_2024/Documentazione_T56_R2_B1/)**
+- **[File Sorgente dei Diagrammi](Documentazione_2024/Documentazione_T56_R2_B1/vpp/)**
 
 
 
