@@ -6,10 +6,26 @@ services:
     restart: always
     expose:
       - 8080
+    depends_on:
+      - mongodb
+    # Entry point customizzato per includere un ritardo di 5 secondi prima dell'avvio dell'app,
+    # necessario per assicurare che MongoDB sia completamente avviato prima di iniziare l'app.
+    entrypoint: /bin/sh -c "sleep 5 && java -jar /app/t5-0.0.1-SNAPSHOT.jar"
     networks:
       - global-network
     volumes:
-      - /logs:/logs  # Monta la directory dei log sul tuo host
+      - /logs:/logs
+
+  mongodb:
+    image: mongo:latest
+    container_name: db-leaderboard
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./initLeaderboard.js:/docker-entrypoint-initdb.d/initLeaderboard.js
+    networks:
+      - global-network
 
 networks:
   global-network:

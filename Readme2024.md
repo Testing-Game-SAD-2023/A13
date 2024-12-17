@@ -148,11 +148,36 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-TBD
+Il nostro team ha lavorato al **Task R2**, che prevedeva l'introduzione di nuove funzionalità e modifiche strutturali al microservizio **T5** del progetto ENACTEST.
+Le modifiche sono incentrate sulla gestione e visualizzazione di una classfica in cui sono visualizzati i giocatori e posizionati sulla base di punteggio totale, partite totali e partite vinte, con la possibilità di scegliere in base a quale di questi criteri si voglia ordinare.  
+Il nostro lavoro si è focalizzato su due aspetti principali,l'aggiunta di un nuovo database sul microservizio T5, per gestire i giocatori e la classifica, e l'implementazione dei servizi associati alla classifica introdotta.
+
+Moduli aggiunti al Task 56:
+
+- **Model**
+  - **Player.java**: Rappresenta i dati del giocatore.
+  - **Classifica.java**: Rappresenta i dati della classifica.
+  
+- **Repository**
+  - **LeaderboardRepository**: La repository che interagisce con il Database MongoDB.
+
+- **Services**
+  - **LeaderboardService.java**: Gestisce la logica di business per le leaderboard.
+  - **LeaderboardDatabaseService.java**: Gestisce la logica di interfacciamento tra la pagina e il database.
+  - **PlayerComparator.java**: Definisce i criteri di ordinamento delle classifiche.
+
+- **Templates**
+  - **leaderboard.html**: Interfaccia per visualizzare la classifica.
+
+- **Game**
+  - **GameController.java**: Aggiunta la funzione di salvataggio di una partita nel nostro database.
+
+- **T5**
+  - **GuiController.java**: Aggiunta la logica per gestire la pagina /leaderboard.
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
-
+- **[Documentazione Completa (PDF)](Documentazione_2024/Documentazione_T56_R2_B1/)**
+- **[File Sorgente dei Diagrammi](Documentazione_2024/Documentazione_T56_R2_B1/vpp/)**
 
 
 

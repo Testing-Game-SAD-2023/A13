@@ -336,6 +336,10 @@ function getFormData() {
 	formData.append("username", localStorage.getItem("username"));
 	formData.append("testClassId", className);
 	formData.append("eliminaGame", false);
+	//AGGIUNTO IL 13/12/2024 MOMENTO IN CUI L'USERNAME EQUIVALE ALLA MAIL E NON É SALVATO NEL LOCALSTORAGE
+	//QUESTO APPEND É STATO EFFETTUATO IN MODO CHE NEL MOMENTO IN CUI VIENE EFFETTUATA LA CHIAMATA REST A: /RUN SIA POSSIBILE SALVARE LA MAIL DEL RICHIEDENTE NEL DATABASE DI T5
+	formData.append("mail", username);
+
 	return formData;
 }
 

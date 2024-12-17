@@ -58,7 +58,12 @@ import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
+import com.g2.Model.Classifica;
+import com.g2.Model.Player;
+import com.g2.Service.LeaderboardService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -67,11 +72,16 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 public class GuiController {
 
+    private static final Logger logger = LoggerFactory.getLogger(PageBuilder.class);
+
     private final ServiceManager serviceManager;
     private final LocaleResolver localeResolver;
 
     @Autowired
     private AchievementService achievementService;
+    @Autowired
+    private LeaderboardService leaderboardService;
+
 
     @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
@@ -211,15 +221,45 @@ public class GuiController {
         return editor.handlePageRequest();
     }
     
+
+    //CAMBIAMENTI A /LEADERBOARD EFFETTUATI IL 13/12/2025
     @GetMapping("/leaderboard")
-    public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+    public String leaderboard(@RequestParam(value = "search", required = false) String search,
+                            @RequestParam(value = "sortOrder", defaultValue = "totalScore") String sortOrder,
+                            @RequestParam(value = "page", defaultValue = "0") int page,
+                            @RequestParam(value = "size", defaultValue = "30") int size,
+                            Model model, 
+                            @CookieValue(name = "jwt", required = false) String jwt) {
+        // instanzio il modello base della pagina
+        
+        logger.info("[GUICONTROLLER]: ricevuta richiesta pagina classifica");
         PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
-        ServiceObjectComponent lista_utenti = new ServiceObjectComponent(serviceManager, "listaPlayers",
-                "T23", "GetUsers");
-        leaderboard.setObjectComponents(lista_utenti);
         leaderboard.SetAuth(jwt);
+        // instanzio l'oggetto leaderboard che fará da wrapper dei dati della richiesta e che contiene i dati dei giocatori nella classifica
+        Classifica lead = new Classifica (search, sortOrder, page, size);
+        // mi assicuro che l'utente che richiede la pagina sia autenticato
+        
+        
+
+        // Carica i dati riguardanti tutti i giocatori
+        lead.setPlayers(leaderboardService.getPlayerData(lead));
+        // listaplayers utilizza il casting a List<Map<String, Object>> perché la
+        List<Map<String, Object>> playersList = leaderboardService.getPlayersInPage(lead,search);
+
+        // Passo i parametri della leaderboard al front end   
+        logger.info("[GUICONTROLLER]: Caricamento dei dati della classifica nella pagina");
+        model.addAttribute("listaPlayers", playersList);
+        model.addAttribute("search", lead.getSearch());
+        model.addAttribute("sortOrder", lead.getSortOrder());
+        model.addAttribute("page", lead.getPage());
+        model.addAttribute("size", lead.getSize());
+        model.addAttribute("totalPages", lead.getTotalPages());
+        logger.info("[GUICONTROLLER]: restituzione pagina classifica");
+
         return leaderboard.handlePageRequest();
     }
+
+
 
     @GetMapping("/edit_profile")
     public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
