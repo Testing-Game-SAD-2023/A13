@@ -247,18 +247,30 @@ public class ChallengeService {
     
         // Recupera tutti i Challenge dal repository
         List<Challenge> challenges = challengeRepository.findAll();
-    
+        String statusStyle;
+
         // Genera il contenuto HTML per il corpo della tabella
         StringBuilder htmlBuilder = new StringBuilder();
         for (Challenge challenge : challenges) {
+            if ("scaduta".equalsIgnoreCase(challenge.getStatus())) {
+                statusStyle = " style='color:red;'";
+            } else if ("in corso".equalsIgnoreCase(challenge.getStatus())) {
+                statusStyle = " style='color:green;'";
+            } else if ("in attesa".equalsIgnoreCase(challenge.getStatus())) {
+                statusStyle = " style='color:#DAA520;'";
+            } else {
+                statusStyle = ""; // Nessuno stile di default
+            }
+
             htmlBuilder.append("<tr>")
-                .append("<td>").append(challenge.getChallengeName()).append("</td>")
-                .append("<td>").append(challenge.getDescription()).append("</td>")
-                .append("<td>").append(challenge.getTeamId()).append("</td>")
-                .append("<td>").append(challenge.getStartDate()).append("</td>")
-                .append("<td>").append(challenge.getEndDate()).append("</td>")
-                .append("<td>").append(challenge.getStatus()).append("</td>")
-                .append("</tr>");
+            .append("<td>").append(challenge.getChallengeName()).append("</td>")
+            .append("<td>").append(challenge.getDescription()).append("</td>")
+            .append("<td>").append(challenge.getTeamId()).append("</td>")
+            .append("<td>").append(challenge.getStartDate()).append("</td>")
+            .append("<td>").append(challenge.getEndDate()).append("</td>")
+            .append("<td").append(statusStyle).append(">")
+            .append(challenge.getStatus()).append("</td>")
+            .append("</tr>");
         }
         return ResponseEntity.ok(htmlBuilder.toString());
     }
@@ -276,27 +288,39 @@ public class ChallengeService {
     
     public ResponseEntity<String> updateExpiredChallenges(String jwt) {
         // Verifica la validità del token JWT
-        if (!jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                 .body("Accesso non autorizzato: JWT non valido o assente.");
+    if (!jwtService.isJwtValid(jwt)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                             .body("Accesso non autorizzato: JWT non valido o assente.");
+    }
+
+    LocalDate today = LocalDate.now(); // Ottieni la data di oggi
+
+    // Recupera tutte le challenge dal database
+    List<Challenge> challenges = challengeRepository.findAll();
+
+    int countExpired = 0; // Contatore delle challenge scadute aggiornate
+    int countInProgress = 0; // Contatore delle challenge in corso aggiornate
+
+    for (Challenge challenge : challenges) {
+        LocalDate endDate = LocalDate.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate startDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
+
+        // Controlla se la challenge è scaduta
+        if (today.isAfter(endDate) && !"scaduta".equals(challenge.getStatus())) {
+            challenge.setStatus("scaduta");
+            challengeRepository.save(challenge);
+            countExpired++;
+        } 
+        // Controlla se la challenge inizia oggi
+        if (today.isEqual(startDate) && "in attesa".equals(challenge.getStatus())) {
+            challenge.setStatus("in corso");
+            challengeRepository.save(challenge);
+            countInProgress++;
         }
-    
-        LocalDate today = LocalDate.now(); // Ottieni la data di oggi
-    
-        // Recupera tutte le challenge dal database
-        List<Challenge> challenges = challengeRepository.findAll();
-    
-        int count = 0; // Contatore delle challenge aggiornate
-        for (Challenge challenge : challenges) {
-            LocalDate endDate = LocalDate.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE);
-            if (today.isAfter(endDate) && !"Scaduta".equals(challenge.getStatus())) {
-                challenge.setStatus("Scaduta");
-                challengeRepository.save(challenge);
-                count++;
-            }
-        }
-    
-        return ResponseEntity.ok("Aggiornate " + count + " challenge a stato 'Scaduta'.");
+    }
+
+    return ResponseEntity.ok("Aggiornate " + countExpired + " challenge a stato 'Scaduta' e "
+                             + countInProgress + " challenge a stato 'in corso'.");
     }
     
 
