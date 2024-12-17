@@ -522,53 +522,6 @@ import org.springframework.web.bind.annotation.RequestParam;
         public ModelAndView showTeamManagementPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         return adminService.showTeamManagementPage(request, jwt);
     }
-    // Fine Modifica 29/11/2024
-
-    /* 
-    @GetMapping("/team/{teamName}")
-    @ResponseBody
-    public ResponseEntity<Team> getTeamByName(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.getTeamByName(teamName, jwt);
-    }
-
-   
-
-    @PutMapping("/team/{teamName}")
-    @ResponseBody
-    public ResponseEntity<Team> updateTeam(@PathVariable String teamName, @RequestBody Team updatedTeam, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.updateTeam(teamName, updatedTeam, jwt);
-    }
-
-    @DeleteMapping("/team/{teamName}")
-    @ResponseBody
-    public ResponseEntity<String> deleteTeam(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.deleteTeam(teamName, jwt);
-    }
-
-    @GetMapping("/teams/leader/{leaderId}")
-    @ResponseBody
-    public ResponseEntity<List<Team>> findTeamsByLeader(@PathVariable String leaderId, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.findTeamsByLeader(leaderId, jwt);
-    }
-    
-     
-
-    @GetMapping("/team/view/{teamName}")
-    public ModelAndView showTeamDetails(@PathVariable String teamName, @CookieValue(name = "jwt", required = false) String jwt) {
-    return teamService.showTeamDetails(teamName, jwt);
-    }
-    
-   /*  @GetMapping("/team/view")
-    public ModelAndView showTeamPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-    return teamService.showTeamPage(request, jwt);
-    } */
-
-    /* @PostMapping("/team/create")
-    public ModelAndView createTeam(@RequestBody Team team, HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.createTeamAndReturnUpdatedList(team, request, jwt);
-    } */
-
-    
 
    
     
@@ -580,7 +533,7 @@ import org.springframework.web.bind.annotation.RequestParam;
     //aggiunta rotte challenges (10/12/2024)
     
     /**
-     * Crea una nuova challenge.
+     * Crea una nuova challenge. 
      */
     @PostMapping("/challenge_create")
     public ResponseEntity<Challenge> createChallenge(
@@ -591,8 +544,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
         /**
-     * Recupera una challenge tramite il nome.
-     */
+     * Recupera una challenge tramite il nome. NON USATA
+     
     @GetMapping("/challenges/ChallengesByName")
     public ResponseEntity<Challenge> getChallengeByName(
             @PathVariable String challengeName,
@@ -601,8 +554,8 @@ import org.springframework.web.bind.annotation.RequestParam;
     }
 
     /**
-     * Recupera tutte le challenge associate a un team.
-     */
+     * Recupera tutte le challenge associate a un team. //non usata
+      
     @GetMapping("/team/team_Id")
     public ResponseEntity<List<Challenge>> getChallengesByTeam(
             @PathVariable String teamId,
@@ -611,8 +564,8 @@ import org.springframework.web.bind.annotation.RequestParam;
     }
 
         /**
-     * Aggiorna lo stato di una challenge.
-     */
+     * Aggiorna lo stato di una challenge. //non usata
+     
     @PutMapping("/challenges/ChallengesByName/status")
     public ResponseEntity<String> updateChallengeStatus(
             @PathVariable String challengeName,
@@ -620,10 +573,10 @@ import org.springframework.web.bind.annotation.RequestParam;
             @CookieValue(name = "jwt", required = false) String jwt) {
         return challengeService.updateChallengeStatus(challengeName, newStatus, jwt);
     }
-
+    */
 
         /**
-     * Elimina una challenge.
+     * Elimina una challenge. //USATA
      */
     @PostMapping("/challenges_ChallengesByName")
     @ResponseBody
@@ -636,7 +589,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
         /**
-     * Recupera le partite associate a un giocatore specifico.
+     * Recupera le partite associate a un giocatore specifico. //Per ora non usata
      */
     @GetMapping("/players/{playerName}/games")
     public ResponseEntity<?> getPlayerGames(
@@ -647,7 +600,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
         /**
-     * Verifica se una challenge è completata.
+     * Verifica se una challenge è completata. // Per ora non usata
      */
     @GetMapping("/challenges/{challenge_Id}/{playerName}")
     public ResponseEntity<Boolean> isChallengeCompleted(
@@ -682,7 +635,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
-    //route bottone della challenge
+    //route bottone della challenge //USATA
     @GetMapping("/challenges_show")
     @ResponseBody
     public ModelAndView showChallengeManagementPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -690,19 +643,19 @@ import org.springframework.web.bind.annotation.RequestParam;
     }   
 
 
-    @GetMapping("/challenge_view")
+    @GetMapping("/challenge_view") //USATA
     public ResponseEntity<String> getAllChallengesAsHtml(@RequestHeader("Authorization") String jwt) {
         String token = jwt.replace("Bearer ", ""); // Rimuove il prefisso Bearer
         return challengeService.getAllChallengesAsHtml(token);
     }
 
-    @GetMapping("/challenges_view")
+    @GetMapping("/challenges_view") //USATA
     @ResponseBody
     public ResponseEntity<List<Challenge>> getAllChallenges(@CookieValue(name = "jwt", required = false) String jwt) {
         return challengeService.getAllChallenges(jwt);
     }
 
-    // Route per ottenere la victoryConditionType
+    // Route per ottenere la victoryConditionType //USATA
     @GetMapping("/victoryConditionTypes")
     @ResponseBody
     public ResponseEntity<VictoryConditionType[]> getVictoryConditionTypes() {
