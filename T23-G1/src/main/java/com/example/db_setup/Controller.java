@@ -136,7 +136,7 @@ public class Controller {
         // NOME -- Modifica (02/02/2024) : Possibilità di inserire più nomi separati da uno spazio
         // regex_old = "[a-zA-Z]+" , regex_new = "[a-zA-Z]+(\s[a-zA-Z]+)*"
         //if ((name.length() >= 2) && (name.length() <= 30) && (Pattern.matches("[a-zA-Z]+", name))) {
-        if ((name.length() >= 2) && (name.length() <= 30) && (Pattern.matches("[a-zA-Z]+(\\s[a-zA-Z]+)*", name))) {
+        if ((name.length() >= 2) && (name.length() <= 30) && (Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", name))) {
             n.setName(name);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Name not valid");
@@ -146,7 +146,7 @@ public class Controller {
         //                                  da un apostrofo
         // regex_old = "[a-zA-Z]+" , regex_new = [a-zA-Z]+(\s?[a-zA-Z]+\'?)*
         //if ((name.length() >= 2) && (surname.length() <= 30) && (Pattern.matches("[a-zA-Z]+", surname))) {
-        if ((name.length() >= 2) && (surname.length() <= 30) && (Pattern.matches("[a-zA-Z]+(\\s?[a-zA-Z]+\\'?)*", surname))) {
+        if ((surname.length() >= 2) && (surname.length() <= 30) && (Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", surname))) {
             n.setSurname(surname);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Surname not valid");
@@ -746,11 +746,11 @@ public class Controller {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password vecchia sbagliata.");
             }
 
-            if(!(user.name.equals(user_updated.name)) && (!(user_updated.name.length() >= 2) || !(user_updated.name.length() <= 30) || !(Pattern.matches("[a-zA-Z]+(\\s[a-zA-Z]+)*", user_updated.name)))){
+            if(!(user.name.equals(user_updated.name)) && (!(user_updated.name.length() >= 2) || !(user_updated.name.length() <= 30) || !(Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", user_updated.name)))){
                 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome nuovo non valido");
 
-            }else if(!(user.surname.equals(user_updated.surname)) && (!(user_updated.surname.length() >= 2) || !(user_updated.surname.length() <= 30) || !(Pattern.matches("[a-zA-Z]+(\\s?[a-zA-Z]+\\'?)*", user_updated.surname)))){
+            }else if(!(user.surname.equals(user_updated.surname)) && (!(user_updated.surname.length() >= 2) || !(user_updated.surname.length() <= 30) || !(Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", user_updated.surname)))){
                 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cognome nuovo non valido");
 
@@ -767,7 +767,7 @@ public class Controller {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email nuova non valida");
                 }
 
-            }else if(!(user.biography.equals(user_updated.biography)) && (!(user_updated.biography.length() >= 2) || !(user_updated.biography.length() <= 130) || !(Pattern.matches("[a-zA-Z]+(\\s?[a-zA-Z]+\\'?)*", user_updated.biography)))){
+            }else if(!(user.biography.equals(user_updated.biography)) && (!(user_updated.biography.length() >= 2) || !(user_updated.biography.length() <= 130) || !(Pattern.matches("^[A-Za-zÀ-ÿ0-9\\s.,'!?-]+$", user_updated.biography)))){
                 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Biografia nuova non valido");
 
