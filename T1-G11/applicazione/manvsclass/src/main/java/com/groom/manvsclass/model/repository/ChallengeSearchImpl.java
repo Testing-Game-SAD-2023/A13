@@ -41,21 +41,6 @@ public class ChallengeSearchImpl {
         return challenge;
     }
 
-    public List<Challenge> findChallengesByTeam(String teamId) {
-        MongoDatabase database = client.getDatabase("manvsclass");
-        MongoCollection<Document> collection = database.getCollection("Challenge");
-
-        Bson filter = Filters.eq("teamId", teamId); // Filtra per teamId
-        List<Challenge> challenges = new ArrayList<>();
-
-        collection.find(filter).forEach(doc -> {
-            Challenge challenge = converter.read(Challenge.class, doc);
-            challenge.setVictoryConditionType(VictoryConditionType.valueOf(doc.getString("victoryConditionType")));
-            challenge.setVictoryCondition(doc.getString("victoryCondition"));
-            challenges.add(challenge);
-        });
-        return challenges;
-    }
 
     public void addChallenge(Challenge challenge) {
         MongoDatabase database = client.getDatabase("manvsclass");
@@ -74,16 +59,7 @@ public class ChallengeSearchImpl {
 
         collection.insertOne(challengeDoc);
     }
-
-    public void updateChallengeStatus(String challengeName, String newStatus) {
-        MongoDatabase database = client.getDatabase("manvsclass");
-        MongoCollection<Document> collection = database.getCollection("Challenge");
-
-        Bson filter = Filters.eq("challengeName", challengeName); // Filtra per nome della challenge
-        Bson update = new Document("$set", new Document("status", newStatus));
-
-        collection.updateOne(filter, update);
-    }
+    
 
     public void deleteChallenge(String challengeName) {
         MongoDatabase database = client.getDatabase("manvsclass");

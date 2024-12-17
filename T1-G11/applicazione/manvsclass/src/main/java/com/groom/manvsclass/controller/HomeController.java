@@ -543,37 +543,6 @@ import org.springframework.web.bind.annotation.RequestParam;
     }
 
 
-        /**
-     * Recupera una challenge tramite il nome. NON USATA
-     
-    @GetMapping("/challenges/ChallengesByName")
-    public ResponseEntity<Challenge> getChallengeByName(
-            @PathVariable String challengeName,
-            @CookieValue(name = "jwt", required = false) String jwt) {
-        return challengeService.getChallengeByName(challengeName, jwt);
-    }
-
-    /**
-     * Recupera tutte le challenge associate a un team. //non usata
-      
-    @GetMapping("/team/team_Id")
-    public ResponseEntity<List<Challenge>> getChallengesByTeam(
-            @PathVariable String teamId,
-            @CookieValue(name = "jwt", required = false) String jwt) {
-        return challengeService.getChallengesByTeam(teamId, jwt);
-    }
-
-        /**
-     * Aggiorna lo stato di una challenge. //non usata
-     
-    @PutMapping("/challenges/ChallengesByName/status")
-    public ResponseEntity<String> updateChallengeStatus(
-            @PathVariable String challengeName,
-            @RequestBody String newStatus,
-            @CookieValue(name = "jwt", required = false) String jwt) {
-        return challengeService.updateChallengeStatus(challengeName, newStatus, jwt);
-    }
-    */
 
         /**
      * Elimina una challenge. //USATA
@@ -672,6 +641,6 @@ import org.springframework.web.bind.annotation.RequestParam;
         return challengeService.updateExpiredChallenges(jwt);
     }
 
-
+    //FINE MODIFICA: Rotte per la gestione delle Challenge 16/12/2024
     
 }

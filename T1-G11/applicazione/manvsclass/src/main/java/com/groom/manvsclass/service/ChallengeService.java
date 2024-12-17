@@ -62,7 +62,7 @@ public class ChallengeService {
     }
 
     /**
-     * Recupera una challenge tramite il nome.
+     * Recupera una challenge tramite il nome. //per ora non usata
      */
     public ResponseEntity<Challenge> getChallengeByName(String challengeName, String jwt) {
         if (!jwtService.isJwtValid(jwt)) {
@@ -77,33 +77,7 @@ public class ChallengeService {
         }
     }
 
-    /**
-     * Recupera tutte le challenge associate a un team.
-     */
-    public ResponseEntity<List<Challenge>> getChallengesByTeam(String teamId, String jwt) {
-        if (!jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
 
-        List<Challenge> challenges = searchRepository.findChallengesByTeam(teamId);
-        return ResponseEntity.ok(challenges);
-    }
-
-    /**
-     * Aggiorna lo stato di una challenge.
-     */
-    public ResponseEntity<String> updateChallengeStatus(String challengeName, String newStatus, String jwt) {
-        if (!jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-
-        try {
-            searchRepository.updateChallengeStatus(challengeName, newStatus);
-            return ResponseEntity.ok("Challenge status updated successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating challenge status: " + e.getMessage());
-        }
-    }
 
     /**
      * Elimina una challenge.
@@ -122,7 +96,7 @@ public class ChallengeService {
     }
 
      /**
-     * Recupera le partite associate a un giocatore specifico.
+     * Recupera le partite associate a un giocatore specifico. //per ora non usata
      */
     public ResponseEntity<List<Map<String, Object>>> getPlayerGames(String playerName, String jwt) {
         try {
@@ -164,7 +138,7 @@ public class ChallengeService {
     
 
     /**
- * Verifica il completamento della challenge.
+ * Verifica il completamento della challenge. //per ora non usata
  */
     public boolean isChallengeCompletedByMember(Challenge challenge, String playerName, String jwt) {
         LocalDate challengeStartDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
@@ -206,7 +180,7 @@ public class ChallengeService {
 
 
     /**
-     * Verifica se tutti i membri del team hanno completato la challenge.
+     * Verifica se tutti i membri del team hanno completato la challenge. //per ora non usata
      */
     public boolean isChallengeCompletedByTeam(Challenge challenge, Team team, String jwt) {
         List<String> teamMembers = team.getMember(); // Recupera la lista dei nomi dei membri (String)
