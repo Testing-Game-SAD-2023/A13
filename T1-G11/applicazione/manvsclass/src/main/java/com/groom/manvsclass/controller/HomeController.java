@@ -521,7 +521,7 @@ import org.springframework.web.bind.annotation.RequestParam;
         @ResponseBody
         public ModelAndView showTeamManagementPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         return adminService.showTeamManagementPage(request, jwt);
-        }
+    }
     // Fine Modifica 29/11/2024
 
     /* 

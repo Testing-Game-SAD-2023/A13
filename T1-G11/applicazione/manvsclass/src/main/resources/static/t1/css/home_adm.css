@@ -375,7 +375,7 @@ nav.top-right {
   height: 120px;
   border-radius: 50%;
   background-color: rgb(60, 120, 216); /* Colore iniziale */
-  color: white;
+  color: black;
   font-size: 18px;
   border: none;
   cursor: pointer;
@@ -409,7 +409,7 @@ nav.top-right {
   height: 120px;
   border-radius: 50%;
   background-color: rgb(255, 136, 0); /* Colore iniziale per Challenges */
-  color: white;
+  color: black;
   font-size: 18px;
   border: none;
   cursor: pointer;
