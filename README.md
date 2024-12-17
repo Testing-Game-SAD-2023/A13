@@ -26,6 +26,7 @@ Matteo D'Avino [M63001724], Luigi Fienga [M63001733] e Andrea Roscigno [M6300177
 3. Modulo T5:
     - Aggiunto il model:
       - `Ratio.java`
+      - `Mission.java`
     - Cambi nei test:
       - `T23ServiceTest.java` [Model di User]
     - Modifiche a:

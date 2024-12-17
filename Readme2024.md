@@ -3,7 +3,7 @@ Web App a supporto dell'insegnamento del Software Testing attraverso la Gamifica
 
 Questa Web App è descritta anche nel seguente articolo scientifico: 
 Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
-"Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://doi.org/10.1145/3678869.368568
+"Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://dl.acm.org/doi/10.1145/3678869.3685686
 
 # Descrizione 
 The Testing_Challenge_Game Web Application was developed with the contributions of the students of the University of Naples Federico II in Italy, enrolled in the Software Architecture Design (SAD) courses held by the Prof. Anna Rita Fasolino in the academic years 2022-23, 2023-24, 2024-25.
@@ -42,13 +42,13 @@ e)	elenco giocatori seguiti
 ![alt text](https://github.com/luigifienga18/A13/blob/main/Registrazioni/SchermataFinale.jpg?raw=true)
 [Risultato finale della pagina Profilo]
 
-[![Watch the video]](https://youtu.be/LjDLXT4wjgE)
+[![Watch the video](https://img.youtube.com/vi/LjDLXT4wjgE/0.jpg)](https://youtu.be/LjDLXT4wjgE)
 [Visualizzazzione pagina Profilo e Profilo Seguito]
 
-[![Watch the video]](https://youtu.be/JncBBGXr6l4)
+[![Watch the video](https://img.youtube.com/vi/JncBBGXr6l4/0.jpg)](https://youtu.be/JncBBGXr6l4)
 [Modifica Informazioni personali]
 
-[![Watch the video]](https://youtu.be/Rk1ngC514kg)
+[![Watch the video](https://img.youtube.com/vi/Rk1ngC514kg/0.jpg)](https://youtu.be/Rk1ngC514kg)
 [Ricerca Player; AddFollow e RmFollow]
 
 
@@ -169,9 +169,9 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-Le modifiche principale sono state fatte all'interno dei servizi T5 e T23, per quest'ultimo è stato modificato opportunatamente il model degli Utenti garantendo l'implementazione della logica degli Utenti, ovviamente sono state predisposte delle route API per: modificare le informazioni del profilo, aggiungere una persona all'interno della propria lista dei seguiti, rimuovere una persona dalla propria lista dei seguiti e ricercare una persona per seguirla o togliere il seguito.
-Per quanto riguarda il modulo T5, sono stati aggiunti i servizi di UserService e modificato il già presente T23Service per garantire la corretta comunicazione con il microservizio precedente alle route precedentemente nominate. Sono state create inoltre delle route nel modulo T5 per garantire la corretta comunicazione tra il web browser, il T5 e il T23 rispetto alle possibili interazioni dette prima, in questo modo il Web Browser comunica esclusivamente con il T5, poi quest'ultimo con il T23.
-Ovviamente è stato modificato anche il front-end predisponendo correttamente la pagina del profilo in sezioni ad hoc e creando dei file .js opportuni per implementare la parte dinamica e quindi di interazione con il modulo T5.
+Le modifiche principale sono state fatte all'interno dei servizi T5 e T23, per quest'ultimo è stato modificato opportunatamente il model degli Utenti garantendo l'implementazione della logica dei Follow, ovviamente sono state predisposte delle route API per: modificare le informazioni del profilo, aggiungere una persona all'interno della propria lista dei seguiti, rimuovere una persona dalla propria lista dei seguiti e ricercare una persona per seguirla o togliere il seguito.
+Per quanto riguarda il modulo T5, sono stati aggiunti i servizi di UserService e modificato il già presente T23Service per garantire la corretta comunicazione con il microservizio precedente alle route precedentemente nominate. Sono state create inoltre delle route nel modulo T5 per gestire la corretta comunicazione tra il web browser, il T5 e il T23 rispetto alle possibili interazioni dette prima, in questo modo il Web Browser comunica esclusivamente con il T5 senza "ovviarlo" come era in precedenza.
+Ovviamente è stato modificato anche il front-end predisponendo correttamente la pagina del profilo in sezioni ad hoc e creando un file .js opportuno per implementare la parte dinamica e quindi di interazione con il modulo T5.
 
 
 Per maggiori dettagli delle modifiche effettuate consultare il documento [Readme.md](https://github.com/luigifienga18/A13/blob/main/README.md)
