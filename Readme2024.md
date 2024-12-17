@@ -148,6 +148,7 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
+
 Il nostro gruppo si è occupato di implementare una funzionalità che permettesse di visualizzare le classifiche globali del gioco e cercare altri giocatori attraverso la loro email. Il componente UI dedicato alle classifiche è accessibile tramite il pulsante "Classifiche" aggiunto alla navbar e ne permette la visualizzazione paginata selezionando una modalità di gioco ed una statistica di merito (ad esempio, le partite vinte da un utente).
 
 Complessivamente, sono stati modificati i microservizi T23, T4 e T5.
@@ -168,6 +169,7 @@ Nel microservizio T23:
 # Documentazione di Progetto della Versione corrente
 
 La documentazione e i diagrammi sono stati inseriti nella cartella: ![Documentazione/Documentazione_2024/](Documentazione/Documentazione_2024/)
+
 
 
 
