@@ -335,6 +335,8 @@ function populateChallengeSelect(selectId) {
             input.required = true;
             input.min = 0; // Valore minimo
             container.appendChild(input);
+            input.placeholder = "Inserisci SOLO il numero di partite da completare";
+
         } else {
             // Mostra un input testuale
             const textarea = document.createElement('textarea');
