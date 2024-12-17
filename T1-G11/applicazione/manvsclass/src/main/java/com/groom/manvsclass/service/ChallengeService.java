@@ -274,7 +274,31 @@ public class ChallengeService {
     }
     
     
-
+    public ResponseEntity<String> updateExpiredChallenges(String jwt) {
+        // Verifica la validità del token JWT
+        if (!jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                 .body("Accesso non autorizzato: JWT non valido o assente.");
+        }
+    
+        LocalDate today = LocalDate.now(); // Ottieni la data di oggi
+    
+        // Recupera tutte le challenge dal database
+        List<Challenge> challenges = challengeRepository.findAll();
+    
+        int count = 0; // Contatore delle challenge aggiornate
+        for (Challenge challenge : challenges) {
+            LocalDate endDate = LocalDate.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE);
+            if (today.isAfter(endDate) && !"Scaduta".equals(challenge.getStatus())) {
+                challenge.setStatus("Scaduta");
+                challengeRepository.save(challenge);
+                count++;
+            }
+        }
+    
+        return ResponseEntity.ok("Aggiornate " + count + " challenge a stato 'Scaduta'.");
+    }
+    
 
     
 }

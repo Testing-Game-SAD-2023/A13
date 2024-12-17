@@ -345,6 +345,33 @@ function populateChallengeSelect(selectId) {
             container.appendChild(textarea);
         }
     }
+        // Funzione per aggiornare lo stato delle challenge scadute
+    function updateExpiredChallenges() {
+        fetch('/challenges/update_expired', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${document.cookie.split('jwt=')[1]}`
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else if (response.status === 401) {
+                throw new Error('Accesso non autorizzato: JWT non valido.');
+            } else {
+                throw new Error('Errore nell\'aggiornamento dello stato delle challenge.');
+            }
+        })
+        .then(message => {
+            alert(message); // Mostra il messaggio di successo restituito dal server
+            listHtml(); // Aggiorna la lista delle challenge
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            alert('Errore: ' + error.message);
+        });
+    }
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -366,5 +393,6 @@ document.addEventListener('DOMContentLoaded', function () {
     getVictoryConditionType();
     selectCondType.value = 'GAMES_PLAYED';
     updateVictoryConditionInput();
+    
 
 });

@@ -662,4 +662,16 @@ import org.springframework.web.bind.annotation.RequestParam;
         return ResponseEntity.ok(VictoryConditionType.values());
     }
 
+        /**
+     * Endpoint per aggiornare lo stato delle challenge scadute.
+     */
+    @PostMapping("/challenges/update_expired")
+    @ResponseBody
+    public ResponseEntity<String> updateExpiredChallenges(
+            @CookieValue(name = "jwt", required = false) String jwt) {
+        return challengeService.updateExpiredChallenges(jwt);
+    }
+
+
+    
 }

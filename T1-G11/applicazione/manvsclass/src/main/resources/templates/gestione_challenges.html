@@ -222,8 +222,20 @@
             <h2>Lista Challenges</h2>
 
             <!-- Barra di ricerca per filtrare le Challenge -->
-            <label for="challegeSearch">Filtra per Nome Challenge:</label>
-            <input type="text" id="challengeSearch" placeholder="Inserisci il nome della Challenge..." oninput="filterChallenge()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="flex: 1;">
+                    <label for="challengeSearch">Filtra per Nome Challenge:</label>
+                    <input type="text" id="challengeSearch" placeholder="Inserisci il nome della Challenge..." 
+                           oninput="filterChallenge()" style="width: 70%;">
+                </div>
+                <button id="updateExpiredChallengesBtn" 
+                        onclick="updateExpiredChallenges()" 
+                        style="width: auto; padding: 10px 20px; background-color: #1abc9c; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                    Aggiorna Stato
+                </button>
+            </div>
+            
+            
             
             <div class="table-container">
                 <table>
