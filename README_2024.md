@@ -167,4 +167,4 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 
 # Documentazione di Progetto della Versione corrente
 
-La documentazione completa è presente al link seguente: ![Documentazione](Documentazione/Documentazione_SAD_Team_B14_Task_R5.pdf)
+La documentazione completa è presente al link seguente: ![Documentazione](Documentazione/DOCUMENTAZIONE_2024_TASK_R5_GRUPPO_B14/Documentazione_SAD_Team_B14_Task_R5.pdf)
