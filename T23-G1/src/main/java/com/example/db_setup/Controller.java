@@ -693,6 +693,11 @@ public class Controller {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 non esiste");
             }
 
+            // Controllo per evitare che un utente segua se stesso
+            if (follower.getID().equals(followed.getID())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Operazione non consentita");
+            }
+
             //Controlla se io provo a defolloware una persona che già non follow
             if (!(userRepository.existsFollowRelationship(follower.ID, followed.ID) > 0)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower già non segue followed");
@@ -719,7 +724,7 @@ public class Controller {
 
         if(key_search.matches(".*[a-zA-Z]+.*")){
             user = userRepository.findByEmail(key_search);
-        }else{
+        }else if(key_search.matches("^\\d+$")){
             user = userRepository.findByID(Integer.parseInt(key_search));
         }
 

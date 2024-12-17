@@ -128,7 +128,7 @@ const search = () => {
       return;
   }
 
-  if(keySearch === user.id || keySearch === user.email){
+  if( (!isNaN(keySearch) && parseInt(keySearch, 10) === user.id) || keySearch === user.email){
     alert("Non puoi cercare te stesso!");
     return;
   }
