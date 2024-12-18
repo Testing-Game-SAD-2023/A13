@@ -42,13 +42,13 @@ e)	elenco giocatori seguiti
 ![alt text](https://github.com/luigifienga18/A13/blob/main/Registrazioni/SchermataFinale.jpg?raw=true)
 [Risultato finale della pagina Profilo]
 
-[![Watch the video](https://img.youtube.com/vi/LjDLXT4wjgE/0.jpg)](https://youtu.be/LjDLXT4wjgE)
+[![Watch the video](https://img.youtube.com/vi/Jkn9nSMF0bw/0.jpg)](https://youtu.be/Jkn9nSMF0bw)
 [Visualizzazzione pagina Profilo e Profilo Seguito]
 
-[![Watch the video](https://img.youtube.com/vi/JncBBGXr6l4/0.jpg)](https://youtu.be/JncBBGXr6l4)
+[![Watch the video](https://img.youtube.com/vi/Tcby2wbMczs/0.jpg)](https://youtu.be/Tcby2wbMczs)
 [Modifica Informazioni personali]
 
-[![Watch the video](https://img.youtube.com/vi/Rk1ngC514kg/0.jpg)](https://youtu.be/Rk1ngC514kg)
+[![Watch the video](https://img.youtube.com/vi/qA8CCm6UuGg/0.jpg)](https://youtu.be/qA8CCm6UuGg)
 [Ricerca Player; AddFollow e RmFollow]
 
 
