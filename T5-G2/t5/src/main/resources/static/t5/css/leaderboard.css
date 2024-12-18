@@ -53,6 +53,11 @@
 
 /* Table */
 
+.fixed-size-table {
+    height: 535px !important;
+    overflow: auto;
+}
+
 .tableError {
     color: crimson;
     font-weight: bold;
@@ -60,11 +65,15 @@
 }
 
 .col-rank {
-    width: 10%;
+    width: 15%;
 }
 
 .col-data {
-    width: 45%;
+    width: 60%;
+}
+
+.col-value {
+    width: 25%;
 }
 
 .leaderboard-table {
@@ -72,13 +81,15 @@
     width: 100%;
 }
 
-
 /* Search */
 
 .search-box {
     max-width: 100% !important;
     margin-bottom: .125rem !important;
 }
+
+
+/* Highlight */
 
 @keyframes fadeOutHighlight {
     0% {
