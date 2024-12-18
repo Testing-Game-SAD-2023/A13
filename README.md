@@ -59,6 +59,7 @@ Matteo D'Avino [M63001724], Luigi Fienga [M63001733] e Andrea Roscigno [M6300177
         - `updateRatioVisibility`
         - `clearFilter`
       - `profile_followed.html`
+      - `main3.css`
     - Aggiunto il service `UserService.java` con i metodi:
       - `getUserbyID`
       - `isUserInFollower`
