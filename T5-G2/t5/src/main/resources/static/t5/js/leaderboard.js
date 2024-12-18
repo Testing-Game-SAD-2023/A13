@@ -229,9 +229,9 @@ function renderTable(gamemode, statistic, page) {
         const position = (page - 1) * pageSize + i + 1
 
         
-        let classTd = '';
+        let highlightAnim = '';
         if (searchedEmail === row.email) {
-            classTd = 'highlight';
+            highlightAnim = 'highlight';
         }
 
         let trophy = position;
@@ -243,9 +243,9 @@ function renderTable(gamemode, statistic, page) {
             trophy = '<img alt="3" style="height:34px;" src="/t5/Icone/3rd-place.png"/>'
 
         tr.innerHTML = `
-          <td class="align-middle text-center ${classTd}">${trophy}</td>
-          <td class="align-middle ${classTd}">${row.email}</td>
-          <td class="align-middle text-center ${classTd}">${row.statistic}</td>
+          <td class="align-middle ${highlightAnim} text-center fw-bold">${trophy}</td>
+          <td class="align-middle ${highlightAnim}">${row.email}</td>
+          <td class="align-middle ${highlightAnim} text-center">${row.statistic}</td>
         `;
         tableBody.appendChild(tr);
     });
