@@ -37,6 +37,9 @@ Matteo D'Avino [M63001724], Luigi Fienga [M63001733] e Andrea Roscigno [M6300177
       - Aggiunta le route `/profile/searchPlayer`
       - Aggiunta le route `/profile/addFollow`
       - Aggiunta le route `/profile/rmFollow`
+    - Modifiche a Controller `GameController.java`:
+      - Nel metodo `StarGame` è stato decommentato a riga 223 "gameLogic.CreateGame()";
+      - Nel metodo `gestisciPartita` è stata aggiunta la logica per aggiornare i progressi delle statistiche righe 338-341 
     - Mofiche/Aggiunte front-end:
       - `profile.html`
       - `profile.js`:
