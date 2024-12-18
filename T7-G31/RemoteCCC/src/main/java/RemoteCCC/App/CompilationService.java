@@ -90,26 +90,26 @@ public class CompilationService {
             if (compileExecuteCoverageWithMaven()) {
                 this.Coverage = readFileToString(config.getCoverageFolderPath());
                 this.Errors = false;
-                logger.info("[Compilation Service] Compilazione Terminata senza errori.");
+                logger.info("[CompilationService] Compilazione terminata senza errori.");
             } else {
                 this.Coverage = null;
                 this.Errors = true;
-                logger.info("[Compilation Service] Compilazione Terminata con errori");
+                logger.info("[CompilationService] Compilazione terminata con errori");
             }
             deleteFile(config.getUnderTestClassPath() + underTestClassName);
             deleteFile(config.getTestingClassPath() + testingClassName);
             deleteTemporaryDirectories(config.getPathCompiler());
-            logger.info("[CompilationService] File termporanei eliminati");
+            logger.info("[CompilationService] File temporanei eliminati");
         } catch (FileConcurrencyException e) {
-            logger.error("[Compilation Service] [LOCK ERROR] ", e);
+            logger.error("[CompilationService] [LOCK ERROR] ", e);
         } catch (IOException e) {
-            logger.error("[Compilation Service] [I/O ERROR] ", e);
+            logger.error("[CompilationService] [I/O ERROR] ", e);
         } catch (IllegalArgumentException e) {
-            logger.error("[Compilation Service] [ARGS ERROR] ", e);
+            logger.error("[CompilationService] [ARGS ERROR] ", e);
         } catch (RuntimeException e) {
-            logger.error("[Compilation Service] [RUNTIME ERROR] ", e);
+            logger.error("[CompilationService] [RUNTIME ERROR] ", e);
         } catch (Exception e) {
-            logger.error("[Compilation Service] [GENERIC ERROR] ", e);
+            logger.error("[CompilationService] [GENERIC ERROR] ", e);
         }
     }
 
@@ -121,19 +121,19 @@ public class CompilationService {
              *   infine per il report della cov userPath/timestamp/target/site/
          */
         createDirectoryIfNotExists(config.getPathCompiler());
-        logger.info("[Compilation Service] directory creata con successo: {}", config.getPathCompiler());
+        logger.info("[CompilationService] directory creata con successo: {}", config.getPathCompiler());
 
         copyPomFile();
-        logger.info("[Compilation Service] pom file creato con successo {}", config.getPathCompiler() + "pom.xml");
+        logger.info("[CompilationService] pom file creato con successo {}", config.getPathCompiler() + "pom.xml");
 
         createDirectoryIfNotExists(config.getTestingClassPath());
-        logger.info("[Compilation Service] directory creata con successo: {}", config.getTestingClassPath());
+        logger.info("[CompilationService] directory creata con successo: {}", config.getTestingClassPath());
 
         createDirectoryIfNotExists(config.getUnderTestClassPath());
-        logger.info("[Compilation Service] directory creata con successo: {}", config.getUnderTestClassPath());
+        logger.info("[CompilationService] directory creata con successo: {}", config.getUnderTestClassPath());
 
         createDirectoryIfNotExists(config.getCoverageFolderPath());
-        logger.info("[Compilation Service] directory creata con successo: {}", config.getCoverageFolderPath());
+        logger.info("[CompilationService] directory creata con successo: {}", config.getCoverageFolderPath());
     }
 
     protected void createDirectoryIfNotExists(String path) throws IOException {
@@ -153,7 +153,7 @@ public class CompilationService {
 
         // Controlla se il file pom.xml esiste prima di tentare di copiarlo
         if (!pomFile.exists()) {
-            throw new IOException("[Compilation Service] Il file pom.xml non esiste: " + pomFile.getAbsolutePath());
+            throw new IOException("[CompilationService] Il file pom.xml non esiste: " + pomFile.getAbsolutePath());
         } 
         /*
         *   Questa classe implementa un tipo di lock che distingue tra operazioni di lettura e scrittura, 
@@ -237,10 +237,10 @@ public class CompilationService {
             // Verifica se il processo è terminato con successo
             return (process.exitValue()) == 0;
         } catch (IOException e) {
-            logger.error("[Compilation Service] [MAVEN] {}", errorOutput);
+            logger.error("[CompilationService] [MAVEN] {}", errorOutput);
             throw new RuntimeException("[compileExecuteCoverageWithMaven] Errore di I/O durante l'esecuzione del processo Maven: " + e.getMessage(), e);
         } catch (InterruptedException e) {
-            logger.error("[Compilation Service] [MAVEN] {}", errorOutput);
+            logger.error("[CompilationService] [MAVEN] {}", errorOutput);
             Thread.currentThread().interrupt(); // Ripristina lo stato di interruzione
             throw new RuntimeException("[compileExecuteCoverageWithMaven] Processo Maven interrotto: " + e.getMessage(), e);
         } finally {

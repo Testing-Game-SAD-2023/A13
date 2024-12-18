@@ -3,6 +3,9 @@ HELP.md
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+*.log
+*.DS_Store
+
 target/
 .vpp
 .lock

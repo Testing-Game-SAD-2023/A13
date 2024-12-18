@@ -30,7 +30,6 @@ public class ScoreCalculator implements IStatisticCalculator{
 
     @Override
     public float calculate(List<Game> gamesList) {
-        //TODO: il punteggio è temporaneo
         return (float) gamesList.stream().mapToDouble(Game::getScore).sum();
     }
 

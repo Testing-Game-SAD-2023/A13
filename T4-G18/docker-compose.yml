@@ -5,6 +5,9 @@ volumes:
   appdata:
   grafdata:
   promdata:
+  Volume:
+    external: true
+
 
 services:
   app:
@@ -12,6 +15,7 @@ services:
     ports:
       - 3000:3000/tcp
     volumes:
+      - Volume:/Volume
       - appdata:/app/data
       - ./config.docker.json:/app/config.json
     depends_on:

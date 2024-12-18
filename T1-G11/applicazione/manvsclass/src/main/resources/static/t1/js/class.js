@@ -31,8 +31,14 @@ else
         .then(response => response.json())
         .then(data => {
             let classutList = document.getElementById('classut-list');
+
             let rows = '';
             data.forEach(home => {
+
+                let robotSpans = '';
+            if (home.robots && home.robots.length > 0) {
+                robotSpans = home.robots.map(robot => `<span class="badge badge-secondary">${robot.robotName}</span>`).join(' ');
+            }
 					
                 rows += `
 
@@ -44,9 +50,14 @@ else
 		<span class="badge badge-info">${home.category[0]}</span><span class="badge badge-info">${home.category[1]}</span> <span class="badge badge-info">${home.category[2]}</span> &emsp;&emsp;&emsp;&emsp;
 		<small class="date text-success">${home.difficulty}<span class="date text-muted">&emsp;&emsp;&emsp;&emsp;${home.date}</span></small>
 	</p>
+    
 	<p>
 		<small class="date text-muted">${home.description} </small>
 	</p>
+    <p>
+        <!-- Aggiunta dinamica degli span per i robot -->
+         ${robotSpans}
+    </p>
 	<p>
 		<button type="button" class="btn btn-light" onclick="window.location.href='modificaClasse?parametro=${home.name}'">
 			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil">
