@@ -102,7 +102,7 @@ func (suite *ControllerSuite) TestCreate() {
 		{
 			Name:           "T00-04-BadJson",
 			ExpectedStatus: http.StatusBadRequest,
-			Body:           `{"playersCount": 34`,
+			Body:           `{"playersCount": 34}`,
 		},
 		{
 			Name:           "T00-05-GameCreated",

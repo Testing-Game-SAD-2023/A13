@@ -15,6 +15,7 @@ var (
 	ErrInvalidParam  = errors.New("invalid param")
 )
 
+
 func MakeServiceError(err error) error {
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):

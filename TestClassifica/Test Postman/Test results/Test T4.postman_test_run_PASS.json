@@ -1,0 +1,236 @@
+{
+	"id": "9c350a13-420a-4709-bb1c-01c343926c8d",
+	"name": "Test T4",
+	"timestamp": "2024-12-11T18:25:27.476Z",
+	"collection_id": "15923526-d1fcf738-78d9-431f-a434-6f7bf7046b78",
+	"folder_id": 0,
+	"environment_id": "35010686-c33f204a-502b-4fb9-aaf5-1c9ed6d2e7f7",
+	"totalPass": 85,
+	"delay": "1000",
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2024-12-11T18:24:56.394Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "dd3c6925-9692-4598-859a-ca738e53b2d2",
+			"name": "T4subInterval",
+			"url": "http://localhost:3000/leaderboard/subInterval/sfida/partite_giocate?pageSize=10&numPages=9223372036854776000&startPage=1&playerId=",
+			"time": 2,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is as expected": true,
+				"Response has content type of application/json": true,
+				"Error schema is valid": true
+			},
+			"testPassFailCounts": {
+				"Status code is as expected": {
+					"pass": 28,
+					"fail": 0
+				},
+				"Response has content type of application/json": {
+					"pass": 28,
+					"fail": 0
+				},
+				"Response schema is valid": {
+					"pass": 2,
+					"fail": 0
+				},
+				"Page is included in the response": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Error schema is valid": {
+					"pass": 26,
+					"fail": 0
+				}
+			},
+			"times": [
+				7,
+				5,
+				2,
+				2,
+				3,
+				3,
+				3,
+				3,
+				2,
+				2,
+				3,
+				2,
+				4,
+				3,
+				3,
+				2,
+				3,
+				3,
+				2,
+				2,
+				3,
+				2,
+				3,
+				2,
+				2,
+				2,
+				2,
+				2
+			],
+			"allTests": [
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Response schema is valid": true,
+					"Page is included in the response": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Response schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				},
+				{
+					"Status code is as expected": true,
+					"Response has content type of application/json": true,
+					"Error schema is valid": true
+				}
+			]
+		}
+	],
+	"count": 28,
+	"totalTime": 77,
+	"collection": {
+		"requests": [
+			{
+				"id": "dd3c6925-9692-4598-859a-ca738e53b2d2",
+				"method": "GET"
+			}
+		]
+	}
+}

@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.g2.Model.Game;
+import com.g2.Model.LeaderboardSubInterval;
 import com.g2.Model.StatisticProgress;
-import org.springframework.core.ParameterizedTypeReference;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -45,13 +47,11 @@ public class T4Service extends BaseService {
 
         registerAction("getGames", new ServiceActionDefinition(
                 params -> getGames((int) params[0]),
-                Integer.class
-        ));
+                Integer.class));
 
         registerAction("getStatisticsProgresses", new ServiceActionDefinition(
                 params -> getStatisticsProgresses((int) params[0]),
-                Integer.class
-        ));
+                Integer.class));
 
         registerAction("updateStatisticProgress", new ServiceActionDefinition(
                 params -> updateStatisticProgress((int) params[0], (String) params[1], (float) params[2]),
@@ -90,6 +90,10 @@ public class T4Service extends BaseService {
         registerAction("GetRisultati", new ServiceActionDefinition(
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class));
+
+        registerAction("getLeaderboardSubinterval", new ServiceActionDefinition(
+                params -> getLeaderboardSubinterval((String) params[0], (String) params[1], (Integer) params[2], (Integer) params[3], (Integer) params[4], (Long) params[5]),
+                String.class, String.class, Integer.class, Integer.class, Integer.class, Long.class));
     }
 
     // usa /games per ottenere una lista di giochi
@@ -105,8 +109,9 @@ public class T4Service extends BaseService {
 
         String endpoint = "/phca/" + playerID;
 
-        List<StatisticProgress> response = callRestGET(endpoint, formData, new ParameterizedTypeReference<List<StatisticProgress>>() {
-        });
+        List<StatisticProgress> response = callRestGET(endpoint, formData,
+                new ParameterizedTypeReference<List<StatisticProgress>>() {
+                });
         return response;
     }
 
@@ -119,28 +124,32 @@ public class T4Service extends BaseService {
         String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
         return response;
     }
-    
-/*
-    private String updateStatisticProgress(int playerID, String statisticID, float progress) {
-        try {
-            MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
-            jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
-            jsonMap.put("statistic", Collections.singletonList(statisticID));
-            jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
 
-            String endpoint = "/phca/" + playerID + "/" + statisticID;
+    /*
+     * private String updateStatisticProgress(int playerID, String statisticID,
+     * float progress) {
+     * try {
+     * MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
+     * jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
+     * jsonMap.put("statistic", Collections.singletonList(statisticID));
+     * jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
+     * 
+     * String endpoint = "/phca/" + playerID + "/" + statisticID;
+     * 
+     * String response = callRestPut(endpoint, jsonMap, new HashMap<>(),
+     * String.class);
+     * 
+     * return response;
+     * } catch (Exception e) {
+     * System.out.
+     * println("[updateStatisticProgress] Errore nell'update delle statistiche: " +
+     * e.getMessage());
+     * return "errore UPDATESTATISTICPROGRESS";
+     * }
+     * }
+     */
 
-            String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
-
-            return response;
-        } catch (Exception e) {
-            System.out.println("[updateStatisticProgress] Errore nell'update delle statistiche: " + e.getMessage());
-            return "errore UPDATESTATISTICPROGRESS";
-        }
-    }
-*/
-    
-    // usa /robots per ottenere dati 
+    // usa /robots per ottenere dati
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
         formData.put("testClassId", className); // Nome della classe
@@ -237,6 +246,23 @@ public class T4Service extends BaseService {
         formData.add("creationDate", creation_date);
         String respose = callRestPost(endpoint, formData, null, String.class);
         return respose;
+    }
+
+    private LeaderboardSubInterval getLeaderboardSubinterval(String gamemode, String statistica, Integer pageSize,
+            Integer numPages, Integer startPage, Long playerId) {
+                
+        String endpoint = "leaderboard/subInterval" + "/" + gamemode + "/" + statistica;
+
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("pageSize", String.valueOf(pageSize));
+        queryParams.put("numPages", String.valueOf(numPages));
+        queryParams.put("startPage", String.valueOf(startPage));
+        queryParams.put("playerId", String.valueOf(playerId));
+        
+
+        LeaderboardSubInterval jsonResponse = callRestGET(endpoint, queryParams, LeaderboardSubInterval.class);
+
+        return jsonResponse;
     }
 
 }

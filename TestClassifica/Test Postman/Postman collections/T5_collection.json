@@ -1,0 +1,183 @@
+{
+    "collection": {
+        "info": {
+            "_postman_id": "55c7a01c-dbc3-4e3e-9978-36286dd65ce4",
+            "name": "Test T5",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+            "updatedAt": "2024-12-11T19:09:35.000Z",
+            "createdAt": "2024-12-11T15:07:53.000Z",
+            "lastUpdatedBy": "15923526",
+            "uid": "35010686-55c7a01c-dbc3-4e3e-9978-36286dd65ce4"
+        },
+        "item": [
+            {
+                "name": "T5subInterval",
+                "event": [
+                    {
+                        "listen": "test",
+                        "script": {
+                            "id": "80757df0-24d9-4a82-b309-6277d9dd0940",
+                            "exec": [
+                                "let expectedStatus = pm.iterationData.get(\"expected_status\");\r",
+                                "\r",
+                                "// Assert the response status\r",
+                                "pm.test(\"Status code is as expected\", function () {\r",
+                                "    pm.response.to.have.status(parseInt(expectedStatus));\r",
+                                "});\r",
+                                "\r",
+                                "// Assert response content type\r",
+                                "pm.test(\"Response has content type of application/json\", function () {\r",
+                                "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+                                "});\r",
+                                "\r",
+                                "// Assert content if status 200\r",
+                                "if (expectedStatus === 200) {\r",
+                                "    pm.test(\"Response schema is valid\", function () {\r",
+                                "    var schema = {\r",
+                                "        type: \"object\",\r",
+                                "        properties: {\r",
+                                "        positions: {\r",
+                                "            type: \"array\",\r",
+                                "            items: {\r",
+                                "            type: \"object\",\r",
+                                "            properties: {\r",
+                                "                    email: {\r",
+                                "                    type: \"string\"\r",
+                                "                    },\r",
+                                "                    statistic: {\r",
+                                "                    type: \"number\"\r",
+                                "                    },\r",
+                                "                    rank: {\r",
+                                "                    type: \"number\"\r",
+                                "                    }\r",
+                                "                },\r",
+                                "            },\r",
+                                "        },\r",
+                                "        totalLength: {\r",
+                                "                type: \"number\"\r",
+                                "            },\r",
+                                "        },\r",
+                                "        required: [\"positions\", \"totalLength\"],\r",
+                                "    };\r",
+                                "    pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+                                "    });\r",
+                                "    \r",
+                                "    let email = pm.request.url.query.find(param => param.key === 'email').value;\r",
+                                "    if (email.length > 0){\r",
+                                "        let flag = false\r",
+                                "        pm.test(\"Email is included in the response\", function () {\r",
+                                "            pm.response.json().positions.forEach((user,i)=>{\r",
+                                "                if (user.email == email){\r",
+                                "                    flag = true\r",
+                                "                }\r",
+                                "            })\r",
+                                "            pm.expect(flag).to.be.true;\r",
+                                "        })\r",
+                                "    }\r",
+                                "\r",
+                                "\r",
+                                " let startPage = parseInt(pm.request.url.query.find(param => param.key === 'startPage').value)\r",
+                                "    if (startPage > 0){\r",
+                                "        let flag = false\r",
+                                "        pm.test(\"Page is included in the response\", function () {\r",
+                                "        let rank = pm.response.json().positions[0].rank\r",
+                                "        let pageSize = parseInt(pm.request.url.query.find(param => param.key === 'pageSize').value)\r",
+                                "        let checkStartPage = Math.floor(rank / pageSize) + 1\r",
+                                "        if (checkStartPage === startPage){\r",
+                                "            flag = true\r",
+                                "        }\r",
+                                "        pm.expect(flag).to.be.true\r",
+                                "        })\r",
+                                "    }\r",
+                                "    \r",
+                                "\r",
+                                "\r",
+                                "} // Assert content if status 404\r",
+                                "else if (expectedStatus == 404)  { \r",
+                                "    pm.test(\"Error schema is valid\", function () {\r",
+                                "    var schema = {\r",
+                                "        type: \"object\",\r",
+                                "        properties: {\r",
+                                "        message: {\r",
+                                "                type: \"string\",\r",
+                                "            },\r",
+                                "        },\r",
+                                "        required: [\"message\"],\r",
+                                "    };\r",
+                                "\r",
+                                "    pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;\r",
+                                "    });\r",
+                                "}\r",
+                                "\r",
+                                "\r",
+                                ""
+                            ],
+                            "type": "text/javascript",
+                            "packages": {}
+                        }
+                    }
+                ],
+                "id": "203f973f-4c33-4a56-b14d-a253f7cb3bde",
+                "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                },
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "http://localhost:80/api/leaderboard/subInterval/:gamemode/:statistic?pageSize={{pageSize}}&numPages={{numPages}}&startPage={{startPage}}&email={{email}}",
+                        "protocol": "http",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "80",
+                        "path": [
+                            "api",
+                            "leaderboard",
+                            "subInterval",
+                            ":gamemode",
+                            ":statistic"
+                        ],
+                        "query": [
+                            {
+                                "key": "pageSize",
+                                "value": "{{pageSize}}",
+                                "description": "Required"
+                            },
+                            {
+                                "key": "numPages",
+                                "value": "{{numPages}}",
+                                "description": "Required"
+                            },
+                            {
+                                "key": "startPage",
+                                "value": "{{startPage}}",
+                                "description": "Required but mutually exclusive with email"
+                            },
+                            {
+                                "key": "email",
+                                "value": "{{email}}",
+                                "description": "Required but mutually exclusive with startPage"
+                            }
+                        ],
+                        "variable": [
+                            {
+                                "key": "gamemode",
+                                "value": "{{gamemode}}",
+                                "description": "Required"
+                            },
+                            {
+                                "key": "statistic",
+                                "value": "{{statistic}}",
+                                "description": "Required"
+                            }
+                        ]
+                    },
+                    "description": "The endpoint retrieves the leaderboard for a specific sub-interval of a game, based on the number of games played. The response returned is a JSON object with the following schema:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"positions\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"userId\": {\n            \"type\": \"number\"\n          },\n          \"statistic\": {\n            \"type\": \"number\"\n          },\n          \"rank\": {\n            \"type\": \"number\"\n          }\n        }\n      }\n    },\n    \"totalLength\": {\n      \"type\": \"number\"\n    }\n  }\n}\n\n ```"
+                },
+                "response": [],
+                "uid": "35010686-203f973f-4c33-4a56-b14d-a253f7cb3bde"
+            }
+        ]
+    }
+}

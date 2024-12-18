@@ -217,7 +217,7 @@ public class GameController {
             if (gameLogic == null) {
                 //Creo la nuova partita 
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode);
-                //gameLogic.CreateGame();
+                gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");
                 return ResponseEntity.ok().build();

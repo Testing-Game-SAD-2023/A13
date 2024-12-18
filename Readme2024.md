@@ -148,10 +148,28 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-TBD
+
+Il nostro gruppo si è occupato di implementare una funzionalità che permettesse di visualizzare le classifiche globali del gioco e cercare altri giocatori attraverso la loro email. Il componente UI dedicato alle classifiche è accessibile tramite il pulsante "Classifiche" aggiunto alla navbar e ne permette la visualizzazione paginata selezionando una modalità di gioco ed una statistica di merito (ad esempio, le partite vinte da un utente).
+
+Complessivamente, sono stati modificati i microservizi T23, T4 e T5.
+
+Nel microservizio T5:
+1. È stata predisposta una API per incrociare i dati degli utenti provenienti dal T23 e i dati sulle statistiche provenienti dal T4 e fornire le classifiche arricchite dei dati utente al front-end
+2. È stato aggiunto il componente UI dedicato alla visualizzazione delle classifiche.
+
+Nel microservizio T4:
+1. È stata aggiunta una tabella SQL in cui vengono mantenute le statistiche dei giocatori già aggregate. Questa tabella è dotata di indici secondari per non caricare il database di frequenti operazioni di ordinamento, in funzione dei requisiti di scalabilità e performance preposti.
+2. È stata predisposta una API per la lettura della classifica selezionata dall'utente nella View.
+
+Nel microservizio T23:
+1. È stata aggiunta una API per ottenere le informazioni di uno studente a partire dalla sua email
+
+
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
+
+La documentazione e i diagrammi sono stati inseriti nella cartella: ![Documentazione/Documentazione_2024/](Documentazione/Documentazione_2024/)
+
 
 
 

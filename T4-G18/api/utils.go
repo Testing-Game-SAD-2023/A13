@@ -77,3 +77,20 @@ func Duplicated(v []string) bool {
 	}
 	return false
 }
+
+func GetLeaderboardColName(modeMap map[string]string, statMap map[string]string, mode string, stat string) (string, bool) {
+    var columnName string
+	m, ok := modeMap[mode]
+	if !ok {
+		return columnName, ok
+	}
+
+	s, ok := statMap[stat]
+	if !ok {
+		return columnName, ok 
+	}
+
+	columnName = fmt.Sprintf("%s_%s", m, s)
+    
+    return columnName, ok 
+}
