@@ -17,6 +17,64 @@ setTimeout(function(){
 	nav.classList.toggle('open');	
 }, 800);
 
+function Gestisci() {
+
+  fetch('/teams_show', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      
+      response.text().then(okMessage => {
+        alert("Verrai reindirizzato alla pagina di gestione dei team.");
+      });
+
+      window.location.href = "/teams_show";
+    }
+    else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      });
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    // Gestione errori
+    alert("Si è verificato un errore durante il reindirizzamento alla pagina di gestione dei team.");
+  });
+}
+
+function GestisciChallenges() {
+  fetch('/challenges_show', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then(response => {
+    console.log('Response:', response);
+    if(response.status == 200) {
+      response.text().then(okMessage => {
+        alert("Verrai reindirizzato alla pagina di gestione delle challenges.");
+      });
+      window.location.href = "/challenges_show";
+    } else {
+      response.text().then(errorMessage => {
+        alert(errorMessage);
+      });
+    }
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    alert("Si è verificato un errore durante il reindirizzamento alla pagina di gestione delle challenges.");
+  });
+}
+
+
 function Disconnessione() {
 
   fetch('/logout_admin', {
@@ -107,3 +165,7 @@ function Scalata() {
     //Aggiungi qui il codice per gestire gli errori
   });
 }
+
+
+
+

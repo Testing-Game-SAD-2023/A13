@@ -1,0 +1,276 @@
+@import url("https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900");
+
+html, body {
+  height: 100%;
+}
+
+h1 {
+  font-family: Alegreya Sans, sans-serif;
+  font-size: 100px;
+  text-align: center;
+}
+
+body {
+  background: beige;
+  font-family: Alegreya Sans, sans-serif;
+}
+
+nav {
+  display: block;
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  transform: translate3d(25px, -25px, 0);
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9);
+}
+
+nav.open {
+  transform: translate3d(0, 0, 0);
+}
+
+nav.top-right {
+  top: 0px;
+  right: 0px;
+}
+
+.disc {
+  position: absolute;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  font: 25px Alegreya Sans, sans-serif;
+  line-height: 40px;
+  padding-top: 10px;
+  border-radius: 250px;
+  transform: scale3d(0.5, 0.5, 0.5) rotate3d(0, 0, 1, 190deg);
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.5, 0.9), opacity 0.5s;
+}
+
+.disc div {
+  transform: rotate(180deg);
+}
+
+.open .disc {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.l1 {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background: tomato;
+  transition-delay: 0s;
+}
+
+.open .l1 {
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l1:hover {
+  color: white;
+  background-color: rgb(255, 22, 84);
+}
+
+.l2 {
+  top: 50px;
+  left: 50px;
+  right: 50px;
+  bottom: 50px;
+  background: #ff7a39;
+  transition-delay: 0.1s;
+}
+
+.open .l2 {
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l2:hover {
+  color: rgb(18, 102, 79);
+  background-color: rgb(243, 255, 189);
+}
+
+.l3 {
+  top: 100px;
+  left: 100px;
+  right: 100px;
+  bottom: 100px;
+  background: #ff912b;
+  transition-delay: 0.2s;
+}
+
+.open .l3 {
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l3:hover {
+  color: rgb(239, 156, 218);
+  background-color: rgb(178, 219, 191);
+}
+
+.l4 {
+  top: 150px;
+  left: 150px;
+  right: 150px;
+  bottom: 150px;
+  background: #ffa91c;
+  transition-delay: 0.3s;
+}
+
+.open .l4 {
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l4:hover {
+  color: rgb(219, 153, 90);
+  background-color: rgb(112, 193, 179);
+}
+
+.l5 {
+  top: 200px;
+  left: 200px;
+  right: 200px;
+  bottom: 200px;
+  background: #ffc00e;
+  transition-delay: 0.4s;
+}
+
+.open .l5 {
+  transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, 190deg);
+  opacity: 1;
+}
+
+.open .l5:hover {
+  color: rgb(219, 153, 90);
+  background-color: rgb(36, 123, 160);
+}
+
+.toggle {
+  line-height: 100px;
+  padding: 0;
+  width: 100px;
+  background: gold;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.open .toggle {
+  transform: rotate3d(0, 0, 1, 0deg);
+}
+
+.toggle:hover {
+  text-decoration: underline;
+  background-color: rgb(68, 222, 231);
+}
+
+/* Stile per il bottone Home */
+.top-left-button {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 10px 20px;
+  background-color: rgb(60, 120, 216);
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: Alegreya Sans, sans-serif;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.top-left-button:hover {
+  background-color: rgb(35, 90, 190);
+  transform: scale(1.05);
+}
+
+.top-left-button:active {
+  background-color: rgb(25, 70, 160);
+  transform: scale(0.95);
+}
+
+.team-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 15px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  width: 50%;
+  height: 40vh;
+  overflow-y: auto; /* Aggiunge la scrollbar */
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+}
+
+.team-section {
+  padding: 15px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  background-color: #fff;
+  width: calc(100% - 30px); /* Rimuove padding extra */
+  margin: 0 auto; /* Assicura che le sezioni siano a filo */
+}
+
+.team-section h2 {
+  font-size: 1.5em;
+  margin: 0 0 10px 0;
+}
+
+.team-section p {
+  font-size: 1em;
+  margin: 0;
+}
+
+/* Contenitore del tooltip */
+.member-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+}
+
+/* Contenuto del tooltip */
+.member-tooltip:hover::after {
+  content: attr(title); /* Usa l'attributo "title" per mostrare il contenuto */
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  top: 120%; /* Posiziona sotto l'elemento */
+  left: 0;
+  white-space: pre-wrap; /* Permette a lungo testo di andare a capo */
+  z-index: 1000;
+  display: block;
+  min-width: 150px;
+  max-width: 300px;
+}
+
+/* Nasconde l'attributo "title" come default */
+.member-tooltip::after {
+  display: none;
+}
+
+.member-tooltip:hover::after {
+  display: block;
+}
+

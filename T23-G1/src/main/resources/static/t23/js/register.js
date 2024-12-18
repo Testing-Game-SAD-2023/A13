@@ -2,6 +2,12 @@
 //Bugfix della funzione della registrazione, non coerente con la POST nel controller
 //Aggiunto anche il popup di errore nel caso di una compilazione sbagliata
 
+//MODIFICA (05/11/2024) Aggiunto controller reCAPTCHA
+let recaptchaToken = null; 
+
+function setRecaptchaToken(token) {
+  recaptchaToken = token; // Assegna il token reCAPTCHA alla variabile globale
+}
 
 document.addEventListener('DOMContentLoaded', (event) => {
   const form = document.querySelector("form");
@@ -27,57 +33,72 @@ document.addEventListener('DOMContentLoaded', (event) => {
     formData.append("password", password);
     formData.append("check_password", confermaPassword);
     formData.append("studies", corsoDiStudi);
+    formData.append("g-recaptcha-response", recaptchaToken); // Aggiungi il token di reCAPTCHA
+
+    // Validazione lato client
+    if (nome === '') {
+      alert("Compila il campo Nome!");
+      return;
+    }
+
+    if (cognome === '') {
+      alert("Compila il campo Cognome!");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      alert("Inserisci un'email valida!");
+      return;
+    }
+
+    if (password === '') {
+      alert("Compila il campo Password!");
+      return;
+    }
+
+    if (confermaPassword === '') {
+      alert("Compila il campo Conferma Password!");
+      return;
+    }
+
+    if (password !== confermaPassword) {
+      alert("Le password non corrispondono!");
+      return;
+    }
+      
+    for (let pair of formData.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
+    //MODIFICA (05/11/2024) Aggiunto controllo reCAPTCHA
+    if (!recaptchaToken) {
+      //controllo reCAPTCHA
+      alert("Per favore, completa il reCAPTCHA.");
+      return;
+    }
 
     try {
-
-      if (nome === '') {
-        alert("Compila il campo Nome!");
-        return;
-      }
-    
-      if (cognome === '') {
-        alert("Compila il campo Cognome!");
-        return;
-      }
-    
-      if (email === '') {
-        alert("Compila il campo Email!");
-        return;
-      }
-    
-      if (password === '') {
-        alert("Compila il campo Password!");
-        return;
-      }
-    
-      if (confermaPassword === '') {
-        alert("Compila il campo Conferma Password!");
-        return;
-      }
-    
-      if (password !== confermaPassword) {
-        alert("Le password non corrispondono!");
-        return;
-      }
-      
-      console.log(toString(formData));
-
-      // fatch della richiesta
+      // Invia la richiesta al server
       const response = await fetch('/register', {
         method: 'POST',
         body: formData,
       });
 
-      // Controllo dello status code di reindirizzamento (301)
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error('Errore dalla risposta:', errorBody);
+        throw new Error(`Errore dalla richiesta: ${response.status} ${response.statusText}`);
+      }
+
       if (!response.redirected) {
-        // Se non non è 301 lancia un errore
         const errorBody = await response.text();
         throw new Error(`Errore: ${errorBody}`);
       }
 
-      // Se la response è di reindirizzo cerca l'url nell'header della response
-      console.log('Received data:', response.body);
+      // Reindirizza alla pagina di successo
       window.location.href = response.url;
+      
     } catch (error) {
       // Pop-up del messaggio di errore da parte della pagina, gestisce anche gli errori del controller
       console.error('Error:', error.message);
