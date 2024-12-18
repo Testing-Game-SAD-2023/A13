@@ -12,11 +12,12 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 # Stato del progetto
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
-# Contributori del Branch/ Fork corrente 
-Esposito Fabio M63001806
-Grandioso Nicola M63001814
-Fontanella Gianluca M63001818
-Iovine Giovanna M63001821
+## Contributori del Branch/Fork Corrente
+
+- **Esposito Fabio** (M63001806)  
+- **Grandioso Nicola** (M63001814)  
+- **Fontanella Gianluca** (M63001818)  
+- **Iovine Giovanna** (M63001821)  
 
 
 # Funzionalità dell'Applicazione 
@@ -151,23 +152,69 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 
 _NB_: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
-# Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-In T4-G18\api è stato aggiunto il package "player" contenente i seguenti moduli: "player.go", "controller.go", "service.go".
-In T4-G18\model\model.go sono state fatte le seguenti modifiche: nella tabella "players" sono stati aggiunti i campi "Points" e "GamesWon"; è stato aggiunto il trigger "afterSave" della tabella "Game".
-In T4-G18\main.go: è stata aggiunta la rotta "/player"; è stato aggiunto il controller (player endpoint); è stato importato il package aggiunto "player".
-In T4-G18\api\game\service.go è stata aggiunta la funzione di Update perchè quando viene aggiornato un game e isWinner viene aggiornato anche il campo isWinner della tabella "PlayerGame" e aggiorna direttamente il numero di partite vinte in Player.
+# Modifiche e Nuove Feature Aggiunte
 
-In T5-G2\t5\src\main\java\com\g2\Interfaces\T4Service è stata aggiunta la chiamata rest GET "GetAllPlayers()".
-In T5-G2\t5\src\main\java\com\g2\Model sono stati aggiunti i seguenti moduli: "Player.java", "PlayerDTO.java" un dto del giocatore che contiene id, nome, cognome,punti e partite giocate.
-In T5-G2\t5\src\main\java\com\g2\Service è stato aggiunto il modulo "LeaderboardService.java".
-In T5-G2\t5\src\main\java\com\g2\t5\GuiController.java sono state fatte le seguenti modifiche: è stata riscritta la rotta "/leaderboard"; è stato importato Service.LeaderboardService; è stato aggiunto l'attributo Leaderboard (@AutoWired).
+## **T4-G18**
 
-In T5-G2\t5\src\main\resources\templates\fragments è stato modificato il file navbar.html per aggiungere il bottone "Classifica".
-In T5-G2\t5\src\main\resources\templates è stata riscritta la pagina "leaderboard.html".
-In T5-G2\t5\src\main\resources\static\t5\css è stato aggiunto il file "leaderboard.css".
-In T5-G2\t5\src\main\resources\static\t5\js è stato aggiunto il file "leaderboard.js".
-In T5-G2\t5\src\main\resources\static\t5\images è stata aggiunta "foto7.jpeg" ossia l’immagine usata come sfondo nella pagina delle classifiche.
-In T5-G2\t5\src\main\resources\lang sono stati modificati i file per la gestione del meccanismo di internazionalizzazione aggiungendo le etichette presenti nella pagina html.
+- È stato aggiunto il package `player` contenente i seguenti moduli:
+  - `player.go`
+  - `controller.go`
+  - `service.go`
+
+- In `T4-G18\model\model.go`:
+  - Aggiunti i campi `Points` e `GamesWon` nella tabella `players`.
+  - Aggiunto il trigger `afterSave` per la tabella `Game`.
+
+- In `T4-G18\main.go`:
+  - Aggiunta la rotta `/player`.
+  - Integrato il controller per il player endpoint.
+  - Importato il package `player`.
+
+- In `T4-G18\api\game\service.go`:
+  - Aggiunta la funzione `Update` per aggiornare:
+    - Il campo `isWinner` nella tabella `PlayerGame` quando un game viene aggiornato.
+    - Il numero di partite vinte nel modello `Player`.
+
+---
+
+## **T5-G2**
+
+- In `T5-G2\t5\src\main\java\com\g2\Interfaces\T4Service`:
+  - Aggiunta la chiamata REST GET `GetAllPlayers()`.
+
+- In `T5-G2\t5\src\main\java\com\g2\Model`:
+  - Aggiunti i seguenti moduli:
+    - `Player.java`
+    - `PlayerDTO.java` (un DTO del giocatore che contiene id, nome, cognome, punti e partite giocate).
+
+- In `T5-G2\t5\src\main\java\com\g2\Service`:
+  - Aggiunto il modulo `LeaderboardService.java`.
+
+- In `T5-G2\t5\src\main\java\com\g2\t5\GuiController.java`:
+  - Riscritta la rotta `/leaderboard`.
+  - Importato `Service.LeaderboardService`.
+  - Aggiunto l'attributo `Leaderboard` (`@AutoWired`).
+
+---
+
+### **5. Frontend**
+
+#### **Navbar**
+- In `T5-G2\t5\src\main\resources\templates\fragments\navbar.html`:
+  - Aggiunto il bottone `Classifica`.
+
+#### **Leaderboard**
+- In `T5-G2\t5\src\main\resources\templates`:
+  - Riscritta la pagina `leaderboard.html`.
+- In `T5-G2\t5\src\main\resources\static\t5\css`:
+  - Aggiunto il file `leaderboard.css`.
+- In `T5-G2\t5\src\main\resources\static\t5\js`:
+  - Aggiunto il file `leaderboard.js`.
+- In `T5-G2\t5\src\main\resources\static\t5\images`:
+  - Aggiunta l'immagine `foto7.jpeg` utilizzata come sfondo nella pagina delle classifiche.
+
+- In `T5-G2\t5\src\main\resources\lang`:
+  - Modificati i file per supportare le nuove etichette utilizzate nella pagina `leaderboard.html`.
 
 
 # Documentazione di Progetto della Versione corrente
