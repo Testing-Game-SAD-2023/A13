@@ -7,13 +7,14 @@ services:
     expose:
       - 8080
     # ports:
-    #   - 8080:8080
+    #   - 8080:8080 
     depends_on:
       - mongo_db
     volumes:
-      - ./FilesUpload:/Files-Upload
+      - ./RobotConfig:/RobotConfig
       - VolumeT9:/VolumeT9
       - VolumeT8:/VolumeT8
+      - Volume:/Volume
     networks:
       - global-network      
 
@@ -35,4 +36,6 @@ volumes:
   VolumeT9:
     external: true
   VolumeT8:
+    external: true
+  Volume:
     external: true

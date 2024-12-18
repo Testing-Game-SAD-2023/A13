@@ -3,6 +3,8 @@ version: '3.12.12'
 services:
   app:
     build: .
+    volumes:
+      - Volume:/Volume
     restart: always
     expose:
       - 1234
@@ -13,4 +15,8 @@ services:
 
 networks:
   global-network:
+    external: true
+
+volumes:
+  Volume:
     external: true

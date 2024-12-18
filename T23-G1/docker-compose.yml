@@ -3,6 +3,8 @@ version: '3.1'
 services:
   app:
     build: .
+    volumes:
+      - Volume:/Volume
     expose:
       - 8080
     # ports:
@@ -32,4 +34,8 @@ services:
   
 networks:
   global-network:
+    external: true
+
+volumes:
+  Volume:
     external: true

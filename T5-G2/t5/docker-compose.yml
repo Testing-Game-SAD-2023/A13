@@ -10,7 +10,12 @@ services:
       - global-network
     volumes:
       - /logs:/logs  # Monta la directory dei log sul tuo host
+      - Volume:/Volume
 
 networks:
   global-network:
+    external: true
+
+volumes:
+  Volume:
     external: true
