@@ -177,6 +177,4 @@ Ovviamente è stato modificato anche il front-end predisponendo correttamente la
 Per maggiori dettagli delle modifiche effettuate consultare il documento [Readme.md](https://github.com/luigifienga18/A13/blob/main/README.md)
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
-
-//TODO collegamento con la documentazione.
+Al seguente link è presente la documentazione del nostro progetto [Documentazione_2024.pdf](https://github.com/luigifienga18/A13/blob/main/Documentazione_2024/B8%20-%20R1%20-%20Documentazione_2024.pdf) (file pdf) e ai diagrammi [UML Prodotti](https://github.com/luigifienga18/A13/tree/main/Documentazione_2024/Diagrammi%20UML). Complessivamente si trovano nella cartella [Documentazione_2024](https://github.com/luigifienga18/A13/tree/main/Documentazione_2024)
