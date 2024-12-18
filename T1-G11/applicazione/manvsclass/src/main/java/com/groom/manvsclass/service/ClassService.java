@@ -115,7 +115,7 @@ public class ClassService {
 
         // ! TO DELETE IN FUTURE VERSIONS
         logger.debug("Starting legacy upload...");
-        adminService.uploadTest(classFile, modelJSON, tests.get("Randoop"), tests.get("Evosuite"), jwt, request);
+        adminService.uploadTest(classFile, modelJSON, tests.get("Randoop"), tests.get("EvoSuite"), jwt, request);
         logger.debug("Legacy upload ended.");
 
         // Saves in MongoDB
