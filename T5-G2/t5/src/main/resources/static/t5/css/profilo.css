@@ -1,0 +1,527 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#currentProfilePicture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid #007bff;
+    margin-bottom: 10px;
+}
+
+.modify-avatar-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modify-avatar-btn:hover {
+    background-color: #0056b3;
+}
+
+.user-info-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.user-fullname {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.user-nickname {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.edit-info-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-info-btn:hover {
+    background-color: #0056b3;
+}
+
+.edit-info-form {
+    display: none;
+    margin-top: 20px;
+}
+
+.edit-info-form .form-group {
+    margin-bottom: 15px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.cancel-btn, .save-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-btn {
+    background-color: #cccccc;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background-color: #aaaaaa;
+}
+
+.save-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+}
+
+.bio-section {
+    width: 100%;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.bio-section h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+#bioText {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+.edit-bio-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.edit-bio-btn:hover {
+    background-color: #0056b3;
+}
+
+#bioEditSection {
+    display: none;
+    margin-top: 10px;
+}
+
+/* Contenitore principale per l'userId */
+#userIdDisplay {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2rem;
+    color: #333; /* Colore testo */
+    background-color: #f9f9f9; /* Colore di sfondo */
+    border: 1px solid #ddd; /* Bordo sottile */
+    border-radius: 8px; /* Angoli arrotondati */
+    padding: 10px 20px; /* Spaziatura interna */
+    margin: 20px auto; /* Spaziatura esterna */
+    text-align: center; /* Allinea il testo al centro */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Effetto ombra */
+    max-width: 400px; /* Larghezza massima */
+}
+
+/* Hover per un effetto interattivo */
+#userIdDisplay:hover {
+    background-color: #eef; /* Colore di sfondo chiaro al passaggio del mouse */
+    border-color: #aaa; /* Cambia il colore del bordo */
+    transition: all 0.3s ease-in-out; /* Animazione */
+}
+
+/* Stile per il pulsante + nel caricamento immagine*/
+#uploadProfilePictureButton {
+    border: 2px dashed #007bff; /* Bordo tratteggiato */
+    border-radius: 50%; /* Forma circolare */
+    background-color: transparent; /* Sfondo trasparente */
+    color: #007bff; /* Colore del testo */
+    width: 50px; /* Larghezza del pulsante */
+    height: 50px; /* Altezza del pulsante */
+    display: inline-flex; /* Allinea il contenuto al centro */
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem; /* Dimensione del testo */
+    line-height: 1;
+    cursor: pointer; /* Cursore a forma di mano */
+    transition: all 0.3s ease-in-out; /* Animazione morbida */
+}
+
+/* Hover: evidenziazione quando si passa sopra il pulsante */
+#uploadProfilePictureButton:hover {
+    background-color: #007bff; /* Sfondo blu */
+    color: white; /* Colore del testo bianco */
+}
+
+/* Form di upload immagine */
+#uploadProfilePictureForm {
+    margin-top: 15px; /* Distanza dal pulsante + */
+    padding: 10px;
+    border: 1px solid #ddd; /* Bordo sottile */
+    border-radius: 5px; /* Angoli arrotondati */
+    background-color: #f9f9f9; /* Sfondo chiaro */
+    display: none; /* Nasconde inizialmente */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Effetto ombra */
+}
+
+/* Input di caricamento file */
+#profilePictureUploadInput {
+    display: block; /* Forza un comportamento di blocco */
+    margin-bottom: 10px; /* Spaziatura inferiore */
+    font-size: 1rem; /* Dimensione del testo */
+}
+
+/* Pulsante "Carica" */
+#uploadProfilePictureForm button {
+    background-color: #007bff; /* Sfondo blu */
+    color: white; /* Testo bianco */
+    border: none; /* Rimuove il bordo */
+    padding: 10px 20px; /* Spaziatura interna */
+    border-radius: 5px; /* Angoli arrotondati */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out; /* Animazione morbida */
+}
+
+#uploadProfilePictureForm button:hover {
+    background-color: #0056b3; /* Colore blu più scuro al passaggio del mouse */
+}
+
+
+
+/* Messaggio di errore */
+#errorMessage {
+    font-family: 'Segoe UI';
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e74c3c; /* Colore rosso per i messaggi di errore */
+    margin-top: 20px;
+}
+
+
+
+/* Stile per la card */
+.card {
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  /* Titolo della card */
+  .card-title {
+    font-weight: bold;
+    color: #333;
+  }
+   
+/* Stile per nome cognome e nickname in tutte le sezioni */
+.user-header {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-header p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.user-header .text-muted {
+    font-size: 0.8rem;
+}
+
+.container {
+    display: flex; /* Usa Flexbox */
+    flex-direction: row; /* Disposizione orizzontale */
+    gap: 1%; /* Riduce lo spazio tra le card */
+    width: 96%; /* Riduce i margini laterali per occupare più spazio */
+    max-width: 100%; /* Garantisce che non superi la larghezza della pagina */
+    height: auto; /* Adatta l'altezza al contenuto */
+    min-height: 90vh; /* Occupa la maggior parte dell'altezza della finestra */
+    padding: 1%; /* Margine interno */
+    margin: 2% auto; /* Centra il container e aggiunge un piccolo margine verticale */
+    box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
+    align-items: stretch; /* Uniforma l'altezza delle colonne */
+}
+
+
+/* Lista Amici */
+#friendsContainer {
+    height: auto; /* Altezza basata sul contenuto */
+    max-height: 80vh; /* Altezza massima per prevenire overflow */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 0.5em;
+    box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* Scroll verticale per contenuti lunghi */
+    padding: 2%; /* Margine interno */
+    box-sizing: border-box; /* Garantisce che padding non sfori il contenitore */
+}
+
+/* Elementi lista */
+#friendsContainer .friend-item {
+    display: flex;
+    align-items: center;
+    padding: 1.5%;
+    border-bottom: 0.1em solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+/* Avatar */
+#friendsContainer .friend-avatar {
+    width: 10%; /* Larghezza relativa */
+    height: auto;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 2%;
+    border: 0.2em solid #ddd;
+}
+
+/* Informazioni amico */
+#friendsContainer .friend-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Pulsante elimina */
+#friendsContainer .btn-danger {
+    margin-left: auto;
+    font-size: 85%;
+    padding: 1% 3%;
+}
+
+/* Card Cerca Amico */
+.card.shadow-sm {
+    height: auto; /* Altezza basata sul contenuto */
+    background-color: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 0.5em 0.7em rgba(0, 0, 0, 0.1);
+    padding: 2%; /* Margine interno */
+    box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.unobtained {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.obtained {
+    opacity: 1;
+    filter: none;
+}
+
+.completed-trophy {
+    color: green;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.progress-bar {
+    transition: width 0.5s ease; /* Animazione del riempimento della barra */
+}
+
+.bg-success {
+    background-color: #28a745 !important; /* Verde */
+}
+
+.bg-warning {
+    background-color: #ffc107 !important; /* Giallo */
+}
+.custom-progress-bar {
+    background-color: #d900ff; /* Azzurro */
+    height: 20px;
+}
+/* Stili base delle sezioni */
+#completed-trophies,
+#in-progress-trophies {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Stati di visibilità */
+.hidden {
+    opacity: 0;
+    pointer-events: none; /* Evita clic su sezioni nascoste */
+}
+
+.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.edit-info-form input{
+    color : #ececec;
+}
+#currentProfilePicture {
+    width: 200px; /* Imposta la larghezza desiderata */
+    height: 200px; /* Imposta l'altezza desiderata */
+    object-fit: cover; /* Adatta l'immagine senza distorcerla */
+    border-radius: 50%; /* Rende l'immagine circolare */
+    border: 5px solid #007bff; /* Opzionale: Bordo intorno all'immagine */
+}
+
+/* Contenitore delle statistiche */
+#stats-section {
+    padding: 20px;
+    margin-top: 20px;
+}
+
+/* Card principale */
+.stats-card {
+    background: #ffffff; /* Sfondo bianco */
+    border-radius: 10px; /* Angoli arrotondati */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Leggera ombra */
+    padding: 20px;
+    overflow-y: auto; /* Scroll se necessario */
+}
+
+/* Titolo della card */
+.stats-card-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #000000; /* Colore primario */
+    margin-bottom: 20px;
+}
+
+/* Separatore */
+.stats-card hr {
+    border-top: 2px solid #eee;
+    margin: 15px 0;
+}
+
+/* Righe delle statistiche */
+.stat-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f9f9f9; /* Sfondo leggero per le righe */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Icone delle statistiche */
+.stat-icon {
+    font-size: 1.5rem;
+    color: #4a90e2; /* Colore primario */
+    margin-right: 15px;
+    display: inline-block;
+}
+
+/* Nome della statistica */
+.stat-name {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #555;
+    flex: 1; /* Occupa lo spazio disponibile */
+}
+
+/* Valore della statistica */
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #4a90e2; /* Colore in evidenza */
+    text-align: right;
+}
+
+
+.language-switcher {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px; /* Spaziatura tra i pulsanti */
+}
+
+.language-switcher button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; /* Dimensione testo */
+    font-weight: bold; /* Testo in grassetto */
+    padding: 5px 10px; /* Spaziatura interna */
+    border: 1px solid #ccc; /* Bordo leggero */
+    border-radius: 5px; /* Angoli arrotondati */
+    background-color: #f8f9fa; /* Colore di sfondo chiaro */
+    color: #333; /* Colore testo */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* Animazioni per hover e clic */
+}
+
+.language-switcher button:hover {
+    background-color: #e2e6ea; /* Colore sfondo al passaggio del mouse */
+    transform: scale(1.05); /* Leggero zoom al passaggio del mouse */
+}
+
+.language-switcher button:active {
+    background-color: #d6d8db; /* Colore sfondo al clic */
+    transform: scale(0.95); /* Leggera riduzione al clic */
+}
+
+.language-switcher button:focus {
+    outline: none; /* Rimuove il bordo di focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Aggiunge un'ombra luminosa */
+}

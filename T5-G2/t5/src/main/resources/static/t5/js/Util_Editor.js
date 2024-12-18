@@ -201,6 +201,28 @@ function getConsoleTextError(){
 			Ci sono stati errori di compilazione, controlla la console !`;
 }
 
+// Gabman 30/11 Ajax request generica
+async function ajaxRequest(url, method = 'POST', data = null, isJson = true, dataType = 'json') {
+    try {
+        const options = {
+            url: url,
+            type: method,
+            dataType: dataType,
+            processData: isJson,
+            contentType: isJson ? 'application/json; charset=UTF-8' : false,
+            data: isJson && data ? JSON.stringify(data) : data, // Converti i dati in stringa JSON
+        };
+
+        const response = await $.ajax(options);
+        return response;
+    } catch (error) {
+        console.error("Errore durante la richiesta AJAX:", error);
+        throw error;
+    }
+}
+
+
+
 // Funzione per avviare il gioco utilizzando ajaxRequest
 async function startGame(data) {
 	try {
@@ -613,3 +635,5 @@ function openModalError(text_title, text_content, buttons = []) {
 	// Mostra il modal
 	modal.show();
 }
+//Gabman
+export { ajaxRequest, openModalWithText, openModalError, toggleLoading };
