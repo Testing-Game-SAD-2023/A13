@@ -19,6 +19,7 @@ import (
 	"github.com/alarmfox/game-repository/api/robot"
 	"github.com/alarmfox/game-repository/api/round"
 	"github.com/alarmfox/game-repository/api/scalatagame"
+	"github.com/alarmfox/game-repository/api/player"
 	"github.com/alarmfox/game-repository/api/playerhascategoryachievement"
 	"github.com/alarmfox/game-repository/api/turn"
 	"github.com/alarmfox/game-repository/limiter"
@@ -181,6 +182,9 @@ func run(ctx context.Context, c Configuration) error {
 			// scalatagame endpoint
 			scalataController = scalatagame.NewController(scalatagame.NewRepository(db))
 
+			//player endpoint
+			playerController = player.NewController(player.NewRepository(db))
+
             // phca endpoint
             phcaController = playerhascategoryachievement.NewController(playerhascategoryachievement.NewRepository(db))
 		)
@@ -192,6 +196,7 @@ func run(ctx context.Context, c Configuration) error {
 			robotController,
 			scalataController,
 			phcaController,
+			playerController,
 		))
 	})
 	log.Printf("listening on %s", c.ListenAddress)
@@ -316,10 +321,15 @@ func makeDefaults(c *Configuration) {
 
 }
 
-func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, pc *playerhascategoryachievement.Controller) *chi.Mux {
+func setupRoutes(gc *game.Controller, rc *round.Controller, tc *turn.Controller, roc *robot.Controller, sgc *scalatagame.Controller, pc *playerhascategoryachievement.Controller, pcc *player.Controller) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(api.WithMaximumBodySize(api.DefaultBodySize))
+	r.Route("/player", func(r chi.Router) {
+		// List games
+		r.Get("/", api.HandlerFunc(pcc.GetAllPlayers))
+
+	})
 
 	r.Route("/games", func(r chi.Router) {
 		// Get game

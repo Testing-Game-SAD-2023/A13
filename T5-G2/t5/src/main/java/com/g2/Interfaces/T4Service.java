@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.g2.Model.Game;
+import com.g2.Model.Player;
 import com.g2.Model.StatisticProgress;
 import org.springframework.core.ParameterizedTypeReference;
 import org.json.JSONArray;
@@ -90,6 +91,10 @@ public class T4Service extends BaseService {
         registerAction("GetRisultati", new ServiceActionDefinition(
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class));
+        registerAction("GetAllPlayers", new ServiceActionDefinition(
+            params -> GetAllPlayers()
+            
+             ));
     }
 
     // usa /games per ottenere una lista di giochi
@@ -237,6 +242,19 @@ public class T4Service extends BaseService {
         formData.add("creationDate", creation_date);
         String respose = callRestPost(endpoint, formData, null, String.class);
         return respose;
+    }
+
+    //GETALLPLAYERS
+    private List<Player> GetAllPlayers() {
+        final String endpoint = "/player";
+        try {
+            // Chiamata GET utilizzando il metodo della classe base per ottenere una lista di utenti
+            return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Player>>() {
+            });
+        } catch (RuntimeException e) {
+            // Gestione degli errori durante la richiesta
+            throw new IllegalArgumentException("[GetAllPlayers()] Errore durante il recupero degli utenti: " + e.getMessage());
+        }
     }
 
 }

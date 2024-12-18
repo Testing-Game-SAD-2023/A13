@@ -57,7 +57,9 @@ import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
+import com.g2.Model.PlayerDTO;
 import com.g2.Service.AchievementService;
+import com.g2.Service.LeaderboardService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,6 +80,9 @@ public class GuiController {
         this.serviceManager = new ServiceManager(restTemplate);
         this.localeResolver = localeResolver;
     }
+
+    @Autowired
+    private LeaderboardService leaderboardService;
 
     //Gestione lingua 
     @PostMapping("/changeLanguage")
@@ -211,16 +216,65 @@ public class GuiController {
         return editor.handlePageRequest();
     }
     
-    @GetMapping("/leaderboard")
-    public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
-        ServiceObjectComponent lista_utenti = new ServiceObjectComponent(serviceManager, "listaPlayers",
-                "T23", "GetUsers");
-        leaderboard.setObjectComponents(lista_utenti);
-        leaderboard.SetAuth(jwt);
-        return leaderboard.handlePageRequest();
+        @GetMapping("/leaderboard") 
+    public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) { 
+        try{ 
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]); 
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8); 
+ 
+       
+            ObjectMapper mapper = new ObjectMapper(); 
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class); 
+ 
+            Long userId = Long.valueOf(map.get("userId").toString()); 
+ 
+ 
+ 
+        PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model); 
+         
+        //servizio per ottenere lista complessiva 
+        leaderboardService.getList(); 
+        //lista filtrata per punti 
+        List <PlayerDTO> lista_players_points = leaderboardService.getSortedLeaderboardByPoints(); 
+ 
+        GenericObjectComponent lista_player_gen_points = new GenericObjectComponent("listaPlayersPoints",lista_players_points); 
+        leaderboard.setObjectComponents(lista_player_gen_points); 
+         
+ 
+ 
+        //lista filtrata per partite vinte 
+ 
+        List <PlayerDTO> lista_players_games = leaderboardService.getSortedLeaderboardByGames(); 
+ 
+        GenericObjectComponent lista_player_gen_games = new GenericObjectComponent("listaPlayersGames",lista_players_games); 
+        leaderboard.setObjectComponents(lista_player_gen_games); 
+         
+         
+         
+        //calcolo posizione user nella lista filtrata per Points e per Games 
+ 
+        PlayerDTO playerRank= leaderboardService.getPlayerRank(userId); 
+        GenericObjectComponent rank_gen_points = new GenericObjectComponent("playerRank",playerRank); 
+        leaderboard.setObjectComponents(rank_gen_points); 
+ 
+ 
+ 
+ 
+ 
+ 
+        leaderboard.SetAuth(jwt); 
+        return leaderboard.handlePageRequest(); 
+ 
+         
+        } catch (NullPointerException e){ 
+            //ri-autenticazione 
+            return "redirect:/login"; 
+        }catch (Exception e) { 
+            model.addAttribute("error", e); 
+            System.out.println("(/leaderboard) Error requesting leaderboard: " + e.getMessage()); 
+            return "redirect:/error"; 
+        } 
     }
-
     @GetMapping("/edit_profile")
     public String edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);

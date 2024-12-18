@@ -128,16 +128,51 @@ func (gs *Repository) Delete(id int64) error {
 }
 
 func (gs *Repository) Update(id int64, r *UpdateRequest) (Game, error) {
+    var (
+        game model.Game = model.Game{ID: id}
+        err  error
+    )
 
-	var (
-		game model.Game = model.Game{ID: id}
-		err  error
-	)
+    // Effettuare l'aggiornamento in una transazione
+    err = gs.db.Transaction(func(tx *gorm.DB) error {
+        // Aggiorna i dati del gioco
+        if err := tx.Model(&game).Updates(r).Error; err != nil {
+            return err
+        }
 
-	err = gs.db.Model(&game).Updates(r).Error
-	if err != nil {
-		return Game{}, api.MakeServiceError(err)
-	}
+        // Se IsWinner è presente, aggiorna il campo is_winner nella tabella PlayerGames
+        if r.IsWinner {
+            // Aggiorna i record nella tabella PlayerGame
+            if err := tx.Model(&model.PlayerGame{}).
+                Where("game_id = ?", id).
+                Update("is_winner", r.IsWinner).Error; err != nil {
+                return err
+            }
 
-	return fromModel(&game), api.MakeServiceError(err)
+            // Recupera tutti i playerID associati al game
+            var playerIDs []int64
+            if err := tx.Model(&model.PlayerGame{}).
+                Where("game_id = ?", id).
+                Pluck("player_id", &playerIDs).Error; err != nil {
+                return err
+            }
+
+            // Aggiorna il campo `games_won` per ogni player
+            for _, playerID := range playerIDs {
+                if err := tx.Model(&model.Player{}).
+                    Where("id = ?", playerID).
+                    UpdateColumn("games_won", gorm.Expr("games_won + ?", 1)).Error; err != nil {
+                    return err
+                }
+            }
+        }
+
+        return nil
+    })
+
+    if err != nil {
+        return Game{}, api.MakeServiceError(err)
+    }
+
+    return fromModel(&game), nil
 }
