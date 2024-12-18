@@ -33,8 +33,10 @@ L'amministratore del Gioco può:
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
 
 
-# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
+# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
 ### Funzionalità di aggiunta di test da parte di più robot per una singola classe
+https://github.com/user-attachments/assets/c6dae664-7c64-49f5-b168-c45c2a2bd1b0
+
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
@@ -125,7 +127,7 @@ In questa nuova versione, è stato modificato il container T1 per una maggiore g
 
 Inoltre, è stata introdotta una nuova funzionalità nella pagina "Add Class and Test". Ora gli utenti hanno la possibilità di caricare solo una classe, caricare più test contemporaneamente, oppure caricare singoli test. Prima, infatti, era necessario caricare tutti i test associati a una singola classe in un'unica operazione.
 
-Per l'elenco delle modifiche, si può consultare questo link: ![Modifiche effettuate]()
+Per l'elenco delle modifiche, si può consultare questo link: ![Modifiche effettuate](https://github.com/vittorioguerra/A13-R6-B15/blob/main/Documentazione_2024/Modifiche%20Effettuate.md)
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
+Di seguito si riporta il link alla cartella con la documentazione completa e i diagrammi: ![Documentazione versione corrente](https://github.com/vittorioguerra/A13-R6-B15/tree/main/Documentazione_2024)
