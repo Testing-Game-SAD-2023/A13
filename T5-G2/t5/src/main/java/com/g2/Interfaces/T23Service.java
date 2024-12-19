@@ -44,6 +44,12 @@ public class T23Service extends BaseService {
         registerAction("GetUsers", new ServiceActionDefinition(
                 params -> GetUsers() //metodo senza parametri
         ));
+
+        registerAction("GetUserByEmail", new ServiceActionDefinition(
+                params -> GetUserByEmail((String) params[0]),
+                String.class
+        ));
+
     }
 
     // Metodo per l'autenticazione
@@ -64,5 +70,11 @@ public class T23Service extends BaseService {
     private List<User> GetUsers() {
         final String endpoint = "/students_list";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
+    }
+
+    // Metodo per ottenere un utente per email
+    private User GetUserByEmail(String email) {
+        final String endpoint = "/students_list/getByEmail/" + email;
+        return callRestGET(endpoint, null, User.class);
     }
 }

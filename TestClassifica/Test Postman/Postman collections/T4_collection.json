@@ -1,0 +1,176 @@
+{
+    "collection": {
+        "info": {
+            "_postman_id": "d1fcf738-78d9-431f-a434-6f7bf7046b78",
+            "name": "Test T4",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+            "updatedAt": "2024-12-11T19:09:24.000Z",
+            "createdAt": "2024-12-11T17:28:29.000Z",
+            "lastUpdatedBy": "15923526",
+            "uid": "15923526-d1fcf738-78d9-431f-a434-6f7bf7046b78"
+        },
+        "item": [
+            {
+                "name": "T4subInterval",
+                "event": [
+                    {
+                        "listen": "test",
+                        "script": {
+                            "id": "f26aaa58-a0eb-44d0-8cbb-4e3ac64b45ca",
+                            "exec": [
+                                "let expectedStatus = pm.iterationData.get(\"expected_status\");",
+                                "",
+                                "// Assert the response status",
+                                "pm.test(\"Status code is as expected\", function () {",
+                                "    pm.response.to.have.status(parseInt(expectedStatus));",
+                                "});",
+                                "",
+                                "// Assert response content type",
+                                "pm.test(\"Response has content type of application/json\", function () {",
+                                "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                                "});",
+                                "",
+                                "// Assert content if status 200",
+                                "if (expectedStatus === 200) {",
+                                "    pm.test(\"Response schema is valid\", function () {",
+                                "    var schema = {",
+                                "        type: \"object\",",
+                                "        properties: {",
+                                "        positions: {",
+                                "            type: \"array\",",
+                                "            items: {",
+                                "            type: \"object\",",
+                                "            properties: {",
+                                "                    playerId: {",
+                                "                    type: \"number\"",
+                                "                    },",
+                                "                    statistic: {",
+                                "                    type: \"number\"",
+                                "                    },",
+                                "                    rank: {",
+                                "                    type: \"number\"",
+                                "                    }",
+                                "                },",
+                                "            },",
+                                "        },",
+                                "        totalLength: {",
+                                "                type: \"number\"",
+                                "            },",
+                                "        },",
+                                "        required: [\"positions\", \"totalLength\"],",
+                                "    };",
+                                "    pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+                                "    });",
+                                "    ",
+                                "    let playerId = parseInt(pm.request.url.query.find(param => param.key === 'playerId').value);",
+                                "    if (playerId.length > 0){",
+                                "        let flag = false",
+                                "        pm.test(\"PlayerID is included in the response\", function () {",
+                                "            pm.response.json().positions.forEach((user,i)=>{",
+                                "                if (user.playerId === playerId){",
+                                "                    flag = true",
+                                "                }",
+                                "            })",
+                                "            pm.expect(flag).to.be.true;",
+                                "        })",
+                                "    }",
+                                "",
+                                "",
+                                "    let startPage = parseInt(pm.request.url.query.find(param => param.key === 'startPage').value)",
+                                "    if (startPage > 0){",
+                                "        let flag = false",
+                                "        pm.test(\"Page is included in the response\", function () {",
+                                "        let rank = pm.response.json().positions[0].rank",
+                                "        let pageSize = parseInt(pm.request.url.query.find(param => param.key === 'pageSize').value)",
+                                "        let checkStartPage = Math.floor(rank / pageSize) + 1",
+                                "        if (checkStartPage === startPage){",
+                                "            flag = true",
+                                "        }",
+                                "        pm.expect(flag).to.be.true",
+                                "        })",
+                                "    }",
+                                "",
+                                "",
+                                "} // Assert content if status 400 or 404",
+                                "else if (expectedStatus == 400 || expectedStatus == 404)  { ",
+                                "    pm.test(\"Error schema is valid\", function () {",
+                                "    var schema = {",
+                                "        type: \"object\",",
+                                "        properties: {",
+                                "        message: {",
+                                "                type: \"string\",",
+                                "            },",
+                                "        },",
+                                "        required: [\"message\"],",
+                                "    };",
+                                "",
+                                "    pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+                                "    });",
+                                "}",
+                                "",
+                                "",
+                                ""
+                            ],
+                            "type": "text/javascript",
+                            "packages": {}
+                        }
+                    }
+                ],
+                "id": "dd3c6925-9692-4598-859a-ca738e53b2d2",
+                "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                },
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "http://localhost:3000/leaderboard/subInterval/:gamemode/:statistic?pageSize={{pageSize}}&numPages={{numPages}}&startPage={{startPage}}&playerId={{playerId}}",
+                        "protocol": "http",
+                        "host": [
+                            "localhost"
+                        ],
+                        "port": "3000",
+                        "path": [
+                            "leaderboard",
+                            "subInterval",
+                            ":gamemode",
+                            ":statistic"
+                        ],
+                        "query": [
+                            {
+                                "key": "pageSize",
+                                "value": "{{pageSize}}"
+                            },
+                            {
+                                "key": "numPages",
+                                "value": "{{numPages}}"
+                            },
+                            {
+                                "key": "startPage",
+                                "value": "{{startPage}}"
+                            },
+                            {
+                                "key": "playerId",
+                                "value": "{{playerId}}"
+                            }
+                        ],
+                        "variable": [
+                            {
+                                "key": "gamemode",
+                                "value": "{{gamemode}}",
+                                "description": "Required"
+                            },
+                            {
+                                "key": "statistic",
+                                "value": "{{statistic}}",
+                                "description": "Required"
+                            }
+                        ]
+                    }
+                },
+                "response": [],
+                "uid": "15923526-dd3c6925-9692-4598-859a-ca738e53b2d2"
+            }
+        ]
+    }
+}

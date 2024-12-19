@@ -19,14 +19,15 @@ package com.g2.Components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import com.g2.Interfaces.MockServiceManager;
+import com.g2.t5.T5Application;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
-
-import com.g2.Interfaces.MockServiceManager;
-import com.g2.t5.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
 public class AuthComponentTest {
@@ -42,6 +43,7 @@ public class AuthComponentTest {
         serviceManager = new MockServiceManager(restTemplate);
         authComponent = new AuthComponent(serviceManager, "Jwt");
     }
+
     /*
      * Test 1: testAuthComponentInitialization
      * Precondizioni: AuthComponent deve essere inizializzato tramite il metodo

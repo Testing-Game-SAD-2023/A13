@@ -1,0 +1,106 @@
+:root {
+    --custom-yellow: #fdb838;
+}
+
+.big-canvas {
+    width: 55vw !important;
+    padding: 0px 100px;
+}
+
+.btn-close-offcanvas {
+    position: absolute;
+    top: 50px;
+    right: 80px;
+}
+
+.form-check {
+    padding: 0 !important;
+}
+
+.form-check-input {
+    display: none;
+}
+
+.form-check-label {
+    font-size: 0.95em !important;
+}
+
+.form-check-input:checked+.form-check-label {
+    background-color: var(--custom-yellow);
+    color: white;
+    border-color: var(--custom-yellow);
+}
+
+.btn-refresh {
+    position: absolute;
+    right: 0px;
+    top: -280%;
+}
+
+.btn-filter {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-filter:hover {
+    color: white !important;
+    border-color: var(--custom-yellow) !important;
+}
+
+
+
+/* Table */
+
+.fixed-size-table {
+    height: 535px !important;
+    overflow: auto;
+}
+
+.tableError {
+    color: crimson;
+    font-weight: bold;
+    padding: 20px;
+}
+
+.col-rank {
+    width: 15%;
+}
+
+.col-data {
+    width: 60%;
+}
+
+.col-value {
+    width: 25%;
+}
+
+.leaderboard-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Search */
+
+.search-box {
+    max-width: 100% !important;
+    margin-bottom: .125rem !important;
+}
+
+
+/* Highlight */
+
+@keyframes fadeOutHighlight {
+    0% {
+        color: var(--custom-yellow) !important;
+    }
+
+    100% {
+        color: white !important;
+    }
+}
+
+.highlight {
+    animation: fadeOutHighlight 3s forwards !important;
+}

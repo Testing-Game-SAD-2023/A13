@@ -54,6 +54,10 @@ zuul:
       sensitiveHeaders:
       path: /api/compile-and-codecoverage/**
       url: http://remoteccc-app-1:1234/compile-and-codecoverage
+    leaderboardSubInterval-service:
+      sensitiveHeaders:
+      path: /api/leaderboard/subInterval/**
+      url: http://t5-app-1:8080/leaderboard/subInterval
 eureka:
   client:
     enabled: false
