@@ -1,0 +1,20 @@
+.login-box p{
+    font-family: 'Quicksand', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: .02em;
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+
+.register-signup-now{
+    font-family: 'Quicksand', sans-serif;
+    color: #007BFF;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    margin-top: 1rem;
+}
+.register-signup-now:hover{
+    color: #0056b3;
+}
