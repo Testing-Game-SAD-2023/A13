@@ -59,10 +59,16 @@ public class LeaderboardService {
             position++; // Incrementa la posizione per il prossimo giocatore
         }
         // Filtra i giocatori prima di aggiungerli alla lista di mappe
-        if (SearchFilter != null) {
+        if (SearchFilter != null  && !SearchFilter.isEmpty()) {
             playersMapList = playersMapList.stream()
                                            .filter(playerMap -> playerMap.get("Mail").equals(SearchFilter))
                                            .collect(Collectors.toList());
+            //Se é stata effettuata una ricerca, filtro gli utenti anche nella leaderboard
+            //(questo secondo filtro puó sembrare inutile, ma serve a ricalcolare il nuovo totalpages della classifica)
+            List<Player> filteredPlayers = lead.getPlayers().stream()
+                        .filter(player -> player.getMail().equals(SearchFilter))
+                        .collect(Collectors.toList());
+            lead.setPlayers(filteredPlayers);
         }
         return playersMapList;
         }

@@ -288,7 +288,7 @@ public class GameController {
             if (eliminaGame) {
                 return eliminaGame(playerId);
             }
-            
+
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
             String underTestClassName = gameLogic.getClasseUT() + ".java";
 
@@ -319,6 +319,8 @@ public class GameController {
         if (userData.get("coverage") != null && !userData.get("coverage").isEmpty()) {
             // Calcolo copertura e punteggio utente
             // il primo è covered e il secondo è missed
+
+            //Definisco ISWINNER PER LA CLASSIFICA (MODIFICA EFFETTUATA IL 16/12/2024)
             boolean isWinner = false; 
 
             int[] lineCoverage = getCoverage(userData.get("coverage"), "LINE");
@@ -338,9 +340,11 @@ public class GameController {
             if (isGameEnd || gameLogic.isGameEnd()) {
                 activeGames.remove(playerId);
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
+                 //CALCOLO ISWINNER PER LA CLASSIFICA (MODIFICA EFFETTUATA IL 16/12/2024)
                 if (userScore >= robotScore) {
                     isWinner = true;
                 }
+                //SALVO I DATI NEL DATABASE DELLA CLASSIFICA (MODIFICA EFFETTUATA IL 16/12/2024)
                 leaderboardService.updateLeaderboard(mail, userScore, isWinner);
                 return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
