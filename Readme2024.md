@@ -13,7 +13,10 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente 
-Nomi degli autori dei nuovi contributi presenti in questo repository 
+Esposito Andrea, 
+Vallefuoco Roberto, 
+Sorrentino Carmine, 
+Papale Livio.
 
 
 # Funzionalità dell'Applicazione 
@@ -29,8 +32,13 @@ L'amministratore del Gioco può:
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
 
 
-# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
-Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
+# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
+
+- **Video funzionamento pagina classifica**
+
+[![Guarda il Video](https://github.com/bobberto99/ewe/blob/main/Documentazione_2024/Documentazione_T56_R2_B1/immagini/readme/pagina-classifica.png)](https://www.youtube.com/watch?v=y_OhmZrEtDQ&ab_channel=RobertoVallefuoco)
+
+
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
