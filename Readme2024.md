@@ -36,7 +36,7 @@ L'amministratore del Gioco può:
 
 - **Video funzionamento pagina classifica**
 
-[![Guarda il Video](https://github.com/bobberto99/ewe/blob/main/Documentazione_2024/Documentazione_T56_R2_B1/immagini/readme/pagina-classifica.png)](https://www.youtube.com/watch?v=y_OhmZrEtDQ&ab_channel=RobertoVallefuoco)
+[![Guarda il Video](https://github.com/CarSor16/A13-T5_R2_Esposito_A/tree/main/Documentazione_2024/Documentazione_T56_R2_B1/immagini/readme/pagina-classifica.png)](https://www.youtube.com/watch?v=y_OhmZrEtDQ&ab_channel=RobertoVallefuoco)
 
 
 
