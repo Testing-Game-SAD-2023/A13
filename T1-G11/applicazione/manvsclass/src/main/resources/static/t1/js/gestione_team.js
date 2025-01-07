@@ -126,31 +126,34 @@ function filterTeams() {
 
 
 
-// Funzione per aggiornare la lista degli studenti selezionati
-function toggleSelectedStudentsList() {
-    // Ottieni la lista corrente degli studenti selezionati
-    const selectedEmails = Array.from(selectedStudentsList.children).map(li => li.dataset.value);
+selectMembro.addEventListener('click', (event) => {
+    const option = event.target; // Ottieni l'opzione cliccata
 
-    // Aggiungi o rimuovi gli studenti selezionati
-    Array.from(selectMembro.selectedOptions).forEach(option => {
-        const email = option.value; // Usa l'email come identificatore
+    if (option.tagName === 'OPTION') {
+        const email = option.value; // Ottieni l'email dall'opzione
+        const selectedEmails = Array.from(selectedStudentsList.children).map(li => li.dataset.value);
+
         const isAlreadySelected = selectedEmails.includes(email);
 
         if (isAlreadySelected) {
-            // Se l'email è già presente, rimuovila dalla lista
+            // Se già selezionata, rimuovila
             const existingStudent = Array.from(selectedStudentsList.children).find(li => li.dataset.value === email);
             if (existingStudent) {
                 selectedStudentsList.removeChild(existingStudent);
+                option.selected = false; // Deseleziona l'opzione nel riquadro
             }
         } else {
-            // Se l'email non è presente, aggiungila alla lista
+            // Se non selezionata, aggiungila
             const li = document.createElement('li');
             li.textContent = option.textContent; // Mostra il testo visibile (es. nome completo)
             li.dataset.value = email; // Salva SOLO l'email nel dataset
             selectedStudentsList.appendChild(li);
+            option.selected = true; // Seleziona l'opzione nel riquadro
         }
-    });
-}
+    }
+});
+
+
 
 
 function studentiLista(studentsSelect) {
@@ -199,9 +202,7 @@ function updateStudentList(studentsSelect, students) {
 }
 
 
-selectMembro.addEventListener('change', () => {
-        toggleSelectedStudentsList();
-});
+
 // Funzione per pulire la lista degli studenti selezionati
 clearButton.addEventListener('click', () => {
         // Deseleziona tutti gli studenti nella select
