@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Admin")
-public class Admin {
+public class Admin {/*  */
 	private String	nome;
 	private String	cognome;
 	private	String	username;
