@@ -3,11 +3,11 @@ package com.groom.manvsclass.responses;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApiReponse extends Response {
+public class ApiResponse extends Response {
 
     private List<String> data;
 
-    public ApiReponse() {
+    public ApiResponse() {
         this.data = new ArrayList<>();
     }
 

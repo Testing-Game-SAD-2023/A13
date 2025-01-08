@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Robot;
 import com.groom.manvsclass.repository.ClassRepository;
-import com.groom.manvsclass.responses.ApiReponse;
+import com.groom.manvsclass.responses.ApiResponse;
 
 @Service
 public class ApiService {
@@ -49,9 +49,9 @@ public class ApiService {
     @Value("${config.pathRobot}")
     private String configRobotPath;
 
-    public ResponseEntity<ApiReponse> getClasses(String jwt) {
+    public ResponseEntity<ApiResponse> getClasses(String jwt) {
 
-        ApiReponse response = new ApiReponse();
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {
@@ -81,9 +81,9 @@ public class ApiService {
 
     }
 
-    public ResponseEntity<ApiReponse> getClass(String className, String jwt) {
+    public ResponseEntity<ApiResponse> getClass(String className, String jwt) {
 
-        ApiReponse response = new ApiReponse();
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {
@@ -111,9 +111,9 @@ public class ApiService {
 
     }
 
-    public ResponseEntity<ApiReponse> getRobots(String className, String jwt) {
+    public ResponseEntity<ApiResponse> getRobots(String className, String jwt) {
 
-        ApiReponse response = new ApiReponse();
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {
@@ -153,9 +153,9 @@ public class ApiService {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
-    public ResponseEntity<ApiReponse> getRobot(String className, String robotName, String jwt) {
+    public ResponseEntity<ApiResponse> getRobot(String className, String robotName, String jwt) {
 
-        ApiReponse response = new ApiReponse();
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {
@@ -196,10 +196,10 @@ public class ApiService {
 
     // Aggiunge o sovrascrive una classe. Deve fare upload path nel DB e deve
     // ripulire la cartella prima di aggiungere
-    public ResponseEntity<ApiReponse> setClass(String className, MultipartFile classFile, String jwt)
+    public ResponseEntity<ApiResponse> setClass(String className, MultipartFile classFile, String jwt)
             throws IOException {
 
-        ApiReponse response = new ApiReponse();
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {
@@ -235,10 +235,10 @@ public class ApiService {
 
     // Aggiungo o sovrascrive un robot se esso è disponibile nel file di
     // configurazione
-    public ResponseEntity<ApiReponse> setRobot(String className, MultipartFile robotFile, String jwt,
+    public ResponseEntity<ApiResponse> setRobot(String className, MultipartFile robotFile, String jwt,
             String robotName) throws IOException {
 
-        ApiReponse response = new ApiReponse();
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {
@@ -308,8 +308,8 @@ public class ApiService {
     }
 
     // Elmina l'intera classe dal DB e dal filesystem
-    public ResponseEntity<ApiReponse> deleteClass(String className, String jwt) throws IOException {
-        ApiReponse response = new ApiReponse();
+    public ResponseEntity<ApiResponse> deleteClass(String className, String jwt) throws IOException {
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {
@@ -339,10 +339,10 @@ public class ApiService {
     }
 
     // Elimina un solo Robot dal DB e dal Filesystem
-    public ResponseEntity<ApiReponse> deleteRobot(String className, String jwt,
+    public ResponseEntity<ApiResponse> deleteRobot(String className, String jwt,
             String robotName) throws IOException {
 
-        ApiReponse response = new ApiReponse();
+        ApiResponse response = new ApiResponse();
 
         /*
          * if (!jwtService.isJwtValid(jwt)) {

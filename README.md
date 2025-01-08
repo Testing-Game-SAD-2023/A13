@@ -1,4 +1,4 @@
-# Testing_Challenge_Game (by UNINA)- Ver. A13
+# Testing_Challenge_Game (by UNINA)- Ver. A13-R6-B15
 Web App a supporto dell'insegnamento del Software Testing attraverso la Gamification. 
 
 Questa Web App è descritta anche nel seguente articolo scientifico: 
@@ -17,7 +17,7 @@ Vittorio Guerra – M63000000
 
 Fabrizio Imparato – M63001758
 
-Tommaso Rivieccio – M63000000
+Tommaso Rivieccio – M63001845
 
 
 # Funzionalità dell'Applicazione 

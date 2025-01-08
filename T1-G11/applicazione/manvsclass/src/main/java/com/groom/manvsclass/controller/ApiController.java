@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import com.groom.manvsclass.responses.ApiReponse;
+import com.groom.manvsclass.responses.ApiResponse;
 import com.groom.manvsclass.service.ApiService;
 
 @CrossOrigin
@@ -24,13 +24,13 @@ public class ApiController {
 
     // Restituisce la lista dei nomi delle classi disponibili
     @GetMapping("classes")
-    public ResponseEntity<ApiReponse> getClasses(@CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<ApiResponse> getClasses(@CookieValue(name = "jwt", required = false) String jwt) {
         return apiService.getClasses(jwt);
     }
 
     // Restituisce il path in cui si trova una specifica classe
     @GetMapping("classes/{className}")
-    public ResponseEntity<ApiReponse> getClass(@PathVariable(value = "className") String className,
+    public ResponseEntity<ApiResponse> getClass(@PathVariable(value = "className") String className,
             @CookieValue(name = "jwt", required = false) String jwt) {
 
         System.out.println("Entro nel controller con: " + className);
@@ -39,14 +39,14 @@ public class ApiController {
 
     // Restituisce la lista di Robot associati ad una classe
     @GetMapping("classes/{className}/robots")
-    public ResponseEntity<ApiReponse> getRobots(@PathVariable(value = "className") String className,
+    public ResponseEntity<ApiResponse> getRobots(@PathVariable(value = "className") String className,
             @CookieValue(name = "jwt", required = false) String jwt) {
         return apiService.getRobots(className, jwt);
     }
 
     // Restituisce il path di uno specifico robot per una specifica classe
     @GetMapping("classes/{className}/{robotName}")
-    public ResponseEntity<ApiReponse> getRobot(@PathVariable(value = "className") String className,
+    public ResponseEntity<ApiResponse> getRobot(@PathVariable(value = "className") String className,
             @PathVariable(value = "robotName") String robotName,
             @CookieValue(name = "jwt", required = false) String jwt) {
 
@@ -55,7 +55,7 @@ public class ApiController {
 
     // Salva un classe UT
     @PostMapping("classes/{className}")
-    public ResponseEntity<ApiReponse> setClass(@PathVariable(value = "className") String className,
+    public ResponseEntity<ApiResponse> setClass(@PathVariable(value = "className") String className,
             @RequestParam(name = "classFile", required = false) MultipartFile classFile,
             @CookieValue(name = "jwt", required = false) String jwt) throws IOException {
 
@@ -64,7 +64,7 @@ public class ApiController {
 
     // Salva il test per una classe UT
     @PostMapping("classes/{className}/{robotName}")
-    public ResponseEntity<ApiReponse> setRobot(@PathVariable(value = "className") String className,
+    public ResponseEntity<ApiResponse> setRobot(@PathVariable(value = "className") String className,
             @PathVariable(value = "robotName") String robotName,
             @RequestParam(name = "robotFile", required = false) MultipartFile robotFile,
             @CookieValue(name = "jwt", required = false) String jwt) throws IOException {
@@ -74,7 +74,7 @@ public class ApiController {
 
     // Salva un classe UT
     @DeleteMapping("classes/{className}")
-    public ResponseEntity<ApiReponse> deleteClass(@PathVariable(value = "className") String className,
+    public ResponseEntity<ApiResponse> deleteClass(@PathVariable(value = "className") String className,
             @CookieValue(name = "jwt", required = false) String jwt) throws IOException {
 
         return apiService.deleteClass(className, jwt);
@@ -82,7 +82,7 @@ public class ApiController {
 
     // Salva il test per una classe UT
     @DeleteMapping("classes/{className}/{robotName}")
-    public ResponseEntity<ApiReponse> deleteRobot(@PathVariable(value = "className") String className,
+    public ResponseEntity<ApiResponse> deleteRobot(@PathVariable(value = "className") String className,
             @PathVariable(value = "robotName") String robotName,
             @CookieValue(name = "jwt", required = false) String jwt) throws IOException {
 
