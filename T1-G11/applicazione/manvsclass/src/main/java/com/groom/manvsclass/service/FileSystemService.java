@@ -2,12 +2,15 @@ package com.groom.manvsclass.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileSystemException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -22,6 +25,9 @@ public class FileSystemService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileSystemService.class);
 
+    private final ConcurrentHashMap<Path, ReentrantLock> lockMap = new ConcurrentHashMap<>();
+
+    // Absolute path
     @Value("${filesystem.classesPath}")
     private String classesPath;
 
@@ -31,14 +37,21 @@ public class FileSystemService {
     @Value("${filesystem.testsFolder}")
     private String testsFolder;
 
-    /**
-     * 
-     * @param className name of the class to save
-     * @param classFile class.java file to save
-     * @return the path to classFile.
-     * @throws IOException
-     */
-    public Path saveClass(String className, MultipartFile classFile) throws IOException {
+    private void lockPath(Path path) {
+        lockMap.computeIfAbsent(path, p -> new ReentrantLock()).lock();
+    }
+
+    private void unlockPath(Path path) {
+        ReentrantLock lock = lockMap.get(path);
+        if(lock != null) {
+            lock.unlock();
+            if(!lock.hasQueuedThreads()) {
+                lockMap.remove(path, lock);
+            }
+        }
+    }
+
+    public Path saveClass(String className, MultipartFile classFile) throws FileSystemException {
 
         Path path = createFolder(classesPath + className);
 
@@ -52,15 +65,7 @@ public class FileSystemService {
         return path;
     }
 
-    /**
-     * 
-     * @param className name of the class in which the test is being added
-     * @param robotName name of the generator of the test
-     * @param testFile  test.zip file to save
-     * @return the path to the robotName folder.
-     * @throws IOException
-     */
-    public Path saveTest(String className, String robotName, MultipartFile testFile) throws IOException {
+    public Path saveTest(String className, String robotName, MultipartFile testFile) throws FileSystemException {
 
         logger.debug("Saving test of Robot: {}", robotName);
 
@@ -74,13 +79,7 @@ public class FileSystemService {
         return path;
     }
 
-    /**
-     * 
-     * @param className name of the class to delete
-     * @return path of the deleted folder
-     * @throws IOException
-     */
-    public Path deleteAll(String className) throws IOException {
+    public Path deleteAll(String className) throws FileSystemException {
 
         Path path = deleteDirectory(Paths.get(classesPath + className));
 
@@ -89,13 +88,7 @@ public class FileSystemService {
         return path;
     }
 
-    /**
-     * 
-     * @param className name of the class' SourceCode to delete
-     * @return path of the deleted folder
-     * @throws IOException
-     */
-    public Path deleteClass(String className) throws IOException {
+    public Path deleteClass(String className) throws FileSystemException {
 
         Path path = deleteDirectory(Paths.get(classesPath + className).resolve(sourceFolder));
 
@@ -104,14 +97,7 @@ public class FileSystemService {
         return path;
     }
 
-    /**
-     * 
-     * @param className name of the class' test to remove
-     * @param robotName name of the robot's test to remove
-     * @return path of the deleted folder
-     * @throws IOException
-     */
-    public Path deleteTest(String className, String robotName) throws IOException {
+    public Path deleteTest(String className, String robotName) throws FileSystemException {
 
         Path path = deleteDirectory(Paths.get(classesPath + className).resolve(testsFolder + robotName));
 
@@ -120,66 +106,58 @@ public class FileSystemService {
         return path;
     }
 
-    /**
-     * 
-     * @param path is a String which contains the path to the folder to create
-     * @return the Path of the created folder
-     * @throws IOException
-     */
-    public static Path createFolder(String path) throws IOException {
+    public Path createFolder(String path) throws FileSystemException {
 
         Path target = Paths.get(path);
-        target = Files.createDirectories(target);
-
-        logger.info("Folder created: {}", target.toString());
+        target = createFolder(target);
 
         return target;
     }
 
-    /**
-     * 
-     * @param path is the Path where the folder is created
-     * @return the Path of the created folder
-     * @throws IOException
-     */
-    public static Path createFolder(Path path) throws IOException {
+    public Path createFolder(Path path) throws FileSystemException {
 
-        path = Files.createDirectories(path);
+        lockPath(path);
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            // Catching exception and rolling back
+            logger.warn("Error in creating {}", path.toString());
+            deleteDirectory(path);
+            throw new FileSystemException(path.toString());
+        } finally {
+            unlockPath(path);
+        }
 
         logger.info("Folder created: {}", path.toString());
 
         return path;
     }
 
-    /**
-     * 
-     * @param file is the file to be saved
-     * @param path is the destination folder of the file
-     * @return the path to the file.
-     * @throws IOException
-     */
-    public static Path saveFile(MultipartFile file, Path path) throws IOException {
+    public Path saveFile(MultipartFile file, Path path) throws FileSystemException {
+        Path filePath = path.resolve(file.getOriginalFilename());
 
-        path = path.resolve(file.getOriginalFilename());
-        file.transferTo(path);
+        lockPath(path);
+        lockPath(filePath);
+        try {
+            file.transferTo(filePath);
+        } catch (IOException e) {
+            logger.warn("Error during transfer of file {}", file.getOriginalFilename());
+            deleteDirectory(filePath);
+            throw new FileSystemException(file.getOriginalFilename());
+        } finally {
+            unlockPath(filePath);
+            unlockPath(path);
+        }
 
         logger.info("File saved: {}", path.toString());
 
-        return path;
+        return filePath;
     }
 
-    /**
-     * 
-     * @param zipFile   is the file to unzip
-     * @param unzipPath is the destination folder of unzip operation
-     * @return the destination folder of the unzip operation.
-     * @throws IOException
-     */
-    public static Path unzip(MultipartFile zipFile, Path unzipPath) throws IOException {
+    public Path unzip(MultipartFile zipFile, Path unzipPath) throws FileSystemException {
         // Verifies the existance of the path, creates it if nonexistent
-        // ? Should've created them before. Just do a check or throw an error?
         if (Files.notExists(unzipPath)) {
-            Files.createDirectories(unzipPath);
+            createFolder(unzipPath);
         }
 
         logger.debug("Beginning extraction of: {}", unzipPath.toString());
@@ -198,8 +176,7 @@ public class FileSystemService {
 
                 // Checks for PathTraversal attacks
                 if (!extractedPath.startsWith(unzipPath)) {
-                    throw new IOException(
-                            "Tentativo di estrarre file fuori dal percorso consentito: " + entry.getName());
+                    throw new FileSystemException(extractedPath.toString(), null, "Tentativo di estrarre file fuori dal percorso consentito: " + entry.getName());
                 }
 
                 if (entry.isDirectory()) {
@@ -220,44 +197,49 @@ public class FileSystemService {
 
                 zis.closeEntry();
             }
+        } catch(IOException e) {
+            logger.warn("Error during the unzip of {}", zipFile.toString());
+            throw new FileSystemException(zipFile.toString());
         }
 
         logger.info("ZIP file extracted successfully.");
         return unzipPath;
     }
 
-    /**
-     * 
-     * @param directory to delete
-     * @return the deleted directory Path.
-     * @throws IOException
-     */
-    public static Path deleteDirectory(Path directory) throws IOException {
+    public Path deleteDirectory(Path directory) throws FileSystemException {
+        //! CHECK: Directory existance
         if (!Files.exists(directory)) {
             logger.warn("The directory {} doesn't exist", directory.toString());
-            throw new IOException("La directory non esiste.");
+            throw new FileSystemException(directory.toString());
         }
 
         // Usa un FileVisitor per attraversare ricorsivamente la directory
-        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+        lockPath(directory);
+        try {
+            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+                // Action done when visiting a file
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                    logger.debug("Deleting: {}", file.toString());
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+    
+                // Action done after visiting a directory
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
+                    logger.debug("Deleting: {}", dir.toString());
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            logger.warn("Deletion of {} gone wrong", directory.toString());
+            throw new FileSystemException(directory.toString());
+        } finally {
+            unlockPath(directory);
+        }
 
-            // Action done when visiting a file
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                logger.debug("Deleting: {}", file.toString());
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            // Action done after visiting a directory
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
-                logger.debug("Deleting: {}", dir.toString());
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-
-        });
         logger.info("Deletion completed successfully: {}", directory.toString());
 
         return directory;

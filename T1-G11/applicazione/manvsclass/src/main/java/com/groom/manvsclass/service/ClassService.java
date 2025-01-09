@@ -60,6 +60,7 @@ public class ClassService {
             return new ResponseEntity<FileResponse>(response, HttpStatus.BAD_REQUEST);
         }
 
+        // ! CHECK: Presence of class file
         if (classFile == null) {
             logger.warn("File not present.");
             response.setMessage("Errore, richiesto il file.java della classe.");
@@ -79,55 +80,59 @@ public class ClassService {
             return new ResponseEntity<FileResponse>(response, HttpStatus.BAD_REQUEST);
         }
 
-        // Controllo classe duplicata
-        logger.info("Checking if class already exists.");
-        Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(classUT.getName()));
-
-        if (mongoTemplate.findOne(query, ClassUT.class) != null) {
-            logger.warn("Class already in MongoDB");
-            response.setMessage("Errore, classe già presente");
-            return new ResponseEntity<FileResponse>(response, HttpStatus.BAD_REQUEST);
-        }
-
         if (tests.containsKey("file")) {
             // In the tests Map there is also a duplicate of classFile remove it
             logger.debug("Class.java inside the Map.");
             tests.remove("file");
         }
 
-        String className = classUT.getName();
+        // ! CHECK: Class exists already
+        logger.info("Checking if class already exists.");
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(classUT.getName()));
 
-        Path path = fileSystemService.saveClass(className, classFile);
-        classUT.setcode_Uri(path.toString());
-
-        // Robot adding to ClassUT and RobotFolder creation
-        List<Robot> robots = new ArrayList<Robot>();
-        for (String robotName : tests.keySet()) {
-
-            path = fileSystemService.saveTest(className, robotName, tests.get(robotName));
-            robots.add(new Robot(robotName, path.toString() + "/"));
-
+        synchronized (this) {
+            if (mongoTemplate.findOne(query, ClassUT.class) != null) {
+                logger.warn("Class already in MongoDB");
+                response.setMessage("Errore, classe già presente");
+                return new ResponseEntity<FileResponse>(response, HttpStatus.BAD_REQUEST);
+            }
+    
+            String className = classUT.getName();
+    
+            Path path = fileSystemService.saveClass(className, classFile);
+            classUT.setcode_Uri(path.toString());
+    
+            // Robot adding to ClassUT and RobotFolder creation
+            List<Robot> robots = new ArrayList<Robot>();
+            for (String robotName : tests.keySet()) {
+    
+                path = fileSystemService.saveTest(className, robotName, tests.get(robotName));
+                robots.add(new Robot(robotName, path.toString() + "/"));
+    
+            }
+            classUT.setRobots(robots);
+    
+            logger.info("Robots saved successfully");
+    
+            // Saves in MongoDB
+            logger.debug("Saving class into the database...");
+            classRepository.save(classUT);
+            logger.info("Class saved into the database");
+    
+            logger.info("Class saved successfully in the application: {}", className);
         }
-        classUT.setRobots(robots);
-
-        logger.info("Robots saved successfully");
 
         // ! TO DELETE IN FUTURE VERSIONS
         logger.debug("Starting legacy upload...");
         adminService.uploadTest(classFile, modelJSON, tests.get("Randoop"), tests.get("EvoSuite"), jwt, request);
         logger.debug("Legacy upload ended.");
 
-        // Saves in MongoDB
-        logger.debug("Saving class into the database...");
-        classRepository.save(classUT);
-        System.out.println("Class saved into the database");
 
         // Building response
         response.setFileName(classFile.getOriginalFilename());
         response.setSize(classFile.getSize());
 
-        logger.info("Class saved successfully in the application: {}", className);
 
         return new ResponseEntity<FileResponse>(response, HttpStatus.OK);
     }
@@ -146,13 +151,15 @@ public class ClassService {
         Query query = new Query();
         query.addCriteria(Criteria.where("name").is(className));
 
-        if (mongoTemplate.findOne(query, ClassUT.class) == null) {
-            logger.warn("Class not in database");
-            return new ResponseEntity<String>("Questa classe non esiste.", HttpStatus.BAD_REQUEST);
+        synchronized (this) {
+            if (mongoTemplate.findOne(query, ClassUT.class) == null) {
+                logger.warn("Class not in database");
+                return new ResponseEntity<String>("Questa classe non esiste.", HttpStatus.BAD_REQUEST);
+            }
+    
+            logger.debug("Deleting from FileSystem...");
+            fileSystemService.deleteAll(className);
         }
-
-        logger.debug("Deleting from FileSystem...");
-        fileSystemService.deleteAll(className);
 
         // ! When removed, insert the delete from MongoDB logic
         logger.debug("Starting legacy deletion...");

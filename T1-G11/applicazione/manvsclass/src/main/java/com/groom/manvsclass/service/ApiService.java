@@ -221,7 +221,7 @@ public class ApiService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        FileSystemService.deleteDirectory(Paths.get(classesPath + className));
+        fileSystemService.deleteDirectory(Paths.get(classesPath + className));
 
         Path path = fileSystemService.saveClass(className, classFile);
 
@@ -285,7 +285,7 @@ public class ApiService {
             }
 
             if (find) {
-                FileSystemService.deleteDirectory(Paths.get(classesPath + className + "/" + testsFolder + robotName));
+                fileSystemService.deleteDirectory(Paths.get(classesPath + className + "/" + testsFolder + robotName));
             }
 
             // Salva il nuovo test
@@ -380,7 +380,7 @@ public class ApiService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        FileSystemService.deleteDirectory(Paths.get(classesPath + className + "/" + testsFolder + robotName));
+        fileSystemService.deleteDirectory(Paths.get(classesPath + className + "/" + testsFolder + robotName));
 
         robots.remove(index);
 
