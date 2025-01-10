@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipEntry;
@@ -25,11 +27,13 @@ public class FileSystemService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileSystemService.class);
 
-    private final ConcurrentHashMap<Path, ReentrantLock> lockMap = new ConcurrentHashMap<>();
+    private final Map<Path, ReentrantLock> lockMap = new ConcurrentHashMap<>();
+
+    private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
     // Absolute path
     @Value("${filesystem.classesPath}")
-    private String classesPath;
+    private String classesFolder;
 
     @Value("${filesystem.sourceFolder}")
     private String sourceFolder;
@@ -37,11 +41,11 @@ public class FileSystemService {
     @Value("${filesystem.testsFolder}")
     private String testsFolder;
 
-    private void lockPath(Path path) {
+    public void lockPath(Path path) {
         lockMap.computeIfAbsent(path, p -> new ReentrantLock()).lock();
     }
 
-    private void unlockPath(Path path) {
+    public void unlockPath(Path path) {
         ReentrantLock lock = lockMap.get(path);
         if(lock != null) {
             lock.unlock();
@@ -52,36 +56,55 @@ public class FileSystemService {
     }
 
     public Path saveClass(String className, MultipartFile classFile) throws FileSystemException {
+        Path classPath = Paths.get(classesFolder).resolve(className);
 
-        Path path = createFolder(classesPath + className);
+        lockPath(classPath);
+        try {
+            Path path = createFolder(classPath);
+    
+            path = path.resolve(sourceFolder);
+            createFolder(path);
+    
+            path = saveFile(classFile, path);
+    
+            logger.info("Class saved successfully: {}", className);
+            return path;
+        } catch(IOException e) {
+            logger.error("Upload of class {} unsuccessful", className);
+            deleteAll(className);
+            throw new FileSystemException(classFile.getOriginalFilename());
+        } finally {
+            unlockPath(classPath);
+        }
 
-        path = path.resolve(sourceFolder);
-        createFolder(path);
-
-        path = saveFile(classFile, path);
-
-        logger.info("Class saved successfully: {}", className);
-
-        return path;
     }
 
     public Path saveTest(String className, String robotName, MultipartFile testFile) throws FileSystemException {
+        Path classPath = Paths.get(classesFolder).resolve(className);
 
-        logger.debug("Saving test of Robot: {}", robotName);
-
-        Path path = Paths.get(classesPath + className).resolve(testsFolder + robotName);
-        createFolder(path);
-
-        unzip(testFile, path);
-
-        logger.info("Test saved successfully: {} | {}", className, robotName);
-
-        return path;
+        lockPath(classPath);
+        try{
+            logger.debug("Saving test of Robot: {}", robotName);
+    
+            Path path = classPath.resolve(testsFolder).resolve(robotName);
+            createFolder(path);
+    
+            unzip(testFile, path);
+    
+            logger.info("Test saved successfully: {} | {}", className, robotName);
+            return path;
+        } catch(IOException e) {
+            logger.error("Error occurred while saving: {} | {}", className, robotName);
+            deleteAll(className);
+            throw new FileSystemException(testFile.getOriginalFilename());
+        } finally {
+            unlockPath(classPath);
+        }
     }
 
     public Path deleteAll(String className) throws FileSystemException {
 
-        Path path = deleteDirectory(Paths.get(classesPath + className));
+        Path path = deleteDirectory(Paths.get(classesFolder).resolve(className));
 
         logger.info("Class and its tests deleted successfully: {}", className);
 
@@ -90,7 +113,7 @@ public class FileSystemService {
 
     public Path deleteClass(String className) throws FileSystemException {
 
-        Path path = deleteDirectory(Paths.get(classesPath + className).resolve(sourceFolder));
+        Path path = deleteDirectory(Paths.get(classesFolder + className).resolve(sourceFolder));
 
         logger.info("SourceCode deleted successfully: {}", className);
 
@@ -99,33 +122,21 @@ public class FileSystemService {
 
     public Path deleteTest(String className, String robotName) throws FileSystemException {
 
-        Path path = deleteDirectory(Paths.get(classesPath + className).resolve(testsFolder + robotName));
+        Path path = deleteDirectory(Paths.get(classesFolder + className).resolve(testsFolder + robotName));
 
         logger.info("Test deleted successfully: {} | {}", className, robotName);
 
         return path;
     }
 
-    public Path createFolder(String path) throws FileSystemException {
-
-        Path target = Paths.get(path);
-        target = createFolder(target);
-
-        return target;
-    }
-
-    public Path createFolder(Path path) throws FileSystemException {
-
-        lockPath(path);
+    private Path rawCreateFolder(Path path) throws FileSystemException {
+        
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
             // Catching exception and rolling back
             logger.warn("Error in creating {}", path.toString());
-            deleteDirectory(path);
             throw new FileSystemException(path.toString());
-        } finally {
-            unlockPath(path);
         }
 
         logger.info("Folder created: {}", path.toString());
@@ -133,25 +144,56 @@ public class FileSystemService {
         return path;
     }
 
+    public Path createFolder(String path) throws FileSystemException {
+        return createFolder(Paths.get(path));
+    }
+
+    public Path createFolder(Path path) throws FileSystemException {
+
+        lockPath(path);
+        try {
+            return rawCreateFolder(path);
+        } catch (IOException exception) {
+            // Catching exception and rolling back
+            deleteDirectory(path);
+            throw exception;
+        } finally {
+            unlockPath(path);
+        }
+    }
+
+    private Path rawSaveFile(MultipartFile file, Path path) throws FileSystemException {
+        Path filePath = path.resolve(file.getOriginalFilename());
+
+        try {
+            file.transferTo(filePath);
+        } catch (IOException e) {
+            logger.warn("Error during transfer of file {}", file.getOriginalFilename());
+            throw new FileSystemException(file.getOriginalFilename());
+        }
+
+        logger.info("File saved: {}", filePath.toString());
+
+        return filePath;
+    }
+
+    public Path saveFile(MultipartFile file, String path) throws FileSystemException {
+        return saveFile(file, Paths.get(path));
+    }
+
     public Path saveFile(MultipartFile file, Path path) throws FileSystemException {
         Path filePath = path.resolve(file.getOriginalFilename());
 
-        lockPath(path);
         lockPath(filePath);
         try {
-            file.transferTo(filePath);
+            return rawSaveFile(file, path);
         } catch (IOException e) {
             logger.warn("Error during transfer of file {}", file.getOriginalFilename());
             deleteDirectory(filePath);
             throw new FileSystemException(file.getOriginalFilename());
         } finally {
             unlockPath(filePath);
-            unlockPath(path);
         }
-
-        logger.info("File saved: {}", path.toString());
-
-        return filePath;
     }
 
     public Path unzip(MultipartFile zipFile, Path unzipPath) throws FileSystemException {
@@ -207,6 +249,8 @@ public class FileSystemService {
     }
 
     public Path deleteDirectory(Path directory) throws FileSystemException {
+        Map<Path, byte[]> localFiles = threadLocalPath.get();
+
         //! CHECK: Directory existance
         if (!Files.exists(directory)) {
             logger.warn("The directory {} doesn't exist", directory.toString());
@@ -220,28 +264,61 @@ public class FileSystemService {
                 // Action done when visiting a file
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                    logger.debug("Deleting: {}", file.toString());
-                    Files.delete(file);
+                    lockPath(file);
+                    try {
+                        logger.debug("Backup of file: {}", file.toString());
+                        localFiles.put(file, Files.readAllBytes(file));
+                        logger.debug("Deleting: {}", file.toString());
+                        Files.delete(file);
+                    } finally {
+                        unlockPath(file);
+                    }
                     return FileVisitResult.CONTINUE;
                 }
     
                 // Action done after visiting a directory
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
-                    logger.debug("Deleting: {}", dir.toString());
-                    Files.delete(dir);
+                    lockPath(dir);
+                    try {
+                        logger.debug("Back up of folder: {}", dir);
+                        localFiles.put(dir, null);
+                        logger.debug("Deleting: {}", dir.toString());
+                        Files.delete(dir);
+                    } finally {
+                        unlockPath(dir);
+                    }
                     return FileVisitResult.CONTINUE;
                 }
             });
         } catch (IOException e) {
             logger.warn("Deletion of {} gone wrong", directory.toString());
+
+            localFiles.forEach((key, value) -> {
+                deleteRollback(key, value);
+            });
+
             throw new FileSystemException(directory.toString());
         } finally {
             unlockPath(directory);
+            localFiles.clear();
         }
 
         logger.info("Deletion completed successfully: {}", directory.toString());
 
         return directory;
+    }
+
+    private void deleteRollback(Path path, byte[] file) {
+        try {
+            if(file == null){
+                createFolder(path);
+            } else {
+                Files.write(path, file);
+            }
+        } catch(IOException e) {
+            logger.error("Rollback not working: {}", path.toString());
+            return;
+        }
     }
 }
