@@ -159,12 +159,13 @@ public class ClassService {
     
             logger.debug("Deleting from FileSystem...");
             fileSystemService.deleteAll(className);
+
+            // ! When removed, insert the delete from MongoDB logic
+            logger.debug("Starting legacy deletion...");
+            adminService.eliminaClasse(className, jwt);
+            logger.debug("Legacy deletion completed.");
         }
 
-        // ! When removed, insert the delete from MongoDB logic
-        logger.debug("Starting legacy deletion...");
-        adminService.eliminaClasse(className, jwt);
-        logger.debug("Legacy deletion completed.");
 
         logger.info("Class and its Tests have been successfully eliminated.");
 

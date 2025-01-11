@@ -31,6 +31,9 @@ public class FileSystemService {
 
     private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
+    @Value("${filesystem.rootPath}")
+    private String rootFolder;
+
     // Absolute path
     @Value("${filesystem.classesPath}")
     private String classesFolder;
@@ -321,5 +324,13 @@ public class FileSystemService {
             logger.error("Rollback not working: {}", path.toString());
             return;
         }
+    }
+
+    public boolean existsPath(Path path) {
+        return Files.exists(path);
+    }
+
+    public boolean validatePath(Path path) {
+        return path.startsWith(rootFolder);
     }
 }
