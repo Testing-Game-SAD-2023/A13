@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Robot;
 import com.groom.manvsclass.repository.ClassRepository;
@@ -36,15 +35,6 @@ public class ApiService {
 
     @Autowired
     private JwtService jwtService;
-
-    @Value("${filesystem.classesPath}")
-    private String classesPath;
-
-    @Value("${filesystem.sourceFolder}")
-    private String sourceFolder;
-
-    @Value("${filesystem.testsFolder}")
-    private String testsFolder;
 
     @Value("${config.pathRobot}")
     private String configRobotPath;
@@ -137,18 +127,14 @@ public class ApiService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        List<Robot> robots = classUT.getRobots();
+        List<String> robotNames = classUT.getRobotNames();
 
-        for (Robot robot : robots) {
-            robotsnames.add(robot.getRobotName());
-        }
-
-        if (robots.isEmpty()) {
+        if (robotNames.isEmpty()) {
             response.setMessage("Robots not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        response.setData(robotsnames);
+        response.setData(robotNames);
         response.setMessage("Robots found");
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
@@ -177,16 +163,12 @@ public class ApiService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        List<Robot> robots = classUT.getRobots();
+        List<String> robotNames = classUT.getRobotNames();
 
-        for (Robot robot : robots) {
-
-            if (robot.getRobotName().equals(robotName)) {
-                response.setData(robot.getRobotFile());
-                response.setMessage("Robot found");
-                return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
-            }
-
+        if (robotNames.contains(robotName)) {
+            response.setData(classUT.getRobotPath(robotName));
+            response.setMessage("Robot found");
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
         response.setMessage("Error, robot not found");
@@ -194,8 +176,7 @@ public class ApiService {
 
     }
 
-    // Aggiunge o sovrascrive una classe. Deve fare upload path nel DB e deve
-    // ripulire la cartella prima di aggiungere
+    // Sovrascrive una classe
     public ResponseEntity<ApiResponse> setClass(String className, MultipartFile classFile, String jwt)
             throws IOException {
 
@@ -221,7 +202,7 @@ public class ApiService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        fileSystemService.deleteDirectory(Paths.get(classesPath + className));
+        fileSystemService.deleteClass(className);
 
         Path path = fileSystemService.saveClass(className, classFile);
 
@@ -260,50 +241,30 @@ public class ApiService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        List<Robot> robots = classUT.getRobots();
-
         List<String> robotsConfig = Files.readAllLines(Paths.get(configRobotPath));
 
         if (!robotsConfig.contains(robotName)) {
             response.setMessage("Robot not available.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON)
                     .body(response);
-        } else {
-
-            // Recupera ed elimina il documento dal DB temporaneamente
-            // classUT = mongoTemplate.findAndRemove(query, ClassUT.class);
-
-            // Pulisce la directory con i file del robot se esiste
-            boolean find = false;
-            int index = 0;
-            for (Robot robot : robots) {
-
-                if (robot.getRobotName().equals(robotName)) {
-                    find = true;
-                    index = robots.indexOf(robot);
-                }
-            }
-
-            if (find) {
-                fileSystemService.deleteDirectory(Paths.get(classesPath + className + "/" + testsFolder + robotName));
-            }
-
-            // Salva il nuovo test
-            Path path = fileSystemService.saveTest(className, robotName, robotFile);
-
-            // Aggiunge il robot alla classe solo se è un INSERT (nel caso di UPDATE cambio
-            // solo il path)
-            if (!find) {
-                classUT.addRobot(new Robot(robotName, path.toString() + "/"));
-            } else {
-                Robot robot = robots.get(index);
-                robot.setRobotFile(path.toString() + "/");
-            }
-
-            mongoTemplate.findAndReplace(query, classUT);
-            response.setMessage("Robot setted");
-            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
         }
+
+        List<String> robotNames = classUT.getRobotNames();
+
+        if (robotNames.contains(robotName)) {
+            fileSystemService.deleteTest(className, robotName);
+        }
+
+        // Salva il nuovo test
+        Path path = fileSystemService.saveTest(className, robotName, robotFile);
+
+        if (!robotNames.contains(robotName)) {
+            classUT.addRobot(new Robot(robotName, path.toString() + "/"));
+        }
+
+        mongoTemplate.findAndReplace(query, classUT);
+        response.setMessage("Robot setted");
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
 
     }
 
@@ -364,23 +325,18 @@ public class ApiService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        List<Robot> robots = classUT.getRobots();
-        boolean find = false;
-        int index = 0;
-        for (Robot robot : robots) {
+        List<String> robotNames = classUT.getRobotNames();
 
-            if (robot.getRobotName().equals(robotName)) {
-                find = true;
-                index = robots.indexOf(robot);
-            }
-        }
-
-        if (!find) {
+        if (!robotNames.contains(robotName)) {
             response.setMessage("Error, robot not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
-        fileSystemService.deleteDirectory(Paths.get(classesPath + className + "/" + testsFolder + robotName));
+        fileSystemService.deleteTest(className, robotName);
+
+        int index = robotNames.indexOf(robotName);
+
+        List<Robot> robots = classUT.getRobots();
 
         robots.remove(index);
 

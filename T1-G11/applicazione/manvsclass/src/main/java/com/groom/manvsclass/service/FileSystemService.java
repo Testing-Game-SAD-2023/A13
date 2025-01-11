@@ -47,9 +47,9 @@ public class FileSystemService {
 
     public void unlockPath(Path path) {
         ReentrantLock lock = lockMap.get(path);
-        if(lock != null) {
+        if (lock != null) {
             lock.unlock();
-            if(!lock.hasQueuedThreads()) {
+            if (!lock.hasQueuedThreads()) {
                 lockMap.remove(path, lock);
             }
         }
@@ -61,15 +61,15 @@ public class FileSystemService {
         lockPath(classPath);
         try {
             Path path = createFolder(classPath);
-    
+
             path = path.resolve(sourceFolder);
             createFolder(path);
-    
+
             path = saveFile(classFile, path);
-    
+
             logger.info("Class saved successfully: {}", className);
             return path;
-        } catch(IOException e) {
+        } catch (IOException e) {
             logger.error("Upload of class {} unsuccessful", className);
             deleteAll(className);
             throw new FileSystemException(classFile.getOriginalFilename());
@@ -83,17 +83,17 @@ public class FileSystemService {
         Path classPath = Paths.get(classesFolder).resolve(className);
 
         lockPath(classPath);
-        try{
+        try {
             logger.debug("Saving test of Robot: {}", robotName);
-    
+
             Path path = classPath.resolve(testsFolder).resolve(robotName);
             createFolder(path);
-    
+
             unzip(testFile, path);
-    
+
             logger.info("Test saved successfully: {} | {}", className, robotName);
             return path;
-        } catch(IOException e) {
+        } catch (IOException e) {
             logger.error("Error occurred while saving: {} | {}", className, robotName);
             deleteAll(className);
             throw new FileSystemException(testFile.getOriginalFilename());
@@ -130,7 +130,7 @@ public class FileSystemService {
     }
 
     private Path rawCreateFolder(Path path) throws FileSystemException {
-        
+
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
@@ -218,7 +218,8 @@ public class FileSystemService {
 
                 // Checks for PathTraversal attacks
                 if (!extractedPath.startsWith(unzipPath)) {
-                    throw new FileSystemException(extractedPath.toString(), null, "Tentativo di estrarre file fuori dal percorso consentito: " + entry.getName());
+                    throw new FileSystemException(extractedPath.toString(), null,
+                            "Tentativo di estrarre file fuori dal percorso consentito: " + entry.getName());
                 }
 
                 if (entry.isDirectory()) {
@@ -239,7 +240,7 @@ public class FileSystemService {
 
                 zis.closeEntry();
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             logger.warn("Error during the unzip of {}", zipFile.toString());
             throw new FileSystemException(zipFile.toString());
         }
@@ -251,7 +252,7 @@ public class FileSystemService {
     public Path deleteDirectory(Path directory) throws FileSystemException {
         Map<Path, byte[]> localFiles = threadLocalPath.get();
 
-        //! CHECK: Directory existance
+        // ! CHECK: Directory existance
         if (!Files.exists(directory)) {
             logger.warn("The directory {} doesn't exist", directory.toString());
             throw new FileSystemException(directory.toString());
@@ -275,7 +276,7 @@ public class FileSystemService {
                     }
                     return FileVisitResult.CONTINUE;
                 }
-    
+
                 // Action done after visiting a directory
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
@@ -311,12 +312,12 @@ public class FileSystemService {
 
     private void deleteRollback(Path path, byte[] file) {
         try {
-            if(file == null){
+            if (file == null) {
                 createFolder(path);
             } else {
                 Files.write(path, file);
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             logger.error("Rollback not working: {}", path.toString());
             return;
         }

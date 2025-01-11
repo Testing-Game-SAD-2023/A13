@@ -1,5 +1,6 @@
 package com.groom.manvsclass.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -93,6 +94,28 @@ public class ClassUT {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public List<String> getRobotNames() {
+
+		List<String> robotNames = new ArrayList<>();
+
+		for (Robot robot : robots) {
+			robotNames.add(robot.getRobotName());
+		}
+
+		return robotNames;
+	}
+
+	public String getRobotPath(String robotName) {
+
+		for (Robot robot : robots) {
+
+			if (robot.getRobotName().equals(robotName))
+				return robot.getRobotFile();
+		}
+
+		return null;
 	}
 
 	@Override

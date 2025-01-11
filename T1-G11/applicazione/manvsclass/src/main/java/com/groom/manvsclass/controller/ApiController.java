@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.groom.manvsclass.model.PathRequest;
 import com.groom.manvsclass.responses.ApiResponse;
 import com.groom.manvsclass.service.ApiService;
 
@@ -89,4 +92,10 @@ public class ApiController {
         return apiService.deleteRobot(className, jwt, robotName);
     }
 
+    @GetMapping("fileSystem")
+    public ResponseEntity<ApiResponse> getFileSystem(@RequestBody PathRequest pathRequest,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+
+        return null;
+    }
 }
