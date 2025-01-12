@@ -439,10 +439,12 @@ public class ApiService {
         System.out.println("[TA] Entro in lock con path: " + path.toString());
 
         ReentrantLock lock = new ReentrantLock();
+        Condition condition = lock.newCondition();
+        Boolean isReady = false;
 
         Thread worker = new Thread(() -> {
             try {
-                runThread(lock, path);
+                runThread(lock, condition, isReady, path);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -452,7 +454,14 @@ public class ApiService {
 
         System.out.println("[TA] wait sul lock di comunicazione");
 
-        lock.wait();
+        lock.lock();
+        try {
+            while(!isReady){
+                    condition.await();
+                }
+        } finally {
+            lock.unlock();
+        }
 
         System.out.println("[TA] invio risposta di lock");
 
@@ -461,7 +470,7 @@ public class ApiService {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
-    public ResponseEntity<ApiResponse> unlock(String pathRequest, String jwt) {
+    public ResponseEntity<ApiResponse> unlock(String pathRequest, String jwt) throws InterruptedException {
 
         ApiResponse response = new ApiResponse();
 
@@ -480,7 +489,7 @@ public class ApiService {
 
         System.out.println("[TC] notify sul lock del path ");
 
-        fileSystemService.notifyReadPath(path);
+        fileSystemService.notify(path);
 
         System.out.println("[TC] Invio messaggio di riposta unlock");
 
@@ -491,7 +500,7 @@ public class ApiService {
     }
 
     // lock gia è wait quando viene passato
-    private void runThread(ReentrantLock lock, Path path) throws InterruptedException {
+    private void runThread(ReentrantLock lock, Condition condition, Boolean isReady, Path path) throws InterruptedException {
 
         if (lock == null) {
             return;
@@ -499,26 +508,26 @@ public class ApiService {
 
         System.out.println("[TB] start");
 
-        fileSystemService.lockReadPath(path);
+        fileSystemService.readLock(path);
 
         System.out.println("[TB] lock sul lock del path");
-
-        try {
-            while (!lock.hasQueuedThreads()) {
-                Thread.currentThread().sleep(3000);
-            }
-
+        
+        
+        lock.lock();
+        try{
+            isReady = true;
             System.out.println("[TB] notify sul lock di comunicazione");
-
-            lock.notify();
-
-            System.out.println("[TB] wait sul lock del path");
-
-            fileSystemService.waitReadPath(path);
+            condition.signal();
         } finally {
-            System.out.println("[TB] unlock sul lock del path");
-
-            fileSystemService.unlockReadPath(path);
+            lock.unlock();
         }
+
+        System.out.println("[TB] wait sul lock del path");
+
+        fileSystemService.wait(path);
+
+        System.out.println("[TB] unlock sul lock del path");
+
+        fileSystemService.readUnlock(path);
     }
 }

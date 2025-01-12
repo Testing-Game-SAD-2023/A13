@@ -11,9 +11,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -30,6 +32,8 @@ public class FileSystemService {
 
     private final Map<Path, ReentrantReadWriteLock> lockMap = new ConcurrentHashMap<>();
 
+    private final Map<Path, SimpleEntry<Condition, Boolean>> conditionsMap = new ConcurrentHashMap<>();
+
     private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
     @Value("${filesystem.rootPath}")
@@ -45,19 +49,58 @@ public class FileSystemService {
     @Value("${filesystem.testsFolder}")
     private String testsFolder;
 
-    public void waitReadPath(Path path) throws InterruptedException {
-        lockMap.get(path).readLock().wait(60000);
+    public void notify(Path path) throws InterruptedException {
+        ReentrantReadWriteLock lock = lockMap.get(path);
+        WriteLock writeLock = lock.writeLock();
+        newCondition(path);
+
+        writeLock.lock();
+
+        SimpleEntry<Condition, Boolean> entry = conditionsMap.get(path);
+        Condition condition = entry.getKey();
+
+        try {
+            entry.setValue(true);
+            entry.getKey().signal();
+            
+            if(lock.hasWaiters(condition)){
+                entry.setValue(false);
+            } else {
+                conditionsMap.remove(path);
+            }
+        } finally {
+            writeLock.unlock();
+        }
     }
 
-    public void notifyReadPath(Path path) {
-        lockMap.get(path).readLock().notify();
+    public void wait(Path path) throws InterruptedException {
+        ReentrantReadWriteLock lock = lockMap.get(path);
+        WriteLock writeLock = lock.writeLock();
+        newCondition(path);
+
+        writeLock.lock();
+
+        SimpleEntry<Condition, Boolean> entry = conditionsMap.get(path);
+        
+        try {
+            while(!entry.getValue()){
+                entry.getKey().await();
+            }
+        } finally {
+            writeLock.unlock();
+        }
     }
 
-    public void lockReadPath(Path path) {
+    public void newCondition(Path path) throws InterruptedException {
+        Condition condition = lockMap.get(path).writeLock().newCondition();
+        conditionsMap.computeIfAbsent(path, p -> new SimpleEntry<Condition,Boolean>(condition, false));
+    }
+
+    public void readLock(Path path) throws InterruptedException {
         lockMap.computeIfAbsent(path, p -> new ReentrantReadWriteLock()).readLock().lock();
     }
 
-    public void unlockReadPath(Path path) {
+    public void readUnlock(Path path) {
         ReentrantReadWriteLock lock = lockMap.get(path);
         if (lock != null) {
             lock.readLock().unlock();
@@ -67,11 +110,11 @@ public class FileSystemService {
         }
     }
 
-    public void lockWritePath(Path path) {
+    public void writeLock(Path path) {
         lockMap.computeIfAbsent(path, p -> new ReentrantReadWriteLock()).writeLock().lock();
     }
 
-    public void unlockWritePath(Path path) {
+    public void writeUnlock(Path path) {
         ReentrantReadWriteLock lock = lockMap.get(path);
         if (lock != null) {
             lock.writeLock().unlock();
@@ -84,7 +127,7 @@ public class FileSystemService {
     public Path saveClass(String className, MultipartFile classFile) throws FileSystemException {
         Path classPath = Paths.get(classesFolder).resolve(className);
 
-        lockWritePath(classPath);
+        writeLock(classPath);
         try {
             Path path = createFolder(classPath);
 
@@ -100,7 +143,7 @@ public class FileSystemService {
             deleteAll(className);
             throw new FileSystemException(classFile.getOriginalFilename());
         } finally {
-            unlockWritePath(classPath);
+            writeUnlock(classPath);
         }
 
     }
@@ -108,7 +151,7 @@ public class FileSystemService {
     public Path saveTest(String className, String robotName, MultipartFile testFile) throws FileSystemException {
         Path classPath = Paths.get(classesFolder).resolve(className);
 
-        lockWritePath(classPath);
+        writeLock(classPath);
         try {
             logger.debug("Saving test of Robot: {}", robotName);
 
@@ -124,7 +167,7 @@ public class FileSystemService {
             deleteAll(className);
             throw new FileSystemException(testFile.getOriginalFilename());
         } finally {
-            unlockWritePath(classPath);
+            writeUnlock(classPath);
         }
     }
 
@@ -176,7 +219,7 @@ public class FileSystemService {
 
     public Path createFolder(Path path) throws FileSystemException {
 
-        lockWritePath(path);
+        writeLock(path);
         try {
             return rawCreateFolder(path);
         } catch (IOException exception) {
@@ -184,7 +227,7 @@ public class FileSystemService {
             deleteDirectory(path);
             throw exception;
         } finally {
-            unlockWritePath(path);
+            writeUnlock(path);
         }
     }
 
@@ -210,7 +253,7 @@ public class FileSystemService {
     public Path saveFile(MultipartFile file, Path path) throws FileSystemException {
         Path filePath = path.resolve(file.getOriginalFilename());
 
-        lockWritePath(filePath);
+        writeLock(filePath);
         try {
             return rawSaveFile(file, path);
         } catch (IOException e) {
@@ -218,7 +261,7 @@ public class FileSystemService {
             deleteDirectory(filePath);
             throw new FileSystemException(file.getOriginalFilename());
         } finally {
-            unlockWritePath(filePath);
+            writeUnlock(filePath);
         }
     }
 
@@ -285,20 +328,20 @@ public class FileSystemService {
         }
 
         // Usa un FileVisitor per attraversare ricorsivamente la directory
-        lockWritePath(directory);
+        writeLock(directory);
         try {
             Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
                 // Action done when visiting a file
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                    lockWritePath(file);
+                    writeLock(file);
                     try {
                         logger.debug("Backup of file: {}", file.toString());
                         localFiles.put(file, Files.readAllBytes(file));
                         logger.debug("Deleting: {}", file.toString());
                         Files.delete(file);
                     } finally {
-                        unlockWritePath(file);
+                        writeUnlock(file);
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -306,14 +349,14 @@ public class FileSystemService {
                 // Action done after visiting a directory
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
-                    lockWritePath(dir);
+                    writeLock(dir);
                     try {
                         logger.debug("Back up of folder: {}", dir);
                         localFiles.put(dir, null);
                         logger.debug("Deleting: {}", dir.toString());
                         Files.delete(dir);
                     } finally {
-                        unlockWritePath(dir);
+                        writeUnlock(dir);
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -327,7 +370,7 @@ public class FileSystemService {
 
             throw new FileSystemException(directory.toString());
         } finally {
-            unlockWritePath(directory);
+            writeUnlock(directory);
             localFiles.clear();
         }
 
