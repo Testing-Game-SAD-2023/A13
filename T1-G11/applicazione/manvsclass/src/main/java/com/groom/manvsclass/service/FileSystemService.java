@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -27,7 +28,7 @@ public class FileSystemService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileSystemService.class);
 
-    private final Map<Path, ReentrantLock> lockMap = new ConcurrentHashMap<>();
+    private final Map<Path, ReentrantReadWriteLock> lockMap = new ConcurrentHashMap<>();
 
     private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
@@ -44,14 +45,28 @@ public class FileSystemService {
     @Value("${filesystem.testsFolder}")
     private String testsFolder;
 
-    public void lockPath(Path path) {
-        lockMap.computeIfAbsent(path, p -> new ReentrantLock()).lock();
+    public void lockReadPath(Path path) {
+        lockMap.computeIfAbsent(path, p -> new ReentrantReadWriteLock()).readLock().lock();
     }
 
-    public void unlockPath(Path path) {
-        ReentrantLock lock = lockMap.get(path);
+    public void unlockReadPath(Path path) {
+        ReentrantReadWriteLock lock = lockMap.get(path);
         if (lock != null) {
-            lock.unlock();
+            lock.readLock().unlock();
+            if(!lock.hasQueuedThreads()) {
+                lockMap.remove(path, lock);
+            }
+        }
+    }
+
+    public void lockWritePath(Path path) {
+        lockMap.computeIfAbsent(path, p -> new ReentrantReadWriteLock()).writeLock().lock();
+    }
+
+    public void unlockWritePath(Path path) {
+        ReentrantReadWriteLock lock = lockMap.get(path);
+        if (lock != null) {
+            lock.writeLock().unlock();
             if (!lock.hasQueuedThreads()) {
                 lockMap.remove(path, lock);
             }
@@ -61,7 +76,7 @@ public class FileSystemService {
     public Path saveClass(String className, MultipartFile classFile) throws FileSystemException {
         Path classPath = Paths.get(classesFolder).resolve(className);
 
-        lockPath(classPath);
+        lockWritePath(classPath);
         try {
             Path path = createFolder(classPath);
 
@@ -77,7 +92,7 @@ public class FileSystemService {
             deleteAll(className);
             throw new FileSystemException(classFile.getOriginalFilename());
         } finally {
-            unlockPath(classPath);
+            unlockWritePath(classPath);
         }
 
     }
@@ -85,7 +100,7 @@ public class FileSystemService {
     public Path saveTest(String className, String robotName, MultipartFile testFile) throws FileSystemException {
         Path classPath = Paths.get(classesFolder).resolve(className);
 
-        lockPath(classPath);
+        lockWritePath(classPath);
         try {
             logger.debug("Saving test of Robot: {}", robotName);
 
@@ -101,7 +116,7 @@ public class FileSystemService {
             deleteAll(className);
             throw new FileSystemException(testFile.getOriginalFilename());
         } finally {
-            unlockPath(classPath);
+            unlockWritePath(classPath);
         }
     }
 
@@ -153,7 +168,7 @@ public class FileSystemService {
 
     public Path createFolder(Path path) throws FileSystemException {
 
-        lockPath(path);
+        lockWritePath(path);
         try {
             return rawCreateFolder(path);
         } catch (IOException exception) {
@@ -161,7 +176,7 @@ public class FileSystemService {
             deleteDirectory(path);
             throw exception;
         } finally {
-            unlockPath(path);
+            unlockWritePath(path);
         }
     }
 
@@ -187,7 +202,7 @@ public class FileSystemService {
     public Path saveFile(MultipartFile file, Path path) throws FileSystemException {
         Path filePath = path.resolve(file.getOriginalFilename());
 
-        lockPath(filePath);
+        lockWritePath(filePath);
         try {
             return rawSaveFile(file, path);
         } catch (IOException e) {
@@ -195,7 +210,7 @@ public class FileSystemService {
             deleteDirectory(filePath);
             throw new FileSystemException(file.getOriginalFilename());
         } finally {
-            unlockPath(filePath);
+            unlockWritePath(filePath);
         }
     }
 
@@ -262,20 +277,20 @@ public class FileSystemService {
         }
 
         // Usa un FileVisitor per attraversare ricorsivamente la directory
-        lockPath(directory);
+        lockWritePath(directory);
         try {
             Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
                 // Action done when visiting a file
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                    lockPath(file);
+                    lockWritePath(file);
                     try {
                         logger.debug("Backup of file: {}", file.toString());
                         localFiles.put(file, Files.readAllBytes(file));
                         logger.debug("Deleting: {}", file.toString());
                         Files.delete(file);
                     } finally {
-                        unlockPath(file);
+                        unlockWritePath(file);
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -283,14 +298,14 @@ public class FileSystemService {
                 // Action done after visiting a directory
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
-                    lockPath(dir);
+                    lockWritePath(dir);
                     try {
                         logger.debug("Back up of folder: {}", dir);
                         localFiles.put(dir, null);
                         logger.debug("Deleting: {}", dir.toString());
                         Files.delete(dir);
                     } finally {
-                        unlockPath(dir);
+                        unlockWritePath(dir);
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -304,7 +319,7 @@ public class FileSystemService {
 
             throw new FileSystemException(directory.toString());
         } finally {
-            unlockPath(directory);
+            unlockWritePath(directory);
             localFiles.clear();
         }
 
