@@ -250,6 +250,7 @@ public class FileSystemService {
     public Path saveFile(MultipartFile file, Path path) throws FileSystemException {
         Path filePath = path.resolve(file.getOriginalFilename());
 
+        writeLock(path);
         writeLock(filePath);
         try {
             return rawSaveFile(file, path);
@@ -259,6 +260,7 @@ public class FileSystemService {
             throw new FileSystemException(file.getOriginalFilename());
         } finally {
             writeUnlock(filePath);
+            writeUnlock(path);
         }
     }
 
@@ -394,6 +396,8 @@ public class FileSystemService {
     }
 
     public boolean validatePath(Path path) {
-        return path.startsWith(rootFolder);
+        return path.startsWith(rootFolder)
+                && !(path.equals(Paths.get("/Volume")) || path.equals(Paths.get(classesFolder))
+                        || path.equals(Paths.get(rootFolder)));
     }
 }
