@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -33,8 +34,9 @@ public class FileSystemService {
     private static final Logger logger = LoggerFactory.getLogger(FileSystemService.class);
 
     private static class LockWrapper {
-        final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        final Condition condition = lock.writeLock().newCondition();
+        final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+        final ReentrantLock lock = new ReentrantLock();
+        final Condition condition = lock.newCondition();
         final AtomicBoolean bool = new AtomicBoolean(false);
     }
 
@@ -66,12 +68,12 @@ public class FileSystemService {
             throw new InterruptedException("LockWrapper doesn't exist");
         }
 
-        lockWrapper.lock.writeLock().lock();
+        lockWrapper.lock.lock();
         try {
             lockWrapper.bool.set(true);
             lockWrapper.condition.signal();
         } finally {
-            lockWrapper.lock.writeLock().unlock();
+            lockWrapper.lock.unlock();
         }
     }
 
@@ -79,24 +81,24 @@ public class FileSystemService {
         LockWrapper lockWrapper = getOrCreateLock(path);
         boolean signalled = false;
 
-        lockWrapper.lock.writeLock().lock();
+        lockWrapper.lock.lock();
         try {
-            while(!lockWrapper.bool.get()){
+            while (!lockWrapper.bool.get()) {
                 signalled = lockWrapper.condition.await(TIMEOUTSECONDS, TimeUnit.SECONDS);
             }
         } finally {
-            lockWrapper.lock.writeLock().unlock();
+            lockWrapper.lock.unlock();
         }
 
         return signalled;
     }
 
     public void readLock(Path path) throws InterruptedException {
-        getOrCreateLock(path).lock.readLock().lock();
+        getOrCreateLock(path).readWriteLock.readLock().lock();
     }
 
     public void readUnlock(Path path) {
-        ReentrantReadWriteLock lock = getOrCreateLock(path).lock;
+        ReentrantReadWriteLock lock = getOrCreateLock(path).readWriteLock;
         if (lock != null) {
             lock.readLock().unlock();
             if (!lock.hasQueuedThreads()) {
@@ -106,11 +108,11 @@ public class FileSystemService {
     }
 
     public void writeLock(Path path) {
-        getOrCreateLock(path).lock.writeLock().lock();
+        getOrCreateLock(path).readWriteLock.writeLock().lock();
     }
 
     public void writeUnlock(Path path) {
-        ReentrantReadWriteLock lock = getOrCreateLock(path).lock;
+        ReentrantReadWriteLock lock = getOrCreateLock(path).readWriteLock;
         if (lock != null) {
             lock.writeLock().unlock();
             if (!lock.hasQueuedThreads()) {

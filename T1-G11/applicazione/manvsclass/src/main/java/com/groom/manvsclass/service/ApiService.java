@@ -219,7 +219,8 @@ public class ApiService {
 
     }
 
-    // Aggiungo o sovrascrive un robot se esso è disponibile nel file di configurazione
+    // Aggiungo o sovrascrive un robot se esso è disponibile nel file di
+    // configurazione
     public ResponseEntity<ApiResponse> setRobot(String className, MultipartFile robotFile, String jwt,
             String robotName) throws IOException {
 
@@ -437,6 +438,11 @@ public class ApiService {
 
         Path path = Paths.get(pathRequest);
 
+        if (!fileSystemService.validatePath(path) || !fileSystemService.existsPath(path)) {
+            response.setMessage("Error, path not valid");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
+        }
+
         System.out.println("[TA] Entro in lock con path: " + path.toString());
 
         ReentrantLock lock = new ReentrantLock();
@@ -454,7 +460,7 @@ public class ApiService {
         worker.start();
 
         System.out.println("[TA] wait sul lock di comunicazione");
-        
+
         boolean signalled = false;
         lock.lock();
         try {
@@ -465,7 +471,7 @@ public class ApiService {
             lock.unlock();
         }
 
-        if(!signalled){
+        if (!signalled) {
             response.setMessage("TIMEOUT");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
         }
@@ -491,6 +497,11 @@ public class ApiService {
          */
 
         Path path = Paths.get(pathRequest);
+
+        if (!fileSystemService.validatePath(path) || !fileSystemService.existsPath(path)) {
+            response.setMessage("Error, path not valid");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
+        }
 
         System.out.println("[TC] Entro in unlock con path: " + path.toString());
 
