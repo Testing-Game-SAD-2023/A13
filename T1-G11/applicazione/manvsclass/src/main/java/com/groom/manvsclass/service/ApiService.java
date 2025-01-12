@@ -344,4 +344,77 @@ public class ApiService {
         response.setMessage("Robot deleted");
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
+
+    public ResponseEntity<ApiResponse> setFileSystem(String pathRequest, MultipartFile file, String jwt)
+            throws IOException {
+
+        ApiResponse response = new ApiResponse();
+
+        /*
+         * if (!jwtService.isJwtValid(jwt)) {
+         * response.setMessage("Error, token not valid");
+         * return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.
+         * APPLICATION_JSON)
+         * .body(response);
+         * }
+         */
+
+        Path path = Paths.get(pathRequest);
+
+        if (!fileSystemService.validatePath(path) || !fileSystemService.existsPath(path)) {
+            response.setMessage("Error, path not valid");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
+        }
+
+        if (file == null) {
+            response.setMessage("Error, file not present");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
+        }
+
+        if (!Files.isDirectory(path)) {
+
+            fileSystemService.deleteDirectory(path);
+
+            fileSystemService.saveFile(file, path.getParent());
+
+        } else {
+
+            if (file.getOriginalFilename().endsWith(".zip")) {
+                fileSystemService.unzip(file, path);
+            } else {
+                fileSystemService.saveFile(file, path);
+            }
+        }
+
+        response.setMessage("Setted path element");
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
+    }
+
+    public ResponseEntity<ApiResponse> deleteFileSystem(String pathRequest, String jwt) throws IOException {
+
+        ApiResponse response = new ApiResponse();
+
+        /*
+         * if (!jwtService.isJwtValid(jwt)) {
+         * response.setMessage("Error, token not valid");
+         * return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.
+         * APPLICATION_JSON)
+         * .body(response);
+         * }
+         */
+
+        Path path = Paths.get(pathRequest);
+
+        if (fileSystemService.validatePath(path) && fileSystemService.existsPath(path)) {
+
+            fileSystemService.deleteDirectory(path);
+
+            response.setMessage("Deleted path element");
+            return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
+        } else {
+
+            response.setMessage("Error, path not valid");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(response);
+        }
+    }
 }

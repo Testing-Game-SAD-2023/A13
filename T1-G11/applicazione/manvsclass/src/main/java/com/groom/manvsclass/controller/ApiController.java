@@ -10,11 +10,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.groom.manvsclass.model.PathRequest;
 import com.groom.manvsclass.responses.ApiResponse;
 import com.groom.manvsclass.service.ApiService;
 
@@ -92,10 +89,19 @@ public class ApiController {
         return apiService.deleteRobot(className, jwt, robotName);
     }
 
-    @GetMapping("fileSystem")
-    public ResponseEntity<ApiResponse> getFileSystem(@RequestBody PathRequest pathRequest,
-            @CookieValue(name = "jwt", required = false) String jwt) {
+    @PostMapping("fileSystem")
+    public ResponseEntity<ApiResponse> setFileSystem(@RequestParam(name = "path") String pathRequest,
+            @RequestParam(name = "file") MultipartFile file,
+            @CookieValue(name = "jwt", required = false) String jwt) throws IOException {
 
-        return null;
+        return apiService.setFileSystem(pathRequest, file, jwt);
+    }
+
+    @DeleteMapping("fileSystem")
+    public ResponseEntity<ApiResponse> deleteFileSystem(
+            @RequestParam(name = "path") String pathRequest,
+            @CookieValue(name = "jwt", required = false) String jwt) throws IOException {
+
+        return apiService.deleteFileSystem(pathRequest, jwt);
     }
 }
