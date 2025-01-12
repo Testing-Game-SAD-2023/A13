@@ -11,12 +11,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -29,11 +28,17 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileSystemService {
 
+    private static final int TIMEOUTSECONDS = 30;
+
     private static final Logger logger = LoggerFactory.getLogger(FileSystemService.class);
 
-    private final Map<Path, ReentrantReadWriteLock> lockMap = new ConcurrentHashMap<>();
+    private static class LockWrapper {
+        final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        final Condition condition = lock.writeLock().newCondition();
+        final AtomicBoolean bool = new AtomicBoolean(false);
+    }
 
-    private final Map<Path, SimpleEntry<Condition, AtomicBoolean>> conditionsMap = new ConcurrentHashMap<>();
+    private final Map<Path, LockWrapper> lockMap = new ConcurrentHashMap<>();
 
     private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
@@ -50,62 +55,48 @@ public class FileSystemService {
     @Value("${filesystem.testsFolder}")
     private String testsFolder;
 
+    public LockWrapper getOrCreateLock(Path path) {
+        return lockMap.computeIfAbsent(path, p -> new LockWrapper());
+    }
+
     public void notify(Path path) throws InterruptedException {
-        ReentrantReadWriteLock lock = lockMap.get(path);
-        WriteLock writeLock = lock.writeLock();
-        newCondition(path);
+        LockWrapper lockWrapper = getOrCreateLock(path);
 
-        SimpleEntry<Condition, AtomicBoolean> entry = conditionsMap.get(path);
-        Condition condition = entry.getKey();
+        if (lockWrapper == null) {
+            throw new InterruptedException("LockWrapper doesn't exist");
+        }
 
-        // while (!lock.hasWaiters(condition)) {}
-
-        writeLock.lock();
-
+        lockWrapper.lock.writeLock().lock();
         try {
-            entry.setValue(new AtomicBoolean(true));
-            entry.getKey().signal();
-
-            if (lock.hasWaiters(condition)) {
-                entry.setValue(new AtomicBoolean(false));
-            } else {
-                conditionsMap.remove(path);
-            }
+            lockWrapper.bool.set(true);
+            lockWrapper.condition.signal();
         } finally {
-            writeLock.unlock();
+            lockWrapper.lock.writeLock().unlock();
         }
     }
 
-    public void wait(Path path) throws InterruptedException {
-        ReentrantReadWriteLock lock = lockMap.get(path);
-        WriteLock writeLock = lock.writeLock();
-        newCondition(path);
+    public boolean wait(Path path) throws InterruptedException {
+        LockWrapper lockWrapper = getOrCreateLock(path);
+        boolean signalled = false;
 
-        writeLock.lock();
-
-        SimpleEntry<Condition, AtomicBoolean> entry = conditionsMap.get(path);
-
+        lockWrapper.lock.writeLock().lock();
         try {
-            while (!entry.getValue().get()) {
-                entry.getKey().await();
+            while(!lockWrapper.bool.get()){
+                signalled = lockWrapper.condition.await(TIMEOUTSECONDS, TimeUnit.SECONDS);
             }
         } finally {
-            writeLock.unlock();
+            lockWrapper.lock.writeLock().unlock();
         }
-    }
 
-    public void newCondition(Path path) throws InterruptedException {
-        Condition condition = lockMap.get(path).writeLock().newCondition();
-        conditionsMap.computeIfAbsent(path,
-                p -> new SimpleEntry<Condition, AtomicBoolean>(condition, new AtomicBoolean(false)));
+        return signalled;
     }
 
     public void readLock(Path path) throws InterruptedException {
-        lockMap.computeIfAbsent(path, p -> new ReentrantReadWriteLock()).readLock().lock();
+        getOrCreateLock(path).lock.readLock().lock();
     }
 
     public void readUnlock(Path path) {
-        ReentrantReadWriteLock lock = lockMap.get(path);
+        ReentrantReadWriteLock lock = getOrCreateLock(path).lock;
         if (lock != null) {
             lock.readLock().unlock();
             if (!lock.hasQueuedThreads()) {
@@ -115,11 +106,11 @@ public class FileSystemService {
     }
 
     public void writeLock(Path path) {
-        lockMap.computeIfAbsent(path, p -> new ReentrantReadWriteLock()).writeLock().lock();
+        getOrCreateLock(path).lock.writeLock().lock();
     }
 
     public void writeUnlock(Path path) {
-        ReentrantReadWriteLock lock = lockMap.get(path);
+        ReentrantReadWriteLock lock = getOrCreateLock(path).lock;
         if (lock != null) {
             lock.writeLock().unlock();
             if (!lock.hasQueuedThreads()) {
