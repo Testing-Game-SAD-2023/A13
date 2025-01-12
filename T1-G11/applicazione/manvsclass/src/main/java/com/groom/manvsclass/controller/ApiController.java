@@ -114,7 +114,7 @@ public class ApiController {
 
     @PostMapping("/unlock")
     public ResponseEntity<ApiResponse> unlock(@RequestParam(name = "path") String pathRequest,
-            @CookieValue(name = "jwt", required = false) String jwt) {
+            @CookieValue(name = "jwt", required = false) String jwt) throws InterruptedException {
 
         return apiService.unlock(pathRequest, jwt);
     }

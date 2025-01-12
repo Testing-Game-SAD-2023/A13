@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -440,7 +442,7 @@ public class ApiService {
 
         ReentrantLock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
-        Boolean isReady = false;
+        AtomicBoolean isReady = new AtomicBoolean(false);
 
         Thread worker = new Thread(() -> {
             try {
@@ -456,9 +458,9 @@ public class ApiService {
 
         lock.lock();
         try {
-            while(!isReady){
-                    condition.await();
-                }
+            while (!isReady.get()) {
+                condition.await(10, TimeUnit.SECONDS);
+            }
         } finally {
             lock.unlock();
         }
@@ -500,7 +502,8 @@ public class ApiService {
     }
 
     // lock gia è wait quando viene passato
-    private void runThread(ReentrantLock lock, Condition condition, Boolean isReady, Path path) throws InterruptedException {
+    private void runThread(ReentrantLock lock, Condition condition, AtomicBoolean isReady, Path path)
+            throws InterruptedException {
 
         if (lock == null) {
             return;
@@ -511,11 +514,14 @@ public class ApiService {
         fileSystemService.readLock(path);
 
         System.out.println("[TB] lock sul lock del path");
-        
-        
+
+        // while (!lock.hasWaiters(condition)) {}
+
+        System.out.println("[TB] uscito dal while");
+
         lock.lock();
-        try{
-            isReady = true;
+        try {
+            isReady.set(true);
             System.out.println("[TB] notify sul lock di comunicazione");
             condition.signal();
         } finally {

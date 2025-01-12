@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -32,7 +33,7 @@ public class FileSystemService {
 
     private final Map<Path, ReentrantReadWriteLock> lockMap = new ConcurrentHashMap<>();
 
-    private final Map<Path, SimpleEntry<Condition, Boolean>> conditionsMap = new ConcurrentHashMap<>();
+    private final Map<Path, SimpleEntry<Condition, AtomicBoolean>> conditionsMap = new ConcurrentHashMap<>();
 
     private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
@@ -54,17 +55,19 @@ public class FileSystemService {
         WriteLock writeLock = lock.writeLock();
         newCondition(path);
 
-        writeLock.lock();
-
-        SimpleEntry<Condition, Boolean> entry = conditionsMap.get(path);
+        SimpleEntry<Condition, AtomicBoolean> entry = conditionsMap.get(path);
         Condition condition = entry.getKey();
 
+        // while (!lock.hasWaiters(condition)) {}
+
+        writeLock.lock();
+
         try {
-            entry.setValue(true);
+            entry.setValue(new AtomicBoolean(true));
             entry.getKey().signal();
-            
-            if(lock.hasWaiters(condition)){
-                entry.setValue(false);
+
+            if (lock.hasWaiters(condition)) {
+                entry.setValue(new AtomicBoolean(false));
             } else {
                 conditionsMap.remove(path);
             }
@@ -80,10 +83,10 @@ public class FileSystemService {
 
         writeLock.lock();
 
-        SimpleEntry<Condition, Boolean> entry = conditionsMap.get(path);
-        
+        SimpleEntry<Condition, AtomicBoolean> entry = conditionsMap.get(path);
+
         try {
-            while(!entry.getValue()){
+            while (!entry.getValue().get()) {
                 entry.getKey().await();
             }
         } finally {
@@ -93,7 +96,8 @@ public class FileSystemService {
 
     public void newCondition(Path path) throws InterruptedException {
         Condition condition = lockMap.get(path).writeLock().newCondition();
-        conditionsMap.computeIfAbsent(path, p -> new SimpleEntry<Condition,Boolean>(condition, false));
+        conditionsMap.computeIfAbsent(path,
+                p -> new SimpleEntry<Condition, AtomicBoolean>(condition, new AtomicBoolean(false)));
     }
 
     public void readLock(Path path) throws InterruptedException {
