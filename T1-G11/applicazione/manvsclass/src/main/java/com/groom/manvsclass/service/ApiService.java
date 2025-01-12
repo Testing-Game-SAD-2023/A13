@@ -219,8 +219,7 @@ public class ApiService {
 
     }
 
-    // Aggiungo o sovrascrive un robot se esso è disponibile nel file di
-    // configurazione
+    // Aggiungo o sovrascrive un robot se esso è disponibile nel file di configurazione
     public ResponseEntity<ApiResponse> setRobot(String className, MultipartFile robotFile, String jwt,
             String robotName) throws IOException {
 
@@ -455,14 +454,20 @@ public class ApiService {
         worker.start();
 
         System.out.println("[TA] wait sul lock di comunicazione");
-
+        
+        boolean signalled = false;
         lock.lock();
         try {
             while (!isReady.get()) {
-                condition.await(10, TimeUnit.SECONDS);
+                signalled = condition.await(20, TimeUnit.SECONDS);
             }
         } finally {
             lock.unlock();
+        }
+
+        if(!signalled){
+            response.setMessage("TIMEOUT");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
         }
 
         System.out.println("[TA] invio risposta di lock");
@@ -514,10 +519,6 @@ public class ApiService {
         fileSystemService.readLock(path);
 
         System.out.println("[TB] lock sul lock del path");
-
-        // while (!lock.hasWaiters(condition)) {}
-
-        System.out.println("[TB] uscito dal while");
 
         lock.lock();
         try {
