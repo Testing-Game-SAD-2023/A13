@@ -45,6 +45,14 @@ public class FileSystemService {
     @Value("${filesystem.testsFolder}")
     private String testsFolder;
 
+    public void waitReadPath(Path path) throws InterruptedException {
+        lockMap.get(path).readLock().wait(60000);
+    }
+
+    public void notifyReadPath(Path path) {
+        lockMap.get(path).readLock().notify();
+    }
+
     public void lockReadPath(Path path) {
         lockMap.computeIfAbsent(path, p -> new ReentrantReadWriteLock()).readLock().lock();
     }
@@ -53,7 +61,7 @@ public class FileSystemService {
         ReentrantReadWriteLock lock = lockMap.get(path);
         if (lock != null) {
             lock.readLock().unlock();
-            if(!lock.hasQueuedThreads()) {
+            if (!lock.hasQueuedThreads()) {
                 lockMap.remove(path, lock);
             }
         }

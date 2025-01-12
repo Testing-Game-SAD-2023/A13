@@ -104,4 +104,18 @@ public class ApiController {
 
         return apiService.deleteFileSystem(pathRequest, jwt);
     }
+
+    @PostMapping("/lock")
+    public ResponseEntity<ApiResponse> lock(@RequestParam(name = "path") String pathRequest,
+            @CookieValue(name = "jwt", required = false) String jwt) throws InterruptedException {
+
+        return apiService.lock(pathRequest, jwt);
+    }
+
+    @PostMapping("/unlock")
+    public ResponseEntity<ApiResponse> unlock(@RequestParam(name = "path") String pathRequest,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+
+        return apiService.unlock(pathRequest, jwt);
+    }
 }
