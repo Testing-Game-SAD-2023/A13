@@ -788,42 +788,37 @@ public class Controller {
     }
     @GetMapping("/getAvatar")
     public ResponseEntity<String> getAvatar(@CookieValue(name = "jwt", required = false) String jwt) {
-    try {
-        // Verifica se il token JWT è presente
-        if (jwt == null || jwt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        try {
+            if (jwt == null || jwt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+
+            // Decodifica il token JWT
+            Integer userId = extractUserIdFromJwt(jwt);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token");
+            }
+
+            // Recupera l'utente
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if (!optionalUser.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            // Restituisci l'avatar o un valore predefinito
+            User user = optionalUser.get();
+            String avatarPath = user.getAvatar();
+            if (avatarPath == null || avatarPath.isEmpty()) {
+                avatarPath = "/t5/images/sampleavatar.jpg"; // Avatar predefinito
+            }
+            return ResponseEntity.ok(avatarPath);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving avatar");
         }
-
-        // Decodifica il token JWT per ottenere l'ID utente
-        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> userData = mapper.readValue(decodedUserJson, Map.class);
-        String userId = userData.get("userId").toString();
-
-        // Recupera l'utente dal database
-        Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
-        if (!optionalUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        // Ottieni l'avatar
-        User user = optionalUser.get();
-        String avatarPath = user.getAvatar();
-
-        // Verifica se l'avatar è presente
-        if (avatarPath == null || avatarPath.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No avatar found");
-        }
-
-        // Restituisci il percorso dell'avatar
-        return ResponseEntity.ok(avatarPath);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving avatar");
     }
-    }
+
 
 
 

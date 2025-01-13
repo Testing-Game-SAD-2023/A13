@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.GeneratedValue;
-//importati in T5
+
 @Document(collection = "achievements")
 public class Achievement {
     @Id @GeneratedValue // Auto-Increment

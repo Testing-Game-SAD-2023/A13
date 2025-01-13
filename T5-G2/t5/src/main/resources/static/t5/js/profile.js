@@ -68,6 +68,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    // Funzione per caricare l'avatar o l'immagine del profilo
+    const loadAvatarOrImage = async () => {
+    try {
+        const response = await fetch('/getImage');
+        const data = await response.json();
+
+        if (response.ok && data.imageUrl) {
+            currentProfilePicture.src = data.imageUrl;
+        } else {
+            currentProfilePicture.src = '/t5/images/sampleavatar.jpg'; // Fallback
+        }
+    } catch (error) {
+        console.error("Errore durante il caricamento dell'immagine:", error);
+        currentProfilePicture.src = '/t5/images/sampleavatar.jpg'; // Fallback in caso di errore
+    }
+    };
+    window.addEventListener('load', loadAvatarOrImage);
+
+    
+
     // Salva l'avatar selezionato
     const saveAvatar = async () => {
     if (!selectedAvatar) {
@@ -158,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Funzione per caricare la biografia dal database
     const loadBiography = async () => {
-        try {
             const response = await fetch('/getBiography');
             if (response.ok) {
                 const data = await response.json();
@@ -166,11 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 console.error('Errore nel caricamento della biografia.');
             }
-        } catch (error) {
-            console.error('Errore nella connessione al server:', error);
-        }
-    };
-  
+
+    }
+      
    
     
 
@@ -297,8 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Salva la biografia
     saveBioButton.addEventListener("click", async () => {
         const bio = biographyInput.value;
-
-        try {
             const response = await fetch("/updateBiography", {
                 method: "POST",
                 headers: {
@@ -321,9 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const error = await response.text();
                 alert("Errore nel salvataggio: " + error);
             }
-        } catch (error) {
-            alert("Errore nella connessione al server.");
-        }
+    
     });
 
     // Gestisci il pulsante "Annulla"
