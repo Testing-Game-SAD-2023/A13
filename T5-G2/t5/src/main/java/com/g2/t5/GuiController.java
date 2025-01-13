@@ -16,6 +16,7 @@
  */
 
 package com.g2.t5;
+import com.g2.Interfaces.T23Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -31,18 +32,20 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.GenericObjectComponent;
@@ -72,6 +75,11 @@ public class GuiController {
 
     @Autowired
     private AchievementService achievementService;
+
+    @Autowired
+    private T23Service t23Service;
+
+
 
     @Autowired
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
@@ -121,6 +129,63 @@ public class GuiController {
 
         return "error";
     }
+        //modifiche cami
+    @PostMapping("/updateBiography")
+    public ResponseEntity<String> updateBiography(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam("biography") String biography) {
+        try {
+            // Decodifica il token JWT per ottenere l'ID utente
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String userId = map.get("userId").toString();
+            // Chiamata al metodo del T23Service
+            Boolean updateSuccess = t23Service.updateBiography(userId, biography);
+            if (updateSuccess) {
+                return ResponseEntity.ok("Biography updated successfully!");
+            } else {
+                return ResponseEntity.status(400).body("Failed to update biography.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error updating biography: " + e.getMessage());
+            return ResponseEntity.status(500).body("Internal server error.");
+        }
+    }
+
+    @GetMapping("/getBiography")
+    public ResponseEntity<Map<String, String>> getBiography(@CookieValue(name = "jwt", required = false) String jwt) {
+        try {
+            // Decodifica il token JWT per ottenere l'ID utente
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String userId = map.get("userId").toString();
+
+            // Recupera la biografia dal servizio
+            String biography = t23Service.getBiography(userId);
+            if (biography != null) {
+                Map<String, String> response = new HashMap<>();
+                response.put("biography", biography);
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(404).body(null);
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching biography: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
+        }   
+        }
+
+
+    
+
 
     @GetMapping("/profile/{playerID}")
     public String profilePage(Model model,
@@ -256,7 +321,7 @@ public class GuiController {
          * scalataName, dal quale è possibile risalire a tutte le informazioni relative quella specifica "Scalata"
          */
 
- /*
+        /*
         * Verifica dell'autenticità del player controllando che l'header identificato dal: "X-UserID" sia lo stesso
         * associato all'utente identificato da "playerID"
          */
@@ -358,4 +423,359 @@ public class GuiController {
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
     }
+
+
+
+//  Metodo per aggiungere un amico
+    @PostMapping("/addFriend")
+    public ResponseEntity<String> addFriend(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam Integer friendId) {
+        try {
+            Integer userId = extractUserIdFromJwt(jwt);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non valido.");
+            }
+
+            String response = t23Service.addFriend(userId.toString(), friendId.toString());
+            if (response == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante l'aggiunta dell'amico.");
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
+        }
+    }
+    
+    @GetMapping("/searchFriend")
+    public ResponseEntity<Map<String, String>> searchFriend(
+    @RequestParam String identifier,
+    @CookieValue(name = "jwt", required = false) String jwt
+    ) {
+    try {
+        // Verifica autenticazione
+        Integer userId = extractUserIdFromJwt(jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Cerca l'utente tramite T23Service
+        Map<String, String> user = t23Service.searchFriend(identifier);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.ok(user);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+    }
+    
+    @PostMapping("/removeFriend")
+    public ResponseEntity<String> removeFriend(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam Integer friendId) {
+    try {
+        // Verifica che il token JWT esista
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato.");
+        }
+
+        // Chiama il T23Service per rimuovere l'amico
+        Boolean result = t23Service.removeFriend(jwt, friendId);
+
+        if (result != null && result) {
+            return ResponseEntity.ok("Amico rimosso con successo.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante la rimozione dell'amico.");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore interno del server.");
+    }
+    }
+
+    
+    
+    //cami (02/12)
+    @PostMapping("/updateAvatar")
+    public ResponseEntity<String> updateAvatar(
+        @CookieValue(name = "jwt", required = false) String jwt,
+        @RequestParam("avatar") String avatar) {
+    try {
+        // Verifica se il token JWT è presente
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+        Integer userIdAsInteger = Integer.parseInt(userId);
+        // Chiamata al metodo del T23Service per aggiornare l'avatar
+        Boolean updateSuccess = (Boolean) t23Service.updateAvatar(userIdAsInteger, avatar);
+
+        if (updateSuccess) {
+            return ResponseEntity.ok("Avatar updated successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update avatar.");
+        }
+    } catch (Exception e) {
+        System.err.println("Error updating avatar: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error.");
+    }
+    }
+
+    @GetMapping("/getAvatar")
+    public ResponseEntity<String> getAvatar(
+    @CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica se il token JWT è presente
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al servizio di T23 per recuperare l'avatar
+        String avatar = t23Service.getAvatar(userId);
+
+        // Restituisci il valore dell'avatar
+        if (avatar != null) {
+            return ResponseEntity.ok(avatar);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found");
+        }
+    } catch (Exception e) {
+        System.err.println("Error fetching avatar: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error.");
+    }
+    }
+
+
+
+    @GetMapping("/getUserInfo")
+    public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Verifica che il token JWT esista
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Utente non autenticato
+        }
+
+        // Decodifica il token JWT per ottenere l'ID utente
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+        String userId = map.get("userId").toString();
+
+        // Chiamata al servizio T23 per ottenere le informazioni utente
+        Map<String, String> userInfo = t23Service.getUserInfo(userId);
+        if (userInfo != null) {
+            return ResponseEntity.ok(userInfo);
+        } else {
+            return ResponseEntity.status(404).body(null); // Informazioni utente non trovate
+        }
+    } catch (Exception e) {
+        System.out.println("Errore durante il recupero delle informazioni utente: " + e.getMessage());
+        return ResponseEntity.status(500).body(null); // Errore del server
+    }
+    }
+
+    //Gabman 09/12 (Update user info)
+    @PostMapping("/updateUserInfo")
+    public ResponseEntity<String> updateUserInfo(
+            @CookieValue(name = "jwt", required = false) String jwt,
+            @RequestParam("name") String name,
+            @RequestParam("surname") String surname,
+            @RequestParam("nickname") String nickname) {
+        try {
+            // Decodifica il token JWT per ottenere l'ID utente
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+            String userId = map.get("userId").toString();
+
+            // Chiamata al metodo del T23Service
+            Boolean updateSuccess = t23Service.updateUserInfo(userId, name, surname, nickname);
+            if (updateSuccess) {
+                return ResponseEntity.ok("User information updated successfully!");
+            } else {
+                return ResponseEntity.status(400).body("Failed to update user information.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error updating user information: " + e.getMessage());
+            return ResponseEntity.status(500).body("Internal server error.");
+        }
+    }
+
+    //GabMan 03/12 (Ottengo lista amici)
+    @GetMapping("/getFriendlist")
+    public ResponseEntity<List<Map<String, String>>> getFriendlist(
+        @CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // 1. Verifica il JWT
+        if (jwt == null || jwt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Utente non autenticato
+        }
+
+        // 2. Decodifica del JWT
+        Integer userId = extractUserIdFromJwt(jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // JWT non valido
+        }
+
+        // 3. Chiamata al T23Service per ottenere la lista amici
+        List<Map<String, String>> friendlist = t23Service.getFriendlist(userId.toString());
+        if (friendlist == null || friendlist.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Nessun amico trovato
+        }
+
+        return ResponseEntity.ok(friendlist); // Restituisci la lista amici
+    } catch (Exception e) {
+        // 4. Log degli errori per debugging
+        System.err.println("Errore durante il recupero della lista amici: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+    }
+
+/**
+ * Metodo per estrarre l'ID utente dal JWT.
+ */
+    private Integer extractUserIdFromJwt(String jwt) {
+    try {
+        // Decodifica il JWT
+        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+        // Converte il payload del JWT in una mappa
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
+
+        // Restituisce l'ID utente
+        return Integer.parseInt(map.get("userId").toString());
+    } catch (Exception e) {
+        System.err.println("Errore nella decodifica del JWT: " + e.getMessage());
+        return null; // Ritorna null in caso di errore
+    }
+    }
+
+    //GabMan 09/12 (Ottengo ID utente)
+    @GetMapping("/getUserId")
+    public ResponseEntity<Map<String, String>> getUserId(@CookieValue(name = "jwt", required = false) String jwt) {
+    try {
+        // Usa il metodo esistente per estrarre l'userId
+        Integer userId = extractUserIdFromJwt(jwt);
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Utente non autenticato
+        }
+
+        // Restituisci l'userId come risposta JSON
+        Map<String, String> response = new HashMap<>();
+        response.put("userId", userId.toString());
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        System.err.println("Errore durante il recupero dell'userId: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Errore generico
+    }
+    }
+
+
+    @PostMapping("/updateProfilePicture")
+    public ResponseEntity<String> updateProfilePicture(
+        @RequestBody Map<String, String> payload,
+        @CookieValue(name = "jwt", required = false) String jwt
+    ) {
+        try {
+            if (jwt == null || jwt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato.");
+            }
+
+            Integer userId = extractUserIdFromJwt(jwt);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido.");
+            }
+
+            String base64Image = payload.get("profilePicture");
+            if (base64Image == null || base64Image.isEmpty()) {
+                return ResponseEntity.badRequest().body("Nessuna immagine fornita.");
+            }
+
+            boolean success = t23Service.updateProfilePicture(userId, base64Image);
+            return success
+                ? ResponseEntity.ok("Immagine caricata con successo!")
+                : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il caricamento dell'immagine.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore.");
+        }
+    }
+
+
+
+   @GetMapping("/getImage")
+    public ResponseEntity<Map<String, String>> getImage(@CookieValue(name = "jwt", required = false) String jwt) {
+        try {
+            if (jwt == null || jwt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Utente non autenticato."));
+            }
+
+            Integer userId = extractUserIdFromJwt(jwt);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Token JWT non valido."));
+            }
+
+            String imageUrl = t23Service.getImage(userId);
+            if (imageUrl != null) {
+                return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Immagine non trovata."));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Errore nel recupero dell'immagine."));
+        }
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

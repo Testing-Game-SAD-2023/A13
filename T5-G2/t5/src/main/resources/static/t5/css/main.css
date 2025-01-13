@@ -731,3 +731,211 @@ padding-left: 8%;
     filter: grayscale(1);
     mix-blend-mode: multiply;
 }
+
+/* Stili per le sezioni */
+/*Modifica (28/11) by GabMan 'Sezioni Pagina Profilo'*/
+.section {
+  padding: 20px;
+  min-height: 80vh;
+  display: none; /* Nascondi tutte le sezioni per impostazione predefinita */
+}
+
+/* Mostra solo la sezione visibile */
+.section.active {
+  display: block;
+}
+/* Pulsanti di navigazione - stato predefinito */
+/* Pulsanti di navigazione - stato predefinito */
+button.btn {
+  background-color: #007bff !important; /* Grigio */
+  color: white !important;
+  border: 1px solid #007bff !important;
+}
+
+/* Pulsante attivo */
+button.btn-active {
+  background-color: #007bff !important; /* Blu */
+  color: white !important;
+  font-weight: bold !important;
+  border: 2px solid #0056b3 !important;
+}
+/*cami*/
+/* Hover sul pulsante */
+button.btn:hover {
+  background-color: #0056b3 !important; /* Grigio scuro */
+  color: white !important;
+}
+
+/* Stile per "Modifica Biografia" */
+#editBioButton {
+  background-color: #28a745 !important; /* Blu fisso */
+  color: white !important;
+  font-weight: bold;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover per "Modifica Biografia" */
+#editBioButton:hover {
+  background-color: #218838 !important; /* Blu scuro */
+}
+
+
+
+/* Stili per i pulsanti */
+.btn {
+  margin: 5px;
+}
+
+/* Modifica (28/11) by GabMan 'Stile per il pulsante Salva Biografia' */
+#saveBioButton {
+  background-color: #28a745 !important; /* Verde */
+  color: white !important;
+  font-weight: bold;
+  border: none;
+}
+
+#saveBioButton:hover {
+  background-color: #218838 !important; /* Verde più scuro */
+}
+
+
+#saveBioButton:active {
+  background-color: #1e7e34 !important; /* Colore ancora più scuro per il click */
+}
+
+/* Modifica (30/11) by GabMan 'Stile per il box della biografia' */
+#biography {
+  border: 2px solid #6c757d; /* Bordo grigio chiaro */
+  border-radius: 5px; /* Angoli arrotondati */
+  padding: 10px; /* Spaziatura interna */
+  font-family: Arial, sans-serif; /* Font principale */
+  font-size: 16px; /* Dimensione del testo */
+  resize: none; /* Disabilita il ridimensionamento del box */
+  transition: border-color 0.3s ease; /* Transizione per il cambio del bordo */
+}
+
+#biography:focus {
+  border-color: #007bff; /* Cambia colore del bordo quando è attivo */
+  outline: none; /* Rimuove il bordo di focus di default */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Glow azzurro */
+}
+
+#bioText {
+  font-size: 16px;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+/* Modifica (30/11) by GabMan 'Stile per il box della biografia' */
+.btn-selected {
+  background-color: #7ebcda; /* Blu selezionato */
+  color: white;
+  font-weight: bold;
+  border: 2px solid #0b1118; /* Bordo più scuro */
+}
+
+/* Modifica (30/11) by GabMan 'Sezione Amici' */
+/* Stile per la lista amici */
+#friendsContainer {
+  background-color: #ffffff; /* Sfondo bianco */
+  border: 1px solid #ddd; /* Bordo sottile */
+  border-radius: 8px; /* Angoli arrotondati */
+  padding: 10px; /* Spaziatura interna */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+}
+
+.list-group-item {
+  display: flex; /* Layout flessibile per allineare immagine e testo */
+  align-items: center; /* Allineamento verticale */
+  padding: 10px; /* Spaziatura interna */
+  margin-bottom: 10px; /* Spaziatura tra gli elementi */
+  background-color: #f9f9f9; /* Sfondo chiaro */
+  border: 1px solid #ddd; /* Bordo sottile */
+  border-radius: 5px; /* Angoli arrotondati */
+  transition: background-color 0.3s ease; /* Transizione al passaggio del mouse */
+}
+
+.list-group-item:hover {
+  background-color: #f1f1f1; /* Colore al passaggio del mouse */
+}
+
+/* Immagine del profilo amico */
+.friend-avatar {
+  width: 50px; /* Dimensioni immagine */
+  height: 50px;
+  object-fit: cover; /* Ritaglio dell'immagine */
+  margin-right: 15px; /* Spaziatura accanto all'immagine */
+  border: 2px solid #ddd; /* Bordo sottile */
+}
+
+/* Nome del profilo amico */
+.friend-nickname {
+  font-size: 1.2rem; /* Dimensione del testo */
+  font-weight: bold; /* Grassetto */
+  color: #333; /* Colore del testo */
+  margin-right: 15px; /* Spaziatura accanto al nome */
+}
+
+/* Pulsante elimina */
+.list-group-item .btn-danger {
+  padding: 5px 10px; /* Spaziatura del pulsante */
+  font-size: 0.9rem; /* Dimensione testo pulsante */
+  border-radius: 4px; /* Angoli arrotondati */
+}
+
+/* Pulsante aggiungi amico */
+#addFriendButton {
+  margin-left: 10px; /* Spaziatura accanto all'input */
+  padding: 10px 20px; /* Spaziatura pulsante */
+  font-size: 1rem; /* Dimensione testo */
+}
+#avatarSelection {
+  display: none;
+  position: absolute; /* Posiziona la tendina in modo assoluto */
+  top: 50px; /* Distanza dalla parte superiore della colonna */
+  left: 0;  /* Allineamento a sinistra */
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  width: 200px;  /* Imposta una larghezza fissa per la tendina */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Aggiungi un'ombra per una visibilità migliore */
+  z-index: 10; /* Assicurati che la tendina si sovrapponga agli altri contenuti */
+}
+
+.avatar-option {
+  width: 50px;
+  height: 50px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.avatar-option.selected {
+  border: 2px solid #007bff; /* Aggiungi un bordo per l'immagine selezionata */
+}
+
+#saveAvatarButton {
+  display: block;
+  margin: 10px auto; /* Centra il pulsante */
+  width: 100%; /* Rende il pulsante largo quanto la tendina */
+}
+.col-210 {
+  display: flex;
+  flex-direction: column; /* Allinea gli elementi verticalmente */
+  align-items: center;    /* Centra gli elementi orizzontalmente */
+  justify-content: center; /* Allinea gli elementi al centro */
+  padding: 10px;
+}
+
+#currentProfilePicture {
+  width: 100px; /* Imposta la larghezza dell'immagine */
+  height: 100px; /* Imposta l'altezza dell'immagine */
+}
+
+#modifyAvatarButton {
+  margin-top: 10px; /* Aggiungi uno spazio tra l'immagine e il pulsante */
+}
+
+

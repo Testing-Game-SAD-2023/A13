@@ -1,66 +1,238 @@
 <html>
-    <head>
-        <link href="/t5/css/main.css" rel="stylesheet" />
-        <link href="/t5/css/main2.css" rel="stylesheet" />
-        <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
+<head>
+    <link href="/t5/css/main.css" rel="stylesheet" />
+    <link href="/t5/css/main2.css" rel="stylesheet" />
+    <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/t5/css/profilo.css" rel="stylesheet" />
 
-        <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
-        <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
-        <!--Modifica (20/05) Adding Sweet Alert-->
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        <!--Modifica (21/05) Adding JQuery-->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <!--Fine Modifica-->
+    <!-- Librerie -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-        <script src="/t5/js/profile.js"></script>
+    <script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-        <title>Profilo utente</title>
-    </head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-    <body class="bg-custom">
-        <div class="container-fluid">
-            <div class="row">
-                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" >Profilo</p>
-                <div id="topRightContainer">
-                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Profilo</button>
-                    <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
+
+    <script src="/t5/js/bootstrap.bundle.min.js"></script>
+    <script src="/t5/js/profile.js"></script>
+    <script src="/t5/js/Util_Editor.js"></script>
+    <script src="/t5/js/Amici.js"></script>
+
+    <title>Profilo utente</title>
+</head>
+
+<body class="bg-custom">
+    <div class="container-fluid">
+        <!-- Barra di Navigazione -->
+        <div class="row">
+            <div class="col text-center">
+                <div class="btn-group" role="group">
+                    <button id="btnProfile" class="btn btn-primary" onclick="showSection('profile')">Profilo</button>
+                    <button id="btnTrophies" class="btn btn-primary" onclick="showSection('trophies')">Trofei</button>
+                    <button id="btnStats" class="btn btn-primary" onclick="showSection('stats')">Statistiche</button>
+                    <button id="btnFriends" class="btn btn-primary" onclick="showSection('friends')">Amici</button>
+                    <button id="btnLeaderboard" class="btn btn-primary" onclick="showSection('leaderboard')">Classifica</button>
+                    <button id="btnHome" class="btn btn-success" onclick="goToHome()">Home</button>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-8">
-                    <div class="row">
-                        <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
+        </div>
+
+
+
+        <!-- nome-cognome-nickname in tutte le sezioni -->
+        <div id="userHeader" class="user-header d-none">
+            <p id="headerFullName" class="mb-0"></p>
+            <p id="headerNickname" class="mb-0 text-muted"></p>
+        </div>
+        
+        <!-- Cambia Lingua -->
+        <div class="language-switcher" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+            <button id="btnItalian" class="btn btn-light" title="Italiano" style="margin-right: 5px;">
+                🇮🇹 Italiano
+            </button>
+            <button id="btnEnglish" class="btn btn-light" title="English">
+                🇬🇧 English
+            </button>
+        </div>
+
+        
+        
+
+        <!-- Sezioni -->
+        <div id="profile" class="section active">
+            <div id="userInfo" class="profile-container">
+                <!-- Avatar -->
+                <div class="col-4 text-center" style="margin-bottom: 20px;">
+                    <!-- Immagine attuale dell'avatar -->
+                    <img id="currentProfilePicture" src="/t5/images/sampleavatar.jpg" alt="Profile picture" class="profile-avatar">
+
+                    
+                    <!-- Pulsante per mostrare le opzioni -->
+                    <button id="modifyAvatarButton" class="btn btn-secondary mb-2">Modifica Avatar</button>
+                    
+                    <!-- Sezione nascosta per selezionare un nuovo avatar -->
+                    <div id="avatarSelection" style="display: none; padding: 20px; max-width: 600px; border: 1px solid #ddd; border-radius: 10px;">
+                        <h5>Seleziona un nuovo avatar:</h5>
+                        <img src="/t5/images/profilo/defaultavatarF.png" class="avatar-option" alt="Default Female Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarF.png')" style="width: 50px; height: 50px; margin-right: 5px;">
+                        <img src="/t5/images/sampleavatar.jpg" class="avatar-option" alt="Default Male Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatarM.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
+                        <img src="/t5/images/profilo/defaultavatarM.jpg" class="avatar-option" alt="Default Avatar" onclick="selectAvatar('/t5/images/profilo/defaultavatar.jpg')" style="width: 50px; height: 50px; margin-right: 5px;">
+                        <!-- Pulsante + per l'upload immagine -->
+                        <button id="uploadProfilePictureButton" class="btn btn-outline-primary" style="width: 50px; height: 50px; font-size: 1.5rem; line-height: 1;">+</button>
+
+                        <!-- Form di upload immagine -->
+                        <form id="uploadProfilePictureForm" style="display: none;" enctype="multipart/form-data">
+                            <label for="profilePictureUploadInput" style="display: block; margin-top: 15px;">Carica la tua immagine di profilo:</label>
+                            <input type="file" id="profilePictureUploadInput" name="profilePicture" accept="image/*" class="form-control-file">
+                            <button type="button" class="btn btn-primary mt-2" id="uploadProfilePictureSubmitButton">Upload</button>
+                        </form>
+                        
+
+                        <form action="/updateAvatar" method="POST">
+                            <input type="hidden" id="selectedAvatar" name="avatar" value="">
+                            <button id="saveAvatarButton" class="btn btn-primary mt-2" type="submit">Salva</button>
+                            <button id="cancelAvatarButton" class="btn btn-secondary" type="button" style="width: 48%;">Annulla</button>
+                        </form>
+                    </div>
+                </div>
+        
+                <!-- Informazioni Utente -->
+                <div class="user-info-section">
+                    <h1 id="userFullName" class="user-fullname">Nome Cognome</h1>
+                    <p id="userNickname" class="user-nickname">@nickname</p>
+                    <div id="userIdDisplay">User ID</div>
+                    <button id="editInfoButton" class="btn edit-info-btn">Modifica Info</button>
+        
+                    <form id="editInfoForm" class="edit-info-form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="newName" placeholder="Nome">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="newSurname" placeholder="Cognome">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="newNickname" placeholder="Nickname">
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancelEditInfoButton" class="btn cancel-btn">Annulla</button>
+                            <button type="submit" class="btn save-btn">Salva</button>
+                        </div>
+                    </form>
+                </div>
+        
+                <!-- Biografia -->
+                <div class="bio-section">
+                    <h2>Biografia</h2>
+                    <div id="bioDisplaySection">
+                        <p id="bioText">La tua biografia...</p>
+                        <button id="editBioButton" class="btn edit-bio-btn">Modifica</button>
+                    </div>
+                    <div id="bioEditSection">
+                        <textarea id="biography" class="form-control" rows="4" placeholder="Inserisci la tua biografia..."></textarea>
+                        <div class="form-actions">
+                            <button id="cancelBioButton" class="btn cancel-btn">Annulla</button>
+                            <button id="saveBioButton" class="btn save-btn">Salva</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div id="friends" class="section">
+            <div class="container">
+                <div class="row">
+                    <!-- Lista Amici -->
+                    <div class="col-lg-7">
+                        <div class="card shadow-sm">
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-210">
-                                        <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                                <h4 class="card-title text-center mb-4">Lista Amici</h4>
+                                <div id="friendsContainer" class="list-group">
+                                    <div class="friend-item">
+                                        <img src="/t5/images/profilo/sampleavatar.jpg" class="friend-avatar" alt="Avatar">
+                                        <div class="friend-info">
+                                            <p class="friend-nickname">Nickname Esempio</p>
+                                            <p class="friend-id">ID: 12345</p>
+                                        </div>
+                                        <button class="btn btn-danger">Elimina</button>
                                     </div>
-                                    <div class="col">
-                                        <h4 class="card-title" id="usernameField"></h4>
-                                        <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
-                                        <hr>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur maximus pretium lacinia. Curabitur et varius neque. Aliquam tincidunt tortor eget felis rhoncus, et commodo ex vulputate. Cras tristique id arcu non condimentum. Fusce non dignissim lorem. Ut porttitor mattis nisl quis interdum. Aliquam tortor orci, interdum in gravida faucibus, auctor sit amet tellus. Aliquam vulputate enim quis rhoncus eleifend. Maecenas id orci est. Mauris at rutrum velit. Nunc posuere leo eget nisl lacinia semper. Fusce interdum, neque at suscipit tristique, tellus sem elementum quam, quis placerat justo orci eget nunc. Nam eget turpis ut elit sollicitudin ornare ac id lorem. Cras facilisis enim et eros suscipit, ut convallis ante suscipit. Nunc luctus diam at sollicitudin ornare. Mauris vel pharetra dolor. </p>
-                                    </div>
+                                </div>
+                                <p id="errorMessage" class="text-danger text-center mt-3"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Cerca Amico -->
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm mt-4 mt-lg-0">
+                            <div class="card-body">
+                                <h5 class="card-title">Cerca Amico</h5>
+                                <div class="input-group">
+                                    <input
+                                        type="text"
+                                        id="searchFriendInput"
+                                        class="form-control"
+                                        placeholder="Inserisci il nickname o l'ID"
+                                    />
+                                    <button id="searchFriendButton" class="btn btn-primary">
+                                        Cerca
+                                    </button>
+                                </div>
+                                <p id="searchFriendMessage" class="text-center mt-2"></p>
+                                <div id="searchResult" class="mt-3" style="display: none;">
+                                    <p>Amico trovato: <span id="friendName"></span></p>
+                                    <button id="addFriendButton" class="btn btn-success">
+                                        Aggiungi Amico
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
-                            <div class="card-body">
-                                <h4 class="card-title">Trofei</h4>
-                                <hr>
-                                <div style="height:44.2vh; overflow-y: auto">
-                                    <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
-                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div id="trophies" class="section">
+            <div class="row">
+                <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
+                    <div class="card-body">
+                        <h4 class="card-title">Trofei</h4>
+                        <div class="btn-group" role="group" aria-label="Switch Trophies">
+                            <button id="btnCompleted" class="btn btn-secondary" onclick="showCompleted()">Completati</button>
+                            <button id="btnInProgress" class="btn btn-primary" onclick="showInProgress()">In Progresso</button>
+                        </div>
+                        <hr>
+                        <div style="height:44.2vh; overflow-y: auto">
+                            <!-- Sezione Trofei Completati -->
+                            <div id="completed-trophies" class="hidden">
+                                <div th:each="element : ${achievementProgresses}" th:if="${element.Progress} >= ${element.ProgressRequired}">
+                                    <div class="achievement-container" style="overflow: hidden; margin: 2px">
                                         <div class="row">
                                             <div class="col-2">
-                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" class="completed">
                                             </div>
                                             <div class="col">
                                                 <h4 th:text="${element.Name}">Nome achievement</h4>
                                                 <p th:text="${element.Description}">Descrizione achievement</p>
-                                                <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Sezione Trofei In Progresso -->
+                            <div id="in-progress-trophies" class="visible">
+                                <div th:each="element : ${achievementProgresses}" th:if="${element.Progress} < ${element.ProgressRequired}">
+                                    <div class="achievement-container" style="overflow: hidden; margin: 2px">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" class="unobtained">
+                                            </div>
+                                            <div class="col">
+                                                <h4 th:text="${element.Name}">Nome achievement</h4>
+                                                <p th:text="${element.Description}">Descrizione achievement</p>
+                                                <div class="progress">
                                                     <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
                                                 </div>
                                             </div>
@@ -71,21 +243,27 @@
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card" style="height:92vh">
-                        <div class="card-body">
-                            <h4 class="card-title">Statistiche</h4>
-                            <hr>
-                            <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
-                                <!--<div class="col-1">
-                                    I
-                                </div>-->
-                                <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
-                                    Nome statistica
-                                </div>
-                                <div class="col text-right" th:text="${element.Progress}">
-                                    1000
-                                </div>
+            </div>
+        </div>
+        
+        
+        
+        
+
+        <div id="stats" class="section">
+             <div class="col">
+                <div class="stats-card" style="height:92vh">
+                    <div class="card-body">
+                        <h4 class="stats-card-title">Statistiche</h4>
+                        <hr>
+                        <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="stat-row">
+                            <!-- Icona per ogni statistica -->
+                            <span class="stat-icon">📊</span>
+                            <div class="stat-name" th:text="${IdToStatistic.get(element.StatisticID).name}">
+                                Nome statistica
+                            </div>
+                            <div class="stat-value" th:text="${element.Progress}">
+                                1000
                             </div>
                         </div>
                     </div>
@@ -93,6 +271,32 @@
             </div>
         </div>
 
-        <span id="user_id" style="display: none;" th:text="${userID}"></span>
-    </body>
+
+        <div id="leaderboard" class="section">
+            <div class="container">
+                <h4 class="text-center">Classifica</h4>
+                <div id="leaderboardContent">
+                    <p class="text-center">La classifica sarà presto disponibile.</p>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+    </div>
+
+    <!-- Script per la gestione delle sezioni -->
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function goToHome() {
+            window.location.href = "/main";
+        }
+
+        
+    </script>
+</body>
 </html>
