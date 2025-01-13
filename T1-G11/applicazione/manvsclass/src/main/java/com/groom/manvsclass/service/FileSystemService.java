@@ -37,13 +37,14 @@ public class FileSystemService {
         final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
         final ReentrantLock lock = new ReentrantLock();
         final Condition condition = lock.newCondition();
-        final AtomicBoolean bool = new AtomicBoolean(false);
+        final AtomicBoolean isReady = new AtomicBoolean(false);
     }
 
     private final Map<Path, LockWrapper> lockMap = new ConcurrentHashMap<>();
 
     private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
+    // Absolute path
     @Value("${filesystem.rootPath}")
     private String rootFolder;
 
@@ -58,6 +59,7 @@ public class FileSystemService {
     private String testsFolder;
 
     public LockWrapper getOrCreateLock(Path path) {
+        logger.info("[{}] Getting or creating lock for path {}", Thread.currentThread().getName(), path.toString());
         return lockMap.computeIfAbsent(path, p -> new LockWrapper());
     }
 
@@ -70,7 +72,7 @@ public class FileSystemService {
 
         lockWrapper.lock.lock();
         try {
-            lockWrapper.bool.set(true);
+            lockWrapper.isReady.set(true);
             lockWrapper.condition.signal();
         } finally {
             lockWrapper.lock.unlock();
@@ -83,7 +85,7 @@ public class FileSystemService {
 
         lockWrapper.lock.lock();
         try {
-            while (!lockWrapper.bool.get()) {
+            while (!lockWrapper.isReady.get()) {
                 signalled = lockWrapper.condition.await(TIMEOUTSECONDS, TimeUnit.SECONDS);
             }
         } finally {
@@ -93,7 +95,8 @@ public class FileSystemService {
         return signalled;
     }
 
-    public void readLock(Path path) throws InterruptedException {
+    public void readLock(Path path) {
+        logger.info("[{}] ReadLocking the path {}", Thread.currentThread().getName(), path.toString());
         getOrCreateLock(path).readWriteLock.readLock().lock();
     }
 
@@ -101,6 +104,7 @@ public class FileSystemService {
         ReentrantReadWriteLock lock = getOrCreateLock(path).readWriteLock;
         if (lock != null) {
             lock.readLock().unlock();
+            logger.info("[{}] ReadUnlocking the path {}", Thread.currentThread().getName(), path.toString());
             if (!lock.hasQueuedThreads()) {
                 lockMap.remove(path, lock);
             }
@@ -108,6 +112,7 @@ public class FileSystemService {
     }
 
     public void writeLock(Path path) {
+        logger.info("[{}] WriteLocking the path {}", Thread.currentThread().getName(), path.toString());
         getOrCreateLock(path).readWriteLock.writeLock().lock();
     }
 
@@ -115,6 +120,7 @@ public class FileSystemService {
         ReentrantReadWriteLock lock = getOrCreateLock(path).readWriteLock;
         if (lock != null) {
             lock.writeLock().unlock();
+            logger.info("[{}] WriteUnlocking the path {}", Thread.currentThread().getName(), path.toString());
             if (!lock.hasQueuedThreads()) {
                 lockMap.remove(path, lock);
             }
@@ -292,17 +298,20 @@ public class FileSystemService {
 
                 if (entry.isDirectory()) {
                     // If directory, create it
-                    Files.createDirectories(extractedPath);
+                    createFolder(extractedPath);
                 } else {
                     // If not save file
-                    Files.createDirectories(extractedPath.getParent());
+                    createFolder(extractedPath.getParent());
 
+                    writeLock(extractedPath);
                     try (OutputStream os = Files.newOutputStream(extractedPath)) {
                         byte[] buffer = new byte[4096];
                         int bytesRead;
                         while ((bytesRead = zis.read(buffer)) != -1) {
                             os.write(buffer, 0, bytesRead);
                         }
+                    } finally {
+                        writeUnlock(extractedPath);
                     }
                 }
 
@@ -317,19 +326,19 @@ public class FileSystemService {
         return unzipPath;
     }
 
-    public Path deleteDirectory(Path directory) throws FileSystemException {
+    public Path deleteDirectory(Path path) throws FileSystemException {
         Map<Path, byte[]> localFiles = threadLocalPath.get();
 
         // ! CHECK: Directory existance
-        if (!Files.exists(directory)) {
-            logger.warn("The directory {} doesn't exist", directory.toString());
-            throw new FileSystemException(directory.toString());
+        if (!Files.exists(path)) {
+            logger.warn("The directory {} doesn't exist", path.toString());
+            throw new FileSystemException(path.toString());
         }
 
         // Usa un FileVisitor per attraversare ricorsivamente la directory
-        writeLock(directory);
+        writeLock(path);
         try {
-            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 // Action done when visiting a file
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
@@ -350,7 +359,7 @@ public class FileSystemService {
                 public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
                     writeLock(dir);
                     try {
-                        logger.debug("Back up of folder: {}", dir);
+                        logger.debug("Backup of folder: {}", dir);
                         localFiles.put(dir, null);
                         logger.debug("Deleting: {}", dir.toString());
                         Files.delete(dir);
@@ -361,21 +370,21 @@ public class FileSystemService {
                 }
             });
         } catch (IOException e) {
-            logger.warn("Deletion of {} gone wrong", directory.toString());
+            logger.warn("Deletion of {} gone wrong", path.toString());
 
             localFiles.forEach((key, value) -> {
                 deleteRollback(key, value);
             });
 
-            throw new FileSystemException(directory.toString());
+            throw new FileSystemException(path.toString());
         } finally {
-            writeUnlock(directory);
+            writeUnlock(path);
             localFiles.clear();
         }
 
-        logger.info("Deletion completed successfully: {}", directory.toString());
+        logger.info("Deletion completed successfully: {}", path.toString());
 
-        return directory;
+        return path;
     }
 
     private void deleteRollback(Path path, byte[] file) {
