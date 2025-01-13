@@ -35,12 +35,12 @@ public class FileSystemService {
 
     private static class LockWrapper {
         final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-        final ReentrantLock lock = new ReentrantLock();
-        final Condition condition = lock.newCondition();
+        final ReentrantLock comunicationLock = new ReentrantLock();
+        final Condition notification = comunicationLock.newCondition();
         final AtomicBoolean isReady = new AtomicBoolean(false);
     }
 
-    private final Map<Path, LockWrapper> lockMap = new ConcurrentHashMap<>();
+    private static final Map<Path, LockWrapper> lockMap = new ConcurrentHashMap<>();
 
     private final ThreadLocal<Map<Path, byte[]>> threadLocalPath = ThreadLocal.withInitial(LinkedHashMap::new);
 
@@ -70,12 +70,12 @@ public class FileSystemService {
             throw new InterruptedException("LockWrapper doesn't exist");
         }
 
-        lockWrapper.lock.lock();
+        lockWrapper.comunicationLock.lock();
         try {
             lockWrapper.isReady.set(true);
-            lockWrapper.condition.signal();
+            lockWrapper.notification.signal();
         } finally {
-            lockWrapper.lock.unlock();
+            lockWrapper.comunicationLock.unlock();
         }
     }
 
@@ -83,13 +83,13 @@ public class FileSystemService {
         LockWrapper lockWrapper = getOrCreateLock(path);
         boolean signalled = false;
 
-        lockWrapper.lock.lock();
+        lockWrapper.comunicationLock.lock();
         try {
             while (!lockWrapper.isReady.get()) {
-                signalled = lockWrapper.condition.await(TIMEOUTSECONDS, TimeUnit.SECONDS);
+                signalled = lockWrapper.notification.await(TIMEOUTSECONDS, TimeUnit.SECONDS);
             }
         } finally {
-            lockWrapper.lock.unlock();
+            lockWrapper.comunicationLock.unlock();
         }
 
         return signalled;
@@ -405,8 +405,7 @@ public class FileSystemService {
     }
 
     public boolean validatePath(Path path) {
-        return path.startsWith(rootFolder)
-                && !(path.equals(Paths.get("/Volume")) || path.equals(Paths.get(classesFolder))
-                        || path.equals(Paths.get(rootFolder)));
+        return path.startsWith(rootFolder) &&
+            !(path.equals(Paths.get("/Volume")) || path.equals(Paths.get(classesFolder)) || path.equals(Paths.get(rootFolder)));
     }
 }
