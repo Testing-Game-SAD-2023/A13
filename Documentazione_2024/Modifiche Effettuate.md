@@ -10,17 +10,21 @@
 - Spostato il codice JavaScript di `uploadClasseAndTest.html` nel file `addClassAndTest.js`
 - Modificato il codice JavaScript `class.js`
 - Cambiamenti ad `application.properties`:
-    - Aggiunte nuove proprietà legate al file system:
-        - `filesystem.rootPath = /Volume/Root/`
-        - `filesystem.classesPath = ${filesystem.rootPath}Classes/`
-        - `filesystem.sourceFolder = SourceCode/`
-        - `filesystem.testsFolder = Tests/`
-        - `config.pathRobot = /RobotConfig/robots.txt`
-    
+  - Aggiunte nuove proprietà legate al file system:
+    - `filesystem.rootPath = /Volume/Root/`
+    - `filesystem.classesPath = ${filesystem.rootPath}Classes/`
+    - `filesystem.sourceFolder = SourceCode/`
+    - `filesystem.testsFolder = Tests/`
+    - `config.pathRobot = /RobotConfig/robots.txt`
 
 ### Cambiamenti a `model`
 - Nuovo model: `Robot.java`
-- Aggiunto attributo a `ClassUT.java`
+- Aggiunto a `ClassUT.java`:
+  - Attributo:
+    - `List<Robot> robots`
+  - Metodi:
+    - `getRobotNames()`
+    - `getRobotPath()`
 
 ### Spostamenti di cartelle
 - Spostata cartella `repository`
@@ -28,61 +32,85 @@
 
 ### Creazione nuove cartelle
 - **`configuration`**:
-    - Inserita la classe `PasswordEncoderAdmin.java`
+  - Inserita la classe `PasswordEncoderAdmin.java`
 - **`responses`**:
-    - Creata la classe `Response.java`
-    - Creata la classe `FileResponse.java`
-    - Creata la classe `ApiResponse.java`
-    - Inserita la classe `FileUploadResponse.java`
+  - Creata la classe `Response.java`
+  - Creata la classe `FileResponse.java`
+  - Creata la classe `ApiResponse.java`
+  - Inserita la classe `FileUploadResponse.java`
 
 ### Cambiamenti ai controller
 - Creata la classe `ApiController.java`:
-    - Creato metodo/route:
-        - `getClasses()`
-        - `getClass()`
-        - `getRobots()`
-        - `getRobot()`
-        - `setRobot()`
-        - `setClass()`
-        - `deleteRobot()`
-        - `deleteClass()`
+  - Creato metodo/route:
+    - `getClasses()`
+    - `getClass()`
+    - `getRobots()`
+    - `getRobot()`
+    - `setRobot()`
+    - `setClass()`
+    - `deleteRobot()`
+    - `deleteClass()`
+    - `setFileSystem()`
+    - `deleteFileSystem()`
+    - `lock()`
+    - `unlock()`
 - Cambiamenti a `HomeController.java`:
-    - Aggiunto metodo/route: `getRobots()`
-    - Metodo/route `uploadTest()` chiama `classService.saveAll()`
-    - Metodo/route `eliminaClasse()` chiama `classService.deleteClass()`
+  - Aggiunto metodo/route: `getRobots()`
+  - Metodo/route `uploadTest()` chiama `classService.saveAll()`
+  - Metodo/route `eliminaClasse()` chiama `classService.deleteClass()`
 
 ### Cambiamenti a `service`
 - Creata la classe `ClassService.java`:
-    - Creato metodo:
-        - `saveAll()`
-        - `deleteClass()`
+  - Creato metodo:
+    - `saveAll()`
+    - `deleteClass()`
 - Creata la classe `FileSystemService.java`:
-    - Creato metodo:
-        - `saveClass()`
-        - `saveTest()`
-        - `deleteAll()`
-        - `deleteTest()`
-        - `createFolder()`
-        - `saveFile()`
-        - `unzip()`
-        - `deleteDirectory()`
+  - Creato metodo:
+    - `saveClass()`
+    - `saveTest()`
+    - `deleteAll()`
+    - `deleteTest()`
+    - `createFolder()`
+    - `saveFile()`
+    - `unzip()`
+    - `deleteDirectory()`
+    - `rawSaveFile()`
+    - `rawCreateFolder()`
+    - `deleteRollback()`
+    - `existsPath()`
+    - `validatePath()`
+    - `getOrCreateLock()`
+    - `readLock()`
+    - `readUnlock()`
+    - `writeLock()`
+    - `writeUnlock()`
 - Creata la classe `ApiService.java`:
-    - Creato metodo:
-        - `getClasses()`
-        - `getClass()`
-        - `getRobots()`
-        - `getRobot()`
-        - `setRobot()`
-        - `setClass()`
-        - `deleteRobot()`
-        - `deleteClass()`
+  - Creato metodo:
+    - `getClasses()`
+    - `getClass()`
+    - `getRobots()`
+    - `getRobot()`
+    - `setRobot()`
+    - `setClass()`
+    - `deleteRobot()`
+    - `deleteClass()`
+    - `setFileSystem()`
+    - `deleteFileSystem()`
+    - `lock()`
+    - `unlock()`
+    - `runThread()`
 - Modificata la classe `AdminService.java`:
-    - Creato metodo: `getRobots()`
+  - Creato metodo: `getRobots()`
 
 ### Cambiamenti a `UI Gateway`
 - Modifica al file di configurazione dell’UI Gateway:
-    - Aggiunta route `/classes`
-    - Aggiunta route `/listofrobots`
+  - Aggiunta route `/classes`
+  - Aggiunta route `/listofrobots`
+  - Aggiunta route `/fileSystem`
+  - Aggiunta route `/lock`
+  - Aggiunta route `/unlock`
+
+### Varie
 - Aggiunto il **Volume condiviso** tra tutti i container
 - Aggiunta cartella di mount **RobotConfig** con file di configurazione `robots.txt`
 

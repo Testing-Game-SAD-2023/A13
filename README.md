@@ -13,7 +13,7 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente 
-Vittorio Guerra – M63000000
+Vittorio Guerra – M63001850
 
 Fabrizio Imparato – M63001758
 
@@ -123,9 +123,13 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-In questa nuova versione, è stato modificato il container T1 per una maggiore generalizzazione nella gestione dei robot. Per evitare problemi legati alla ridondanza dei dati, è stato creato un nuovo volume condiviso tra tutti i container. Questo ha reso necessario l'adozione di un nuovo filesystem, che facilita una gestione più efficace, al momento, delle classi e dei test da parte di più robot.
 
-Inoltre, è stata introdotta una nuova funzionalità nella pagina "Add Class and Test". Ora gli utenti hanno la possibilità di caricare solo una classe, caricare più test contemporaneamente, oppure caricare singoli test. Prima, infatti, era necessario caricare tutti i test associati a una singola classe in un'unica operazione.
+In questa nuova versione, il container T1 è stato modificato per migliorare la gestione generale dei robot. Per ridurre la ridondanza dei dati, è stato creato un nuovo volume condiviso tra tutti i container. Questo ha richiesto l'adozione di un nuovo file system, che attualmente consente una gestione più efficace delle classi e dei test da parte di più robot.
+
+Inoltre, nella pagina "Add Class and Test" è stata introdotta una nuova funzionalità che offre maggiore flessibilità agli utenti. Ora è possibile caricare solo una classe, caricare più test contemporaneamente e caricare singoli test.
+In precedenza, era necessario caricare tutti i test associati a una classe in un'unica operazione, limitando le possibilità di personalizzazione.
+
+Infine, è stata implementata la logica per la gestione della concorrenza, al fine di supportare la multiutenza nell'applicazione, garantendo un funzionamento corretto e sicuro in ambienti con più utenti simultanei.
 
 Per l'elenco delle modifiche, si può consultare questo link: ![Modifiche effettuate](https://github.com/vittorioguerra/A13-R6-B15/blob/main/Documentazione_2024/Modifiche%20Effettuate.md)
 
