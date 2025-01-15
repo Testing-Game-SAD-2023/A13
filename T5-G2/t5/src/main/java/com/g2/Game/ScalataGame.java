@@ -64,11 +64,11 @@ public class ScalataGame extends GameLogic {
     }
 
     @Override
-    public int GetScore(String underTestClassCode, int coverage, int numPrivateMethods,int privateMethodsCovered, String difficulty) {
+    public int GetScore(String jacoco_xml,int num_lines,int numPrivateMethods, ArrayList<Integer> privateMethodLines, int cyclomaticComplexity, String difficulty) {
         // Implementa la logica per calcolare il punteggio totale tra tutti i giochi
         int totalScore = 0;
         for (Sfida game : games) {
-            totalScore += game.GetScore(underTestClassCode,coverage,numPrivateMethods,privateMethodsCovered,difficulty); // Calcola il punteggio per ogni gioco
+            totalScore += game.GetScore(jacoco_xml, num_lines, numPrivateMethods, privateMethodLines, cyclomaticComplexity,difficulty); // Calcola il punteggio per ogni gioco
         }
         return totalScore;
     }

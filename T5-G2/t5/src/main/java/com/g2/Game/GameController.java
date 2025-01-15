@@ -198,33 +198,7 @@ public class GameController {
         }
     }
 
-    /*
-     *  Partendo dai dati dell'utente ottengo la sua percentuale di coverage 
-     */
     
-    public int LineCoverage(String cov) {
-        try {
-            // Parsing del documento XML con Jsoup
-            Document doc = Jsoup.parse(cov, "", Parser.xmlParser());
-            // Selezione dell'elemento counter di tipo "LINE"
-            Element line = doc.selectFirst("report > counter[type=LINE]");
-            // Verifica se l'elemento è stato trovato
-            if (line == null) {
-                throw new IllegalArgumentException("Elemento 'counter' di tipo 'LINE' non trovato nel documento XML.");
-            }
-            // Lettura degli attributi "covered" e "missed" e calcolo della percentuale di copertura
-            int covered = Integer.parseInt(line.attr("covered"));
-            int missed = Integer.parseInt(line.attr("missed"));
-            // Calcolo della percentuale di copertura
-            return 100 * covered / (covered + missed);
-        } catch (NumberFormatException e) {
-            logger.error("[GAMECONTROLLER] LineCoverage:", e);
-            throw new IllegalArgumentException("Gli attributi 'covered' e 'missed' devono essere numeri interi validi.", e);
-        } catch (Exception e) {
-            logger.error("[GAMECONTROLLER] LineCoverage:", e);
-            throw new RuntimeException("Errore durante l'elaborazione del documento XML.", e);
-        }
-    }
 
     public int[] getCoverage(String cov, String coverageType) {
         try {
@@ -439,35 +413,19 @@ public class GameController {
             int[] branchCoverageRobot = getCoverage(robotData.get("coverage"), "BRANCH");
             int[] instructionCoverageRobot = getCoverage(robotData.get("coverage"), "INSTRUCTION");
             */
-
-            int lineCov = LineCoverage(userData.get("coverage"));
+            String jacoco_xml = userData.get("coverage");
+            //MODIFICA calcolo linee di codice della classe
+            int num_lines=Metrics_util.countCodeLines(underTestClassCode);
+            //MODIFICA calcolo complessita ciclomatica
+            int cyclomaticComplexity=Metrics_util.calculateCyclomaticComplexity(underTestClassCode);
             /*MODIFICA FUNZIONANTE: prendo un arraylist di elementi che rappresentano le righe dei miei metodi privati*/
-            ArrayList<Integer> privateMethodLines = Punteggio_util.findPrivateMethodLines(underTestClassCode);
+            ArrayList<Integer> privateMethodLines = Metrics_util.findPrivateMethodLines(underTestClassCode);
 
             //MODIFICA calcolo il numero di metodi private
-            int numPrivateMethods = Punteggio_util.countPrivateMethods(underTestClassCode);
+            int numPrivateMethods = Metrics_util.countPrivateMethods(underTestClassCode);
             /*logger.info("[GAMECONTROLLER] /run: privateMethodLines {}",privateMethodLines);*/
-            int privateMethodsCovered = 0;
-            try {
-                privateMethodsCovered = Punteggio_util.countCoveredPrivateMethods(privateMethodLines, userData.get("coverage"));
-                logger.info("[GAMECONTROLLER] /run: privateMethodsCovered {}",privateMethodsCovered);
-            } catch (Exception ex) {
-                logger.info("[GAMECONTROLLER] /run: eccezione");
-            }
-            
-            logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);
-            
-            
-            //logger.info("[GAMECONTROLLER] /run: LineTot {}", gameLogic.countCodeLines(underTestClassCode));
-
-            double locPerc = ((double) lineCov) / 100;
-            logger.info("[GAMECONTROLLER] /run: locPerc {}", locPerc);
-
-
-            /*int lineCovRobot = LineCoverage(robotData.get("coverage"));
-            logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);*/
-
-            int userScore = gameLogic.GetScore(underTestClassCode,lineCov, numPrivateMethods,privateMethodsCovered,difficulty);
+           
+            int userScore = gameLogic.GetScore(jacoco_xml,num_lines,numPrivateMethods,privateMethodLines,cyclomaticComplexity,difficulty);
             logger.info("[GAMECONTROLLER] /run: user_score {}", userScore);
 
             // Salvo i dati del turno
@@ -552,6 +510,5 @@ public class GameController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.toString());
     }
 
-    /*MODIFICA FUNZIONANTE metodo che localizza i metodi privati della classeUT e li mette in un array di interi */
     
 }

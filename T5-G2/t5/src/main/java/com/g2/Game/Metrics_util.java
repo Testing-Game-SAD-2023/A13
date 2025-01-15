@@ -1,23 +1,13 @@
 package com.g2.Game;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.NodeList;
-
-public class Punteggio_util {
+public class Metrics_util {
 
 
-
+    /*MODIFICA FUNZIONANTE metodo che localizza i metodi privati della classeUT e li mette in un array di interi */
     public static ArrayList<Integer> findPrivateMethodLines(String underTestClassCode) {
         // Regex per trovare metodi privati
         String methodRegex = "\\bprivate\\b\\s+(?:static\\s+|final\\s+)?\\S+\\s+\\w+\\s*\\([^\\)]*\\)\\s*\\{";
@@ -41,64 +31,6 @@ public class Punteggio_util {
     }
 
     
-
-    /* Metodo che confronta l'xml di coverage con l'arraylist con le linee dei metodi privati */
-    public static int countCoveredPrivateMethods(ArrayList<Integer> privateMethodLines, String jacocoXml) throws Exception {
-        try {
-            System.out.println("Private Method Lines: " + privateMethodLines);
-            // Configura DocumentBuilderFactory per ignorare DTD esterni
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setNamespaceAware(false);
-
-            // Disabilita il caricamento di DTD esterni per evitare errori
-            try {
-                factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            } catch (ParserConfigurationException e) {
-                // Alcuni parser potrebbero non supportare questa feature
-                System.err.println("Impossibile disabilitare il caricamento di DTD esterni: " + e.getMessage());
-            }
-
-            // Crea DocumentBuilder
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            // Imposta un ErrorHandler che ignora gli errori DTD
-            builder.setErrorHandler(new org.xml.sax.helpers.DefaultHandler());
-
-            // Parsing della stringa XML
-            InputStream xmlInput = new ByteArrayInputStream(jacocoXml.getBytes("UTF-8"));
-            org.w3c.dom.Document document = builder.parse(xmlInput);
-            document.getDocumentElement().normalize();
-
-            // Trova tutti gli elementi <line> nel file di coverage
-            NodeList lineNodes = document.getElementsByTagName("line");
-            Set<Integer> coveredLines = new HashSet<>();
-
-            for (int i = 0; i < lineNodes.getLength(); i++) {
-                org.w3c.dom.Element lineElement = (org.w3c.dom.Element) lineNodes.item(i);
-
-                // Verifica che gli attributi "nr" e "ci" esistano
-                if (lineElement.hasAttribute("nr") && lineElement.hasAttribute("ci")) {
-                    try {
-                        int lineNumber = Integer.parseInt(lineElement.getAttribute("nr"));
-                        int covered = Integer.parseInt(lineElement.getAttribute("ci"));
-
-                        // Se la riga è coperta, aggiungila all'insieme delle righe coperte
-                        if (covered > 0) {
-                            coveredLines.add(lineNumber - 1);
-                        }
-                        System.out.println("Covered Lines: " + coveredLines);
-                    } catch (NumberFormatException e) {
-                        // Log dell'errore di parsing e continua
-                        System.err.println("Errore nel parsing degli attributi nr o ci: " + e.getMessage());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Errore durante il confronto delle linee dei metodi privati.", e);
-        }
-        return 0; 
-    }
-
     //METODO PER IL CONTEGGIO DEI METODI PRIVATE
      public static int countPrivateMethods(String underTestClassCode) {
         // Regex per trovare metodi privati
