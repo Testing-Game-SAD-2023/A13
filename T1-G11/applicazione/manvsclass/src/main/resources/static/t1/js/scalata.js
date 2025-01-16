@@ -734,7 +734,6 @@ $(document).ready(function() {
   displayScalate();
   displayClasses();
   selectClasses();
-  submitScalataData();
   updateTotalClasses();
   updateTotalScalate();
   filterClassesByDifficulty();
