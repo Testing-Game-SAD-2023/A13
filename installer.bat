@@ -102,6 +102,9 @@ docker volume create VolumeT9 || ( echo "Error in creating the volume T9" && exi
 REM Creazione del volume Docker 'VolumeT8'
 docker volume create VolumeT8 || ( echo "Error in creating the volume T8" && exit /b 1 )
 
+REM Creazione del volume Docker 'Volume'
+docker volume create Volume || ( echo "Error in creating the volume" && exit /b 1 )
+
 REM Creazione della rete Docker 'global-network'
 docker network create global-network || ( echo "Error in creating the network global-network" && exit /b 1 )
 

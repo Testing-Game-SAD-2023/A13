@@ -9,6 +9,7 @@ services:
       - global-network
     volumes:
       - VolumeT8:/VolumeT8
+      - Volume:/Volume
 
 networks:
   global-network:
@@ -16,4 +17,6 @@ networks:
 
 volumes:
   VolumeT8:
+    external: true
+  Volume:
     external: true

@@ -9,6 +9,9 @@ docker volume create VolumeT9 || echo "Errore nella creazione del volume"
 # Creazione del volume Docker 'VolumeT8'
 docker volume create VolumeT8 || echo "Errore nella creazione del volume"
 
+# Creazione del volume Docker 'Volume'
+docker volume create Volume || echo "Errore nella creazione del volume"
+
 # Creazione della rete Docker 'global-network'
 docker network create global-network || echo "Errore nella creazione della rete"
 
