@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .antMatcher("/**").authorizeRequests()
-            .antMatchers("/llogin", "/t23/**", "/login", "**").permitAll()
+            .antMatchers("/llogin", "/t23/**", "/login","/new_notification", "**").permitAll()
             .anyRequest().authenticated()
             .and()
             .oauth2Login().loginPage("/login").userInfoEndpoint()

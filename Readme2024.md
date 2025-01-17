@@ -1,16 +1,25 @@
 # Testing_Challenge_Game (by UNINA)- Ver. A13
+Web App a supporto dell'insegnamento del Software Testing attraverso la Gamification.
+
+Questa Web App è descritta anche nel seguente articolo scientifico:
+Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
+"Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://doi.org/10.1145/3678869.368568
+
+# Descrizione
 Web App a supporto dell'insegnamento del Software Testing attraverso la Gamification. 
 
 Questa Web App è descritta anche nel seguente articolo scientifico: 
 Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
 "Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://doi.org/10.1145/3678869.368568
 
-# Descrizione 
-The Testing_Challenge_Game Web Application was developed with the contributions of the students of the University of Naples Federico II in Italy, enrolled in the Software Architecture Design (SAD) courses held by the Prof. Anna Rita Fasolino in the academic years 2022-23, 2023-24, 2024-25.
-It has  an extremely ambitious goal: to enhance the importance of testing, a discipline often mistreated and not explored in depth in university courses, through the innovative strategy of gamification which, as the term suggests, consists in using elements borrowed from games but in non-playful contexts. The result of the application of this mechanism was the design and subsequent development of the interactive game: "Man vs Automated Testing Tools challenges" which sees the students, from here on called players, compete, with tests designed using the JUnit framework, against robots (Randoop or EvoSuite) capable of automatically generating such tests; the challenge can be considered won by the participant capable of completing a certain coverage objective.
+# Contributori del Branch/ Fork corrente
+- [Vincenzo Luigi Bruno](https://github.com/vlb20): vincenzol.bruno@studenti.unina.it
+- [Salvatore Cangiano](https://github.com/Salvr28): salva.cangiano@studenti.unina.it
+- [Cristina Carleo](https://github.com/iris-cmd22): cr.carleo@studenti.unina.it
 
-# Stato del progetto
-Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
+
+# Funzionalità dell'Applicazione
+L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi.
 
 # Contributori del Branch/ Fork corrente 
 Nomi degli autori dei nuovi contributi presenti in questo repository 
@@ -23,12 +32,25 @@ Il giocatore può:
 - Giocare una Sfida Multi-livello (Scalata) contro i Robot Evosuite o Randoop
 - Allenarsi nella scrittura di Test JUnit per testare classi di codice in Java
 - Visualizzare il proprio Profilo Utente, accedendo ai propri achievement (traguardi raggiunti)
+- Ricercare e visualizzare Profili Utente di amici e seguirli
 
 L'amministratore del Gioco può:
 - Caricare nuove classi in Java su cui i giocatori potranno allenarsi e sfidare i Robot
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
 
+# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
+1. Video dimostrativo della funzionalità: "Modifica Profilo"
+![Demo Edit Profile](Documentazione/Documentazione_2024/Video_Demo/Demo_Edit_Profile.mp4)
 
+2. Video dimostrativo della funzionalità: "Notifica Achievement"
+![Demo Notifica Achievement](Documentazione/Documentazione_2024/Video_Demo/Demo_Nuovo_Achievement.mp4)
+
+3. Video dimostrativo delle funzionalità: "Seguire un altro giocatore" e "Notifica Follow"
+![Demo Follow Player](Documentazione/Documentazione_2024/Video_Demo/Demo_Follow_Player.mp4)
+![Demo Notifica Follow](Documentazione/Documentazione_2024/Video_Demo/Demo_Notifica_Follow.mp4)
+
+# Come iniziare
+1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
 Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
 
@@ -77,8 +99,7 @@ Versione DXCore: 10.0.25131.1002-220531-1700.rs-onecore-base2-hyp
 Maven
 -----------------------
 Versione    3.9.6
------------------------   
-```
+-----------------------
 
 # Come installare
 
@@ -107,8 +128,7 @@ Tali script dovranno essere avviati unicamnete con Docker in esecuzione, altrime
 3) Creazione dei singoli container in Docker desktop.
 4) Esecuzione dei file di installazione nei container del task T8 e T7
 5) Avvio dei container
-6) Comandi di inizializzazione del database del task T1
-   
+6) Comandi di inizializzazione del database del task T1   
 NOTA: il container relativo al Task 9 ("Progetto-SAD-G19-master") si sospenderà autonomamente dopo l'avvio. Esso viene utilizzato solo per "popolare" il volume "VolumeT9" condiviso con il Task 1.
 
 # Risoluzione di Problemi ricorrenti
@@ -148,12 +168,35 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
+## 1. Aggiunta di un Profilo Utente
+- Descrizione: Gli utenti ora possono creare un profilo personalizzato, con informazioni come immagine di profilo e bio. 
+- Benefici: Migliora l’esperienza utente fornendo un punto centrale per la gestione delle informazioni personali.
+
+## 2. Sistema di Seguiti e Seguaci
+- Descrizione: Introduzione di una funzionalità che permette agli utenti di seguire e essere seguiti da altri utenti.
+- Benefici: Favorisce l’interazione sociale tra utenti.
+
+## 3. Modifica del Profilo Utente
+- Descrizione: Gli utenti possono ora modificare le informazioni del proprio profilo.
+- Benefici: Consente agli utenti di mantenere aggiornati i propri dati personali.
+
+## 4. Sistema di Notifica nel Profilo Utente
+- Descrizione: Aggiunta di un sistema centralizzato di notifiche visibili nel profilo dell'utente.
+- Benefici: Fornisce agli utenti una panoramica chiara delle attività rilevanti.
+
+## 5. Notifica al Conseguimento di un Achievement
+- Descrizione: Gli utenti ricevono notifiche automatiche quando raggiungono un obiettivo (achievement).
+- Benefici: Incentiva il coinvolgimento degli utenti premiando i loro progressi.
+
+## 6. Notifica per Nuovo Follower
+- Descrizione: Gli utenti ricevono notifiche quando qualcuno inizia a seguirli.
+- Benefici: Migliora l’esperienza sociale informando gli utenti delle interazioni con altri membri.
+
+# Documentazione di Progetto della Versione corrente
+
+La documentazione completa, i powerpoint delle iterazioni ed i diagrammi sono consultabili al link seguente: ![Documentazione](Documentazione/Documentazione_2024/)
+=======
 TBD
 
 # Documentazione di Progetto della Versione corrente
 Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
-
-
-
-
-

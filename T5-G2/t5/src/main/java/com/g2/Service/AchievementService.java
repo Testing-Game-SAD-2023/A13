@@ -17,14 +17,21 @@
 
 package com.g2.Service;
 
-import com.commons.model.Gamemode;
-import com.g2.Interfaces.ServiceManager;
-import com.g2.Model.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import com.commons.model.Gamemode;
+import com.g2.Interfaces.ServiceManager;
+import com.g2.Model.Achievement;
+import com.g2.Model.AchievementProgress;
+import com.g2.Model.Game;
+import com.g2.Model.Statistic;
+import com.g2.Model.StatisticProgress;
 
 @Service
 public class AchievementService {
@@ -110,5 +117,15 @@ public class AchievementService {
         }
 
         return statisticProgresses;
+    }
+
+    public void updateNotificationsForAchievements(String userEmail, List<AchievementProgress> newAchievements) {
+
+        for (AchievementProgress achievement : newAchievements) {
+            String titolo = "Nuovo Achievement";
+            String message = "Congratulazioni! Hai ottenuto il nuovo achievement: " + achievement.Name + "!";
+            serviceManager.handleRequest("T23", "NewNotification", userEmail, titolo, message);
+
+        }
     }
 }

@@ -1,0 +1,684 @@
+/* Generale */
+body {
+    background-color: #1a1a2e; /* Sfondo scuro */
+    color: #fff; /* Testo bianco */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+.nav-bar {
+    background-color: #0e153a; /* Sfondo della navbar */
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #333;
+}
+
+.nav-bar a {
+    text-decoration: none;
+    color: #ccc; /* Colore tenue per i link */
+    font-weight: bold;
+}
+
+.nav-bar a:hover {
+    color: #fff;
+}
+
+.logout-button {
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #c9302c;
+}
+
+/* Layout principale */
+.container-fluid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Due colonne uguali */
+    grid-template-rows: auto auto; /* Righe automatiche */
+    gap: 20px; /* Spaziatura tra le celle */
+    padding: 20px;
+}
+
+/* Card generiche */
+.card {
+    background-color: #2a2a42; /* Sfondo delle card */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #ccc;
+    border-bottom: 1px solid #444;
+    margin-bottom: 10px;
+}
+
+.card-body {
+    color: #aaa;
+}
+
+/* Profilo Utente */
+.user-name {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Stili per il gruppo di bottoni */
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-custom {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #0056b3;
+}
+
+.card-body.d-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-body.d-flex img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+.card-body.d-flex div {
+    flex-grow: 1;
+}
+
+.card-body.d-flex button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.card-body.d-flex button:hover {
+    background-color: #0056b3;
+}
+
+.token-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 5px;
+}
+
+.token-container i {
+    color: #ffd700; /* Colore dorato per l'icona delle monete */
+}
+
+/* Bio */
+.card-body p.text-muted {
+    font-size: 0.9rem;
+    color: #fff9f9; /* Colore per la bio */
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.bio-box {
+    background: linear-gradient(145deg, #2d2d45, #323250);
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+}
+
+.bio-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(145deg, #323250, #2d2d45);
+}
+
+/* Achievements Tab */
+.nav-tabs .nav-link {
+    color: #ccc;
+    background-color: transparent;
+    border: none;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 5px;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #fff;
+}
+
+/* Stile della card principale */
+.card {
+    background-color: #2a2a42;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+}
+
+.card-header {
+    background-color: #343a40;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 15px;
+    border-bottom: 2px solid #444;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Container principale delle notifiche */
+.notifications-container {
+    padding: 0;
+    background-color: #2a2a42;
+}
+
+/* Lista delle notifiche */
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+}
+
+/* Singola notifica */
+.notification-item {
+    background: linear-gradient(145deg, #2d2d45, #323250);
+    padding: 16px;
+    border-radius: 12px;
+    border-left: 4px solid #3498db;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Contenuto della notifica */
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notification-content strong {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.notification-content span {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.notification-content small {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+/* Badge di stato */
+.notification-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.status-read {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #2ecc71;
+}
+
+.status-unread {
+    background-color: rgba(243, 156, 18, 0.2);
+    color: #f1c40f;
+}
+
+/* Pulsanti azione */
+.notification-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.read-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.read-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.delete-btn:hover {
+    background-color: #e74c3c;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Messaggio nessuna notifica */
+.no-notifications {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-style: italic;
+}
+
+/* Animazione di entrata */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification-item {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Statistiche */
+.statistics-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #444;
+}
+
+.statistics-row:last-child {
+    border-bottom: none;
+}
+
+/* Layout principale */
+.container-fluid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Due colonne uguali */
+    gap: 20px; /* Spaziatura tra le colonne */
+    padding: 20px;
+}
+
+.left-column, .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Spaziatura tra le card */
+}
+
+/* Achievements Styles */
+.achievements-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spaziatura tra gli achievement */
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    background-color: #2a2a42; /* Colore di sfondo */
+    border-radius: 10px; /* Angoli arrotondati */
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.achievement-icon {
+    width: 60px; /* Dimensione massima dell'icona */
+    height: 60px; /* Dimensione massima dell'icona */
+    object-fit: contain; /* Mantiene il rapporto d'aspetto */
+    margin-right: 15px; /* Spaziatura tra l'icona e il testo */
+}
+
+.achievement-details {
+    flex-grow: 1;
+    color: #fff; /* Colore del testo */
+}
+
+.achievement-details h5 {
+    margin: 0;
+    font-size: 16px; /* Titolo più piccolo */
+    font-weight: bold;
+}
+
+.achievement-details p {
+    margin: 5px 0 0;
+    font-size: 14px; /* Testo descrittivo */
+    color: #aaa; /* Colore più tenue per la descrizione */
+}
+
+/* Achievement "Locked" Style */
+.achievement-item.unobtained {
+    opacity: 0.5; /* Riduce l'opacità per i trofei bloccati */
+    background-color: #1a1a2e; /* Colore di sfondo diverso per quelli bloccati */
+}
+
+.achievement-progress {
+    margin-top: 10px;
+    height: 10px;
+    background-color: #1a1a2e;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.achievement-progress .progress-bar {
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(145deg, #2d2d45, #323250);
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.friend-item:hover {
+    background: linear-gradient(145deg, #323250, #2d2d45);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+
+.friend-item.hidden {
+    display: none;
+}
+
+.friend-info {
+    flex-grow: 1;
+}
+
+.friend-info h5 {
+    color: #fff;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.friend-info p {
+    color: #f4efef;
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+}
+
+.btn-custom {
+    background-color: #007bff;
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-custom:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.nav-tabs .nav-link {
+    color: #ccc;
+    border: none;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    color: #fff;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.nav-link .badge {
+    margin-left: 5px;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+/* Contenitore per la ricerca amici */
+.friend-search {
+    position: relative;
+    margin-bottom: 20px;
+    z-index: 2; /* Assicura che il dropdown appaia sopra gli altri elementi */
+}
+
+.search-input-container {
+    position: relative;
+}
+
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 2;
+    pointer-events: none; /* Permette di cliccare "attraverso" l'icona */
+}
+
+.search-input-container input {
+    padding-left: 35px; /* Spazio per l'icona */
+}
+
+.search-input-container input::placeholder {
+    padding-left: 0; /* Rimuove il padding dal placeholder */
+}
+
+#friend-search-input {
+    text-indent: 25px; /* Sposta il testo a destra senza spostare il placeholder */
+}
+
+/* Input di ricerca */
+.friend-search input {
+    width: 100%;
+    background-color: #e9e9f1;
+    border: 1px solid #444;
+    color: #000000;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+.friend-search input:focus {
+    background-color: #ffffff;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    color: #000000;
+}
+
+/* Lista dei suggerimenti */
+#friend-suggestions {
+    position: absolute;
+    width: 100%;
+    top: 100%;
+    left: 0;
+    background-color: #2d2d45;
+    border: 1px solid #444;
+    border-radius: 0 0 5px 5px;
+    z-index: 3; /* Valore più alto per assicurarsi che appaia sopra tutto */
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Stile per ogni suggerimento */
+.profile-info {
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    background-color: #2a2a42;
+    transition: background-color 0.2s ease;
+    gap: 20px; /* Aggiungiamo spazio tra le info e il bottone */
+}
+
+.profile-info:hover {
+    background-color: #323250;
+}
+
+/* Contenitore info utente */
+.profile-info .user-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-info .user-details .name {
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.profile-info .user-details .email {
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+/* Stile bottone */
+.profile-info .btn-custom {
+    flex-shrink: 0; /* Previene il restringimento del bottone */
+    min-width: 120px; /* Larghezza minima fissa per il bottone */
+    white-space: nowrap; /* Previene l'andare a capo del testo */
+}
+
+/* Tab navigation - aggiungiamo solo lo spacing necessario */
+.card-body .nav-tabs {
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Aggiustiamo il contenuto dei tab */
+.tab-content {
+    position: relative;
+    z-index: 1;
+    padding-top: 15px;
+}
+
+.tab-search-container {
+    margin: 15px 0;
+    position: relative;
+}
+
+.tab-search {
+    width: 100%;
+    background-color: #e9e9f1;
+    border: 1px solid #444;
+    color: #000000;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.tab-search:focus {
+    background-color: #ffffff;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.btn-danger {
+    background-color: #dc3545 !important; /* Rosso */
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+.btn-danger:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+/* Assicuriamoci che il bottone mantenga sempre un aspetto consistente */
+#followButton {
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+#followButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container-fluid {
+        grid-template-columns: 1fr; /* Una colonna su dispositivi più piccoli */
+    }
+}

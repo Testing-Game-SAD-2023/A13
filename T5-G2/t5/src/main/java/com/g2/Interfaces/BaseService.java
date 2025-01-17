@@ -39,6 +39,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.g2.Model.User;
+
 /*
  *  Questa è una classe base che implementa l'interfaccia ServiceInterface per il dispatcher ServiceManager
  *   e ti fornisce svariati metodi che mappano POST, GET, PUT E DELETE, in vari formati e header.
@@ -214,33 +216,33 @@ public abstract class BaseService implements ServiceInterface {
     protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, 
                             Map<String, String> queryParams, Map<String, String> customHeaders, 
                             Class<R> responseType) {
-    if (endpoint == null || endpoint.isEmpty()) {
-        throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-    }
-    if (formData == null) {
-        throw new IllegalArgumentException("formData non può essere nullo");
-    }
-    
-    return executeRestCall("callRestPut", () -> {
-        String url = buildUri(endpoint, queryParams);
-        
-        HttpHeaders headers = new HttpHeaders();
-        
-        // Aggiunge gli header personalizzati se presenti
-        if (customHeaders != null) {
-            customHeaders.forEach(headers::add);
+        if (endpoint == null || endpoint.isEmpty()) {
+            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
+        }
+        if (formData == null) {
+            throw new IllegalArgumentException("formData non può essere nullo");
         }
         
-        // Imposta il content type di default se non specificato
-        if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        }
-        
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
-        ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
-        return response.getBody();
-    });
-}
+        return executeRestCall("callRestPut", () -> {
+            String url = buildUri(endpoint, queryParams);
+            
+            HttpHeaders headers = new HttpHeaders();
+            
+            // Aggiunge gli header personalizzati se presenti
+            if (customHeaders != null) {
+                customHeaders.forEach(headers::add);
+            }
+            
+            // Imposta il content type di default se non specificato
+            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            }
+            
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
+            ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
+            return response.getBody();
+        });
+    }
 
     // metodo per chiamare PUT con content type a application/json
     protected <R> R callRestPut(String endpoint, JSONObject jsonObject, 
@@ -269,6 +271,10 @@ public abstract class BaseService implements ServiceInterface {
                 headers.setContentType(MediaType.APPLICATION_JSON);
             }
             
+            System.out.println("Request URL: " + url);
+            System.out.println("Request Headers: " + headers);
+            System.out.println("Request Body: " + jsonBody);
+
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
             return response.getBody();

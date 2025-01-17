@@ -1,40 +1,40 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark" id="html-root" xmlns:th="http://www.thymeleaf.org">
-    <head th:include="fragments/header :: header">
-        <link rel="stylesheet" href="/t5/css/Css/Edit_profile_marco.css"/>
-    </head>
-    
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/t5/css/profile-edit.css">
+</head>
 <body>
-
-    <!-- NAV -->
-<div th:replace="fragments/navbar :: navbar"></div>
-
-    <!-- Profile Page -->
-    <div class="container">
-        <div class="profile-container">
-            <div class="text-center mb-4">
-                <h3 class="text-custom">
-                    <span th:text="${player.name}"></span>
-                    <span th:text="${player.surname}"></span>
-                </h3>
-            </div>
-            <form>
-                <div class="mb-3">
-                    <label for="email" class="form-label" th:text="#{studi}"></label>
-                    <input type="email" id="email" class="form-control" value="${player.studies}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">email:</label>
-                    <input type="email" id="email" class="form-control" value="${player.email}" readonly>
-                </div>
-                <div class="text-center mt-3">
-                    <button type="button" class="btn btn-sm btn-success" th:text="#{modifica_profilo}"></button>
-                </div>
-            </form>
-        </div>
+    <!-- Header con il pulsante -->
+    <header class="header">
+        <a href="/profile" class="profile-link">
+            <button id="user-email" class="profile-button" th:text="${email}">Torna al profilo utente</button>
+        </a>
+    </header>
+    <!-- Dati utente nascosti -->
+    <div id="user-data"
+        th:data-current-bio="${bio}"
+        th:data-current-image="${propic}"
+        hidden>
     </div>
-
+    <!-- Contenuto principale -->
+    <main class="content">
+        <!-- Sezione immagini profilo -->
+        <div id="profile-pictures">
+            <img th:each="image : ${images}"
+                th:src="@{/t5/images/profileImages/{image}(image=${image})}"
+                th:class="${image == propic ? 'profile-picture selected' : 'profile-picture'}"
+                alt="Profile Picture" />
+        </div>
+        <!-- Campo per la bio -->
+        <textarea id="bio-input" th:text="${bio}"></textarea>
+        <!-- Pulsante per salvare -->
+        <button id="save-button" th:text="#{editProfile.save}">Salva</button>
+    </main>
     <div th:replace="fragments/footer :: footer"></div>
-
+    <script src="/t5/js/profile-edit.js"></script>
 </body>
 </html>
