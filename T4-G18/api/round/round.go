@@ -3,8 +3,9 @@ package round
 import (
 	"strconv"
 	"time"
-
 	"github.com/alarmfox/game-repository/model"
+	"github.com/alarmfox/game-repository/api/robot"
+	"fmt"
 )
 
 type Round struct {
@@ -12,6 +13,8 @@ type Round struct {
 	Order       int        `json:"order"`
 	TestClassId string     `json:"testClassId"`
 	GameID      int64      `json:"gameId"`
+	RobotID     int64      `json:"robotId"`
+	Robot       robot.Robot      `json:"robot"`
 	CreatedAt   time.Time  `json:"createdAt"`
 	UpdatedAt   time.Time  `json:"updatedAt"`
 	StartedAt   *time.Time `json:"startedAt"`
@@ -21,17 +24,22 @@ type Round struct {
 type CreateRequest struct {
 	GameId      int64      `json:"gameId"`
 	TestClassId string     `json:"testClassId"`
+	RobotID     int64      `json:"robotId"` // ID del Robot associato
 	StartedAt   *time.Time `json:"startedAt,omitempty"`
 	ClosedAt    *time.Time `json:"closedAt,omitempty"`
 }
 
-func (CreateRequest) Validate() error {
-	return nil
+func (r CreateRequest) Validate() error {
+    if r.RobotID == 0 {
+        return fmt.Errorf("robotId is required")
+    }
+    return nil
 }
 
 type UpdateRequest struct {
 	StartedAt *time.Time `json:"startedAt,omitempty"`
 	ClosedAt  *time.Time `json:"closedAt,omitempty"`
+	RobotID   *int64     `json:"robotId,omitempty"`
 }
 
 func (UpdateRequest) Validate() error {
@@ -59,5 +67,6 @@ func fromModel(r *model.Round) Round {
 		StartedAt:   r.StartedAt,
 		ClosedAt:    r.ClosedAt,
 		GameID:      r.GameID,
+		RobotID:     r.RobotID, // Associa l'ID del Robot
 	}
 }
