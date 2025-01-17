@@ -6,11 +6,11 @@ Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
 "Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://doi.org/10.1145/3678869.368568
 
 # Descrizione
-The Testing_Challenge_Game Web Application was developed with the contributions of the students of the University of Naples Federico II in Italy, enrolled in the Software Architecture Design (SAD) courses held by the Prof. Anna Rita Fasolino in the academic years 2022-23, 2023-24, 2024-25.
-It has  an extremely ambitious goal: to enhance the importance of testing, a discipline often mistreated and not explored in depth in university courses, through the innovative strategy of gamification which, as the term suggests, consists in using elements borrowed from games but in non-playful contexts. The result of the application of this mechanism was the design and subsequent development of the interactive game: "Man vs Automated Testing Tools challenges" which sees the students, from here on called players, compete, with tests designed using the JUnit framework, against robots (Randoop or EvoSuite) capable of automatically generating such tests; the challenge can be considered won by the participant capable of completing a certain coverage objective.
+Web App a supporto dell'insegnamento del Software Testing attraverso la Gamification. 
 
-# Stato del progetto
-Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
+Questa Web App è descritta anche nel seguente articolo scientifico: 
+Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
+"Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://doi.org/10.1145/3678869.368568
 
 # Contributori del Branch/ Fork corrente
 - [Vincenzo Luigi Bruno](https://github.com/vlb20): vincenzol.bruno@studenti.unina.it
@@ -20,6 +20,13 @@ Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forka
 
 # Funzionalità dell'Applicazione
 L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi.
+
+# Contributori del Branch/ Fork corrente 
+Nomi degli autori dei nuovi contributi presenti in questo repository 
+
+
+# Funzionalità dell'Applicazione 
+L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi. 
 Il giocatore può:
 - Giocare una Sfida di Testing contro i Robot Evosuite o Randoop
 - Giocare una Sfida Multi-livello (Scalata) contro i Robot Evosuite o Randoop
@@ -30,7 +37,6 @@ Il giocatore può:
 L'amministratore del Gioco può:
 - Caricare nuove classi in Java su cui i giocatori potranno allenarsi e sfidare i Robot
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
-
 
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
 1. Video dimostrativo della funzionalità: "Modifica Profilo"
@@ -45,6 +51,11 @@ L'amministratore del Gioco può:
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di
+# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
+Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
+
+# Come iniziare
+1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 
 scaricare, al seguente indirizzo https://git-scm.com/downloads, ed installare, sul proprio computer, Git (per una guida completa all'installazione fare riferimento al seguente indirizzo: https://github.com/git-guides/install-git).
 Una volta aver completato l'installazione, sarà possibile clonare i repository GitHub sulla propria macchina:
 <pre>
@@ -89,7 +100,6 @@ Maven
 -----------------------
 Versione    3.9.6
 -----------------------
-```
 
 # Come installare
 
@@ -118,8 +128,7 @@ Tali script dovranno essere avviati unicamnete con Docker in esecuzione, altrime
 3) Creazione dei singoli container in Docker desktop.
 4) Esecuzione dei file di installazione nei container del task T8 e T7
 5) Avvio dei container
-6) Comandi di inizializzazione del database del task T1
-
+6) Comandi di inizializzazione del database del task T1   
 NOTA: il container relativo al Task 9 ("Progetto-SAD-G19-master") si sospenderà autonomamente dopo l'avvio. Esso viene utilizzato solo per "popolare" il volume "VolumeT9" condiviso con il Task 1.
 
 # Risoluzione di Problemi ricorrenti
@@ -159,7 +168,6 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-
 ## 1. Aggiunta di un Profilo Utente
 - Descrizione: Gli utenti ora possono creare un profilo personalizzato, con informazioni come immagine di profilo e bio. 
 - Benefici: Migliora l’esperienza utente fornendo un punto centrale per la gestione delle informazioni personali.
@@ -187,8 +195,8 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 # Documentazione di Progetto della Versione corrente
 
 La documentazione completa, i powerpoint delle iterazioni ed i diagrammi sono consultabili al link seguente: ![Documentazione](Documentazione/Documentazione_2024/)
+=======
+TBD
 
-
-
-
-
+# Documentazione di Progetto della Versione corrente
+Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
