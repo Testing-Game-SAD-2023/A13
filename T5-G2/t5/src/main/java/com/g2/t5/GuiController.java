@@ -332,7 +332,8 @@ public class GuiController {
         System.out.println("ECCO LO USERNAME : " + username);       //in realtà stampa l'indirizzo e-mail del player...
 
         // globalID = g.getGameId();
-        JSONObject ids = gameDataWriter.saveGame(g, username, selectedScalata);
+        //Aggiunta del parametro Robot per il salvataggio della partita e la creazione di un nuovo round.
+        JSONObject ids = gameDataWriter.saveGame(g, robot, username, selectedScalata);
         if (ids == null) {
             return ResponseEntity.badRequest().body("Bad Request");
         }

@@ -187,25 +187,14 @@ function pressedSubmit() {
     });
 }
 
-function getDifficulty(difficulty) {
-    switch (difficulty) {
-        case 'Beginner':
-            return 1;
-        case 'Intermediate':
-            return 2;
-        case 'Advanced':
-            return 3;
-        default:
-            return '';
-    }
-  }
+
 async function retrieveScalata(scalata) {
     return new Promise((resolve, reject) => { 
         $.ajax({
             url: `/retrieve_scalata/${scalata}`,
             type: 'GET',
             success: (data) => {
-                // Estrarre i nomi delle classi dalla lista di oggetti
+                // EDIT: Estrarre i nomi delle classi dalla lista di oggetti
                 const classNames = data[0].selectedClasses.map(cls => cls.className);
                 const robots = data[0].selectedClasses.map(rbt => rbt.robot);
                 const difficulties = data[0].selectedClasses.map(dft => dft.difficulty)
@@ -214,6 +203,7 @@ async function retrieveScalata(scalata) {
                 // Salvare le informazioni necessarie in localStorage
                 localStorage.setItem("SelectedScalata", scalata);
                 localStorage.setItem("total_rounds_of_scalata", data[0].numberOfRounds);
+                //EDIT: Vengono processate le classi, i robot e le difficoltà della scalata
                 localStorage.setItem("scalata_classes", JSON.stringify(classNames));
                 localStorage.setItem("scalata_robots", JSON.stringify(robots));
                 localStorage.setItem("scalata_difficulties", JSON.stringify(difficulties));

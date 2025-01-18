@@ -232,6 +232,7 @@ runButton.addEventListener("click", function () {
         processData: false,
         contentType: false,
         dataType: "json",
+        //Prima comunicazione riguardante il solo esito della partita
         success: function (response) {
 
           console.log(response);
@@ -245,6 +246,8 @@ runButton.addEventListener("click", function () {
           //document.getElementById('loading-editor').style.display = 'none';
 
           // Check if the player has won
+
+          
 
           if (response.win == true) {
 
@@ -261,12 +264,15 @@ runButton.addEventListener("click", function () {
           }
           orderTurno++;
 
+          // Seconda comunicazione riguardante l'estrazione delle statistiche del robot
+          
+
           // e.g VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java
           var classe = 'VolumeT8/FolderTreeEvo/' + localStorage.getItem("classe") + 
                         '/' + localStorage.getItem("classe") + 'SourceCode' +
                         '/' + localStorage.getItem("classe") + '.java';
 
-          //  TODO:  This path is used also from task t8, so if change, check also t8
+          // TODO:  This path is used also from task t8, so if change, check also t8
           // /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game1/Round1/Turn1/TestReport
           // /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Scalata/Scalata1/Calcolatrice/Game1/Round1/Turn1/TestReport
           if (localStorage.getItem("modalita") === "Scalata") {
@@ -391,19 +397,31 @@ runButton.addEventListener("click", function () {
                             //The player has completed the round, not the Scalata
                             swal("Complimenti!", `Hai completato il round ${current_round_scalata}/${total_rounds_scalata}!\n${displayRobotPoints}`, "success").then((value) => {
                               current_round_scalata++;
+                              
                               localStorage.setItem("current_round_scalata", current_round_scalata);
+
+                              //TODO: passare come parametro anche robot e difficoltà
+
                               classe = getScalataClasse(current_round_scalata-1, localStorage.getItem("scalata_classes"));
+                              var robot = getScalataRobot(current_round_scalata-1, localStorage.getItem("scalata_robots"))
+                              var difficulty = getScalataDifficulty(current_round_scalata-1, localStorage.getItem("scalata_difficulties")); 
+
+
                               localStorage.setItem("classe", classe);
+                              localStorage.setItem("robot", robot);
+                              localStorage.setItem("difficulty", difficulty);
+
+
                               console.log("[editor.js] classes in scalata: "+localStorage.getItem("scalata_classes")+"\n\
                                         selected class: "+classe);
                               incrementScalataRound(localStorage.getItem("scalataId"), current_round_scalata).then((data) => {
                                 console.log("[editor.js] Creating new game for next round in scalata with parameters: \
-                                  Robot: evosuite\n\
+                                  Robot: "+robot+"\n\
                                   Classe: "+classe+"\n\
-                                  Difficulty: 1\n\
+                                  Difficulty: "+difficulty+"\n\
                                   ScalataId: "+localStorage.getItem("scalataId")+"\n\
                                   Username: "+localStorage.getItem("username")+".");
-                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username"),localStorage.getItem("modalita")).then((data) => {
+                                createGame(robot, classe, difficulty, localStorage.getItem("scalataId"), localStorage.getItem("username"),localStorage.getItem("modalita")).then((data) => {
                                   console.log(data);
                                   window.location.href = "editor_old";
                                 });
