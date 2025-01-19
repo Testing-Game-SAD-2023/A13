@@ -226,15 +226,14 @@ runButton.addEventListener("click", function () {
       formData.append("testClassId", localStorage.getItem("classe"));
 
       $.ajax({
-        url: "/api/run", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        //Prima comunicazione riguardante il solo esito della partita
-        success: function (response) {
-
+          url: "/api/run", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json",
+          //Prima comunicazione riguardante il solo esito della partita
+          success: function (response) {
           console.log(response);
           // risp = response;                            
 
@@ -246,27 +245,71 @@ runButton.addEventListener("click", function () {
           //document.getElementById('loading-editor').style.display = 'none';
 
           // Check if the player has won
-
-          
-
-          if (response.win == true) {
-
-            // alert("Hai vinto! Punteggio: " + gameScore);
-            swal("Complimenti!", "Hai vinto! Ecco il tuo punteggio: " + gameScore, "success");
-            turno++;                                      // Increment the number of turns played so far
-            isWin = true;
-          }
+          console.log("Handling victory...");
+          if (response.win) {
+            swal("Complimenti!", "Hai vinto! Ecco il tuo punteggio: " + gameScore, "success").then(() => {
+              turno++;
+              isWin = true;
+              handleNextRound();
+            });
+          } 
           else {
-
-            // alert("Hai perso! Punteggio: " + gameScore);
-            swal("Peccato!", "Hai perso! Ecco il tuo punteggio: " + gameScore, "error");
-            turno++;
+              swal("Peccato!", "Hai perso! Ecco il tuo punteggio: " + gameScore, "error").then(() => {
+                turno++;
+                isWin = false;
+              });
           }
           orderTurno++;
 
-          // Seconda comunicazione riguardante l'estrazione delle statistiche del robot
+          function handleNextRound() {
+            if (current_round_scalata >= total_rounds_scalata) {
+                console.log("Completing scalata...");
+                calculateFinalScore(localStorage.getItem("scalataId"))
+                    .then(data => {
+                        closeScalata(localStorage.getItem("scalataId"), true, data.finalScore, current_round_scalata)
+                            .then(() => {
+                                swal("Complimenti!", "Hai completato la scalata!", "success").then(() => {
+                                    window.location.href = "leaderboardScalata";
+                                });
+                            });
+                    })
+                    .catch(error => {
+                        console.error("Error calculating final score:", error);
+                        swal("Errore!", "Si è verificato un errore durante il calcolo del punteggio finale.", "error");
+                    });
+            } 
+            else {
+                current_round_scalata++;
+                localStorage.setItem("current_round_scalata", current_round_scalata);
           
+                const classe = getScalataClasse(current_round_scalata - 1, localStorage.getItem("scalata_classes"));
+                const robot = getScalataRobot(current_round_scalata - 1, localStorage.getItem("scalata_robots"));
+                const difficulty = getScalataDifficulty(current_round_scalata - 1, localStorage.getItem("scalata_difficulties"));
+          
+                localStorage.setItem("classe", classe);
+                localStorage.setItem("robot", robot);
+                localStorage.setItem("difficulty", difficulty);
+          
+                incrementScalataRound(localStorage.getItem("scalataId"), current_round_scalata)
+                    .then(() => {
+                        createGame(robot, classe, difficulty, localStorage.getItem("scalataId"), localStorage.getItem("username"), localStorage.getItem("modalita"))
+                            .then(() => {
+                                console.log("Game created for next round.");
+                                window.location.href = "editor_old";
+                            })
+                            .catch(error => {
+                                console.error("Error creating game:", error);
+                                swal("Errore!", "Si è verificato un errore durante la creazione del nuovo round.", "error");
+                            });
+                    })
+                    .catch(error => {
+                        console.error("Error incrementing scalata round:", error);
+                        swal("Errore!", "Si è verificato un errore durante l'incremento del round.", "error");
+                    });
+            }
+          }
 
+          // Seconda comunicazione riguardante l'estrazione delle statistiche del robot
           // e.g VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java
           var classe = 'VolumeT8/FolderTreeEvo/' + localStorage.getItem("classe") + 
                         '/' + localStorage.getItem("classe") + 'SourceCode' +
