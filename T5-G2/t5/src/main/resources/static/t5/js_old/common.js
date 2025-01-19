@@ -1,8 +1,26 @@
-
+//EDIT: Oltre al parse della classe per ogni round, viene effettuato il parse della classe per ogni robot e difficoltà
 function getScalataClasse(roundId, scalateJsonArray) {
     return JSON.parse(scalateJsonArray)[roundId];
 }
-
+function getScalataRobot(roundId, scalateJsonArray) {
+    return JSON.parse(scalateJsonArray)[roundId];
+}
+function getScalataDifficulty(roundId, scalateJsonArray) {
+    const difficulty =  JSON.parse(scalateJsonArray)[roundId];
+    return getDifficulty(JSON.parse(scalateJsonArray)[roundId]);
+}
+function getDifficulty(difficulty) {
+    switch (difficulty) {
+        case 'Beginner':
+            return 1;
+        case 'Intermediate':
+            return 2;
+        case 'Advanced':
+            return 3;
+        default:
+            return '';
+    }
+  }
 async function createGame(robot, classe, difficulty, scalataId, username, gamemode) {
     console.log("[createGame] robot: ", robot, " classe: ", classe, " difficulty: ", difficulty, " scalataId: ", scalataId, " username: ", username, "gamemode: ", gamemode);
     return new Promise((resolve, reject) => { 
