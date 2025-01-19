@@ -157,13 +157,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // driverObj.drive();
     // Show a confirmation message to the user when the page loads
-    window.onload = function() {
+    // Controlla se il pop-up è già stato mostrato
+    if (!localStorage.getItem('tourShown')) {
+        window.onload = function() {
         if (confirm('Vuoi partecipare al tour guidato?')) {
 
         // Start the tour if the user accepts
         driverObj.drive();
     }
-  };
+    // Imposta il flag nel localStorage per indicare che il pop-up è stato mostrato
+    localStorage.setItem('tourShown', 'true');
+};
+}
 
 document.getElementById('nav-tour').addEventListener('click', function(event) {
 event.preventDefault(); 

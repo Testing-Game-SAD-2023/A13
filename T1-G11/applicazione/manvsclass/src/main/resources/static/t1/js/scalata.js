@@ -66,7 +66,7 @@ $.ajax({
 
 //Function to dispaly the retrieved classed into the HTML page
 function displayClasses(classes) {
-
+  console.log("displayClasses chiamata");
   const classUTList = $("#classUTList");
 
   /*This line of code is used to select an HTML
@@ -265,7 +265,7 @@ function handleRoundsChange() {
 
       // Remove the 'disabled' class from the 'classUTList' div
       $('#classUTList').removeClass('disabled');
-
+      addButton.disabled = true; // Disabilita il tasto "Aggiungi"
     }
     else {
 
@@ -294,6 +294,15 @@ function selectClasses(rounds) {
         swal("Attenzione!", "Hai già selezionato il numero massimo di classi.", "warning");
         return;
       }
+      var className = $(this).find('.card-title').text();
+      var robot = $(this).find('.robot-select').val();
+      var difficulty = $(this).find('.difficulty-select').val();
+            
+      // Controllo per impedire il clic sulla carta se entrambi i campi non sono stati selezionati
+      if (robot === '' || difficulty === '') {
+        swal("Errore!", "Seleziona sia il robot che la difficoltà prima di selezionare la classe.", "error");
+        return;
+      }
 
       // Toggle the 'selected' class on the clicked card
       this.classList.toggle('selected');
@@ -302,7 +311,7 @@ function selectClasses(rounds) {
       var className = $(this).find('.card-title').text();
       var robot = $(this).find('.robot-select').val();
       var difficulty = $(this).find('.difficulty-select').val();
-
+  
       // Find if the class is already selected
       var index = selectedClasses.findIndex(function(selectedClass) {
         return selectedClass.className === className;
@@ -311,6 +320,10 @@ function selectClasses(rounds) {
       if (index > -1) {
         // If it's already selected, remove it from the array
         selectedClasses.splice(index, 1);
+        //riabilita i menu a tendina quando la card viene deselezionata
+        $(this).find('.robot-select, .difficulty-select').prop('disabled', false);
+
+    
       } else {
         // If not selected, add it to the array with the robot and difficulty
         selectedClasses.push({
@@ -318,7 +331,14 @@ function selectClasses(rounds) {
           robot: robot,
           difficulty: difficulty
         });
+        //disabilita i menu a tendina quando la card viene selezionata
+        $(this).find('.robot-select, .difficulty-select').prop('disabled', true);
+
       }
+    });
+    // Aggiungi i gestori di eventi per i menu a tendina per impedire la propagazione dell'evento di clic
+    $(cards[i]).find('.robot-select, .difficulty-select').on('click', function(event) {
+    event.stopPropagation();
     });
   }
 }
@@ -458,13 +478,13 @@ function submitScalataData() {
     console.log('Response:', response);
 
     if(response.status == 200) {
-
+        
       response.text().then(okMessage => {
-
+        
         swal("Operazione completata!", "La tua 'Scalata' è stata configurata con successo.", "success");
-
+        
         //Reload the page
-        // location.reload();
+         //location.reload();
       })
     }
     else {
@@ -519,60 +539,90 @@ function checkName(name) {
 }
 
 //Funzione per visualizzare le classi
+// Funzione per visualizzare le classi
 function displayClasses(classes) {
-
   const classUTList = $("#classUTList");
 
-  // Clear the container before creating new cards
+  // Svuota il contenitore prima di creare nuove card
   classUTList.empty();
   console.log("Cleaning the container before creating new cards...\n");
 
-  $.each(classes, function(index, classUT) {
-    
-    // Create a new card for each class
-    const card = $('<div>').addClass('col-md-3 card border-primary mb-3 mr-5').attr('data-difficulty', classUT.difficulty.toLowerCase());
+  $.each(classes, function (index, classUT) {
+    // Crea una nuova card per ogni classe
+    const card = $('<div>')
+      .addClass('col-md-3 card border-primary mb-3 mr-5')
+      .attr('data-difficulty', classUT.difficulty.toLowerCase());
 
-    // Generate a random image for the card
+    // Genera un'immagine casuale per la card
     var image = images[Math.floor(Math.random() * images.length)];
     const img = $('<img>').addClass('card-img-top').attr('src', image);
 
     const cardBody = $('<div>').addClass('card-body');
-    const cardTitle = $('<h5>').addClass('card-title text-center').text(classUT.name);
+    const cardTitle = $('<h5>')
+      .addClass('card-title text-center')
+      .text(classUT.name);
     const cardText = $('<p>').addClass('card-text').text(classUT.description);
 
-    // Create a new footer for the difficulty
-    const difficulty = $('<div>').addClass('card-footer text-muted text-center').text('Difficulty: ' + getStars(classUT.difficulty));
-    
+    // Crea un footer per visualizzare la difficoltà
+    const difficulty = $('<div>')
+      .addClass('card-footer text-muted text-center')
+      .text('Difficulty: ' + getStars(classUT.difficulty));
+
     let coverage = 'Coperture: \n';
-    if (Array.isArray(classUT.robotList) 
-        && classUT.robotList.length > 0 
-        && Array.isArray(classUT.coverage) 
-        && classUT.coverage.length > 0
-        && Array.isArray(classUT.robotDifficulty)) 
-    {
+    if (
+      Array.isArray(classUT.robotList) &&
+      classUT.robotList.length > 0 &&
+      Array.isArray(classUT.coverage) &&
+      classUT.coverage.length > 0 &&
+      Array.isArray(classUT.robotDifficulty)
+    ) {
       for (let i = 0; i < classUT.robotList.length; i++) {
         coverage += classUT.robotList[i] + "\r\n";
         for (let j = 0; j < classUT.robotDifficulty.length; j++) {
-          coverage += classUT.robotDifficulty[j] + ": " + classUT.coverage[3*i+j]+ "\r\n";
+          coverage +=
+            classUT.robotDifficulty[j] + ": " + classUT.coverage[3 * i + j] + "\r\n";
         }
       }
     } else {
-        coverage += 'N/A';
+      coverage += 'N/A';
     }
     const coverageElement = $('<p>').addClass('card-text').text(coverage);
 
-    // Create dropdowns for robot and difficulty
+    // Crea i dropdown per robot e difficoltà
     const robotSelect = $('<select>').addClass('form-control robot-select');
-    classUT.robotList.forEach(function(robot) {
+    robotSelect.append($('<option>').val('').text('')); // Aggiungi una riga vuota
+    classUT.robotList.forEach(function (robot) {
       robotSelect.append($('<option>').text(robot).val(robot));
     });
 
     const difficultySelect = $('<select>').addClass('form-control difficulty-select');
-    classUT.robotDifficulty.forEach(function(difficulty) {
-      difficultySelect.append($('<option>').text(difficulty).val(difficulty));
+    difficultySelect.append($('<option>').val('').text('Select difficulty')); // Aggiungi una riga vuota
+
+    // Funzione per aggiornare il menu delle difficoltà in base al robot selezionato
+    function updateDifficultySelect(selectedRobot) {
+      difficultySelect.empty(); // Svuota il menu delle difficoltà
+      difficultySelect.append($('<option>').val('').text('Select difficulty')); // Aggiungi una riga vuota
+
+      const robotIndex = classUT.robotList.indexOf(selectedRobot);
+      if (robotIndex !== -1) {
+        // Aggiungi le difficoltà valide per il robot selezionato
+        classUT.robotDifficulty.forEach(function (difficulty, index) {
+          const coverageValue = classUT.coverage[3 * robotIndex + index];
+          if (coverageValue != null) {
+            difficultySelect.append($('<option>').text(difficulty).val(difficulty));
+          }
+        });
+      }
+    }
+
+    // Aggiungi un listener per l'evento di cambiamento sul menu del robot
+    robotSelect.on("change", function () {
+      const selectedRobot = $(this).val();
+      console.log("Robot selezionato:", selectedRobot);
+      updateDifficultySelect(selectedRobot);
     });
 
-    // Append the dropdowns to the card body
+    // Aggiungi il contenuto alla card
     cardBody.append(cardTitle);
     cardBody.append(cardText);
     cardBody.append(coverageElement);
@@ -580,12 +630,13 @@ function displayClasses(classes) {
     cardBody.append('Select Robot: ', robotSelect);
     cardBody.append('Select Difficulty: ', difficultySelect);
 
-    // Append the card to the container
+    // Aggiungi la card al contenitore
     card.append(img);
     card.append(cardBody);
     classUTList.append(card);
   });
 }
+
 
 function displayScalate() {
 
@@ -713,9 +764,15 @@ function submitScalataData() {
   .then(response => {
     console.log('Response:', response);
     if(response.status == 200) {
+      document.getElementById('addRoundButton').disabled = false; // Riabilita il tasto "Aggiungi"
       response.text().then(okMessage => {
-        swal("Operazione completata!", "La tua 'Scalata' è stata configurata con successo.", "success");
+        swal("Operazione completata!", "La tua 'Scalata' è stata configurata con successo.", "success")
+          .then(() => {
+            // Reload della pagina dopo che il popup è stato chiuso
+            location.reload();
+          });
       });
+     
     } else {
       response.text().then(errorMessage => {
         swal("Errore!", errorMessage, "error");
@@ -763,4 +820,11 @@ $(document).ready(function() {
       selectedClasses[classIndex].difficulty = difficulty;
     }
   });
+});
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";  // Impedisce al browser di ripristinare la posizione
+}
+
+window.addEventListener('load', function() {
+  window.scrollTo(0, 0);
 });

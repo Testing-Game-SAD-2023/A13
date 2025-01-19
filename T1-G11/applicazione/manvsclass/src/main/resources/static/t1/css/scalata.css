@@ -28,10 +28,10 @@ body{
 }
 .card {
     flex: 1 0 21%;              /* The width of the cards will be 21% of the container, and they will grow and shrink as needed */
-    margin-right: 5px;          /* Add some margin to the right of each card */
+    margin-right: 10px;          /* Add some margin to the right of each card */
     margin-bottom: 20px;        /* Add some margin to the bottom of each card */
-    min-height: 400px;          /* Set a minimum height for the cards */
-    max-height: 400px;          /* Set a maximum height for the cards */
+    min-height: 750px;          /* Set a minimum height for the cards */
+    max-height: 750px;          /* Set a maximum height for the cards */
     position: relative;         /* This makes the card the nearest positioned ancestor */
     padding: 0;                 /* Remove the default padding */
     cursor: pointer;            /* Change the cursor to a hand when it's over a card */
