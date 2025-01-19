@@ -281,65 +281,55 @@ function handleRoundsChange() {
 function selectClasses(rounds) {
   console.log("selectClasses called");
   selectedClasses.length = 0;
-  // Get the container with the id 'classUTList'
   var container = document.getElementById('classUTList');
-
-  // Get all div elements (cards) within the container
   var cards = container.getElementsByClassName('col-md-3 card border-primary mb-3 mr-5');
-  // Add a click event listener to each card
+
   for (var i = 0; i < cards.length; i++) {
-    cards[i].addEventListener('click', function() {
-      // Prevent selecting more than the allowed number of classes
-      if (selectedClasses.length >= rounds && !this.classList.contains('selected')) {
-        swal("Attenzione!", "Hai già selezionato il numero massimo di classi.", "warning");
-        return;
-      }
-      var className = $(this).find('.card-title').text();
-      var robot = $(this).find('.robot-select').val();
-      var difficulty = $(this).find('.difficulty-select').val();
-            
-      // Controllo per impedire il clic sulla carta se entrambi i campi non sono stati selezionati
-      if (robot === '' || difficulty === '') {
-        swal("Errore!", "Seleziona sia il robot che la difficoltà prima di selezionare la classe.", "error");
-        return;
-      }
+      // Aggiungi i gestori di eventi per i menu a tendina
+      $(cards[i]).find('.robot-select, .difficulty-select').on('change', function() {
+          var parentCard = $(this).closest('.card');
+          var robot = parentCard.find('.robot-select').val();
+          var difficulty = parentCard.find('.difficulty-select').val();
+          var className = parentCard.find('.card-title').text();
 
-      // Toggle the 'selected' class on the clicked card
-      this.classList.toggle('selected');
+          // Controlla se sia il robot che la difficoltà sono stati selezionati
+          if (robot !== '' && difficulty !== '') {
+              // Controlla se il numero massimo di classi è stato raggiunto
+              if (selectedClasses.length >= rounds && !parentCard.hasClass('selected')) {
+                  swal("Attenzione!", "Hai già selezionato il numero massimo di classi.", "warning");
+                  return;
+              }
 
-      // Find the class data from the card's title and dropdowns
-      var className = $(this).find('.card-title').text();
-      var robot = $(this).find('.robot-select').val();
-      var difficulty = $(this).find('.difficulty-select').val();
-  
-      // Find if the class is already selected
-      var index = selectedClasses.findIndex(function(selectedClass) {
-        return selectedClass.className === className;
+              // Seleziona la card
+              parentCard.addClass('selected');
+
+              // Aggiungi la classe selezionata all'array selectedClasses
+              var index = selectedClasses.findIndex(function(selectedClass) {
+                  return selectedClass.className === className;
+              });
+              if (index === -1) {
+                  selectedClasses.push({
+                      className: className,
+                      robot: robot,
+                      difficulty: difficulty
+                  });
+              } else {
+                  selectedClasses[index].robot = robot;
+                  selectedClasses[index].difficulty = difficulty;
+              }
+          } else {
+              // Deseleziona la card se uno dei due campi non è selezionato
+              parentCard.removeClass('selected');
+
+              // Rimuovi la classe selezionata dall'array selectedClasses
+              var index = selectedClasses.findIndex(function(selectedClass) {
+                  return selectedClass.className === className;
+              });
+              if (index > -1) {
+                  selectedClasses.splice(index, 1);
+              }
+          }
       });
-
-      if (index > -1) {
-        // If it's already selected, remove it from the array
-        selectedClasses.splice(index, 1);
-        //riabilita i menu a tendina quando la card viene deselezionata
-        $(this).find('.robot-select, .difficulty-select').prop('disabled', false);
-
-    
-      } else {
-        // If not selected, add it to the array with the robot and difficulty
-        selectedClasses.push({
-          className: className,
-          robot: robot,
-          difficulty: difficulty
-        });
-        //disabilita i menu a tendina quando la card viene selezionata
-        $(this).find('.robot-select, .difficulty-select').prop('disabled', true);
-
-      }
-    });
-    // Aggiungi i gestori di eventi per i menu a tendina per impedire la propagazione dell'evento di clic
-    $(cards[i]).find('.robot-select, .difficulty-select').on('click', function(event) {
-    event.stopPropagation();
-    });
   }
 }
 
