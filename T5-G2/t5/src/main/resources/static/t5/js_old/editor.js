@@ -247,6 +247,7 @@ runButton.addEventListener("click", function () {
           // Check if the player has won
           console.log("Handling victory...");
           if (response.win) {
+            //.then cosi da dover cliccare tasto OK prima di passare a round successivo
             swal("Complimenti!", "Hai vinto! Ecco il tuo punteggio: " + gameScore, "success").then(() => {
               turno++;
               isWin = true;
@@ -261,6 +262,7 @@ runButton.addEventListener("click", function () {
           }
           orderTurno++;
 
+          //NUOVA
           function handleNextRound() {
             if (current_round_scalata >= total_rounds_scalata) {
                 console.log("Completing scalata...");
