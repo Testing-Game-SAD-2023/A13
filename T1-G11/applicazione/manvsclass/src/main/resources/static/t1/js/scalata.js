@@ -240,13 +240,14 @@ function updateTotalScalate() {
 // Define a function to handle changes on the rounds input
 function handleRoundsChange() {
 
+  selectedClasses.length = 0;
   //Get the addButton element
   var addButton = document.getElementById('addRoundButton');
 
   // Add an event listener for the click event
   addButton.addEventListener('click', function() {
 
-    console.log("addButton clicked.");
+    console.log("addButton clicked!");
 
     // Get the rounds input element
     var roundsInput = document.getElementById('rounds');
@@ -254,6 +255,34 @@ function handleRoundsChange() {
     //Read the input value
     rounds = parseInt(roundsInput.value);
     console.log("handleRoundsChange() rounds: " + rounds);
+
+  // Get the "Scalata" name
+  var scalataName = document.getElementById('form-name').value;
+  console.log("nome"+scalataName);
+   // Define the regex for the name validation
+  var nameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+
+  //Check if the user has assigned a name
+  if (!scalataName) {
+    swal("Errore!", "Inserisci un nome per la tua 'Scalata' prima di procedere.", "error");
+    return;
+  }
+  if (!nameRegex.test(scalataName)) {
+    swal("Errore!", "Il nome della 'Scalata' deve contenere da 3 a 20 caratteri alfanumerici separati da un underscore (_) e.g. 'Prova_scalata'", "error");
+    return;
+
+  }
+   // If the user confirms, perform the POST request
+      checkName(scalataName);
+    
+  // Check if both rounds and selectedClasses are zero
+  if (rounds === 0 && selectedClasses.length === 0) {
+    swal("Errore!", "Definisci il numero di rounds prima di procedere.", "error");
+    return;
+  }
+
+
+
 
     //Check if the value is greater than or equal to 2
     if (rounds >= 2) {
@@ -280,7 +309,8 @@ function handleRoundsChange() {
 //Modificare la funzione selectClasses per memorizzare le selezioni di robot e difficoltà
 function selectClasses(rounds) {
   console.log("selectClasses called");
-  selectedClasses.length = 0;
+  
+
   var container = document.getElementById('classUTList');
   var cards = container.getElementsByClassName('col-md-3 card border-primary mb-3 mr-5');
 
@@ -359,6 +389,7 @@ function getSummary() {
       var robot = selectedClasses[i].robot;
       var difficulty = selectedClasses[i].difficulty;
 
+      
       summary += "ROUND[" + (i + 1) + "]: " + className + " - Robot: " + robot + " - Difficulty: " + difficulty + "\n";
     }
 
@@ -370,35 +401,19 @@ function getSummary() {
 function handleConfirm() {
 
   console.log("handleConfirm called!");
-
-  // Get the "Conferma" button
+// Get the "conferma" button
   var confirmButton = document.getElementById('confirmButton');
 
-  // Add a click event listener to the "Conferma" button
+  // Add a click event listener to the "conferma" button
   confirmButton.addEventListener('click', function() {
 
-    // Get the "Scalata" name
-    var scalataName = document.getElementById('form-name').value;
-
-     // Define the regex for the name validation
-    var nameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-
-    //Check if the user has assigned a name
-    if (!scalataName) {
-      swal("Errore!", "Inserisci un nome per la tua 'Scalata' prima di procedere.", "error");
-      return;
-    }
-    if (!nameRegex.test(scalataName)) {
-      swal("Errore!", "Il nome della 'Scalata' deve contenere da 3 a 20 caratteri alfanumerici separati da un underscore (_) e.g. 'Prova_scalata'", "error");
-      return;
-
-    }
     
     // Check if both rounds and selectedClasses are zero
     if (rounds === 0 && selectedClasses.length === 0) {
       swal("Errore!", "Definisci il numero di rounds prima di procedere.", "error");
       return;
     }
+  
 
     //Check if the number of selected classes is equal to the number of rounds
     if (selectedClasses.length !== rounds) {
@@ -409,23 +424,10 @@ function handleConfirm() {
 
     // Show a confirmation pop-up
     if (confirm('Vuoi procedere con l\'operazione?')) {
-
-      // If the user confirms, perform the POST request
-      checkName(scalataName)
-        .then(() => {
-
-          // If the Promise resolved, call submitScalataData
-          submitScalataData();
-        })
-        .catch((error) => {
-
-          // If the Promise rejected, handle the error
-          console.error('Error:', error);
-        });
+      submitScalataData();
     }
-    else {
-      // If the user cancels, do nothing
-    }
+
+     
   });
 }
 
@@ -529,7 +531,6 @@ function checkName(name) {
 }
 
 //Funzione per visualizzare le classi
-// Funzione per visualizzare le classi
 function displayClasses(classes) {
   const classUTList = $("#classUTList");
 
