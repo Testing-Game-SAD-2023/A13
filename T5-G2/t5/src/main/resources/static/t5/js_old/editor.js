@@ -97,6 +97,8 @@ $(document).ready(function () {
 
       // Gestione dell'errore
       console.log("Errore durante la ricezione del file "+ nameCUT+".java");
+      alert("Errore durante la ricezione del file "+ nameCUT+".java");
+      window.location.href = "/main";
     }
   });
 });

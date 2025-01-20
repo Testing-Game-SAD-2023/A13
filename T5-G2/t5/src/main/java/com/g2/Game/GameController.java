@@ -14,10 +14,13 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
 package com.g2.Game;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONException;
@@ -84,6 +87,7 @@ public class GameController {
                 -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Sfida.toString()));
         gameRegistry.put(Gamemode.Allenamento.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode)
                 -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Allenamento.toString()));
+        //gameRegistry.put(Gamemode.Scalata.toString(),(sm, playerId, )
         // Aggiungi altri giochi qui
     }
 
@@ -205,7 +209,11 @@ public class GameController {
             @RequestParam String type_robot,
             @RequestParam String difficulty,
             @RequestParam String mode,
-            @RequestParam String underTestClassName) {
+            @RequestParam String underTestClassName//,
+            // @RequestParam Optional<Integer> scalata_id,
+            // @RequestParam Optional<List<String>> robot,
+            // @RequestParam Optional<List<String>> selectedScalata,
+            ) {
 
         try {
             GameFactoryFunction gameConstructor = gameRegistry.get(mode);

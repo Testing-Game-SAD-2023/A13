@@ -35,7 +35,8 @@ public class ScalataGame extends GameLogic {
         this.currentRound = 1; // Inizia dal round 1
         this.currentGameIndex = 0; // Indice del gioco corrente
 
-        for (int i = 0; i < typesRobot.size(); i++) {
+        //il primo elemento è già stato inserito, parto da i = 1
+        for (int i = 1; i < typesRobot.size(); i++) {
             String typeRobot = typesRobot.get(i);
             String difficulty = difficulties.get(i);
             games.add(new Sfida(serviceManager, playerID, classeUT, typeRobot, difficulty, mode));

@@ -162,13 +162,14 @@ function pressedSubmit() {
                         localStorage.setItem("current_round_scalata", 1);
                         localStorage.setItem("scalata_name", selectedScalata);
                         retrieveScalata(selectedScalata)
-                            .then( data => {return createGame(localStorage.getItem("robot"), localStorage.getItem("classe"), localStorage.getItem("difficulty"), result.scalataGameId, username, "Scalata")})
+                            .then( data => {
+                            return createGame(localStorage.getItem("robot"), localStorage.getItem("classe"), localStorage.getItem("difficulty"), result.scalataGameId, username, "Scalata")})
                             .then( data => {
                                 return swal("Successo!", "La tua scelta è stata confermata, a breve verrai reindirizzato all'arena di gioco.", "success");
                             })
                             .then( () => {
                                 console.log(data);
-                                window.location.href = "editor_old";
+                                window.location.href = "editor?ClassUT="+localStorage.getItem("classe");
                             })
                             .catch((error) => {
                                 console.log("error: "+ error);
@@ -181,7 +182,7 @@ function pressedSubmit() {
                 });
             }
             else {
-                //Do nothing
+                swal("Errore!", "Si è verificato un errore imprevisto", "error");//Do nothing
             }
         }
     });

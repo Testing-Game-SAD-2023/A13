@@ -355,6 +355,7 @@ public class GuiController {
 
     @GetMapping("/editor_old")
     public String getEditorOld(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        
         PageBuilder main = new PageBuilder(serviceManager, "editor_old", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
