@@ -42,6 +42,7 @@ function getGameData() {
     );
 }
 
+
 // Funzione per eseguire la richiesta AJAX
 async function runGameAction(url, formData, isGameEnd) {
     try {
@@ -57,6 +58,11 @@ async function runGameAction(url, formData, isGameEnd) {
 // Documento pronto
 $(document).ready(function () {
     const data = getGameData();
+    if(localStorage.getItem("modalita") === "Scalata"){ 
+        if (current_round_scalata === 0)  handleScalataParameters();
+        console.log("Modalità Scalata rilevata");
+        data.mode = "Sfida";
+    } 
     startGame(data);
     if (data.mode === "Allenamento") {
         document.getElementById("runButton").disabled = true;
@@ -141,7 +147,7 @@ async function processCoverage(coverage, formData, robotScore, userScore, isGame
     toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
     displayUserPoints(isGameEnd, valori_csv, robotScore, userScore, coverageDetails); // Mostra i punti dell'utente
     if (isGameEnd) { // Se il gioco è finito
-        handleEndGame(userScore); // Gestisce la fine del gioco
+        handleEndGame(userScore, robotScore); // Gestisce la fine del gioco
     } else {
         resetButtons(); // Reimposta i pulsanti
     }
@@ -170,13 +176,62 @@ async function fetchCoverageReport(formData) {
 }
 
 // Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
-function handleEndGame(userScore) {
-    openModalWithText(
-        status_game_end,
-        `${score_partita_text} ${userScore} pt.`, // Mostra il punteggio dell'utente
-        [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
-    );
-    flush_localStorage(); // Pulisce i dati salvati nel localStorage
+function handleEndGame(userScore, robotScore) {
+    if(localStorage.getItem("modalita")=== "Scalata" && userScore >= robotScore){
+
+        var isScalataEnded = handleScalataNextRound();
+        //Termine Scalata
+        if (isScalataEnded) {
+
+            openModalWithText(
+                status_scalata_completed,
+                //va aggiunto il punteggio complessivo
+                `${scalata_completed_text} \n` + // Mostra il punteggio dell'utente
+                `Il tuo punteggio: ${userScore}\n` +
+                `Il punteggio del robot : ${robotScore}`,
+                [{ text: vai_home, href: '/main', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
+            );
+            flush_localStorage();
+        }
+        else{
+            //Termine round scalata ma non della scalata
+            var displayRoundScalata = current_round_scalata-1;
+            console.log(current_round_scalata);
+            openModalWithText(
+                status_scalata_roundUp,
+                `${scalata_roundUp_text} ${displayRoundScalata} / ${total_rounds_scalata}\n` + // Mostra il punteggio dell'utente
+                `Il tuo punteggio: ${userScore}\n` +
+                `Il punteggio del robot : ${robotScore}`,
+                [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("ClassUT"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
+            );
+            pulisciLocalStorage("difficulty");
+            pulisciLocalStorage("robot");
+            pulisciLocalStorage("roundId");
+            pulisciLocalStorage("turnId");
+            pulisciLocalStorage("username");
+            pulisciLocalStorage("storico");
+            pulisciLocalStorage("codeMirrorContent");
+        }
+    }
+    else if(localStorage.getItem("modalita")=== "Scalata" && userScore < robotScore){
+
+        openModalWithText(
+            status_scalata_lost,
+            `${scalata_lost_text} round ${current_round_scalata}\n` + // Mostra il punteggio dell'utente
+            `Il tuo punteggio: ${userScore}\n` +
+            `Il punteggio del robot : ${robotScore}`,
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
+        );
+        flush_localStorage();
+    }
+    else{
+        openModalWithText(
+            status_game_end,
+            `${score_partita_text} ${userScore} pt.`, // Mostra il punteggio dell'utente
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
+        );
+        flush_localStorage(); // Pulisce i dati salvati nel localStorage
+    }
 }
 
 // Reimposta i pulsanti per consentire nuove azioni

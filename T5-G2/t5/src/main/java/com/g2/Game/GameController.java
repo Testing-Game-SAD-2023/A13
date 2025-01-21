@@ -214,7 +214,7 @@ public class GameController {
             // @RequestParam Optional<List<String>> robot,
             // @RequestParam Optional<List<String>> selectedScalata,
             ) {
-
+        logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");   
         try {
             GameFactoryFunction gameConstructor = gameRegistry.get(mode);
             if (gameConstructor == null) {

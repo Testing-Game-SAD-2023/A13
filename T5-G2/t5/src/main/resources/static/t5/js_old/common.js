@@ -21,10 +21,15 @@ function getDifficulty(difficulty) {
             return '';
     }
   }
+
+//chiamata non più in uso
 async function createGame(robot, classe, difficulty, scalataId, username, gamemode) {
+    
     console.log("[createGame] robot: ", robot, " classe: ", classe, " difficulty: ", difficulty, " scalataId: ", scalataId, " username: ", username, "gamemode: ", gamemode);
+     // salvo il nome della classe come underTestClassName
     return new Promise((resolve, reject) => { 
         $.ajax({ 
+            /* Chiamata vecchia
             url: '/api/save-data',
             data: {
             playerId: parseJwt(getCookie("jwt")).userId,
@@ -35,30 +40,33 @@ async function createGame(robot, classe, difficulty, scalataId, username, gamemo
             gamemode: gamemode,
             username: parseJwt(getCookie("jwt")).sub
             },
-            
-           /*Chiamata nuova
+            */
+           /*Chiamata nuova */
+           
            url: '/StartGame',
-           data: {
-            playerId: parseJwt(getCookie("jwt")).userId,
-            type_robot: robot,
-            difficulty: difficulty,
-            mode:gamemode,
-            underTestClassName: classe,
-            scalata_
-           },
-           */
+            data: {
+                playerId: parseJwt(getCookie("jwt")).userId,
+                type_robot: robot,
+                difficulty: difficulty,
+                mode:"Sfida", //Inseriamo Sfida perché le scalate non sono state implementate
+                underTestClassName: classe,
+                //scalata_
+            },
+           
             type: 'POST',
             traditional: true,
             success: function (response) {
-                /* la risposta non fornisce ID e non fa chiamate a database */
-
-                localStorage.setItem("gameId", response.game_id);
-                localStorage.setItem("turnId", response.turn_id);
-                localStorage.setItem("roundId", response.round_id);
+                //la risposta non fornisce ID e non fa chiamate a database 
+                if (!response || $.isEmptyObject(response)) {
+                    response = {data: 'SampleData'};
+                }
+                //localStorage.setItem("gameId", response.game_id);
+                //localStorage.setItem("turnId", response.turn_id);
+                //localStorage.setItem("roundId", response.round_id); 
                 resolve(response);
                 
             },
-            dataType: "json",
+            //dataType: "json",
             error: function (error) {
                 console.log("Error details:", error);
                 console.log("USERNAME : ", localStorage.getItem("username"));

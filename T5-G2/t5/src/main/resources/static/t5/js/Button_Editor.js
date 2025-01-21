@@ -268,7 +268,6 @@ editor_utente.on('change', saveToLocalStorage);
 function flush_localStorage(){
 	//Pulisco i dati locali 
 	pulisciLocalStorage("difficulty");
-	pulisciLocalStorage("modalita");
 	pulisciLocalStorage("robot");
 	pulisciLocalStorage("roundId");
 	pulisciLocalStorage("turnId");
@@ -276,4 +275,16 @@ function flush_localStorage(){
 	pulisciLocalStorage("username");
 	pulisciLocalStorage("storico");
 	pulisciLocalStorage("codeMirrorContent");
+	if(localStorage.getItem("modalita") == "Scalata"){
+
+		pulisciLocalStorage("scalataId");
+		pulisciLocalStorage("scalata_name");
+		pulisciLocalStorage("scalata_classes");
+		pulisciLocalStorage("scalata_robots");
+		pulisciLocalStorage("scalata_difficulties");
+		pulisciLocalStorage("current_round_scalata");
+		pulisciLocalStorage("total_rounds_of_scalata");
+		
+	}
+	pulisciLocalStorage("modalita");
 }

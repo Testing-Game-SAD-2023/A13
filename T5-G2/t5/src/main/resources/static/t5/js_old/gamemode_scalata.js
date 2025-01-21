@@ -163,12 +163,14 @@ function pressedSubmit() {
                         localStorage.setItem("scalata_name", selectedScalata);
                         retrieveScalata(selectedScalata)
                             .then( data => {
-                            return createGame(localStorage.getItem("robot"), localStorage.getItem("classe"), localStorage.getItem("difficulty"), result.scalataGameId, username, "Scalata")})
-                            .then( data => {
+                                localStorage.setItem("modalita", "Scalata"); //per raggirare
+                            //return createGame(localStorage.getItem("robot"), localStorage.getItem("ClassUT"), localStorage.getItem("difficulty"), result.scalataGameId, username, "Scalata")
+                            })
+                             .then( data => {
                                 return swal("Successo!", "La tua scelta è stata confermata, a breve verrai reindirizzato all'arena di gioco.", "success");
                             })
                             .then( () => {
-                                console.log(data);
+                                //console.log(data);
                                 window.location.href = "editor?ClassUT="+localStorage.getItem("classe");
                             })
                             .catch((error) => {
@@ -208,8 +210,8 @@ async function retrieveScalata(scalata) {
                 localStorage.setItem("scalata_classes", JSON.stringify(classNames));
                 localStorage.setItem("scalata_robots", JSON.stringify(robots));
                 localStorage.setItem("scalata_difficulties", JSON.stringify(difficulties));
-                localStorage.setItem("classe", classNames[0]); // Salva il nome della prima classe
-                
+                localStorage.setItem("ClassUT", classNames[0]); // Salva il nome della prima classe
+                localStorage.setItem("underTestClassName", classNames[0]);
                 localStorage.setItem("difficulty", getDifficulty(data[0].selectedClasses[0].difficulty));
                 localStorage.setItem("robot", data[0].selectedClasses[0].robot);
                 

@@ -365,6 +365,18 @@ async function ajaxRequest(
 		throw error;
 	}
 }
+//FUNZIONI SCALATA
+
+function handleScalataParameters(){
+    id_scalata = localStorage.getItem("scalataID");
+    name_scalata = localStorage.getItem("scalata_name");
+    current_round_scalata = localStorage.getItem("current_round_scalata");
+    classes_scalata = localStorage.getItem("scalata_classes");
+    robots_scalata = localStorage.getItem("scalata_robots");
+    difficulties_scalata = localStorage.getItem("scalata_difficulties");
+	total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
+	console.log("Dati scalata: ",id_scalata, name_scalata, current_round_scalata, total_rounds_scalata, classes_scalata, robots_scalata, difficulties_scalata);
+}
 
 function controlloScalata(
 	iswin,
@@ -466,34 +478,61 @@ function controlloScalata(
 					});
 			});
 		}
-	} else {
-		//The player has lost the round
-		closeScalata(
-			localStorage.getItem("scalataId"),
-			false,
-			0,
-			current_round_scalata
-		)
-			.then((data) => {
-				console.log("Close Scalata response: ", data);
-				swal(
-					"Peccato!",
-					`Hai perso al round ${current_round_scalata}/${total_rounds_scalata} della scalata, la prossima volta andrà meglio!\n${displayRobotPoints}`,
-					"error"
-				).then((value) => {
-					window.location.href = "/main";
-				});
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-				swal(
-					"Errore!",
-					"Si è verificato un errore durante il recupero dei dati. Riprovare.",
-					"error"
-				);
-			});
 	}
 }
+//EDIT: Oltre al parse della classe per ogni round, viene effettuato il parse della classe per ogni robot e difficoltà
+function getScalataClasse(roundId, scalateJsonArray) {
+	var data = JSON.parse(scalateJsonArray)[roundId];
+	console.log(data);
+    return data;
+}
+function getScalataRobot(roundId, scalateJsonArray) {
+    var data = JSON.parse(scalateJsonArray)[roundId];
+	console.log(data);
+	return data;
+}
+function getScalataDifficulty(roundId, scalateJsonArray) {
+    const difficulty =  JSON.parse(scalateJsonArray)[roundId];
+	console.log(difficulty);
+    return getDifficulty(difficulty);
+}
+function getDifficulty(difficulty) {
+    switch (difficulty) {
+        case 'Beginner':
+            return 1;
+        case 'Intermediate':
+            return 2;
+        case 'Advanced':
+            return 3;
+        default:
+            return '';
+    }
+  }
+function handleScalataNextRound(){
+	console.log("gestione round successivo ...");
+	var isScalataEnded = false ;
+	if(current_round_scalata == total_rounds_scalata){
+		return true;
+	}
+	else{
+		//finestra di dialogo
+		localStorage.setItem("robot", getScalataRobot(current_round_scalata, robots_scalata));
+		localStorage.setItem("difficulty", getScalataDifficulty(current_round_scalata, difficulties_scalata));
+		localStorage.setItem("ClassUT", getScalataClasse(current_round_scalata, classes_scalata));
+		localStorage.setItem("underTestClassName", getScalataClasse(current_round_scalata, classes_scalata));
+		current_round_scalata++;
+		localStorage.setItem("current_round_scalata",current_round_scalata);
+		
+		console.log(current_round_scalata)
+		//window.location.href = "/editor?ClassUT="+localStorage.getItem("ClassUT");
+		return false;
+	}
+	
+}
+
+
+
+
 
 // Funzione per analizzare l'output di Maven
 function parseMavenOutput(output) {
