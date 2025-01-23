@@ -29,26 +29,27 @@ public class ScalataGame extends GameLogic {
     private int currentGameIndex;
 
     public ScalataGame(ServiceManager serviceManager, String playerID, String classeUT,
-                       List<String> typesRobot, List<String> difficulties, String mode) {
+                       List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
         super(serviceManager, playerID, classeUT, typesRobot.get(0), difficulties.get(0), mode); 
         this.games = new ArrayList<>();
         this.currentRound = 1; // Inizia dal round 1
         this.currentGameIndex = 0; // Indice del gioco corrente
 
-        //il primo elemento è già stato inserito, parto da i = 1
-        for (int i = 1; i < typesRobot.size(); i++) {
+        for (int i = 0; i < typesRobot.size(); i++) {
+            String classe = classes.get(i);
             String typeRobot = typesRobot.get(i);
             String difficulty = difficulties.get(i);
-            games.add(new Sfida(serviceManager, playerID, classeUT, typeRobot, difficulty, mode));
+            games.add(new Sfida(serviceManager, playerID, classe, typeRobot, difficulty, mode));
         }
     }
 
     @Override
-    public void playTurn(int userScore, int robotScore) {
+    public void playTurn(int userScore, int robotScore, boolean isGameEnd) {
+        System.out.println("[SCALATAGAME][T5]");
         if (currentGameIndex < games.size()) {
             Sfida currentGame = games.get(currentGameIndex);
-            currentGame.playTurn(userScore, robotScore);
-
+            currentGame.playTurn(userScore, robotScore,isGameEnd);
+            
             // Verifica se il gioco corrente è finito
             if (currentGame.isGameEnd()) {
                 System.out.println("Round " + currentRound + " completed.");
@@ -74,6 +75,17 @@ public class ScalataGame extends GameLogic {
         }
         return totalScore;
     }
-
+    @Override
+    public String getClasseUT(){
+        return games.get(currentGameIndex).getClasseUT();
+    }
+    @Override
+    public String getType_robot(){
+        return games.get(currentGameIndex).getType_robot();
+    }
+    @Override
+    public String getDifficulty(){
+        return games.get(currentGameIndex).getDifficulty();
+    }
     // Altri metodi necessari per gestire la logica del gioco
 }

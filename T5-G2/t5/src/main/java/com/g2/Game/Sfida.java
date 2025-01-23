@@ -29,8 +29,7 @@ public class Sfida extends GameLogic {
     private int userScore;
     private int robotScore;
     private int totalTurns = 10;
-    private Boolean GameOVer = false;
-
+    private Boolean isGameEnd;
 
     //Questa classe si specializza in una partita semplice basata sui turni, prende il nome di Sfida nella UI
     public Sfida(ServiceManager serviceManager, String PlayerID, String ClasseUT,
@@ -40,16 +39,17 @@ public class Sfida extends GameLogic {
     }
 
     @Override
-    public void playTurn(int userScore, int robotScore) {
+    public void playTurn(int userScore, int robotScore, boolean isGameEnd) {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         currentTurn++;
         //CreateTurn(Time, userScore);
+        this.isGameEnd = isGameEnd;
         System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
     }
 
     @Override
     public Boolean isGameEnd() {
-        return false; //il giocatore può fare quanti turni vuole quindi ritorno sempre false
+        return this.isGameEnd; //il giocatore può fare quanti turni vuole quindi ritorno sempre false
     }
 
     @Override
@@ -66,5 +66,8 @@ public class Sfida extends GameLogic {
         double score = locPerc * 100 * penaltyFactor;
         return (int) Math.ceil(score);
     }
+
+
+    //Aggiunta di un set per la condizione di game over
 
 }

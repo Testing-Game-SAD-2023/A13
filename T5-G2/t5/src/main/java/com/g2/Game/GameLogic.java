@@ -51,7 +51,7 @@ public abstract class GameLogic {
     /*
      * PlayTurn deve aggiornalo lo stato della partita ad ogni turno, il concetto di turno può esser gestito come si vuole
      */
-    public abstract void playTurn(int userScore, int robotScore);
+    public abstract void playTurn(int userScore, int robotScore, boolean isGameEnd);
     /*
      * Si deve personalizzare la condizione di fine del gioco, in generale l'utente può sempre decretarne la fine tramite l'editor.
      */

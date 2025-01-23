@@ -20,26 +20,46 @@
 */
 // Funzione per ottenere i dati dal localStorage
 function getGameData() {
-    let underTestClassName = localStorage.getItem("underTestClassName");
-    if (underTestClassName) {
-        // La stringa non è né nulla né vuota
-        let ClassUT = getParameterByName("ClassUT");
-        if(ClassUT === underTestClassName){
-            return {
-                playerId: 			String(parseJwt(getCookie("jwt")).userId),
-                type_robot: 		localStorage.getItem("robot"),
-                difficulty: 		localStorage.getItem("difficulty"),
-                mode: 				localStorage.getItem("modalita"),
-                underTestClassName: localStorage.getItem("underTestClassName"),
-            };
+    let modalita = localStorage.getItem("modalita");
+    is_scalata_inprogress = (parseInt(localStorage.getItem("scalata_score"),10) > 0) ? true : false;
+    if(modalita == "Scalata" && !is_scalata_inprogress){
+        handleScalataParameters();
+        return {
+            playerId: 			    String(parseJwt(getCookie("jwt")).userId),
+            type_robot: 		    localStorage.getItem("robot"),
+            difficulty: 		    localStorage.getItem("difficulty"),
+            mode: 				    localStorage.getItem("modalita"),
+            underTestClassName:     localStorage.getItem("underTestClassName"),
+            scalata_classes:        localStorage.getItem("scalata_classes"),
+            scalata_robots:         localStorage.getItem("scalata_robots"),
+            scalata_difficulties:   localStorage.getItem("scalata_difficulties"),
         }
-    }   
-    //modal che ti blocca
-    openModalError(
-        "Accesso Illegale all'editor ",
-        `Non sei passato da Gamemode per settare la tua partita o hai inserito un URL sbagliato.`,
-        [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
-    );
+    }
+    else if(modalita === "Scalata" && is_scalata_inprogress){
+        handleScalataParameters();
+    }
+    else{
+        let underTestClassName = localStorage.getItem("underTestClassName");
+        if (underTestClassName) {
+            // La stringa non è né nulla né vuota
+            let ClassUT = getParameterByName("ClassUT");
+            if(ClassUT === underTestClassName){
+                return {
+                    playerId: 			String(parseJwt(getCookie("jwt")).userId),
+                    type_robot: 		localStorage.getItem("robot"),
+                    difficulty: 		localStorage.getItem("difficulty"),
+                    mode: 				localStorage.getItem("modalita"),
+                    underTestClassName: localStorage.getItem("underTestClassName"),
+                };
+            }
+        }   
+        //modal che ti blocca
+        openModalError(
+            "Accesso Illegale all'editor ",
+            `Non sei passato da Gamemode per settare la tua partita o hai inserito un URL sbagliato.`,
+            [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
+        );
+    }
 }
 
 
@@ -58,11 +78,6 @@ async function runGameAction(url, formData, isGameEnd) {
 // Documento pronto
 $(document).ready(function () {
     const data = getGameData();
-    if(localStorage.getItem("modalita") === "Scalata"){ 
-        if (current_round_scalata === 0)  handleScalataParameters();
-        console.log("Modalità Scalata rilevata");
-        data.mode = "Sfida";
-    } 
     startGame(data);
     if (data.mode === "Allenamento") {
         document.getElementById("runButton").disabled = true;
