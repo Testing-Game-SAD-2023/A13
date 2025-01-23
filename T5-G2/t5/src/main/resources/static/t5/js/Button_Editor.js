@@ -284,6 +284,7 @@ function flush_localStorage(){
 		pulisciLocalStorage("scalata_difficulties");
 		pulisciLocalStorage("current_round_scalata");
 		pulisciLocalStorage("total_rounds_of_scalata");
+		pulisciLocalStorage("scalata_score");
 		
 	}
 	pulisciLocalStorage("modalita");

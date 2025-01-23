@@ -137,6 +137,10 @@ function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
 
 // Processa la copertura del codice e aggiorna i dati di gioco
 async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails) {
+
+    //salvataggio all'interno delle variabili dell'editor
+    user_score = userScore;
+
     highlightCodeCoverage($.parseXML(coverage), editor_robot); // Evidenzia la copertura del codice nell'editor
     orderTurno++; // Incrementa l'ordine del turno
     const csvContent = await fetchCoverageReport(formData); // Recupera il report di coverage
@@ -177,51 +181,66 @@ async function fetchCoverageReport(formData) {
 
 // Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
 function handleEndGame(userScore, robotScore) {
-    if(localStorage.getItem("modalita")=== "Scalata" && userScore >= robotScore){
+    if(localStorage.getItem("modalita")=== "Scalata" && locGiocatore >= robotScore){
 
         var isScalataEnded = handleScalataNextRound();
         //Termine Scalata
         if (isScalataEnded) {
-
+            let scalataFinalScore = locGiocatore + parseInt(localStorage.getItem("scalata_score"),10);
+            
             openModalWithText(
                 status_scalata_completed,
                 //va aggiunto il punteggio complessivo
-                `${scalata_completed_text} \n` + // Mostra il punteggio dell'utente
-                `Il tuo punteggio: ${userScore}\n` +
+                `${scalata_completed_text}: ${scalataFinalScore} pt\n` + // Mostra il punteggio dell'utente
+                `Il tuo punteggio: ${locGiocatore}\n` +
                 `Il punteggio del robot : ${robotScore}`,
                 [{ text: vai_home, href: '/main', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
             );
+            closeScalata(id_scalata, true, scalataFinalScore,current_round_scalata);
             flush_localStorage();
         }
         else{
             //Termine round scalata ma non della scalata
             var displayRoundScalata = current_round_scalata-1;
             console.log(current_round_scalata);
-            openModalWithText(
-                status_scalata_roundUp,
-                `${scalata_roundUp_text} ${displayRoundScalata} / ${total_rounds_scalata}\n` + // Mostra il punteggio dell'utente
-                `Il tuo punteggio: ${userScore}\n` +
-                `Il punteggio del robot : ${robotScore}`,
-                [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("ClassUT"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
-            );
-            pulisciLocalStorage("difficulty");
-            pulisciLocalStorage("robot");
-            pulisciLocalStorage("roundId");
-            pulisciLocalStorage("turnId");
-            pulisciLocalStorage("username");
-            pulisciLocalStorage("storico");
-            pulisciLocalStorage("codeMirrorContent");
+
+            //prima viene effettuata la chiamata API per aggiornare la scalata
+            try {
+                incrementScalataRound(id_scalata,current_round_scalata);
+                openModalWithText(
+                    status_scalata_roundUp,
+                    `${scalata_roundUp_text} ${displayRoundScalata} / ${total_rounds_scalata}\n` + // Mostra il punteggio dell'utente
+                    `Il tuo punteggio: ${locGiocatore}\n` +
+                    `Il punteggio del robot : ${robotScore}`,
+                    [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("ClassUT"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
+                );
+                pulisciLocalStorage("difficulty");
+                pulisciLocalStorage("robot");
+                pulisciLocalStorage("roundId");
+                pulisciLocalStorage("turnId");
+                pulisciLocalStorage("username");
+                pulisciLocalStorage("storico");
+                pulisciLocalStorage("codeMirrorContent");
+            } catch (error) {
+                alert("errore nella memorizzazione del progresso della scalata");
+                window.location.href = "/main";
+                flush_localStorage();
+            }
         }
     }
-    else if(localStorage.getItem("modalita")=== "Scalata" && userScore < robotScore){
+    else if(localStorage.getItem("modalita")=== "Scalata" && locGiocatore < robotScore){
 
         openModalWithText(
             status_scalata_lost,
             `${scalata_lost_text} round ${current_round_scalata}\n` + // Mostra il punteggio dell'utente
-            `Il tuo punteggio: ${userScore}\n` +
+            `Il tuo punteggio: ${locGiocatore}\n` +
             `Il punteggio del robot : ${robotScore}`,
             [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
+
+            
         );
+
+        closeScalata(id_scalata, false, 0, current_round_scalata);
         flush_localStorage();
     }
     else{

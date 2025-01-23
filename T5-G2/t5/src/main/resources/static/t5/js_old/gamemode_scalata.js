@@ -158,12 +158,17 @@ function pressedSubmit() {
                         var result = JSON.parse(data);
 
                         console.log("ScalataGameId: " + result.scalataGameId);
+
+                        //Della scalata verranno impostati degli elementi in localstorage per conservare l'ID, il round, il nome e il punteggio della scalata
                         localStorage.setItem("scalataId", result.scalataGameId);
                         localStorage.setItem("current_round_scalata", 1);
+                        localStorage.setItem("scalata_score", 0);
+                        console.log("scalata_score: "+ parseInt(localStorage.getItem("scalata_score")));
                         localStorage.setItem("scalata_name", selectedScalata);
                         retrieveScalata(selectedScalata)
                             .then( data => {
                                 localStorage.setItem("modalita", "Scalata"); //per raggirare
+
                             //return createGame(localStorage.getItem("robot"), localStorage.getItem("ClassUT"), localStorage.getItem("difficulty"), result.scalataGameId, username, "Scalata")
                             })
                              .then( data => {
@@ -171,7 +176,7 @@ function pressedSubmit() {
                             })
                             .then( () => {
                                 //console.log(data);
-                                window.location.href = "editor?ClassUT="+localStorage.getItem("classe");
+                                window.location.href = "editor?ClassUT="+localStorage.getItem("ClassUT");
                             })
                             .catch((error) => {
                                 console.log("error: "+ error);

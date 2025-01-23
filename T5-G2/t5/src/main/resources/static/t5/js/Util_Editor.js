@@ -149,6 +149,7 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 
 function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScore) {
 	let lineCoveragePercentage = (coverageDetails.line.covered / (coverageDetails.line.covered + coverageDetails.line.missed)) * 100;
+	locGiocatore = lineCoveragePercentage; //memorizzazione in una variabile per allert
 	let BranchCoveragePercentage = (coverageDetails.branch.covered / (coverageDetails.branch.covered + coverageDetails.branch.missed)) * 100;
 	let instructionCoveragePercentage = (coverageDetails.instruction.covered / (coverageDetails.instruction.covered + coverageDetails.instruction.missed)) * 100;
 	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
@@ -367,17 +368,6 @@ async function ajaxRequest(
 }
 //FUNZIONI SCALATA
 
-function handleScalataParameters(){
-    id_scalata = localStorage.getItem("scalataID");
-    name_scalata = localStorage.getItem("scalata_name");
-    current_round_scalata = localStorage.getItem("current_round_scalata");
-    classes_scalata = localStorage.getItem("scalata_classes");
-    robots_scalata = localStorage.getItem("scalata_robots");
-    difficulties_scalata = localStorage.getItem("scalata_difficulties");
-	total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
-	console.log("Dati scalata: ",id_scalata, name_scalata, current_round_scalata, total_rounds_scalata, classes_scalata, robots_scalata, difficulties_scalata);
-}
-
 function controlloScalata(
 	iswin,
 	current_round_scalata,
@@ -508,10 +498,24 @@ function getDifficulty(difficulty) {
             return '';
     }
   }
+
+function handleScalataParameters(){
+
+	id_scalata = localStorage.getItem("scalataId");
+    name_scalata = localStorage.getItem("scalata_name");
+    current_round_scalata = localStorage.getItem("current_round_scalata");
+    classes_scalata = localStorage.getItem("scalata_classes");
+    robots_scalata = localStorage.getItem("scalata_robots");
+    difficulties_scalata = localStorage.getItem("scalata_difficulties");
+	total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
+	console.log("Dati scalata: ",id_scalata, name_scalata, current_round_scalata, total_rounds_scalata, classes_scalata, robots_scalata, difficulties_scalata);
+}
+
 function handleScalataNextRound(){
 	console.log("gestione round successivo ...");
 	var isScalataEnded = false ;
 	if(current_round_scalata == total_rounds_scalata){
+
 		return true;
 	}
 	else{
@@ -523,11 +527,64 @@ function handleScalataNextRound(){
 		current_round_scalata++;
 		localStorage.setItem("current_round_scalata",current_round_scalata);
 		
-		console.log(current_round_scalata)
+		let scalataScore = parseInt(localStorage.getItem("scalata_score"),10) + user_score;
+		localStorage.setItem("scalata_score", scalataScore);
+		console.log(current_round_scalata);
+
 		//window.location.href = "/editor?ClassUT="+localStorage.getItem("ClassUT");
 		return false;
 	}
 	
+}
+
+async function incrementScalataRound(scalataId, roundId) {
+    return new Promise((resolve, reject) => { 
+        $.ajax({
+            url: '/scalates/'+scalataId,
+            type: 'PUT',
+            contentType: "application/json",
+            data: JSON.stringify({
+                CurrentRound: roundId
+            }),
+            dataType: "json",
+            success: function (response) {
+                resolve(response);
+            },
+            error: function (error) {
+                console.log("Error details:", error);
+                console.error('Errore nell\' invio dei dati');
+                reject(error);
+            }
+        })
+    })
+}
+
+
+async function closeScalata(scalataId, isWin, finalScore, roundId) {
+    data = JSON.stringify({
+        CurrentRound: parseInt(roundId),
+        IsFinished: isWin,
+        FinalScore: finalScore,
+        ClosedAt: new Date().toISOString()  
+    });
+    console.log("[closeScalata] json data: "+data);
+    return new Promise((resolve, reject) => { 
+        $.ajax({
+            url: '/scalates/'+scalataId,
+            type: 'PUT',
+            contentType: "application/json",
+            data: data,
+            dataType: "json",
+            success: function (response) {
+                resolve(response);
+            },
+            error: function (error) {
+                console.log("Error details:", error);
+                console.error('Errore nell\' invio dei dati');
+                reject(error);
+            }
+        })
+    })
 }
 
 

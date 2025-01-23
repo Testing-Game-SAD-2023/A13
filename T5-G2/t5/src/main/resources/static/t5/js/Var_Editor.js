@@ -115,7 +115,7 @@ var turno = 0; // numero di turni giocati fino ad ora
 var iGameover = false; // flag per indicare se il giocatore ha vinto o perso
 var orderTurno = 0;
 var perc_robot = "0"; // percentuale di copertura del robot scelto
-var userScore = 0;
+var user_score = 0;
 var locGiocatore = 0;
 var currentDate = new Date();
 
