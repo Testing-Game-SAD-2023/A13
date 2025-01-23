@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 allowInteraction: false
             },
             {
-                element: '#summarymButton',
+                element: '#summaryButton',
                 popover: {
                     title: 'Ti serve un riepilogo?',
                     description: 'Cliccando questo bottone potrai avere una panoramica di come è stata configurata la "Scalata".',
