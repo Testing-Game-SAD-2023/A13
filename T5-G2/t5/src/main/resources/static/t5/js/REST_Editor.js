@@ -229,8 +229,6 @@ function handleEndGame(userScore, robotScore) {
                     `Il punteggio del robot : ${robotScore}`,
                     [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("ClassUT"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
                 );
-                pulisciLocalStorage("difficulty");
-                pulisciLocalStorage("robot");
                 pulisciLocalStorage("roundId");
                 pulisciLocalStorage("turnId");
                 pulisciLocalStorage("username");

@@ -122,6 +122,16 @@ public abstract class GameLogic {
         return this.ClasseUT;
     }
 
+//aggiunta dei set per robot, difficoltà e classeUT
+    public void setType_Robot(String type_robot) {
+        this.type_robot = type_robot;
+    }
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+    public void setClasseUT(String classeUT) {
+        this.ClasseUT = classeUT;
+    }
     public Boolean CheckGame(String type_robot, String difficulty, String underTestClassName){
         if( this.type_robot.equals(type_robot) && 
             this.difficulty.equals(difficulty) &&

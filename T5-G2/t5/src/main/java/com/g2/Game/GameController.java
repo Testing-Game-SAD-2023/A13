@@ -41,9 +41,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.yaml.snakeyaml.emitter.ScalarAnalysis;
 
 import com.commons.model.Gamemode;
+import com.g2.Game.ScalataGame.ScalataGamestatus;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Service.AchievementService;
 
@@ -235,7 +235,12 @@ public class GameController {
             }
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
-                //Creo la nuova partita 
+                //Creo la nuova partita
+                if (mode.equals("Scalata")) {
+                    //decodifico le liste di parametri della scalata ricevuti in ingresso
+                    ScalataGame.processScalataParameters(scalata_classes.get(), scalata_robots.get(), scalata_difficulties.get());
+                    System.out.println(scalata_classes.get().get(0) +", "+ scalata_classes.get().get(1));
+                } 
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode,scalata_classes,scalata_robots,scalata_difficulties);
                 //gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
@@ -259,7 +264,7 @@ public class GameController {
                 errorCode = "1";
                 //Rimuovo il vecchio game e ne creo uno nuovo 
                 activeGames.remove(playerId);
-                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode,scalata_classes,scalata_robots,scalata_difficulties);;
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode,scalata_classes,scalata_robots,scalata_difficulties);
                 activeGames.put(playerId, gameLogic);
             }
             //Setto messaggio d'errore e codice di conseguenza 
@@ -348,11 +353,49 @@ public class GameController {
 
             // Salvo i dati del turno
             gameLogic.playTurn(userScore, robotScore,isGameEnd);
-            // Controllo fine partita
-            if (isGameEnd || gameLogic.isGameEnd()) {
-                activeGames.remove(playerId);
-                logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
+            /*
+             * La seguente funzione cerca di eliminare la partita corrente in base all'ID del giocatore, per la scalata invece bisogna verificare gli stati della stessa per poter proseguire
+             */
+            if (isGameEnd) {
+                //la fine partita della scalata non coincide con la fine della scalata stessa, siccome essa può avere più turni
+                if(gameLogic.getMode().equals("Scalata")){
+
+                    GameLogic nextRound = activeGames.get(playerId);
+                    ScalataGamestatus status = ((ScalataGame) nextRound).getStatus();
+                    
+ 
+                    switch (status) {
+                        case IN_PROGRESS: 
+                        /* giocando il turno prima dell'if, il metodo get dovrebbe ritornare la classe successiva rispetto alla classe correntemente memorizzata.
+                        questo perché la get di riferimento è quella della scalata, che restituisce classe, robot e difficoltà                        
+                        in base all'indice attualmente memorizzato
+                        Mentre invece la set è la semplice implementazione di GameLogic */
+                         logger.info("[GAMECONTROLLER] /run: scalata: round superato, caricamento prossimo turno \n"
+                            + nextRound.getClasseUT()+ nextRound.getType_robot()+nextRound.getDifficulty());
+                            nextRound.setClasseUT(nextRound.getClasseUT());
+                            nextRound.setType_Robot(nextRound.getType_robot());
+                            nextRound.setDifficulty(nextRound.getDifficulty());
+                            //viene propagata la modifica all'interno di activeGames
+                            activeGames.replace(playerId, nextRound);
+                        break;
+                    
+                        case WIN:
+                            logger.info("[GAMECONTROLLER] /run: scalata vinta");
+                            activeGames.remove(playerId);
+                        break;
+                        
+                        case LOST:
+                            logger.info("[GAMECONTROLLER] /run: scalata persa");
+                            activeGames.remove(playerId);
+                        break;
+                    }
+                }
+                else{
+                    //per le partite normali, viene semplicemente rimossa la partita attiva
+                    activeGames.remove(playerId);
+                }
+                    logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
+                    return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
                 return createResponseRun(userData, robotScore, userScore, false, lineCoverage, branchCoverage, instructionCoverage);
