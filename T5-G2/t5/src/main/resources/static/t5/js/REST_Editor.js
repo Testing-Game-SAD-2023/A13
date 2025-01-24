@@ -31,10 +31,11 @@ function getGameData() {
             difficulty: 		    localStorage.getItem("difficulty"),
             mode: 				    localStorage.getItem("modalita"),
             underTestClassName:     localStorage.getItem("underTestClassName"),
+            scalata_name:           localStorage.getItem("scalata_name"),
             scalata_classes:        localStorage.getItem("scalata_classes"),
             scalata_robots:         localStorage.getItem("scalata_robots"),
             scalata_difficulties:   localStorage.getItem("scalata_difficulties"),
-            scalata_name:           localStorage.getItem("scalata_name")
+            
         }
     }
     else if(modalita === "Scalata" && is_scalata_inprogress){
