@@ -47,6 +47,11 @@ public class T23Service extends BaseService {
                 params -> GetUsers() //metodo senza parametri
         ));
 
+        registerAction("GetUser", new ServiceActionDefinition(
+            params -> GetUser((String) params[0]), 
+            String.class
+        ));
+
         registerAction("EditProfile", new ServiceActionDefinition(
                 params -> EditProfile((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class
@@ -118,6 +123,11 @@ public class T23Service extends BaseService {
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
     }
 
+    private User GetUser(String user_id){
+        final String endpoint = "/students_list/" + user_id;
+        return callRestGET(endpoint, null, User.class);
+    }
+
     // Metodo per modificare il profilo di un utente
     private Boolean EditProfile(String userEmail, String bio, String imagePath) {
         final String endpoint = "/edit_profile";
@@ -132,9 +142,7 @@ public class T23Service extends BaseService {
 
     private User GetUserByEmail(String userEmail) {
         final String endpoint = "/user_by_email";
-
         Map<String, String> queryParams = Map.of("email", userEmail);
-
         return callRestGET(endpoint, queryParams, User.class);
     }
 
@@ -152,21 +160,17 @@ public class T23Service extends BaseService {
 
     public List<Notification> getNotifications(String userEmail) {
         final String endpoint = "/notifications";
-
         Map<String, String> queryParams = Map.of("email", userEmail);
-
         // Effettua la chiamata GET e restituisce una lista di notifiche
         return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<Notification>>() {});
     }
 
     public String updateNotification(String userEmail, String notificationID) {
         final String endpoint = "/update_notification";
-
         // Imposta i dati del form
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("email", userEmail);
         formData.add("id notifica", notificationID);
-
         // Effettua una chiamata POST per aggiornare lo stato della notifica
         return callRestPost(endpoint, formData, null, String.class);
     }
@@ -186,13 +190,15 @@ public class T23Service extends BaseService {
     // Metodo per eliminare tutte le notifiche
     public String clearNotifications(String userEmail) {
         final String endpoint = "/clear_notifications";
-
         Map<String, String> queryParams = Map.of("email", userEmail);
-
         return callRestDelete(endpoint, queryParams);
     }
 
-    // Metodo per follow/unfollow di un utente
+    /*
+    *   Metodo per follow/unfollow di un utente
+    *   il targetUserId + chi viene seguito 
+    *   il authUserId è chi segue 
+    */ 
     public String followUser(Integer targetUserId, Integer authUserId) {
         final String endpoint = "/add-follow";
 

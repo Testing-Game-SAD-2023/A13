@@ -1,5 +1,19 @@
+/*
+ *   Copyright (c) 2025 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
 
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 package com.g2.Service;
 
 import java.util.ArrayList;
@@ -11,36 +25,45 @@ import org.springframework.web.client.RestTemplate;
 
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.User;
+import com.g2.Model.UserProfile;
 
 @Service
-public class UserProfileService{
+public class UserProfileService {
+
     private final ServiceManager serviceManager;
 
     @Autowired
-    public UserProfileService(RestTemplate restTemplate){
+    public UserProfileService(RestTemplate restTemplate) {
         this.serviceManager = new ServiceManager(restTemplate);
     }
 
-    public String getProfileBio(int playerID){
-         // Mi prendo l'id del giocatore, così forse carico la foto e la bio che già ci sono
-        int userId = playerID;
+    public UserProfile GetUserProfile(int userID){
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", userID);
+        return user.getUserProfile();
+    }
 
+    public UserProfile GetUserProfile(String userId) {
+        int userID_int = Integer.parseInt(userId);
+        return GetUserProfile(userID_int);
+    }
+
+    public String getProfileBio(int playerID) {
+        // Mi prendo l'id del giocatore, così forse carico la foto e la bio che già ci sono
+        int userId = playerID;
         // Mi prendo prima tutti gli utenti
         @SuppressWarnings("unchecked")
-        List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
-
+        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
         // Mi prendo l'utente che mi interessa con l'id e la sua bio
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
         String bio = user.getUserProfile().getBio();
-
         return bio;
     }
 
-   //Prendo tutte le immagini fra le quali posso selezionare la mia
-   public List<String> getAllProfilePictures(){
+    //Prendo tutte le immagini fra le quali posso selezionare la mia
+    public List<String> getAllProfilePictures() {
 
-   // Mi prendo le foto
-   /*
+        // Mi prendo le foto
+        /*
     List<String> list_images = new ArrayList<>();
     String directoryPath = "profileImages";
     URL resource = getClass().getClassLoader().getResource(directoryPath);
@@ -76,96 +99,94 @@ public class UserProfileService{
     System.err.println("Nessun file immagine trovato nella directory: " + resource);
         list_images=null; // Oppure una lista vuota o lancia un'eccezione, a secondo delle tue esigenze
     }
-    */
+         */
+        List<String> list_images = new ArrayList<>();
+        list_images.add("default.png");
+        list_images.add("men-1.png");
+        list_images.add("men-2.png");
+        list_images.add("men-3.png");
+        list_images.add("men-4.png");
+        list_images.add("women-1.png");
+        list_images.add("women-2.png");
+        list_images.add("women-3.png");
+        list_images.add("women-4.png");
 
-    List<String> list_images = new ArrayList<>();
-    list_images.add("default.png");
-    list_images.add("men-1.png");
-    list_images.add("men-2.png");
-    list_images.add("men-3.png");
-    list_images.add("men-4.png");
-    list_images.add("women-1.png");
-    list_images.add("women-2.png");
-    list_images.add("women-3.png");
-    list_images.add("women-4.png");
+        return list_images;
+    }
 
-    return list_images;
-}
+    public String getProfilePicture(int playerID) {
+        // Mi prendo l'id del giocatore, così carico la foto e la bio che già ci sono
+        int userId = playerID;
 
-public String getProfilePicture(int playerID){
-    // Mi prendo l'id del giocatore, così carico la foto e la bio che già ci sono
-   int userId = playerID;
+        // Mi prendo prima tutti gli utenti
+        @SuppressWarnings("unchecked")
+        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
 
-   // Mi prendo prima tutti gli utenti
-   @SuppressWarnings("unchecked")
-   List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
+        // Mi prendo l'utente che mi interessa con l'id
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
-   // Mi prendo l'utente che mi interessa con l'id
-   User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+        List<String> list_images = this.getAllProfilePictures();
 
-   List<String> list_images=this.getAllProfilePictures();
-
-    //Verifico la validità del path
-    Boolean propicvalid = false;
-    for (int i=0;i<list_images.size();i++){
-        if (user.getUserProfile().getProfilePicturePath().equals(list_images.get(i))){
-            propicvalid=true;
-            break;
+        //Verifico la validità del path
+        Boolean propicvalid = false;
+        for (int i = 0; i < list_images.size(); i++) {
+            if (user.getUserProfile().getProfilePicturePath().equals(list_images.get(i))) {
+                propicvalid = true;
+                break;
+            }
         }
+
+        //se lo trovo restituisco l'immagine
+        if (propicvalid) {
+            return user.getUserProfile().getProfilePicturePath();
+        }
+
+        return null;
     }
 
-    //se lo trovo restituisco l'immagine
-    if(propicvalid){
-        return user.getUserProfile().getProfilePicturePath();
+    public Integer getProfileID(int playerID) {
+
+        // Mi prendo l'id del giocatore
+        int userId = playerID;
+
+        // Mi prendo prima tutti gli utenti
+        @SuppressWarnings("unchecked")
+        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
+
+        // Mi prendo l'utente che mi interessa con l'id
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getUserProfile().getID();
+
     }
 
-   return null;
+    public List<Integer> getFollowingList(int playerID) {
+        // Mi prendo l'id del giocatore
+        int userId = playerID;
+
+        // Mi prendo prima tutti gli utenti
+        @SuppressWarnings("unchecked")
+        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
+
+        // Mi prendo l'utente che mi interessa con l'id
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getUserProfile().getFollowingList();
+    }
+
+    public List<Integer> getFollowersList(int playerID) {
+        // Mi prendo l'id del giocatore
+        int userId = playerID;
+
+        // Mi prendo prima tutti gli utenti
+        @SuppressWarnings("unchecked")
+        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
+
+        // Mi prendo l'utente che mi interessa con l'id
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getUserProfile().getFollowersList();
+
+    }
+
 }
-
-public Integer getProfileID(int playerID){
-
-    // Mi prendo l'id del giocatore
-    int userId = playerID;
-
-    // Mi prendo prima tutti gli utenti
-    @SuppressWarnings("unchecked")
-    List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
-
-    // Mi prendo l'utente che mi interessa con l'id
-    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-
-    return user.getUserProfile().getID();
-
-    }
-
-public List<Integer> getFollowingList(int playerID){
-    // Mi prendo l'id del giocatore
-    int userId = playerID;
-
-    // Mi prendo prima tutti gli utenti
-    @SuppressWarnings("unchecked")
-    List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
-
-    // Mi prendo l'utente che mi interessa con l'id
-    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-
-    return user.getUserProfile().getFollowingList();
-    }
-
-public List<Integer> getFollowersList(int playerID){
-    // Mi prendo l'id del giocatore
-    int userId = playerID;
-
-    // Mi prendo prima tutti gli utenti
-    @SuppressWarnings("unchecked")
-    List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
-
-    // Mi prendo l'utente che mi interessa con l'id
-    User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-
-    return user.getUserProfile().getFollowersList();
-
-    }
-
-}
-

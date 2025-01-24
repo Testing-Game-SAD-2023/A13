@@ -19,7 +19,10 @@ package com.g2.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,7 +88,8 @@ public class AchievementService {
     }
 
     public List<AchievementProgress> getProgressesByPlayer(int playerID) {
-        List<Achievement> achievementList = (List<Achievement>) serviceManager.handleRequest("T1", "getAchievements", null);
+        @SuppressWarnings("unchecked")
+        List<Achievement> achievementList = (List<Achievement>) serviceManager.handleRequest("T1", "getAchievements");
         List<StatisticProgress> categoryProgressList = getStatisticsByPlayer(playerID);
         List<AchievementProgress> achievementProgresses = new ArrayList<>();
         for (Achievement a : achievementList)
@@ -96,31 +100,48 @@ public class AchievementService {
             if (filteredList.size() == 0) // if there is no progress recorded, just put progress 0
                 achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), 0));
         }
-
         return achievementProgresses;
     }
 
+    public Map<String, Statistic> GetIdToStatistic(){
+        return getStatistics().stream().collect(Collectors.toMap(Statistic::getID, stat -> stat));
+    } 
+    
+    public List<AchievementProgress> getUnlockedAchievementProgress(List<AchievementProgress> achievementProgresses){
+        return achievementProgresses.stream().filter(a -> a.getProgress() >= a.getProgressRequired()).toList();
+    }
+    
+    public List<AchievementProgress> getLockedAchievementProgress(List<AchievementProgress> achievementProgresses){
+        return achievementProgresses.stream().filter(a -> a.getProgress() < a.getProgressRequired()).toList();
+    } 
+
     public List<StatisticProgress> getStatisticsByPlayer(int playerID) {
+        @SuppressWarnings("unchecked")
         List<StatisticProgress> statisticProgresses = (List<StatisticProgress>) serviceManager.handleRequest("T4", "getStatisticsProgresses", playerID);
-
-        if (statisticProgresses == null)
+        if (statisticProgresses == null) {
             throw new RuntimeException("Errore nel fetch delle statistiche del giocatore.");
-
+        }
         List<Statistic> statisticList = getStatistics();
-
-        statisticProgresses.removeIf(x -> !statisticList.stream().anyMatch(y -> Objects.equals(y.getID(), x.getStatisticID())));
-
+        // Ottimizzazione con Set per rimuovere statistiche non valide
+        Set<String> validStatisticIDs = statisticList.stream()
+                                                     .map(Statistic::getID)
+                                                     .collect(Collectors.toSet());
+        statisticProgresses.removeIf(x -> !validStatisticIDs.contains(x.getStatisticID()));
+        // Ottimizzazione con Set per aggiungere statistiche mancanti
+        Set<String> existingStatisticIDs = statisticProgresses.stream()
+                                                                .map(StatisticProgress::getStatisticID)
+                                                                .collect(Collectors.toSet());
         for (Statistic statistic : statisticList) {
-            // se non c'è il progresso salvato in db, aggiungilo manualmente impostandolo a 0
-            if (!statisticProgresses.stream().anyMatch(progress -> Objects.equals(progress.getStatisticID(), statistic.getID())))
-                statisticProgresses.add(new StatisticProgress(playerID, statistic.getID(), 0));
+            if (!existingStatisticIDs.contains(statistic.getID())) {
+                 // Aggiungi la statistica con il nome associato
+                statisticProgresses.add(new StatisticProgress(playerID, statistic.getID(), 0, statistic.getName()));
+            }
         }
 
         return statisticProgresses;
     }
 
     public void updateNotificationsForAchievements(String userEmail, List<AchievementProgress> newAchievements) {
-
         for (AchievementProgress achievement : newAchievements) {
             String titolo = "Nuovo Achievement";
             String message = "Congratulazioni! Hai ottenuto il nuovo achievement: " + achievement.Name + "!";

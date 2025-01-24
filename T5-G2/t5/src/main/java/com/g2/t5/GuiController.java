@@ -14,7 +14,6 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package com.g2.t5;
 
 import java.nio.charset.StandardCharsets;
@@ -29,6 +28,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.swing.plaf.TreeUI;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,12 +51,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.ServiceObjectComponent;
+import com.g2.Components.UserProfileComponent;
 import com.g2.Components.VariableValidationLogicComponent;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.AchievementProgress;
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
-import com.g2.Model.Notification;
 import com.g2.Model.ScalataGiocata;
 import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
@@ -87,8 +88,8 @@ public class GuiController {
     //Gestione lingua
     @PostMapping("/changeLanguage")
     public ResponseEntity<Void> changeLanguage(@RequestParam("lang") String lang,
-                                                HttpServletRequest request,
-                                                HttpServletResponse response) {
+            HttpServletRequest request,
+            HttpServletResponse response) {
         Cookie cookie = new Cookie("lang", lang);
         cookie.setMaxAge(3600); // Imposta la durata del cookie a 1 ora
         cookie.setPath("/"); // Imposta il percorso per il cookie
@@ -102,315 +103,92 @@ public class GuiController {
 
     @GetMapping("/main")
     public String GUIController(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder main = new PageBuilder(serviceManager, "main", model);
-        main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
+        PageBuilder main = new PageBuilder(serviceManager, "main", model, jwt);
+        main.SetAuth(); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
     }
 
-    // Ricevuta chiamata a profile, effettuo l'autenticazione
     @GetMapping("/profile")
-    public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt)
-    {
-        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-            String userId = map.get("userId").toString(); //Identifico l'utente
-            //Passo l'holder del modello, l'id dell'utente e il token alla pagina effettiva
-            return profilePage(model, userId, jwt);
+    public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder profile = new PageBuilder(serviceManager, "profile", model, jwt);
+        profile.SetAuth();
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", profile.getUserId());
+        if (user == null) {
+            //Qua gestisco utente sbagliato
+            return "error";
         }
-        catch (Exception e) {
-            System.out.println("(/profile) Error requesting profile: " + e.getMessage());
-        }
-
-        return "error";
-    }
-
-    //Definisco la mia pagina utente
-    @GetMapping("/profile/{playerID}")
-    public String profilePage(Model model,
-                              @PathVariable(value="playerID") String playerID,
-                              @CookieValue(name = "jwt", required = false) String jwt) {
-        //Mi sto istanziando il profilo come PageBuilder
-        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
-        //Do l'autenticazione
-        profile.SetAuth(jwt);
-
-        //Mi prendo l'id del giocatore, così da filtrare per il suo id i suoi progressi degli achievement e le sue statistiche
-        int userId = Integer.parseInt(playerID);
-
-        // PROVARE A RENDERE REALE IL PASSAGGIO DEI DATI ALLA PAGINA PROFILO
-        //UserProfile profileDTO=new UserProfile(userId,"Inserisci qui la tua bio...","sample_propic.jpg",null,null);
-        // Mi prendo prima tutti gli utenti e poi l'utente che mi interessa con l'id con un filtraggio
-        List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Mi prendo i suoi dati da passare alla pagina
-        String email = user.getEmail();
-        String studies = user.getStudies();
-        String username = user.getName();
-        String surname = user.getSurname();
-
-        // Mi prendo immagine e bio
-        String image = userProfileService.getProfilePicture(userId);
-        String bio = userProfileService.getProfileBio(userId);
-
-        // Mi prendo le notifiche
-        List<Notification> notifications = (List<Notification>) serviceManager.handleRequest("T23", "getNotifications", email);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        for (Notification notification : notifications) {
-            String formattedate = notification.getTimestamp().format(formatter).toString();
-            model.addAttribute("formattedDate", formattedate);
-            System.out.println("Notification ID: " + notification.getId() + ", isRead: " + notification.getIsRead());
-        }
-
-        // Mi prendo i progressi degli achievement
-        List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
-
-        // Divido i progressi degli achievement in "unlocked" e "locked"
-        List<AchievementProgress> unlockedAchievements = achievementProgresses.stream().filter(a -> a.getProgress() >= a.getProgressRequired()).toList();
-        List<AchievementProgress> lockedAchievements = achievementProgresses.stream().filter(a -> a.getProgress() < a.getProgressRequired()).toList();
-
-        // Mi prendo le statistiche del giocatore
-        List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
-        List<Statistic> allStatistics = achievementService.getStatistics();
-        Map<String, Statistic> IdToStatistic = new HashMap<>();
-
-        for (Statistic stat : allStatistics)
-            IdToStatistic.put(stat.getID(), stat);
-
-        // Mi prendo la lista dei follower e dei following
-        List<User> followersList = new ArrayList<>();
-        List<User> followingList = new ArrayList<>();
-        followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", String.valueOf(userId));
-        followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", String.valueOf(userId));
-
-        Integer followersListSize = followersList.size();
-        Integer followingListSize = followingList.size();
-
-        //DEBUG
-        System.out.println("Following list: " + followingList);
-        System.out.println("Followers list: " + followersList);
-        System.out.println("Following list size: " + followingListSize);
-        System.out.println("Followers list size: " + followersListSize);
-
-        // Creo i componenti per passare i dati alla pagina
-        GenericObjectComponent objEmail = new GenericObjectComponent("email", email);
-        GenericObjectComponent objStudies = new GenericObjectComponent("studies", studies);
-        GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
-        GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
-        GenericObjectComponent objImage = new GenericObjectComponent("propic", image);
-        GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
-        GenericObjectComponent objFollowingList = new GenericObjectComponent("followingList", followingList);
-        GenericObjectComponent objFollowersList = new GenericObjectComponent("followersList", followersList);
-        GenericObjectComponent objFollowingListSize = new GenericObjectComponent("followingListSize", followingListSize);
-        GenericObjectComponent objFollowersListSize = new GenericObjectComponent("followersListSize", followersListSize);
-
-        GenericObjectComponent objUnlockedAchievements = new GenericObjectComponent("unlockedAchievements", unlockedAchievements);
-        GenericObjectComponent objLockedAchievements = new GenericObjectComponent("lockedAchievements", lockedAchievements);
-        GenericObjectComponent objAchievementProgresses = new GenericObjectComponent("achievementProgresses", achievementProgresses);
-        GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
-        GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
-        GenericObjectComponent objUserID = new GenericObjectComponent("userID", userId);
-
-        GenericObjectComponent objNotifications = new GenericObjectComponent("notifications", notifications);
-
-        // Aggiungo i componenti alla pagina
-        profile.setObjectComponents(objEmail);
-        profile.setObjectComponents(objStudies);
-        profile.setObjectComponents(objUsername);
-        profile.setObjectComponents(objSurname);
-        profile.setObjectComponents(objImage);
-        profile.setObjectComponents(objBio);
-        profile.setObjectComponents(objFollowingList);
-        profile.setObjectComponents(objFollowersList);
-        profile.setObjectComponents(objFollowingListSize);
-        profile.setObjectComponents(objFollowersListSize);
-        profile.setObjectComponents(objUnlockedAchievements);
-        profile.setObjectComponents(objLockedAchievements);
-        profile.setObjectComponents(objAchievementProgresses);
-        profile.setObjectComponents(objStatisticProgresses);
-        profile.setObjectComponents(objIdToStatistic);
-        profile.setObjectComponents(objUserID);
-        profile.setObjectComponents(objNotifications);
-        //TODO: Aggiungere componenti missioni
-
+        profile.setObjectComponents(
+            new UserProfileComponent(serviceManager, user, profile.getUserId(), achievementService, false)
+        );
         return profile.handlePageRequest();
     }
 
-    // Visualizzazione profilo di un amico
+    /*
+     *    TENERE QUESTA CHIAMATA SOLO PER DEBUG DA DISATTIVARE 
+     * 
+     */
+    @GetMapping("/profile/{playerID}")
+    public String profilePage(Model model,
+            @PathVariable(value = "playerID") String playerID,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+
+        PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
+        profile.SetAuth(jwt);
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
+        if (user == null) {
+            //Qua gestisco utente sbagliato
+        }
+        profile.setObjectComponents(
+                new UserProfileComponent(serviceManager, user, playerID, achievementService, false)
+        );
+        return profile.handlePageRequest();
+    }
+
     @GetMapping("/friend/{playerID}")
-    public String friendProfilePage(Model model, @PathVariable(value="playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
-        try {
-            // Istanzio il profilo come PageBuilder
-            PageBuilder profile = new PageBuilder(serviceManager, "friend_profile", model);
-
-            // Autenticazione
-            profile.SetAuth(jwt);
-
-            // Converto l'ID del giocatore
-            int userId = Integer.parseInt(playerID);
-
-            // Recupero l'utente
-            List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-            User user = users.stream()
-                .filter(u -> u.getId() == userId)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
-
-            // Recupero i dati pubblici da visualizzare
-            String username = user.getName();
-            String surname = user.getSurname();
-
-            // Recupero immagine e bio pubbliche
-            String image = userProfileService.getProfilePicture(userId);
-            String bio = userProfileService.getProfileBio(userId);
-
-            // Recupero i progressi degli achievement pubblici
-            List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(userId);
-
-            // Divido i progressi degli achievement in "unlocked" e "locked"
-            List<AchievementProgress> unlockedAchievements = achievementProgresses.stream()
-                .filter(a -> a.getProgress() >= a.getProgressRequired())
-                .toList();
-            List<AchievementProgress> lockedAchievements = achievementProgresses.stream()
-                .filter(a -> a.getProgress() < a.getProgressRequired())
-                .toList();
-
-            // Recupero le statistiche pubbliche del giocatore
-            List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(userId);
-            List<Statistic> allStatistics = achievementService.getStatistics();
-            Map<String, Statistic> IdToStatistic = new HashMap<>();
-
-            for (Statistic stat : allStatistics) {
-                IdToStatistic.put(stat.getID(), stat);
-            }
-
-            // Mi prendo la lista dei follower e dei following
-            List<User> followersList = new ArrayList<>();
-            List<User> followingList = new ArrayList<>();
-            followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", String.valueOf(userId));
-            followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", String.valueOf(userId));
-
-            Integer followersListSize = followersList.size();
-            Integer followingListSize = followingList.size();
-
-            // Decodifica JWT per ottener l'ID dell'utente autenticato
-            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-            ObjectMapper mapper = new ObjectMapper();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-            String authUserId = map.get("userId").toString();
-
-            //Ottengo il profilo dell'utente autenticato
-            User authUser = users.stream()
-                .filter(u -> u.getId() == Integer.parseInt(authUserId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
-
-            // Ottengo l'ID dello UserProfile dell'utente autenticato
-            Integer authUserProfileID = userProfileService.getProfileID(Integer.parseInt(authUserId));
-            // Ottengo l'ID del profilo dell'utente visualizzato
-            Integer userProfileID = userProfileService.getProfileID(userId);
-
-            // Verifichiamo se l'utente autenticato è tra i follower dell'utente visualizzato
-            boolean isFollowing = userProfileService.getFollowersList(userId) != null &&
-                            userProfileService.getFollowersList(userId).stream()
-                                .anyMatch(f -> f.equals(authUserProfileID));
-
-            System.out.println("Sto cercando le informazioni dell'utente: "+userId);
-            System.out.println("Id profilo: "+userProfileID);
-            System.out.println("Lista dei follower:"+userProfileService.getFollowersList(userId));
-            System.out.println("Lista dei following: "+userProfileService.getFollowingList(userId));
-            System.out.println("isFollowing: " + isFollowing);
-
-            // Creo i componenti per passare i dati pubblici alla pagina
-            GenericObjectComponent objUsername = new GenericObjectComponent("username", username);
-            GenericObjectComponent objSurname = new GenericObjectComponent("surname", surname);
-            GenericObjectComponent objImage = new GenericObjectComponent("propic", image);
-            GenericObjectComponent objBio = new GenericObjectComponent("bio", bio);
-            GenericObjectComponent objFollowingList = new GenericObjectComponent("followingList", followingList);
-            GenericObjectComponent objFollowersList = new GenericObjectComponent("followersList", followersList);
-            GenericObjectComponent objFollowingListSize = new GenericObjectComponent("followingListSize", followingListSize);
-            GenericObjectComponent objFollowersListSize = new GenericObjectComponent("followersListSize", followersListSize);
-
-            GenericObjectComponent objUnlockedAchievements = new GenericObjectComponent("unlockedAchievements", unlockedAchievements);
-            GenericObjectComponent objLockedAchievements = new GenericObjectComponent("lockedAchievements", lockedAchievements);
-            GenericObjectComponent objStatisticProgresses = new GenericObjectComponent("statisticProgresses", statisticProgresses);
-            GenericObjectComponent objIdToStatistic = new GenericObjectComponent("IdToStatistic", IdToStatistic);
-            GenericObjectComponent objIsFollowing = new GenericObjectComponent("isFollowing", isFollowing);
-            GenericObjectComponent objUserId = new GenericObjectComponent("userId", userId); //frienId
-
-            // Aggiungo i componenti alla pagina
-            profile.setObjectComponents(objUsername);
-            profile.setObjectComponents(objSurname);
-            profile.setObjectComponents(objImage);
-            profile.setObjectComponents(objBio);
-            profile.setObjectComponents(objFollowingList);
-            profile.setObjectComponents(objFollowersList);
-            profile.setObjectComponents(objFollowingListSize);
-            profile.setObjectComponents(objFollowersListSize);
-            profile.setObjectComponents(objUnlockedAchievements);
-            profile.setObjectComponents(objLockedAchievements);
-            profile.setObjectComponents(objStatisticProgresses);
-            profile.setObjectComponents(objIdToStatistic);
-            profile.setObjectComponents(objIsFollowing);
-            profile.setObjectComponents(objUserId);
-
-            return profile.handlePageRequest();
-        } catch (NumberFormatException e) {
-            System.out.println("(/friend) ID utente non valido: " + e.getMessage());
-            return "error";
-        } catch (RuntimeException e) {
-            System.out.println("(/friend) Utente non trovato: " + e.getMessage());
-            return "error";
-        } catch (Exception e) {
-            System.out.println("(/friend) Errore generico: " + e.getMessage());
+    public String friendProfilePage(Model model, @PathVariable(value = "playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt){
+        PageBuilder profile = new PageBuilder(serviceManager, "friend_profile", model, jwt);
+        profile.SetAuth();
+        User Friend_user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
+        if (Friend_user == null) {
+            //Qua gestisco utente sbagliato
             return "error";
         }
+        int userID_int = Integer.parseInt(profile.getUserId());
+        boolean isFollowing =  Friend_user.getFollowersList().contains(userID_int);
+        profile.setObjectComponents(
+            new UserProfileComponent(serviceManager, Friend_user, playerID, achievementService, true),
+            new GenericObjectComponent("isFollowing", isFollowing),
+            new GenericObjectComponent("userId", playerID)
+        );
+        return profile.handlePageRequest();
     }
 
-    // Seguire o smettere di seguire un utente
-    @PostMapping("/follow/{playerID}")
-    @ResponseBody
-    public ResponseEntity<?> toggleFollow(@PathVariable(value="playerID") String playerID,
-                                          @CookieValue(name = "jwt", required = false) String jwt) {
-
-        try{
-            // Converto l'ID del giocatore di cui voglio fare il follow/unfollow
-            Integer userId = Integer.parseInt(playerID);
-
-            // Decodifica JWT per ottener l'ID dell'utente autenticato
-            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-            ObjectMapper mapper = new ObjectMapper();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-            String authUserIdString = map.get("userId").toString();
-            Integer authUserId = Integer.parseInt(authUserIdString);
-
-            // Chiamo il servizio per seguire o smettere di seguire l'utente
-            String result = (String) serviceManager.handleRequest("T23", "followUser", userId, authUserId);
-
-            return ResponseEntity.ok(result);
-
-        }catch(Exception e){
-            System.out.println("(/follow) Errore generico: " + e.getMessage());
-            return ResponseEntity.badRequest().body("Errore generico");
+    @GetMapping("/edit_profile")
+    public String aut_edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {        
+        PageBuilder Edit_Profile = new PageBuilder(serviceManager, "Edit_Profile", model, jwt);
+        Edit_Profile.SetAuth();
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", Edit_Profile.getUserId());
+        if (user == null) {
+            //Qua gestisco utente sbagliato
+            return "error";
         }
+        // Prendiamo le risorse dal servizio UserProfileService
+        List<String> list_images = userProfileService.getAllProfilePictures();
+        Edit_Profile.setObjectComponents(
+            new GenericObjectComponent("user", user),
+            new GenericObjectComponent("images", list_images)
+        );
+        return Edit_Profile.handlePageRequest();
     }
+
+   
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model,
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam(value = "mode", required = false) String mode) {
 
-        if("Sfida".equals(mode) || "Allenamento".equals(mode)){
+        if ("Sfida".equals(mode) || "Allenamento".equals(mode)) {
             PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
             //controllo che sia stata fornita una modalità valida dall'utente
             VariableValidationLogicComponent Valida_classeUT = new VariableValidationLogicComponent(mode);
@@ -428,12 +206,12 @@ public class GuiController {
             gamemode.SetAuth(jwt);
             return gamemode.handlePageRequest();
         }
-        if("Scalata".equals(mode)){
+        if ("Scalata".equals(mode)) {
             PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode_scalata", model);
             gamemode.SetAuth(jwt);
             return gamemode.handlePageRequest();
         }
-            return "main";
+        return "main";
     }
 
     @GetMapping("/editor")
@@ -446,21 +224,21 @@ public class GuiController {
         Valida_classeUT.setCheckNull();
         @SuppressWarnings("unchecked")
         List<ClassUT> Lista_classi_UT = (List<com.g2.Model.ClassUT>) serviceManager.handleRequest("T1", "getClasses");
-        List<String>  Lista_classi_UT_nomi =  new ArrayList<>();
-        for(ClassUT element : Lista_classi_UT){
+        List<String> Lista_classi_UT_nomi = new ArrayList<>();
+        for (ClassUT element : Lista_classi_UT) {
             Lista_classi_UT_nomi.add(element.getName());
         }
 
         System.out.println(Lista_classi_UT_nomi);
 
         Valida_classeUT.setCheckAllowedValues(Lista_classi_UT_nomi); //Se il request param non è in questa lista è un problema
-        ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT","T1", "getClassUnderTest", ClassUT);
+        ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT", "T1", "getClassUnderTest", ClassUT);
         editor.setObjectComponents(ClasseUT);
         editor.SetAuth(jwt);
         editor.setLogicComponents(Valida_classeUT);
         //Se l'utente ha inserito un campo nullo o un valore non consentito vuol dire che non è passato da gamemode
-        editor.setErrorPage( "NULL_VARIABLE",  "redirect:/main");
-        editor.setErrorPage( "VALUE_NOT_ALLOWED",  "redirect:/main");
+        editor.setErrorPage("NULL_VARIABLE", "redirect:/main");
+        editor.setErrorPage("VALUE_NOT_ALLOWED", "redirect:/main");
         return editor.handlePageRequest();
     }
 
@@ -474,68 +252,43 @@ public class GuiController {
         return leaderboard.handlePageRequest();
     }
 
-    @GetMapping("/edit_profile")
-    public String aut_edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-        String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
+
+    // Seguire o smettere di seguire un utente
+
+    /* Gia raggiungibile */
+
+    @PostMapping("/follow/{playerID}")
+    @ResponseBody
+    public ResponseEntity<?> toggleFollow(@PathVariable(value = "playerID") String playerID,
+            @CookieValue(name = "jwt", required = false) String jwt) {
 
         try {
+            // Converto l'ID del giocatore di cui voglio fare il follow/unfollow
+            Integer userId = Integer.parseInt(playerID);
+
+            // Decodifica JWT per ottener l'ID dell'utente autenticato
+            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
             @SuppressWarnings("unchecked")
             Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-            String userId = map.get("userId").toString(); //Identifico l'utente
-            //Passo l'holder del modello, l'id dell'utente e il token alla pagina effettiva
-            return edit_profile(model, userId, jwt);
+            String authUserIdString = map.get("userId").toString();
+            Integer authUserId = Integer.parseInt(authUserIdString);
+
+            // Chiamo il servizio per seguire o smettere di seguire l'utente
+            String result = (String) serviceManager.handleRequest("T23", "followUser", userId, authUserId);
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            System.out.println("(/follow) Errore generico: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Errore generico");
         }
-        catch (Exception e) {
-            System.out.println("(/edit_profile) Error requesting edit_profile: " + e.getMessage());
-        }
+    }
 
-        return "error";
-}
-
-    @GetMapping("/edit_profile/{playerID}")
-    public String edit_profile(Model model, @PathVariable(value="playerID") String playerID,@CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder main = new PageBuilder(serviceManager, "Edit_Profile", model);
-
-        // Mi prendo l'id del giocatore, così forse carico la foto e la bio che già ci sono
-        int userId = Integer.parseInt(playerID);
-
-        // Mi prendo prima tutti gli utenti
-        @SuppressWarnings("unchecked")
-        List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
-
-        // Mi prendo l'utente che mi interessa con l'id
-        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
-        String email = user.getEmail();
-        String name = user.getName();
-        String surname = user.getSurname();
-
-        // Prendiamo le risorse dal servizio UserProfileService
-        List<String> list_images = userProfileService.getAllProfilePictures();
-        String image = userProfileService.getProfilePicture(userId);
-        String bio = userProfileService.getProfileBio(userId);
-
-        GenericObjectComponent userObject = new GenericObjectComponent("user", userId);
-        GenericObjectComponent surnameObject = new GenericObjectComponent("surname", surname);
-        GenericObjectComponent nameObject = new GenericObjectComponent("name", name);
-        GenericObjectComponent emailObject = new GenericObjectComponent("email", email);
-        GenericObjectComponent imagesObject = new GenericObjectComponent("images", list_images);
-        GenericObjectComponent propicObject = new GenericObjectComponent("propic", image);
-        GenericObjectComponent bioObject = new GenericObjectComponent("bio", bio);
-
-
-        main.setObjectComponents(userObject);
-        main.setObjectComponents(surnameObject);
-        main.setObjectComponents(nameObject);
-        main.setObjectComponents(emailObject);
-        main.setObjectComponents(imagesObject);
-        main.setObjectComponents(propicObject);
-        main.setObjectComponents(bioObject);
-        main.SetAuth(jwt);
-        return main.handlePageRequest();
-        }
-
+    /*
+     * NON RAGGIUNGIBILE
+     */
     @GetMapping("/getUserByEMail")
     public ResponseEntity<User> getUserByEMail(Model model, @RequestParam(value = "email", required = true) String email) {
         User user = (User) serviceManager.handleRequest("T23", "GetUserByEmail", email);
@@ -543,10 +296,13 @@ public class GuiController {
     }
 
     // Salvataggio delle modifiche al profilo
+    /*
+     * Cambiare endpoint 
+     */
     @PostMapping("/update-profile")
     public ResponseEntity<String> updateProfile(@RequestParam("email") String email,
-                                                @RequestParam("bio") String bio,
-                                                @RequestParam("profilePicturePath") String profilePicturePath){
+            @RequestParam("bio") String bio,
+            @RequestParam("profilePicturePath") String profilePicturePath) {
 
         System.out.println("Email: " + email);
         System.out.println("Bio: " + bio);
@@ -554,47 +310,25 @@ public class GuiController {
         // Chiamata al servizio T23 per modificare il profilo
         Boolean result = (Boolean) serviceManager.handleRequest("T23", "EditProfile", email, bio, profilePicturePath);
 
-        if(result){
+        if (result) {
             return ResponseEntity.ok("Profile updated successfully");
-        }
-        else{
+        } else {
             return ResponseEntity.badRequest().body("Error updating profile");
         }
     }
 
-    @PostMapping("/read-notification")
-    public ResponseEntity<String> readNotification(@RequestParam("email") String userEmail,
-                                                   @RequestParam("id") String notificationID) {
-        String result = (String) serviceManager.handleRequest("T23", "updateNotification", userEmail, notificationID);
-        if(result != null){
-            return ResponseEntity.ok("Notification read successfully");
-        }
-        else{
-            return ResponseEntity.badRequest().body("Error reading notification");
-        }
-    }
-
+    //non raggiungibile 
     @DeleteMapping("/delete-notification")
     public ResponseEntity<String> deleteNotification(@RequestParam("email") String userEmail,
-                                                     @RequestParam("id") String notificationID) {
+            @RequestParam("id") String notificationID) {
         System.out.println(notificationID);
         System.out.println(userEmail);
         String result = (String) serviceManager.handleRequest("T23", "deleteNotification", userEmail, notificationID);
-        if(result != null){
+        if (result != null) {
             return ResponseEntity.ok("Notification deleted successfully");
-        }
-        else{
+        } else {
             return ResponseEntity.badRequest().body("Error deleting notification");
         }
-    }
-
-    @GetMapping("/report")
-    public String reportPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        Boolean Auth = (Boolean) serviceManager.handleRequest("T23", "GetAuthenticated", jwt);
-        if (Auth) {
-            return "report";
-        }
-        return "redirect:/login";
     }
 
     // TODO: Salvataggio della ScalataGiocata
@@ -654,13 +388,13 @@ public class GuiController {
 
     @PostMapping("/save-data")
     public ResponseEntity<String> saveGame(@RequestParam("playerId") int playerId,
-                                            @RequestParam("robot") String robot,
-                                            @RequestParam("classe") String classe,
-                                            @RequestParam("difficulty") String difficulty,
-                                            @RequestParam("gamemode") String gamemode,
-                                            @RequestParam("username") String username,
-                                            @RequestParam("selectedScalata") Optional<Integer> selectedScalata,
-                                            HttpServletRequest request) {
+            @RequestParam("robot") String robot,
+            @RequestParam("classe") String classe,
+            @RequestParam("difficulty") String difficulty,
+            @RequestParam("gamemode") String gamemode,
+            @RequestParam("username") String username,
+            @RequestParam("selectedScalata") Optional<Integer> selectedScalata,
+            HttpServletRequest request) {
 
         if (!request.getHeader("X-UserID").equals(String.valueOf(playerId))) {
             return ResponseEntity.badRequest().body("Unauthorized");
@@ -693,16 +427,15 @@ public class GuiController {
         System.out.println("Checking achievements...");
 
         //Voglio notificare l'utente dei nuovi achievement
-
         // Mi prendo prima tutti gli utenti
         @SuppressWarnings("unchecked")
-        List<User> users = (List<com.g2.Model.User>)serviceManager.handleRequest("T23", "GetUsers");
+        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
 
         // Mi prendo l'utente che mi interessa con l'id
         User user = users.stream().filter(u -> u.getId() == playerId).findFirst().orElse(null);
         String email = user.getEmail();
         List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(playerId);
-        achievementService.updateNotificationsForAchievements(email,newAchievements);
+        achievementService.updateNotificationsForAchievements(email, newAchievements);
 
         return ResponseEntity.ok(ids.toString());
     }

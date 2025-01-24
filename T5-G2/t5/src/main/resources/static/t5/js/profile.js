@@ -1,3 +1,20 @@
+/*
+ *   Copyright (c) 2025 Stefano Marano https://github.com/StefanoMarano80017
+ *   All rights reserved.
+
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+
+ *   http://www.apache.org/licenses/LICENSE-2.0
+
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
     // Log di verifica
     console.log("DOM completamente caricato e analizzato");
@@ -191,9 +208,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 try {
                     const formData = new URLSearchParams();
                     formData.append("email", userEmail);
-                    formData.append("id", notificationId);
-
-                    const response = await fetch("/read-notification", {
+                    formData.append("id notifica", notificationId);
+                    // qua era /read-notification
+                    const response = await fetch("/update_notification", {
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: formData.toString(),
@@ -219,8 +236,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 try {
                     const formData = new URLSearchParams();
                     formData.append("email", userEmail);
-                    formData.append("id", notificationId);
-
+                    formData.append("idnotifica", notificationId);
+                    // qui c'era /delete-notification devo mettere /delete_notification
                     const response = await fetch("/delete-notification", {
                         method: "DELETE",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },

@@ -17,8 +17,10 @@
 package com.g2.Interfaces;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,6 +53,11 @@ public class T4Service extends BaseService {
         registerAction("getStatisticsProgresses", new ServiceActionDefinition(
                 params -> getStatisticsProgresses((int) params[0]),
                 Integer.class
+        ));
+
+        registerAction("getHashStatisticsProgresses", new ServiceActionDefinition(
+            params -> getHashStatisticsProgresses((int) params[0]),
+            Integer.class
         ));
 
         registerAction("updateStatisticProgress", new ServiceActionDefinition(
@@ -110,6 +117,20 @@ public class T4Service extends BaseService {
         return response;
     }
 
+    private Set<StatisticProgress> getHashStatisticsProgresses(int playerID) {
+        Map<String, String> formData = new HashMap<>();
+        formData.put("pid", String.valueOf(playerID));
+        String endpoint = "/phca/" + playerID;
+        // Recupera la risposta come una lista
+        List<StatisticProgress> response = callRestGET( endpoint, 
+                                                        formData, 
+                                                        new ParameterizedTypeReference<List<StatisticProgress>>() {
+                                                       });
+        // Converti la lista in un HashSet per rimuovere eventuali duplicati
+        Set<StatisticProgress> responseSet = new HashSet<>(response);
+        return responseSet;
+    }
+
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
         JSONObject obj = new JSONObject();
         obj.put("playerId", playerID);
@@ -121,7 +142,7 @@ public class T4Service extends BaseService {
         return response;
     }
 
-/*
+    /*
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
         try {
             MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
@@ -139,8 +160,7 @@ public class T4Service extends BaseService {
             return "errore UPDATESTATISTICPROGRESS";
         }
     }
-*/
-
+     */
     // usa /robots per ottenere dati
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
@@ -171,7 +191,6 @@ public class T4Service extends BaseService {
         return jsonObject.getInt("id");
     }
 
-
     private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner) {
         final String endpoint = "/games/" + String.valueOf(gameid);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -182,6 +201,7 @@ public class T4Service extends BaseService {
         String respose = callRestPost(endpoint, formData, null, String.class);
         return respose;
     }
+
     /*
     private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner){
         final String endpoint = "/games/" + String.valueOf(gameid);
@@ -197,7 +217,7 @@ public class T4Service extends BaseService {
             throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
         }
     }
-        */
+     */
 
     private int CreateRound(int game_id, String ClasseUT, String Time) {
         final String endpoint = "/rounds";
@@ -222,8 +242,7 @@ public class T4Service extends BaseService {
         String response = callRestPut(endpoint, formData, null, String.class);
         return response;
     }
-    */
-
+     */
     private String EndRound(String Time, int roundId) {
         //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);

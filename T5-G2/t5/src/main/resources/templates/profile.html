@@ -29,13 +29,13 @@
             <!-- Profilo Utente -->
             <div class="card mb-3">
                 <div class="card-body d-flex">
-                    <img th:src="${propic != null ? '/t5/images/profileImages/' + propic : '/t5/images/sample_propic.jpg'}"
+                    <img th:src="${user.userProfile.profilePicturePath != null ? '/t5/images/profileImages/' + user.userProfile.profilePicturePath : '/t5/images/sample_propic.jpg'}"
                          class="rounded me-3" style="width: 80px; height: 80px;" alt="Profile Picture">
                     <div>
-                        <h5 class="user-name" th:text="${username} + ' ' + ${surname}"></h5>
-                        <p id="user-email" th:text="${email}"></p>
-                        <div class="bio-box" th:if="${bio != null}">
-                            <p th:text="${bio}">Inserisci una bio...</p>
+                        <h5 class="user-name" th:text="${user.name} + ' ' + ${user.surname}"></h5>
+                        <p id="user-email" th:text="${user.email}"></p>
+                        <div class="bio-box" th:if="${user.userProfile.bio != null}">
+                            <p th:text="${user.userProfile.bio}">Inserisci una bio...</p>
                         </div>
                         <div class="button-group">
                             <button class="btn btn-custom btn-sm" onclick="location.href='/edit_profile' " th:text="#{profile.modifyButton}">Modifica Profilo</button>
