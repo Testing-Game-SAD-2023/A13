@@ -25,12 +25,12 @@ import com.g2.Interfaces.ServiceManager;
 
 public abstract class GameLogic {
 
-    private final ServiceManager serviceManager;
+    protected final ServiceManager serviceManager;
 
     //IDs
     private int GameID;
     private int  RoundID;
-    private String TurnID;
+    private int TurnID;
     private final String PlayerID;
     private String ClasseUT;
     private String type_robot;
@@ -67,15 +67,28 @@ public abstract class GameLogic {
      */
     protected void CreateGame() {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", this.gamemode, this.PlayerID);
-        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time);
+        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, this.difficulty, this.ClasseUT, this.gamemode, this.PlayerID);
+        int robot_id =(int) serviceManager.handleRequest("T4", "GetRobotID", this.ClasseUT, this.type_robot, this.difficulty);
+        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time, robot_id);
+        this.TurnID = (int) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
     }
 
     protected void CreateTurn(String Time, int userScore) {
-        //Apro un nuovo turno
-        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
-        //Chiudo il turno 
+        
+        //Chiudo il turno precedente 
         serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
+
+        //Apro un nuovo turno
+        this.TurnID = (int) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        
+        
+    }
+    protected void EndTurn(int turn_id, String Time, int userScore) {
+        
+        //Chiudo il turno precedente 
+        serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
+  
+        
     }
 
     protected void EndRound(String Time) {
@@ -84,6 +97,10 @@ public abstract class GameLogic {
 
     protected void EndGame(String Time, int Score, Boolean isWinner){
         this.serviceManager.handleRequest("T4","EndGame", this.GameID, this.PlayerID, Time, Score, isWinner);
+    }
+
+    public String getPlayerID(){
+        return this.PlayerID;
     }
 
     public int getGameID() {
@@ -102,11 +119,11 @@ public abstract class GameLogic {
         this.RoundID = RoundID;
     }
 
-    public String getTurnID() {
+    public int getTurnID() {
         return this.TurnID;
     }
 
-    public void setTurnID(String TurnID) {
+    public void setTurnID(int TurnID) {
         this.TurnID = TurnID;
     }
 

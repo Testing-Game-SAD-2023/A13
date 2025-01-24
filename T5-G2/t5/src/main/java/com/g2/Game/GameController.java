@@ -78,8 +78,9 @@ public class GameController {
 
         GameLogic create(ServiceManager serviceManager,
                 String playerId, String underTestClassName,
-                String type_robot, String difficulty, String mode 
-                , Optional<List<String>> scalataClasses, Optional<List<String>> scalataRobots, Optional<List<String>> scalataDifficulties
+                String type_robot, String difficulty, String mode, 
+                Optional<String> scalata_name,
+                Optional<List<String>> scalataClasses, Optional<List<String>> scalataRobots, Optional<List<String>> scalataDifficulties
                 );
 
         
@@ -91,12 +92,12 @@ public class GameController {
      */
     private void registerGames() {
         //Attenzione le chiavi sono CaseSensitive
-        gameRegistry.put(Gamemode.Sfida.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode, scalataClasses, scalataRobots, scalataDifficulties)
+        gameRegistry.put(Gamemode.Sfida.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalataClasses, scalataRobots, scalataDifficulties)
                 -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Sfida.toString()));
-        gameRegistry.put(Gamemode.Allenamento.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode, scalataClasses, scalataRobots, scalataDifficulties)
+        gameRegistry.put(Gamemode.Allenamento.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalataClasses, scalataRobots, scalataDifficulties)
                 -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Allenamento.toString()));
-        gameRegistry.put(Gamemode.Scalata.toString(),(sm, playerId, underTestClassName,type_robot, difficulty, mode, scalataClasses, scalataRobots, scalataDifficulties)
-                -> new ScalataGame(sm, playerId, underTestClassName, scalataClasses.get(), scalataRobots.get(), scalataDifficulties.get(), Gamemode.Scalata.toString()));
+        gameRegistry.put(Gamemode.Scalata.toString(),(sm, playerId, underTestClassName,type_robot, difficulty, mode, scalata_name, scalataClasses, scalataRobots, scalataDifficulties)
+                -> new ScalataGame(sm, playerId, underTestClassName, scalata_name.get(),scalataClasses.get(), scalataRobots.get(), scalataDifficulties.get(), Gamemode.Scalata.toString()));
 
         // Aggiungi altri giochi qui
     }
@@ -209,7 +210,6 @@ public class GameController {
         }
     }
 
-
     /*
      *  Chiamata che l'editor fa appena instanzia un nuovo gioco, controllo se la partita quindi esisteva già o meno
      *  
@@ -220,8 +220,8 @@ public class GameController {
             @RequestParam String difficulty,
             @RequestParam String mode,
             @RequestParam String underTestClassName,
-            //@RequestParam Optional<Integer> scalata_id,
-            //@RequestParam Optional<String> scalata_name,
+            //parametri scalata
+            @RequestParam Optional<String> scalata_name,
             @RequestParam Optional<List<String>> scalata_classes,
             @RequestParam Optional<List<String>> scalata_robots,
             @RequestParam Optional<List<String>> scalata_difficulties
@@ -241,8 +241,9 @@ public class GameController {
                     ScalataGame.processScalataParameters(scalata_classes.get(), scalata_robots.get(), scalata_difficulties.get());
                     System.out.println(scalata_classes.get().get(0) +", "+ scalata_classes.get().get(1));
                 } 
-                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode,scalata_classes,scalata_robots,scalata_difficulties);
-                //gameLogic.CreateGame();
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalata_classes,scalata_robots,scalata_difficulties);
+
+                if (!mode.equals("Allenamento"))gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");
                 return ResponseEntity.ok().build();
@@ -264,7 +265,7 @@ public class GameController {
                 errorCode = "1";
                 //Rimuovo il vecchio game e ne creo uno nuovo 
                 activeGames.remove(playerId);
-                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode,scalata_classes,scalata_robots,scalata_difficulties);
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode,scalata_name,scalata_classes,scalata_robots,scalata_difficulties);
                 activeGames.put(playerId, gameLogic);
             }
             //Setto messaggio d'errore e codice di conseguenza 

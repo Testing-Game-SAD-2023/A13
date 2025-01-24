@@ -17,6 +17,9 @@
 
 package com.g2.Game;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,16 +36,19 @@ public class ScalataGame extends GameLogic {
 
     private ScalataGamestatus currentStatus;
     private final List<Sfida> games;
+    private int id_scalata;
+    private String scalata_name;
     private int currentRound;       //usata per contare il progresso della scalata
     private int currentRoundIndex;  //indice usato per la lettura della lista interna
 
-    public ScalataGame(ServiceManager serviceManager, String playerID, String classeUT,
+    public ScalataGame(ServiceManager serviceManager, String playerID, String scalata_name, String classeUT,
                        List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
         super(serviceManager, playerID, classeUT, typesRobot.get(0), difficulties.get(0), mode); 
         this.games = new ArrayList<>();
         this.currentRound = 1; // Inizia dal round 1
         this.currentRoundIndex = 0;
         this.currentStatus = ScalataGamestatus.IN_PROGRESS;
+        this.scalata_name = scalata_name;
 
         for (int i = 0; i < classes.size(); i++) {
             String classe = classes.get(i);
@@ -56,12 +62,15 @@ public class ScalataGame extends GameLogic {
     //con isGameEnd ci si riferisce al termine del round all'interno di una scalata, e non alla scalata stessa.
     public void playTurn(int userScore, int robotScore, boolean isGameEnd) {
 
+        String now = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         if (currentRoundIndex < games.size()) {
             Sfida currentGame = games.get(currentRoundIndex);
             currentGame.playTurn(userScore, robotScore,isGameEnd);
             
             // Verifica se il gioco corrente è finito. Per gioco s'intende il round della scalata
             if (currentGame.isGameEnd() && userScore >= robotScore) {
+                currentGame.EndGame(now, robotScore, true);
+                currentGame.EndRound(now);
                 System.out.println("[SCALATAGAME][T5] Round " + currentRound + " completed.");
                     currentRoundIndex++; // Passa al gioco successivo
                     currentRound++;
@@ -70,15 +79,30 @@ public class ScalataGame extends GameLogic {
                     if(isGameEnd()){
                         System.out.println("[SCALATAGAME][T5] Scalata  completed.");
                         currentStatus = ScalataGamestatus.WIN;
+
+                        this.CloseScalata(getPlayerID(), id_scalata, getRoundID(), true, userScore);
+                    }
+                    else{
+                        games.get(currentRoundIndex).CreateGame();
                     }
 
             }
             else if (currentGame.isGameEnd() && userScore< robotScore) {
+                currentGame.EndGame(now, robotScore, false);
+                currentGame.EndRound(now);
+                currentGame.EndTurn(getTurnID(), now, userScore);
+
                 System.out.println("[SCALATAGAME][T5] Round " + currentRound + " lost.");
                 currentStatus = ScalataGamestatus.LOST;
+
+                //gestione scalata persa
+                this.CloseScalata(getPlayerID(), id_scalata, getRoundID(), false, 0);
+
             }
             else {
+                currentGame.CreateTurn(now, userScore);
                 System.out.println("[SCALATAGAME][T5] Compilation command detected.");
+                
             }
             
         } else {
@@ -104,8 +128,6 @@ public class ScalataGame extends GameLogic {
         return totalScore;
     }
 
-
-
     @Override
     public String getClasseUT(){
         return games.get(currentRoundIndex).getClasseUT();
@@ -120,10 +142,61 @@ public class ScalataGame extends GameLogic {
     }
     // Altri metodi necessari per gestire la logica del gioco
 
+    @Override
+    protected void CreateGame(){
+        createScalata(getPlayerID(),this.scalata_name);
+        games.get(currentRoundIndex).CreateGame();
+    }
+
     //funzione per ottenere lo stato interno della scalata
     public ScalataGamestatus getStatus(){
         return currentStatus;
     }
+
+
+    //Chiamate a T4
+
+    public void createScalata(String player_id, String scalata_name){
+        String creationDate = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String creationTime = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+        String id_scalata = (String)serviceManager.handleRequest(
+            "T4", 
+            "CreateScalata",
+             player_id,
+             scalata_name,
+             creationTime,
+             creationDate);
+        this.id_scalata = Integer.valueOf(id_scalata);
+        //System.out.println(id_scalata);
+    }
+
+    public void updateScalata(String player_id, int scalata_id, int round_id){
+        String updateTime = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+        String response = (String)serviceManager.handleRequest(
+            "T4",
+            "UpdateScalata",
+            player_id,
+            scalata_id,
+            round_id,
+            updateTime
+            );
+        //System.out.println(response);
+    }
+    public void CloseScalata(String player_id, int scalata_id, int round_id, boolean is_win, int final_score){
+        String closeTime = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+        String response = (String)serviceManager.handleRequest(
+            "T4",
+            "CloseScalata",
+            player_id,
+            scalata_id,
+            round_id,
+            is_win,
+            final_score,
+            closeTime
+            );
+        //System.out.println(response);
+    }
+
 
 
 //funzione statica per processare i parametri sotto forma di JSON array che vengono passati come parametro nella chiamata

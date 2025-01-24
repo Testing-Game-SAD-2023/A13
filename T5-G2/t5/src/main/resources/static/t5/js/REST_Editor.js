@@ -22,6 +22,7 @@
 function getGameData() {
     let modalita = localStorage.getItem("modalita");
     is_scalata_inprogress = (parseInt(localStorage.getItem("scalata_score"),10) > 0) ? true : false;
+    console.log(is_scalata_inprogress);
     if(modalita == "Scalata" && !is_scalata_inprogress){
         handleScalataParameters();
         return {
@@ -33,10 +34,18 @@ function getGameData() {
             scalata_classes:        localStorage.getItem("scalata_classes"),
             scalata_robots:         localStorage.getItem("scalata_robots"),
             scalata_difficulties:   localStorage.getItem("scalata_difficulties"),
+            scalata_name:           localStorage.getItem("scalata_name")
         }
     }
     else if(modalita === "Scalata" && is_scalata_inprogress){
         handleScalataParameters();
+        return {
+            playerId: 			String(parseJwt(getCookie("jwt")).userId),
+            type_robot: 		localStorage.getItem("robot"),
+            difficulty: 		localStorage.getItem("difficulty"),
+            mode: 				localStorage.getItem("modalita"),
+            underTestClassName: localStorage.getItem("underTestClassName"),
+        };
     }
     else{
         let underTestClassName = localStorage.getItem("underTestClassName");
@@ -78,13 +87,14 @@ async function runGameAction(url, formData, isGameEnd) {
 // Documento pronto
 $(document).ready(function () {
     const data = getGameData();
-    startGame(data);
+    if(is_scalata_inprogress == false)startGame(data);
     if (data.mode === "Allenamento") {
         document.getElementById("runButton").disabled = true;
         console.log("Sei in allenamento");
     }
     const savedContent = localStorage.getItem('codeMirrorContent');
 	if (!savedContent) {
+        console.log("TEST UNDERTESTCLASSNAME: " + localStorage.getItem("underTestClassName"));
         //non ho salvato il contenuto dell'editor, quindi lo scarico e imposto il template con i dati dell'utente
         let formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
         let replacements  = {

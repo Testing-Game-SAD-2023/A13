@@ -147,7 +147,9 @@ function pressedSubmit() {
             if (confirm_choice) {
                 // Confirmed. Handle the POST request
                 console.log("Confirmed choice.");
-                $.ajax({
+                retrieveScalata(selectedScalata);
+                window.location.href = "editor?ClassUT="+localStorage.getItem("ClassUT");
+/*                 $.ajax({
                     url: '/api/save-scalata',
                     type: 'POST',
                     data: {
@@ -186,7 +188,7 @@ function pressedSubmit() {
                     error: function(error) {
                         console.log(error);
                     }
-                });
+                }); */
             }
             else {
                 swal("Errore!", "Si è verificato un errore imprevisto", "error");//Do nothing
@@ -219,6 +221,10 @@ async function retrieveScalata(scalata) {
                 localStorage.setItem("underTestClassName", classNames[0]);
                 localStorage.setItem("difficulty", getDifficulty(data[0].selectedClasses[0].difficulty));
                 localStorage.setItem("robot", data[0].selectedClasses[0].robot);
+                localStorage.setItem("current_round_scalata", 1);
+                localStorage.setItem("scalata_score", 0);
+                localStorage.setItem("modalita", "Scalata");
+                localStorage.setItem("scalata_name", selectedScalata);
                 
                 console.log(classNames[0]);
                 console.log(getDifficulty(data[0].selectedClasses[0].difficulty));
