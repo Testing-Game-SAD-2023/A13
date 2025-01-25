@@ -4,12 +4,24 @@ services:
   app:
     build: .
     restart: always
-    expose:
-      - 8080
+    #expose:
+    ports:
+      - 8001:8080
     networks:
       - global-network
     volumes:
       - /logs:/logs  # Monta la directory dei log sul tuo host
+    depends_on:
+      - t5_mongo
+  
+  t5_mongo:
+    image: mongo
+    container_name: t5_mongo
+    restart: always
+    ports:
+      - 27017
+    networks:
+      - global-network
 
 networks:
   global-network:

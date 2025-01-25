@@ -240,7 +240,7 @@ public abstract class BaseService implements ServiceInterface {
         ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
         return response.getBody();
     });
-}
+    }
 
     // metodo per chiamare PUT con content type a application/json
     protected <R> R callRestPut(String endpoint, JSONObject jsonObject, 

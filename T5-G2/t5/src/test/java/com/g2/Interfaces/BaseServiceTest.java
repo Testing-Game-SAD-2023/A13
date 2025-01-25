@@ -57,9 +57,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.g2.T5Application;
 import com.g2.Interfaces.ServiceActionDefinition.InvalidParameterTypeException;
 import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
-import com.g2.t5.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
 public class BaseServiceTest {

@@ -20,7 +20,7 @@ package com.g2.Game;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
+import org.json.*;
 import com.g2.Interfaces.ServiceManager;
 
 public abstract class GameLogic {
@@ -73,9 +73,13 @@ public abstract class GameLogic {
 
     protected void CreateTurn(String Time, int userScore) {
         //Apro un nuovo turno
-        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        String response = (String)serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        System.out.println("Response from t4 on createturn: " + response);
+        JSONArray json = new JSONArray(response);
+        int id = json.getJSONObject(0).getInt("id");
+        this.TurnID = ""+id ;
         //Chiudo il turno 
-        serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
+        serviceManager.handleRequest("T4", "EndTurn", ""+userScore, Time, id);
     }
 
     protected void EndRound(String Time) {

@@ -43,9 +43,17 @@ public class Sfida extends GameLogic {
     public void playTurn(int userScore, int robotScore) {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         currentTurn++;
-        //CreateTurn(Time, userScore);
+        CreateTurn(Time, userScore);
         System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
     }
+
+    // B12-giulio: Codice aggiunto per finalizzare la sedimentazione della partita
+    @Override
+    protected void EndGame(String Time, int Score, Boolean isWinner){
+        super.EndRound(Time);
+        super.EndGame(Time, Score, isWinner);
+    }
+    
 
     @Override
     public Boolean isGameEnd() {

@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.t5.T5Application;
+import com.g2.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
 class ServiceLogicComponentTest {

@@ -36,7 +36,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.t5.T5Application;
+import com.g2.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
 public class T4ServiceTest {

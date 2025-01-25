@@ -170,14 +170,13 @@ public class T4Service extends BaseService {
         return jsonObject.getInt("id");
     }
 
+    //B12-giulio: QUESTO CODICE NON AVEVA SENSO, ERA STATO SCRITTO CON CHATGPT???
+    //            ora manda, come giusto che sia, i parametri con json nel body 
     private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner) {
         final String endpoint = "/games/" + String.valueOf(gameid);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("closedAt", closedAt);
-        formData.add("username", username);
-        formData.add("score", Integer.toString(Score));
-        formData.add("isWinner", isWinner ? "true" : "false");
-        String respose = callRestPost(endpoint, formData, null, String.class);
+        JSONObject obj = new JSONObject();
+        obj.put("closedAt", closedAt);
+        String respose = callRestPut(endpoint, obj,  null ,null, String.class);
         return respose;
     }
 
@@ -194,16 +193,21 @@ public class T4Service extends BaseService {
         return jsonObject.getInt("id");
     }
 
+    //B12-giulio: QUESTO CODICE NON AVEVA SENSO, ERA STATO SCRITTO CON CHATGPT???
+    //            ora manda, come giusto che sia, i parametri con json nel body 
     private String EndRound(String Time, int roundId) {
         // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
         // costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("closedAt", Time);
-        String response = callRestPut(endpoint, formData, null, String.class);
+        JSONObject obj = new JSONObject();
+        obj.put("closedAt", Time);
+        String response = callRestPut(endpoint, obj, null, null, String.class);
         return response;
     }
 
+
+    //B12-giulio: QUESTO CODICE NON AVEVA SENSO, ERA STATO SCRITTO CON CHATGPT???
+    //            ora manda, come giusto che sia, i parametri con json nel body 
     private String CreateTurn(String Player_id, int Round_id, String Time) {
         final String endpoint = "/turns";
         JSONObject obj = new JSONObject();
@@ -220,10 +224,10 @@ public class T4Service extends BaseService {
         // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
         // costruito a mano
         final String endpoint = "turns/" + String.valueOf(turnId);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("scores", user_score);
-        formData.add("closedAt", Time);
-        String response = callRestPut(endpoint, formData, null, String.class);
+        JSONObject obj = new JSONObject();
+        obj.put("scores", user_score);
+        obj.put("closedAt", Time);
+        String response = callRestPut(endpoint, obj, null, null, String.class);
         return response;
     }
 

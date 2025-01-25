@@ -35,10 +35,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+
+import com.g2.T5Application;
 import com.g2.Interfaces.ServiceActionDefinition.InvalidParameterTypeException;
 import com.g2.Interfaces.ServiceActionDefinition.MissingParametersException;
 import com.g2.Model.ClassUT;
-import com.g2.t5.T5Application;
+
 import static org.springframework.test.web.client.ExpectedCount.once;
 
 

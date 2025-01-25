@@ -15,13 +15,16 @@
  *   limitations under the License.
  */
 
-package com.g2.t5;
+package com.g2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-@SpringBootApplication(scanBasePackages = {"com.g2.factory", "com.g2.Interfaces", "com.g2.Game", "com.g2.t5", "com.g2.Service"})
+import com.g2.Exercises.ExerciseRepository;
+import com.g2.Exercises.GoalRepository;
+
+@SpringBootApplication(scanBasePackages = {"com.g2.factory", "com.g2.Interfaces", "com.g2.Game", "com.g2.t5", "com.g2.Service", "com.g2.Exercises"})
 public class T5Application {
 
     public static void main(String[] args) {
@@ -32,6 +35,17 @@ public class T5Application {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+    @Bean
+    public GoalRepository goalRepository(){
+        return new GoalRepository();
+    }
+
+    @Bean
+    public ExerciseRepository exerciseRepository(){
+        return new ExerciseRepository();
+    }
+
 
 }
 

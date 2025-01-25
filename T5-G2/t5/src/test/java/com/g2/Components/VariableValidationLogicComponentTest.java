@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.g2.t5.T5Application;
+import com.g2.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
 public class VariableValidationLogicComponentTest {

@@ -16,6 +16,9 @@
  */
 package com.g2.Game;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -120,6 +123,7 @@ public class GameController {
             Map<String, String> return_data = new HashMap<>();
             return_data.put("coverage", xml_string);
             return_data.put("outCompile", outCompile);
+            return_data.put("uut",underTestClassNameNoJava); //B12-giulio aggiunto nome classe uut per calcolo goal
             return return_data;
         } catch (JSONException e) {
             logger.error("[GAMECONTROLLER] GetUserData: Errore nella lettura del JSON", e);
@@ -216,8 +220,9 @@ public class GameController {
             GameLogic gameLogic = activeGames.get(playerId);
             if (gameLogic == null) {
                 //Creo la nuova partita 
+                logger.info("B12-giulio: Creata partita!");
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode);
-                //gameLogic.CreateGame();
+                gameLogic.CreateGame(); //B12-giulio: scommentato
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");
                 return ResponseEntity.ok().build();
@@ -330,7 +335,16 @@ public class GameController {
             // Controllo fine partita
             if (isGameEnd || gameLogic.isGameEnd()) {
                 activeGames.remove(playerId);
-                logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
+
+                //B12-giulio: put achievements calcs here
+
+
+                gameLogic.EndGame(//B12-giulio: metodo aggiunto per la sedimentazione in t4
+                    ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),
+                    userScore,
+                    userScore>robotScore                    
+                );
+                logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true ; B12-giulio: Partita terminata e salvata!");
                 return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");

@@ -38,8 +38,9 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g2.T5Application;
 import com.g2.Model.User;
-import com.g2.t5.T5Application;
+
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 
 @SpringBootTest(classes = T5Application.class)

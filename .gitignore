@@ -33,3 +33,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### logs ###
+*.log
+
+### vscode ###
+**/.vscode

@@ -27,7 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.t5.T5Application;
+import com.g2.T5Application;
 
 @SpringBootTest(classes = T5Application.class)
 @ActiveProfiles("test")

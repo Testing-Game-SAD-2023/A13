@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
  import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.t5.T5Application;
+import com.g2.T5Application;
  
  @SpringBootTest(classes = T5Application.class)
  @ExtendWith(MockitoExtension.class)
