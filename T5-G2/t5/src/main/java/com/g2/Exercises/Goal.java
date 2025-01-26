@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.g2.Exercises.Goals.ClassScoreGoal;
+import com.g2.Exercises.Goals.SomeotherGoal;
 import com.g2.Game.GameLogic;
 
 import org.springframework.data.annotation.Id;
@@ -68,6 +69,9 @@ public abstract class Goal{
         switch (type) {
             case 1:
                 retval = mapper.readValue(obj, ClassScoreGoal.class);
+                break;
+            case 10000:
+                retval = mapper.readValue(obj, SomeotherGoal.class);
                 break;
             default:
                 throw new IllegalArgumentException("Type not recognized");
