@@ -23,14 +23,24 @@ public class ExerciseRepository {
 
     }
 
-    public Exercise find(String exerciseId){
+    public Exercise findById(String exerciseId){
         return mongo.findById(
             exerciseId,
             Exercise.class
         );
     }
 
-    public String insert(Exercise exercise){
-        return mongo.insert(exercise).id;
+    public Exercise insert(Exercise exercise){
+        return mongo.insert(exercise);
+    }
+
+    public void remove(Exercise exercise) throws Exception {
+        if(mongo.remove(exercise).getDeletedCount() != 1){
+            throw new Exception("Could not delete");
+        }
+    }
+
+    public Exercise updateExercise(Exercise exercise) {
+        return mongo.save(exercise);
     }
 }

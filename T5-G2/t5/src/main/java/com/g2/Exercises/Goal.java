@@ -75,4 +75,23 @@ public abstract class Goal{
         return retval;
     }
 
+        //quando un goal non è ancora sedimentato (= non ha un id)
+    //due goal dello stesso tipo, dello stesso esercizio, dello stesso giocatore
+    //dovrebbero essere lo stesso goal, a meno di casi limite
+    /*
+    @Override
+    public int hashCode(){
+        return Objects.hash(type,assignmentId,playerId);
+    }
+    @Override
+    public boolean equals(Object otherGoal){
+        if(this == otherGoal) return true;
+        if(otherGoal instanceof Goal) return false;
+        Goal other = (Goal) otherGoal;
+        if(id != null && other.getId() != null) return id == other.getId();
+        //si potrebbe decidere se tipo, playerId e assignmentId definiscono univocamente un goal
+        return false;
+    }
+*/
+
 }
