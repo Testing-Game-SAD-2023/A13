@@ -128,7 +128,7 @@ function tippy_configuration(button, item) {
         animation: 'scale-extreme',
         theme: 'translucent'
         });
-}
+}     
 
 function pressedSubmit() {
     // Get the 'Submit' button
@@ -147,7 +147,7 @@ function pressedSubmit() {
             if (confirm_choice) {
                 // Confirmed. Handle the POST request
                 console.log("Confirmed choice.");
-                retrieveScalata(selectedScalata);
+                retrieveScalata(selectedScalata); 
                 window.location.href = "editor?ClassUT="+localStorage.getItem("ClassUT");
 /*                 $.ajax({
                     url: '/api/save-scalata',
@@ -188,7 +188,7 @@ function pressedSubmit() {
                     error: function(error) {
                         console.log(error);
                     }
-                }); */
+                });*/
             }
             else {
                 swal("Errore!", "Si è verificato un errore imprevisto", "error");//Do nothing
@@ -208,7 +208,6 @@ async function retrieveScalata(scalata) {
                 const classNames = data[0].selectedClasses.map(cls => cls.className);
                 const robots = data[0].selectedClasses.map(rbt => rbt.robot);
                 const difficulties = data[0].selectedClasses.map(dft => dft.difficulty)
-
 
                 // Salvare le informazioni necessarie in localStorage
                 localStorage.setItem("SelectedScalata", scalata);

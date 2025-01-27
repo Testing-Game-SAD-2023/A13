@@ -23,7 +23,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
 
 public class ScalataGame extends GameLogic {
@@ -80,7 +79,7 @@ public class ScalataGame extends GameLogic {
                         System.out.println("[SCALATAGAME][T5] Scalata  completed.");
                         currentStatus = ScalataGamestatus.WIN;
 
-                        this.CloseScalata(getPlayerID(), id_scalata, getRoundID(), true, userScore);
+                        this.CloseScalata(id_scalata, getRoundID(), true, userScore);
                     }
                     else{
                         games.get(currentRoundIndex).CreateGame();
@@ -96,7 +95,7 @@ public class ScalataGame extends GameLogic {
                 currentStatus = ScalataGamestatus.LOST;
 
                 //gestione scalata persa
-                this.CloseScalata(getPlayerID(), id_scalata, getRoundID(), false, 0);
+                this.CloseScalata(id_scalata, getRoundID(), false, 0);
 
             }
             else {
@@ -159,42 +158,40 @@ public class ScalataGame extends GameLogic {
     public void createScalata(String player_id, String scalata_name){
         String creationDate = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE);
         String creationTime = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        String id_scalata = (String)serviceManager.handleRequest(
+        String id_scalata_string = (String)serviceManager.handleRequest(
             "T4", 
             "CreateScalata",
              player_id,
              scalata_name,
              creationTime,
              creationDate);
-        this.id_scalata = Integer.valueOf(id_scalata);
-        //System.out.println(id_scalata);
+        this.id_scalata = Integer.parseInt(id_scalata_string);
+        System.out.println("scalata with ID: " + this.id_scalata);
     }
 
-    public void updateScalata(String player_id, int scalata_id, int round_id){
+    public void updateScalata(int scalata_id, int round_id){
         String updateTime = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         String response = (String)serviceManager.handleRequest(
             "T4",
             "UpdateScalata",
-            player_id,
             scalata_id,
             round_id,
             updateTime
             );
         //System.out.println(response);
     }
-    public void CloseScalata(String player_id, int scalata_id, int round_id, boolean is_win, int final_score){
+    public void CloseScalata(int scalata_id, int round_id, boolean is_win, int final_score){
         String closeTime = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         String response = (String)serviceManager.handleRequest(
             "T4",
             "CloseScalata",
-            player_id,
             scalata_id,
             round_id,
             is_win,
             final_score,
             closeTime
             );
-        //System.out.println(response);
+        System.out.println(response);
     }
 
 
@@ -233,5 +230,26 @@ public class ScalataGame extends GameLogic {
             }
         }
         
+    }
+
+    //27GEN AGGIUNTE PER IL GAMECONTROLLER
+    public int getId_scalata() {
+        return this.id_scalata;
+    }
+
+    public void setId_scalata(int id_scalata) {
+        this.id_scalata = id_scalata;
+    }
+
+    public int getCurrentRoundID() {
+        return this.games.get(currentRoundIndex).getRoundID();
+    }
+
+    public int getCurrentGameID(){
+        return this.games.get(currentRoundIndex).getGameID();
+    }
+
+    public String getCurrentTurnID(){
+        return this.games.get(currentRoundIndex).getTurnID();
     }
 }

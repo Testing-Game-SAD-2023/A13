@@ -47,9 +47,6 @@ import com.g2.Game.ScalataGame.ScalataGamestatus;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Service.AchievementService;
 
-import com.g2.Model.ScalataGiocata;
-import com.g2.Model.Game;
-
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
 @CrossOrigin
 @RestController
@@ -225,8 +222,7 @@ public class GameController {
             @RequestParam Optional<List<String>> scalata_classes,
             @RequestParam Optional<List<String>> scalata_robots,
             @RequestParam Optional<List<String>> scalata_difficulties
-            ) {
-        logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");   
+            ) {  
         try {
             GameFactoryFunction gameConstructor = gameRegistry.get(mode);
             if (gameConstructor == null) {
@@ -246,7 +242,20 @@ public class GameController {
                 if (!mode.equals("Allenamento"))gameLogic.CreateGame();
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");
-                return ResponseEntity.ok().build();
+                //27GEN MODIFICHE: SE è SCALATA RITORNIAMO I DATI CHE SERVONO AD UTILEDITOR
+                if(mode.equals("Sfida")) {
+                    return ResponseEntity.ok().build();
+                }
+                else if (mode.equals("Scalata")){
+                    System.out.println("Entro in scalata di game controller");
+                    JSONObject obj = new JSONObject();
+                    obj.put("roundID", ((ScalataGame) gameLogic).getCurrentRoundID());
+                    obj.put("gameID", ((ScalataGame) gameLogic).getCurrentGameID());
+                    obj.put("turnID", ((ScalataGame) gameLogic).getCurrentTurnID());
+                    obj.put("scalataID", ((ScalataGame) gameLogic).getId_scalata());
+                    System.out.println(obj.toString());
+                    return ResponseEntity.ok(obj.toString());
+                }
             }
             // Ottieni la modalità della partita trovata
             String currentMode = gameLogic.getClass().getSimpleName();

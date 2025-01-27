@@ -1,24 +1,25 @@
 package round
 
 import (
+	"fmt"
 	"strconv"
 	"time"
-	"github.com/alarmfox/game-repository/model"
+
 	"github.com/alarmfox/game-repository/api/robot"
-	"fmt"
+	"github.com/alarmfox/game-repository/model"
 )
 
 type Round struct {
-	ID          int64      `json:"id"`
-	Order       int        `json:"order"`
-	TestClassId string     `json:"testClassId"`
-	GameID      int64      `json:"gameId"`
-	RobotID     int64      `json:"robotId"`
-	Robot       robot.Robot      `json:"robot"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
-	StartedAt   *time.Time `json:"startedAt"`
-	ClosedAt    *time.Time `json:"closedAt"`
+	ID          int64       `json:"id"`
+	Order       int         `json:"order"`
+	TestClassId string      `json:"testClassId"`
+	GameID      int64       `json:"gameId"`
+	RobotID     int64       `json:"robotId"`
+	Robot       robot.Robot `json:"robot"`
+	CreatedAt   time.Time   `json:"createdAt"`
+	UpdatedAt   time.Time   `json:"updatedAt"`
+	StartedAt   *time.Time  `json:"startedAt"`
+	ClosedAt    *time.Time  `json:"closedAt"`
 }
 
 type CreateRequest struct {
@@ -30,10 +31,10 @@ type CreateRequest struct {
 }
 
 func (r CreateRequest) Validate() error {
-    if r.RobotID == 0 {
-        return fmt.Errorf("robotId is required")
-    }
-    return nil
+	if r.RobotID == 0 {
+		return fmt.Errorf("robotId is required")
+	}
+	return nil
 }
 
 type UpdateRequest struct {

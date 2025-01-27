@@ -80,8 +80,8 @@ public class T4Service extends BaseService {
                 String.class, Integer.class, String.class));
 
         registerAction("EndTurn", new ServiceActionDefinition(
-                params -> EndTurn((String) params[0], (String) params[1], (int) params[2]),
-                String.class, String.class, Integer.class));
+                params -> EndTurn((int) params[0], (String) params[1], (String) params[2]),
+                Integer.class, String.class, String.class));
 
         registerAction("CreateScalata", new ServiceActionDefinition(
                 params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]),
@@ -96,11 +96,11 @@ public class T4Service extends BaseService {
             String.class, String.class, String.class));
         //vengono registrate le azioni per l'increamento del round di una scalata e della sua chiusura
         registerAction("UpdateScalata", new ServiceActionDefinition(
-                params -> UpdateScalata((String) params[0], (int) params[1], (int) params[2], (String)params[3]),
-                String.class, Integer.class, Integer.class, String.class));
+                params -> UpdateScalata((int) params[0], (int) params[1], (String)params[2]),
+                Integer.class, Integer.class, String.class));
         registerAction("CloseScalata", new ServiceActionDefinition(
-                    params -> CloseScalata((String) params[0],(int) params[1], (int) params[2], (boolean) params[3], (int) params[4], (String) params[5]),
-                    String.class, Integer.class, Integer.class,Boolean.class, Integer.class, String.class));
+                    params -> CloseScalata((int) params[0], (int) params[1], (boolean) params[2], (int) params[3], (String) params[4]),
+                    Integer.class, Integer.class,Boolean.class, Integer.class, String.class));
         
     }
 
@@ -163,7 +163,9 @@ public class T4Service extends BaseService {
         return response;
     }
 
+    //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
     private int CreateGame(String Time, String difficulty, String name, String description, String id) {
+        System.out.println("CREATE GAME - T4 SERVICE");
         final String endpoint = "/games";
         JSONObject obj = new JSONObject();
         obj.put("difficulty", difficulty);
@@ -173,26 +175,32 @@ public class T4Service extends BaseService {
         JSONArray playersArray = new JSONArray();
         playersArray.put(String.valueOf(id));
         obj.put("players", playersArray);
-        // Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio
-        // parse per avere l'id
+        System.out.println("Dati inviati a /games: " + obj); 
+        // Questa chiamata in risposta dà anche i valori che hai fornito, quindi faccio parse per avere l'id
         String respose = callRestPost(endpoint, obj, null, null, String.class);
+        System.out.println("Dati inviati a /games: " + respose); 
         // Parsing della stringa JSON
         JSONObject jsonObject = new JSONObject(respose);
         // Estrazione del valore di id
         return jsonObject.getInt("id");
     }
 
+    //FLAVIO 26GEN: ISWINNER PASSATO COME BOOLEANO E USIAMO CALLRESTPUT
     private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner) {
         final String endpoint = "/games/" + String.valueOf(gameid);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("closedAt", closedAt);
-        formData.add("username", username);
-        formData.add("score", Integer.toString(Score));
-        formData.add("isWinner", isWinner ? "true" : "false");
-        String respose = callRestPost(endpoint, formData, null, String.class);
+        JSONObject obj = new JSONObject();
+        obj.put("closedAt", closedAt);
+        obj.put("username", username);
+        obj.put("score", Score);
+        obj.put("isWinner", isWinner);
+        System.out.println("OBJ ENDGAME: " + obj);
+        String respose = callRestPut(endpoint, obj, null, String.class);
+        System.out.println("Dati inviati a /games: " + respose); 
         return respose;
     }
-//aggiunta dell'ID del robot
+
+    //aggiunta dell'ID del robot
+    //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
     private int CreateRound(int game_id, String ClasseUT, String Time, int robot_id) {
         final String endpoint = "/rounds";
         JSONObject obj = new JSONObject();
@@ -203,20 +211,24 @@ public class T4Service extends BaseService {
         String respose = callRestPost(endpoint, obj, null, null, String.class);
         // Parsing della stringa JSON
         JSONObject jsonObject = new JSONObject(respose);
+        System.out.println("Dati inviati a /rounds: " + jsonObject); 
         // Estrazione del valore di id
         return jsonObject.getInt("id");
     }
 
+    //26GEN FLAVIO: modifiche json invece di formdata
     private String EndRound(String Time, int roundId) {
-        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
-        // costruito a mano
+        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("closedAt", Time);
-        String response = callRestPut(endpoint, formData, null, String.class);
+        //MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        //formData.add("closedAt", Time);
+        JSONObject obj = new JSONObject();
+        obj.put("closedAt", Time);
+        String response = callRestPut(endpoint, obj, null, String.class);
         return response;
-    }
+    } 
 
+    //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
     private String CreateTurn(String Player_id, int Round_id, String Time) {
         final String endpoint = "/turns";
         JSONObject obj = new JSONObject();
@@ -225,66 +237,103 @@ public class T4Service extends BaseService {
         obj.put("players", playersArray);
         obj.put("roundId", Round_id);
         obj.put("startedAt", Time);
-        String respose = callRestPost(endpoint, obj, null, null, String.class);
-        return respose;
+    
+        try {
+            String response = callRestPost(endpoint, obj, null, null, String.class);
+            System.out.println("Risposta ricevuta da /turns: " + response);
+    
+            //SALVATAGGIO IN DATABASE COME LISTA QUINDI CALCOLARE ANCHE LE QUADRE
+            if (response.trim().startsWith("[")) {
+                JSONArray jsonArray = new JSONArray(response);
+                if (jsonArray.length() > 0) {
+                    JSONObject lastObject = jsonArray.getJSONObject(jsonArray.length() - 1); // Ultimo elemento
+                    return lastObject.get("id").toString();
+                } else {
+                    throw new IllegalStateException("La lista dei turni è vuota.");
+                }
+            } else {
+                JSONObject jsonObject = new JSONObject(response);
+                return jsonObject.get("id").toString();
+            }
+        } catch (Exception e) {
+            System.err.println("Errore durante la chiamata /turns: " + e.getMessage());
+            throw e;
+        }
     }
 
-    private String EndTurn(String user_score, String Time, int turnId) {
-        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
-        // costruito a mano
-        final String endpoint = "turns/" + String.valueOf(turnId);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("scores", user_score);
-        formData.add("closedAt", Time);
-        String response = callRestPut(endpoint, formData, null, String.class);
+    //FLAVIO 26GEN: modificata in versione json
+    private String EndTurn(int user_score, String Time, String turnId) {
+        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
+        final String endpoint = "turns/" + turnId;
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("scores", String.valueOf(user_score));
+        jsonBody.put("closedAt", Time);
+        System.out.println("JSON ENDTURN: " + jsonBody);
+        String response = callRestPut(endpoint, jsonBody, null, String.class);
+        System.out.println("Dati di endturn inviati a /turns: " + response);
         return response;
     }
 
     //Servizio API per recuperare l'ID del robot
+    //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTGET DATI NEL FORMATO GIUSTO
 private int GetRobotID(String classUT, String robot_type, String difficulty){
     final String endpoint = "/robots";
     Map<String, String> formData = new HashMap<>();
     formData.put("testClassID", classUT);
     formData.put("type", robot_type);
     formData.put("difficulty", difficulty);
-    int response = callRestGET(endpoint, formData, Integer.class);
-    return response;
-    
+    System.out.println("FORMDATA GETROBOTID: " + formData); 
+    Map<String, Object> response = callRestGET(endpoint, formData, Map.class);
+    int robotId = (int) response.get("id"); // Estrai il valore numerico
+    System.out.println("Dati inviati a /robots: " + robotId);
+    return robotId;
 }
 
     //SERVIZI SCALATA
-
-    // Questa chiamata non è documentata nel materiale di caterina
+    //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
     private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date) {
         final String endpoint = "/scalates";
         JSONObject obj = new JSONObject();
-        obj.put("playerID", player_id);
+        obj.put("playerID", Integer.parseInt(player_id));
         obj.put("scalataName", scalata_name);
         obj.put("creationTime", creation_Time);
         obj.put("creationDate", creation_date);
-        
-        //lascio un attimo a string ma serve int
+        System.out.println("Dati inviati a /scalates: " + obj);
+        //SIMONE: lascio un attimo a string ma serve int (?)
         String respose = callRestPost(endpoint, obj, null, null, String.class);
-        return respose;
+        // Parsing della stringa JSON
+        JSONObject jsonObject = new JSONObject(respose);
+        System.out.println("Dati inviati da createscalata a /scalates: " + jsonObject); 
+        //Estrazione del valore di id
+        System.out.println("ID DI CREA SCALATA" + jsonObject.get("id").toString());
+        return jsonObject.get("id").toString();
     }
-    private String UpdateScalata(String player_id, int scalata_id, int round_id, String update_date){
-        final String endpoint = "/scalates"+String.valueOf(scalata_id);
+
+    //27GEN MODIFICHE
+    private String UpdateScalata(int scalata_id, int round_id, String update_date){
+        final String endpoint = "/scalates/" + String.valueOf(scalata_id);
         JSONObject obj = new JSONObject();
         obj.put("CurrentRound", round_id);
+        obj.put("updateDate", update_date);
     
-        String response = callRestPut(endpoint, obj, null, null, String.class);
+        String response = callRestPut(endpoint, obj, null, String.class);
         return response;
     }
-    private String CloseScalata(String player_id, int scalata_id, int round_id, boolean is_win, int final_score, String close_time){
-        final String endpoint = "/scalates"+String.valueOf(scalata_id);
+
+    private String CloseScalata(int scalata_id, int round_id, boolean is_win, int final_score, String close_time){
+        System.out.println("Valore di scalataid in T4 service closescalata: " + scalata_id);
+        final String endpoint = "/scalates/" + String.valueOf(scalata_id);
+        System.out.println(endpoint);
         JSONObject obj = new JSONObject();
         obj.put("CurrentRound", round_id);
         obj.put("isFinished", is_win);
         obj.put("FinalScore", final_score);
         obj.put("ClosedAt", close_time);
-        String response = callRestPut(endpoint, obj, null, null, String.class);
+        System.out.println("Dati inviati da closescalata a /scalates: " + obj);
+        String response = callRestPut(endpoint, obj, null, String.class);
+        System.out.println("CLOSESCLATA - callrestput ha funziona correttamente");
+        System.out.println("CLOSESCLATA - response: " + response);
         return response;
-    
     }
 
 }

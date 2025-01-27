@@ -206,6 +206,7 @@ function getConsoleTextError(){
 async function startGame(data) {
 	try {
 		// Utilizziamo la funzione ajaxRequest per la chiamata POST
+		console.log("Dati inviati a /StartGame:", data); //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
 		const response = await ajaxRequest(
 			"/StartGame",
 			"POST",
@@ -214,6 +215,21 @@ async function startGame(data) {
 			"text"
 		);
 		console.log("Partita iniziata con successo:", response);
+
+		// Estrai i valori specifici per la modalità Scalata
+		//27GEN MODIFICHE PER PRENDERE I DATI DA INVIARE ALL EDITOR
+		if (localStorage.getItem("modalita") === "Scalata") {
+			const jsonResponse = JSON.parse(response);
+			const roundID = jsonResponse.roundID;
+			const gameID = jsonResponse.gameID;
+			const turnID = jsonResponse.turnID;
+			const scalataID = jsonResponse.scalataID;
+			localStorage.setItem("roundId", roundID);
+			localStorage.setItem("gameId", gameID);
+			localStorage.setItem("turnId", turnID);
+			localStorage.setItem("scalataId", scalataID);
+			console.log("Scalata Details:", { roundID, gameID, turnID, scalataID });
+		}
 	} catch (error) {
 		// Assicurati che error sia una stringa prima di usare includes
 		errorMessage = JSON.stringify(error);
@@ -567,6 +583,7 @@ async function closeScalata(scalataId, isWin, finalScore, roundId) {
         FinalScore: finalScore,
         ClosedAt: new Date().toISOString()  
     });
+	console.log("Parametri ricevuti:", { scalataId, isWin, finalScore, roundId });
     console.log("[closeScalata] json data: "+data);
     return new Promise((resolve, reject) => { 
         $.ajax({
@@ -586,10 +603,6 @@ async function closeScalata(scalataId, isWin, finalScore, roundId) {
         })
     })
 }
-
-
-
-
 
 // Funzione per analizzare l'output di Maven
 function parseMavenOutput(output) {

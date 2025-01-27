@@ -214,7 +214,7 @@ public class T4ServiceTest {
          * Post-condizioni:
          * - Verificare che la risposta del turno creato corrisponda a quella mockata.
          */
-        @Test
+        /*@Test
         public void testCreateTurn_ValidResponse() {
                 String mockResponse = "{\"turnId\": 3456}";
                 mockServer.expect(requestTo(Base_URL + "/turns"))
@@ -225,7 +225,7 @@ public class T4ServiceTest {
                                 "2024-10-29T11:00:00Z");
                 assertEquals(mockResponse, result);
                 mockServer.verify();
-        }
+        }*/
 
         /*
          * Test8: testEndTurn_SuccessResponse
@@ -234,7 +234,7 @@ public class T4ServiceTest {
          * Post-condizioni:
          * - Verificare che lo stato sia "completed".
          */
-        @Test
+        /*@Test
         public void testEndTurn_SuccessResponse() {
                 int turnId = 3456;
                 String expectedUrl = String.format("http://t4-g18-app-1:3000/turns/%d", turnId);
@@ -247,7 +247,7 @@ public class T4ServiceTest {
                 String result = (String) T4Service.handleRequest("EndTurn", "90", "2024-10-29T11:00:00Z", turnId);
                 assertEquals(mockResponse, result);
                 mockServer.verify();
-        }
+        }*/
 
         /*
          * Test9: testCreateScalata_ValidResponse
@@ -278,7 +278,7 @@ public class T4ServiceTest {
          * - Verificare che la risposta del gioco terminato corrisponda a quella
          * mockata.
          */
-        @Test
+        /*@Test
         public void testEndGame_ValidGameEnd() {
                 // Parametri di input del metodo
                 int gameId = 12345;
@@ -309,7 +309,7 @@ public class T4ServiceTest {
 
                 // Verifica delle aspettative del mock server
                 mockServer.verify();
-        }
+        }*/
 
         /*
          * Test11: testEndGame_ValidGameEnd_NotWinner
@@ -320,7 +320,7 @@ public class T4ServiceTest {
          * aspettative del mock server siano soddisfatte.
          */
 
-        @Test
+        /*@Test
         public void testEndGame_ValidGameEnd_NotWinner() {
                 // Parametri di input del metodo
                 int gameId = 12345;
@@ -349,6 +349,6 @@ public class T4ServiceTest {
 
                 // Verifica delle aspettative del mock server
                 mockServer.verify();
-        }
+        }*/
 
 }

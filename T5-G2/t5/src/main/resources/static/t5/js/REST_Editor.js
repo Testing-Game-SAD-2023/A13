@@ -206,6 +206,7 @@ async function fetchCoverageReport(formData) {
 }
 
 // Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
+//27GEN MODIFICATO CON: localStorage.getItem("scalataId")
 function handleEndGame(userScore, robotScore) {
     if(localStorage.getItem("modalita")=== "Scalata" && locGiocatore >= robotScore){
 
@@ -222,7 +223,7 @@ function handleEndGame(userScore, robotScore) {
                 `Il punteggio del robot : ${robotScore}`,
                 [{ text: vai_home, href: '/main', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
             );
-            closeScalata(id_scalata, true, scalataFinalScore,current_round_scalata);
+            closeScalata(localStorage.getItem("scalataId"), true, scalataFinalScore,current_round_scalata);
             flush_localStorage();
         }
         else{
@@ -232,7 +233,7 @@ function handleEndGame(userScore, robotScore) {
 
             //prima viene effettuata la chiamata API per aggiornare la scalata
             try {
-                incrementScalataRound(id_scalata,current_round_scalata);
+                incrementScalataRound(localStorage.getItem("scalataId"),current_round_scalata);
                 openModalWithText(
                     status_scalata_roundUp,
                     `${scalata_roundUp_text} ${displayRoundScalata} / ${total_rounds_scalata}\n` + // Mostra il punteggio dell'utente

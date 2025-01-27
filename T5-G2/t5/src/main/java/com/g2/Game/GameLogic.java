@@ -30,7 +30,8 @@ public abstract class GameLogic {
     //IDs
     private int GameID;
     private int  RoundID;
-    private int TurnID;
+    //FLAVIO 25GEN: INT NON VA BENE PERCHE DOVREBBE FARE UN CAST CHE NON RIESCE A FARE
+    private String TurnID;
     private final String PlayerID;
     private String ClasseUT;
     private String type_robot;
@@ -62,29 +63,33 @@ public abstract class GameLogic {
      */
     public abstract int GetScore(int cov);
 
-    /*
-     * Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
-     */
+    //Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
+    //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
     protected void CreateGame() {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, this.difficulty, this.ClasseUT, this.gamemode, this.PlayerID);
         int robot_id =(int) serviceManager.handleRequest("T4", "GetRobotID", this.ClasseUT, this.type_robot, this.difficulty);
         this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time, robot_id);
-        this.TurnID = (int) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        System.out.println("ROUND:"+getRoundID()+ "GAME"+getGameID() + "TURN" + getTurnID());
     }
 
     protected void CreateTurn(String Time, int userScore) {
         
         //Chiudo il turno precedente 
+        System.out.println("endturn chiamato da createturn");
         serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
 
         //Apro un nuovo turno
-        this.TurnID = (int) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
         
         
     }
-    protected void EndTurn(int turn_id, String Time, int userScore) {
+
+    //Flavio 25GEN: cambiato in string id
+    protected void EndTurn(String turn_id, String Time, int userScore) {
         
+        System.out.println("endturn chiamato");
         //Chiudo il turno precedente 
         serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
   
@@ -119,11 +124,11 @@ public abstract class GameLogic {
         this.RoundID = RoundID;
     }
 
-    public int getTurnID() {
+    public String getTurnID() {
         return this.TurnID;
     }
 
-    public void setTurnID(int TurnID) {
+    public void setTurnID(String TurnID) {
         this.TurnID = TurnID;
     }
 
