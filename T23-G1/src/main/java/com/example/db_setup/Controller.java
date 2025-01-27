@@ -88,10 +88,8 @@ public class Controller {
     @Value("${recaptcha.url}")
     private String recaptchaServerURL;
 
-    @Bean 
-    public RestTemplate restTemplate(RestTemplateBuilder builder){
-        return builder.build();
-    }
+    //MODIFICA GIULIO: RIMOZIONE DICHIARAZIONE BEAN
+
     
     @Autowired
     private RestTemplate restTemplate;

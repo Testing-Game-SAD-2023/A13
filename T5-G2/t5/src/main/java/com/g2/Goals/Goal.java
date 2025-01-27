@@ -1,11 +1,9 @@
-package com.g2.Exercises;
+package com.g2.Goals;
 
 import java.time.Instant;
 import java.util.Map;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.g2.Exercises.Goals.ClassScoreGoal;
-import com.g2.Exercises.Goals.SomeotherGoal;
 import com.g2.Game.GameLogic;
 
 import org.springframework.data.annotation.Id;
@@ -18,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
@@ -25,17 +24,18 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @Document(collection = "goals")
-
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 public abstract class Goal{
     @Id
+    @EqualsAndHashCode.Exclude
     String id;
     String assignmentId;
     String playerId;
-
     Integer type;
+    @EqualsAndHashCode.Exclude
     Integer completition;
 
     /**
@@ -43,7 +43,7 @@ public abstract class Goal{
      * l'esercizio aggiorni il suo stato. I parametri sono esattamente
      * i dati fruibili a fine partita attraverso il GameController.
      */
-    public abstract void match(Map<String, String> userData, GameLogic gameLogic);
+    public abstract boolean match(Map<String, String> userData, GameLogic gameLogic, int robotScore, int userScore);
 
     
 
@@ -54,7 +54,7 @@ public abstract class Goal{
      * @return specializzazione di esercizio
      * @throws JacksonException
      */
-    static Goal deserialize(String obj)
+    public static Goal deserialize(String obj)
         throws JacksonException    
     {
 
@@ -90,12 +90,12 @@ public abstract class Goal{
     @Override
     public boolean equals(Object otherGoal){
         if(this == otherGoal) return true;
-        if(otherGoal instanceof Goal) return false;
+        if(! (otherGoal instanceof Goal)) return false;
         Goal other = (Goal) otherGoal;
         if(id != null && other.getId() != null) return id == other.getId();
         //si potrebbe decidere se tipo, playerId e assignmentId definiscono univocamente un goal
         return false;
     }
-*/
+    */
 
 }

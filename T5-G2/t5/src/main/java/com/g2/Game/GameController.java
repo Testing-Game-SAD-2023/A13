@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.commons.model.Gamemode;
+import com.g2.Goals.GoalService;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Service.AchievementService;
 
@@ -58,6 +59,9 @@ public class GameController {
 
     @Autowired
     private AchievementService achievementService;
+
+    @Autowired
+    private GoalService goalService;
 
     //Logger 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
@@ -337,7 +341,7 @@ public class GameController {
                 activeGames.remove(playerId);
 
                 //B12-giulio: put achievements calcs here
-
+                goalService.updateGoalProgresses(userData, gameLogic, playerId, robotScore, userScore);
 
                 gameLogic.EndGame(//B12-giulio: metodo aggiunto per la sedimentazione in t4
                     ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),

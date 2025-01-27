@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JacksonException;
+import com.g2.Goals.Goal;
+import com.g2.Goals.GoalRepository;
 
 public class ExerciseModelManager {
     
@@ -42,7 +44,7 @@ public class ExerciseModelManager {
      * 3) si inseriscono nel db i goal nuovi;
      * 4) i goal non scartati dal db sono goal obsoleti di studenti non in lista o tipi rimossi.
      * 
-     * Per garantire che le operazioni siano efficienti si usa l'hashSet, sulla base dell'{@link com.g2.Goals.Goal#hashCode() hashCode}.
+     * Per garantire che le operazioni siano efficienti si usa l'hashSet, sulla base dell'{@link com.g2.Exercises.Goals.Goals.Goal#hashCode() hashCode}.
      * Si intende utilizzare questa funzione in caso di richieste di update di missioni dal controller rest.
      * 
      * 
@@ -57,6 +59,7 @@ public class ExerciseModelManager {
             throw new IllegalArgumentException("Non c'è una lista di studenti!");
         }
         List<Goal> existingGoals = goalRepository.findAll(null, exercise.id, null,null);
+        
         HashSet<Goal> hashedGoals = new HashSet<>(existingGoals);
 
         Goal goal;

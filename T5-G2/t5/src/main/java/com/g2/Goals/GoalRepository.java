@@ -1,4 +1,4 @@
-package com.g2.Exercises;
+package com.g2.Goals;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g2.Exercises.Exercise;
 import com.mongodb.DBObject;
 
 
@@ -47,11 +48,14 @@ public  class GoalRepository{
     
         if(isValid!=null){
             //questi contano nel filtraggio degli esercizi
-            Criteria criteria = Criteria.where("startingTime");
+            Criteria criteria;
             if(isValid){
-                criteria.lt(Instant.now()).and("expiryTime").gt(Instant.now());
+                criteria = Criteria.where("startingTime").lt(Instant.now()).and("expiryTime").gt(Instant.now());
             }else{
-                criteria.gt(Instant.now()).orOperator(Criteria.where("expiryTime").lt(Instant.now()));
+                criteria = new Criteria().orOperator(
+                    Criteria.where("expiryTime").lt(Instant.now()),
+                    Criteria.where("startingTime").gt(Instant.now())
+                );
             }
             if(assignmentId != null){
                 criteria.and("_id").is(assignmentId);
@@ -121,16 +125,16 @@ public  class GoalRepository{
             if(completed != null){
                 if(completed){
                     query.addCriteria(Criteria.where("completition").is(100));
-            }else{
-                query.addCriteria(Criteria.where("completition").ne(100));
+                }else{
+                    query.addCriteria(Criteria.where("completition").ne(100));
+                }
             }
             return mongo.find(
                 query,
                 Goal.class
-                );
-            }
+            );
+            
         }
-        return null;
     }
         
     public void delete(Goal goal){
@@ -143,6 +147,11 @@ public  class GoalRepository{
         Query query = new Query();
         query.addCriteria(Criteria.where("assignmentId").is(assignmentId));
         mongo.remove(query, Goal.class);
+    }
+
+    public Goal update(Goal goal) {
+        
+        return mongo.save(goal);
     }
 }
 

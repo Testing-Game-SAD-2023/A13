@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -40,6 +43,12 @@ public class Team {
     @ManyToMany(fetch=FetchType.LAZY)
     private Set<User> studentList = new HashSet<User>();
 
+
+    @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "Student_Exercise_Association", joinColumns = @JoinColumn(name = "team_id"))
+    @Column(name = "exercise_id", nullable = false)
+    private Set<String> exerciseList = new HashSet<String>();
+
     public Integer getID(){ return ID;}
     public void setID(Integer ID){this.ID = ID;}
 
@@ -50,6 +59,7 @@ public class Team {
     public void setDescription(String description){this.description=description;}
 
     public Set<User> getStudentList(){return studentList;}
+    public Set<String> getExerciseList(){return exerciseList;}
 
     public static class ReducedDTO{
         private String name;

@@ -22,7 +22,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Exercises.ExerciseRepository;
-import com.g2.Exercises.GoalRepository;
+import com.g2.Goals.GoalRepository;
+import com.g2.Goals.GoalService;
 
 @SpringBootApplication(scanBasePackages = {"com.g2.factory", "com.g2.Interfaces", "com.g2.Game", "com.g2.t5", "com.g2.Service", "com.g2.Exercises"})
 public class T5Application {
@@ -46,6 +47,10 @@ public class T5Application {
         return new ExerciseRepository();
     }
 
+    @Bean
+    public GoalService goalService(){
+        return new GoalService();
+    }
 
 }
 

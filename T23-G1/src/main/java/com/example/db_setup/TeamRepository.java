@@ -29,7 +29,7 @@ public interface TeamRepository extends JpaRepository<Team,Integer>{
         value="Insert INTO student_team_association(team_id, user_id) VALUES (:tid, :uid)",
         nativeQuery = true
     )
-    public void insertStudent(@Param("uid") Integer uid, @Param("tid") Integer tid);
+    public int insertStudent(@Param("uid") Integer uid, @Param("tid") Integer tid);
 
     @Transactional
     @Modifying
@@ -37,10 +37,10 @@ public interface TeamRepository extends JpaRepository<Team,Integer>{
         value="Delete FROM student_team_association WHERE team_id=:tid and user_id=:uid",
         nativeQuery = true
     )
-    public void deleteStudent(@Param("uid") Integer uid, @Param("tid") Integer tid);
+    public int deleteStudent(@Param("uid") Integer uid, @Param("tid") Integer tid);
 
     @Query(
-        value="SELECT FROM student_team_association WHERE user_id=:user;",
+        value="SELECT t.* FROM teams t JOIN student_team_association s WHERE s.user_id=:user AND s.team_id=t.id;",
         nativeQuery = true
     )
     public List<Team> getStudentTeams(@Param("user") Integer user);
