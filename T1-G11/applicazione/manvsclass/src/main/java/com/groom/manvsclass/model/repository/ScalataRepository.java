@@ -26,4 +26,9 @@ public interface ScalataRepository extends MongoRepository<Scalata, String> {
     // Returns all the Scalata objects with the given name
     List<Scalata> findByScalataNameContaining(String scalataName);
 
+    // Returns all the Scalata objects that contain a specific class
+    List<Scalata> findBySelectedClassesClassName(String className);
+
+    // Verifica se esiste una scalata con una classe specifica
+    boolean existsBySelectedClassesClassName(String className);
 }

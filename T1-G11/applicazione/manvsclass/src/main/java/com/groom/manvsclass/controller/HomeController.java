@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -607,33 +608,47 @@ public class HomeController {
 	 }
 
 	 @PostMapping("/delete/{name}")
-	 @ResponseBody
-	 public ResponseEntity<?> eliminaClasse(@PathVariable String name, 
-	 										@CookieValue(name = "jwt", required = false) String jwt) {
-		 if (isJwtValid(jwt)) {
-
-			System.out.println("Token valido, può rimuovere la classe selezionata (/delete/{name})");
-			 Query query = new Query(); 
-			 query.addCriteria(Criteria.where("name").is(name));
-			 this.eliminaFile(name, jwt);							//Aggiunta parametro jwt
-			 LocalDate currentDate = LocalDate.now();
-			 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			 String data = currentDate.format(formatter);
-			 Operation operation1 = new Operation((int)orepo.count(), userAdmin.getUsername(), name, 2, data);
-			 orepo.save(operation1);
-			 ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
-			 if (deletedClass != null) {
-
-		         System.out.println("Rimozione avvenuta con successo (/delete/{name})");
-				 return ResponseEntity.ok().body(deletedClass);
-
-			 } else {
-				 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
-			 }
-		 } else {
-			 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido");
-		 }
-	 }
+@ResponseBody
+public ResponseEntity<?> eliminaClasse(@PathVariable String name, 
+                                       @CookieValue(name = "jwt", required = false) String jwt) {
+    if (isJwtValid(jwt)) {
+        System.out.println("Token valido, può rimuovere la classe selezionata (/delete/{name})");
+        
+        // Controlla se la classe è presente in una scalata
+        try {
+            List<Scalata> scalate = scalata_repo.findBySelectedClassesClassName(name);
+            if (!scalate.isEmpty()) {
+                String scalateNomi = scalate.stream()
+                                            .map(Scalata::getScalataName)
+                                            .collect(Collectors.joining(", "));
+				String message = scalate.size() == 1 
+				? "La classe è presente nella seguente scalata: " + scalateNomi + ". Vuoi eliminare la scalata associata?"
+				: "La classe è presente nelle seguenti scalate: " + scalateNomi + ". Vuoi eliminare tutte le scalate associate?";
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore interno");
+        }
+        Query query = new Query(); 
+        query.addCriteria(Criteria.where("name").is(name));
+        this.eliminaFile(name, jwt); // Aggiunta parametro jwt
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String data = currentDate.format(formatter);
+        Operation operation1 = new Operation((int)orepo.count(), userAdmin.getUsername(), name, 2, data);
+        orepo.save(operation1);
+        ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
+        if (deletedClass != null) {
+            System.out.println("Rimozione avvenuta con successo (/delete/{name})");
+            return ResponseEntity.ok().body(deletedClass);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
+        }
+    } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido");
+    }
+}
 	 
 	@PostMapping("/deleteFile/{fileName}")
 	@ResponseBody

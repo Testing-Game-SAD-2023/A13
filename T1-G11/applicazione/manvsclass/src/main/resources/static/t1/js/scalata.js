@@ -523,8 +523,6 @@ function displayScalate() {
           scalataName: scalataName
         };
 
-        //Send the data to the server
-
         fetch(`/delete_scalata/${scalataName}`, {
           method: 'DELETE',
           header: {
@@ -533,18 +531,16 @@ function displayScalate() {
           body: JSON.stringify(data)
         })
         .then(response => {
-
-          console.log("Response:", response);
-
-          if(response.status == 200) {
-
+        console.log("Response:", response);
+      
+          if(response.status === 200) {
+      
             response.text().then(okMessage => {
             swal("Operazione completata!", "La 'Scalata' è stata cancellata con successo.", "success");
             badge.remove();
             })
-
-          } else {
-
+      
+          } else {      
             response.text().then(errorMessage => {
             swal("Errore!", errorMessage, "error");
             })
@@ -553,7 +549,7 @@ function displayScalate() {
         .catch(error => {
           console.error('Error:', error);
         });
-
+        
       }else {
         //Do nothing
       }
@@ -567,6 +563,7 @@ function displayScalate() {
   });
 
 }
+
 
 //Modificare submitScalataData per includere robot e difficoltà
 function submitScalataData() {
