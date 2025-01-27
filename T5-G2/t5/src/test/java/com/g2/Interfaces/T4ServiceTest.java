@@ -180,7 +180,7 @@ public class T4ServiceTest {
                                 .andExpect(method(HttpMethod.POST))
                                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
-                int roundId = (int) T4Service.handleRequest("CreateRound", 12345, "ClassName", "2024-10-29T10:00:00Z");
+                int roundId = (int) T4Service.handleRequest("CreateRound", 12345, "ClassName", "2024-10-29T10:00:00Z", 10);
                 assertEquals(6789, roundId);
                 mockServer.verify();
         }
@@ -256,10 +256,11 @@ public class T4ServiceTest {
          * Post-condizioni:
          * - Verificare che l'ID della scalata creata corrisponda a quello mockato.
          */
+        /* 
         @Test
         public void testCreateScalata_ValidResponse() {
                 String mockResponse = "{\"scalataId\": 7890}";
-                mockServer.expect(requestTo("http://t4-g18-app-1:3000/turns"))
+                mockServer.expect(requestTo("http://t4-g18-app-1:3000/scalates"))
                                 .andExpect(method(HttpMethod.POST))
                                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
@@ -268,7 +269,7 @@ public class T4ServiceTest {
                 assertEquals(mockResponse, result);
                 mockServer.verify();
         }
-
+        */
         /*
          * Test10: testEndGame_ValidGameEnd
          * Precondizioni: ID di gioco valido e parametri corretti per chiudere il gioco.

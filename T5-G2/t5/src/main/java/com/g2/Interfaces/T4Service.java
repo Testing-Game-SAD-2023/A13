@@ -66,10 +66,10 @@ public class T4Service extends BaseService {
                 params -> EndGame((int) params[0], (String) params[1], (String) params[2], (int) params[3],
                         (Boolean) params[4]),
                 Integer.class, String.class, String.class, Integer.class, Boolean.class));
-
+        //Aggiunta dell'ID del robot
         registerAction("CreateRound", new ServiceActionDefinition(
-                params -> CreateRound((int) params[0], (String) params[1], (String) params[2]),
-                Integer.class, String.class, String.class));
+                params -> CreateRound((int) params[0], (String) params[1], (String) params[2], (int) params[3]),
+                Integer.class, String.class, String.class, Integer.class));
 
         registerAction("EndRound", new ServiceActionDefinition(
                 params -> EndRound((String) params[0], (int) params[1]),
@@ -90,6 +90,18 @@ public class T4Service extends BaseService {
         registerAction("GetRisultati", new ServiceActionDefinition(
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class));
+        //registro per il recupero dell'ID del robot da conservare ogni round
+        registerAction("GetRobotID", new ServiceActionDefinition(
+            params -> GetRobotID((String) params[0], (String) params[1], (String) params[2]),
+            String.class, String.class, String.class));
+        //vengono registrate le azioni per l'increamento del round di una scalata e della sua chiusura
+        registerAction("UpdateScalata", new ServiceActionDefinition(
+                params -> UpdateScalata((String) params[0], (int) params[1], (int) params[2], (String)params[3]),
+                String.class, Integer.class, Integer.class, String.class));
+        registerAction("CloseScalata", new ServiceActionDefinition(
+                    params -> CloseScalata((String) params[0],(int) params[1], (int) params[2], (boolean) params[3], (int) params[4], (String) params[5]),
+                    String.class, Integer.class, Integer.class,Boolean.class, Integer.class, String.class));
+        
     }
 
     // usa /games per ottenere una lista di giochi
@@ -180,13 +192,14 @@ public class T4Service extends BaseService {
         String respose = callRestPost(endpoint, formData, null, String.class);
         return respose;
     }
-
-    private int CreateRound(int game_id, String ClasseUT, String Time) {
+//aggiunta dell'ID del robot
+    private int CreateRound(int game_id, String ClasseUT, String Time, int robot_id) {
         final String endpoint = "/rounds";
         JSONObject obj = new JSONObject();
         obj.put("gameId", game_id);
         obj.put("testClassId", ClasseUT);
         obj.put("startedAt", Time);
+        obj.put("robotID", robot_id);
         String respose = callRestPost(endpoint, obj, null, null, String.class);
         // Parsing della stringa JSON
         JSONObject jsonObject = new JSONObject(respose);
@@ -227,16 +240,51 @@ public class T4Service extends BaseService {
         return response;
     }
 
+    //Servizio API per recuperare l'ID del robot
+private int GetRobotID(String classUT, String robot_type, String difficulty){
+    final String endpoint = "/robots";
+    Map<String, String> formData = new HashMap<>();
+    formData.put("testClassID", classUT);
+    formData.put("type", robot_type);
+    formData.put("difficulty", difficulty);
+    int response = callRestGET(endpoint, formData, Integer.class);
+    return response;
+    
+}
+
+    //SERVIZI SCALATA
+
     // Questa chiamata non è documentata nel materiale di caterina
     private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date) {
-        final String endpoint = "/turns";
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("playerID", player_id);
-        formData.add("scalataName", scalata_name);
-        formData.add("creationTime", creation_Time);
-        formData.add("creationDate", creation_date);
-        String respose = callRestPost(endpoint, formData, null, String.class);
+        final String endpoint = "/scalates";
+        JSONObject obj = new JSONObject();
+        obj.put("playerID", player_id);
+        obj.put("scalataName", scalata_name);
+        obj.put("creationTime", creation_Time);
+        obj.put("creationDate", creation_date);
+        
+        //lascio un attimo a string ma serve int
+        String respose = callRestPost(endpoint, obj, null, null, String.class);
         return respose;
+    }
+    private String UpdateScalata(String player_id, int scalata_id, int round_id, String update_date){
+        final String endpoint = "/scalates"+String.valueOf(scalata_id);
+        JSONObject obj = new JSONObject();
+        obj.put("CurrentRound", round_id);
+    
+        String response = callRestPut(endpoint, obj, null, null, String.class);
+        return response;
+    }
+    private String CloseScalata(String player_id, int scalata_id, int round_id, boolean is_win, int final_score, String close_time){
+        final String endpoint = "/scalates"+String.valueOf(scalata_id);
+        JSONObject obj = new JSONObject();
+        obj.put("CurrentRound", round_id);
+        obj.put("isFinished", is_win);
+        obj.put("FinalScore", final_score);
+        obj.put("ClosedAt", close_time);
+        String response = callRestPut(endpoint, obj, null, null, String.class);
+        return response;
+    
     }
 
 }
