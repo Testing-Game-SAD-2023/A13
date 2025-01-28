@@ -16,20 +16,14 @@
  */
 package com.g2.t5;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-
-import javax.swing.plaf.TreeUI;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +37,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.ServiceObjectComponent;
@@ -58,11 +50,8 @@ import com.g2.Model.AchievementProgress;
 import com.g2.Model.ClassUT;
 import com.g2.Model.Game;
 import com.g2.Model.ScalataGiocata;
-import com.g2.Model.Statistic;
-import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
-import com.g2.Service.UserProfileService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -74,12 +63,8 @@ public class GuiController {
 
     private final ServiceManager serviceManager;
     private final LocaleResolver localeResolver;
-
     @Autowired
     private AchievementService achievementService;
-    @Autowired
-    private UserProfileService userProfileService;
-
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
         this.serviceManager = new ServiceManager(restTemplate);
         this.localeResolver = localeResolver;
@@ -94,7 +79,6 @@ public class GuiController {
         cookie.setMaxAge(3600); // Imposta la durata del cookie a 1 ora
         cookie.setPath("/"); // Imposta il percorso per il cookie
         response.addCookie(cookie); // Aggiungi il cookie alla risposta
-
         Locale locale = new Locale(lang);
         localeResolver.setLocale(request, response, locale);
         // Restituisce una risposta vuota con codice di stato 200 OK
@@ -153,8 +137,8 @@ public class GuiController {
             //Qua gestisco utente sbagliato
             return "error";
         }
-        int userID_int = Integer.parseInt(profile.getUserId());
-        boolean isFollowing =  Friend_user.getFollowersList().contains(userID_int);
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", profile.getUserId());
+        boolean isFollowing = Friend_user.getFollowersList().contains(user.getUserProfile().getID());
         profile.setObjectComponents(
             new UserProfileComponent(serviceManager, Friend_user, playerID, achievementService, true),
             new GenericObjectComponent("isFollowing", isFollowing),
@@ -162,6 +146,24 @@ public class GuiController {
         );
         return profile.handlePageRequest();
     }
+
+    /*
+     * Andrebbe gestito che ogni uno può mettere la foto che vuole con i tipi Blob nel DB
+     */
+    private List<String> getProfilePictures(){
+        List<String> list_images = new ArrayList<>();
+        list_images.add("default.png");
+        list_images.add("men-1.png");
+        list_images.add("men-2.png");
+        list_images.add("men-3.png");
+        list_images.add("men-4.png");
+        list_images.add("women-1.png");
+        list_images.add("women-2.png");
+        list_images.add("women-3.png");
+        list_images.add("women-4.png");
+        return list_images;
+    }
+
 
     @GetMapping("/edit_profile")
     public String aut_edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {        
@@ -173,15 +175,13 @@ public class GuiController {
             return "error";
         }
         // Prendiamo le risorse dal servizio UserProfileService
-        List<String> list_images = userProfileService.getAllProfilePictures();
+        List<String> list_images = getProfilePictures();
         Edit_Profile.setObjectComponents(
             new GenericObjectComponent("user", user),
             new GenericObjectComponent("images", list_images)
         );
         return Edit_Profile.handlePageRequest();
     }
-
-   
 
     @GetMapping("/gamemode")
     public String gamemodePage(Model model,
@@ -250,85 +250,6 @@ public class GuiController {
         leaderboard.setObjectComponents(lista_utenti);
         leaderboard.SetAuth(jwt);
         return leaderboard.handlePageRequest();
-    }
-
-
-    // Seguire o smettere di seguire un utente
-
-    /* Gia raggiungibile */
-
-    @PostMapping("/follow/{playerID}")
-    @ResponseBody
-    public ResponseEntity<?> toggleFollow(@PathVariable(value = "playerID") String playerID,
-            @CookieValue(name = "jwt", required = false) String jwt) {
-
-        try {
-            // Converto l'ID del giocatore di cui voglio fare il follow/unfollow
-            Integer userId = Integer.parseInt(playerID);
-
-            // Decodifica JWT per ottener l'ID dell'utente autenticato
-            byte[] decodedUserObj = Base64.getDecoder().decode(jwt.split("\\.")[1]);
-            String decodedUserJson = new String(decodedUserObj, StandardCharsets.UTF_8);
-            ObjectMapper mapper = new ObjectMapper();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> map = mapper.readValue(decodedUserJson, Map.class);
-            String authUserIdString = map.get("userId").toString();
-            Integer authUserId = Integer.parseInt(authUserIdString);
-
-            // Chiamo il servizio per seguire o smettere di seguire l'utente
-            String result = (String) serviceManager.handleRequest("T23", "followUser", userId, authUserId);
-
-            return ResponseEntity.ok(result);
-
-        } catch (Exception e) {
-            System.out.println("(/follow) Errore generico: " + e.getMessage());
-            return ResponseEntity.badRequest().body("Errore generico");
-        }
-    }
-
-    /*
-     * NON RAGGIUNGIBILE
-     */
-    @GetMapping("/getUserByEMail")
-    public ResponseEntity<User> getUserByEMail(Model model, @RequestParam(value = "email", required = true) String email) {
-        User user = (User) serviceManager.handleRequest("T23", "GetUserByEmail", email);
-        return ResponseEntity.ok(user);
-    }
-
-    // Salvataggio delle modifiche al profilo
-    /*
-     * Cambiare endpoint 
-     */
-    @PostMapping("/update-profile")
-    public ResponseEntity<String> updateProfile(@RequestParam("email") String email,
-            @RequestParam("bio") String bio,
-            @RequestParam("profilePicturePath") String profilePicturePath) {
-
-        System.out.println("Email: " + email);
-        System.out.println("Bio: " + bio);
-        System.out.println("Profile Picture Path: " + profilePicturePath);
-        // Chiamata al servizio T23 per modificare il profilo
-        Boolean result = (Boolean) serviceManager.handleRequest("T23", "EditProfile", email, bio, profilePicturePath);
-
-        if (result) {
-            return ResponseEntity.ok("Profile updated successfully");
-        } else {
-            return ResponseEntity.badRequest().body("Error updating profile");
-        }
-    }
-
-    //non raggiungibile 
-    @DeleteMapping("/delete-notification")
-    public ResponseEntity<String> deleteNotification(@RequestParam("email") String userEmail,
-            @RequestParam("id") String notificationID) {
-        System.out.println(notificationID);
-        System.out.println(userEmail);
-        String result = (String) serviceManager.handleRequest("T23", "deleteNotification", userEmail, notificationID);
-        if (result != null) {
-            return ResponseEntity.ok("Notification deleted successfully");
-        } else {
-            return ResponseEntity.badRequest().body("Error deleting notification");
-        }
     }
 
     // TODO: Salvataggio della ScalataGiocata

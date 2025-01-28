@@ -1,13 +1,10 @@
 /*
  *   Copyright (c) 2024 Stefano Marano https://github.com/StefanoMarano80017
  *   All rights reserved.
-
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
-
  *   http://www.apache.org/licenses/LICENSE-2.0
-
  *   Unless required by applicable law or agreed to in writing, software
  *   distributed under the License is distributed on an "AS IS" BASIS,
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,16 +13,13 @@
  */
 
 package com.g2.Interfaces;
-
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 import com.g2.Model.Notification;
 import com.g2.Model.User;
 
@@ -42,7 +36,7 @@ public class T23Service extends BaseService {
                 params -> GetAuthenticated((String) params[0]),
                 String.class
         ));
-
+        
         registerAction("GetUsers", new ServiceActionDefinition(
                 params -> GetUsers() //metodo senza parametri
         ));
@@ -52,8 +46,8 @@ public class T23Service extends BaseService {
             String.class
         ));
 
-        registerAction("EditProfile", new ServiceActionDefinition(
-                params -> EditProfile((String) params[0], (String) params[1], (String) params[2]),
+        registerAction("UpdateProfile", new ServiceActionDefinition(
+                params -> UpdateProfile((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class
         ));
 
@@ -129,14 +123,12 @@ public class T23Service extends BaseService {
     }
 
     // Metodo per modificare il profilo di un utente
-    private Boolean EditProfile(String userEmail, String bio, String imagePath) {
-        final String endpoint = "/edit_profile";
-
+    private Boolean UpdateProfile(String userEmail, String bio, String imagePath) {
+        final String endpoint = "/update_profile";
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("email", userEmail);
         map.add("bio", bio);
         map.add("profilePicturePath", imagePath);
-
         return callRestPost(endpoint, map, null, Boolean.class);
     }
 
@@ -149,12 +141,10 @@ public class T23Service extends BaseService {
     // Metodo per la creazione di una notifica
     private String NewNotification(String userEmail, String title, String message) {
         final String endpoint = "/new_notification";
-
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("email", userEmail);
         map.add("title", title);
         map.add("message", message);
-
         return callRestPost(endpoint, map, null, String.class);
     }
 
@@ -178,12 +168,10 @@ public class T23Service extends BaseService {
     // Metodo per eliminare una singola notifica
     public String deleteNotification(String userEmail, String notificationID) {
         final String endpoint = "/delete_notification";
-
         Map<String, String> queryParams = Map.of(
             "email", userEmail,
             "idnotifica", notificationID
         );
-
         return callRestDelete(endpoint, queryParams);
     }
 
@@ -201,27 +189,21 @@ public class T23Service extends BaseService {
     */ 
     public String followUser(Integer targetUserId, Integer authUserId) {
         final String endpoint = "/add-follow";
-
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("targetUserId", String.valueOf(targetUserId));
         map.add("authUserId", String.valueOf(authUserId));
-
         return callRestPost(endpoint, map, null, String.class);
     }
 
     public List<User> getFollowers(String userId) {
         final String endpoint = "/get-followers";
-
         Map<String, String> queryParams = Map.of("userId", userId);
-
         return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {});
     }
 
     public List<User> getFollowing(String userId) {
         final String endpoint = "/get-following";
-
         Map<String, String> queryParams = Map.of("userId", userId);
-
         return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {});
     }
 }

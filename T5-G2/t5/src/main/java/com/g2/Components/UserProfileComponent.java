@@ -18,6 +18,7 @@ package com.g2.Components;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.g2.Interfaces.ServiceManager;
@@ -75,7 +76,7 @@ public class UserProfileComponent extends GenericObjectComponent {
     public Map<String, Object> getModel() {
         try {
             // Inserisce i dati del profilo utente nel modello con la chiave specificata
-            this.Model.put("user", user);
+            this.Model.put("user", this.user);
             int playerID_int = Integer.parseInt(playerID);
             // Ottieni follower e following
             List<User> followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", this.playerID);
@@ -101,7 +102,7 @@ public class UserProfileComponent extends GenericObjectComponent {
             return this.Model;
         } catch (Exception e) {
             // Gestione delle eccezioni, ad esempio log dell'errore
-            System.err.println("Errore durante il recupero del profilo utente: " + e.getMessage());
+            System.err.println("[UserProfileComponent]Errore durante il recupero del profilo utente: " + e.getMessage());
             return null;
         }
     }

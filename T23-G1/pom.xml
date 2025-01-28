@@ -99,12 +99,10 @@
         </dependency>
 
         <!--MODIFICA (05/02/2024) : Aggiunta social login tramite OAuth2, aggiunta dipendenze Maven-->
-        
         <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency> -->
-       
         <!--FINE MODIFICA-->
         <!--Test per ricaricare l'applicazione automaticamente-->
         <dependency>
@@ -113,16 +111,10 @@
             <optional>true</optional>
         </dependency>
         <!--MODIFICA (16/05/2024) : Aggiunta social login tramite OAuth2 con Google, aggiunta dipendenze Maven-->
-        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
        
         <!--FINE MODIFICA-->
 

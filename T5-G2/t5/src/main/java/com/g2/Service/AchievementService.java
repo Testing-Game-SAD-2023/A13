@@ -78,8 +78,9 @@ public class AchievementService {
         return (List<Game>) serviceManager.handleRequest("T4", "getGames", playerId);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Statistic> getStatistics() {
-        return (List<Statistic>) serviceManager.handleRequest("T1", "getStatistics", null);
+        return (List<Statistic>) serviceManager.handleRequest("T1", "getStatistics");
     }
 
     private void setProgress(int playerID, String statisticID, float progress) {

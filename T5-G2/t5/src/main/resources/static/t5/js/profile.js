@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             try {
                 // Effettua la richiesta al server
-                const url = new URL("/getUserByEMail", window.location.origin);
+                const url = new URL("/user_by_email", window.location.origin);
                 url.searchParams.append("email", query);
 
                 const response = await fetch(url, {
@@ -209,7 +209,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     const formData = new URLSearchParams();
                     formData.append("email", userEmail);
                     formData.append("id notifica", notificationId);
-                    // qua era /read-notification
                     const response = await fetch("/update_notification", {
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -237,8 +236,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const formData = new URLSearchParams();
                     formData.append("email", userEmail);
                     formData.append("idnotifica", notificationId);
-                    // qui c'era /delete-notification devo mettere /delete_notification
-                    const response = await fetch("/delete-notification", {
+                    const response = await fetch("/remove_notification", {
                         method: "DELETE",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: formData.toString(),
@@ -264,12 +262,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
-    }
-});
-
-// Listener per chiudere i suggerimenti quando si clicca fuori
-document.addEventListener('click', function(e) {
-    if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
-        suggestionsContainer.style.display = 'none';
     }
 });
