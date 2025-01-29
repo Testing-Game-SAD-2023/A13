@@ -669,7 +669,7 @@ $(document).ready(function() {
 $('#modeRobotSelect').on('change', function() {
   const selectedOption = $(this).val();
   
-  if (selectedOption.startsWith('personalizzabile')) {
+  if (selectedOption.startsWith('predefinita')) {
       const selectedRobot = selectedOption.split('-')[1]; // "Randoop" o "Evosuite"
 
       // Imposta la selezione del robot su tutte le card
