@@ -30,5 +30,5 @@ public interface ScalataRepository extends MongoRepository<Scalata, String> {
     List<Scalata> findBySelectedClassesClassName(String className);
 
     // Verifica se esiste una scalata con una classe specifica
-    boolean existsBySelectedClassesClassName(String className);
+   // boolean existsBySelectedClassesClassName(String className);
 }

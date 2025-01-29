@@ -360,4 +360,5 @@ public class GuiController {
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
     }
+
 }

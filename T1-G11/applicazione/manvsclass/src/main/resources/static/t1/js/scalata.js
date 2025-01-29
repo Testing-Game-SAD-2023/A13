@@ -391,17 +391,17 @@ function checkName(name) {
 function displayClasses(classes) {
   const classUTList = $("#classUTList");
 
-  // Svuota il contenitore prima di creare nuove card
+  // Clear the container before creating new cards
   classUTList.empty();
   console.log("Cleaning the container before creating new cards...\n");
 
   $.each(classes, function (index, classUT) {
-    // Crea una nuova card per ogni classe
+    // Create a new card for each class
     const card = $('<div>')
       .addClass('col-md-3 card border-primary mb-3 mr-5')
       .attr('data-difficulty', classUT.difficulty.toLowerCase());
 
-    // Genera un'immagine casuale per la card
+    // Generate a random image for the card
     var image = images[Math.floor(Math.random() * images.length)];
     const img = $('<img>').addClass('card-img-top').attr('src', image);
 
@@ -411,18 +411,18 @@ function displayClasses(classes) {
       .text(classUT.name);
     const cardText = $('<p>').addClass('card-text').text(classUT.description);
 
-    // Crea un footer per visualizzare la difficoltà
+    // Create a new footer for the difficulty
     const difficulty = $('<div>')
       .addClass('card-footer text-muted text-center')
       .text('Difficulty: ' + getStars(classUT.difficulty));
 
     let coverage = 'Coperture: \n';
     if (
-      Array.isArray(classUT.robotList) &&
-      classUT.robotList.length > 0 &&
-      Array.isArray(classUT.coverage) &&
-      classUT.coverage.length > 0 &&
-      Array.isArray(classUT.robotDifficulty)
+      Array.isArray(classUT.robotList) 
+      && classUT.robotList.length > 0 
+      && Array.isArray(classUT.coverage)
+      && classUT.coverage.length > 0 
+      && Array.isArray(classUT.robotDifficulty)
     ) {
       for (let i = 0; i < classUT.robotList.length; i++) {
         coverage += classUT.robotList[i] + "\r\n";
@@ -436,8 +436,8 @@ function displayClasses(classes) {
     }
     const coverageElement = $('<p>').addClass('card-text').text(coverage);
 
-    // Crea i dropdown per robot e difficoltà
-    const robotSelect = $('<select>').addClass('form-control robot-select');
+    // Create dropdowns for robot and difficulty
+    const robotSelect = $('<select>').addClass('form-control robot-select').data('classUT', classUT);
     robotSelect.append($('<option>').val('').text('')); // Aggiungi una riga vuota
     classUT.robotList.forEach(function (robot) {
       robotSelect.append($('<option>').text(robot).val(robot));
@@ -470,7 +470,7 @@ function displayClasses(classes) {
       updateDifficultySelect(selectedRobot);
     });
 
-    // Aggiungi il contenuto alla card
+    // Append the dropdowns to the card body
     cardBody.append(cardTitle);
     cardBody.append(cardText);
     cardBody.append(coverageElement);
@@ -478,7 +478,7 @@ function displayClasses(classes) {
     cardBody.append('Select Robot: ', robotSelect);
     cardBody.append('Select Difficulty: ', difficultySelect);
 
-    // Aggiungi la card al contenitore
+    // Append the card to the container
     card.append(img);
     card.append(cardBody);
     classUTList.append(card);
@@ -665,6 +665,50 @@ $(document).ready(function() {
       selectedClasses[classIndex].difficulty = difficulty;
     }
   });
+//codice per gestire il cambiamento di modalità
+$('#modeRobotSelect').on('change', function() {
+  const selectedOption = $(this).val();
+  
+  if (selectedOption.startsWith('personalizzabile')) {
+      const selectedRobot = selectedOption.split('-')[1]; // "Randoop" o "Evosuite"
+
+      // Imposta la selezione del robot su tutte le card
+      $('.robot-select').each(function() {
+          $(this).val(selectedRobot).trigger('change');
+          $(this).prop('disabled', true); // Disabilita la selezione nelle card
+      });
+  } else {
+      // Abilita la selezione libera del robot
+      $('.robot-select').each(function() {
+          $(this).val('').trigger('change'); // Resetta la selezione
+          $(this).prop('disabled', false); // Riabilita la selezione
+      });
+  }
+});
+
+// Funzione per aggiornare il menu delle difficoltà in base al robot selezionato
+function updateDifficultySelect(selectedRobot, difficultySelect, classUT) {
+  difficultySelect.empty(); // Svuota il menu delle difficoltà
+  difficultySelect.append($('<option>').val('').text('Select difficulty')); // Aggiungi una riga vuota
+  const robotIndex = classUT.robotList.indexOf(selectedRobot);
+  if (robotIndex !== -1) {
+      // Aggiungi le difficoltà valide per il robot selezionato
+      classUT.robotDifficulty.forEach(function(difficulty, index) {
+          const coverageValue = classUT.coverage[3 * robotIndex + index];
+          if (coverageValue != null) {
+              difficultySelect.append($('<option>').text(difficulty).val(difficulty));
+          }
+      });
+  }
+}
+
+// Event listener per la selezione del robot nelle card
+$(document).on('change', '.robot-select', function() {
+  const selectedRobot = $(this).val();
+  const difficultySelect = $(this).closest('.card-body').find('.difficulty-select');
+  const classUT = $(this).data('classUT'); // Assumi che tu abbia un modo per ottenere l'oggetto classUT associato
+  updateDifficultySelect(selectedRobot, difficultySelect, classUT);
+});
 });
 if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";  // Impedisce al browser di ripristinare la posizione
