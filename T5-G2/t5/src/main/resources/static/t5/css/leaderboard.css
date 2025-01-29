@@ -1,0 +1,264 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-image: url('/t5/images/foto7.jpg');
+    background-size: cover; /* Adatta l'immagine all'intero schermo */
+    background-repeat: no-repeat; /* Impedisce la ripetizione dell'immagine */
+    background-position: center; /* Centra l'immagine */
+    background-attachment: fixed; /* Mantiene lo sfondo fisso durante lo scroll */
+    position: relative; /* Per posizionare correttamente il velo sotto gli altri contenuti */
+}
+
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Velo nero semitrasparente */
+    z-index: -1; /* Lo mette dietro il contenuto della pagina */
+}
+
+
+h1 {
+    text-align: left;
+    color: #ffffff;
+    font-size: 60px;
+    font-weight: bold;
+    margin-left: 150px;
+    margin-bottom: 5px !important; /* Riduce lo spazio tra il titolo e la tabella */
+}
+
+/* TABELLA */
+
+.table-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        width: 90%;
+        margin: 10px auto; /* Riduce lo spazio tra il titolo e la tabella */
+
+}
+
+table {
+    width: 90% !important;
+    border-collapse: collapse; /* Necessario per creare spazi tra le righe */
+    border-spacing: 0 8px; /* Spazio tra le righe */
+    background: linear-gradient(135deg, #4c4e50, #6e7173); /* Sfumatura per il fondo della tabella */
+    border-radius: 8px; /* Bordo arrotondato */
+    overflow: hidden; /* Assicura che il contenuto non esca */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Ombra leggera per effetto elevato */
+    border: none; /* Rimuove il bordo esterno */
+    table-layout: fixed !important;
+}
+
+thead {
+    background: linear-gradient(135deg, #18171a, #2a2a2c); /* Sfumatura per l'intestazione */
+    color: #fff;
+}
+
+th, td {
+    text-align: center !important;
+    padding: 12px !important;
+    border: none; /* Rimuove i bordi interni */
+    font-weight: bold !important;
+    color: #ffffff;
+}
+
+tbody tr {
+    background: linear-gradient(135deg, #4c4e50, #5e6063); /* Sfumatura visibile su ogni riga */
+    border-radius: 4px; /* Angoli arrotondati */
+}
+
+tbody tr + tr {
+    margin-top: 8px; /* Spazio visibile tra le righe */
+}
+
+tbody tr:hover {
+    background: linear-gradient(135deg, #6e7173, #8a8d90); /* Sfumatura più chiara al passaggio del mouse */
+    transition: background 0.3s; /* Transizione morbida per il cambiamento */
+}
+
+/* Righe alternate */
+tbody tr:nth-child(even) {
+    background: linear-gradient(135deg, #3e3f41, #5e6063); /* Sfumatura leggermente diversa per righe pari */
+}
+
+tbody tr:nth-child(odd) {
+    background: linear-gradient(135deg, #4c4e50, #6e7173); /* Sfumatura diversa per righe dispari */
+}
+
+
+
+/*RETTANGOLO*/
+.rectangle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    margin: 20px auto;
+}
+
+.rectangle {
+    display: flex;
+    width: 90%; /* Adatta la larghezza del rettangolo alla tabella */
+    height: 40px;
+    background: linear-gradient(135deg, #f97316, #fbbf24, #fb923c); /* Gradiente di colore */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Ombra per un effetto leggero */
+    border: none; /* Rimosso il bordo */
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rectangle .section {
+    flex: 1; /* Ogni sezione occupa lo stesso spazio */
+    background: transparent; /* Sfondo trasparente per mantenere il gradiente visibile */
+    color: #fff; /* Testo bianco per contrasto con il gradiente */
+    font-weight: bold;
+    text-align: center;
+    line-height: 40px; /* Allinea il testo verticalmente */
+    white-space: nowrap; /* Impedisce al testo di andare a capo */
+    overflow: hidden; /* Rimuove il testo che esce dalla sezione */
+    text-overflow: ellipsis; /* Aggiunge i puntini di sospensione se il testo è troppo lungo */
+    border-right: 1px solid rgba(255, 255, 255, 0.2); /* Linea sottile per separazione visiva */
+}
+
+/* Rimuove la linea di bordo sull'ultima sezione */
+.rectangle .section:last-child {
+    border-right: none;
+}
+
+.rectangle-title {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 10px; /* Spazio tra la frase e il rettangolo */
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+
+/*TOGGLE*/
+
+.toggle-container {
+    position: relative;
+    width: 200px;
+    height: 35px;
+    margin-top: 120px;
+    margin-left: 150px !important; /* Aumenta il margine sinistro per spostarlo più a destra */
+    padding-top: 10px; /* Aggiungi spazio all'interno del contenitore */
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-label {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #ccc;
+    border-radius: 20px;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Ombra per un effetto leggero */
+}
+
+.toggle-option {
+    flex: 1;
+    display: flex; /* Usa Flexbox */
+    justify-content: center; /* Centra orizzontalmente */
+    align-items: center; /* Centra verticalmente */
+    text-align: center;
+    line-height: 50px;
+    color: #fff;
+    font-weight: bold;
+    transition: background 0.3s, color 0.3s;
+}
+
+.toggle-option:first-child {
+    background: linear-gradient(135deg, #f97316, #fbbf24, #fb923c); /* Gradiente di colore */
+}
+
+.toggle-input:checked + .toggle-label .toggle-option:first-child {
+    background: #ccc;
+    color: #666;
+}
+
+.toggle-input:checked + .toggle-label .toggle-option:last-child {
+    background: linear-gradient(135deg, #f97316, #fbbf24, #fb923c); /* Gradiente di colore */
+    color: #fff;
+}
+
+/*DATATABLE*/
+
+/* Cambia il colore del testo nella barra di ricerca */
+.dataTables_filter{
+    margin-top: -20px !important;
+    margin-bottom: 20px !important;
+    margin-right: 65px !important;
+}
+.dataTables_filter label {
+    color: #fff;  /* Colore per "Search" */
+}
+
+.dataTables_filter input {
+    color: white; /* Cambia il colore del testo in bianco (o qualsiasi altro colore tu voglia) */
+}
+
+ /* Usa Flexbox per posizionare i bottoni "Previous" e "Next" a sinistra e a destra */
+.dataTables_paginate {
+    display: flex;
+    justify-content: space-between; /* Spinge i bottoni agli estremi */
+    width: 100%; /* Assicura che occupino tutta la larghezza disponibile */
+}
+
+/* Aggiungi altre personalizzazioni se necessario per i bottoni */
+.dataTables_paginate .previous,
+.dataTables_paginate .next {
+    background-color: transparent !important;
+    color: #ffffff !important; /* Colore del testo dei bottoni */
+    padding: 5px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.dataTables_paginate .previous {
+    margin-left: 65px !important; /* Spazio a sinistra */
+}
+
+.dataTables_paginate .next {
+    margin-right: 65px; /* Spazio a destra */
+}
+
+/* Aggiungi le frecce usando il CSS */
+.dataTables_paginate .previous:before {
+    content: "←"; /* Freccia sinistra */
+    font-size: 30px; /* Puoi cambiare la dimensione della freccia */
+    color: #ffffff; /* Colore della freccia */
+    background: transparent !important;
+    font-weight: bold;
+}
+
+.dataTables_paginate .next:before {
+    content: "→"; /* Freccia destra */
+    font-size: 30px; /* Puoi cambiare la dimensione della freccia */
+    color: #ffffff; /* Colore della freccia */
+    background: transparent !important;
+    font-weight: bold;
+}
+
+/* Rimuovi il testo "Previous" e "Next" */
+.dataTables_paginate .previous,
+.dataTables_paginate .next {
+    text-align: center;
+    font-size: 0; /* Rimuove il testo */
+}
+
+/* Modifica il layout di DataTables per garantire che non ci siano conflitti */
+.dataTables_wrapper {
+    position: relative; /* Necessario per il posizionamento assoluto dei bottoni */
+}
