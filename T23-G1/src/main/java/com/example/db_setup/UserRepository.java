@@ -28,7 +28,7 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User,Integer> {
 
     User findByEmail(String email);
-    User findByName(String name);
+    List<User> findByName(String name);
     User findByResetToken(String resetToken);
     User findByID(Integer ID);
     //MODIFICA
@@ -41,4 +41,9 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     User findByUserProfile(@Param("userProfile") UserProfile userProfile);
     @Query("SELECT u FROM User u WHERE u.userProfile IN :userProfiles")
     List<User> findUsersByProfiles(@Param("userProfiles") List<UserProfile> userProfiles);
+    
+    //Modifica 12/12/2024
+    List<User> findBySurnameAndName(String surname,String name); //SELECT * FROM User WHERE surname = ? AND name = ?
+    List<User> findBySurname(String surname);
+
 }

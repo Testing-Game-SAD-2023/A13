@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Teams</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js" defer></script>
+    <link rel="stylesheet" href="/t1/css/teamDetail.css">
+</head>
+<body>
+    <!-- Classe header -->
+    <div class="header">
+        <!-- Freccia di ritorno -->
+        <span class="back-arrow" id="backArrow">&larr;</span>
+        <!-- Contenitore per il titolo e la matita -->
+        <div class="title-container">
+            <div class="title-content">
+                <p id="title"></p>
+                <span class="edit-icon" id="editIcon">
+                    <img src="/t1/css/Images/pencil.png" alt="edit" class="pencil-icon">
+                </span>
+            </div>
+            <div class="tour">
+                <p id="team_tour">Pensavi ti lasciassimo solo? Clicca qui e segui il tour per sapere cosa fare in questa pagina!</p>
+            </div>
+        </div>
+        
+       
+    </div>
+    
+    <!-- Toggle Switch per cambiare tra Assignments e Student -->
+    <div class="toggle-container">
+        <label class="switch">
+        <input type="checkbox" id="toggleSwitch">
+        <span class="slider">
+            <span class="toggle-text" id="toggleText"></span>
+            <span class="circle"></span> <!-- Cerchio che si muove -->
+        </span>
+        </label>
+    </div>
+    <!-- Container per la tabella -->
+    <div class="container" id="studentsContainer">
+        <ul class="responsive-table">
+            <!-- Header della tabella -->
+            <li class="table-header">
+                <div class="col-1">ID-Student</div>
+                <div class="col-2">Student Name</div>
+                <div class="col-3">Student Surname</div>
+                <div class="col-4">E-mail</div>
+                <div class="col-5">Assignment</div>
+                <!-- Pulsante per il modale -->
+                <div class="add-student">
+                    <button class="button-header" id="openModalButton">Add Student</button>
+                </div>
+            </li>
+            <!-- Contenuto della tabella sarà aggiunto dinamicamente -->
+        </ul>
+    </div>
+    <!--Per il caricamento degli assignment, ci mette 6 secondi dato che manda anche email-->
+    <div id="loadingScreen" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Container per gli assignment -->
+    <div id="assignmentsContainer" class="container">
+        <ul class="responsive-table">
+            <li class="table-header">
+                <div class="col-1">ID-Assignment</div>
+                <div class="col-2">Title</div>
+                <div class="col-3">Creation-Date</div>
+                <div class="col-4">End-Date</div>
+                <div class="col-5">Order By:
+                    <select id="dropdown-container-assignment">
+                    <option value="default">Default</option>
+                    <option value="creation">Creation</option>
+                    <option value="end">End</option>
+                </select>
+                </div>
+                <!-- Pulsante per il modale -->
+                <div class="add-assignment">
+                    <button class="button-header" id="openModalButtonAssignment">Add Assignment</button>
+                </div>
+            </li>
+            <!-- Contenuto generato dinamicamente -->
+        </ul>
+    </div>
+
+
+
+    <!-- Modal Placeholder -->
+    <div id="modalContainer"></div>
+    <div id="modalContainerAssignment"></div>
+    <div id="modalContainerAssignmentInfo"></div>
+
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.js" defer></script>
+    <script src="/t1/js/teamDetail.js"></script>
+    <script src="/t1/js/tour_teamDetails.js"></script>
+</body>
+</html>

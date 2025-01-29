@@ -20,11 +20,19 @@ package com.example.db_setup;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -40,6 +48,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,11 +65,14 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+
+
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 import com.example.db_setup.Service.NotificationService;
 import com.example.db_setup.Service.OAuthUserGoogleService;
 import com.example.db_setup.Service.UserService;
+import org.springframework.web.servlet.LocaleResolver;
 //MODIFICA (Deserializzazione risposta JSON)
 import com.fasterxml.jackson.databind.ObjectMapper;
 //FINE MODIFICA
@@ -70,6 +83,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
 public class Controller {
+
+    //Modifica 04/12/2024
+    @Autowired
+    UserService userService;
 
     @Autowired
     private UserRepository userRepository;
@@ -121,6 +138,34 @@ public class Controller {
     //                                 maiuscolo, un numero ed un carattere speciale
     String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,16}$"; // maiuscola, minuscola, numero e chr. speciale
     Pattern p = Pattern.compile(regex);
+
+
+    //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
+    @PostMapping("/studentsByIds")
+    public ResponseEntity<?> getStudentsByIds(@RequestBody List<String> idsStudenti){
+        return userService.getStudentsByIds(idsStudenti);
+    }
+
+    //Modifica 06/12/2024 Giuleppe: Aggiunta rotta
+    @GetMapping("/studentByEmail/{emailStudente}")
+    @ResponseBody
+    public ResponseEntity<?> getStudentByEmail(@PathVariable("emailStudente") String emailStudent){
+        return userService.getStudentByEmail(emailStudent);
+    }
+
+    //Modifica 12/12/2024
+    @GetMapping("/studentsByNameSurname")
+    @ResponseBody
+    public List<Map<String,Object>> getStudentsBySurnameAndName(@RequestBody Map<String, String> request){
+        return userService.getStudentsBySurnameAndName(request);
+    }
+    
+    //Modifica 12/12/2024 Giuleppe: Aggiunta nuova rotta che verrà aggiunta per la ricerca degli studenti. 
+    @PostMapping("/searchStudents")
+    @ResponseBody
+    public List<Map<String,Object>> searchStudents(@RequestBody Map<String, String> request){
+        return userService.searchStudents(request);
+    }
 
 
     // Registrazione
