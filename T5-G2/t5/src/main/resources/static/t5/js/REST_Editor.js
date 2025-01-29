@@ -220,7 +220,7 @@ function handleEndGame(userScore, robotScore, totalScore) {
                 `${scalata_completed_text}: ${totalScore} pt\n` + // Mostra il punteggio dell'utente
                 `Il tuo punteggio: ${locGiocatore}\n` +
                 `Il punteggio del robot : ${robotScore}`,
-                [{ text: vai_home, href: '/main', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
+                [{ text: vai_menu_scalata, href: '/gamemode_scalata', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
             );
             //incrementScalataRound(localStorage.getItem("scalataId"), localStorage.getItem("roundId"))
             //closeScalata(localStorage.getItem("scalataId"), true, scalataFinalScore,current_round_scalata);
