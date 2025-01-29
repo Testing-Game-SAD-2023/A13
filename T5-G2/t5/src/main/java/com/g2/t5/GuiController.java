@@ -187,7 +187,8 @@ public class GuiController {
     public String editorPage(Model model,
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam(value = "ClassUT", required = false) String ClassUT) {
-
+        
+        System.out.println("[T5][PAGEGBUILDER] ClasseUT passata come parametro" + ClassUT);
         PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
         VariableValidationLogicComponent Valida_classeUT = new VariableValidationLogicComponent(ClassUT);
         Valida_classeUT.setCheckNull(); 
@@ -199,7 +200,7 @@ public class GuiController {
         }
 
         System.out.println(Lista_classi_UT_nomi);
-
+        
         Valida_classeUT.setCheckAllowedValues(Lista_classi_UT_nomi); //Se il request param non è in questa lista è un problema 
         ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT","T1", "getClassUnderTest", ClassUT);
         editor.setObjectComponents(ClasseUT);

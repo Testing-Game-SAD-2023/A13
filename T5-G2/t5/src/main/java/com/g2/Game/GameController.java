@@ -230,13 +230,14 @@ public class GameController {
                 return createErrorResponse("[/StartGame] errore modalità non esiste/non registrata", "0");
             }
             GameLogic gameLogic = activeGames.get(playerId);
+            if (mode.equals("Scalata")) {
+                //decodifico le liste di parametri della scalata ricevuti in ingresso
+                ScalataGame.processScalataParameters(scalata_classes.get(), scalata_robots.get(), scalata_difficulties.get());
+                System.out.println(scalata_classes.get().get(0) +", "+ scalata_classes.get().get(1));
+            } 
             if (gameLogic == null) {
                 //Creo la nuova partita
-                if (mode.equals("Scalata")) {
-                    //decodifico le liste di parametri della scalata ricevuti in ingresso
-                    ScalataGame.processScalataParameters(scalata_classes.get(), scalata_robots.get(), scalata_difficulties.get());
-                    System.out.println(scalata_classes.get().get(0) +", "+ scalata_classes.get().get(1));
-                } 
+
                 gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalata_classes,scalata_robots,scalata_difficulties);
 
                 if (!mode.equals("Allenamento"))gameLogic.CreateGame();
@@ -357,8 +358,9 @@ public class GameController {
 
             int lineCov = LineCoverage(userData.get("coverage"));
             logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);
-
+            
             int userScore = gameLogic.GetScore(lineCov);
+            int totalScore = 0;
             logger.info("[GAMECONTROLLER] /run: user_score {}", userScore);
 
             // Salvo i dati del turno
@@ -380,6 +382,8 @@ public class GameController {
                         questo perché la get di riferimento è quella della scalata, che restituisce classe, robot e difficoltà                        
                         in base all'indice attualmente memorizzato
                         Mentre invece la set è la semplice implementazione di GameLogic */
+                        totalScore = ((ScalataGame)activeGames.get(playerId)).GetTotalScore();
+
                          logger.info("[GAMECONTROLLER] /run: scalata: round superato, caricamento prossimo turno \n"
                             + nextRound.getClasseUT()+ nextRound.getType_robot()+nextRound.getDifficulty());
                             nextRound.setClasseUT(nextRound.getClasseUT());
@@ -391,6 +395,7 @@ public class GameController {
                     
                         case WIN:
                             logger.info("[GAMECONTROLLER] /run: scalata vinta");
+                            totalScore = ((ScalataGame)activeGames.get(playerId)).GetTotalScore();
                             activeGames.remove(playerId);
                         break;
                         
@@ -403,24 +408,25 @@ public class GameController {
                 else{
                     //per le partite normali, viene semplicemente rimossa la partita attiva
                     activeGames.remove(playerId);
+                    totalScore = userScore; 
                 }
                     logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                    return createResponseRun(userData, robotScore, userScore, true, lineCoverage, branchCoverage, instructionCoverage);
+                    return createResponseRun(userData, robotScore, userScore, totalScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
-                return createResponseRun(userData, robotScore, userScore, false, lineCoverage, branchCoverage, instructionCoverage);
+                return createResponseRun(userData, robotScore, userScore, totalScore, false, lineCoverage, branchCoverage, instructionCoverage);
             }
         } else {
             // Errori di compilazione
             logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
-            return createResponseRun(userData, 0, 0, false, null, null, null);
+            return createResponseRun(userData, 0, 0,0, false, null, null, null);
         }
     }
 
     //metodo di supporto per creare la risposta
     private ResponseEntity<String> createResponseRun(
             Map<String, String> userData, int robotScore,
-            int userScore, boolean gameOver,
+            int userScore, int totalScore, boolean gameOver,
             int[] lineCoverageValues,
             int[] branchCoverageValues,
             int[] instructionCoverageValues) {
@@ -441,6 +447,7 @@ public class GameController {
         result.put("coverage", userData.get("coverage"));
         result.put("robotScore", robotScore);
         result.put("userScore", userScore);
+        result.put("totalScore" , totalScore);
         result.put("GameOver", gameOver);
         // Aggiungi i valori di copertura (covered, missed) per Line, Branch, Instruction
         JSONObject coverageDetails = new JSONObject();
