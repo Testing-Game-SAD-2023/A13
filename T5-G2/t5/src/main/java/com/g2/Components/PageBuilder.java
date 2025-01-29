@@ -14,11 +14,12 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package com.g2.Components;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +29,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Interfaces.ServiceManager;
 
 @Service
 public class PageBuilder {
+
     // Lista di componenti di pagina
     private final List<GenericLogicComponent> LogicComponents;
     private final List<GenericObjectComponent> ObjectComponents;
@@ -49,11 +52,13 @@ public class PageBuilder {
     private final String PageName;
     //Lista codici d'errore ottenuti 
     private List<String> ErrorCode;
-
+    // Aggiunto per memorizzare l'utente dal JWT
+    private String userId; 
+    private String JWT;
 
     //Logger 
     private static final Logger logger = LoggerFactory.getLogger(PageBuilder.class);
-
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     //COSTRUTTORI 
     /**
@@ -61,7 +66,11 @@ public class PageBuilder {
      * @param PageName nome della pagina da implementare
      * @param pageComponents lista dei componenti che fanno parte della pagina
      */
-    public PageBuilder(ServiceManager serviceManager, String PageName, Model model_html, List<GenericObjectComponent> ObjectComponents, List<GenericLogicComponent> LogicComponents) {
+    public PageBuilder(ServiceManager serviceManager, 
+                        String PageName, 
+                        Model model_html, 
+                        List<GenericObjectComponent> ObjectComponents, 
+                        List<GenericLogicComponent> LogicComponents) {
         this.serviceManager = serviceManager;
         this.ObjectComponents = ObjectComponents;
         this.LogicComponents = LogicComponents;
@@ -81,11 +90,29 @@ public class PageBuilder {
         logger.info("[PAGEBULDER] Builder costruito con successo");
     }
 
+    // COSTRUTTORE CON JWT
+    public PageBuilder(ServiceManager serviceManager, String PageName, Model model_html, String jwt) {
+        this(serviceManager, PageName, model_html);
+        this.userId = extractUserId(jwt);
+        this.JWT = jwt;
+        logger.info("[PageBuilder] Costruttore con JWT completato per userId: {}", this.userId);
+    }
+
+    // COSTRUTTORE CON JWT + COMPONENTI
+    public PageBuilder(ServiceManager serviceManager, String PageName, Model model_html,
+                       List<GenericObjectComponent> ObjectComponents,
+                       List<GenericLogicComponent> LogicComponents, String jwt) {
+        this(serviceManager, PageName, model_html, ObjectComponents, LogicComponents);
+        this.userId = extractUserId(jwt);
+        this.JWT = jwt;
+        logger.info("[PageBuilder] Costruttore con JWT e componenti completato per userId: {}", this.userId);
+    }
+
     //HANDLE PAGE REQUEST 
     // Metodo per eseguire la logica di tutti i componenti
     private List<String> executeComponentsLogic() {
         // Lista per raccogliere eventuali errori
-        List<String> errorCodes = new ArrayList<>(); 
+        List<String> errorCodes = new ArrayList<>();
         for (GenericLogicComponent Component : LogicComponents) {
             if (!Component.executeLogic()) {
                 errorCodes.add(Component.getErrorCode()); // Aggiunge il codice d'errore alla lista
@@ -129,7 +156,9 @@ public class PageBuilder {
             return_page_error = ExecuteError(ErrorCode);
         }
         // Restituisco il nome del template da usare
-        if(return_page_error != null) return return_page_error;
+        if (return_page_error != null) {
+            return return_page_error;
+        }
         if (ObjectComponents != null && !ObjectComponents.isEmpty()) {
             // Costruisci la mappa combinata dei dati dei componenti
             Map<String, Object> combinedModel = buildModel();
@@ -141,9 +170,34 @@ public class PageBuilder {
     //COMPONENTI 
     // Questo metodo serve per attivare l'autenticazione per la pagina
     public void SetAuth(String jwt) {
-        if (serviceManager != null){
+        if (serviceManager != null) {
             setLogicComponents(new AuthComponent(serviceManager, jwt));
-        }        
+        }
+    }
+    public void SetAuth(){
+        if (serviceManager != null) {
+            setLogicComponents(new AuthComponent(serviceManager, JWT));
+        }
+    }
+
+    // METODO PER ESTRARRE USER ID DAL JWT
+    private static String extractUserId(String jwt) {
+        try {
+            if (jwt == null || jwt.split("\\.").length < 2) {
+                throw new IllegalArgumentException("JWT non valido: formato errato");
+            }
+            byte[] decodedBytes = Base64.getDecoder().decode(jwt.split("\\.")[1]);
+            String decodedJson = new String(decodedBytes, StandardCharsets.UTF_8);
+            Map<String, Object> payload = OBJECT_MAPPER.readValue(decodedJson, Map.class);
+            Object userId = payload.get("userId");
+            if (userId == null) {
+                throw new IllegalArgumentException("JWT non valido: userId mancante");
+            }
+            return userId.toString();
+        } catch (Exception e) {
+            logger.error("[PageBuilder] Errore nella decodifica del JWT: {}", e.getMessage());
+            return null;
+        }
     }
 
     //CODICI D'ERRORE 
@@ -153,18 +207,21 @@ public class PageBuilder {
     public void setErrorPage(String errorCode, String pageName) {
         errorPageMap.put(errorCode, pageName);
     }
+
     //overload nel caso in cui l'utente fornisce una lista intera 
     public void setErrorPage(Map<String, String> userErrorPageMap) {
         errorPageMap.putAll(userErrorPageMap);
     }
+
     //Qui setto il comportamento Standard agli errori 
     private void setStandardErrorPage() {
         errorPageMap.put("Auth_error", "redirect:/login");
         errorPageMap.put("default", "redirect:/error");
     }
+
     // Metodo per ottenere i messaggi d'errore basati sui codici d'errore
     private String ExecuteError(List<String> errorCodes) {
-        if (errorCodes != null && !errorCodes.isEmpty()){
+        if (errorCodes != null && !errorCodes.isEmpty()) {
             for (String errorCode : errorCodes) {
                 // per ora si ferma al primo errore, ma qui posso implementare ogni tipo di logica 
                 // anche in base alla combinazione o if-else
@@ -173,6 +230,7 @@ public class PageBuilder {
         }
         return null;
     }
+
     //GET E SET 
     public List<GenericLogicComponent> getLogicComponents() {
         return new ArrayList<>(LogicComponents); // Ritorna una copia per evitare modifiche esterne
@@ -204,5 +262,9 @@ public class PageBuilder {
 
     public Map<String, String> getErrorPageMap() {
         return errorPageMap;
+    }
+
+    public String getUserId() {
+        return this.userId;
     }
 }
