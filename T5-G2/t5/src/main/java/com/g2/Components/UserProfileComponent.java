@@ -18,9 +18,6 @@ package com.g2.Components;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.AchievementProgress;
 import com.g2.Model.Notification;
@@ -28,7 +25,6 @@ import com.g2.Model.Statistic;
 import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
-import com.g2.Service.UserProfileService;
 
 /**
  * Componente che recupera i dati del profilo utente dal servizio e li inserisce
@@ -96,7 +92,8 @@ public class UserProfileComponent extends GenericObjectComponent {
             //Se è il profilo dell'utente carico delle info, sennò è un profilo amico e quindi carico altro
             if (!IsFriendProfile) {
                 //Ottengo la lista delle notifiche 
-                List<Notification> notifications = (List<Notification>) serviceManager.handleRequest("T23", "getNotifications", user.getEmail());
+                // Per ora prendo le prime top 10
+                List<Notification> notifications = (List<Notification>) serviceManager.handleRequest("T23", "getNotifications", user.getEmail(), 0, 10);
                 this.Model.put("notifications", notifications);
             }
             return this.Model;
