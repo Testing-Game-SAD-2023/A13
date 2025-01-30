@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
-package com.example.db_setup;
+package com.example.db_setup.Controllers;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -25,14 +25,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
@@ -51,11 +49,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,40 +60,29 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-
-
+import com.example.db_setup.EmailService;
+import com.example.db_setup.MyPasswordEncoder;
+import com.example.db_setup.MyResponseClass;
+import com.example.db_setup.Studies;
+import com.example.db_setup.User;
+import com.example.db_setup.UserProfile;
+import com.example.db_setup.UserRepository;
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
-import com.example.db_setup.Service.NotificationService;
 import com.example.db_setup.Service.OAuthUserGoogleService;
 import com.example.db_setup.Service.UserService;
-import org.springframework.web.servlet.LocaleResolver;
 //MODIFICA (Deserializzazione risposta JSON)
 import com.fasterxml.jackson.databind.ObjectMapper;
 //FINE MODIFICA
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
 @RestController
 public class Controller {
-
-    //Modifica 04/12/2024
-    @Autowired
-    UserService userService;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
-    private NotificationService notificationService;
 
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
@@ -221,9 +205,7 @@ public class Controller {
         Matcher m = p.matcher(password);
 
         if ((password.length() >16) || (password.length() < 8) || !(m.matches())) {
-
             //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password not valid, maiuscola, minuscola e numero, con lunghezza tra 8 e 16");
-
             //MODIFICA (05/02/2024)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password non valida! La password deve contenere almeno una lettera maiuscola, una minuscola, un numero ed un carattere speciale e deve essere lunga tra gli 8 e i 16 caratteri");
             //FINE MODIFICA
@@ -285,7 +267,7 @@ public class Controller {
         }
 
         User user = userRepository.findByEmail(email);
-
+        
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email not found");
         } else if (user.isRegisteredWithFacebook) {
@@ -703,134 +685,8 @@ public class Controller {
         profile.setBio(bio);
         profile.setProfilePicturePath(profilePicturePath);
         userService.saveProfile(profile);
-
         return ResponseEntity.ok(true); // Ritorna true se l'operazione ha avuto successo
     }
-
-    //MODIFICA 26/11/24 per le notifiche
-    @PostMapping("/new_notification")
-    public ResponseEntity<String> updateNotifications(@RequestParam("email") String email,
-                                                    @RequestParam("title") String title,
-                                                    @RequestParam("message") String message) {
-        UserProfile profile = userService.findProfileByEmail(email);
-        if (profile == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile not found");
-        }
-        notificationService.saveNotification(profile.getUser().getID(),title,message);
-
-        return ResponseEntity.ok("Profile notifications updated successfully");
-    }
-
-    @GetMapping("/notifications")
-    public List<Notification> getNotifications(@RequestParam("email") String email) {
-        UserProfile profile = userService.findProfileByEmail(email);
-        if (profile == null) {
-            System.out.println(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found"));
-            return null;
-        }
-        List<Notification> notifications = notificationService.getNotificationsByPlayer(profile.getUser().getID());
-        for (Notification notif : notifications) {
-            System.out.println(notif.getIsRead());
-        }
-        return notificationService.getNotificationsByPlayer(profile.getUser().getID());
-    }
-
-    @PostMapping("/update_notification")
-    public ResponseEntity<String> updateNotification(@RequestParam("email") String email,
-                                                    @RequestParam("id notifica") String notificationID) {
-        // Cerca il profilo dell'utente utilizzando l'email fornita come parametro
-        UserProfile profile = userService.findProfileByEmail(email);
-
-        // Controlla se il profilo dell'utente è stato trovato
-        if (profile == null) {
-            // Se il profilo non esiste, restituisce un errore 400 (BAD_REQUEST) con un messaggio appropriato
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");
-        }
-
-
-        Long notifID = Long.parseLong(notificationID); // Converte l'ID della notifica da stringa a tipo Long
-        boolean found = false; // Inizializza una variabile booleana per determinare se la notifica è stata trovata
-        // Recupera tutte le notifiche associate all'utente utilizzando il suo ID
-        List<Notification> notifications = notificationService.getNotificationsByPlayer(profile.getUser().getID());
-
-        // Cerca la notifica specifica all'interno della lista di notifiche
-        for (Notification notif : notifications) {
-            if (notifID == notif.getId()) {
-                found = true;
-                break;
-            }
-        }
-
-        // Se la notifica è stata trovata
-        if (found) {
-            // Marca la notifica come letta utilizzando il servizio notifiche
-            notificationService.markNotificationAsRead(notifID);
-            // Restituisce una risposta 200 (OK) per indicare il successo dell'operazione
-            return ResponseEntity.ok("Profile notifications updated successfully");
-        } else {
-            // Se la notifica non è stata trovata, restituisce un errore 404 (NOT_FOUND) con un messaggio appropriato
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("[T23 Controller] Notification not found");
-        }
-
-    }
-
-    @DeleteMapping("/remove_notification")
-    public ResponseEntity<String> deleteNotification(@RequestParam("email") String email,
-                                                    @RequestParam("idnotifica") String notificationID) {
-        // Cerca il profilo dell'utente utilizzando l'email fornita come parametro
-        UserProfile profile = userService.findProfileByEmail(email);
-
-        // Controlla se il profilo dell'utente è stato trovato
-        if (profile == null) {
-            // Se il profilo non esiste, restituisce un errore 400 (BAD_REQUEST) con un messaggio appropriato
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");
-        }
-
-        try {
-            // Converte l'ID della notifica da stringa a tipo Long
-            Long notifID = Long.parseLong(notificationID);
-
-            // Verifica che la notifica esista per l'utente specificato
-            List<Notification> notifications = notificationService.getNotificationsByPlayer(profile.getUser().getID());
-            boolean found = notifications.stream().anyMatch(notif -> notifID.equals(notif.getId()));
-
-            if (!found) {
-                // Se la notifica non esiste, restituisce un errore 404 (NOT_FOUND)
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("[T23 Controller] Notification not found");
-            }
-
-            // Elimina la notifica utilizzando il servizio notifiche
-            notificationService.deleteNotification(notifID);
-            // Restituisce una risposta 200 (OK) per indicare il successo dell'operazione
-            return ResponseEntity.ok("Notification deleted successfully");
-
-        } catch (NumberFormatException e) {
-            // Se l'ID della notifica non è valido, restituisce un errore 400 (BAD_REQUEST)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] Invalid Notification ID");
-        }
-    }
-
-    @DeleteMapping("/clear_notifications")
-    public ResponseEntity<String> clearNotifications(@RequestParam("email") String email) {
-        // Cerca il profilo dell'utente utilizzando l'email fornita come parametro
-        UserProfile profile = userService.findProfileByEmail(email);
-
-        // Controlla se il profilo dell'utente è stato trovato
-        if (profile == null) {
-            // Se il profilo non esiste, restituisce un errore 400 (BAD_REQUEST) con un messaggio appropriato
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");
-        }
-
-        // Ottiene l'ID dell'utente dal profilo
-        int playerID = profile.getUser().getID();
-
-        // Elimina tutte le notifiche associate all'utente
-        notificationService.clearNotificationsByPlayer(playerID);
-
-        // Restituisce una risposta 200 (OK) per indicare il successo dell'operazione
-        return ResponseEntity.ok("All notifications cleared successfully");
-    }
-
 
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -915,7 +771,7 @@ public class Controller {
     }
 
     //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
-    @PostMapping("/studentsByIds")
+    @PostMapping("/getStudentiTeam")
     public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){
         return userService.getStudentiTeam(idsStudenti);
     }

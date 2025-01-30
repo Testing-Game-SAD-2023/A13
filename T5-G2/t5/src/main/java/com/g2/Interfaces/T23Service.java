@@ -11,16 +11,23 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package com.g2.Interfaces;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Model.Notification;
+import com.g2.Model.NotificationResponse;
 import com.g2.Model.User;
 
 @Service
@@ -36,14 +43,14 @@ public class T23Service extends BaseService {
                 params -> GetAuthenticated((String) params[0]),
                 String.class
         ));
-        
+
         registerAction("GetUsers", new ServiceActionDefinition(
                 params -> GetUsers() //metodo senza parametri
         ));
 
         registerAction("GetUser", new ServiceActionDefinition(
-            params -> GetUser((String) params[0]), 
-            String.class
+                params -> GetUser((String) params[0]),
+                String.class
         ));
 
         registerAction("UpdateProfile", new ServiceActionDefinition(
@@ -62,8 +69,8 @@ public class T23Service extends BaseService {
         ));
 
         registerAction("getNotifications", new ServiceActionDefinition(
-                params -> getNotifications((String) params[0]),
-                String.class
+                params -> getNotifications((String) params[0], (Integer) params[1], (Integer) params[2]),
+                String.class, Integer.class, Integer.class
         ));
 
         registerAction("updateNotification", new ServiceActionDefinition(
@@ -114,10 +121,11 @@ public class T23Service extends BaseService {
     // Metodo per ottenere la lista degli utenti
     private List<User> GetUsers() {
         final String endpoint = "/students_list";
-        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {});
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {
+        });
     }
 
-    private User GetUser(String user_id){
+    private User GetUser(String user_id) {
         final String endpoint = "/students_list/" + user_id;
         return callRestGET(endpoint, null, User.class);
     }
@@ -148,12 +156,27 @@ public class T23Service extends BaseService {
         return callRestPost(endpoint, map, null, String.class);
     }
 
-    public List<Notification> getNotifications(String userEmail) {
+    public List<Notification> getNotifications(String userEmail, int page, int size) {
         final String endpoint = "/notifications";
-        Map<String, String> queryParams = Map.of("email", userEmail);
-        // Effettua la chiamata GET e restituisce una lista di notifiche
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<Notification>>() {});
+        // Creazione dei parametri di query, inclusi email, pagina e dimensione
+        Map<String, String> queryParams = Map.of(
+                "email", userEmail,
+                "page", String.valueOf(page),
+                "size", String.valueOf(size)
+        );
+        
+        ResponseEntity<NotificationResponse> response = restTemplate.exchange(
+            buildUri(endpoint, queryParams),
+            HttpMethod.GET,
+            null, // Puoi aggiungere intestazioni, se necessario
+            NotificationResponse.class
+        );
+
+        NotificationResponse notificationResponse = response.getBody();
+        return notificationResponse.getContent();
     }
+
+
 
     public String updateNotification(String userEmail, String notificationID) {
         final String endpoint = "/update_notification";
@@ -169,8 +192,8 @@ public class T23Service extends BaseService {
     public String deleteNotification(String userEmail, String notificationID) {
         final String endpoint = "/delete_notification";
         Map<String, String> queryParams = Map.of(
-            "email", userEmail,
-            "idnotifica", notificationID
+                "email", userEmail,
+                "idnotifica", notificationID
         );
         return callRestDelete(endpoint, queryParams);
     }
@@ -186,7 +209,7 @@ public class T23Service extends BaseService {
     *   Metodo per follow/unfollow di un utente
     *   il targetUserId + chi viene seguito 
     *   il authUserId è chi segue 
-    */ 
+     */
     public String followUser(Integer targetUserId, Integer authUserId) {
         final String endpoint = "/add-follow";
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
@@ -198,12 +221,14 @@ public class T23Service extends BaseService {
     public List<User> getFollowers(String userId) {
         final String endpoint = "/get-followers";
         Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {});
+        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
+        });
     }
 
     public List<User> getFollowing(String userId) {
         final String endpoint = "/get-following";
         Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {});
+        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
+        });
     }
 }

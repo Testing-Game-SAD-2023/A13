@@ -5,11 +5,19 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.groom.manvsclass.model.Team;
-import com.groom.manvsclass.service.TeamService;
 import com.groom.manvsclass.service.TeamModificationRequest;
+import com.groom.manvsclass.service.TeamService;
 
 @CrossOrigin
 @Controller
@@ -18,26 +26,25 @@ public class TeamController {
     @Autowired
     private TeamService teamService;
 
-
     // Endpoint per aggiungere un nuovo team
     @PostMapping("/creaTeam")
     @ResponseBody
-    public ResponseEntity<?> creaTeam(@RequestBody Team team,@CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.creaTeam(team,jwt);
+    public ResponseEntity<?> creaTeam(@RequestBody Team team, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.creaTeam(team, jwt);
     }
-    
+
     // Endpoint per aggiungere un nuovo team
     @DeleteMapping("/deleteTeam")
     @ResponseBody
-    public ResponseEntity<?> deleteTeam(@RequestBody String idTeam,@CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.deleteTeam(idTeam,jwt);
+    public ResponseEntity<?> deleteTeam(@RequestBody String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.deleteTeam(idTeam, jwt);
     }
 
     // Endpoint per modificare il nome di un team
     @PutMapping("/modificaNomeTeam")
     @ResponseBody
-    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request,@CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.modificaNomeTeam(request,jwt);
+    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.modificaNomeTeam(request, jwt);
     }
 
     @GetMapping("/visualizzaTeams")
@@ -58,19 +65,18 @@ public class TeamController {
     public ResponseEntity<?> aggiungiStudenti(@PathVariable("idTeam") String idTeam, @RequestBody List<String> idStudenti, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.aggiungiStudenti(idTeam, idStudenti, jwt);
     }
-    
+
     @GetMapping("/ottieniStudentiTeam/{idTeam}")
     @ResponseBody
-    public ResponseEntity<?> ottieniStudentiTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt){
-        return teamService.ottieniStudentiTeam(idTeam,jwt);
+    public ResponseEntity<?> ottieniStudentiTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.ottieniStudentiTeam(idTeam, jwt);
     }
 
     //Modifica 05/12/2024: aggiunta rimozione studente da un team
     @PutMapping("/rimuoviStudenteTeam/{idTeam}")
     @ResponseBody
-    public ResponseEntity<?> rimuoviStudenteTeam(@PathVariable("idTeam") String idTeam,@RequestBody String idStudente,@CookieValue(name = "jwt", required = false) String jwt){
-        return teamService.rimuoviStudenteTeam(idTeam,idStudente,jwt);
+    public ResponseEntity<?> rimuoviStudenteTeam(@PathVariable("idTeam") String idTeam, @RequestBody String idStudente, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.rimuoviStudenteTeam(idTeam, idStudente, jwt);
     }
-   
-}   
 
+}

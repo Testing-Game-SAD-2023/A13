@@ -1,84 +1,99 @@
 <!--REFACTORING TOTALE (5/12/2024): Restyling pagina-->
 <!DOCTYPE html>
-<html lang="en" >
-<head>
+<html lang="en">
+  <head>
+    <!--MODIFICA (17/04/2024) : FontAwesome import-->
+    <script
+      src="https://kit.fontawesome.com/d963f915e6.js"
+      crossorigin="anonymous"
+    ></script>
+    <!--FINE MODIFICA (17/04/2024)-->
 
-<!--MODIFICA (17/04/2024) : FontAwesome import-->
-<script src="https://kit.fontawesome.com/d963f915e6.js" crossorigin="anonymous"></script>
-<!--FINE MODIFICA (17/04/2024)-->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home Admin</title>
 
-<title>Home Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"
+    />
+    <link rel="stylesheet" href="/t1/css/home_adm.css" />
+    <!--Nuovo font per gli elementi-->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900"
+      class="rel"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!--Codice HTML qui-->
+    <br />
+    <br />
+    <header>
+      <h1>Pannello Amministratore</h1>
+    </header>
+    <!-- Freccia per riaprire la barra laterale (inizialmente nascosta) -->
+    <!-- Codice per il pulsante di toggle -->
+    <button class="sidebar-toggle">
+      ☰
+      <!-- Icona hamburger per la barra laterale -->
+    </button>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-<link rel="stylesheet" href="/t1/css/home_adm.css">
-<!--Nuovo font per gli elementi-->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alegreya+Sans:800,900" class="rel">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Barra laterale -->
+    <div class="sidebar">
+      <p id="username-display"></p>
+      <!--Inserimento dinamico del nome dell'admin-->
+      <a href="info">Info</a
+      ><!--Rimando alla pagina di info admin-->
+      <a href="/player">Players</a
+      ><!--Rimando alla pagina dei players-->
+      <button onclick="Invita()">Invita</button
+      ><!--Rimando alla pagina di invito-->
 
-</head>
-<body> 
+      <!-- Logout in basso a sinistra -->
+      <button class="logout" onclick="Disconnessione()">Logout</button>
+    </div>
 
-<!--Codice HTML qui-->
-<br>
-<br>
-<header>
-    <h1>Pannello Amministratore</h1>
-  </header>
-   <!-- Freccia per riaprire la barra laterale (inizialmente nascosta) -->
-<!-- Codice per il pulsante di toggle -->
-	<button class="sidebar-toggle">
-		☰  <!-- Icona hamburger per la barra laterale -->
-	</button>
+    <!-- Contenitore dei bottoni -->
+    <div class="dashboard-container">
+      <div class="button-team" id="button-generics">
+        <!--Folder di rimando alla pagina di gestione teams-->
+        <div class="icon">📊</div>
+        <h3>Teams</h3>
+        <p>Gestisci i team</p>
+      </div>
+      <div class="button-scalata" id="button-generics">
+        <!--Rimando alla pagina scalata -->
+        <div class="icon">🚀</div>
+        <h3>Scalata</h3>
+        <p>Crescita continua</p>
+      </div>
+      <div class="button-achievement" id="button-generics">
+        <!--Rimando alla pagina di visualizzazione achievement-->
+        <div class="icon">🏆</div>
+        <h3>Achievement</h3>
+        <p>Assegna gli Achievement</p>
+      </div>
 
-   <!-- Barra laterale -->
-   <div class="sidebar">
-    <p id="username-display"></p><!--Inserimento dinamico del nome dell'admin-->
-    <a href="info">Info</a><!--Rimando alla pagina di info admin-->
-    <a href="/player">Players</a><!--Rimando alla pagina dei players-->
-	<button onclick="Invita()">Invita</button><!--Rimando alla pagina di invito-->
+      <div class="button-class" id="button-generics">
+        <!--Rimando alla pagina delle classi-->
+        <div class="icon">🤖</div>
+        <h3>Classes</h3>
+        <p>Crea le tue classi di test</p>
+      </div>
+    </div>
 
-    <!-- Logout in basso a sinistra -->
-  <button class="logout" onclick="Disconnessione()">Logout</button>
-	</div>
+    <!--FINE MODIFICA-->
+  </body>
 
-
-	<!-- Contenitore dei bottoni -->
-	<div class="dashboard-container">
-		<div class="button-team" id="button-generics"><!--Folder di rimando alla pagina di gestione teams-->
-		<div class="icon">📊</div>
-		<h3>Teams</h3>
-		<p>Gestisci i team</p>
-		</div>
-		<div class="button-scalata" id="button-generics"><!--Rimando alla pagina scalata -->
-		<div class="icon">🚀</div>
-		<h3>Scalata</h3>
-		<p>Crescita continua</p>
-		</div>
-		<div class="button-achievement" id="button-generics"><!--Rimando alla pagina di visualizzazione achievement-->
-			<div class="icon">🏆</div>
-			<h3>Achievement</h3>
-			<p>Assegna gli Achievement</p>
-		</div>
-		
-		<div class="button-class" id="button-generics"><!--Rimando alla pagina delle classi-->
-			<div class="icon">🤖</div>
-			<h3>Classes</h3>
-			<p>Crea le tue classi di test</p>
-		</div>
-		
-	</div>
-
-
-<!--FINE MODIFICA-->
-</body>
-
-<!--Includi JQuery-->
-<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/t1/js/home_adm.js"></script>
-
+  <!--Includi JQuery-->
+  <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/t1/js/home_adm.js"></script>
 </html>

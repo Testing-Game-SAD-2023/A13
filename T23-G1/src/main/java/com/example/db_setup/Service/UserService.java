@@ -68,6 +68,10 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public User getUserByID(Integer ID){
+        return userRepository.findByID(ID);
+    }
+
     // Modifica 06/12/2024: Aggiunta end-point per restituire solo i campi non sensibili dello USER
     public ResponseEntity<?> getStudentByEmail(String email) {
         User user = userRepository.findByEmail(email);
