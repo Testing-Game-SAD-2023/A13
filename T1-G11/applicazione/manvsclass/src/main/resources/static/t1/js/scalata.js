@@ -227,6 +227,12 @@ function handleRoundsChange() {
         // Remove the 'disabled' class from the 'classUTList' div
         $('#classUTList').removeClass('disabled');
         addButton.disabled = true; // Disabilita il tasto "Aggiungi"
+         // Disabilita gli input e le etichette
+         document.getElementById('form-name').disabled = true;
+         document.getElementById('FormControlTextareaDescription').disabled = true;
+         document.getElementById('rounds').disabled = true;
+
+         //roundsInput.disabled = true;
     } else {
         swal("Errore!", "La modalità 'Scalata' prevede un numero minimo di rounds pari a 2, imposta un valore corretto", "error");
     }
@@ -615,6 +621,10 @@ function submitScalataData() {
     console.log('Response:', response);
     if(response.status == 200) {
       document.getElementById('addRoundButton').disabled = false; // Riabilita il tasto "Aggiungi"
+      // abilita gli input e le etichette
+      document.getElementById('form-name').disabled = false;
+      document.getElementById('FormControlTextareaDescription').disabled = false;
+      document.getElementById('rounds').disabled = false;
       response.text().then(okMessage => {
         swal("Operazione completata!", "La tua 'Scalata' è stata configurata con successo.", "success")
           .then(() => {
