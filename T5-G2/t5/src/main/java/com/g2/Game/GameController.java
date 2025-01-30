@@ -111,7 +111,7 @@ public class GameController {
 
             logger.info("[GAMECONTROLLER] GetUserData - underTestClassCode: {}", underTestClassCode);
 
-            //Chiato T7 per valutare coverage e userscore
+            //Chiamo T7 per valutare coverage e userscore
             String response_T7 = (String) serviceManager.handleRequest("T7", "CompileCoverage",
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode);
 

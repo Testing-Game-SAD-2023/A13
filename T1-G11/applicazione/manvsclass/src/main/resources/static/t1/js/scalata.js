@@ -170,6 +170,11 @@ function handleRoundsChange() {
   //Get the addButton element
   var addButton = document.getElementById('addRoundButton');
 
+  // Event listener per impedire l'inserimento manuale tramite tastiera
+  document.getElementById('rounds').addEventListener('keydown', function(event) {
+     event.preventDefault();
+  });
+
   // Add an event listener for the click event
   addButton.addEventListener('click', async function() {
 
