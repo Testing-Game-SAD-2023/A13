@@ -166,18 +166,14 @@ public class UserService {
             List<Integer> idIntegerList = idUtenti.stream()
                     .map(Integer::valueOf)
                     .collect(Collectors.toList());
-
             // Recupera gli utenti dal database
             List<User> utenti = userRepository.findAllById(idIntegerList);
-
             // Verifica se sono stati trovati utenti
             if (utenti == null || utenti.isEmpty()) {
                 System.out.println("Nessun utente trovato per gli ID forniti.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nessun utente trovato.");
             }
-
             System.out.println("Utenti trovati: " + utenti);
-
             // Restituisce la lista di utenti trovati
             return ResponseEntity.ok(utenti);
 

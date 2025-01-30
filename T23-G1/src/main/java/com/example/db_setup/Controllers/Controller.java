@@ -515,8 +515,6 @@ public class Controller {
         return ResponseEntity.ok("Logout successful");
     }
 
-
-
     //Recupera Password
     @PostMapping("/password_reset")
     public ResponseEntity<String> resetPassword(@RequestParam("email") String email, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
@@ -582,28 +580,6 @@ public class Controller {
         return ResponseEntity.ok("Password change successful");
     }
 
-    // // ID per il task 5
-    // @GetMapping("/get_ID")
-    // public Integer getID(@RequestParam("email") String email, @RequestParam("password") String password){
-
-    //     User user = userRepository.findByEmail(email);
-
-    //     if (user == null) {
-    //         return -1;
-    //     }
-
-    //     boolean passwordMatches = myPasswordEncoder.matches(password, user.password);
-    //     if (!passwordMatches) {
-    //         return -1;
-    //     }
-
-    //     Integer ID= user.ID;
-
-    //     return ID;
-    // }
-
-    /* GET PER LE VIEW */
-
     public boolean isJwtValid(String jwt) {
         try {
             Claims c = Jwts.parser().setSigningKey("mySecretKey").parseClaimsJws(jwt).getBody();
@@ -621,14 +597,12 @@ public class Controller {
     @PostMapping("/validateToken")
     public ResponseEntity<Boolean> checkValidityToken( @RequestParam("jwt") String jwt) {
         if(isJwtValid(jwt)) return ResponseEntity.ok(true);
-
         return ResponseEntity.ok(false);
     }
 
     @GetMapping("/register")
     public ModelAndView showRegistrationForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
         return new ModelAndView("register_new");
     }
 
@@ -639,16 +613,12 @@ public class Controller {
         return new ModelAndView("login_success");
     }
 
-    //MODIFICA (18/02/2024) : Aggiunta menù
     @GetMapping("/menu")
     public ModelAndView showMenuForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-
         System.out.println("GET (/menu)");
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/login");
-
         return new ModelAndView("menu_new");
     }
-    //FINE MODIFICA
 
     @GetMapping("/login")
     public ModelAndView showLoginForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -691,7 +661,6 @@ public class Controller {
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
         return new ModelAndView("password_reset_new");
     }
 
@@ -699,18 +668,16 @@ public class Controller {
     @GetMapping("/password_change")
     public ModelAndView showChangeForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
         return new ModelAndView("password_change");
     }
 
     @GetMapping("/mail_register")
     public ModelAndView showMailForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
-
         return new ModelAndView("mail_register");
     }
-    //Modifica 16/05/2024: Aggiunta login con Google
 
+    //Modifica 16/05/2024: Aggiunta login con Google
     // Questo metodo reindirizza l'utente alla pagina di autorizzazione di Google per il login
     @GetMapping("/loginWithGoogle")
     public void loginWithGoogle(HttpServletResponse response) throws IOException {
@@ -732,11 +699,6 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Session is not active");
     }
 }
-    @GetMapping("/test_prova")
-    @ResponseBody
-    public String test() {
-        return "test T23";
-    }
 
     @PostMapping("/changeLanguage")
     public String changeLanguage(HttpServletRequest request, @RequestParam("lang") String lang, RedirectAttributes redirectAttributes) {

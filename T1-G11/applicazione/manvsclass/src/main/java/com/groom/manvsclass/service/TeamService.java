@@ -11,10 +11,14 @@ import java.util.stream.Collectors;
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.client.RestTemplate;
 
 import com.groom.manvsclass.controller.EmailService;
 import com.groom.manvsclass.model.Assignment;
@@ -78,21 +82,46 @@ public class TeamService {
 
         // 6. Salva il team nel database
         Team savedTeam = teamRepository.save(team);
-
         // 7. Crea una relazione tra Admin e Team
         TeamAdmin teamManagement = new TeamAdmin(
-                adminUsername,                      // ID dell'Admin -- Ussername.
-                savedTeam.getIdTeam(),        // ID del Team appena creato
-                savedTeam.getName(),            //Nome Team
-                "Owner",                      // Ruolo (può essere parametrizzato)
-                true                          // Relazione attiva
+                adminUsername,                           // ID dell'Admin -- Ussername.
+                savedTeam.getIdTeam(),                   // ID del Team appena creato
+                savedTeam.getName(),                     //Nome Team
+                "Owner",                            // Ruolo (può essere parametrizzato)
+                true                            // Relazione attiva
         );
 
         // 8. Salva la relazione nel database
         teamAdminRepository.save(teamManagement);
-
         // 9. Restituisci una risposta con il team creato
         return ResponseEntity.ok().body(savedTeam);
+    }
+
+    // Funzione per inviare la notifica
+    public String sendNotification(String email, String title, String message) {
+        // Crea una nuova istanza di RestTemplate
+        RestTemplate restTemplate = new RestTemplate();
+        // Prepara i parametri della richiesta
+        String url = "http://t23-g1-app-1:8080/new_notification";
+        // Aggiungi i parametri alla richiesta
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        String params = "email=" + email + "&title=" + title + "&message=" + message;
+        // Crea l'oggetto HttpEntity che contiene i parametri e gli header
+        HttpEntity<String> entity = new HttpEntity<>(params, headers);
+        try {
+            // Invia la richiesta POST
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            // Verifica se la risposta è stata OK
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return "Notifica inviata con successo!";
+            } else {
+                return "Errore nell'invio della notifica: " + response.getStatusCode();
+            }
+        } catch (Exception e) {
+            // Gestione delle eccezioni
+            return "Errore durante la comunicazione con il server: " + e.getMessage();
+        }
     }
 
     // Elimina un team dato il nome del team
@@ -192,7 +221,6 @@ public class TeamService {
         return ResponseEntity.ok().body(existingTeam);
     }
 
-    
     // Metodo per visualizzare i team associati a un admin specifico
     public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
     System.out.println("Recupero dei team associati all'Admin in corso...");
@@ -257,33 +285,26 @@ public class TeamService {
   
     //Modifica 03/12/2024: Aggiunta dell'aggiungiStudenti
     public ResponseEntity<?> aggiungiStudenti(String idTeam, List<String> idStudenti, String jwt) {
-
-
         // 1. Verifica se il token JWT è valido
         if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
-    
         // 2. Estrai l'ID dell'admin dal JWT
         String adminUsername = jwtService.getAdminFromJwt(jwt);
-    
         // 3. Verifica se il team esiste
         Team existingTeam = teamRepository.findById(idTeam).orElse(null);
         if (existingTeam == null) {
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
         }
-    
         // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
         TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
         if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || !"Owner".equals(teamAdmin.getRole())) {
           return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
         }   
-
         //4.1 Verifica che non ho un array di id vuoto!
         if(idStudenti.isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Non hai selezionato nessuno studente.");
         }
-    
         // 5. Filtra gli studenti già presenti nel team
         List<String> nuoviStudenti = idStudenti.stream()
             .filter(idStudente -> !existingTeam.getStudenti().contains(idStudente))
@@ -295,13 +316,10 @@ public class TeamService {
     
         // 6. Aggiungi gli studenti validi al team
         existingTeam.getStudenti().addAll(nuoviStudenti);
-    
         // 7. Aggiorna il numero di studenti
         existingTeam.setNumStudenti(existingTeam.getStudenti().size());
-    
          // 8. Salva il team aggiornato
         Team updatedTeam = teamRepository.save(existingTeam);
-
         // 9. Recupero dettagli degli studenti per inviare le email.
         ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(nuoviStudenti, jwt);
         if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
@@ -322,11 +340,20 @@ public class TeamService {
         } catch (MessagingException e) {
             System.out.println("Errore durante l'invio della email.");
         }
-        
-        
 
-    // 10. Restituisci il team aggiornato come risposta
-    return ResponseEntity.ok().body(updatedTeam);
+        // 12. notifica l'utente nella pagina web
+        String Title = "Aggiunto al Team ";
+        String message = "Ora fai parte di " + existingTeam.getName();
+        for (String email : emails){
+            try {
+                sendNotification(email,Title, message);
+            } catch (Exception e) {
+                System.out.println("Errore durante l'invio della notifica.");
+            }
+        }
+        
+        // 10. Restituisci il team aggiornato come risposta
+        return ResponseEntity.ok().body(updatedTeam);
   }
 
     //Modifica 04/12/2024: Aggiunta ottieniStudentiTeam
@@ -402,7 +429,6 @@ public class TeamService {
         // 9. Restituisci il team aggiornato come risposta
         return ResponseEntity.ok().body(updatedTeam);
     }
-
 
     
 }

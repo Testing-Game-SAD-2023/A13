@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 
-import com.groom.manvsclass.controller.EmailService;
 import com.groom.manvsclass.model.Assignment;
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.model.TeamAdmin;
@@ -23,23 +22,14 @@ import com.groom.manvsclass.model.repository.TeamRepository;
 @Service
 public class AssignmentService {
     
-
     @Autowired
     private TeamRepository teamRepository;
     @Autowired
     private TeamAdminRepository teamAdminRepository;
-
     @Autowired
     private JwtService jwtService;  // Servizio per la validazione del JWT
-
     @Autowired
     private AssignmentRepository assignmentRepository;
-
-    @Autowired
-    private StudentService studentService;
-
-    @Autowired 
-    private EmailService emailService;
 
     //Modifica 07/12/2024 : creazione funzione per la creazione di un assignment
     @Transactional
