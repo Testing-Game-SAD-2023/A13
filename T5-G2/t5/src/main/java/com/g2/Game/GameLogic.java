@@ -20,6 +20,7 @@ package com.g2.Game;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import com.g2.Interfaces.ServiceManager;
 
@@ -67,12 +68,22 @@ public abstract class GameLogic {
     //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
     protected void CreateGame() {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, this.difficulty, this.ClasseUT, this.gamemode, this.PlayerID);
+        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, this.difficulty, this.ClasseUT, this.gamemode, this.PlayerID,Optional.empty());
         int robot_id =(int) serviceManager.handleRequest("T4", "GetRobotID", this.ClasseUT, this.type_robot, this.difficulty);
         this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time, robot_id);
         this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
         System.out.println("ROUND:"+getRoundID()+ "GAME"+getGameID() + "TURN" + getTurnID());
     }
+
+    protected void CreateGame(int scalataID) {
+        String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, this.difficulty, this.ClasseUT, this.gamemode, this.PlayerID, Optional.of(scalataID));
+        int robot_id =(int) serviceManager.handleRequest("T4", "GetRobotID", this.ClasseUT, this.type_robot, this.difficulty);
+        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time, robot_id);
+        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        System.out.println("ROUND:"+getRoundID()+ "GAME"+getGameID() + "TURN" + getTurnID());
+    }
+
 
     protected void CreateTurn(String Time, int userScore) {
         

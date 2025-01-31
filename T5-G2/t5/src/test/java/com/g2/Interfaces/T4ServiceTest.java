@@ -35,6 +35,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.util.Optional;
+
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.t5.T5Application;
@@ -156,17 +159,17 @@ public class T4ServiceTest {
          */
         @Test
         public void testCreateGame_ValidGameCreation() {
-                String mockResponse = "{\"id\": 12345}";
-                mockServer.expect(requestTo(Base_URL + "/games"))
-                                .andExpect(method(HttpMethod.POST))
-                                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
-
-                int gameId = (int) T4Service.handleRequest("CreateGame", "2024-10-29T10:00:00Z", "Hard", "GameName",
-                                "Description", "Username");
-                assertEquals(12345, gameId);
-                mockServer.verify();
+            String mockResponse = "{\"id\": 12345}";
+            mockServer.expect(requestTo(Base_URL + "/games"))
+                            .andExpect(method(HttpMethod.POST))
+                            .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+        
+            int gameId = (int) T4Service.handleRequest("CreateGame", "2024-10-29T10:00:00Z", "Hard", "GameName",
+                            "Description", "Username", Optional.of(Integer.valueOf(3)));
+            assertEquals(12345, gameId);
+            mockServer.verify();
         }
-
+        
         /*
          * Test5: testCreateRound_ValidResponse
          * Precondizioni: Parametri validi per creare un nuovo round.

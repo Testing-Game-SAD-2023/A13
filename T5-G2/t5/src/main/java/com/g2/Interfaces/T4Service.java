@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.g2.Model.Game;
 import com.g2.Model.StatisticProgress;
@@ -59,8 +60,8 @@ public class T4Service extends BaseService {
 
         registerAction("CreateGame", new ServiceActionDefinition(
                 params -> CreateGame((String) params[0], (String) params[1], (String) params[2], (String) params[3],
-                        (String) params[4]),
-                String.class, String.class, String.class, String.class, String.class));
+                        (String) params[4], (Optional<Integer>)params[5]),
+                String.class, String.class, String.class, String.class, String.class, Optional.class));
 
         registerAction("EndGame", new ServiceActionDefinition(
                 params -> EndGame((int) params[0], (String) params[1], (String) params[2], (int) params[3],
@@ -164,7 +165,7 @@ public class T4Service extends BaseService {
     }
 
     //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
-    private int CreateGame(String Time, String difficulty, String name, String description, String id) {
+    private int CreateGame(String Time, String difficulty, String name, String description, String id, Optional<Integer> scalataId) {
         System.out.println("CREATE GAME - T4 SERVICE");
         final String endpoint = "/games";
         JSONObject obj = new JSONObject();
@@ -172,6 +173,9 @@ public class T4Service extends BaseService {
         obj.put("name", name);
         obj.put("description", description);
         obj.put("startedAt", Time);
+        if(scalataId.isPresent()) {
+            obj.put("selectedScalata", scalataId.get());
+        }
         JSONArray playersArray = new JSONArray();
         playersArray.put(String.valueOf(id));
         obj.put("players", playersArray);

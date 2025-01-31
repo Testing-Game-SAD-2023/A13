@@ -41,8 +41,8 @@ public class ScalataGame extends GameLogic {
     private int currentRoundIndex;  //indice usato per la lettura della lista interna
     private int totalScore;
 
-    public ScalataGame(ServiceManager serviceManager, String playerID, String scalata_name, String classeUT,
-                       List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
+    public ScalataGame(ServiceManager serviceManager, String playerID,  String classeUT,
+                        String scalata_name,List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
         super(serviceManager, playerID, classeUT, typesRobot.get(0), difficulties.get(0), mode); 
         this.games = new ArrayList<>();
         this.currentRound = 1; // Inizia dal round 1
@@ -85,7 +85,7 @@ public class ScalataGame extends GameLogic {
                     }
                     else{
                         
-                        games.get(currentRoundIndex).CreateGame();
+                        games.get(currentRoundIndex).CreateGame(id_scalata);
                         this.updateScalata(id_scalata, games.get(currentRoundIndex).getRoundID());
                     }
 
@@ -146,7 +146,7 @@ public class ScalataGame extends GameLogic {
     @Override
     protected void CreateGame(){
         createScalata(getPlayerID(),this.scalata_name);
-        games.get(currentRoundIndex).CreateGame();
+        games.get(currentRoundIndex).CreateGame(id_scalata);
     }
 
     //funzione per ottenere lo stato interno della scalata
