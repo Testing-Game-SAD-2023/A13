@@ -65,14 +65,14 @@ $.ajax({
                 var message = "";
 
                 if (isPersonalizzabile) {
-                    message = "Questa scalata è personalizzabile.";
+                    message = info_scalata_personalizzabile;
                 } else if (isPredefinitaRandoop) {
-                    message = "Questa scalata è predefinita Randoop.";
+                    message = info_scalata_randoop ;
                 } else if (isPredefinitaEvosuite) {
-                    message = "Questa scalata è predefinita Evosuite.";
+                    message = info_scalata_evosuite;
                 }
                 
-                swal("Info Scalata", message, "info");
+                swal(info_scalata_titolo, message, "info");
             };
 
             listItem.appendChild(infoButton);

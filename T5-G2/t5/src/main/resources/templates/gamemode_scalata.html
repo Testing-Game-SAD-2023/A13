@@ -102,6 +102,15 @@
     </div>
   </div>
 </div>
+
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
+<script th:inline="javascript">
+    const info_scalata_personalizzabile = /*[[#{info_scalata_personalizzabile}]]*/ '';
+    const info_scalata_randoop = /*[[#{info_scalata_randoop}]]*/ '';
+    const info_scalata_evosuite = /*[[#{info_scalata_evosuite}]]*/ '';
+    const info_scalata_titolo = /*[[#{info_scalata_titolo}]]*/ '';
+</script>
 </body>
 
 </html>
