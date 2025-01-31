@@ -123,6 +123,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 allowInteraction: false
             },
             {
+                element: '#modeRobotSelect',
+                popover: {
+                    title: 'vuoi creare una scalata personalizzabile cioè con tutti i tipi di robot, o predefinita cioè che abbia una sola tipologia di robot?',
+                    description: 'grazie a questo menù a tendina se scegli la modalità personalizzabile puoi scegliere robot diversi per ogni classe, invece se scegli la modalità predefinita potrai selezionare il tipo di robot che deve possedere la tua scalata',
+                    side: "left",
+                    align: 'start' 
+                },
+                allowInteraction: false
+                
+            },
+            {
                 element: '#difficultyFilter',
                 popover: {
                     title: 'Non trovi quello che stai cercando?',
@@ -131,6 +142,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     align: 'start' 
                 },
                 allowInteraction: false
+                
             },
             {
                 element: '#summaryButton',
