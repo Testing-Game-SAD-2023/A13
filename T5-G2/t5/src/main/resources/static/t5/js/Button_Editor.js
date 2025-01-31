@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		 Difficolta + 	localStorage.getItem("difficulty") + "<br>" +
 		"Robot: " 	   +	localStorage.getItem("robot");
 	if (localStorage.getItem("modalita") == "Scalata")
-		messaggio += "<br>Round attuale: " + localStorage.getItem("current_round_scalata");
+		messaggio += "<br>"+ round_corrente_info +": "+ localStorage.getItem("current_round_scalata");
 	var popover = new bootstrap.Popover(popoverButton, {
 		content: messaggio,  	  // Usa il contenuto dal localStorage
 		trigger: 'click',         // Mostra il popover al passaggio del mouse (puoi cambiare con 'click' o 'focus')
@@ -280,6 +280,8 @@ function flush_localStorage(){
 	if(localStorage.getItem("modalita") == "Scalata"){
 
 		pulisciLocalStorage("scalataId");
+		pulisciLocalStorage("SelectedScalata");
+		pulisciLocalStorage("gameId");
 		pulisciLocalStorage("scalata_name");
 		pulisciLocalStorage("scalata_classes");
 		pulisciLocalStorage("scalata_robots");
