@@ -29,6 +29,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -214,18 +215,20 @@ public class T4ServiceTest {
          * Post-condizioni:
          * - Verificare che la risposta del turno creato corrisponda a quella mockata.
          */
-        /*@Test
+        @Test
         public void testCreateTurn_ValidResponse() {
-                String mockResponse = "{\"turnId\": 3456}";
+                String mockResponse = "{\"id\": \"3456\"}";  //EDIT: id invece di turnId
+                
                 mockServer.expect(requestTo(Base_URL + "/turns"))
-                                .andExpect(method(HttpMethod.POST))
-                                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+                        .andExpect(method(HttpMethod.POST))
+                        .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
-                String result = (String) T4Service.handleRequest("CreateTurn", "PlayerId", 6789,
-                                "2024-10-29T11:00:00Z");
-                assertEquals(mockResponse, result);
+                String result = (String) T4Service.handleRequest("CreateTurn", "PlayerId", 6789, 
+                        "2024-10-29T11:00:00Z");
+
+                assertEquals("3456", result); //EDIT: confronta solo l'ID
                 mockServer.verify();
-        }*/
+        }
 
         /*
          * Test8: testEndTurn_SuccessResponse
@@ -234,20 +237,24 @@ public class T4ServiceTest {
          * Post-condizioni:
          * - Verificare che lo stato sia "completed".
          */
-        /*@Test
+        @Test
         public void testEndTurn_SuccessResponse() {
                 int turnId = 3456;
+                int userScore = 90;
+                String time = "2024-10-29T11:00:00Z";
                 String expectedUrl = String.format("http://t4-g18-app-1:3000/turns/%d", turnId);
                 String mockResponse = "{\"status\": \"completed\"}";
 
                 mockServer.expect(requestTo(expectedUrl))
-                                .andExpect(method(HttpMethod.PUT))
-                                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+                        .andExpect(method(HttpMethod.PUT))
+                        .andExpect(content().json("{\"scores\":\"90\", \"closedAt\":\"2024-10-29T11:00:00Z\"}")) //EDIT: Controlla il JSON inviato
+                        .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
-                String result = (String) T4Service.handleRequest("EndTurn", "90", "2024-10-29T11:00:00Z", turnId);
+                String result = (String) T4Service.handleRequest("EndTurn", userScore, time, String.valueOf(turnId)); //EDIT: ora turnId è stringa
+
                 assertEquals(mockResponse, result);
                 mockServer.verify();
-        }*/
+        }
 
         /*
          * Test9: testCreateScalata_ValidResponse
@@ -256,20 +263,21 @@ public class T4ServiceTest {
          * Post-condizioni:
          * - Verificare che l'ID della scalata creata corrisponda a quello mockato.
          */
-        /* 
         @Test
         public void testCreateScalata_ValidResponse() {
-                String mockResponse = "{\"scalataId\": 7890}";
-                mockServer.expect(requestTo("http://t4-g18-app-1:3000/scalates"))
-                                .andExpect(method(HttpMethod.POST))
-                                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+                String mockResponse = "{\"id\": \"7890\"}";  //EDIT: corretto il nome della chiave JSON
 
-                String result = (String) T4Service.handleRequest("CreateScalata", "PlayerId", "ScalataName", "10:00:00",
-                                "2024-10-29");
-                assertEquals(mockResponse, result);
+                mockServer.expect(requestTo("http://t4-g18-app-1:3000/scalates"))
+                        .andExpect(method(HttpMethod.POST))
+                        .andExpect(content().json("{\"playerID\": 123, \"scalataName\": \"ScalataName\", \"creationTime\": \"10:00:00\", \"creationDate\": \"2024-10-29\"}")) //EDIT: Controlla il JSON inviato
+                        .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+                String result = (String) T4Service.handleRequest("CreateScalata", "123", "ScalataName", "10:00:00", "2024-10-29");
+
+                assertEquals("7890", result);  //EDIT: confronta solo l'ID, non l'intero JSON
                 mockServer.verify();
         }
-        */
+
         /*
          * Test10: testEndGame_ValidGameEnd
          * Precondizioni: ID di gioco valido e parametri corretti per chiudere il gioco.
@@ -278,7 +286,7 @@ public class T4ServiceTest {
          * - Verificare che la risposta del gioco terminato corrisponda a quella
          * mockata.
          */
-        /*@Test
+        @Test
         public void testEndGame_ValidGameEnd() {
                 // Parametri di input del metodo
                 int gameId = 12345;
@@ -295,32 +303,29 @@ public class T4ServiceTest {
 
                 // Configurazione del mock server
                 mockServer.expect(requestTo(expectedUrl))
-                                .andExpect(method(HttpMethod.POST))
-                                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+                .andExpect(method(HttpMethod.PUT)) //EDIT: Corretto metodo HTTP
+                .andExpect(content().json("{\"closedAt\": \"2024-10-29T12:00:00Z\", \"username\": \"TestUser\", \"score\": 100, \"isWinner\": true}")) //EDIT: Controlla JSON inviato
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
                 // Chiamata al metodo sotto test
-
-                // EndGame
-                String response = (String) T4Service.handleRequest("EndGame", gameId, username, closedAt, score,
-                                isWinner);
+                String response = (String) T4Service.handleRequest("EndGame", gameId, username, closedAt, score, isWinner);
 
                 // Verifica della risposta
                 assertEquals(mockResponse, response);
 
                 // Verifica delle aspettative del mock server
                 mockServer.verify();
-        }*/
+        }
 
         /*
          * Test11: testEndGame_ValidGameEnd_NotWinner
-         * Precondizioni: ID di gioco valido, username, data di chiusura, punteggio e
+         * Precondizioni: ID di gioco valido, username, data di chiusura, punteggio
          * flag isWinner impostato a false.
          * Azioni: Invocare EndGame con parametri validi per chiudere il gioco.
          * Post-condizioni: Verificare che la risposta sia quella mockata e che le
          * aspettative del mock server siano soddisfatte.
          */
-
-        /*@Test
+        @Test
         public void testEndGame_ValidGameEnd_NotWinner() {
                 // Parametri di input del metodo
                 int gameId = 12345;
@@ -337,18 +342,82 @@ public class T4ServiceTest {
 
                 // Configurazione del mock server
                 mockServer.expect(requestTo(expectedUrl))
-                                .andExpect(method(HttpMethod.POST))
+                                .andExpect(method(HttpMethod.PUT)) //EDIT: Corretto metodo HTTP
+                                .andExpect(content().json("{\"closedAt\": \"2024-10-29T12:00:00Z\", \"username\": \"TestUser\", \"score\": 100, \"isWinner\": false}")) // Controlla JSON inviato
                                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
                 // Chiamata al metodo sotto test
-                String response = (String) T4Service.handleRequest("EndGame", gameId, username, closedAt, score,
-                                isWinner);
+                String response = (String) T4Service.handleRequest("EndGame", gameId, username, closedAt, score, isWinner);
 
                 // Verifica della risposta
                 assertEquals(mockResponse, response);
 
                 // Verifica delle aspettative del mock server
                 mockServer.verify();
-        }*/
+        }
+
+        //EDTI: NUOVI TEST
+        /*
+         * Test12: testUpdateScalata_ValidUpdate
+         * Precondizioni: ID di scalata valido, roundid, data di update
+         * Azioni: Invocare UpdateScalata con parametri validi per chiudere il gioco.
+         * Post-condizioni: Verificare che la risposta sia quella mockata e che le
+         * aspettative del mock server siano soddisfatte.
+         */
+        @Test
+        public void testUpdateScalata_ValidUpdate() {
+                // Parametri di input del metodo
+                int scalataId = 567;
+                int roundId = 3;
+                String updateDate = "2024-10-30";
+
+                String expectedUrl = String.format("%s/scalates/%d", Base_URL, scalataId); //URL di endpoint atteso
+                String mockResponse = "{\"status\": \"updated\"}"; //Mock della risposta attesa
+
+                //Configurazione del mock server
+                mockServer.expect(requestTo(expectedUrl))
+                        .andExpect(method(HttpMethod.PUT))
+                        .andExpect(content().json("{\"CurrentRound\": 3, \"updateDate\": \"2024-10-30\"}")) // Controlla JSON inviato
+                        .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+                //Chiamata al metodo sotto test
+                String response = (String) T4Service.handleRequest("UpdateScalata", scalataId, roundId, updateDate);
+                
+                assertEquals(mockResponse, response); //Verifica della risposta
+                mockServer.verify(); //Verifica delle aspettative del mock server
+        }
+
+        /*
+         * Test13: testCloseScalata_ValidClose
+         * Precondizioni: ID di scalata valido, roundid, data di chiusura, punteggio
+         * flag isWin impostato a true.
+         * Azioni: Invocare CloseScalata con parametri validi per chiudere il gioco.
+         * Post-condizioni: Verificare che la risposta sia quella mockata e che le
+         * aspettative del mock server siano soddisfatte.
+         */
+        @Test
+        public void testCloseScalata_ValidClose() {
+                // Parametri di input del metodo
+                int scalataId = 567;
+                int roundId = 3;
+                boolean isWin = true;
+                int finalScore = 2500;
+                String closeTime = "2024-10-30T15:30:00Z";
+
+                String expectedUrl = String.format("%s/scalates/%d", Base_URL, scalataId); //URL di endpoint atteso
+                String mockResponse = "{\"status\": \"closed\", \"FinalScore\": 2500, \"isFinished\": true}"; //Mock della risposta attesa
+
+                //Configurazione del mock server
+                mockServer.expect(requestTo(expectedUrl))
+                        .andExpect(method(HttpMethod.PUT))
+                        .andExpect(content().json("{\"CurrentRound\": 3, \"isFinished\": true, \"FinalScore\": 2500, \"ClosedAt\": \"2024-10-30T15:30:00Z\"}")) // Controlla JSON inviato
+                        .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
+
+                // Chiamata al metodo sotto test
+                String response = (String) T4Service.handleRequest("CloseScalata", scalataId, roundId, isWin, finalScore, closeTime);
+
+                assertEquals(mockResponse, response); //Verifica della risposta
+                mockServer.verify(); //Verifica delle aspettative del mock server
+        }
 
 }

@@ -42,6 +42,41 @@ $.ajax({
             listItem.appendChild(button);
             listItem.appendChild(badge);
 
+            //EDIT: info per sapere se è predefinita o personalizzabile
+            var infoButton = document.createElement('button');
+            infoButton.textContent = "Info";
+            infoButton.classList.add('btn', 'btn-info', 'btn-sm', 'ml-2');
+            infoButton.setAttribute('data-scalata', item.scalataName);
+
+            infoButton.onclick = function() {
+                //robot nella scalata
+                var robots = item.selectedClasses.map(function(classItem) {
+                    return classItem.robot;
+                });
+
+                //solo nomi unici
+                var uniqueRobots = [...new Set(robots)];
+
+                //quindi se scalata è randoop allora in uniquerobot ci sarà un solo elemento randoop, ecc..
+                var isPredefinitaRandoop = uniqueRobots.length === 1 && uniqueRobots[0] === "Randoop";
+                var isPredefinitaEvosuite = uniqueRobots.length === 1 && uniqueRobots[0] === "Evosuite";
+                var isPersonalizzabile = uniqueRobots.includes("Randoop") && uniqueRobots.includes("Evosuite");
+
+                var message = "";
+
+                if (isPersonalizzabile) {
+                    message = "Questa scalata è personalizzabile.";
+                } else if (isPredefinitaRandoop) {
+                    message = "Questa scalata è predefinita Randoop.";
+                } else if (isPredefinitaEvosuite) {
+                    message = "Questa scalata è predefinita Evosuite.";
+                }
+                
+                swal("Info Scalata", message, "info");
+            };
+
+            listItem.appendChild(infoButton);
+
             button.onclick = function() {
 
                 // Remove the 'active' class from all buttons
