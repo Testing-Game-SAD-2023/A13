@@ -86,6 +86,12 @@ public class ExerciseRestController {
 
     @PutMapping("/exercise")
     public Exercise addExercise(@RequestBody Exercise exercise){
+        if(exercise.getCreationTime()==null){
+            exercise.setCreationTime(Instant.now());
+        }
+        if(exercise.getStartingTime()==null){
+            exercise.setStartingTime(exercise.getCreationTime());
+        }
         exercise = exerciseRepository.insert(exercise);
         try{
             ExerciseModelManager.generateGoalsForExercise(exercise, goalRepository);
