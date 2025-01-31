@@ -144,7 +144,7 @@ async function handleGameAction(isGameEnd) {
 
 // Gestisce la risposta dal server
 function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
-    const { robotScore, userScore, totalScore, outCompile, 
+    const { robotScore, userScore, totalScore , outCompile, 
             coverage, gameId, roundId,
             coverageDetails} = response;
     // Aggiorna i dati del modulo con gameId e roundId

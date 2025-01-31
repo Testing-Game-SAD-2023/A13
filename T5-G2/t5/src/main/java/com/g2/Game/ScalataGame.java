@@ -47,7 +47,7 @@ public class ScalataGame extends GameLogic {
         this.games = new ArrayList<>();
         this.currentRound = 1; // Inizia dal round 1
         this.currentRoundIndex = 0;
-        this.totalScore = 0;
+        this.totalScore = 0 ;
         this.currentStatus = ScalataGamestatus.IN_PROGRESS;
         this.scalata_name = scalata_name;
 

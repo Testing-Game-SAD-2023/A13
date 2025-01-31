@@ -426,7 +426,7 @@ public class GameController {
     //metodo di supporto per creare la risposta
     private ResponseEntity<String> createResponseRun(
             Map<String, String> userData, int robotScore,
-            int userScore, int totalScore, boolean gameOver,
+            int userScore, int totalScore , boolean gameOver,
             int[] lineCoverageValues,
             int[] branchCoverageValues,
             int[] instructionCoverageValues) {
