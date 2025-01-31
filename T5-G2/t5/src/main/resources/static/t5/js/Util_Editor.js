@@ -284,9 +284,11 @@ function setStatus(statusName) {
     }
 }
 
-function highlightCodeCoverage(reportContent, editor) {
+// ***** MODIFICA ***** //
+function highlightCodeCoverage(reportContent, reportRobot, editor) {
 	// Analizza il contenuto del file di output di JaCoCo per individuare le righe coperte, non coperte e parzialmente coperte
 	// Applica lo stile appropriato alle righe del tuo editor
+	
 	var coveredLines = [];
 	var uncoveredLines = [];
 	var partiallyCoveredLines = [];
@@ -316,7 +318,81 @@ function highlightCodeCoverage(reportContent, editor) {
 		editor.removeLineClass(lineNumber - 2, "gutter", "bg-success");
 		editor.addLineClass	(lineNumber - 2, "gutter", "bg-warning");
 	});
+
+	// Si valorizzano i vettori di righe coperte / non coperte / parzialmente coperte
+	reportRobot.querySelectorAll("line").forEach(function (line) {
+		if (line.getAttribute("mi") == 0)
+			RobotcoveredLines.push(line.getAttribute("nr"));
+		else if (
+			line.getAttribute("cb") /
+				(line.getAttribute("mb") + line.getAttribute("cb")) ==
+			2 / 4
+		)
+			RobotpartiallyCoveredLines.push(line.getAttribute("nr"));
+		else RobotuncoveredLines.push(line.getAttribute("nr"));
+	});
+
 }
+
+// ***** MODIFICA *****
+/*
+	Funzione per la visualizzazione della copertura dei robot in relazione
+	alla pressione del pulsante
+*/
+function showRobotCoverage(editor){
+
+	if (check == 0){ // Pulsante = 0 => Visualizzazione Copertura
+		document.getElementById("viewRobotCoverageButton").style.backgroundColor = 'gray';
+        document.getElementById("viewRobotCoverageButton").style.color = 'black'; // Testo nero
+		RobotcoveredLines.forEach(function (lineNumber) {
+			editor.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+			editor.addLineClass(lineNumber - 2, "wrap", "covered-line");
+		});
+	
+		RobotuncoveredLines.forEach(function (lineNumber) {
+			editor.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+			editor.addLineClass(lineNumber - 2, "wrap", "uncovered-line");
+		});
+	
+		RobotpartiallyCoveredLines.forEach(function (lineNumber) {
+			editor.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+			editor.addLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+		});
+		check = 1;
+	}
+
+	else { // Pulsante = 1 => Interruzione Visualizzazione Copertura
+		document.getElementById("viewRobotCoverageButton").style.backgroundColor = 'rgb(101, 204, 238)';
+        document.getElementById("viewRobotCoverageButton").style.color = 'black';
+		RobotcoveredLines.forEach(function (lineNumber) {
+			editor.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+		});
+	
+		RobotuncoveredLines.forEach(function (lineNumber) {
+			editor.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+		});
+	
+		RobotpartiallyCoveredLines.forEach(function (lineNumber) {
+			editor.removeLineClass(lineNumber - 2, "wrap", "uncovered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "covered-line");
+			editor.removeLineClass(lineNumber - 2, "wrap", "partially-covered-line");
+		});
+		check = 0;
+	}
+
+}
+
+
+// Aggiunta listener sul pulsante per la visualizzazione della copertura dei robot
+document.getElementById("viewRobotCoverageButton").addEventListener("click", () => showRobotCoverage(editor_robot));
+
 
 // Funzione per ottenere i dati del form da inviare
 function getFormData() {

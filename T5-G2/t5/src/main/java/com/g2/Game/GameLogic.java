@@ -20,6 +20,7 @@ package com.g2.Game;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 import com.g2.Interfaces.ServiceManager;
 
@@ -51,7 +52,7 @@ public abstract class GameLogic {
     /*
      * PlayTurn deve aggiornalo lo stato della partita ad ogni turno, il concetto di turno può esser gestito come si vuole
      */
-    public abstract void playTurn(int userScore, int robotScore);
+    public abstract void playTurn(double userScore, int robotScore);
     /*
      * Si deve personalizzare la condizione di fine del gioco, in generale l'utente può sempre decretarne la fine tramite l'editor.
      */
@@ -60,7 +61,7 @@ public abstract class GameLogic {
      * In base alla modalità va specificato come viene calcolato lo score, solo la COV viene fornita gli altri sono 
      * parametri interni alla classe di gioco.
      */
-    public abstract int GetScore(int cov);
+    public abstract int GetScore(String jacoco_xml,int num_lines,int numPrivateMethods, ArrayList<Integer> privateMethodLines, int cyclomaticComplexity, String difficulty);
 
     /*
      * Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
@@ -140,5 +141,11 @@ public abstract class GameLogic {
         this.gamemode = gamemode;
     }
 
+   
+   
+
+
+    
+    
 
 }

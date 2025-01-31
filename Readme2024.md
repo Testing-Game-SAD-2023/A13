@@ -13,8 +13,9 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente 
-Nomi degli autori dei nuovi contributi presenti in questo repository 
-
+Emanuele Barbato M63001822
+Gianluca Fabbo M63001812
+Alessandro Cajafa M63001804
 
 # Funzionalità dell'Applicazione 
 L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi. 
@@ -148,10 +149,12 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-TBD
+1) Aggiunto un pulsante nell'editor per visualizzare/nascondere l'indicazione grafica sulla copertura di righe di codice della classe UT da parte del robot(Randoop) una volta inviata la soluzione dell'utente
+2) Modificato e migliorato il meccanismo di punteggio, inserendo nuovi fattori di calcolo come la complessità ciclomatica della classe, il numero di metodi privati coperti e bonus primo turno 
+3) Inserito un nuovo container T10 frutto di un tentativo di compilazione delle classi di Test generate da EvoSuite
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
+https://github.com/XEmanueleBarbatoX/A13/tree/main/Documentazione_2024
 
 
 
