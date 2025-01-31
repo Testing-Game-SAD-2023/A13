@@ -31,9 +31,7 @@ public class ClassScoreGoal extends Goal {
     String className;
 
     public boolean match(Map<String, String> userData, GameLogic gameLogic, int robotScore, int userScore){
-        if(userData.containsKey("uut")) return false;
-        String uut = userData.get("uut");
-        if(uut.equals(className) && userScore >= expectedScore){
+        if(className.equals(gameLogic.getClasseUT()) && userScore >= expectedScore){
             completition = 100;
             return true;
         }

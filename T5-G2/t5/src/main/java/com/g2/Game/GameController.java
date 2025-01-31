@@ -341,7 +341,11 @@ public class GameController {
                 activeGames.remove(playerId);
 
                 //B12-giulio: put achievements calcs here
-                goalService.updateGoalProgresses(userData, gameLogic, playerId, robotScore, userScore);
+                try{
+                    goalService.updateGoalProgresses(userData, gameLogic, Integer.parseInt(playerId), robotScore, userScore);
+                }catch(Exception ex){
+                    logger.error("Error during goals update in game controller",ex);
+                }
 
                 gameLogic.EndGame(//B12-giulio: metodo aggiunto per la sedimentazione in t4
                     ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),

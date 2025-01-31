@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.mail.MessagingException;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -78,8 +79,8 @@ public class TeamRestController {
         for (User user : users) {
             try {
                 emailService.sendTeamDeletedEmail(user.getEmail(), team.getName());
-            } catch (MessagingException e) {
-                throw new RuntimeException("Failed to send email notification", e);
+            } catch (Exception e) {
+                LoggerFactory.getLogger(TeamRestController.class).error("Failed to send email notification", e);
             }
         }
 
@@ -131,8 +132,8 @@ public class TeamRestController {
 
         try {
             emailService.sendStudentAddedToTeamEmail(userRepository.getById(user_id).getEmail(), teamRepository.getById(team_id).getName());
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email notification", e);
+        } catch (Exception e) {
+            LoggerFactory.getLogger(TeamRestController.class).error("Failed to send email notification", e);
         }
         
         updateAllExercises(team_id);
@@ -157,8 +158,8 @@ public class TeamRestController {
 
         try {
             emailService.sendStudentRemovedFromTeamEmail(userRepository.getById(user.getID()).getEmail(), team.getName());
-        } catch (MessagingException e) {
-                throw new RuntimeException("Failed to send email notification", e);
+        } catch (Exception e) {
+                LoggerFactory.getLogger(TeamRestController.class).error("Failed to send email notification", e);
         }
         updateAllExercises(team);
     }
@@ -297,8 +298,8 @@ public class TeamRestController {
         try{
             Map<String, Object> nodeMap = mapper.readValue(json, new TypeReference<HashMap<String, Object>>(){});
         
-            List<String> students = new ArrayList<String>(team.getStudentList().size());
-            team.getStudentList().forEach((student)->{students.add(student.email);});
+            List<Integer> students = new ArrayList<Integer>(team.getStudentList().size());
+            team.getStudentList().forEach((student)->{students.add(student.getID());});
             nodeMap.put("teamId", team.getID());
             nodeMap.put("students",students);
             json = mapper.convertValue(nodeMap, JsonNode.class).toString();

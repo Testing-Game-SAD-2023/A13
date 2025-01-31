@@ -57,7 +57,7 @@ public class ExerciseRestController {
 
     @GetMapping("/goal")
     public List<Goal> getGoals(
-        @RequestParam(required = false) String playerId,
+        @RequestParam(required = false) Integer playerId,
         @RequestParam(required = false) String assignmentId,
         @RequestParam(required = false) Boolean isCompleted,
         @RequestParam(required = false) Boolean isValid
@@ -144,9 +144,9 @@ public class ExerciseRestController {
 
             if(node.has("students")){
                 JsonNode students = node.get("students");
-                exercise.students = new ArrayList<String>();
+                exercise.students = new ArrayList<Integer>();
                 for(JsonNode student : students){
-                    exercise.students.add(student.asText());
+                    exercise.students.add(student.asInt());
                 }
                 ExerciseModelManager.updateGoalsForExercise(exercise, goalRepository);
             }

@@ -39,7 +39,7 @@ public  class GoalRepository{
     }
 
     public List<Goal> findAll(
-        String playerId,
+        Integer playerId,
         String assignmentId,
         Boolean completed,
         Boolean isValid
@@ -64,7 +64,7 @@ public  class GoalRepository{
             //questi contano nel join
             String pipelineStageString="{ $lookup: { from: \"goals\", let: { exeId: \"$_id\" }, pipeline: [{ $match: { $expr: { $and:[{$eq: [\"$$exeId\", { $toObjectId: \"$assignmentId\" }] }";
             if(playerId!=null){
-                pipelineStageString+=",{$eq:[\"$playerId\",\""+playerId+"\"]}";
+                pipelineStageString+=",{$eq:[\"$playerId\","+playerId+"]}";
             }
             if(completed != null){
                 if(completed){
@@ -73,7 +73,7 @@ public  class GoalRepository{
                     pipelineStageString+=",{$ne:[\"$completition\",100]} ";
                 }
             }
-            pipelineStageString+="] } }}], as: \"eGoals\" }}";
+            pipelineStageString+="] } }},{$addFields:{id:{$toString:\"$_id\"}}}], as: \"eGoals\" }}";
             
             System.out.println(pipelineStageString);
 

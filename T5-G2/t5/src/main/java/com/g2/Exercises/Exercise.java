@@ -66,9 +66,9 @@ public class Exercise {
 
 
     @Transient    
-    List<String> students;
+    List<Integer> students;
     @JsonIgnore
-    List<String> getStudents(){
+    List<Integer> getStudents(){
         return students;
     }
     

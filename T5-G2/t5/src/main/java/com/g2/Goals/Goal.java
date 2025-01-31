@@ -33,7 +33,7 @@ public abstract class Goal{
     @EqualsAndHashCode.Exclude
     String id;
     String assignmentId;
-    String playerId;
+    int playerId;
     Integer type;
     @EqualsAndHashCode.Exclude
     Integer completition;

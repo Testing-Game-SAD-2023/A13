@@ -27,7 +27,7 @@ public class GoalService {
      * @param robotScore
      * @param playerScore
      */
-    public void updateGoalProgresses(Map<String, String> userData, GameLogic gameLogic, String playerId, int robotScore, int playerScore){
+    public void updateGoalProgresses(Map<String, String> userData, GameLogic gameLogic, int playerId, int robotScore, int playerScore){
         
         List<Goal> goals = goalRepository.findAll(
             playerId,

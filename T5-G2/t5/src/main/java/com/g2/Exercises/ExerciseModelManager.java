@@ -14,7 +14,7 @@ public class ExerciseModelManager {
     {
         Goal goal;
         for(String generatingString : exercise.getGoalTypes()){
-            for(String student : exercise.getStudents()){
+            for(int student : exercise.getStudents()){
                 goal = Goal.deserialize(generatingString);
                 
                 goal.setAssignmentId(exercise.id);
@@ -65,7 +65,7 @@ public class ExerciseModelManager {
         Goal goal;
         
         for(String generatingString : exercise.getGoalTypes()){
-            for(String student : exercise.getStudents()){
+            for(int student : exercise.getStudents()){
                 
                 goal = Goal.deserialize(generatingString);
                 goal.setAssignmentId(exercise.id);
