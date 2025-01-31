@@ -190,7 +190,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		 ClasseUT  + 	localStorage.getItem("underTestClassName") + "<br>" +
 		 Difficolta + 	localStorage.getItem("difficulty") + "<br>" +
 		"Robot: " 	   +	localStorage.getItem("robot");
-	
+	if (localStorage.getItem("modalita") == "Scalata")
+		messaggio += "<br>Round attuale: " + localStorage.getItem("current_round_scalata");
 	var popover = new bootstrap.Popover(popoverButton, {
 		content: messaggio,  	  // Usa il contenuto dal localStorage
 		trigger: 'click',         // Mostra il popover al passaggio del mouse (puoi cambiare con 'click' o 'focus')

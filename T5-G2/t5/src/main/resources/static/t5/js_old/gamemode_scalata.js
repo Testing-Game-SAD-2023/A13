@@ -141,8 +141,8 @@ function updateNavbar() {
     $('.navbar-brand').text('Ciao, ' + username + '!');
 }
 
-function returnToMenu() {
-    document.getElementById('nav-go-back"').addEventListener('click', function(event) {
+function confirmLogout() {
+    document.getElementById('nav-logout').addEventListener('click', function(event) {
         event.preventDefault();
         swal({
             title: "Sei sicuro?",
@@ -153,7 +153,7 @@ function returnToMenu() {
         })
         .then((willLogout) => {
             if (willLogout) {
-                window.location.href = "/main";
+                window.location.href = this.href;
             }
         });
     });
