@@ -71,7 +71,12 @@
   </div>
   <br>
   <div id="scalate-container" class="container">
-    <!-- List of all "Scalate" to choose-->
+    <!-- List of all "Scalate" to choose + EDIT-->
+    <div class="scalata-item p-3 border rounded mb-2" th:each="scalata : ${scalate}">
+      <strong th:text="${scalata.nome}"></strong>
+      <button class="btn btn-info btn-sm ml-2 info-button" th:attr="data-scalata=${scalata.nome}">Info</button>
+      <input type="radio" name="selectedScalata" th:value="${scalata.nome}">
+  </div>
   </div>
   <br>
   <br>
