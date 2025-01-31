@@ -427,7 +427,7 @@ function displayClasses(classes) {
       .addClass('card-footer text-muted text-center')
       .text('Difficulty: ' + getStars(classUT.difficulty));
 
-    let coverage = 'Coperture: \n';
+    let coverage = "<strong>Coperture da battere:</strong>";
     if (
       Array.isArray(classUT.robotList) 
       && classUT.robotList.length > 0 
@@ -436,16 +436,19 @@ function displayClasses(classes) {
       && Array.isArray(classUT.robotDifficulty)
     ) {
       for (let i = 0; i < classUT.robotList.length; i++) {
-        coverage += classUT.robotList[i] + "\r\n";
+        coverage += `<br><strong>${classUT.robotList[i]}: </strong>`;
         for (let j = 0; j < classUT.robotDifficulty.length; j++) {
-          coverage +=
-            classUT.robotDifficulty[j] + ": " + classUT.coverage[3 * i + j] + "\r\n";
-        }
+          let index = 3 * i + j;
+          if (index < classUT.coverage.length) { 
+            coverage += `${classUT.robotDifficulty[j]}: ${classUT.coverage[index]}; `; // Mostra i valori correttamente
+      }
+    }
+        
       }
     } else {
       coverage += 'N/A';
     }
-    const coverageElement = $('<p>').addClass('card-text').text(coverage);
+    const coverageElement = $('<p>').addClass('card-text').html(coverage);
 
     // Create dropdowns for robot and difficulty
     const robotSelect = $('<select>').addClass('form-control robot-select').data('classUT', classUT);
