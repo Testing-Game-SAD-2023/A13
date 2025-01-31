@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Dashboard</title>
+    <link rel="stylesheet" href="/t1/css/team_dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/t1/js/team_dashboard.js" defer></script>
+</head>
+<body>
+    <h1>Dashboard for Team <span id="teamId"></span></h1>
+    <h2>Name: <span id="teamName"></span></h2>
+    <h2>Description: <span id="teamDescription"></span></h2>
+
+    <h3>Team Students</h3>
+    <div id="teamStudentsContainer" style="display: none;">
+        <!-- Indicatore di caricamento per gli studenti -->
+        <div id="loadingStudentsIndicator" style="text-align: center; display: none;">
+            <p>Loading...</p>
+        </div>
+        <!-- Tabella per visualizzare gli studenti del team -->
+        <table id="teamStudentsTable" border="1">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th>Studies</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Pulsante per aggiungere studenti al team -->
+    <button id="addStudentsButton">Add Students</button>
+
+    <!-- Contenitore per selezionare e aggiungere nuovi studenti -->
+    <div id="studentsContainer" style="display: none;">
+        <table id="studentsTable" border="1">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th>Studies</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button id="addButton">Add</button>
+    </div>
+
+    <br>
+    <!-- Pulsante per eliminare studenti dal team -->
+    <button id="deleteStudentsButton">Delete Students</button>
+
+    <!-- Contenitore per selezionare e eliminare studenti -->
+    <div id="deleteStudentsContainer" style="display: none;">
+        <table id="deleteStudentsTable" border="1">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th>Studies</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button id="deleteButton">Delete</button>
+    </div>
+    
+    <h3>Team Exercises</h3>
+    <div id="teamExercisesContainer" style="display: none;">
+        <!-- Indicatore di caricamento per gli esercizi -->
+        <div id="loadingIndicator" style="text-align: center; display: none;">
+            <p>Loading...</p>
+        </div>
+        <!-- Tabella per visualizzare gli esercizi del team -->
+        <table id="teamExercisesTable" border="1">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Goal Types</th>
+                    <th>Starting Time</th>
+                    <th>Expiry Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Pulsante per aggiungere un nuovo esercizio -->
+    <button id="addExerciseButton">AddExercise</button>
+    
+    <!-- Contenitore nascosto per il form di aggiunta esercizio -->
+    <div id="exerciseContainer" style="display: none;">
+        <!-- Form per inserire i dettagli dell'esercizio -->
+        <form id="exerciseForm">
+            <!-- Sezione per aggiungere i tipi di obiettivi -->
+            <div id="goalTypesContainerWrapper">
+                <label for="goalTypes">Goal Types:</label>
+                <!-- Pulsante per aggiungere un nuovo tipo di obiettivo -->
+                <button type="button" id="addGoalTypeButton" style="border: 1px solid grey; padding: 5px;">Add Goal Type</button>
+            </div>
+            <!-- Contenitore per i tipi di obiettivi aggiunti -->
+            <div id="goalTypesContainer"></div>
+            
+            <!-- Campo per inserire l'orario di inizio dell'esercizio -->
+            <div>
+                <label for="startingTime">Starting Time:</label>
+                <input type="datetime-local" id="startingTime" name="startingTime" required>
+            </div>
+            
+            <!-- Campo per inserire l'orario di scadenza dell'esercizio -->
+            <div>
+                <label for="expiryTime">Expiry Time:</label>
+                <input type="datetime-local" id="expiryTime" name="expiryTime" required>
+            </div>
+            
+            <!-- Campo per inserire la descrizione dell'esercizio -->
+            <div>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            
+            <!-- Pulsante per inviare il form e aggiungere l'esercizio -->
+            <button type="submit" id="submitExerciseButton">Add</button>
+        </form>
+    </div>
+
+    <h3> </h3>
+    <br>
+    <!-- Pulsante Back -->
+    <button id="backButton" style="margin-top: 20px;">Back</button>
+</body>
+</html>

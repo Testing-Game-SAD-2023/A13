@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team</title>
+    <link rel="stylesheet" href="/t1/css/teams.css"> <!-- Link al file CSS esterno -->
+    <script src="/t1/js/teams.js" defer></script> <!-- Collegamento al file JavaScript -->
+</head>
+<body>
+    <h1>Teams</h1>
+
+    <form id="teamForm" onsubmit="event.preventDefault(); createTeam(); resetFields();">
+        <label for="teamName">Team Name:</label>
+        <input type="text" id="teamName" name="teamName" required>
+        <label for="teamDescription">Team Description:</label>
+        <input type="text" id="teamDescription" name="teamDescription" required>
+        <button type="submit" class="create-button">Create Team</button>
+    </form>
+
+    <button id="fetchTeamsButton" class="fetch-button" onclick="fetchTeams()">Fetch Teams</button>
+
+    <table id="teamsTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table rows will be populated by JavaScript -->
+        </tbody>
+    </table>
+</body>
+</html>

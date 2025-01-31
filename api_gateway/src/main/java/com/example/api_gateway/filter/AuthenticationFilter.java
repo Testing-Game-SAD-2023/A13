@@ -25,7 +25,11 @@ public class AuthenticationFilter extends ZuulFilter{
 	
 	@Override
 	public boolean shouldFilter() {
-		return true;
+		RequestContext requestContext = RequestContext.getCurrentContext();
+		String requestURI = requestContext.getRequest().getRequestURI();
+		// Esclude il filtro di autenticazione per il teams-service e la lista degli studenti
+		return !(requestURI.startsWith("/api/team") || requestURI.startsWith("/api/students_list"));
+		// return true;
 	}
 
 	@Override

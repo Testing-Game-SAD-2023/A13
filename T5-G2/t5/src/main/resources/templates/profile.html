@@ -22,6 +22,14 @@
             <div class="row">
                 <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" >Profilo</p>
                 <div id="topRightContainer">
+                    <button id="teamsButton" type="button" class="logout-button" onclick="redirectToTeams()">Gruppi</button>
+                    <script>
+                        // Funzione per ottenere l'ID dell'utente e fare il redirect alla pagina teams_missions/ID
+                        function redirectToTeams() {
+                            var userId = document.getElementById("user_id").innerHTML;
+                            location.href = '/teams_and_missions/' + userId;  // URL con ID dello studente
+                        }
+                    </script>
                     <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Profilo</button>
                     <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
                 </div>

@@ -44,9 +44,4 @@ public interface TeamRepository extends JpaRepository<Team,Integer>{
         nativeQuery = true
     )
     public List<Team> getStudentTeams(@Param("user") Integer user);
-    
-
-    //List<Assignment> getTeamAssignments(Team team);
-    //List<Assignment> getStudentAssignments(User user);
-
 }

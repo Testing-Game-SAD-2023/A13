@@ -68,13 +68,12 @@ public class TeamRestController {
     @DeleteMapping("team/{ID}")
     public void deleteTeam(@PathVariable Integer ID){
 
-        //MODIFICA FEDERICA
         Team team = teamRepository.findById(ID).orElseThrow(
             () -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Team not found"
             )
         );
-        /*
+
         Set<User> users = team.getStudentList();
         for (User user : users) {
             try {
@@ -83,8 +82,6 @@ public class TeamRestController {
                 throw new RuntimeException("Failed to send email notification", e);
             }
         }
-        */
-        //FINE MODIFICA FEDERICA
 
         for(String missionId : team.getExerciseList()){
             ResponseEntity<String> response = relayRequest(missionId, HttpMethod.DELETE, null);
@@ -125,21 +122,19 @@ public class TeamRestController {
     @SuppressWarnings("deprecation")
     @PutMapping("/team/{ID}/students")
     public void addStudent(@RequestBody User user, @PathVariable("ID") Integer team_id){
-        //MODIFICA FEDERICA
         teamRepository.findById(team_id).orElseThrow(
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found")
         );
 
         Integer user_id = user.getID();
         teamRepository.insertStudent(user_id, team_id);
-        /*/
+
         try {
-            emailService.sendStudentAddedToTeamEmail(userRepository.getById(user_id).getEmail(), team.getName());
+            emailService.sendStudentAddedToTeamEmail(userRepository.getById(user_id).getEmail(), teamRepository.getById(team_id).getName());
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email notification", e);
         }
-        */
-        //FINE MODIFICA FEDERICA
+        
         updateAllExercises(team_id);
     }
 
@@ -150,8 +145,6 @@ public class TeamRestController {
     public void deleteStudent(@RequestBody User user, @PathVariable("ID") Integer team_id){
         int affected_rows = teamRepository.deleteStudent(user.getID(), team_id); //mettiamo prima questa perché altrimenti il vettore in team rimane obsoleto in memoria
         
-        
-        //MODIFICA FEDERICA
         Team team = teamRepository.findById(team_id).orElseThrow(
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found")
         );
@@ -162,22 +155,13 @@ public class TeamRestController {
             );
         }
 
-        /*
         try {
             emailService.sendStudentRemovedFromTeamEmail(userRepository.getById(user.getID()).getEmail(), team.getName());
         } catch (MessagingException e) {
                 throw new RuntimeException("Failed to send email notification", e);
         }
-        */
-        //FINE MODIFICA FEDERICA
         updateAllExercises(team);
     }
-
-
-
-
-    
-
 
     /**
      * 
@@ -275,9 +259,6 @@ public class TeamRestController {
         return response; //mando pari pari quello che ho ricevuto 
     } 
 
-
-    
-
     @GetMapping("/team/{tid}/exercise/{mid}")
     public ResponseEntity<String> getTeamExercise(@PathVariable("mid") String mission_id, @PathVariable("tid") Integer team_id){
         Team team = teamRepository.findById(team_id).orElseThrow(
@@ -364,13 +345,9 @@ public class TeamRestController {
         }
     }
 
-
-    // MODIFICA FEDERICA
-
     @GetMapping("/student_teams/{ID}")
     public List<Team> listStudentTeams(@PathVariable("ID") Integer user_id){
         return teamRepository.getStudentTeams(user_id);
     }
-    // FINE MODIFICA FEDERICA
 
 }

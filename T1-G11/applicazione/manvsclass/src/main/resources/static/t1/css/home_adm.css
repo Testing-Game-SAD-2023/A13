@@ -361,3 +361,30 @@ nav.top-right {
 .scalata-button-container button:hover i {
     transform: rotate(360deg); /* Aggiunta rotazione al passaggio del mouse */
 }
+
+.teams-button-container {
+  position: fixed;
+  bottom: 20px; /* Posiziona il pulsante a 20px dal basso */
+  right: 20px; /* Posiziona il pulsante a 20px da destra */
+  z-index: 9999;
+}
+
+.teams-button-container button {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #3b5998; /* Colore del pulsante Teams */
+  color: white;
+  font-size: 25px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: Alegreya Sans, sans-serif;
+  text-align: center;
+}
+
+.teams-button-container button:hover {
+  background-color: #8b9dc3; /* Colore al passaggio del mouse */
+  font-weight: bold;
+  text-decoration: underline;
+}

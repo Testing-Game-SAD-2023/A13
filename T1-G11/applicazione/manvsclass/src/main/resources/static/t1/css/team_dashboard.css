@@ -1,0 +1,306 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+h1 {
+    text-align: center;
+    color: #0A1D2A;
+    margin-top: 40px;
+    font-size: 3rem;
+    letter-spacing: 1px;
+}
+
+h2, h3 {
+    text-align: left;
+    color: #0A1D2A;
+    margin-left: 40px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+form {
+    width: 50%;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ffffff;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+form:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    margin-left: 40px;
+    color: #fff;
+    background-color: #3498db;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button.editExerciseButton, button.deleteExerciseButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #3498db;
+    font-size: 1.2em;
+    margin: 0 5px;
+}
+
+button.editExerciseButton:hover, button.deleteExerciseButton:hover {
+    color: #2980b9;
+}
+
+#studentsContainer, #deleteStudentsContainer {
+    display: none;
+    margin: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+#studentsTable, #teamStudentsTable, #deleteStudentsTable, #teamExercisesTable {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#studentsTable th, #studentsTable td, 
+#teamStudentsTable th, #teamStudentsTable td,
+#deleteStudentsTable th, #deleteStudentsTable td,
+#teamExercisesTable th, #teamExercisesTable td {
+    padding: 15px;
+    text-align: left;
+    border: none;
+}
+
+#studentsTable th, #teamStudentsTable th, #deleteStudentsTable th, #teamExercisesTable th {
+    background-color: #3498db;
+    color: white;
+    font-weight: 600;
+}
+
+#studentsTable td, #teamStudentsTable td, #deleteStudentsTable td, #teamExercisesTable td {
+    background-color: #f9f9f9;
+}
+
+#studentsTable tbody tr:hover, 
+#teamStudentsTable tbody tr:hover, 
+#deleteStudentsTable tbody tr:hover,
+#teamExercisesTable tbody tr:hover {
+    background-color: #e1e1e1; 
+    cursor: pointer;
+    transition: background-color 0.3s ease; 
+}
+
+#studentsTable tbody tr input[type="checkbox"]:checked, 
+#teamStudentsTable tbody tr input[type="checkbox"]:checked, 
+#deleteStudentsTable tbody tr input[type="checkbox"]:checked,
+#teamExercisesTable tbody tr input[type="checkbox"]:checked {
+    background-color: #d3d3d3;
+    transition: background-color 0.3s ease;
+}
+
+#studentsTable tbody tr:last-child td, 
+#teamStudentsTable tbody tr:last-child td, 
+#deleteStudentsTable tbody tr:last-child td,
+#teamExercisesTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#teamStudentsContainer {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #f4f6f9;
+    border-radius: 10px;
+}
+
+#addStudentsButton, #deleteStudentsButton {
+    margin-top: 20px;
+}
+
+input[type="checkbox"] {
+    margin: 0;
+}
+
+#backButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #6c757d;
+    color: white;
+    width: 160px;
+    text-align: center;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+#backButton:hover {
+    background-color: #5a6268;
+}
+
+#exerciseContainer {
+    margin: 20px auto; 
+    padding: 20px; 
+    background-color: #ffffff;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    display: none;
+    width: 80%;
+    max-width: 800px; 
+    transition: all 0.3s ease; 
+}
+
+form#exerciseForm {
+    margin: 0; 
+    padding: 20px; 
+    background: none; 
+    box-shadow: none; 
+    width: calc(100% - 40px);
+}
+
+#exerciseForm div {
+    margin-bottom: 15px; 
+}
+
+#exerciseForm label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+#exerciseForm input[type="text"],
+#exerciseForm input[type="datetime-local"],
+#exerciseForm textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+#exerciseForm textarea {
+    resize: vertical; 
+}
+
+button#addGoalTypeButton, .removeGoalTypeButton {
+    border: 1px solid grey;
+    padding: 5px;
+    background-color: #f0f0f0;
+    color: #333; 
+    font-weight: normal; 
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button#addGoalTypeButton:hover, .removeGoalTypeButton:hover {
+    background-color: #dcdcdc; 
+    color: #333; 
+}
+
+#submitExerciseButton {
+    margin-left: 0; 
+    background-color: #3498db; 
+    color: #fff;
+    border: none; 
+    padding: 10px 20px;
+    border-radius: 5px; 
+    cursor: pointer; 
+}
+
+#submitExerciseButton:hover {
+    background-color: #2980b9; 
+}
+
+#goalTypesContainerWrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#goalTypesContainerWrapper label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#goalTypesContainerWrapper button {
+    margin-left: 10px;
+}
+
+#goalTypesContainer > div {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+}
+
+#goalTypesContainer > div .goalTypeSection,
+#goalTypesContainer > div .goalExpectedScoreSection,
+#goalTypesContainer > div .goalClassNameSection {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+#goalTypesContainer > div label {
+    display: inline-block;
+    width: 120px;
+    font-weight: bold;
+    margin-right: 10px;
+    white-space: nowrap; 
+}
+
+#goalTypesContainer > div input[type="number"],
+#goalTypesContainer > div input[type="range"],
+#goalTypesContainer > div input[type="text"] {
+    flex-grow: 1; 
+    margin-right: 10px;
+}
+
+#goalTypesContainer > div .expectedScoreValue {
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+    margin-left: 10px;
+}
+
+button.removeGoalTypeButton {
+    margin-top: 10px;
+    align-self: flex-end;
+}

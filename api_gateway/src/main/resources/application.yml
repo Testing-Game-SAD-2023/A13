@@ -54,6 +54,22 @@ zuul:
       sensitiveHeaders:
       path: /api/compile-and-codecoverage/**
       url: http://remoteccc-app-1:1234/compile-and-codecoverage
+    teams-service:
+      sensitiveHeaders:
+      path: /api/team/**
+      url: http://t23-g1-app-1:8080/team
+    team-students-service:
+      sensitiveHeaders:
+      path: /api/students_list/**
+      url: http://t23-g1-app-1:8080/students_list
+    student-teams-service:
+      sensitiveHeaders:
+      path: /api/student_teams/**
+      url: http://t23-g1-app-1:8080/student_teams
+    exercise-service:
+      sensitiveHeaders:
+      path: /api/exercise/**
+      url: http://t5-app-1:8080/exercise
 eureka:
   client:
     enabled: false

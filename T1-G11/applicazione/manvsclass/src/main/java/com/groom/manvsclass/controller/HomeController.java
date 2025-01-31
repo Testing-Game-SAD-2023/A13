@@ -1583,5 +1583,19 @@ public class HomeController {
 		
 	}
 
-
+	@GetMapping("/teams")
+	public ModelAndView showTeamsPage(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+		if(isJwtValid(jwt)) return new ModelAndView("teams");
+        return new ModelAndView("login_admin");
+	}
+	
+	@GetMapping("/team_dashboard/{teamId}")
+	public ModelAndView showTeamDashboardPage(@PathVariable("teamId") Integer teamId,
+                                          @CookieValue(name = "jwt", required = false) String jwt) {
+		if (isJwtValid(jwt)) {
+			ModelAndView modelAndView = new ModelAndView("team_dashboard");
+			return modelAndView;
+		}
+		return new ModelAndView("login_admin");
+	}
 }

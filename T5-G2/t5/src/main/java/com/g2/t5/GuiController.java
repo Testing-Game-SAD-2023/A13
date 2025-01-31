@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.GenericObjectComponent;
@@ -357,5 +358,11 @@ public class GuiController {
         PageBuilder main = new PageBuilder(serviceManager, "editor_old", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
+    }
+
+    @GetMapping("/teams_and_missions/{id}")
+    public ModelAndView showTeamsAndMissions(@PathVariable("id") String id, HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+        ModelAndView modelAndView = new ModelAndView("teams_and_missions");
+        return modelAndView;
     }
 }
