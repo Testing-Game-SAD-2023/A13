@@ -19,9 +19,10 @@ package com.g2.t5;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.client.RestTemplate;
 
-@SpringBootApplication(scanBasePackages = {"com.g2.factory", "com.g2.Interfaces", "com.g2.Game", "com.g2.t5", "com.g2.Service"})
+@SpringBootApplication(scanBasePackages = {"com.g2.factory", "com.g2.Interfaces", "com.g2.Game", "com.g2.t5", "com.g2.Service", "com.g2.Repository"})
 public class T5Application {
 
     public static void main(String[] args) {
