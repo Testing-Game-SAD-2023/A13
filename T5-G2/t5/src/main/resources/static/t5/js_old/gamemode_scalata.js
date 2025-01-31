@@ -2,6 +2,11 @@
 var username = "";                              //stores the username of the player from the JWT token
 var selectedScalata = "";                       //stores the "Scalata" selecetd by the user
 
+
+
+
+
+
 $.ajax({
     url: '/scalate_list',
     type: 'GET',
@@ -101,8 +106,8 @@ function updateNavbar() {
     $('.navbar-brand').text('Ciao, ' + username + '!');
 }
 
-function confirmLogout() {
-    document.getElementById('nav-logout').addEventListener('click', function(event) {
+function returnToMenu() {
+    document.getElementById('nav-go-back"').addEventListener('click', function(event) {
         event.preventDefault();
         swal({
             title: "Sei sicuro?",
@@ -113,7 +118,7 @@ function confirmLogout() {
         })
         .then((willLogout) => {
             if (willLogout) {
-                window.location.href = this.href;
+                window.location.href = "/main";
             }
         });
     });
@@ -146,49 +151,19 @@ function pressedSubmit() {
             var confirm_choice = confirm("Hai selezionato la 'Scalata': " + selectedScalata + ".\nSei sicuro di voler proseguire?");
             if (confirm_choice) {
                 // Confirmed. Handle the POST request
-                console.log("Confirmed choice.");
-                retrieveScalata(selectedScalata); 
-                window.location.href = "editor?ClassUT="+localStorage.getItem("ClassUT");
-/*                 $.ajax({
-                    url: '/api/save-scalata',
-                    type: 'POST',
-                    data: {
-                        playerID: parseJwt(getCookie("jwt")).userId,
-                        scalataName: selectedScalata
-                    },
-                    success: function(data) {
-                        var result = JSON.parse(data);
-
-                        console.log("ScalataGameId: " + result.scalataGameId);
-
-                        //Della scalata verranno impostati degli elementi in localstorage per conservare l'ID, il round, il nome e il punteggio della scalata
-                        localStorage.setItem("scalataId", result.scalataGameId);
-                        localStorage.setItem("current_round_scalata", 1);
-                        localStorage.setItem("scalata_score", 0);
-                        console.log("scalata_score: "+ parseInt(localStorage.getItem("scalata_score")));
-                        localStorage.setItem("scalata_name", selectedScalata);
-                        retrieveScalata(selectedScalata)
-                            .then( data => {
-                                localStorage.setItem("modalita", "Scalata"); //per raggirare
-
-                            //return createGame(localStorage.getItem("robot"), localStorage.getItem("ClassUT"), localStorage.getItem("difficulty"), result.scalataGameId, username, "Scalata")
-                            })
-                             .then( data => {
-                                return swal("Successo!", "La tua scelta è stata confermata, a breve verrai reindirizzato all'arena di gioco.", "success");
-                            })
-                            .then( () => {
-                                //console.log(data);
-                                window.location.href = "editor?ClassUT="+localStorage.getItem("ClassUT");
-                            })
-                            .catch((error) => {
-                                console.log("error: "+ error);
-                                swal("Errore!", "Si è verificato un errore durante la creazione del gioco. Riprovare.", "error");
-                            })
-                    },
-                    error: function(error) {
-                        console.log(error);
+                console.log("Confirmed choice."); 
+                retrieveScalata(selectedScalata)
+                .then(() => {
+                    const classUT = localStorage.getItem("ClassUT");
+                    if (classUT) {
+                        window.location.href = `editor?ClassUT=${classUT}`;
+                    } else {
+                        console.error("ClassUT not found in localStorage");
                     }
-                });*/
+                })
+                .catch((error) => {
+                    console.error("Error retrieving Scalata:", error);
+                });
             }
             else {
                 swal("Errore!", "Si è verificato un errore imprevisto", "error");//Do nothing
@@ -197,8 +172,7 @@ function pressedSubmit() {
     });
 }
 
-
-async function retrieveScalata(scalata) {
+function retrieveScalata(scalata) {
     return new Promise((resolve, reject) => { 
         $.ajax({
             url: `/retrieve_scalata/${scalata}`,
@@ -240,40 +214,32 @@ async function retrieveScalata(scalata) {
     })
 }
 
+function flush_localStorage(){
+	//Pulisco i dati locali 
+	pulisciLocalStorage("difficulty");
+	pulisciLocalStorage("robot");
+	pulisciLocalStorage("roundId");
+	pulisciLocalStorage("turnId");
+	pulisciLocalStorage("underTestClassName");
+	pulisciLocalStorage("ClassUT");
+	pulisciLocalStorage("username");
+	pulisciLocalStorage("storico");
+	pulisciLocalStorage("codeMirrorContent");
+	if(localStorage.getItem("modalita") == "Scalata"){
 
-// async function createGame(robot, classe, difficulty, scalataId) {
-//     return new Promise((resolve, reject) => { 
-//         $.ajax({
-//             url: '/api/save-data',
-//             data: {
-//             playerId: parseJwt(getCookie("jwt")).userId,
-//             classe: classe,
-//             robot: robot,
-//             difficulty: difficulty,
-//             selectedScalata: scalataId,
-//             username: username
-//             },
-//             type: 'POST',
-//             traditional: true,
-//             success: function (response) {
-//                 localStorage.setItem("gameId", response.game_id);
-//                 localStorage.setItem("turnId", response.turn_id);
-//                 localStorage.setItem("roundId", response.round_id);
-//                 resolve(response);
-//             },
-//             dataType: "json",
-//             error: function (error) {
-//                 console.log("Error details:", error);
-//                 console.log("USERNAME : ", localStorage.getItem("username"));
-//                 console.error('Errore nell\' invio dei dati');
-//                 reject(error);
-//                 // swal("Errore", "Dati non inviati con successo. Riprovare.", "error");
-//             }
-//         })
-//     })
-// }
+		pulisciLocalStorage("scalataId");
+		pulisciLocalStorage("scalata_name");
+		pulisciLocalStorage("scalata_classes");
+		pulisciLocalStorage("scalata_robots");
+		pulisciLocalStorage("scalata_difficulties");
+		pulisciLocalStorage("current_round_scalata");
+		pulisciLocalStorage("total_rounds_of_scalata");
+		pulisciLocalStorage("scalata_score");
+		
+	}
+	pulisciLocalStorage("modalita");
+}
 
-// Call the functions after the page has been loaded
 $(document).ready(function() {
     localStorage.setItem("modalita", "Scalata");
     updateNavbar();

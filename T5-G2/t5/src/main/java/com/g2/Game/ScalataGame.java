@@ -39,6 +39,7 @@ public class ScalataGame extends GameLogic {
     private String scalata_name;
     private int currentRound;       //usata per contare il progresso della scalata
     private int currentRoundIndex;  //indice usato per la lettura della lista interna
+    private int totalScore;
 
     public ScalataGame(ServiceManager serviceManager, String playerID, String scalata_name, String classeUT,
                        List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
@@ -46,6 +47,7 @@ public class ScalataGame extends GameLogic {
         this.games = new ArrayList<>();
         this.currentRound = 1; // Inizia dal round 1
         this.currentRoundIndex = 0;
+        this.totalScore = 0;
         this.currentStatus = ScalataGamestatus.IN_PROGRESS;
         this.scalata_name = scalata_name;
 
@@ -79,10 +81,12 @@ public class ScalataGame extends GameLogic {
                         System.out.println("[SCALATAGAME][T5] Scalata  completed.");
                         currentStatus = ScalataGamestatus.WIN;
 
-                        this.CloseScalata(id_scalata, getRoundID(), true, userScore);
+                        this.CloseScalata(id_scalata, getRoundID(), true, totalScore);
                     }
                     else{
+                        
                         games.get(currentRoundIndex).CreateGame();
+                        this.updateScalata(id_scalata, games.get(currentRoundIndex).getRoundID());
                     }
 
             }
@@ -119,12 +123,10 @@ public class ScalataGame extends GameLogic {
 
     @Override
     public int GetScore(int coverage) {
-        // Implementa la logica per calcolare il punteggio totale tra tutti i giochi
-        int totalScore = 0;
-        for (Sfida game : games) {
-            totalScore += game.GetScore(coverage); // Calcola il punteggio per ogni gioco
-        }
-        return totalScore;
+        // restituisce il punteggio di un round, e incrementa il punteggio totale all'interno della scalat
+        int score = games.get(currentRoundIndex).GetScore(coverage);
+        this.totalScore += score;
+        return  score;
     }
 
     @Override
@@ -150,6 +152,11 @@ public class ScalataGame extends GameLogic {
     //funzione per ottenere lo stato interno della scalata
     public ScalataGamestatus getStatus(){
         return currentStatus;
+    }
+
+    public int GetTotalScore() {
+
+        return this.totalScore;
     }
 
 

@@ -144,7 +144,7 @@ async function handleGameAction(isGameEnd) {
 
 // Gestisce la risposta dal server
 function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
-    const { robotScore, userScore, outCompile, 
+    const { robotScore, userScore, totalScore, outCompile, 
             coverage, gameId, roundId,
             coverageDetails} = response;
     // Aggiorna i dati del modulo con gameId e roundId
@@ -158,15 +158,15 @@ function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
         return;
     }
     // Se la copertura è disponibile, la processa
-    processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails);
+    processCoverage(coverage, formData, robotScore, userScore, totalScore, isGameEnd, loadingKey, buttonKey, coverageDetails);
 }
 
 // Processa la copertura del codice e aggiorna i dati di gioco
-async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails) {
+async function processCoverage(coverage, formData, robotScore, userScore, totalScore, isGameEnd, loadingKey, buttonKey, coverageDetails) {
 
     //salvataggio all'interno delle variabili dell'editor
     user_score = userScore;
-
+    total_score_scalata = totalScore;
     highlightCodeCoverage($.parseXML(coverage), editor_robot); // Evidenzia la copertura del codice nell'editor
     orderTurno++; // Incrementa l'ordine del turno
     const csvContent = await fetchCoverageReport(formData); // Recupera il report di coverage
@@ -177,7 +177,7 @@ async function processCoverage(coverage, formData, robotScore, userScore, isGame
     toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
     displayUserPoints(isGameEnd, valori_csv, robotScore, userScore, coverageDetails); // Mostra i punti dell'utente
     if (isGameEnd) { // Se il gioco è finito
-        handleEndGame(userScore, robotScore); // Gestisce la fine del gioco
+        handleEndGame(userScore, robotScore, totalScore); // Gestisce la fine del gioco
     } else {
         resetButtons(); // Reimposta i pulsanti
     }
@@ -207,30 +207,34 @@ async function fetchCoverageReport(formData) {
 
 // Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
 //27GEN MODIFICATO CON: localStorage.getItem("scalataId")
-function handleEndGame(userScore, robotScore) {
+function handleEndGame(userScore, robotScore, totalScore) {
     if(localStorage.getItem("modalita")=== "Scalata" && locGiocatore >= robotScore){
 
         var isScalataEnded = handleScalataNextRound();
         //Termine Scalata
         if (isScalataEnded) {
-            let scalataFinalScore = locGiocatore + parseInt(localStorage.getItem("scalata_score"),10);
             
             openModalWithText(
                 status_scalata_completed,
                 //va aggiunto il punteggio complessivo
-                `${scalata_completed_text}: ${scalataFinalScore} pt\n` + // Mostra il punteggio dell'utente
+                `${scalata_completed_text}: ${totalScore} pt\n` + // Mostra il punteggio dell'utente
                 `Il tuo punteggio: ${locGiocatore}\n` +
                 `Il punteggio del robot : ${robotScore}`,
-                [{ text: vai_home, href: '/main', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
+                [{ text: vai_menu_scalata, href: '/gamemode_scalata', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
             );
-            closeScalata(localStorage.getItem("scalataId"), true, scalataFinalScore,current_round_scalata);
+            //incrementScalataRound(localStorage.getItem("scalataId"), localStorage.getItem("roundId"))
+            //closeScalata(localStorage.getItem("scalataId"), true, scalataFinalScore,current_round_scalata);
             flush_localStorage();
         }
         else{
             //Termine round scalata ma non della scalata
             var displayRoundScalata = current_round_scalata-1;
             console.log(current_round_scalata);
-
+            pulisciLocalStorage("roundId");
+            pulisciLocalStorage("turnId");
+            pulisciLocalStorage("username");
+            pulisciLocalStorage("storico");
+            pulisciLocalStorage("codeMirrorContent");
             //prima viene effettuata la chiamata API per aggiornare la scalata
             try {
                 incrementScalataRound(localStorage.getItem("scalataId"),current_round_scalata);
@@ -241,11 +245,7 @@ function handleEndGame(userScore, robotScore) {
                     `Il punteggio del robot : ${robotScore}`,
                     [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("ClassUT"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
                 );
-                pulisciLocalStorage("roundId");
-                pulisciLocalStorage("turnId");
-                pulisciLocalStorage("username");
-                pulisciLocalStorage("storico");
-                pulisciLocalStorage("codeMirrorContent");
+
             } catch (error) {
                 alert("errore nella memorizzazione del progresso della scalata");
                 window.location.href = "/main";
@@ -265,7 +265,7 @@ function handleEndGame(userScore, robotScore) {
             
         );
 
-        closeScalata(id_scalata, false, 0, current_round_scalata);
+        //closeScalata(id_scalata, false, 0, current_round_scalata);
         flush_localStorage();
     }
     else{

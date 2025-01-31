@@ -543,8 +543,7 @@ function handleScalataNextRound(){
 		current_round_scalata++;
 		localStorage.setItem("current_round_scalata",current_round_scalata);
 		
-		let scalataScore = parseInt(localStorage.getItem("scalata_score"),10) + user_score;
-		localStorage.setItem("scalata_score", scalataScore);
+		localStorage.setItem("scalata_score", total_score_scalata);
 		console.log(current_round_scalata);
 
 		//window.location.href = "/editor?ClassUT="+localStorage.getItem("ClassUT");
