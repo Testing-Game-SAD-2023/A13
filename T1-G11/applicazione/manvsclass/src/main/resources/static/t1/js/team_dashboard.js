@@ -179,7 +179,7 @@ async function addStudentToTeam(studentId) {
         });
 
         if (response.ok) {
-            alert(`Student with ID ${studentId} added to team ${teamId}`);
+            // alert(`Student with ID ${studentId} added to team ${teamId}`);
             // Ricarica gli studenti e gli esercizidel team
             fetchTeamStudents();
             fetchTeamExercises();
@@ -270,7 +270,7 @@ async function deleteStudentFromTeam(studentId) {
         });
 
         if (response.ok) {
-            alert(`Student with ID ${studentId} removed from team ${teamId}`);
+            // alert(`Student with ID ${studentId} removed from team ${teamId}`);
             // Ricarica gli studenti e gli esercizi del team
             fetchTeamStudents();
             fetchTeamExercises();
@@ -294,8 +294,15 @@ document.getElementById("addExerciseButton").addEventListener("click", () => {
         exerciseContainer.style.display = "block";
     } else {
         exerciseContainer.style.display = "none";
+        resetExerciseForm(); // Resetta il form quando viene chiuso
     }
 });
+
+// Funzione per resettare il form di aggiunta degli esercizi
+function resetExerciseForm() {
+    document.getElementById("exerciseForm").reset();
+    document.getElementById("goalTypesContainer").innerHTML = ''; // Pulisce i goal types aggiunti
+}
 
 // Listener per aggiungere goal types
 document.getElementById("addGoalTypeButton").addEventListener("click", () => {
@@ -347,7 +354,8 @@ async function addExerciseToTeam(exerciseData) {
                 fetchTeamExercises();  // Aggiorna la tabella degli esercizi
                 // Nascondi il contenitore dell'esercizio
                 document.getElementById("exerciseContainer").style.display = "none";
-                alert('Exercise added successfully');  // Mostra un alert di successo
+                resetExerciseForm(); // Resetta il form quando viene chiuso
+                // alert('Exercise added successfully'); 
             } else {
                 alert(`Failed to add exercise: ${result.message}`);
             }
@@ -377,7 +385,7 @@ async function updateExercise(exerciseId, description, expiryTime) {
         if (response.ok) {
             // Ricarica gli esercizi del team
             fetchTeamExercises();
-            alert('Exercise updated successfully');  // Mostra un alert di successo
+            // alert('Exercise updated successfully');  
         } else {
             alert(`Failed to update exercise with ID ${exerciseId}`);
         }
@@ -399,7 +407,7 @@ async function deleteExerciseFromTeam(exerciseId) {
         if (response.ok) {
             // Ricarica gli esercizi del team
             fetchTeamExercises();
-            alert('Exercise deleted successfully');  // Mostra un alert di successo
+            // alert('Exercise deleted successfully');  
         } else {
             alert(`Failed to delete exercise with ID ${exerciseId} from team`);
         }
