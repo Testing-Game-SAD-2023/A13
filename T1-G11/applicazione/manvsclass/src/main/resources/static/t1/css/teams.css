@@ -114,15 +114,17 @@ button {
 #backButton {
     position: fixed;
     bottom: 20px;
-    right: 20px; 
+    right: 20px;
     background-color: #6c757d;
     color: white;
-    width: 150px;
+    width: 160px;
     text-align: center;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
     font-weight: bold;
-    border-radius: 5px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
 }
 
 #backButton:hover {

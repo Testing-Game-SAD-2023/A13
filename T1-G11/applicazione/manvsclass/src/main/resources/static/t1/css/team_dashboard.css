@@ -58,7 +58,7 @@ button:hover {
     background-color: #2980b9;
 }
 
-button.editExerciseButton, button.deleteExerciseButton {
+button.editExerciseButton, button.deleteExerciseButton, button.infoExerciseButton {
     background: none;
     border: none;
     cursor: pointer;
@@ -67,7 +67,7 @@ button.editExerciseButton, button.deleteExerciseButton {
     margin: 0 5px;
 }
 
-button.editExerciseButton:hover, button.deleteExerciseButton:hover {
+button.editExerciseButton:hover, button.deleteExerciseButton:hover, button.infoExerciseButton:hover {
     color: #2980b9;
 }
 
@@ -303,4 +303,15 @@ button#addGoalTypeButton:hover, .removeGoalTypeButton:hover {
 button.removeGoalTypeButton {
     margin-top: 10px;
     align-self: flex-end;
+}
+
+.exercise-details {
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+.exercise-details hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
 }

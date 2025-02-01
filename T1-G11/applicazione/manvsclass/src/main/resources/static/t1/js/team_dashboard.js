@@ -180,8 +180,9 @@ async function addStudentToTeam(studentId) {
 
         if (response.ok) {
             alert(`Student with ID ${studentId} added to team ${teamId}`);
-            // Ricarica gli studenti del team
+            // Ricarica gli studenti e gli esercizidel team
             fetchTeamStudents();
+            fetchTeamExercises();
         } else {
             alert(`Failed to add student with ID ${studentId} to team`);
         }
@@ -270,8 +271,9 @@ async function deleteStudentFromTeam(studentId) {
 
         if (response.ok) {
             alert(`Student with ID ${studentId} removed from team ${teamId}`);
-            // Ricarica gli studenti del team
+            // Ricarica gli studenti e gli esercizi del team
             fetchTeamStudents();
+            fetchTeamExercises();
         } else {
             alert(`Failed to delete student with ID ${studentId} from team`);
         }
@@ -494,23 +496,35 @@ function updateTeamExercisesTable(exercise) {
     const goalTypes = exercise.goalTypes.map(gt => JSON.parse(gt));
     const goalTypesHtml = goalTypes.map(gt => `
         <div>
-            <strong>Type:</strong> ${gt.type}, 
-            <strong>Expected Score:</strong> ${gt.expectedScore}, 
-            <strong>Class Name:</strong> ${gt.className}
+            <em>Type:</em> ${gt.type}, 
+            <em>Expected Score:</em> ${gt.expectedScore}, 
+            <em>Class Name:</em> ${gt.className}
         </div>
     `).join('');
+
+    // Calcola la media degli stati di completamento
+    const completions = exercise.goals.map(goal => goal.completition);
+    const averageCompletion = completions.reduce((a, b) => a + b, 0) / completions.length;
 
     row.innerHTML = `
         <td>${exercise.description}</td>
         <td>${goalTypesHtml}</td>
         <td>${new Date(exercise.startingTime).toLocaleString()}</td>
         <td>${new Date(exercise.expiryTime).toLocaleString()}</td>
+        <td>${averageCompletion.toFixed(2)}%</td>
         <td>
+            <button class="infoExerciseButton" data-id="${exercise.id}"><i class="fas fa-info-circle"></i></button>
             <button class="editExerciseButton" data-id="${exercise.id}"><i class="fas fa-pencil-alt"></i></button>
             <button class="deleteExerciseButton" data-id="${exercise.id}"><i class="fas fa-trash"></i></button>
         </td>
     `;
     exercisesTableBody.appendChild(row);
+
+    // Aggiungi event listener per il pulsante di info
+    row.querySelector(".infoExerciseButton").addEventListener("click", (event) => {
+        const exerciseId = event.target.closest("button").getAttribute("data-id");
+        toggleExerciseDetails(row, exercise);
+    });
 
     // Aggiungi event listener per il pulsante di modifica
     row.querySelector(".editExerciseButton").addEventListener("click", (event) => {
@@ -523,6 +537,40 @@ function updateTeamExercisesTable(exercise) {
         const exerciseId = event.target.closest("button").getAttribute("data-id");
         await deleteExerciseFromTeam(exerciseId);
     });
+}
+
+function toggleExerciseDetails(row, exercise) {
+    let detailsRow = row.nextElementSibling;
+    if (detailsRow && detailsRow.classList.contains('exercise-details')) {
+        // Se i dettagli sono già visibili, nascondili
+        detailsRow.remove();
+    } else {
+        // Altrimenti, crea una nuova riga per i dettagli
+        detailsRow = document.createElement('tr');
+        detailsRow.classList.add('exercise-details');
+
+        const goalTypes = exercise.goalTypes.map(gt => JSON.parse(gt));
+        const goalDetailsHtml = goalTypes.map((goalType, index) => {
+            const goalsOfType = exercise.goals.filter(goal => goal.expectedScore === goalType.expectedScore && goal.className === goalType.className);
+            const goalCompletion = goalsOfType.reduce((sum, goal) => sum + goal.completition, 0) / goalsOfType.length;
+
+            const studentsHtml = goalsOfType.map(goal => `
+                <li>ID: ${goal.playerId}, Status: ${goal.completition}%</li>
+            `).join('');
+
+            return `
+                <div>
+                    <strong>Goal ${index + 1}</strong><br>
+                    Completion: ${goalCompletion.toFixed(2)}%<br>
+                    <ul>${studentsHtml}</ul>
+                </div>
+                ${index < goalTypes.length - 1 ? '<hr>' : ''}
+            `;
+        }).join('');
+
+        detailsRow.innerHTML = `<td colspan="6">${goalDetailsHtml}</td>`;
+        row.parentNode.insertBefore(detailsRow, row.nextSibling);
+    }
 }
 
 function editExerciseRow(row, exercise) {

@@ -33,40 +33,49 @@ function updateTeamsTable(teams) {
     const tableBody = document.getElementById("teamsTable").getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';  // Pulisce la tabella prima di aggiungere nuovi dati
 
-    teams.forEach(team => {
+    if (teams.length === 0) {
         const row = tableBody.insertRow();
-        const idCell = row.insertCell(0);
-        const nameCell = row.insertCell(1);
-        const descriptionCell = row.insertCell(2);
-        const actionCell = row.insertCell(3);
+        const cell = row.insertCell(0);
+        cell.colSpan = 4;
+        cell.innerHTML = "<i class='fas fa-info-circle'></i> No teams available.";
+        cell.style.textAlign = "center";
+        cell.style.fontStyle = "italic";
+    } else {
+        teams.forEach(team => {
+            const row = tableBody.insertRow();
+            const idCell = row.insertCell(0);
+            const nameCell = row.insertCell(1);
+            const descriptionCell = row.insertCell(2);
+            const actionCell = row.insertCell(3);
 
-        idCell.textContent = team.id;
+            idCell.textContent = team.id;
 
-        // Celle non editabili
-        nameCell.textContent = team.name;
-        descriptionCell.textContent = team.description;
+            // Celle non editabili
+            nameCell.textContent = team.name;
+            descriptionCell.textContent = team.description;
 
-        // Pulsante Modifica
-        const editButton = document.createElement("button");
-        editButton.textContent = "Edit";
-        editButton.className = "edit-button";
-        editButton.onclick = () => enableEditing(row, team.id);
-        actionCell.appendChild(editButton);
+            // Pulsante Modifica
+            const editButton = document.createElement("button");
+            editButton.innerHTML = "<i class='fas fa-pencil-alt'></i>";
+            editButton.className = "edit-button";
+            editButton.onclick = () => enableEditing(row, team.id);
+            actionCell.appendChild(editButton);
 
-        // Pulsante Studenti
-        const studentsButton = document.createElement("button");
-        studentsButton.textContent = "Students";
-        studentsButton.className = "students-button";
-        studentsButton.onclick = () => openTeamPage(team.id);
-        actionCell.appendChild(studentsButton);
+            // Pulsante Studenti
+            const studentsButton = document.createElement("button");
+            studentsButton.innerHTML = "<i class='fas fa-info-circle'></i>";
+            studentsButton.className = "students-button";
+            studentsButton.onclick = () => openTeamPage(team.id);
+            actionCell.appendChild(studentsButton);
 
-        // Pulsante Elimina
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete";
-        deleteButton.className = "delete-button";
-        deleteButton.onclick = () => deleteTeam(team.id);
-        actionCell.appendChild(deleteButton);
-    });
+            // Pulsante Elimina
+            const deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "<i class='fas fa-trash'></i>";
+            deleteButton.className = "delete-button";
+            deleteButton.onclick = () => deleteTeam(team.id);
+            actionCell.appendChild(deleteButton);
+        });
+    }
 }
 
 function openTeamPage(teamId) {
