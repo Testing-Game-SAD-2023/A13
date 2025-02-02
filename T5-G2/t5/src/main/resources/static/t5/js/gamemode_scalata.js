@@ -5,7 +5,7 @@ var selectedScalata = "";                       //stores the "Scalata" selecetd 
 
 
 
-
+//TODO: inserire logica di controllo della scalata esistente, come in modalità Sfida.
 
 $.ajax({
     url: '/scalate_list',
