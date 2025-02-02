@@ -460,30 +460,6 @@ function displayClasses(classes) {
     const difficultySelect = $('<select>').addClass('form-control difficulty-select');
     difficultySelect.append($('<option>').val('').text('Select difficulty')); // Aggiungi una riga vuota
 
-    // Funzione per aggiornare il menu delle difficoltà in base al robot selezionato
-    function updateDifficultySelect(selectedRobot) {
-      difficultySelect.empty(); // Svuota il menu delle difficoltà
-      difficultySelect.append($('<option>').val('').text('Select difficulty')); // Aggiungi una riga vuota
-
-      const robotIndex = classUT.robotList.indexOf(selectedRobot);
-      if (robotIndex !== -1) {
-        // Aggiungi le difficoltà valide per il robot selezionato
-        classUT.robotDifficulty.forEach(function (difficulty, index) {
-          const coverageValue = classUT.coverage[3 * robotIndex + index];
-          if (coverageValue != null) {
-            difficultySelect.append($('<option>').text(difficulty).val(difficulty));
-          }
-        });
-      }
-    }
-
-    // Aggiungi un listener per l'evento di cambiamento sul menu del robot
-    robotSelect.on("change", function () {
-      const selectedRobot = $(this).val();
-      console.log("Robot selezionato:", selectedRobot);
-      updateDifficultySelect(selectedRobot);
-    });
-
     // Append the dropdowns to the card body
     cardBody.append(cardTitle);
     cardBody.append(cardText);
@@ -536,6 +512,8 @@ function displayScalate() {
         const data = {
           scalataName: scalataName
         };
+
+        //Send the data to the server
 
         fetch(`/delete_scalata/${scalataName}`, {
           method: 'DELETE',
@@ -724,7 +702,7 @@ function updateDifficultySelect(selectedRobot, difficultySelect, classUT) {
 $(document).on('change', '.robot-select', function() {
   const selectedRobot = $(this).val();
   const difficultySelect = $(this).closest('.card-body').find('.difficulty-select');
-  const classUT = $(this).data('classUT'); // Assumi che tu abbia un modo per ottenere l'oggetto classUT associato
+  const classUT = $(this).data('classUT');
   updateDifficultySelect(selectedRobot, difficultySelect, classUT);
 });
 });
