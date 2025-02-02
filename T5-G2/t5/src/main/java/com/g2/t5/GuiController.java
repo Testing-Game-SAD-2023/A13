@@ -176,6 +176,7 @@ public class GuiController {
             return gamemode.handlePageRequest();
         }
         if("Scalata".equals(mode)){
+            //TODO: inserire logica di controllo della scalata esistente, come in modalità Sfida.
             PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode_scalata", model);
             gamemode.SetAuth(jwt);
             return gamemode.handlePageRequest();

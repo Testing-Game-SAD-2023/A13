@@ -703,6 +703,7 @@ public ResponseEntity<?> eliminaClasse(@PathVariable String name,
 			List<ClassUT> classe= srepo.findByText(name);
 			System.out.println("File download:");
 			System.out.println(classe.get(0).getcode_Uri());
+			//TODO: Viene scaricato un file da un volume non persistente
 			ResponseEntity file =  FileDownloadUtil.downloadClassFile(classe.get(0).getcode_Uri());
 			return file;
 		}

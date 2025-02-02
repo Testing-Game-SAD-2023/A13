@@ -259,7 +259,7 @@ public class GameController {
                 }
             }
             // Ottieni la modalità della partita trovata
-            String currentMode = gameLogic.getClass().getSimpleName();
+            String currentMode = gameLogic.getGameMode();
             logger.info("[GAMECONTROLLER][StartGame] Partita già esistente modalità: " + currentMode);
 
             //Condizione logica per vedere se la partita è cambiata

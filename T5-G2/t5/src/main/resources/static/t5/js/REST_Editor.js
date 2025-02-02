@@ -18,7 +18,7 @@
 /*
 * 		Qui ci sono le chiamate REST dell'editor 
 */
-// Funzione per ottenere i dati dal localStorage
+// Funzione per ottenere i dati dal localStorage. Discerne se è una partita normale oppure una scalata
 function getGameData() {
     let modalita = localStorage.getItem("modalita");
     is_scalata_inprogress = (parseInt(localStorage.getItem("scalata_score"),10) > 0) ? true : false;
@@ -64,11 +64,16 @@ function getGameData() {
             }
         }   
         //modal che ti blocca
-        openModalError(
-            "Accesso Illegale all'editor ",
-            `Non sei passato da Gamemode per settare la tua partita o hai inserito un URL sbagliato.`,
-            [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
+        flush_localStorage();
+        openModalWithText(
+            editor_error,
+            editor_error_message,
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }]
         );
+        setTimeout(() => {
+            window.location.href = '/main';
+        }, 10000); // Redirect dopo 10 secondi
+        
     }
 }
 
@@ -87,34 +92,47 @@ async function runGameAction(url, formData, isGameEnd) {
 
 // Documento pronto
 $(document).ready(function () {
-    const data = getGameData();
-    if(is_scalata_inprogress == false)startGame(data);
-    if (data.mode === "Allenamento") {
-        document.getElementById("runButton").disabled = true;
-        console.log("Sei in allenamento");
+    try {
+        const data = getGameData();
+        if(is_scalata_inprogress == false)startGame(data);
+        if (data.mode === "Allenamento") {
+            document.getElementById("runButton").disabled = true;
+            console.log("Sei in allenamento");
+        }
+        const savedContent = localStorage.getItem('codeMirrorContent');
+        if (!savedContent) {
+            console.log("TEST UNDERTESTCLASSNAME: " + localStorage.getItem("underTestClassName"));
+            //non ho salvato il contenuto dell'editor, quindi lo scarico e imposto il template con i dati dell'utente
+            let formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
+            let replacements  = {
+                TestClasse: `Test${localStorage.getItem("underTestClassName")}`,
+                username: jwtData.sub,
+                userID: jwtData.userId,
+                date: formattedDate,
+            };
+            SetInitialEditor(replacements);
+        }else{
+            //Se ho del contenuto salvato 
+            editor_utente.setValue(savedContent);
+            //document.getElementById('Editor_utente').value = savedContent;
+            editor_utente.refresh(); // Ricarica l'editor per applicare le modifiche
+        }
+        const savedStorico = localStorage.getItem('storico');
+        if(savedStorico){
+            viewStorico();
+        }
+    } catch (error) {
+        flush_localStorage();
+        openModalWithText(
+            editor_error,
+            editor_error_message,
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }]
+        );
+        setTimeout(() => {
+            window.location.href = '/main';
+        }, 10000); // Redirect dopo 10 secondi
     }
-    const savedContent = localStorage.getItem('codeMirrorContent');
-	if (!savedContent) {
-        console.log("TEST UNDERTESTCLASSNAME: " + localStorage.getItem("underTestClassName"));
-        //non ho salvato il contenuto dell'editor, quindi lo scarico e imposto il template con i dati dell'utente
-        let formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
-        let replacements  = {
-            TestClasse: `Test${localStorage.getItem("underTestClassName")}`,
-            username: jwtData.sub,
-            userID: jwtData.userId,
-            date: formattedDate,
-        };
-        SetInitialEditor(replacements);
-	}else{
-        //Se ho del contenuto salvato 
-        editor_utente.setValue(savedContent);
-        //document.getElementById('Editor_utente').value = savedContent;
-        editor_utente.refresh(); // Ricarica l'editor per applicare le modifiche
-    }
-    const savedStorico = localStorage.getItem('storico');
-    if(savedStorico){
-        viewStorico();
-    }
+
 });
 
 
@@ -222,9 +240,12 @@ function handleEndGame(userScore, robotScore, totalScore) {
                 `${robot_string}: ${robotScore}`,
                 [{ text: vai_menu_scalata, href: '/gamemode?mode=Scalata', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
             );
-            //incrementScalataRound(localStorage.getItem("scalataId"), localStorage.getItem("roundId"))
-            //closeScalata(localStorage.getItem("scalataId"), true, scalataFinalScore,current_round_scalata);
+
+
             flush_localStorage();
+            setTimeout(() => {
+                window.location.href = '/gamemode?mode=Scalata';
+            }, 10000); // Redirect dopo 10 secondi
         }
         else{
             //Termine round scalata ma non della scalata
@@ -237,19 +258,25 @@ function handleEndGame(userScore, robotScore, totalScore) {
             pulisciLocalStorage("codeMirrorContent");
             //prima viene effettuata la chiamata API per aggiornare la scalata
             try {
-                incrementScalataRound(localStorage.getItem("scalataId"),current_round_scalata);
                 openModalWithText(
                     status_scalata_roundUp,
                     `${scalata_roundUp_text} ${displayRoundScalata} / ${total_rounds_scalata}\n` + // Mostra il punteggio dell'utente
-                    `Il tuo punteggio: ${locGiocatore}\n` +
-                    `Il punteggio del robot : ${robotScore}`,
-                    [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("ClassUT"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
+                    `${user_string} : ${locGiocatore}\n` +
+                    `${robot_string} : ${robotScore}`,
+                    [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("underTestClassName"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
                 );
+                setTimeout(() => {
+                    window.location.href = '/editor?ClassUT=' + localStorage.getItem("underTestClassName");
+                }, 10000); // Redirect dopo 10 secondi
 
             } catch (error) {
                 alert("errore nella memorizzazione del progresso della scalata");
+                console.log(error);
                 window.location.href = "/main";
                 flush_localStorage();
+                setTimeout(() => {
+                    window.location.href = '/main';
+                }, 10000); // Redirect dopo 10 secondi
             }
         }
     }
@@ -258,15 +285,16 @@ function handleEndGame(userScore, robotScore, totalScore) {
         openModalWithText(
             status_scalata_lost,
             `${scalata_lost_text} round ${current_round_scalata}\n` + // Mostra il punteggio dell'utente
-            `Il tuo punteggio: ${locGiocatore}\n` +
-            `Il punteggio del robot : ${robotScore}`,
-            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
+            `${user_string} : ${locGiocatore}\n` +
+            `${robot_string} : ${robotScore}`,
+            [{ text: vai_menu_scalata, href: '/gamemode?mode=Scalata', class: 'btn btn-primary' }] // Pulsante per tornare alla home della scalata
 
             
         );
-
-        //closeScalata(id_scalata, false, 0, current_round_scalata);
         flush_localStorage();
+        setTimeout(() => {
+            window.location.href = '/gamemode?mode=Scalata';
+        }, 10000); // Redirect dopo 10 secondi
     }
     else{
         openModalWithText(
@@ -275,6 +303,9 @@ function handleEndGame(userScore, robotScore, totalScore) {
             [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
         );
         flush_localStorage(); // Pulisce i dati salvati nel localStorage
+        setTimeout(() => {
+            window.location.href = '/main';
+        }, 10000); // Redirect dopo 10 secondi
     }
 }
 

@@ -1,3 +1,8 @@
+/**
+   non più in uso - queste chiamate vengono svolte in T5-GameLogic
+  **/
+
+
 //EDIT: Oltre al parse della classe per ogni round, viene effettuato il parse della classe per ogni robot e difficoltà
 function getScalataClasse(roundId, scalateJsonArray) {
     return JSON.parse(scalateJsonArray)[roundId];
@@ -22,7 +27,9 @@ function getDifficulty(difficulty) {
     }
   }
 
-//chiamata non più in uso
+/**
+   non più in uso - Spostata in t5-GameLogic, viene usata la chiamata SaveGame
+  **/
 async function createGame(robot, classe, difficulty, scalataId, username, gamemode) {
     
     console.log("[createGame] robot: ", robot, " classe: ", classe, " difficulty: ", difficulty, " scalataId: ", scalataId, " username: ", username, "gamemode: ", gamemode);
@@ -77,8 +84,9 @@ async function createGame(robot, classe, difficulty, scalataId, username, gamemo
         })
     })
 }
-
-
+/**
+   non più in uso - Spostata in t5-ScalataGame
+  **/
 async function incrementScalataRound(scalataId, roundId) {
     return new Promise((resolve, reject) => { 
         $.ajax({
@@ -101,7 +109,9 @@ async function incrementScalataRound(scalataId, roundId) {
     })
 }
 
-
+/**
+   non più in uso - Spostata in t5-ScalataGame
+  **/
 async function closeScalata(scalataId, isWin, finalScore, roundId) {
     data = JSON.stringify({
         CurrentRound: parseInt(roundId),
@@ -129,7 +139,9 @@ async function closeScalata(scalataId, isWin, finalScore, roundId) {
     })
 }
 
-//TODO: implement in backend t6
+/**
+   non più in uso - Spostata in t5-ScalataGame. Il punteggio finale tiene conto della somma del punteggio delle sfide, usando l'algoritmo implementato all'interno delle sfide stesse.
+  **/
 async function calculateFinalScore(scalataId) {
     return new Promise((resolve, reject) => { 
         $.ajax({

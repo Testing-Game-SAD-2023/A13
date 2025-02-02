@@ -127,5 +127,5 @@ var total_rounds_scalata = 0; // numero totale di rounds
 var robots_scalata =""; // Lista di robots
 var difficulties_scalata = ""; // Lista di difficoltà delle classi nella scalata
 var classes_scalata = ""; // Lista di classi all'interno della scalata
-var total_score_scalata = "";
-var is_scalata_inprogress = false;
+var total_score_scalata = ""; //punteggio totale della scalata
+var is_scalata_inprogress = false; // booleano per comprendere lo stato della scalata

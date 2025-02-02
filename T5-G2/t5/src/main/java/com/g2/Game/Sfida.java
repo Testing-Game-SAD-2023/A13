@@ -39,17 +39,17 @@ public class Sfida extends GameLogic {
     }
 
     @Override
-    public void playTurn(int userScore, int robotScore, boolean isGameEnd) {
+    public void playTurn(int userScore, int robotScore, boolean isRoundEnd) {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         currentTurn++;
         //CreateTurn(Time, userScore);
-        this.isGameEnd = isGameEnd;
+        this.isGameEnd = isRoundEnd;
         System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
     }
 
     @Override
     public Boolean isGameEnd() {
-        return this.isGameEnd; //il giocatore può fare quanti turni vuole quindi ritorno sempre false
+        return this.isGameEnd; 
     }
 
     @Override

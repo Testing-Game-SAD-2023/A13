@@ -53,7 +53,7 @@ public abstract class GameLogic {
     /*
      * PlayTurn deve aggiornalo lo stato della partita ad ogni turno, il concetto di turno può esser gestito come si vuole
      */
-    public abstract void playTurn(int userScore, int robotScore, boolean isGameEnd);
+    public abstract void playTurn(int userScore, int robotScore, boolean isRoundEnd);
     /*
      * Si deve personalizzare la condizione di fine del gioco, in generale l'utente può sempre decretarne la fine tramite l'editor.
      */
@@ -153,6 +153,9 @@ public abstract class GameLogic {
 
     public String getClasseUT() {
         return this.ClasseUT;
+    }
+    public String getGameMode() {
+        return this.gamemode;
     }
 
 //aggiunta dei set per robot, difficoltà e classeUT

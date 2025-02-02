@@ -273,7 +273,6 @@ function flush_localStorage(){
 	pulisciLocalStorage("roundId");
 	pulisciLocalStorage("turnId");
 	pulisciLocalStorage("underTestClassName");
-	pulisciLocalStorage("ClassUT");
 	pulisciLocalStorage("username");
 	pulisciLocalStorage("storico");
 	pulisciLocalStorage("codeMirrorContent");

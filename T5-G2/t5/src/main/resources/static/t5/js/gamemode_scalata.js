@@ -145,8 +145,8 @@ function confirmLogout() {
     document.getElementById('nav-logout').addEventListener('click', function(event) {
         event.preventDefault();
         swal({
-            title: "Sei sicuro?",
-            text: "Sei sicuro di voler effettuare il Logout?",
+            title: conferma,
+            text: conferma2,
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -178,18 +178,18 @@ function pressedSubmit() {
     submitButton.addEventListener('click', function() {
         // Check if the user has selected a "Scalata"
         if (selectedScalata === "") {
-            swal("Errore", "Devi selezionare una 'Scalata' dall'elenco per poter proseguire.", "error");
+            swal(ErrorMessage, scalataNotSelected, "error");
             return;
         }
         else {
             // Confirm the user's choice
-            var confirm_choice = confirm("Hai selezionato la 'Scalata': " + selectedScalata + ".\nSei sicuro di voler proseguire?");
+            var confirm_choice = confirm(alert_selection1 + ": " + selectedScalata + ".\n"+alert_selection2);
             if (confirm_choice) {
                 // Confirmed. Handle the POST request
                 console.log("Confirmed choice."); 
                 retrieveScalata(selectedScalata)
                 .then(() => {
-                    const classUT = localStorage.getItem("ClassUT");
+                    const classUT = localStorage.getItem("underTestClassName");
                     if (classUT) {
                         window.location.href = `editor?ClassUT=${classUT}`;
                     } else {
@@ -201,11 +201,15 @@ function pressedSubmit() {
                 });
             }
             else {
-                swal("Errore!", "Si è verificato un errore imprevisto", "error");//Do nothing
+                swal(errorMessage, suddenError, "error");//Do nothing
             }
         }
     });
 }
+
+/**
+ * Salvataggio dei parametri della scalata ricevuti tramite chiamata API 
+ */
 
 function retrieveScalata(scalata) {
     return new Promise((resolve, reject) => { 
@@ -225,7 +229,6 @@ function retrieveScalata(scalata) {
                 localStorage.setItem("scalata_classes", JSON.stringify(classNames));
                 localStorage.setItem("scalata_robots", JSON.stringify(robots));
                 localStorage.setItem("scalata_difficulties", JSON.stringify(difficulties));
-                localStorage.setItem("ClassUT", classNames[0]); // Salva il nome della prima classe
                 localStorage.setItem("underTestClassName", classNames[0]);
                 localStorage.setItem("difficulty", getDifficulty(data[0].selectedClasses[0].difficulty));
                 localStorage.setItem("robot", data[0].selectedClasses[0].robot);
@@ -256,7 +259,6 @@ function flush_localStorage(){
 	pulisciLocalStorage("roundId");
 	pulisciLocalStorage("turnId");
 	pulisciLocalStorage("underTestClassName");
-	pulisciLocalStorage("ClassUT");
 	pulisciLocalStorage("username");
 	pulisciLocalStorage("storico");
 	pulisciLocalStorage("codeMirrorContent");

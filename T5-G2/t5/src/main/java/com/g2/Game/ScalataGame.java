@@ -40,6 +40,7 @@ public class ScalataGame extends GameLogic {
     private int currentRound;       //usata per contare il progresso della scalata
     private int currentRoundIndex;  //indice usato per la lettura della lista interna
     private int totalScore;
+    private int gameCoverage;   //coverage di ogni partita usato per passare o meno al round successivo.
 
     public ScalataGame(ServiceManager serviceManager, String playerID,  String classeUT,
                         String scalata_name,List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
@@ -61,21 +62,23 @@ public class ScalataGame extends GameLogic {
 
     @Override
     //con isGameEnd ci si riferisce al termine del round all'interno di una scalata, e non alla scalata stessa.
-    public void playTurn(int userScore, int robotScore, boolean isGameEnd) {
+    public void playTurn(int userScore, int robotScore, boolean isRoundEnd) {
 
         String now = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         if (currentRoundIndex < games.size()) {
             Sfida currentGame = games.get(currentRoundIndex);
-            currentGame.playTurn(userScore, robotScore,isGameEnd);
+            currentGame.playTurn(userScore, robotScore,isRoundEnd);
             
             // Verifica se il gioco corrente è finito. Per gioco s'intende il round della scalata
-            if (currentGame.isGameEnd() && userScore >= robotScore) {
+            if (currentGame.isGameEnd() && this.gameCoverage >= robotScore) {
                 currentGame.EndGame(now, robotScore, true);
                 currentGame.EndRound(now);
+                
                 System.out.println("[SCALATAGAME][T5] Round " + currentRound + " completed.");
-                    currentRoundIndex++; // Passa al gioco successivo
-                    currentRound++;
-
+                
+                currentRoundIndex++; // Passa al gioco successivo
+                currentRound++;
+                this.totalScore += userScore;
                     //adesso viene controllato se la scalata è terminata
                     if(isGameEnd()){
                         System.out.println("[SCALATAGAME][T5] Scalata  completed.");
@@ -86,7 +89,7 @@ public class ScalataGame extends GameLogic {
                     else{
                         
                         games.get(currentRoundIndex).CreateGame(id_scalata);
-                        this.updateScalata(id_scalata, games.get(currentRoundIndex).getRoundID());
+                        this.updateScalata(id_scalata, currentRound);
                     }
 
             }
@@ -123,9 +126,11 @@ public class ScalataGame extends GameLogic {
 
     @Override
     public int GetScore(int coverage) {
-        // restituisce il punteggio di un round, e incrementa il punteggio totale all'interno della scalat
+        // restituisce il punteggio di un round, e incrementa il punteggio totale all'interno della scalata
+        //Inoltre, salva all'interno della scalata la copertura della classe, in modo da confrontarla in seguito con il punteggio del robot.
+        this.gameCoverage = coverage;
         int score = games.get(currentRoundIndex).GetScore(coverage);
-        this.totalScore += score;
+        
         return  score;
     }
 
@@ -147,6 +152,18 @@ public class ScalataGame extends GameLogic {
     protected void CreateGame(){
         createScalata(getPlayerID(),this.scalata_name);
         games.get(currentRoundIndex).CreateGame(id_scalata);
+    }
+
+    @Override
+    public Boolean CheckGame(String type_robot, String difficulty, String underTestClassName){
+        System.out.println("[SCALATAGAME][CHECKGAME]");
+        if( this.getType_robot().equals(type_robot) && 
+            this.getDifficulty().equals(difficulty) &&
+            this.getClasseUT().equals(underTestClassName)){
+                return true;
+            }else{
+                return false;
+            }
     }
 
     //funzione per ottenere lo stato interno della scalata

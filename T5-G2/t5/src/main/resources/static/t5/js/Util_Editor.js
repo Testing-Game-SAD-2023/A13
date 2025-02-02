@@ -112,7 +112,7 @@ function getConsoleTextCoverage(valori_csv, gameScore, coverageDetails) {
 
 	var consoleText = 
 `============================== Results ===============================
-Il tuo punteggio: ${gameScore}pt
+${user_string}: ${gameScore}pt
 ============================== JaCoCo ===============================
 Line Coverage COV%:  ${lineCoveragePercentage}% LOC
 covered: ${coverageDetails.line.covered}  
@@ -126,21 +126,21 @@ Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
 covered: ${coverageDetails.instruction.covered} 
 missed: ${coverageDetails.instruction.missed}
 ============================== EvoSuite ===============================
-la tua Coverage:  ${valori_csv[0]*100}% LOC
+${user_coverage_string}:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+${evo}: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+${evo}: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+${evo}: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+${evo}: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+${evo}: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+${evo}: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+${evo}: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato
@@ -158,9 +158,9 @@ function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScor
 		consoleText2 +
 		"\n" +
 `============================== Results ===============================
-Il tuo punteggio:${gameScore}pt
+${user_string} :${gameScore}pt
 ----------------------------------------------------------------------
-La coverage del robot:${punteggioRobot}% LOC
+${robot_coverage_string} :${punteggioRobot}% LOC
 ============================== JaCoCo ===============================
 Line Coverage COV%:  ${lineCoveragePercentage}% LOC
 covered: ${coverageDetails.line.covered}  
@@ -174,21 +174,21 @@ Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
 covered: ${coverageDetails.instruction.covered} 
 missed: ${coverageDetails.instruction.missed}
 ============================== EvoSuite ===============================
-la tua Coverage:  ${valori_csv[0]*100}% LOC
+${user_coverage_string}:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+${evo}: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+${evo}: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+${evo}: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+${evo}: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+${evo}: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+${evo}: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+${evo}: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato
@@ -199,7 +199,7 @@ function getConsoleTextError(){
 	return  `===================================================================== \n` 
 			+ error +  "\n" +
 			`============================== Results =============================== \n
-			Ci sono stati errori di compilazione, controlla la console !`;
+			${console_error}`;
 }
 
 // Funzione per avviare il gioco utilizzando ajaxRequest
@@ -382,8 +382,11 @@ async function ajaxRequest(
 		throw error;
 	}
 }
-//FUNZIONI SCALATA
-
+ /**
+   * Non più in uso. HandleScalata gestisce i parametri della scalata a ogni round, 
+   * handleEndGame gestisce la fine della partita
+   * HandleScalataNextRound gestisce il proseguio al round successivo.
+   */
 function controlloScalata(
 	iswin,
 	current_round_scalata,
@@ -486,22 +489,33 @@ function controlloScalata(
 		}
 	}
 }
-//EDIT: Oltre al parse della classe per ogni round, viene effettuato il parse della classe per ogni robot e difficoltà
+ /**
+   * Parse dell'array JSON delle classi, in base alla posizione nell'array
+   */
 function getScalataClasse(roundId, scalateJsonArray) {
 	var data = JSON.parse(scalateJsonArray)[roundId];
 	console.log(data);
     return data;
 }
+ /**
+   * Parse dell'array JSON dei robot, in base alla posizione nell'array
+   */
 function getScalataRobot(roundId, scalateJsonArray) {
     var data = JSON.parse(scalateJsonArray)[roundId];
 	console.log(data);
 	return data;
 }
+ /**
+   * Parse dell'array JSON delle difficoltà, in base alla posizione nell'array
+   */
 function getScalataDifficulty(roundId, scalateJsonArray) {
     const difficulty =  JSON.parse(scalateJsonArray)[roundId];
 	console.log(difficulty);
     return getDifficulty(difficulty);
 }
+ /**
+   * converte da una difficoltà ad aggettivi a difficoltà a numeri
+   */
 function getDifficulty(difficulty) {
     switch (difficulty) {
         case 'Beginner':
@@ -514,6 +528,9 @@ function getDifficulty(difficulty) {
             return '';
     }
   }
+  /**
+   * Gestisce i parametri della scalata
+   */
 
 function handleScalataParameters(){
 
@@ -527,6 +544,10 @@ function handleScalataParameters(){
 	console.log("Dati scalata: ",id_scalata, name_scalata, current_round_scalata, total_rounds_scalata, classes_scalata, robots_scalata, difficulties_scalata);
 }
 
+/**
+ * 
+ * Gestisce il proseguio del prossimo round.
+ */
 function handleScalataNextRound(){
 	console.log("gestione round successivo ...");
 	var isScalataEnded = false ;
@@ -538,7 +559,6 @@ function handleScalataNextRound(){
 		//finestra di dialogo
 		localStorage.setItem("robot", getScalataRobot(current_round_scalata, robots_scalata));
 		localStorage.setItem("difficulty", getScalataDifficulty(current_round_scalata, difficulties_scalata));
-		localStorage.setItem("ClassUT", getScalataClasse(current_round_scalata, classes_scalata));
 		localStorage.setItem("underTestClassName", getScalataClasse(current_round_scalata, classes_scalata));
 		current_round_scalata++;
 		localStorage.setItem("current_round_scalata",current_round_scalata);
@@ -546,62 +566,12 @@ function handleScalataNextRound(){
 		localStorage.setItem("scalata_score", total_score_scalata);
 		console.log(current_round_scalata);
 
-		//window.location.href = "/editor?ClassUT="+localStorage.getItem("ClassUT");
 		return false;
 	}
 	
 }
 
-async function incrementScalataRound(scalataId, roundId) {
-    return new Promise((resolve, reject) => { 
-        $.ajax({
-            url: '/scalates/'+scalataId,
-            type: 'PUT',
-            contentType: "application/json",
-            data: JSON.stringify({
-                CurrentRound: roundId
-            }),
-            dataType: "json",
-            success: function (response) {
-                resolve(response);
-            },
-            error: function (error) {
-                console.log("Error details:", error);
-                console.error('Errore nell\' invio dei dati');
-                reject(error);
-            }
-        })
-    })
-}
 
-
-async function closeScalata(scalataId, isWin, finalScore, roundId) {
-    data = JSON.stringify({
-        CurrentRound: parseInt(roundId),
-        IsFinished: isWin,
-        FinalScore: finalScore,
-        ClosedAt: new Date().toISOString()  
-    });
-	console.log("Parametri ricevuti:", { scalataId, isWin, finalScore, roundId });
-    console.log("[closeScalata] json data: "+data);
-    return new Promise((resolve, reject) => { 
-        $.ajax({
-            url: '/scalates/'+scalataId,
-            type: 'PUT',
-            contentType: "application/json",
-            data: data,
-            dataType: "json",
-            success: function (response) {
-                resolve(response);
-            },
-            error: function (error) {
-                console.log("Error details:", error);
-                console.error('Errore nell\' invio dei dati');
-                reject(error);
-            }
-        })
-    })
-}
 
 // Funzione per analizzare l'output di Maven
 function parseMavenOutput(output) {
