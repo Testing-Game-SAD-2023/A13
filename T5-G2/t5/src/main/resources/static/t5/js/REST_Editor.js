@@ -303,6 +303,7 @@ function handleEndGame(userScore, robotScore, totalScore) {
             [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
         );
         flush_localStorage(); // Pulisce i dati salvati nel localStorage
+    }
 }
 
 // Reimposta i pulsanti per consentire nuove azioni
