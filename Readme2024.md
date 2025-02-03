@@ -36,19 +36,19 @@ Siccome un'immagine vale più di mille parole, è buona norma inserire degli scr
 
 ### Creazione Scalata
 
+!Creazione Scalata](https://github.com/SimoneDeLucia/A13_R7/blob/main/GruppoB2/Video_Demo/CreazioneScalata.mp4)
 
+### Partita Scalata Vinta
 
-### Partita Vinta
+![Partita Vinta](https://github.com/SimoneDeLucia/A13_R7/blob/main/GruppoB2/Video_Demo/PartitaScalata.mp4)
 
+### Partita Scalata Persa
 
+![Partita Persa](https://github.com/SimoneDeLucia/A13_R7/blob/main/GruppoB2/Video_Demo/SconfittaScalata.mp4)
 
-### Partita Persa
+### Eliminazione di una classe presente in una scalata
 
-
-
-### Eliminazione di una classe all'interno di una scalata
-
-
+![Eliminazione classe](https://github.com/SimoneDeLucia/A13_R7/blob/main/GruppoB2/Video_Demo/GestioneScalataEliminazioneClasse.mp4)
 
 
 # Come iniziare
