@@ -112,7 +112,7 @@ function getConsoleTextCoverage(valori_csv, gameScore, coverageDetails) {
 
 	var consoleText = 
 `============================== Results ===============================
-Il tuo punteggio: ${gameScore}pt
+${user_string}: ${gameScore}pt
 ============================== JaCoCo ===============================
 Line Coverage COV%:  ${lineCoveragePercentage}% LOC
 covered: ${coverageDetails.line.covered}  
@@ -126,21 +126,21 @@ Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
 covered: ${coverageDetails.instruction.covered} 
 missed: ${coverageDetails.instruction.missed}
 ============================== EvoSuite ===============================
-la tua Coverage:  ${valori_csv[0]*100}% LOC
+${user_coverage_string}:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+${evo}: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+${evo}: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+${evo}: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+${evo}: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+${evo}: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+${evo}: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+${evo}: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato
@@ -149,6 +149,7 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 
 function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScore) {
 	let lineCoveragePercentage = (coverageDetails.line.covered / (coverageDetails.line.covered + coverageDetails.line.missed)) * 100;
+	locGiocatore = lineCoveragePercentage; //memorizzazione in una variabile per allert
 	let BranchCoveragePercentage = (coverageDetails.branch.covered / (coverageDetails.branch.covered + coverageDetails.branch.missed)) * 100;
 	let instructionCoveragePercentage = (coverageDetails.instruction.covered / (coverageDetails.instruction.covered + coverageDetails.instruction.missed)) * 100;
 	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
@@ -157,9 +158,9 @@ function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScor
 		consoleText2 +
 		"\n" +
 `============================== Results ===============================
-Il tuo punteggio:${gameScore}pt
+${user_string} :${gameScore}pt
 ----------------------------------------------------------------------
-La coverage del robot:${punteggioRobot}% LOC
+${robot_coverage_string} :${punteggioRobot}% LOC
 ============================== JaCoCo ===============================
 Line Coverage COV%:  ${lineCoveragePercentage}% LOC
 covered: ${coverageDetails.line.covered}  
@@ -173,21 +174,21 @@ Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
 covered: ${coverageDetails.instruction.covered} 
 missed: ${coverageDetails.instruction.missed}
 ============================== EvoSuite ===============================
-la tua Coverage:  ${valori_csv[0]*100}% LOC
+${user_coverage_string}:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+${evo}: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+${evo}: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+${evo}: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+${evo}: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+${evo}: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+${evo}: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+${evo}: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato
@@ -198,13 +199,14 @@ function getConsoleTextError(){
 	return  `===================================================================== \n` 
 			+ error +  "\n" +
 			`============================== Results =============================== \n
-			Ci sono stati errori di compilazione, controlla la console !`;
+			${console_error}`;
 }
 
 // Funzione per avviare il gioco utilizzando ajaxRequest
 async function startGame(data) {
 	try {
 		// Utilizziamo la funzione ajaxRequest per la chiamata POST
+		console.log("Dati inviati a /StartGame:", data); //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
 		const response = await ajaxRequest(
 			"/StartGame",
 			"POST",
@@ -213,6 +215,21 @@ async function startGame(data) {
 			"text"
 		);
 		console.log("Partita iniziata con successo:", response);
+
+		// Estrai i valori specifici per la modalità Scalata
+		//27GEN MODIFICHE PER PRENDERE I DATI DA INVIARE ALL EDITOR
+		if (localStorage.getItem("modalita") === "Scalata") {
+			const jsonResponse = JSON.parse(response);
+			const roundID = jsonResponse.roundID;
+			const gameID = jsonResponse.gameID;
+			const turnID = jsonResponse.turnID;
+			const scalataID = jsonResponse.scalataID;
+			localStorage.setItem("roundId", roundID);
+			localStorage.setItem("gameId", gameID);
+			localStorage.setItem("turnId", turnID);
+			localStorage.setItem("scalataId", scalataID);
+			console.log("Scalata Details:", { roundID, gameID, turnID, scalataID });
+		}
 	} catch (error) {
 		// Assicurati che error sia una stringa prima di usare includes
 		errorMessage = JSON.stringify(error);
@@ -365,7 +382,11 @@ async function ajaxRequest(
 		throw error;
 	}
 }
-
+ /**
+   * Non più in uso. HandleScalata gestisce i parametri della scalata a ogni round, 
+   * handleEndGame gestisce la fine della partita
+   * HandleScalataNextRound gestisce il proseguio al round successivo.
+   */
 function controlloScalata(
 	iswin,
 	current_round_scalata,
@@ -466,34 +487,91 @@ function controlloScalata(
 					});
 			});
 		}
-	} else {
-		//The player has lost the round
-		closeScalata(
-			localStorage.getItem("scalataId"),
-			false,
-			0,
-			current_round_scalata
-		)
-			.then((data) => {
-				console.log("Close Scalata response: ", data);
-				swal(
-					"Peccato!",
-					`Hai perso al round ${current_round_scalata}/${total_rounds_scalata} della scalata, la prossima volta andrà meglio!\n${displayRobotPoints}`,
-					"error"
-				).then((value) => {
-					window.location.href = "/main";
-				});
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-				swal(
-					"Errore!",
-					"Si è verificato un errore durante il recupero dei dati. Riprovare.",
-					"error"
-				);
-			});
 	}
 }
+ /**
+   * Parse dell'array JSON delle classi, in base alla posizione nell'array
+   */
+function getScalataClasse(roundId, scalateJsonArray) {
+	var data = JSON.parse(scalateJsonArray)[roundId];
+	console.log(data);
+    return data;
+}
+ /**
+   * Parse dell'array JSON dei robot, in base alla posizione nell'array
+   */
+function getScalataRobot(roundId, scalateJsonArray) {
+    var data = JSON.parse(scalateJsonArray)[roundId];
+	console.log(data);
+	return data;
+}
+ /**
+   * Parse dell'array JSON delle difficoltà, in base alla posizione nell'array
+   */
+function getScalataDifficulty(roundId, scalateJsonArray) {
+    const difficulty =  JSON.parse(scalateJsonArray)[roundId];
+	console.log(difficulty);
+    return getDifficulty(difficulty);
+}
+ /**
+   * converte da una difficoltà ad aggettivi a difficoltà a numeri
+   */
+function getDifficulty(difficulty) {
+    switch (difficulty) {
+        case 'Beginner':
+            return 1;
+        case 'Intermediate':
+            return 2;
+        case 'Advanced':
+            return 3;
+        default:
+            return '';
+    }
+  }
+  /**
+   * Gestisce i parametri della scalata
+   */
+
+function handleScalataParameters(){
+
+	id_scalata = localStorage.getItem("scalataId");
+    name_scalata = localStorage.getItem("scalata_name");
+    current_round_scalata = localStorage.getItem("current_round_scalata");
+    classes_scalata = localStorage.getItem("scalata_classes");
+    robots_scalata = localStorage.getItem("scalata_robots");
+    difficulties_scalata = localStorage.getItem("scalata_difficulties");
+	total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
+	console.log("Dati scalata: ",id_scalata, name_scalata, current_round_scalata, total_rounds_scalata, classes_scalata, robots_scalata, difficulties_scalata);
+}
+
+/**
+ * 
+ * Gestisce il proseguio del prossimo round.
+ */
+function handleScalataNextRound(){
+	console.log("gestione round successivo ...");
+	var isScalataEnded = false ;
+	if(current_round_scalata == total_rounds_scalata){
+
+		return true;
+	}
+	else{
+		//finestra di dialogo
+		localStorage.setItem("robot", getScalataRobot(current_round_scalata, robots_scalata));
+		localStorage.setItem("difficulty", getScalataDifficulty(current_round_scalata, difficulties_scalata));
+		localStorage.setItem("underTestClassName", getScalataClasse(current_round_scalata, classes_scalata));
+		current_round_scalata++;
+		localStorage.setItem("current_round_scalata",current_round_scalata);
+		
+		localStorage.setItem("scalata_score", total_score_scalata);
+		console.log(current_round_scalata);
+
+		return false;
+	}
+	
+}
+
+
 
 // Funzione per analizzare l'output di Maven
 function parseMavenOutput(output) {

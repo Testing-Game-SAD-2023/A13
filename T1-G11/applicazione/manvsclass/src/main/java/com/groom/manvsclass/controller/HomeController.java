@@ -1,7 +1,6 @@
 /*MODIFICA (5/11/2024) - Refactoring task T1
  * HomeController ora si occupa solo del mapping dei servizi aggiunti.
  */
-
  package com.groom.manvsclass.controller;
 
  import java.io.IOException;
@@ -436,3 +435,4 @@
      }
      
  }
+

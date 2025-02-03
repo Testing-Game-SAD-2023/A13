@@ -176,6 +176,7 @@ public class GuiController {
             return gamemode.handlePageRequest();
         }
         if("Scalata".equals(mode)){
+            //TODO: inserire logica di controllo della scalata esistente, come in modalità Sfida.
             PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode_scalata", model);
             gamemode.SetAuth(jwt);
             return gamemode.handlePageRequest();
@@ -187,7 +188,8 @@ public class GuiController {
     public String editorPage(Model model,
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam(value = "ClassUT", required = false) String ClassUT) {
-
+        
+        System.out.println("[T5][PAGEGBUILDER] ClasseUT passata come parametro" + ClassUT);
         PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
         VariableValidationLogicComponent Valida_classeUT = new VariableValidationLogicComponent(ClassUT);
         Valida_classeUT.setCheckNull(); 
@@ -199,7 +201,7 @@ public class GuiController {
         }
 
         System.out.println(Lista_classi_UT_nomi);
-
+        
         Valida_classeUT.setCheckAllowedValues(Lista_classi_UT_nomi); //Se il request param non è in questa lista è un problema 
         ServiceObjectComponent ClasseUT = new ServiceObjectComponent(serviceManager, "classeUT","T1", "getClassUnderTest", ClassUT);
         editor.setObjectComponents(ClasseUT);
@@ -332,7 +334,8 @@ public class GuiController {
         System.out.println("ECCO LO USERNAME : " + username);       //in realtà stampa l'indirizzo e-mail del player...
 
         // globalID = g.getGameId();
-        JSONObject ids = gameDataWriter.saveGame(g, username, selectedScalata);
+        //Aggiunta del parametro Robot per il salvataggio della partita e la creazione di un nuovo round.
+        JSONObject ids = gameDataWriter.saveGame(g, robot, username, selectedScalata);
         if (ids == null) {
             return ResponseEntity.badRequest().body("Bad Request");
         }
@@ -354,8 +357,10 @@ public class GuiController {
 
     @GetMapping("/editor_old")
     public String getEditorOld(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        
         PageBuilder main = new PageBuilder(serviceManager, "editor_old", model);
         main.SetAuth(jwt); //con questo metodo abilito l'autenticazione dell'utente
         return main.handlePageRequest();
     }
+
 }
