@@ -31,7 +31,10 @@ public class ScalataService {
 
     public ModelAndView showGamePageScalata(HttpServletRequest request, String jwt) {
         return new ModelAndView("scalata");
+
+       
     }
+
 
     public ResponseEntity<?> uploadScalata(Scalata scalata, String jwt) {
         if (!jwtService.isJwtValid(jwt)) {
@@ -75,5 +78,10 @@ public class ScalataService {
         } else {
             return new ResponseEntity<>(scalata, HttpStatus.OK);
         }
+    }
+
+    public List<Scalata> findScalataByClassName(String className){
+        List<Scalata> scalata =  scalata_repo.findBySelectedClassesClassName(className);
+        return scalata;
     }
 }

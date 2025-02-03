@@ -11,6 +11,7 @@
  import java.time.temporal.ChronoUnit;
  import java.util.*;
  import java.util.regex.Pattern;
+ import java.util.stream.Collectors;
  
  import javax.servlet.http.Cookie;
  import javax.servlet.http.HttpServletRequest;
@@ -184,7 +185,24 @@
      @PostMapping("/delete/{name}")
      @ResponseBody
      public ResponseEntity<?> eliminaClasse(@PathVariable String name, @CookieValue(name = "jwt", required = false) String jwt) {
-         return adminService.eliminaClasse(name, jwt);
+        // Controlla se la classe è presente in una scalata
+        try {
+            List<Scalata> scalate = scalataService.findScalataByClassName(name);
+            if (!scalate.isEmpty()) {
+                String scalateNomi = scalate.stream()
+                                            .map(Scalata::getScalataName)
+                                            .collect(Collectors.joining(", "));
+                String message = scalate.size() == 1 
+                ? "La classe è presente nella seguente scalata: " + scalateNomi + ". Vuoi eliminare la scalata associata?"
+                : "La classe è presente nelle seguenti scalate: " + scalateNomi + ". Vuoi eliminare tutte le scalate associate?";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore interno");
+        }
+
+         return adminService.eliminaClasse(name,jwt);
      }
  
      @PostMapping("/deleteFile/{fileName}")
