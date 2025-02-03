@@ -304,29 +304,33 @@ function resetExerciseForm() {
     document.getElementById("goalTypesContainer").innerHTML = ''; // Pulisce i goal types aggiunti
 }
 
-// Listener per aggiungere goal types
-document.getElementById("addGoalTypeButton").addEventListener("click", () => {
+// Assicurati che il listener dell'evento sia attaccato solo una volta
+document.getElementById("addGoalTypeButton").removeEventListener("click", addGoalType);
+document.getElementById("addGoalTypeButton").addEventListener("click", addGoalType);
+
+// Funzione per aggiungere un tipo di obiettivo
+function addGoalType() {
     const goalTypesContainer = document.getElementById("goalTypesContainer");
     const goalTypeDiv = document.createElement("div");
     goalTypeDiv.innerHTML = `
         <div class="goalTypeSection">
-            <label>Type:</label>
+            <label>Tipo:</label>
             <input type="number" class="goalType" name="type" required>
         </div>
         <div class="goalExpectedScoreSection">
-            <label>Expected Score:</label>
+            <label>Punteggio Atteso:</label>
             <input type="range" class="goalExpectedScore" name="expectedScore" min="1" max="100" value="50" required>
             <span class="expectedScoreValue">50</span>
         </div>
         <div class="goalClassNameSection">
-            <label>Class Name:</label>
+            <label>Nome Classe:</label>
             <input type="text" class="goalClassName" name="className" required>
         </div>
-        <button type="button" class="removeGoalTypeButton" style="border: 1px solid grey; padding: 5px;">Remove Goal Type</button>
+        <button type="button" class="removeGoalTypeButton" style="border: 1px solid grey; padding: 5px;">Rimuovi Tipo di Obiettivo</button>
     `;
     goalTypesContainer.appendChild(goalTypeDiv);
 
-    // Aggiorna il valore dello span quando si cambia il valore dello slider
+    // Aggiorna il valore dello span quando il valore del cursore cambia
     goalTypeDiv.querySelector(".goalExpectedScore").addEventListener("input", (event) => {
         goalTypeDiv.querySelector(".expectedScoreValue").textContent = event.target.value;
     });
@@ -334,6 +338,47 @@ document.getElementById("addGoalTypeButton").addEventListener("click", () => {
     goalTypeDiv.querySelector(".removeGoalTypeButton").addEventListener("click", () => {
         goalTypesContainer.removeChild(goalTypeDiv);
     });
+}
+
+// Listener per l'invio del modulo
+document.getElementById("exerciseForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const goalTypes = [];
+    let invalidGoalType = false;
+
+    document.querySelectorAll("#goalTypesContainer > div").forEach(goalTypeDiv => {
+        const type = parseInt(goalTypeDiv.querySelector(".goalType").value, 10);
+        const expectedScore = parseInt(goalTypeDiv.querySelector(".goalExpectedScore").value, 10);
+        const className = goalTypeDiv.querySelector(".goalClassName").value;
+
+        if (type !== 1) {
+            invalidGoalType = true;
+        }
+
+        goalTypes.push({ type, expectedScore, className });
+    });
+
+    if (invalidGoalType) {
+        alert("At the moment, only type 1 goal is available. For more goals, please contact the developers team.");
+        return; // Previene l'invio del modulo e mantiene il contenitore aperto
+    }
+
+    const expiryTime = new Date(document.getElementById("expiryTime").value).toISOString();
+    const startingTime = new Date(document.getElementById("startingTime").value).toISOString();
+    const description = document.getElementById("description").value;
+    const creationTime = new Date().toISOString();
+
+    const exerciseData = {
+        goalTypes: goalTypes.map(gt => JSON.stringify(gt)),
+        expiryTime,
+        startingTime,
+        creationTime,
+        description
+    };
+
+    // Invia la richiesta HTTP PUT all'API
+    addExerciseToTeam(exerciseData);
 });
 
 // Funzione per inviare la richiesta HTTP PUT all'API
@@ -352,9 +397,9 @@ async function addExerciseToTeam(exerciseData) {
             const result = await response.json();
             if (response.ok) {
                 fetchTeamExercises();  // Aggiorna la tabella degli esercizi
-                // Nascondi il contenitore dell'esercizio
+                // Nasconde il contenitore dell'esercizio
                 document.getElementById("exerciseContainer").style.display = "none";
-                resetExerciseForm(); // Resetta il form quando viene chiuso
+                resetExerciseForm(); // Resetta il modulo quando viene chiuso
                 // alert('Exercise added successfully'); 
             } else {
                 alert(`Failed to add exercise: ${result.message}`);
@@ -415,35 +460,6 @@ async function deleteExerciseFromTeam(exerciseId) {
         alert(`Error while deleting exercise: ${error.message}`);
     }
 }
-
-// Listener per il submit del form
-document.getElementById("exerciseForm").addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const goalTypes = [];
-    document.querySelectorAll("#goalTypesContainer > div").forEach(goalTypeDiv => {
-        const type = parseInt(goalTypeDiv.querySelector(".goalType").value, 10);
-        const expectedScore = parseInt(goalTypeDiv.querySelector(".goalExpectedScore").value, 10);
-        const className = goalTypeDiv.querySelector(".goalClassName").value;
-        goalTypes.push({ type, expectedScore, className });
-    });
-
-    const expiryTime = new Date(document.getElementById("expiryTime").value).toISOString();
-    const startingTime = new Date(document.getElementById("startingTime").value).toISOString();
-    const description = document.getElementById("description").value;
-    const creationTime = new Date().toISOString();
-
-    const exerciseData = {
-        goalTypes: goalTypes.map(gt => JSON.stringify(gt)),
-        expiryTime,
-        startingTime,
-        creationTime,
-        description
-    };
-
-    // Invia la richiesta HTTP PUT all'API
-    addExerciseToTeam(exerciseData);
-});
 
 async function fetchTeamExercises() {
     try {
