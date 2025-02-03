@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-@SpringBootApplication(scanBasePackages = {"com.g2.factory", "com.g2.Interfaces", "com.g2.Game", "com.g2.t5", "com.g2.Service"})
+@SpringBootApplication(scanBasePackages = {"com.g2.Controllers", "com.g2.factory", "com.g2.Interfaces", "com.g2.Game", "com.g2.t5", "com.g2.Service"})
 public class T5Application {
 
     public static void main(String[] args) {

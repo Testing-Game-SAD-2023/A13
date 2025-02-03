@@ -71,7 +71,6 @@ public class GameController {
 
     @FunctionalInterface
     interface GameFactoryFunction {
-
         GameLogic create(ServiceManager serviceManager,
                 String playerId, String underTestClassName,
                 String type_robot, String difficulty, String mode);

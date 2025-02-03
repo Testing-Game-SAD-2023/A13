@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.groom.manvsclass.model.Team;
@@ -33,6 +34,18 @@ public class TeamController {
         return teamService.creaTeam(team, jwt);
     }
 
+    @GetMapping("/visualizzaTeams")
+    @ResponseBody
+    public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.visualizzaTeams(jwt);
+    }
+
+    @GetMapping("/cercaTeam/{idTeam}")
+    @ResponseBody
+    public ResponseEntity<?> cercaTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.cercaTeam(idTeam, jwt);
+    }
+
     // Endpoint per aggiungere un nuovo team
     @DeleteMapping("/deleteTeam")
     @ResponseBody
@@ -45,18 +58,6 @@ public class TeamController {
     @ResponseBody
     public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.modificaNomeTeam(request, jwt);
-    }
-
-    @GetMapping("/visualizzaTeams")
-    @ResponseBody
-    public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.visualizzaTeams(jwt);
-    }
-
-    @GetMapping("/cercaTeam/{idTeam}")
-    @ResponseBody
-    public ResponseEntity<?> cercaTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.cercaTeam(idTeam, jwt);
     }
 
     //Modifica 04/12/2024: aggiunta di una lista di idStudenti al team
@@ -79,4 +80,19 @@ public class TeamController {
         return teamService.rimuoviStudenteTeam(idTeam, idStudente, jwt);
     }
 
+
+    /*
+    * Queste chiamate sono accedibili a un utente se fa parte di quel team  
+    */
+    @GetMapping("/ottieniTeamByStudentId")
+    @ResponseBody
+    public ResponseEntity<?> ottieniTeamByStudentId(@CookieValue(name = "jwt", required = false) String jwt, @RequestParam String StudentId) {
+        return teamService.getTeamByStudentId(StudentId).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/GetStudentTeam")
+    @ResponseBody
+    public ResponseEntity<?> GetStudentTeam(@CookieValue(name = "jwt", required = false) String jwt, @RequestParam String StudentId){
+        return teamService.GetStudentTeam(StudentId, jwt);
+    }
 }

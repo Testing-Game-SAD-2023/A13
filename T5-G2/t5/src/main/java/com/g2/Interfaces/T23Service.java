@@ -13,10 +13,10 @@
  */
 package com.g2.Interfaces;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,8 +24,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Model.Notification;
 import com.g2.Model.NotificationResponse;
 import com.g2.Model.User;
@@ -35,6 +33,7 @@ public class T23Service extends BaseService {
 
     private static final String BASE_URL = "http://t23-g1-app-1:8080";
 
+    @SuppressWarnings("unchecked")
     public T23Service(RestTemplate restTemplate) {
         super(restTemplate, BASE_URL);
 
@@ -51,6 +50,11 @@ public class T23Service extends BaseService {
         registerAction("GetUser", new ServiceActionDefinition(
                 params -> GetUser((String) params[0]),
                 String.class
+        ));
+
+        registerAction("GetUsersByList", new ServiceActionDefinition(
+            params -> GetUserByList((List<String>) params[0]),
+            List.class
         ));
 
         registerAction("UpdateProfile", new ServiceActionDefinition(
@@ -130,6 +134,30 @@ public class T23Service extends BaseService {
         return callRestGET(endpoint, null, User.class);
     }
 
+    //Do una lista di ID e mi ritorna una lista di User
+    // Implementata a mano perchè un po' strana è una POST che ottiene dati come una GET
+    private List<User> GetUserByList(List<String> idsStudenti){
+        final String endpoint = "/getStudentiTeam";
+        // Crea un oggetto HttpEntity con i dati che vogliamo inviare (la lista degli ID)
+        HttpEntity<List<String>> requestEntity = new HttpEntity<>(idsStudenti);
+         // Esegui la chiamata POST all'endpoint
+         ResponseEntity<?> responseEntity = restTemplate.exchange(
+                 BASE_URL + endpoint,  // URL dell'endpoint
+                 HttpMethod.POST,  // Tipo di richiesta POST
+                 requestEntity,  // Corpo della richiesta (lista di studenti)
+                 new ParameterizedTypeReference<List<User>>() {}  // Tipo di risposta che ci aspettiamo
+         );
+ 
+         // Gestisci la risposta
+         if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            @SuppressWarnings("unchecked")
+            List<User> users = (List<User>) responseEntity.getBody();
+            return users;
+         } else {
+            return null;
+         }
+    }
+
     // Metodo per modificare il profilo di un utente
     private Boolean UpdateProfile(String userEmail, String bio, String imagePath) {
         final String endpoint = "/update_profile";
@@ -176,8 +204,6 @@ public class T23Service extends BaseService {
         return notificationResponse.getContent();
     }
 
-
-
     public String updateNotification(String userEmail, String notificationID) {
         final String endpoint = "/update_notification";
         // Imposta i dati del form
@@ -204,6 +230,7 @@ public class T23Service extends BaseService {
         Map<String, String> queryParams = Map.of("email", userEmail);
         return callRestDelete(endpoint, queryParams);
     }
+
 
     /*
     *   Metodo per follow/unfollow di un utente

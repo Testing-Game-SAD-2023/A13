@@ -6,6 +6,7 @@ package com.groom.manvsclass.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
@@ -385,7 +386,7 @@ public class TeamService {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Non ci sono studenti associati a questo team.");
         }
 
-    // 6. Invoca il servizio T23 per ottenere i dettagli degli utenti
+        // 6. Invoca il servizio T23 per ottenere i dettagli degli utenti
         return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentiIds,jwt));
     }
 
@@ -430,7 +431,30 @@ public class TeamService {
         return ResponseEntity.ok().body(updatedTeam);
     }
 
-    
+    //Ritorna il team associato a un utente 
+    public Optional<Team> getTeamByStudentId(String studentId) {
+        return teamRepository.findByidStudentiContaining(studentId);
+    }
+
+    // Permetti a uno studente di vedere i componenti del proprio team 
+    public ResponseEntity<?> GetStudentTeam(String studentId, String jwt){
+        // 1. Verifica se l'utente ha un team 
+        Optional<Team> team = getTeamByStudentId(studentId);
+        if(!team.isPresent()){
+            //il team non esiste 
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("L'utente non è associato a un Team");
+        }
+        Team existingTeam = team.get();
+        // 2. Recupera la lista degli id degli studenti dei team
+        List<String> studentiIds = existingTeam.getStudenti(); //Lista di id degli studenti
+        if (studentiIds == null || studentiIds.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Non ci sono studenti associati a questo team.");
+        }
+        // 3. Invoca il servizio T23 per ottenere i dettagli degli utenti
+        return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentiIds,jwt));
+    }
+
+
 }
 
 

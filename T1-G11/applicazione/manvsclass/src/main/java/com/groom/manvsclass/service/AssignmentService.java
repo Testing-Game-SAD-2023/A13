@@ -94,8 +94,6 @@ public class AssignmentService {
         return ResponseEntity.status(HttpStatus.CREATED).body("Assignment creato con successo e associato al Team.");
     }
 
-
-
     //Inviare notifiche agli studenti del team - Merge da fare.
     public void inviaNotificaStudenti(List<String> idStudenti){
 

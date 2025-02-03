@@ -28,12 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.g2.Game.GameController;
-
 @Service
 public class ServiceManager {
     protected final Map<String, ServiceInterface> services = new HashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(GameController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceManager.class);
 
     @Autowired
     public ServiceManager(RestTemplate restTemplate) {
