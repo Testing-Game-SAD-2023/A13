@@ -261,16 +261,27 @@ public class T4Service extends BaseService {
     //26GEN FLAVIO: modifiche json invece di formdata
     /*
     private String EndRound(String Time, int roundId) {
-        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
+        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
+        // costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);
-        //MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        //formData.add("closedAt", Time);
-        JSONObject obj = new JSONObject();
-        obj.put("closedAt", Time);
-        String response = callRestPut(endpoint, obj, null, String.class);
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("closedAt", Time);
+        String response = callRestPut(endpoint, formData, null, String.class);
         return response;
     }
-    */
+     */
+    private String EndRound(String Time, int roundId) {
+        //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
+        final String endpoint = "rounds/" + String.valueOf(roundId);
+        try {
+            JSONObject formData = new JSONObject();
+            formData.put("closedAt", Time);
+            String response = callRestPut(endpoint, formData, null, null, String.class);
+            return response;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[EndRound]: " + e.getMessage());
+        }
+    }
 
     //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
     private String CreateTurn(String Player_id, int Round_id, String Time) {
