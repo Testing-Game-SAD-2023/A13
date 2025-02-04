@@ -368,48 +368,15 @@ public class GameController {
             /*
              * La seguente funzione cerca di eliminare la partita corrente in base all'ID del giocatore, per la scalata invece bisogna verificare gli stati della stessa per poter proseguire
              */
-            if (isGameEnd) {
+            if (gameLogic.isGameEnd()) {
                 //la fine partita della scalata non coincide con la fine della scalata stessa, siccome essa può avere più turni
                 if (gameLogic.getMode().equals("Scalata")) {
-                    GameLogic nextRound = activeGames.get(playerId);
-                    ScalataGamestatus status = ((ScalataGame) nextRound).getStatus();
-
-                    switch (status) {
-                        case IN_PROGRESS:
-                            /* giocando il turno prima dell'if, il metodo get dovrebbe ritornare la classe successiva rispetto alla classe correntemente memorizzata.
-                        questo perché la get di riferimento è quella della scalata, che restituisce classe, robot e difficoltà                        
-                        in base all'indice attualmente memorizzato
-                        Mentre invece la set è la semplice implementazione di GameLogic */
-                            totalScore = ((ScalataGame) activeGames.get(playerId)).GetTotalScore();
-
-                            logger.info("[GAMECONTROLLER] /run: scalata: round superato, caricamento prossimo turno \n"
-                                    + nextRound.getClasseUT() + nextRound.getType_robot() + nextRound.getDifficulty());
-                            nextRound.setClasseUT(nextRound.getClasseUT());
-                            nextRound.setType_Robot(nextRound.getType_robot());
-                            nextRound.setDifficulty(nextRound.getDifficulty());
-                            //viene propagata la modifica all'interno di activeGames
-                            activeGames.replace(playerId, nextRound);
-                            break;
-
-                        case WIN:
-                            logger.info("[GAMECONTROLLER] /run: scalata vinta");
-                            totalScore = ((ScalataGame) activeGames.get(playerId)).GetTotalScore();
-                            activeGames.remove(playerId);
-                            break;
-
-                        case LOST:
-                            logger.info("[GAMECONTROLLER] /run: scalata persa");
-                            activeGames.remove(playerId);
-                            break;
-                    }
+                    totalScore = ((ScalataGame) activeGames.get(playerId)).GetTotalScore();
                 } else {
-                    //per le partite normali, viene semplicemente rimossa la partita attiva
-                    gameLogic.EndRound(playerId);
-                    gameLogic.EndGame(playerId, userScore, userScore > robotScore);
-                    activeGames.remove(playerId);
+                    //per le partite normali, viene semplicemente rimossa la partita attiva all'interno del DB
                     totalScore = userScore;
                 }
-
+                activeGames.remove(playerId);    
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
 
                 // Aggiornamento progressi e notifiche

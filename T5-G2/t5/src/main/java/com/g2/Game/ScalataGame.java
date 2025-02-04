@@ -70,7 +70,8 @@ public class ScalataGame extends GameLogic {
             currentGame.playTurn(userScore, robotScore,isRoundEnd);
             
             // Verifica se il gioco corrente è finito. Per gioco s'intende il round della scalata
-            if (currentGame.isGameEnd() && this.gameCoverage >= robotScore) {
+            // Non so se per il passaggio al turno successivo serva il punteggio o la copertura. In tal caso, la scalata ha un sistema per recuperare entrambi
+            if (currentGame.isGameEnd() && userScore >= robotScore) {
                 currentGame.EndGame(now, robotScore, true);
                 currentGame.EndRound(now);
                 
@@ -79,21 +80,24 @@ public class ScalataGame extends GameLogic {
                 currentRoundIndex++; // Passa al gioco successivo
                 currentRound++;
                 this.totalScore += userScore;
+                //aggiornamento del prossimo turno
+                
                     //adesso viene controllato se la scalata è terminata
-                    if(isGameEnd()){
+                    if(currentRoundIndex >= games.size()){
                         System.out.println("[SCALATAGAME][T5] Scalata  completed.");
                         currentStatus = ScalataGamestatus.WIN;
 
                         this.CloseScalata(id_scalata, getRoundID(), true, totalScore);
                     }
                     else{
-                        
+                        loadNextRound();
                         games.get(currentRoundIndex).CreateGame(id_scalata);
                         this.updateScalata(id_scalata, currentRound);
                     }
 
             }
-            else if (currentGame.isGameEnd() && userScore< robotScore) {
+            else if (currentGame.isGameEnd() && this.gameCoverage< robotScore) {
+                this.currentStatus = ScalataGamestatus.LOST;
                 currentGame.EndGame(now, robotScore, false);
                 currentGame.EndRound(now);
                 currentGame.EndTurn(getTurnID(), now, userScore);
@@ -121,7 +125,13 @@ public class ScalataGame extends GameLogic {
 
     @Override
     public Boolean isGameEnd() {
-        return currentRoundIndex >= games.size();
+        if(currentStatus == ScalataGamestatus.IN_PROGRESS){
+            return false;
+        }
+        else{
+            return true;
+        }
+
     }
 
     @Override
@@ -216,6 +226,14 @@ public class ScalataGame extends GameLogic {
             closeTime
             );
         System.out.println(response);
+    }
+
+    //Viene aggiornato il gameLogic al round successivo, in modo da far risultare il cambio di turno anche al sistema di gioco.
+    private void loadNextRound(){
+
+        this.setClasseUT(this.getClasseUT());
+        this.setType_Robot(this.getType_robot());
+        this.setDifficulty(this.getDifficulty());
     }
 
 

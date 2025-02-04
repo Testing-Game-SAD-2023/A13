@@ -45,6 +45,9 @@ public class Sfida extends GameLogic {
         //CreateTurn(Time, userScore);
         this.isGameEnd = isRoundEnd;
         System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
+        
+        this.EndRound(Time);
+        this.EndGame(Time, userScore, userScore > robotScore);
     }
 
     @Override
