@@ -1,4 +1,6 @@
 package com.groom.manvsclass.model.filesystem;
+//Aggiunta dell'import dell modello della classe sotto test
+import com.groom.manvsclass.model.*;
 
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -8,6 +10,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -364,9 +369,15 @@ public class RobotUtil {
 		}
 
     }
-
-	public static void saveRobots(String fileNameClass, String fileNameTest, String fileNameTestEvo , String className, MultipartFile classFile, MultipartFile testFile, MultipartFile testFileEvo)
+//MODIFICA: In modo da memorizzare i dati all'interno del mongoDB, l'unica util che permette di conoscere anzitempo le percentuali di copertura per le classi è quella dell'unzip
+//viene passata la classe intera invece di className, in modo da fare poi i metodi di set sulle coperture
+	public static void saveRobots(String fileNameClass, String fileNameTest, String fileNameTestEvo , ClassUT classUT, MultipartFile classFile, MultipartFile testFile, MultipartFile testFileEvo)
 			throws IOException {
+
+		//EDIT: definizione di className e inizializzazione delle liste di stringhe da caricare poi in classe
+		String className = classUT.getName(); 	 
+		String coverageList[] = new String[6];
+		//FINE EDIT
 
 		/*CARICAMENTO CLASSE NEI VOLUMI T8 E T9*/
 		Path directory = Paths.get("/VolumeT9/app/FolderTree/" + className + "/" + className + "SourceCode");
@@ -431,10 +442,10 @@ public class RobotUtil {
 		int liv = 0; // livelli di robot prodotti da randoop
 		String randoopName = "randoop";
 		File results[] = resultsDir.listFiles();
-
+		
 		// Itera attraverso tutti i file nella directory dei risultati della generazione
 		// di robot da Randoop.
-
+		
 		for (File result : results) {
 
 			// Calcola la copertura delle linee per ciascun file XML di copertura estraendo
@@ -451,6 +462,9 @@ public class RobotUtil {
 					result.toString().substring(result.toString().length() - 7, result.toString().length() - 5));
 
 			System.out.println("La copertura del livello " + String.valueOf(livello) + " è: " + String.valueOf(score));
+			
+			//Edit: aggiunta coverage
+			coverageList[livello-1] = String.valueOf(score);
 
 			saveT4(score, livello, className, randoopName);
 
@@ -460,6 +474,7 @@ public class RobotUtil {
 				liv = livello;
 
 		}
+
 
 		/*TODO: AGGIUSTAMENTI T8 PER EVOSUITE */
 		// Il seguente codice è l'adattamento ad evosuite del codice appena visto, i
@@ -475,9 +490,15 @@ public class RobotUtil {
 
 			System.out.println("La copertura del livello " + String.valueOf(livello) + " è: " + String.valueOf(score));
 
+			//Edit: aggiunta coverage
+			coverageList[2+livello] = String.valueOf(score);
+
 			saveT4(score, livello, className, evosuiteName);
 
 		}
+		//Edit: impostazione delle coperture
+		classUT.setCoverage(Arrays.asList(coverageList));
+
 	}
     
 

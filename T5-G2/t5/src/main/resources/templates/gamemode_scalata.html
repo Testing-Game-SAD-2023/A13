@@ -30,7 +30,7 @@
 
     <!-- <script type= "text/javascript" src="/t5/js/main.js"></script> -->
     <script type="text/javascript" src="/t5/js_old/common.js"></script>
-    <script type="text/javascript" src="/t5/js_old/gamemode_scalata.js"></script>
+    <script type="text/javascript" src="/t5/js/gamemode_scalata.js"></script>
     
 
 </head>
@@ -65,13 +65,18 @@
   </nav>
 
   <!--Jumbotron-->
-  <div class="jumbotron">
+  <div class="jumbotron" id = "scalata">
     <h1 class="title" th:text="#{titolo_scalata}"></h1>
     <h2 class="subtitle" th:text="#{descrizione_scalata}"></h2>
   </div>
   <br>
   <div id="scalate-container" class="container">
-    <!-- List of all "Scalate" to choose-->
+    <!-- List of all "Scalate" to choose + EDIT-->
+    <div class="scalata-item p-3 border rounded mb-2" th:each="scalata : ${scalate}">
+      <strong th:text="${scalata.nome}"></strong>
+      <button class="btn btn-info btn-sm ml-2 info-button" th:attr="data-scalata=${scalata.nome}">Info</button>
+      <input type="radio" name="selectedScalata" th:value="${scalata.nome}">
+  </div>
   </div>
   <br>
   <br>
@@ -97,6 +102,22 @@
     </div>
   </div>
 </div>
+
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
+<script th:inline="javascript">
+    const info_scalata_personalizzabile = /*[[#{info_scalata_personalizzabile}]]*/ '';
+    const info_scalata_randoop = /*[[#{info_scalata_randoop}]]*/ '';
+    const info_scalata_evosuite = /*[[#{info_scalata_evosuite}]]*/ '';
+    const info_scalata_titolo = /*[[#{info_scalata_titolo}]]*/ '';
+    const alert_selection1    = /*[[#{alert_selection1}]]*/ '';
+    const alert_selection2    = /*[[#{alert_selection2}]]*/ '';
+    const errorMessage        =/*[[#{errorMessage}]]*/ '';
+    const suddenError         = /*[[#{suddenError}]]*/ '';
+    const scalataNotSelected  = /*[[#{scalataNotSelected}]]*/ '';
+    const conferma             =/*[[#{conferma}]]*/ '';
+    const conferma2             =/*[[#{conferma2}]]*/ '';
+</script>
 </body>
 
 </html>

@@ -102,20 +102,76 @@ fetch('/downloadFile/' + name)
     .catch(error => console.error(error));
 }
 
-function eliminaClasse(name) {
-fetch(`/delete/${name}`, {
-    method: 'POST'
-})
-.then(response => {
-    if (!response.ok) {
-    throw new Error('Errore durante l\'eliminazione della classe.');
-    }
-    // gestisci la risposta del server
-    location.reload();
-})
-.catch(error => console.error(error));
+function eliminaScalata(scalataName) {
+    return fetch(`/delete_scalata/${scalataName}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Errore durante l'eliminazione della scalata ${scalataName}.`);
+        }
+        // Ritorna una conferma di successo
+        return response;
+    });
 }
 
+function eliminaClasse(name) {
+    fetch(`/delete/${name}`, {
+        method: 'POST'
+    })
+    .then(response => response.text().then(text => {
+        if (response.status === 409) {
+            // Se lo status è 409, la classe è parte di una scalata
+            const startIndex = text.indexOf(": ") + 2;
+            const endIndex = text.lastIndexOf(". Vuoi eliminare");
+            const scalateNomi = text.substring(startIndex, endIndex).split(", ");
+            const isSingle = scalateNomi.length === 1;
+            const message = isSingle 
+            ? `La classe è presente nella seguente scalata: ${scalateNomi.join(", ")}. Vuoi eliminare la scalata associata?`
+            : `La classe è presente nelle seguenti scalate: ${scalateNomi.join(", ")}. Vuoi eliminare tutte le scalate associate?`;
+
+        swal({
+            title: "Errore!",
+            text: message,
+            icon: "warning",
+            buttons: {
+                cancel: "Annulla",
+                confirm: {
+                    text: isSingle ? "Elimina la scalata associata e prosegui" : "Elimina tutte le scalate associate e prosegui",
+                    value: "delete_all",
+                },
+            },
+        }).then((value) => {
+            if (value === "delete_all") {
+              // Chiamata per eliminare tutte le scalate associate
+              Promise.all(scalateNomi.map(scalataName => eliminaScalata(scalataName.trim())))
+              .then(() => {
+                  // Dopo aver eliminato tutte le scalate, elimina la classe
+                  fetch(`/delete/${name}`, {
+                      method: 'POST'
+                  })
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Errore durante l\'eliminazione della classe.');
+                      }
+                      // gestisci la risposta del server
+                      location.reload();
+                  })
+                  .catch(error => console.error(error));
+              })
+              .catch(error => console.error(error));
+          }
+      });
+      return;
+  }
+  if (!response.ok) {
+      throw new Error('Errore durante l\'eliminazione della classe.');
+  }
+  // gestisci la risposta del server
+  location.reload();
+}))
+.catch(error => console.error(error));
+}
 function newLike(name) {
 fetch(`/newlike/${name}`, {
     method: 'POST'

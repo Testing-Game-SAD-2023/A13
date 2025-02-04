@@ -24,6 +24,9 @@ L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovr
 # Contributori del Branch/ Fork corrente 
 Nomi degli autori dei nuovi contributi presenti in questo repository 
 
+- **Flavio Filippo Parrotta**, M63001807, fl.parrotta@studenti.unina.it - https://github.com/Fjavio
+- **Floriano Francesco**, M63001765, f.floriano@studenti.unina.it, https://github.com/f-floriano
+- **De Lucia Simone**, M63001720, simon.delucia@studenti.unina.it, https://github.com/SimoneDeLucia
 
 # Funzionalità dell'Applicazione 
 L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi. 
@@ -53,6 +56,29 @@ L'amministratore del Gioco può:
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di
 # Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
 Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
+
+### Creazione Scalata
+
+https://github.com/user-attachments/assets/06c78ace-06c5-4960-992c-325f01ea7bc2
+
+### Partita Scalata Vinta
+
+
+
+https://github.com/user-attachments/assets/314b179e-a718-4110-9d29-1cb6ba548aaf
+
+
+### Partita Scalata Persa
+
+
+https://github.com/user-attachments/assets/3f56012a-9806-412c-94bc-72b4145a5192
+
+
+
+### Eliminazione di una classe presente in una scalata
+
+https://github.com/user-attachments/assets/9ef622cb-72b8-4a00-9054-f9edd03484f6
+
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di 

@@ -98,8 +98,8 @@ public abstract class BaseService implements ServiceInterface {
         try {
             return call.execute();
         } catch (HttpClientErrorException e) { // Gestisce gli errori 4xx
-            throw new RestClientException("Chiamata REST fallita con stato 4xx: " + e.getStatusCode()
-                    + " (eseguita da: " + caller + ")", e);
+            throw new RestClientException("Chiamata REST fallita con stato 4xx: " + e.getStatusCode() + 
+                                          " (eseguita da: " + caller + ")", e);
         } catch (HttpServerErrorException e) { // Gestisce gli errori 5xx
             throw new RestClientException("Chiamata REST fallita con stato 5xx: " + e.getStatusCode()
                     + " (eseguita da: " + caller + ")", e);
@@ -113,10 +113,12 @@ public abstract class BaseService implements ServiceInterface {
     }
 
     // Metodo per chiamate GET che restituiscono un singolo oggetto
+    //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
     protected <R> R callRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
         return executeRestCall("callRestGET", () -> {
             String url = buildUri(endpoint, queryParams);
             ResponseEntity<R> response = restTemplate.getForEntity(url, responseType);
+            System.out.println("CALLRESTGET: " + response.getBody()); 
             return response.getBody();
         });
     }
@@ -154,6 +156,7 @@ public abstract class BaseService implements ServiceInterface {
     }
 
     // metodo per chiamare POST con content type a application/json
+    //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
     protected <R> R callRestPost(String endpoint, JSONObject jsonObject,
             Map<String, String> queryParams, Map<String, String> customHeaders,
             Class<R> responseType) {
@@ -161,11 +164,17 @@ public abstract class BaseService implements ServiceInterface {
             throw new IllegalArgumentException("Il body JSON non può essere nullo");
         }
         return executeRestCall("callRestPost", () -> {
+            System.out.println("CALLRESTPOST - OBJECT: " + jsonObject); 
+            System.out.println("CALLRESTPOST - ENDPOINT: " + endpoint); 
             String jsonBody = jsonObject.toString();
+            System.out.println("CALLRESTPOST - jsonbody: " + jsonBody); 
             String url = buildUri(endpoint, queryParams);
             HttpHeaders headers = buildHeaders(customHeaders, MediaType.APPLICATION_JSON);
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
+            System.out.println("CALLRESTPOST - requestEntity: " + requestEntity); 
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
+            System.out.println("CALLRESTPOST - response: " + response); 
+            System.out.println("CALLRESTPOST response body: " + response.getBody()); 
             return response.getBody();
         });
     }
@@ -174,6 +183,12 @@ public abstract class BaseService implements ServiceInterface {
     protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData,
             Map<String, String> queryParams, Class<R> responseType) {
         return callRestPut(endpoint, formData, queryParams, null, responseType);
+    }
+
+    //FLAVIO 26GEN: aggiunta per un put di un jsonObject
+    protected <R> R callRestPut(String endpoint, JSONObject jsonObject, 
+                                Map<String, String> queryParams, Class<R> responseType) {
+        return callRestPut(endpoint, jsonObject, queryParams, null, responseType);
     }
 
     // Metodo per chiamate PUT con content type a application/x-www-form-urlencoded

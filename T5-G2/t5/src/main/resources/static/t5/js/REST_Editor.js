@@ -18,29 +18,65 @@
 /*
 * 		Qui ci sono le chiamate REST dell'editor 
 */
-// Funzione per ottenere i dati dal localStorage
+// Funzione per ottenere i dati dal localStorage. Discerne se è una partita normale oppure una scalata
 function getGameData() {
-    let underTestClassName = localStorage.getItem("underTestClassName");
-    if (underTestClassName) {
-        // La stringa non è né nulla né vuota
-        let ClassUT = getParameterByName("ClassUT");
-        if(ClassUT === underTestClassName){
-            return {
-                playerId: 			String(parseJwt(getCookie("jwt")).userId),
-                type_robot: 		localStorage.getItem("robot"),
-                difficulty: 		localStorage.getItem("difficulty"),
-                mode: 				localStorage.getItem("modalita"),
-                underTestClassName: localStorage.getItem("underTestClassName"),
-            };
+    let modalita = localStorage.getItem("modalita");
+    is_scalata_inprogress = (parseInt(localStorage.getItem("scalata_score"),10) > 0) ? true : false;
+    console.log(is_scalata_inprogress);
+    if(modalita == "Scalata" && !is_scalata_inprogress){
+        handleScalataParameters();
+        return {
+            playerId: 			    String(parseJwt(getCookie("jwt")).userId),
+            type_robot: 		    localStorage.getItem("robot"),
+            difficulty: 		    localStorage.getItem("difficulty"),
+            mode: 				    localStorage.getItem("modalita"),
+            underTestClassName:     localStorage.getItem("underTestClassName"),
+            scalata_name:           localStorage.getItem("scalata_name"),
+            scalata_classes:        localStorage.getItem("scalata_classes"),
+            scalata_robots:         localStorage.getItem("scalata_robots"),
+            scalata_difficulties:   localStorage.getItem("scalata_difficulties"),
+            
         }
-    }   
-    //modal che ti blocca
-    openModalError(
-        "Accesso Illegale all'editor ",
-        `Non sei passato da Gamemode per settare la tua partita o hai inserito un URL sbagliato.`,
-        [{ text: 'Vai alla Home', href: '/main', class: 'btn btn-primary' }]
-    );
+    }
+    else if(modalita === "Scalata" && is_scalata_inprogress){
+        handleScalataParameters();
+        return {
+            playerId: 			String(parseJwt(getCookie("jwt")).userId),
+            type_robot: 		localStorage.getItem("robot"),
+            difficulty: 		localStorage.getItem("difficulty"),
+            mode: 				localStorage.getItem("modalita"),
+            underTestClassName: localStorage.getItem("underTestClassName"),
+        };
+    }
+    else{
+        let underTestClassName = localStorage.getItem("underTestClassName");
+        if (underTestClassName) {
+            // La stringa non è né nulla né vuota
+            let ClassUT = getParameterByName("ClassUT");
+            if(ClassUT === underTestClassName){
+                return {
+                    playerId: 			String(parseJwt(getCookie("jwt")).userId),
+                    type_robot: 		localStorage.getItem("robot"),
+                    difficulty: 		localStorage.getItem("difficulty"),
+                    mode: 				localStorage.getItem("modalita"),
+                    underTestClassName: localStorage.getItem("underTestClassName"),
+                };
+            }
+        }   
+        //modal che ti blocca
+        flush_localStorage();
+        openModalWithText(
+            editor_error,
+            editor_error_message,
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }]
+        );
+        setTimeout(() => {
+            window.location.href = '/main';
+        }, 10000); // Redirect dopo 10 secondi
+        
+    }
 }
+
 
 // Funzione per eseguire la richiesta AJAX
 async function runGameAction(url, formData, isGameEnd) {
@@ -56,33 +92,47 @@ async function runGameAction(url, formData, isGameEnd) {
 
 // Documento pronto
 $(document).ready(function () {
-    const data = getGameData();
-    startGame(data);
-    if (data.mode === "Allenamento") {
-        document.getElementById("runButton").disabled = true;
-        console.log("Sei in allenamento");
+    try {
+        const data = getGameData();
+        if(is_scalata_inprogress == false)startGame(data);
+        if (data.mode === "Allenamento") {
+            document.getElementById("runButton").disabled = true;
+            console.log("Sei in allenamento");
+        }
+        const savedContent = localStorage.getItem('codeMirrorContent');
+        if (!savedContent) {
+            console.log("TEST UNDERTESTCLASSNAME: " + localStorage.getItem("underTestClassName"));
+            //non ho salvato il contenuto dell'editor, quindi lo scarico e imposto il template con i dati dell'utente
+            let formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
+            let replacements  = {
+                TestClasse: `Test${localStorage.getItem("underTestClassName")}`,
+                username: jwtData.sub,
+                userID: jwtData.userId,
+                date: formattedDate,
+            };
+            SetInitialEditor(replacements);
+        }else{
+            //Se ho del contenuto salvato 
+            editor_utente.setValue(savedContent);
+            //document.getElementById('Editor_utente').value = savedContent;
+            editor_utente.refresh(); // Ricarica l'editor per applicare le modifiche
+        }
+        const savedStorico = localStorage.getItem('storico');
+        if(savedStorico){
+            viewStorico();
+        }
+    } catch (error) {
+        flush_localStorage();
+        openModalWithText(
+            editor_error,
+            editor_error_message,
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }]
+        );
+        setTimeout(() => {
+            window.location.href = '/main';
+        }, 10000); // Redirect dopo 10 secondi
     }
-    const savedContent = localStorage.getItem('codeMirrorContent');
-	if (!savedContent) {
-        //non ho salvato il contenuto dell'editor, quindi lo scarico e imposto il template con i dati dell'utente
-        let formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
-        let replacements  = {
-            TestClasse: `Test${localStorage.getItem("underTestClassName")}`,
-            username: jwtData.sub,
-            userID: jwtData.userId,
-            date: formattedDate,
-        };
-        SetInitialEditor(replacements);
-	}else{
-        //Se ho del contenuto salvato 
-        editor_utente.setValue(savedContent);
-        //document.getElementById('Editor_utente').value = savedContent;
-        editor_utente.refresh(); // Ricarica l'editor per applicare le modifiche
-    }
-    const savedStorico = localStorage.getItem('storico');
-    if(savedStorico){
-        viewStorico();
-    }
+
 });
 
 
@@ -112,7 +162,7 @@ async function handleGameAction(isGameEnd) {
 
 // Gestisce la risposta dal server
 function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
-    const { robotScore, userScore, outCompile, 
+    const { robotScore, userScore, totalScore , outCompile, 
             coverage, gameId, roundId,
             coverageDetails} = response;
     // Aggiorna i dati del modulo con gameId e roundId
@@ -126,11 +176,15 @@ function handleResponse(response, formData, isGameEnd, loadingKey, buttonKey) {
         return;
     }
     // Se la copertura è disponibile, la processa
-    processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails);
+    processCoverage(coverage, formData, robotScore, userScore, totalScore, isGameEnd, loadingKey, buttonKey, coverageDetails);
 }
 
 // Processa la copertura del codice e aggiorna i dati di gioco
-async function processCoverage(coverage, formData, robotScore, userScore, isGameEnd, loadingKey, buttonKey, coverageDetails) {
+async function processCoverage(coverage, formData, robotScore, userScore, totalScore, isGameEnd, loadingKey, buttonKey, coverageDetails) {
+
+    //salvataggio all'interno delle variabili dell'editor
+    user_score = userScore;
+    total_score_scalata = totalScore;
     highlightCodeCoverage($.parseXML(coverage), editor_robot); // Evidenzia la copertura del codice nell'editor
     orderTurno++; // Incrementa l'ordine del turno
     const csvContent = await fetchCoverageReport(formData); // Recupera il report di coverage
@@ -141,7 +195,7 @@ async function processCoverage(coverage, formData, robotScore, userScore, isGame
     toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
     displayUserPoints(isGameEnd, valori_csv, robotScore, userScore, coverageDetails); // Mostra i punti dell'utente
     if (isGameEnd) { // Se il gioco è finito
-        handleEndGame(userScore); // Gestisce la fine del gioco
+        handleEndGame(userScore, robotScore, totalScore); // Gestisce la fine del gioco
     } else {
         resetButtons(); // Reimposta i pulsanti
     }
@@ -170,13 +224,86 @@ async function fetchCoverageReport(formData) {
 }
 
 // Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
-function handleEndGame(userScore) {
-    openModalWithText(
-        status_game_end,
-        `${score_partita_text} ${userScore} pt.`, // Mostra il punteggio dell'utente
-        [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
-    );
-    flush_localStorage(); // Pulisce i dati salvati nel localStorage
+//27GEN MODIFICATO CON: localStorage.getItem("scalataId")
+function handleEndGame(userScore, robotScore, totalScore) {
+    if(localStorage.getItem("modalita")=== "Scalata" && locGiocatore >= robotScore){
+
+        var isScalataEnded = handleScalataNextRound();
+        //Termine Scalata
+        if (isScalataEnded) {
+            
+            openModalWithText(
+                status_scalata_completed,
+                //va aggiunto il punteggio complessivo
+                `${scalata_completed_text}: ${totalScore} pt\n` + // Mostra il punteggio dell'utente
+                `${user_string}: ${locGiocatore}\n` +
+                `${robot_string}: ${robotScore}`,
+                [{ text: vai_menu_scalata, href: '/gamemode?mode=Scalata', class: 'btn btn-secondary' }, { text: visualizza_classifica_scalata, href: '/leaderboardScalata', class: 'btn btn-primary' }] 
+            );
+
+
+            flush_localStorage();
+            setTimeout(() => {
+                window.location.href = '/gamemode?mode=Scalata';
+            }, 10000); // Redirect dopo 10 secondi
+        }
+        else{
+            //Termine round scalata ma non della scalata
+            var displayRoundScalata = current_round_scalata-1;
+            console.log(current_round_scalata);
+            pulisciLocalStorage("roundId");
+            pulisciLocalStorage("turnId");
+            pulisciLocalStorage("username");
+            pulisciLocalStorage("storico");
+            pulisciLocalStorage("codeMirrorContent");
+            //prima viene effettuata la chiamata API per aggiornare la scalata
+            try {
+                openModalWithText(
+                    status_scalata_roundUp,
+                    `${scalata_roundUp_text} ${displayRoundScalata} / ${total_rounds_scalata}\n` + // Mostra il punteggio dell'utente
+                    `${user_string} : ${locGiocatore}\n` +
+                    `${robot_string} : ${robotScore}`,
+                    [{ text: nextround, href: '/editor?ClassUT='+localStorage.getItem("underTestClassName"), class: 'btn btn-primary' }] // Pulsante per tornare alla home
+                );
+                setTimeout(() => {
+                    window.location.href = '/editor?ClassUT=' + localStorage.getItem("underTestClassName");
+                }, 10000); // Redirect dopo 10 secondi
+
+            } catch (error) {
+                alert("errore nella memorizzazione del progresso della scalata");
+                console.log(error);
+                window.location.href = "/main";
+                flush_localStorage();
+                setTimeout(() => {
+                    window.location.href = '/main';
+                }, 10000); // Redirect dopo 10 secondi
+            }
+        }
+    }
+    else if(localStorage.getItem("modalita")=== "Scalata" && locGiocatore < robotScore){
+
+        openModalWithText(
+            status_scalata_lost,
+            `${scalata_lost_text} round ${current_round_scalata}\n` + // Mostra il punteggio dell'utente
+            `${user_string} : ${locGiocatore}\n` +
+            `${robot_string} : ${robotScore}`,
+            [{ text: vai_menu_scalata, href: '/gamemode?mode=Scalata', class: 'btn btn-primary' }] // Pulsante per tornare alla home della scalata
+
+            
+        );
+        flush_localStorage();
+        setTimeout(() => {
+            window.location.href = '/gamemode?mode=Scalata';
+        }, 10000); // Redirect dopo 10 secondi
+    }
+    else{
+        openModalWithText(
+            status_game_end,
+            `${score_partita_text} ${userScore} pt.`, // Mostra il punteggio dell'utente
+            [{ text: vai_home, href: '/main', class: 'btn btn-primary' }] // Pulsante per tornare alla home
+        );
+        flush_localStorage(); // Pulisce i dati salvati nel localStorage
+    }
 }
 
 // Reimposta i pulsanti per consentire nuove azioni

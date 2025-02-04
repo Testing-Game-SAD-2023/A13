@@ -112,11 +112,20 @@ const mode = document.getElementById("Nome_modalita").textContent = get_mode_tex
 //  Variabili di gioco 
 
 var turno = 0; // numero di turni giocati fino ad ora
-var current_round_scalata = 0; // round corrente
-var total_rounds_scalata = 0; // numero totale di rounds
 var iGameover = false; // flag per indicare se il giocatore ha vinto o perso
 var orderTurno = 0;
 var perc_robot = "0"; // percentuale di copertura del robot scelto
-var userScore = 0;
+var user_score = 0;
 var locGiocatore = 0;
 var currentDate = new Date();
+
+// Variabili Scalata
+var id_scalata = 0; //id della scalata
+var name_scalata = ""; // Nome della scalata
+var current_round_scalata = 0; // round corrente
+var total_rounds_scalata = 0; // numero totale di rounds
+var robots_scalata =""; // Lista di robots
+var difficulties_scalata = ""; // Lista di difficoltà delle classi nella scalata
+var classes_scalata = ""; // Lista di classi all'interno della scalata
+var total_score_scalata = ""; //punteggio totale della scalata
+var is_scalata_inprogress = false; // booleano per comprendere lo stato della scalata

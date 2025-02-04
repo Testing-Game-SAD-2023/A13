@@ -116,13 +116,13 @@ func (CustomString) Validate() error {
 }
 
 func fromModel(r *model.Robot) *Robot {
-	return &Robot{
-		ID:          r.ID,
-		CreatedAt:   r.CreatedAt,
-		UpdatedAt:   r.UpdatedAt,
-		TestClassId: r.TestClassId,
-		Difficulty:  r.Difficulty,
-		Type:        RobotType(r.Type),
-		Scores:      r.Scores,
-	}
+    return &Robot{
+        ID:          r.ID,
+        CreatedAt:   r.CreatedAt,
+        UpdatedAt:   r.UpdatedAt,
+        TestClassId: r.TestClassId,
+        Difficulty:  r.Difficulty,
+        Type:        RobotType(r.Type),
+        Scores:      r.Scores,
+    }
 }
