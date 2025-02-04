@@ -182,8 +182,12 @@ public class ScalataGame extends GameLogic {
     }
 
     public int GetTotalScore() {
-
-        return this.totalScore;
+        if (currentStatus == ScalataGamestatus.LOST) {
+            return 0;
+        }
+        else{
+            return this.totalScore;
+        }
     }
 
 
