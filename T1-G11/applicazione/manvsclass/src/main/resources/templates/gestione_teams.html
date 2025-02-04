@@ -1,0 +1,113 @@
+<!--CARMINE: Inserimento della pagina di gestione di teams-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Teams</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js" defer></script>
+
+    <link rel='stylesheet' href="/t1/css/teams.css"><!--aggiunta del css della pagina-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <span class="icon">
+            <a href="/home_adm">
+                <img src="/t1/css/Images/admin-logo-1.png" alt="icon">
+            </a>
+        </span>
+        <div class="title-header">
+            <p >Team Manager</p>
+        </div>
+        
+        <div class="tour">
+             <p id="team_tour">Non sai cosa fare in questa pagina? Clicca qui e segui il tour!</p>
+        </div>
+       
+    </div>
+    <div class="search-section">
+        <!-- Barra di ricerca centrale -->
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Cerca team">
+            <button class="search-button">
+                <i class="search">🔍</i>
+            </button>
+        </div>
+    </div>
+    <!--Sezione Team-->
+   <div id="team-section">
+    <div class="section-header">
+        <h2>I tuoi Team</h2>
+        <div class="filter-container">
+            <button class="button-header" id="openModalButtonTeam">
+                <p id="button-header-p">+ Add Team</p>
+            </button>
+            <p>Filter by:</p>
+            <select id="dropdown-container"> 
+                <option value="default">Default</option>
+                <option value="alphabetical">Name</option>
+                <option value="date">Date</option>
+            </select>
+        </div>
+    </div>
+    <!--Inserimento dinamico dei team -->
+        <div id="folders" class="folder-container">
+
+        </div>
+        <p id="viewAllLink-Team" class="view-all-link">View All</p>
+        </div>
+        
+    
+    <!--Finestra modale per inserimento di un team-->
+    <div id="modalContainerTeam">
+
+    </div>
+
+    <!--Per il caricamento degli assignment, ci mette 6 secondi dato che manda anche email-->
+    <div id="loadingScreen" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+
+
+    <!--Sezione Assignment-->
+    <div id="assignment-section">
+        <div class="section-header">
+            <h2>I tuoi Assignment</h2>
+            <div class="filter-container">
+                <button class="button-header" id="openModalButtonAssignment">
+                    <p id="button-header-p">+ Add Assignment</p>
+                </button>
+                <p>Filter by:</p>
+                <select id="dropdown-container-assignment"> 
+                    <option value="default">Default</option>
+                    <option value="creation">Creation</option>
+                    <option value="end">End</option>
+                </select>
+            </div>
+        </div>
+        <!--Inserimento dinamico degli assigment-->
+        <div id="assignment-folder-container" class="assignment-container">
+
+        </div>
+        <p id="viewAllLink-Assignment" class="view-all-link">View All</p>
+    </div>
+        <div id="modalContainerAssignment">
+
+        </div>
+        <div id = "assignmentDetails"></div>
+    </div>
+    
+
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.js" defer></script>
+    <script src="t1/js/teams.js"></script>
+    <script src="t1/js/team_tour.js"></script>
+    
+    
+</body>
+</html>

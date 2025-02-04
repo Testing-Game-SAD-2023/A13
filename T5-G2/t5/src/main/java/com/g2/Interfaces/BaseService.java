@@ -37,7 +37,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import com.g2.Interfaces.BaseService_utils.HttpHeadersFactory;
+import com.g2.Interfaces.BaseService_utils.UriBuilderHelper;
 
 /*
  *  Questa è una classe base che implementa l'interfaccia ServiceInterface per il dispatcher ServiceManager
@@ -75,35 +77,17 @@ public abstract class BaseService implements ServiceInterface {
     // Costruisce un URI partendo dal baseUrl e dall'endpoint, aggiungendo eventuali
     // parametri extra
     protected String buildUri(String endpoint, Map<String, String> queryParams) {
-        // Controllo se l'endpoint è nullo o vuoto
-        if (endpoint == null || endpoint.trim().isEmpty()) {
-            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto.");
-        }
-        // Costruzione dell'URI
-        try {
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl).path(endpoint);
-            if (queryParams != null && !queryParams.isEmpty()) {
-                for (Map.Entry<String, String> param : queryParams.entrySet()) {
-                    // Controllo se la chiave o il valore del parametro sono nulli o vuoti
-                    if (param.getKey() == null || param.getKey().trim().isEmpty()) {
-                        throw new IllegalArgumentException("Le chiavi dei parametri non possono essere nulle o vuote.");
-                    }
-                    if (param.getValue() == null) {
-                        throw new IllegalArgumentException("I valori dei parametri non possono essere nulli.");
-                    }
-                    builder.queryParam(param.getKey(), param.getValue());
-                }
-            }
-            String url = builder.build().toUriString();
-            return url;
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("URL malformato: " + e.getMessage(), e);
-        }
+        return UriBuilderHelper.buildUri(baseUrl, endpoint, queryParams);
     }
 
-    // Interfaccia funzionale per le chiamate REST
+    protected HttpHeaders buildHeaders(Map<String, String> customHeaders, MediaType defaultContentType) {
+        return HttpHeadersFactory.createHeaders(customHeaders, defaultContentType);
+    }
+
+    // Interfaccia funzionale per le chiamate REST serve per executeRestCall(String caller, RestCall<R> call)
     @FunctionalInterface
     protected interface RestCall<R> {
+
         R execute() throws RestClientException, RuntimeException;
     }
 
@@ -114,20 +98,20 @@ public abstract class BaseService implements ServiceInterface {
         try {
             return call.execute();
         } catch (HttpClientErrorException e) { // Gestisce gli errori 4xx
-            throw new RestClientException("Chiamata REST fallita con stato 4xx: " + e.getStatusCode() +
+            throw new RestClientException("Chiamata REST fallita con stato 4xx: " + e.getStatusCode() + 
                                           " (eseguita da: " + caller + ")", e);
         } catch (HttpServerErrorException e) { // Gestisce gli errori 5xx
-            throw new RestClientException("Chiamata REST fallita con stato 5xx: " + e.getStatusCode() + 
-                                          " (eseguita da: " + caller + ")", e);
+            throw new RestClientException("Chiamata REST fallita con stato 5xx: " + e.getStatusCode()
+                    + " (eseguita da: " + caller + ")", e);
         } catch (RestClientException e) { // Altri tipi di errori di RestClient
-            throw new RestClientException("Chiamata REST fallita: " + e.getMessage() + 
-                                          " (eseguita da: " + caller + ")", e);
+            throw new RestClientException("Chiamata REST fallita: " + e.getMessage()
+                    + " (eseguita da: " + caller + ")", e);
         } catch (IllegalArgumentException e) { // Errori dovuti a parametri non validi
-            throw new RuntimeException("Chiamata REST fallita: " + e.getMessage() + 
-                                       " (eseguita da: " + caller + ")", e);
+            throw new RuntimeException("Chiamata REST fallita: " + e.getMessage()
+                    + " (eseguita da: " + caller + ")", e);
         }
     }
-    
+
     // Metodo per chiamate GET che restituiscono un singolo oggetto
     //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
     protected <R> R callRestGET(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
@@ -150,9 +134,7 @@ public abstract class BaseService implements ServiceInterface {
 
     // Metodo per chiamate POST senza specificare content type -> default
     // application/x-www-form-urlencoded
-    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData,
-            Map<String, String> queryParams,
-            Class<R> responseType) {
+    protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
 
         return callRestPost(endpoint, formData, queryParams, null, responseType);
     }
@@ -165,18 +147,8 @@ public abstract class BaseService implements ServiceInterface {
             throw new IllegalArgumentException("formData non può essere nullo");
         }
         return executeRestCall("callRestPost", () -> {
-            String url = buildUri(endpoint, queryParams);
-            // Imposta gli header, incluso il Content-Type di default
-            HttpHeaders headers = new HttpHeaders();
-            // Aggiunge gli header personalizzati
-            if (customHeaders != null) {
-                customHeaders.forEach(headers::add);
-            }
-            // Imposta il content type a application/x-www-form-urlencoded se non
-            // specificato
-            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            }
+            String url = UriBuilderHelper.buildUri(baseUrl, endpoint, queryParams);
+            HttpHeaders headers = HttpHeadersFactory.createHeaders(customHeaders, MediaType.APPLICATION_FORM_URLENCODED);
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
             return response.getBody();
@@ -197,15 +169,7 @@ public abstract class BaseService implements ServiceInterface {
             String jsonBody = jsonObject.toString();
             System.out.println("CALLRESTPOST - jsonbody: " + jsonBody); 
             String url = buildUri(endpoint, queryParams);
-            System.out.println("CALLRESTPOST - URL completo: " + url);
-            HttpHeaders headers = new HttpHeaders();
-            if (customHeaders != null) {
-                customHeaders.forEach(headers::add);
-            }
-            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
-                headers.setContentType(MediaType.APPLICATION_JSON);
-            }
-            System.out.println("Headers: " + headers);
+            HttpHeaders headers = buildHeaders(customHeaders, MediaType.APPLICATION_JSON);
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
             System.out.println("CALLRESTPOST - requestEntity: " + requestEntity); 
             ResponseEntity<R> response = restTemplate.postForEntity(url, requestEntity, responseType);
@@ -216,8 +180,8 @@ public abstract class BaseService implements ServiceInterface {
     }
 
     // Metodo per chiamate PUT senza specificare content type -> default application/x-www-form-urlencoded
-    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, 
-                                Map<String, String> queryParams, Class<R> responseType) {
+    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData,
+            Map<String, String> queryParams, Class<R> responseType) {
         return callRestPut(endpoint, formData, queryParams, null, responseType);
     }
 
@@ -227,67 +191,49 @@ public abstract class BaseService implements ServiceInterface {
         return callRestPut(endpoint, jsonObject, queryParams, null, responseType);
     }
 
-     // Metodo per chiamate PUT con content type a application/x-www-form-urlencoded
-    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData, 
-                            Map<String, String> queryParams, Map<String, String> customHeaders, 
-                            Class<R> responseType) {
-    if (endpoint == null || endpoint.isEmpty()) {
-        throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
-    }
-    if (formData == null) {
-        throw new IllegalArgumentException("formData non può essere nullo");
-    }
-    
-    return executeRestCall("callRestPut", () -> {
-        String url = buildUri(endpoint, queryParams);
-        
-        HttpHeaders headers = new HttpHeaders();
-        
-        // Aggiunge gli header personalizzati se presenti
-        if (customHeaders != null) {
-            customHeaders.forEach(headers::add);
+    // Metodo per chiamate PUT con content type a application/x-www-form-urlencoded
+    protected <R> R callRestPut(String endpoint, MultiValueMap<String, String> formData,
+            Map<String, String> queryParams, Map<String, String> customHeaders,
+            Class<R> responseType) {
+        if (endpoint == null || endpoint.isEmpty()) {
+            throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
         }
-        
-        // Imposta il content type di default se non specificato
-        if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        if (formData == null) {
+            throw new IllegalArgumentException("formData non può essere nullo");
         }
-        
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
-        ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
-        return response.getBody();
-    });
-}
+
+        return executeRestCall("callRestPut", () -> {
+            String url = buildUri(endpoint, queryParams);
+            HttpHeaders headers = buildHeaders(customHeaders, MediaType.APPLICATION_FORM_URLENCODED);
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
+            ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
+            return response.getBody();
+        });
+    }
 
     // metodo per chiamare PUT con content type a application/json
-    protected <R> R callRestPut(String endpoint, JSONObject jsonObject, 
-                                Map<String, String> queryParams, Map<String, String> customHeaders, 
-                                Class<R> responseType) {
+    protected <R> R callRestPut(String endpoint, JSONObject jsonObject,
+            Map<String, String> queryParams, Map<String, String> customHeaders,
+            Class<R> responseType) {
         if (endpoint == null || endpoint.isEmpty()) {
             throw new IllegalArgumentException("L'endpoint non può essere nullo o vuoto");
         }
         if (jsonObject == null) {
             throw new IllegalArgumentException("Il body JSON non può essere nullo");
         }
-        
+
         return executeRestCall("callRestPut", () -> {
             String url = buildUri(endpoint, queryParams);
             String jsonBody = jsonObject.toString();
-            
-            HttpHeaders headers = new HttpHeaders();
-            
-            // Aggiunge gli header personalizzati, se presenti
-            if (customHeaders != null) {
-                customHeaders.forEach(headers::add);
-            }
-            
-            // Imposta il content type a application/json se non specificato
-            if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
-                headers.setContentType(MediaType.APPLICATION_JSON);
-            }
-            
+
+            HttpHeaders headers = buildHeaders(customHeaders, MediaType.APPLICATION_JSON);
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
+
+            System.out.println("Request URL: " + url);
+            System.out.println("Request Headers: " + headers);
+            System.out.println("Request Body: " + jsonBody);
+
             return response.getBody();
         });
     }
@@ -296,7 +242,7 @@ public abstract class BaseService implements ServiceInterface {
     protected String callRestDelete(String endpoint, Map<String, String> queryParams) {
         return executeRestCall("callRestDelete", () -> {
             String url = buildUri(endpoint, queryParams);
-            ResponseEntity<String> response =  restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
             return response.getBody();
         });
     }

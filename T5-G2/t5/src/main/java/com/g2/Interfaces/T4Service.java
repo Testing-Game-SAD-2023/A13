@@ -16,21 +16,23 @@
  */
 package com.g2.Interfaces;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
-import com.g2.Model.Game;
-import com.g2.Model.StatisticProgress;
-import org.springframework.core.ParameterizedTypeReference;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import com.g2.Model.Game;
+import com.g2.Model.StatisticProgress;
 
 @Service
 public class T4Service extends BaseService {
@@ -52,6 +54,11 @@ public class T4Service extends BaseService {
         registerAction("getStatisticsProgresses", new ServiceActionDefinition(
                 params -> getStatisticsProgresses((int) params[0]),
                 Integer.class
+        ));
+
+        registerAction("getHashStatisticsProgresses", new ServiceActionDefinition(
+            params -> getHashStatisticsProgresses((int) params[0]),
+            Integer.class
         ));
 
         registerAction("updateStatisticProgress", new ServiceActionDefinition(
@@ -123,17 +130,32 @@ public class T4Service extends BaseService {
         return response;
     }
 
+    private Set<StatisticProgress> getHashStatisticsProgresses(int playerID) {
+        Map<String, String> formData = new HashMap<>();
+        formData.put("pid", String.valueOf(playerID));
+        String endpoint = "/phca/" + playerID;
+        // Recupera la risposta come una lista
+        List<StatisticProgress> response = callRestGET( endpoint, 
+                                                        formData, 
+                                                        new ParameterizedTypeReference<List<StatisticProgress>>() {
+                                                       });
+        // Converti la lista in un HashSet per rimuovere eventuali duplicati
+        Set<StatisticProgress> responseSet = new HashSet<>(response);
+        return responseSet;
+    }
+
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
-        MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
-        jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
-        jsonMap.put("statistic", Collections.singletonList(statisticID));
-        jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
+        JSONObject obj = new JSONObject();
+        obj.put("playerId", playerID);
+        obj.put("statistic", statisticID);
+        obj.put("progress", progress);
+
         String endpoint = "/phca/" + playerID + "/" + statisticID;
-        String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
+        String response = callRestPut(endpoint, obj, null, null, String.class);
         return response;
     }
-    
-/*
+
+    /*
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
         try {
             MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
@@ -151,9 +173,8 @@ public class T4Service extends BaseService {
             return "errore UPDATESTATISTICPROGRESS";
         }
     }
-*/
-    
-    // usa /robots per ottenere dati 
+     */
+    // usa /robots per ottenere dati
     private String GetRisultati(String className, String robot_type, String difficulty) {
         Map<String, String> formData = new HashMap<>();
         formData.put("testClassId", className); // Nome della classe
@@ -203,6 +224,23 @@ public class T4Service extends BaseService {
         return respose;
     }
 
+    /*
+    private String EndGame(int gameid, String username, String closedAt, int Score, Boolean isWinner){
+        final String endpoint = "/games/" + String.valueOf(gameid);
+        JSONObject formData = new JSONObject();
+        formData.put("closedAt", closedAt);
+        formData.put("username", username);
+        formData.put("score", Integer.toString(Score));
+        formData.put("isWinner", isWinner ? "true" : "false");
+        try {
+            String respose = callRestPut(endpoint, formData, null, null, String.class);
+            return respose;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[CreateGame]: " + e.getMessage());
+        }
+    }
+     */
+
     //aggiunta dell'ID del robot
     //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
     private int CreateRound(int game_id, String ClasseUT, String Time, int robot_id) {
@@ -221,6 +259,7 @@ public class T4Service extends BaseService {
     }
 
     //26GEN FLAVIO: modifiche json invece di formdata
+    /*
     private String EndRound(String Time, int roundId) {
         // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);
@@ -230,7 +269,8 @@ public class T4Service extends BaseService {
         obj.put("closedAt", Time);
         String response = callRestPut(endpoint, obj, null, String.class);
         return response;
-    } 
+    }
+    */
 
     //FLAVIO 25GEN: MODIFICHE PER DARE A CALLRESTPOST DATI NEL FORMATO GIUSTO
     private String CreateTurn(String Player_id, int Round_id, String Time) {

@@ -4,7 +4,6 @@
 package com.groom.manvsclass.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -18,7 +17,6 @@ import com.groom.manvsclass.model.filesystem.RobotUtil;
 import com.groom.manvsclass.model.filesystem.upload.FileUploadResponse;
 import com.groom.manvsclass.model.filesystem.upload.FileUploadUtil;
 import com.groom.manvsclass.model.repository.*;
-import com.groom.manvsclass.service.*;
 import com.commons.model.Gamemode;
 import com.commons.model.Robot;
 import com.commons.model.StatisticRole;
@@ -28,16 +26,9 @@ import com.commons.model.StatisticRole;
 //MODIFICA (14/05/2024) : Importazione delle classi Scalata e ScalataRepository
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.groom.manvsclass.service.JwtService;
-
 //MODIFICA (12/02/2024) : Gestione autenticazione
-import com.groom.manvsclass.controller.Authentication.AuthenticatedAdminRepository;
 import com.groom.manvsclass.model.Admin;
-
-import com.groom.manvsclass.service.AchievementService;
-import com.groom.manvsclass.service.ScalataService;
 import com.groom.manvsclass.service.AdminService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -45,18 +36,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.web.bind.annotation.PathVariable;
-import io.jsonwebtoken.Claims;
 
 //MODIFICA(11/02/2024): Gestione sessione tramite JWT
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import com.groom.manvsclass.model.filesystem.download.FileDownloadUtil;
 import org.springframework.util.StringUtils;
 
@@ -69,7 +53,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import java.io.File;
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -811,5 +794,31 @@ public class AdminService {
     public List<ClassUT> elencaClassi() {
         return repo.findAll();
     }
+
+
+    /*Modifica 29/11/2024: Creazione metodi per reindirizzare alle view Teams e Assignments*/
+    public ModelAndView showGestioneTeams(HttpServletRequest request, String jwt) {
+        if (jwtService.isJwtValid(jwt)) {return new ModelAndView("gestione_teams");}
+        return new ModelAndView("redirect:/loginAdmin");
+    }
+
+    public ModelAndView showGestioneAssignments(HttpServletRequest request, String jwt) {
+        if (jwtService.isJwtValid(jwt)) {return new ModelAndView("gestione_assignments");}
+        return new ModelAndView("redirect:/loginAdmin");
+    }
+
+    public ModelAndView showTeamSpecifico(HttpServletRequest request, String jwt) {
+        if (jwtService.isJwtValid(jwt)) {return new ModelAndView("teamDetail");}
+        return new ModelAndView("redirect:/loginAdmin");
+    }
+
+    public String getUsernameAdmin(String jwt) {
+        if(jwtService.isJwtValid(jwt)){
+            String usernameAdmin= jwtService.getAdminFromJwt(jwt);
+            return usernameAdmin;
+        }
+        return "devi prima loggarti!";
+    }
+
 
 }

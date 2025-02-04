@@ -14,7 +14,6 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package com.g2.Game;
 
 import java.util.HashMap;
@@ -45,6 +44,8 @@ import org.springframework.web.client.RestTemplate;
 import com.commons.model.Gamemode;
 import com.g2.Game.ScalataGame.ScalataGamestatus;
 import com.g2.Interfaces.ServiceManager;
+import com.g2.Model.AchievementProgress;
+import com.g2.Model.User;
 import com.g2.Service.AchievementService;
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
@@ -52,7 +53,7 @@ import com.g2.Service.AchievementService;
 @RestController
 public class GameController {
 
-    //Gestisco qui tutti i giochi aperti 
+    //Gestisco qui tutti i giochi aperti
     private final Map<String, GameLogic> activeGames;
     private final Map<String, GameFactoryFunction> gameRegistry;
     private final ServiceManager serviceManager;
@@ -60,7 +61,7 @@ public class GameController {
     @Autowired
     private AchievementService achievementService;
 
-    //Logger 
+    //Logger
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     public GameController(RestTemplate restTemplate) {
@@ -75,12 +76,11 @@ public class GameController {
 
         GameLogic create(ServiceManager serviceManager,
                 String playerId, String underTestClassName,
-                String type_robot, String difficulty, String mode, 
+                String type_robot, String difficulty, String mode,
                 Optional<String> scalata_name,
                 Optional<List<String>> scalataClasses, Optional<List<String>> scalataRobots, Optional<List<String>> scalataDifficulties
-                );
+        );
 
-        
     }
 
     /*
@@ -93,15 +93,15 @@ public class GameController {
                 -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Sfida.toString()));
         gameRegistry.put(Gamemode.Allenamento.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalataClasses, scalataRobots, scalataDifficulties)
                 -> new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, Gamemode.Allenamento.toString()));
-        gameRegistry.put(Gamemode.Scalata.toString(),(sm, playerId, underTestClassName,type_robot, difficulty, mode, scalata_name, scalataClasses, scalataRobots, scalataDifficulties)
-                -> new ScalataGame(sm, playerId, underTestClassName, scalata_name.get(),scalataClasses.get(), scalataRobots.get(), scalataDifficulties.get(), Gamemode.Scalata.toString()));
+        gameRegistry.put(Gamemode.Scalata.toString(), (sm, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalataClasses, scalataRobots, scalataDifficulties)
+                -> new ScalataGame(sm, playerId, underTestClassName, scalata_name.get(), scalataClasses.get(), scalataRobots.get(), scalataDifficulties.get(), Gamemode.Scalata.toString()));
 
         // Aggiungi altri giochi qui
     }
 
     /*
      *  Prendo da t1 la classe UT, poi fornisco al T7 tutto ciò di cui ha bisogno per fare una compilazione
-     *  infine controllo che tutto sia andato a buon fine e fornisco i dati 
+     *  infine controllo che tutto sia andato a buon fine e fornisco i dati
      */
     private Map<String, String> GetUserData(String testingClassName, String testingClassCode, String underTestClassNameNoJava, String underTestClassName) {
         try {
@@ -140,7 +140,7 @@ public class GameController {
     }
 
     /*
-     *  Sfrutto T4 per avere i risultati dei robot 
+     *  Sfrutto T4 per avere i risultati dei robot
      */
     private int GetRobotScore(String testClass, String robot_type, String difficulty) {
         try {
@@ -157,7 +157,7 @@ public class GameController {
     }
 
     /*
-     *  Partendo dai dati dell'utente ottengo la sua percentuale di coverage 
+     *  Partendo dai dati dell'utente ottengo la sua percentuale di coverage
      */
     public int LineCoverage(String cov) {
         try {
@@ -209,7 +209,7 @@ public class GameController {
 
     /*
      *  Chiamata che l'editor fa appena instanzia un nuovo gioco, controllo se la partita quindi esisteva già o meno
-     *  
+     *
      */
     @PostMapping("/StartGame")
     public ResponseEntity<String> StartGame(@RequestParam String playerId,
@@ -222,7 +222,7 @@ public class GameController {
             @RequestParam Optional<List<String>> scalata_classes,
             @RequestParam Optional<List<String>> scalata_robots,
             @RequestParam Optional<List<String>> scalata_difficulties
-            ) {  
+    ) {
         try {
             GameFactoryFunction gameConstructor = gameRegistry.get(mode);
             if (gameConstructor == null) {
@@ -233,21 +233,22 @@ public class GameController {
             if (mode.equals("Scalata")) {
                 //decodifico le liste di parametri della scalata ricevuti in ingresso
                 ScalataGame.processScalataParameters(scalata_classes.get(), scalata_robots.get(), scalata_difficulties.get());
-                System.out.println(scalata_classes.get().get(0) +", "+ scalata_classes.get().get(1));
-            } 
+                System.out.println(scalata_classes.get().get(0) + ", " + scalata_classes.get().get(1));
+            }
             if (gameLogic == null) {
                 //Creo la nuova partita
 
-                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalata_classes,scalata_robots,scalata_difficulties);
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalata_classes, scalata_robots, scalata_difficulties);
 
-                if (!mode.equals("Allenamento"))gameLogic.CreateGame();
+                if (!mode.equals("Allenamento")) {
+                    gameLogic.CreateGame();
+                }
                 activeGames.put(playerId, gameLogic);
                 logger.info("[GAMECONTROLLER][StartGame] Partita creata con successo.");
                 //27GEN MODIFICHE: SE è SCALATA RITORNIAMO I DATI CHE SERVONO AD UTILEDITOR
-                if(mode.equals("Sfida")) {
+                if (mode.equals("Sfida")) {
                     return ResponseEntity.ok().build();
-                }
-                else if (mode.equals("Scalata")){
+                } else if (mode.equals("Scalata")) {
                     System.out.println("Entro in scalata di game controller");
                     JSONObject obj = new JSONObject();
                     obj.put("roundID", ((ScalataGame) gameLogic).getCurrentRoundID());
@@ -273,12 +274,12 @@ public class GameController {
             } else {
                 errorMessage = "errore l'utente ha cambiato le impostazioni della partita";
                 errorCode = "1";
-                //Rimuovo il vecchio game e ne creo uno nuovo 
+                //Rimuovo il vecchio game e ne creo uno nuovo
                 activeGames.remove(playerId);
-                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode,scalata_name,scalata_classes,scalata_robots,scalata_difficulties);
+                gameLogic = gameConstructor.create(this.serviceManager, playerId, underTestClassName, type_robot, difficulty, mode, scalata_name, scalata_classes, scalata_robots, scalata_difficulties);
                 activeGames.put(playerId, gameLogic);
             }
-            //Setto messaggio d'errore e codice di conseguenza 
+            //Setto messaggio d'errore e codice di conseguenza
             logger.error("[GAMECONTROLLER][StartGame] " + errorMessage);
             return createErrorResponse(errorMessage, errorCode);
         } catch (Exception e) {
@@ -288,7 +289,7 @@ public class GameController {
     }
 
     /*
-     *  chiamata Rest di debug, serve solo per vedere le partite attive 
+     *  chiamata Rest di debug, serve solo per vedere le partite attive
      */
     @GetMapping("/StartGame")
     public Map<String, GameLogic> GetGame() {
@@ -297,8 +298,8 @@ public class GameController {
 
 
     /*
-     *  Chiamata principale del game engine, l'utente ogni volta può comunicare la sua richiesta di 
-     *  calcolare la coverage/compilazione, il campo isGameEnd è da utilizzato per indicare se è anche un submit e 
+     *  Chiamata principale del game engine, l'utente ogni volta può comunicare la sua richiesta di
+     *  calcolare la coverage/compilazione, il campo isGameEnd è da utilizzato per indicare se è anche un submit e
      *  quindi vuole terminare la partita ed ottenere i risultati del robot
      */
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -319,7 +320,6 @@ public class GameController {
             if (eliminaGame) {
                 return eliminaGame(playerId);
             }
-            
 
             // Preparazione dati per i task
             String testingClassName = "Test" + gameLogic.getClasseUT() + ".java";
@@ -358,60 +358,68 @@ public class GameController {
 
             int lineCov = LineCoverage(userData.get("coverage"));
             logger.info("[GAMECONTROLLER] /run: LineCov {}", lineCov);
-            
+
             int userScore = gameLogic.GetScore(lineCov);
             int totalScore = 0;
             logger.info("[GAMECONTROLLER] /run: user_score {}", userScore);
 
             // Salvo i dati del turno
-            gameLogic.playTurn(userScore, robotScore,isGameEnd);
+            gameLogic.playTurn(userScore, robotScore, isGameEnd);
             /*
              * La seguente funzione cerca di eliminare la partita corrente in base all'ID del giocatore, per la scalata invece bisogna verificare gli stati della stessa per poter proseguire
              */
             if (isGameEnd) {
                 //la fine partita della scalata non coincide con la fine della scalata stessa, siccome essa può avere più turni
-                if(gameLogic.getMode().equals("Scalata")){
-
+                if (gameLogic.getMode().equals("Scalata")) {
                     GameLogic nextRound = activeGames.get(playerId);
                     ScalataGamestatus status = ((ScalataGame) nextRound).getStatus();
-                    
- 
+
                     switch (status) {
-                        case IN_PROGRESS: 
-                        /* giocando il turno prima dell'if, il metodo get dovrebbe ritornare la classe successiva rispetto alla classe correntemente memorizzata.
+                        case IN_PROGRESS:
+                            /* giocando il turno prima dell'if, il metodo get dovrebbe ritornare la classe successiva rispetto alla classe correntemente memorizzata.
                         questo perché la get di riferimento è quella della scalata, che restituisce classe, robot e difficoltà                        
                         in base all'indice attualmente memorizzato
                         Mentre invece la set è la semplice implementazione di GameLogic */
-                        totalScore = ((ScalataGame)activeGames.get(playerId)).GetTotalScore();
+                            totalScore = ((ScalataGame) activeGames.get(playerId)).GetTotalScore();
 
-                         logger.info("[GAMECONTROLLER] /run: scalata: round superato, caricamento prossimo turno \n"
-                            + nextRound.getClasseUT()+ nextRound.getType_robot()+nextRound.getDifficulty());
+                            logger.info("[GAMECONTROLLER] /run: scalata: round superato, caricamento prossimo turno \n"
+                                    + nextRound.getClasseUT() + nextRound.getType_robot() + nextRound.getDifficulty());
                             nextRound.setClasseUT(nextRound.getClasseUT());
                             nextRound.setType_Robot(nextRound.getType_robot());
                             nextRound.setDifficulty(nextRound.getDifficulty());
                             //viene propagata la modifica all'interno di activeGames
                             activeGames.replace(playerId, nextRound);
-                        break;
-                    
+                            break;
+
                         case WIN:
                             logger.info("[GAMECONTROLLER] /run: scalata vinta");
-                            totalScore = ((ScalataGame)activeGames.get(playerId)).GetTotalScore();
+                            totalScore = ((ScalataGame) activeGames.get(playerId)).GetTotalScore();
                             activeGames.remove(playerId);
-                        break;
-                        
+                            break;
+
                         case LOST:
                             logger.info("[GAMECONTROLLER] /run: scalata persa");
                             activeGames.remove(playerId);
-                        break;
+                            break;
                     }
-                }
-                else{
+                } else {
                     //per le partite normali, viene semplicemente rimossa la partita attiva
+                    gameLogic.EndRound(playerId);
+                    gameLogic.EndGame(playerId, userScore, userScore > robotScore);
                     activeGames.remove(playerId);
-                    totalScore = userScore; 
+                    totalScore = userScore;
                 }
-                    logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
-                    return createResponseRun(userData, robotScore, userScore, totalScore, true, lineCoverage, branchCoverage, instructionCoverage);
+
+                logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd true");
+
+                // Aggiornamento progressi e notifiche
+                List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
+                Long userId = Long.parseLong(playerId);
+                User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+                String email = user.getEmail();
+                List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(userId.intValue());
+                achievementService.updateNotificationsForAchievements(email, newAchievements);
+                return createResponseRun(userData, robotScore, userScore, totalScore, true, lineCoverage, branchCoverage, instructionCoverage);
             } else {
                 logger.info("[GAMECONTROLLER] /run: risposta inviata con GameEnd false");
                 return createResponseRun(userData, robotScore, userScore, totalScore, false, lineCoverage, branchCoverage, instructionCoverage);
@@ -419,14 +427,14 @@ public class GameController {
         } else {
             // Errori di compilazione
             logger.info("[GAMECONTROLLER] /run: risposta inviata errori di compilazione");
-            return createResponseRun(userData, 0, 0,0, false, null, null, null);
+            return createResponseRun(userData, 0, 0, 0, false, null, null, null);
         }
     }
 
     //metodo di supporto per creare la risposta
     private ResponseEntity<String> createResponseRun(
             Map<String, String> userData, int robotScore,
-            int userScore, int totalScore , boolean gameOver,
+            int userScore, int totalScore, boolean gameOver,
             int[] lineCoverageValues,
             int[] branchCoverageValues,
             int[] instructionCoverageValues) {
@@ -447,7 +455,7 @@ public class GameController {
         result.put("coverage", userData.get("coverage"));
         result.put("robotScore", robotScore);
         result.put("userScore", userScore);
-        result.put("totalScore" , totalScore);
+        result.put("totalScore", totalScore);
         result.put("GameOver", gameOver);
         // Aggiungi i valori di copertura (covered, missed) per Line, Branch, Instruction
         JSONObject coverageDetails = new JSONObject();
@@ -469,13 +477,13 @@ public class GameController {
                 .body(result.toString());
     }
 
-    // Metodo per creare una risposta di errore 
+    // Metodo per creare una risposta di errore
     /*
-     * ERROR CODE che mando al client 
+     * ERROR CODE che mando al client
      *  0 - modalità non esiste
      *  1 -  l'utente ha cambiato le impostazioni della partita
      *  2 -  esiste già la partita
-     *  3 -  è avvenuta un eccezione 
+     *  3 -  è avvenuta un eccezione
      *  4 -  non esiste la partita
      *  5 -  partita eliminata
      */

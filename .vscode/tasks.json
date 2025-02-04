@@ -8,7 +8,6 @@
             "type": "shell",
             "command": "cd T1-G11\\applicazione\\manvsclass; mvn package; docker image prune -f; docker compose up -d --build"
         },
-
         {
             "label": "compile & docker t23",
             "type": "shell",
@@ -52,7 +51,8 @@
         {
             "label": "docker ui_gateway",
             "type": "shell",
-            "command": "cd ui_gateway; docker image prune -f; docker compose up -d --build"
+            "command": "cd ui_gateway; docker image prune -f; docker compose up -d --build",
+            "problemMatcher": []
         }
     ]
 }

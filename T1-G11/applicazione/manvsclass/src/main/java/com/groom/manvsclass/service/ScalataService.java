@@ -5,7 +5,6 @@ package com.groom.manvsclass.service;
 
 import com.groom.manvsclass.model.Scalata;
 import com.groom.manvsclass.model.repository.*;
-import com.groom.manvsclass.service.JwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
