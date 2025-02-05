@@ -13,7 +13,7 @@ It has  an extremely ambitious goal: to enhance the importance of testing, a dis
 Il Progetto è in fase di sviluppo ed evoluzione. Questo progetto è stato forkato dal Repository Master sito in: https://github.com/Testing-Game-SAD-2023/A13
 
 # Contributori del Branch/ Fork corrente 
-Nomi degli autori dei nuovi contributi presenti in questo repository 
+Alessio Avallonw 
 
 
 # Funzionalità dell'Applicazione 
@@ -148,11 +148,13 @@ A questo punto si avrà l'indirizzo pubblico come risposta nel prompt dei comand
 *__NB__*: il comando può essere copiato direttamente dalla dashboard di Ngrok, si consiglia di utilizzare il dominio di tipo statico
 
 # Breve Descrizione delle Modifiche e delle Nuove Feature aggiunte nel repository corrente
-TBD
+Aggiunto il supporto alla generazione di una classe attraverso un LLM, con relative classi di test JUnit (Randoop ed Evosuite)
+Aggiunto tasto Generate a class nell'interfaccia del menu delle classi nella sezion Admin attraverso modifica class.html (in task T1)
+Fix bug che non permetta il building dell'intero progetto A13 (in task T23)
+Fix pom.xml malformato(in Task T23)
 
 # Documentazione di Progetto della Versione corrente
-Riportare il collegamento alla documentazione completa della versione modificata (file pdf) e ai file sorgente dei diagrammi prodotti che dovranno essere contenuti in una cartella denominata "Documentazione_2024" inclusa nel repository stesso.
-
+https://github.com/alexgit933/A13/tree/main/Documentazione2024/DocumentazioneT24.pdf 
 
 
 
