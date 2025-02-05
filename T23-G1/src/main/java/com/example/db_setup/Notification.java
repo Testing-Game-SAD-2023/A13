@@ -1,20 +1,3 @@
-/*
- *   Copyright (c) 2025 Stefano Marano https://github.com/StefanoMarano80017
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
-
 package com.example.db_setup;
 
 import java.time.LocalDateTime;
@@ -47,6 +30,9 @@ public class Notification {
     @Column(length = 500, nullable = false)
     private String message;
 
+    @Column(length = 50, nullable = false) // Nuovo campo per il tipo di notifica
+    private String type = "info"; // Default: "info"
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
@@ -55,17 +41,19 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(int playerID, String titolo, String message, boolean isRead) {
+    public Notification(int playerID, String titolo, String message, String type, boolean isRead) {
         this.playerID = playerID;
         this.titolo = titolo;
         this.message = message;
+        this.type = type != null ? type : "info"; // Imposta il valore di default se null
         this.isRead = isRead;
     }
 
-    public Notification(int playerID, String titolo, String message, LocalDateTime timestamp, boolean isRead) {
+    public Notification(int playerID, String titolo, String message, String type, LocalDateTime timestamp, boolean isRead) {
         this.playerID = playerID;
         this.titolo = titolo;
         this.message = message;
+        this.type = type != null ? type : "info";
         this.isRead = isRead;
         this.timestamp = timestamp;
     }

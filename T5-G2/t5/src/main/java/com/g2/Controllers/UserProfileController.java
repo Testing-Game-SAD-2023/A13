@@ -59,7 +59,7 @@ public class UserProfileController {
 
     @GetMapping("/notification")
     public String ProfileNotificationPage(Model model, @CookieValue(name = "jwt", required = false) String jwt){
-        return null;
+        return "notification";
     }
 
     /*
