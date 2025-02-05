@@ -66,4 +66,31 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("UPDATE Notification n SET n.isRead = true WHERE n.id = :notificationID")
     void markAsRead(@Param("notificationID") Long notificationID);
 
+    //Setta come non letta una notifica
+    @Modifying
+    @Query("UPDATE Notification n SET n.isRead = false WHERE n.id = :notificationID")
+    void markAsNotRead(@Param("notificationID") Long notificationID);
+
+    // Trova tutte le notifiche di un certo tipo per un utente
+    List<Notification> findByPlayerIDAndType(int playerID, String type);
+
+    // Trova solo le notifiche di un certo tipo e non lette
+    List<Notification> findByPlayerIDAndTypeAndIsReadFalse(int playerID, String type);
+
+    // Paginazione delle notifiche per un utente filtrate per tipo
+    Page<Notification> findByPlayerIDAndType(int playerID, String type, Pageable pageable);
+
+    // Filtro per playerID, tipo di notifica e stato di lettura
+    Page<Notification> findByPlayerIDAndTypeAndIsRead(int playerID, String type, boolean isRead, Pageable pageable);
+
+    // Filtro per playerID e stato di lettura
+    Page<Notification> findByPlayerIDAndIsRead(int playerID, boolean isRead, Pageable pageable);
+
+    // Trova le notifiche per un utente che corrispondono a più tipi e stato di lettura
+    Page<Notification> findByPlayerIDAndTypeInAndIsRead(int playerID, List<String> types, boolean isRead, Pageable pageable);
+
+    // Trova le notifiche per un utente che corrispondono a più tipi
+    Page<Notification> findByPlayerIDAndTypeIn(int playerID, List<String> types, Pageable pageable);
+    
+    
 }

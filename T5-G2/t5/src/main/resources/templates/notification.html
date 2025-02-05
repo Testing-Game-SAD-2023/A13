@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <div th:replace ="fragments/header :: header"></div>
+    <title> Notification </title>
+</head>
+
+<body >
+
+<!-- NAVBAR -->
+<div th:replace="fragments/navbar :: navbar"></div>
+
+
+<div class="container">
+    <!-- Search bar-->
+    <div class="d-flex align-items-center justify-content-between p-3 my-3 rounded shadow-sm bg-dark-subtle">
+        <div class="d-flex">
+            <!-- filtro tipo -->
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" 
+                        id="dropdownMenu1" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    <i class="bi bi-gear-fill"></i>
+                <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu checkbox-menu allow-focus" aria-labelledby="dropdownMenu1" id="check_menu_1">
+                <li >
+                    <a class="dropdown-item">
+                        <input type="checkbox" checked> Info
+                    </a>
+                </li>
+                <li >
+                    <a class="dropdown-item">
+                        <input type="checkbox" checked> Team
+                    </a>
+                </li>
+                <li >
+                    <a class="dropdown-item">
+                        <input type="checkbox" checked> Achievement
+                    </a>
+                </li>
+                </ul>
+            </div>
+            <!-- filtro lette-->
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Stato lettura
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item active" href="#" data-status="all">All</a></li>
+                    <li><a class="dropdown-item" href="#" data-status="read">Lette</a></li>
+                    <li><a class="dropdown-item" href="#" data-status="unread">Non Lette</a></li>
+                </ul>
+            </div>  
+            <!-- Ordine -->
+            <button id="toggleOrderBtn" class="btn btn-primary">
+                <i class="bi bi-sort-down"></i>
+            </button>                   
+        </div>
+        <!-- Bottoni -->
+        <nav>
+            <ul class="pagination m-0">
+                <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Notification section -->
+    <div class="my-3 p-3 bg-body rounded shadow-sm bg-dark-subtle" id="notifications">
+        <h6 class="border-bottom pb-2 mb-0">
+        </h6>
+        <!-- notifica -->
+        <div class="d-flex align-content-center justify-content-between text-body-secondary pt-3 border-bottom">
+          <!-- INFO -->
+          <div>
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" 
+            width="32" height="32" xmlns="http://www.w3.org/2000/svg" 
+            role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%"
+             y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+          </div>
+          <div>
+            <p class="pb-3 mb-0 small lh-sm ">
+              <strong class="d-block text-gray-dark">@username</strong>
+              Some representative placeholder content, with some information about this user. Imagine this being some sort of status update, perhaps?
+            </p>
+          </div>
+          <!-- Button-->
+           <div>
+            <!-- READ -->
+            <button type="button" class="btn">
+              <i class="bi bi-bookmark"></i>
+            </button>
+            <!-- DELETE-->
+            <button type="button" class="btn">
+              <i class="bi bi-trash-fill"></i>
+            </button>
+           </div>
+        </div>
+    </div>
+
+
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
+<script>
+   $(document).ready(function () {
+    let currentPage = 0;
+    const pageSize = 5;
+
+    // Variabili per i filtri
+    let selectedTypes = set_type();  // Lista di tipi di notifica
+    let selectedIsRead = null;  // Stato di lettura: true, false, or null per tutti
+    let orderDescending = true; // Di default: Più recenti prima
+
+    // Evento per cambiare l'ordinamento
+    $("#toggleOrderBtn").on("click", function () {
+        orderDescending = !orderDescending;  // Inverte l'ordinamento
+        let iconClass = orderDescending ? "bi-sort-up" : "bi-sort-down";
+        $(this).html(`<i class="bi ${iconClass}"></i>`);
+        fetchNotifications(currentPage);  // Ricarica le notifiche con il nuovo ordine
+    });
+
+    // Funzione per ottenere le notifiche con i filtri applicati
+    function fetchNotifications(page) {
+         // Log dei parametri prima di inviare la richiesta
+        console.log("Parametri richiesti:", {
+            email: email,
+            page: page,
+            size: pageSize,
+            type: selectedTypes.join(","),
+            isRead: selectedIsRead
+        });
+
+        $.ajax({
+            url: "/get_notifications",
+            method: "GET",
+            data: {
+                email: email,
+                page: page,
+                size: pageSize,
+                type: selectedTypes.join(","),  // Aggiungi i tipi separati da virgola
+                isRead: selectedIsRead       // Aggiungi lo stato di lettura
+            },
+            dataType: "json",
+            success: function (data) {
+                $("#notifications").empty();
+
+                if (data.content.length === 0) {
+                    $("#notifications").append("<p class='text-center text-muted'>Nessuna notifica disponibile.</p>");
+                } else {
+
+                    data.content.sort((a, b) => {
+                    return orderDescending
+                        ? new Date(a.timestamp) - new Date(b.timestamp) // Dal più vecchio al più recente
+                        : new Date(b.timestamp) - new Date(a.timestamp); // Dal più recente al più vecchio
+                    });
+
+                    data.content.forEach(notification => {
+                        $("#notifications").append(createNotificationHtml(notification));
+                    });
+                }
+
+                updatePagination(data);
+            },
+            error: function (xhr) {
+                alert("Errore nel recupero delle notifiche: " + xhr.responseText);
+            }
+        });
+    }
+
+    // Funzione per creare l'HTML per ogni notifica
+    function createNotificationHtml(notification) {
+        const colorMap = {
+            "info": "#007bff",    // Blu
+            "team": "#ffc107", // Giallo
+            "Achievement": "#dc3545"    // Rosso
+        };
+
+        const iconColor = colorMap[notification.type] || "#007bff";
+        const readIcon = notification.isRead ? "bi-bookmark-check-fill" : "bi-bookmark";
+
+        return `
+            <div class="d-flex align-content-center justify-content-between text-body-secondary pt-3 border-bottom notification-item" data-id="${notification.id}">
+                <div class="d-flex align-content-center justify-content-center">
+                    <div>
+                        <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" 
+                        width="32" height="32" xmlns="http://www.w3.org/2000/svg" 
+                        role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <rect width="100%" height="100%" fill="${iconColor}"></rect>
+                        <text x="50%" y="50%" fill="#ffffff" dy=".3em"></text></svg>
+                    </div>
+                    <div class="mb-0 small lh-sm">
+                        <p class="mb-0 pb-2">
+                            <strong class="d-block text-gray-dark">${notification.titolo}</strong>
+                            ${notification.message}
+                            <br>
+                            <small class="text-muted">${new Date(notification.timestamp).toLocaleString()}</small>
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-mark-read">
+                        <i class="bi ${readIcon}"></i>
+                    </button>
+                    <button type="button" class="btn btn-delete">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Funzione per aggiornare la paginazione
+    function updatePagination(data) {
+        const totalPages = data.totalPages;
+        const currentPage = data.number;
+        const paginationContainer = $(".pagination");
+
+        paginationContainer.empty();
+
+        paginationContainer.append(`
+            <li class="page-item ${data.first ? 'disabled' : ''}">
+                <a class="page-link prev-page" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        `);
+
+        for (let i = 0; i < totalPages; i++) {
+            paginationContainer.append(`
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link page-num" href="#" data-page="${i}">${i + 1}</a>
+                </li>
+            `);
+        }
+
+        paginationContainer.append(`
+            <li class="page-item ${data.last ? 'disabled' : ''}">
+                <a class="page-link next-page" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        `);
+    }
+
+    // Funzione per gestire il cambio dello stato di lettura della notifica
+    async function toggleNotificationReadStatus(userEmail, notificationId, isRead) {
+        try {
+            const formData = new URLSearchParams();
+            formData.append("email", userEmail);
+            formData.append("notificationID", notificationId);
+            formData.append("isRead", isRead);
+
+            const response = await fetch("/read_notification", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData.toString(),
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                alert("Errore nell'aggiornamento della notifica: " + errorMessage);
+            }
+        } catch (error) {
+            console.error("Errore di rete:", error);
+            alert("Errore di rete. Riprova più tardi.");
+        }
+    }
+
+    // Funzione per gestire la cancellazione della notifica
+    async function handleDeleteNotification(userEmail, notificationId) {
+        try {
+            const formData = new URLSearchParams();
+            formData.append("email", userEmail);
+            formData.append("notificationID", notificationId);
+            const response = await fetch("/remove_notification", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData.toString(),
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                alert("Errore nell'eliminazione della notifica: " + errorMessage);
+            }
+        } catch (error) {
+            console.error("Errore di rete:", error);
+            alert("Errore di rete. Riprova più tardi.");
+        }
+    }
+
+    function set_type(){
+        selectedTypes = [];  // Reset la lista dei tipi selezionati
+        $("#check_menu_1 input[type='checkbox']:checked").each(function() {
+            const typeText = $(this).parent().text().trim().toLowerCase();
+            selectedTypes.push(typeText);  // Aggiungi il tipo selezionato
+        });
+    }
+
+    // Funzione per raccogliere i tipi selezionati dal menu a tendina
+    $(document).on("change", "#check_menu_1 input[type='checkbox']", function () {
+        selectedTypes = [];  // Reset la lista dei tipi selezionati
+        set_type();
+        fetchNotifications(currentPage);  // Richiama la funzione per ottenere le notifiche con i nuovi filtri
+    });
+
+    // Gestione della selezione dello stato di lettura nel dropdown
+    $(document).on("click", ".dropdown-menu .dropdown-item", function () {
+        const status = $(this).data("status");
+        console.log("Valore di status:", status);  // Debugging per vedere cosa contiene status
+
+        if (status === "all") {
+            selectedIsRead = null;  // Tutti
+        } else if (status === "read") {
+            selectedIsRead = true;  // Lette
+        } else if (status === "unread") {
+            selectedIsRead = false;  // Non Lette
+        }
+
+        $(".dropdown-menu .dropdown-item").removeClass("active");
+        $(this).addClass("active");
+
+        fetchNotifications(currentPage);  // Ricarica le notifiche con il nuovo stato
+    });
+
+
+    // Eventi di click per la paginazione
+    $(document).on("click", ".page-num", function (e) {
+        e.preventDefault();
+        currentPage = $(this).data("page");
+        fetchNotifications(currentPage);
+    });
+
+    $(document).on("click", ".prev-page", function (e) {
+        e.preventDefault();
+        if (currentPage > 0) {
+            fetchNotifications(--currentPage);
+        }
+    });
+
+    $(document).on("click", ".next-page", function (e) {
+        e.preventDefault();
+        fetchNotifications(++currentPage);
+    });
+
+    // Eventi di click per "Leggi" e "Elimina"
+    $(document).on("click", ".btn-mark-read", function () {
+        let notificationItem = $(this).closest(".notification-item");
+        let notificationId = notificationItem.data("id");
+        let iconElement = $(this).find("i");
+
+        let isCurrentlyRead = iconElement.hasClass("bi-bookmark-check-fill");
+        let newReadStatus = !isCurrentlyRead;
+
+        if (newReadStatus) {
+            iconElement.removeClass("bi-bookmark").addClass("bi-bookmark-check-fill");
+        } else {
+            iconElement.removeClass("bi-bookmark-check-fill").addClass("bi-bookmark");
+        }
+
+        toggleNotificationReadStatus(email, notificationId, newReadStatus);
+    });
+
+    $(document).on("click", ".btn-delete", function () {
+        let notificationId = $(this).closest(".notification-item").data("id");
+        $(this).closest(".notification-item").remove();
+        alert("Notifica eliminata: " + notificationId);
+        handleDeleteNotification(email, notificationId)
+    });
+
+    // Caricamento iniziale delle notifiche
+    fetchNotifications(currentPage);
+});
+
+</script>
+
+</body>
+</html>

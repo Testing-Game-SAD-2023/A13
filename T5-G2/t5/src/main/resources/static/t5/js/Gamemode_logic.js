@@ -125,6 +125,7 @@ function flush_localStorage() {
 	pulisciLocalStorage("storico");
 	pulisciLocalStorage("codeMirrorContent");
 }
+
 // Funzione per eseguire la richiesta AJAX
 async function runGameActionElimina(url, formData, isGameEnd) {
     try {

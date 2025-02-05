@@ -21,22 +21,21 @@ const parseJwt = (token) => {
     }
 };
 
-function insertStringInUsernameElement(username) {
-    // Trova l'elemento con ID "username"
+function insertStringInUsernameElement(email) {
+    // Trova l'elemento con ID "email"
     var usernameElement = document.getElementById("Username");
-
     // Verifica se l'elemento esiste
     if (usernameElement) {
         // Inserisce la stringa nell'elemento
-        usernameElement.textContent = username.split("@")[0];
+        usernameElement.textContent = email.split("@")[0];
     } else {
-        console.log("L'elemento con id 'username' non esiste.");
+        console.log("L'elemento con id 'email' non esiste.");
     }
 }
 
 const jwtData = parseJwt(getCookie("jwt"));
-const username = jwtData.sub;
-console.log(username);
+const email = jwtData.sub;
+console.log(email);
 const userId = jwtData.userId;
 console.log(userId);
-insertStringInUsernameElement(username);
+insertStringInUsernameElement(email);

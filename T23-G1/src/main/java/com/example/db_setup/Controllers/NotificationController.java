@@ -16,6 +16,7 @@
  */
 package com.example.db_setup.Controllers;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,30 +44,65 @@ public class NotificationController {
     private UserService userService;
 
     @PostMapping("/new_notification")
-    public ResponseEntity<String> updateNotifications(@RequestParam("email") String email,
+    public ResponseEntity<String> updateNotifications(
+            @RequestParam("email") String email,
             @RequestParam("title") String title,
-            @RequestParam("message") String message) {
+            @RequestParam("message") String message,
+            @RequestParam(value = "type", required = false, defaultValue = "info") String type) { // Valore opzionale
+
         UserProfile profile = userService.findProfileByEmail(email);
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile not found");
         }
-        notificationService.saveNotification(profile.getUser().getID(), title, message);
+
+        // Salva la notifica con il tipo
+        notificationService.saveNotification(profile.getUser().getID(), title, message, type);
         return ResponseEntity.ok("Profile notifications updated successfully");
     }
 
-    @GetMapping("/notifications")
+    //Ottieni tutte le notifiche 
+    @GetMapping("/get_notifications")
     public ResponseEntity<Page<Notification>> getNotifications(
-            @RequestParam("email") String email, 
+            @RequestParam("email") String email,
             @RequestParam("page") int page,
-            @RequestParam("size") int size) {
+            @RequestParam("size") int size,
+            @RequestParam(value = "type", required = false) String type, // Parametro opzionale per tipo
+            @RequestParam(value = "isRead", required = false) Boolean isRead) {  // Parametro opzionale per stato di lettura
+    
         UserProfile profile = userService.findProfileByEmail(email);
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        Page<Notification> notifications = notificationService.getNotificationsByPlayer(profile.getUser().getID(), page, size);
-        return ResponseEntity.ok(notifications);
+    
+        // Se il tipo è fornito e non è vuoto, lo elaboriamo
+        if (type != null && !type.isEmpty()) {
+            List<String> types = Arrays.asList(type.split(","));
+            // Se lo stato di lettura è fornito, filtra per tipo e stato di lettura
+            if (isRead != null) {
+                Page<Notification> notifications = notificationService.getNotificationsByPlayerAndTypesAndIsRead(
+                        profile.getUser().getID(), types, isRead, page, size);
+                return ResponseEntity.ok(notifications);
+            } else {
+                // Se solo il tipo è fornito, filtra solo per tipo
+                Page<Notification> notifications = notificationService.getNotificationsByPlayerAndTypes(
+                        profile.getUser().getID(), types, page, size);
+                return ResponseEntity.ok(notifications);
+            }
+        } else if (isRead != null) {
+            // Se solo lo stato di lettura è fornito, filtra per stato di lettura
+            Page<Notification> notifications = notificationService.getNotificationsByPlayerAndReadStatus(
+                    profile.getUser().getID(), isRead, page, size);
+            return ResponseEntity.ok(notifications);
+        } else {
+            // Se nessun filtro è fornito, restituisci tutte le notifiche
+            Page<Notification> notifications = notificationService.getNotificationsByPlayer(
+                    profile.getUser().getID(), page, size);
+            return ResponseEntity.ok(notifications);
+        }
     }
+    
 
+    //Ottieni solo le notifiche non lette
     @GetMapping("/read_notifications")
     public ResponseEntity<List<Notification>> getUnreadNotifications(@RequestParam("userId") String userID) {
         Integer userID_int = Integer.parseInt(userID);
@@ -78,18 +114,23 @@ public class NotificationController {
         return ResponseEntity.ok(unreadNotifications);
     }
 
-    //Marca una singola notifica come letta
-    @PostMapping("/update_notification")
-    public ResponseEntity<String> updateNotification(@RequestParam("email") String email, 
-                                                     @RequestParam("notificationID") String notificationID) {
+    //Marca una singola notifica come letta/non letta
+    @PostMapping("/read_notification")
+    public ResponseEntity<String> Read_Notification(@RequestParam("email") String email,
+            @RequestParam("notificationID") String notificationID,
+            @RequestParam("isRead") Boolean isRead) {
         UserProfile profile = userService.findProfileByEmail(email);
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");
         }
-    
+
         try {
             Long notifID = Long.parseLong(notificationID);
-            notificationService.markNotificationAsRead(notifID);
+            if (isRead) {
+                notificationService.markNotificationAsRead(notifID);
+            } else {
+                notificationService.markNotificationAsNotRead(notifID);
+            }
             return ResponseEntity.ok("Notification marked as read successfully");
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] Invalid Notification ID");
@@ -97,8 +138,8 @@ public class NotificationController {
     }
 
     @DeleteMapping("/remove_notification")
-    public ResponseEntity<String> deleteNotification(@RequestParam("email") String email, 
-                                                     @RequestParam("notificationID") String notificationID) {
+    public ResponseEntity<String> deleteNotification(@RequestParam("email") String email,
+            @RequestParam("notificationID") String notificationID) {
         UserProfile profile = userService.findProfileByEmail(email);
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");
@@ -122,6 +163,5 @@ public class NotificationController {
         notificationService.clearNotificationsByPlayer(playerID);
         return ResponseEntity.ok("All notifications cleared successfully");
     }
-
 
 }

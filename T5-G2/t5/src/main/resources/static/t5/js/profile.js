@@ -35,9 +35,8 @@ function initFriendSearch() {
             // Aggiungi un nuovo timeout per la ricerca
             debounceTimeout = setTimeout(async function () {
                 try {
-                    const user = await fetchUserByEmail(query);
-                    if (user) {
-                        displayUserSuggestions(user, suggestionsContainer);
+                    if (email) {
+                        displayUserSuggestions(email, suggestionsContainer);
                     } else {
                         suggestionsContainer.style.display = "none";
                     }
