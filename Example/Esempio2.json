@@ -1,0 +1,18 @@
+{
+    "ID": 7,
+    "name": "Luigi",
+    "surname": "Costantino",
+    "email": "prova.18@gmail.com",
+    "password": "Paolo_Sorrentino1!",
+    "isRegisteredWithFacebook": false,
+    "isRegisteredWithGoogle": true,
+    "studies": "BSc",
+    "biography": "Ciao mi chiamo Matteo",
+    "missionToken": 0,
+    "following": [],
+    "followers": [],
+    "resetToken": null,
+    "registeredWithGoogle": false,
+    "registeredWithFacebook": false,
+    "id": 7
+}

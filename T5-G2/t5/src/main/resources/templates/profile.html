@@ -1,7 +1,10 @@
-<html>
+<html> 
     <head>
-        <link href="/t5/css/main.css" rel="stylesheet" />
-        <link href="/t5/css/main2.css" rel="stylesheet" />
+        <!--
+                <link href="/t5/css/main.css" rel="stylesheet" />
+                <link href="/t5/css/main2.css" rel="stylesheet" />
+        -->
+        <link href="/t5/css/main3.css" rel="stylesheet" />
         <link href="/t5/bootstrap-4/css/bootstrap.min.css" rel="stylesheet" />
 
         <!--Modifica (05/04) Adding FontAwesome icons (online version)-->
@@ -11,57 +14,94 @@
         <!--Modifica (21/05) Adding JQuery-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!--Fine Modifica-->
-
-        <script src="/t5/js/profile.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+        <script src="/t5/bootstrap-4/js/bootstrap.min.js"></script>
+        <!--<script src="/t5/js/profile.js"></script>--> 
 
         <title>Profilo utente</title>
+
+        
+    
     </head>
 
     <body class="bg-custom">
         <div class="container-fluid">
-            <div class="row">
-                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" >Profilo</p>
-                <div id="topRightContainer">
-                    <button id="profileButton" type="button" class="logout-button" th:onclick="redirectToUserInfo()">Profilo</button>
-                    <button id="logoutButton" type="button" class="logout-button" th:onclick="redirectToLogin()">Logout</button>
+            <div class="top-bar">
+                <p class="user_position_main" style="color: white; font-family:Arial, Helvetica, sans-serif; font-weight: bold;" ></p>
+                <div class="topRightContainer">
+                    <button class="logout-button" data-toggle="modal" data-target="#missionsModal" id="item">Missioni</button>
+                    <a href="/main" class="logout-button" id="item">Home</a>
+                    <a href="/logout" class="logout-button" id="item">Logout</a>
                 </div>
             </div>
             <div class="row">
-                <div class="col-8">
-                    <div class="row">
-                        <div class="card" style="width: 100%; margin-left: 10px; max-height:35vh">
+                <div class="col-6">
+                    
+                    <div class="card ">
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-210">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title">Informazioni Personali</h4>
+                                    <button class="btn btn-secondary" data-toggle="modal" data-target="#editModal">Modifica</button>
+                                </div>
+                                <hr>
+                                
+                                    <div class="profile-container">
                                         <img src="/t5/images/sample_propic.jpg" class="rounded float-start propic" alt="Profile picture">
+                                        <div class="profile-info">
+                                            <div class="name-container">
+                                                <div>
+                                                    <h5>
+                                                        <p th:text="${user.name + ' ' + user.surname}   "></p> <!-- Nome -->
+                                                        <p th:text="${user.email}"></p>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                            <h6 class="card-subtitle mb-2 text-body-secondary" >
+                                                <p th:text="'ID: ' + '' + ${user.id}"></p>
+                                                <p th:text="${user.studies}"></p>
+                                                <p th:text="${user.biography != null && !#strings.isEmpty(user.biography) ? user.biography : 'Qui è presente la mia biografia'}"></p>
+                                            </h6>                                        
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <h4 class="card-title" id="usernameField"></h4>
-                                        <h6 class="card-subtitle mb-2 text-body-secondary" id="studiesField"></h6>
-                                        <hr>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur maximus pretium lacinia. Curabitur et varius neque. Aliquam tincidunt tortor eget felis rhoncus, et commodo ex vulputate. Cras tristique id arcu non condimentum. Fusce non dignissim lorem. Ut porttitor mattis nisl quis interdum. Aliquam tortor orci, interdum in gravida faucibus, auctor sit amet tellus. Aliquam vulputate enim quis rhoncus eleifend. Maecenas id orci est. Mauris at rutrum velit. Nunc posuere leo eget nisl lacinia semper. Fusce interdum, neque at suscipit tristique, tellus sem elementum quam, quis placerat justo orci eget nunc. Nam eget turpis ut elit sollicitudin ornare ac id lorem. Cras facilisis enim et eros suscipit, ut convallis ante suscipit. Nunc luctus diam at sollicitudin ornare. Mauris vel pharetra dolor. </p>
+                                
+                            </div>
+                    </div>
+                    
+                    
+                        <div class="card ">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title">Achievements</h4>
+                                    <div class="d-flex align-items-center">
+                                        <button class="btn btn-secondary" id="toggle-button" onclick="toggleAchievements()">Visualizza tutti gli achievements</button>
+                                        <div class="token-display">
+                                            <p style="margin-top: 0; margin-bottom: 0;" th:text="'Token: ' + '' + ${user.missionToken}">numero token</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="card" style="width: 100%; margin-left: 10px; margin-top:10px;">
-                            <div class="card-body">
-                                <h4 class="card-title">Trofei</h4>
                                 <hr>
-                                <div style="height:44.2vh; overflow-y: auto">
+                                <div class="achievements-container">
                                     <!--<div th:each="element: ${achievementProgresses}" th:id="${element.ID}">Ciao</div>-->
-                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}" class="achievement-container" style="overflow: hidden; margin: 2px">
+                                    <div th:each="element: ${achievementProgresses}" th:id="'achievement-' + ${element.ID}"
+                                        class="achievement-container"
+                                        style="overflow: hidden; margin: 2px"
+                                        th:data-completed="${element.Progress} >= ${element.ProgressRequired} ? 'true' : 'false'">
                                         <div class="row">
                                             <div class="col-2">
-                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px" th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
+                                                <img src="/t5/images/sample_badge.png" style="width: 80px; height: 80px"
+                                                 th:class="${element.Progress} < ${element.ProgressRequired}? 'unobtained'">
                                             </div>
                                             <div class="col">
                                                 <h4 th:text="${element.Name}">Nome achievement</h4>
                                                 <p th:text="${element.Description}">Descrizione achievement</p>
                                                 <div class="progress" th:if="${element.Progress} < ${element.ProgressRequired}">
-                                                    <div class="progress-bar" role="progressbar" th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" aria-valuenow="${element.Progress}" aria-valuemin="0" aria-valuemax="100" th:text="${element.Progress}+'/'+${element.ProgressRequired}"></div>
+                                                    <div class="progress-bar" role="progressbar"
+                                                    th:style="'width:'+${element.Progress}*100/${element.ProgressRequired}+'%;'" 
+                                                    aria-valuenow="${element.Progress}" 
+                                                    aria-valuemin="0" 
+                                                    aria-valuemax="100" 
+                                                    th:text="${element.Progress}+'/'+${element.ProgressRequired}">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -69,22 +109,90 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    
                 </div>
-                <div class="col">
-                    <div class="card" style="height:92vh">
+                <div class="col-6">
+                    <div class="card ">
                         <div class="card-body">
-                            <h4 class="card-title">Statistiche</h4>
-                            <hr>
-                            <div th:each="element: ${statisticProgresses}" th:id="'statistic-' + ${element.StatisticID}" class="row">
-                                <!--<div class="col-1">
-                                    I
-                                </div>-->
-                                <div class="col-8" th:text="${IdToStatistic.get(element.StatisticID).name}">
-                                    Nome statistica
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Statistiche</h4>
+                                <div class="d-flex gap-2">
+                                    <!-- Dropdown Robot -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="robotFilterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Robot
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="robotFilterDropdown">
+                                            <button class="dropdown-item" onclick="selectRobotFilter('None')">None</button>
+                                            <button class="dropdown-item" onclick="selectRobotFilter('Randoop')">Randoop</button>
+                                            <button class="dropdown-item" onclick="selectRobotFilter('EvoSuite')">EvoSuite</button>
+                                        </div>
+                                    </div>
+                                    <!-- Dropdown GameMode -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="gameModeFilterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            GameMode
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="gameModeFilterDropdown">
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('All')">All</button>
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('Sfida')">Sfida</button>
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('Multiplayer')">Multiplayer</button>
+                                            <button class="dropdown-item" onclick="selectGameModeFilter('Scalata')">Scalata</button>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary" onclick="clearFilter()">Rimuovi Filtro</button>
                                 </div>
-                                <div class="col text-right" th:text="${element.Progress}">
-                                    1000
+                            
+                            </div>
+                            <hr>
+                            <div class="statistics-container">
+                                <div th:each="element: ${statisticProgresses}" 
+                                    th:id="'statistic-' + ${element.StatisticID}" 
+                                    class="row statistic-row"
+                                    th:data-robot="${IdToStatistic.get(element.StatisticID).robot}"
+                                    th:data-gamemode="${IdToStatistic.get(element.StatisticID).gamemode}"
+                                    th:data-role="${IdToStatistic.get(element.StatisticID).role}">
+                                    <!--<div class="col-1">
+                                        I
+                                    </div>-->
+                                    <div class="col-8" style="font-weight: bold" th:text="${IdToStatistic.get(element.StatisticID).name}">
+                                        Nome statistica
+                                    </div>
+                                    <div class="col text-right" style="font-weight: bold" th:text="${element.Progress}">
+                                        1000
+                                    </div>
+                                </div>
+                                <div id="ratio-container" class="mt-3" style="display: none;">
+                                    <div th:each="ratio: ${ratios}" 
+                                         class="row ratio-row" 
+                                         th:data-robot="${ratio.robot}" 
+                                         th:data-gamemode="${ratio.gamemode}" style="font-weight: bold">
+                                        <div class="col-8" th:text="'Ratio (Partite Vinte / Partite Giocate) ' ">
+                                            Ratio 
+                                        </div>
+                                        <div class="col text-right" th:text="${ratio.value}">
+                                            1000
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Lista Seguiti</h4>
+                                <button class="btn btn-secondary" data-toggle="modal" data-target="#searchPlayerModal">Ricerca Player</button>
+                            </div>
+                            <hr>
+                            <div class="followed-list-container">
+                                <div th:each="element: ${user.following}" class="row">
+                                    <div class="followed-item">
+                                        <a class="col-8" 
+                                        th:href="@{'/profile/' + ${element.id}}" 
+                                        th:text="${element.name} + ' ' + ${element.surname}">
+                                        </a> 
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +200,120 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Modifica Informazioni</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="nameInput">Nome</label>
+                                <input type="text" class="form-control" id="nameInput" placeholder="Inserisci il nome">
+                            </div>
+                            <div class="form-group">
+                                <label for="surnameInput">Cognome</label>
+                                <input type="text" class="form-control" id="surnameInput" placeholder="Inserisci il cognome">
+                            </div>
+                            <div class="form-group">
+                                <label for="emailInput">Email</label>
+                                <input type="email" class="form-control" id="emailInput" placeholder="Inserisci l'email">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordInput">Password Nuova</label>
+                                <input type="password" class="form-control" id="passwordInput" placeholder="Inserisci la password">
+                            </div>
+                            <div class="form-group">
+                                <label for="studiesInput">Studi</label>
+                                <select class="form-control" id="studiesInput">
+                                    <option value="BSc">BSc</option>
+                                    <option value="MSc">MSc</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="biographyInput">Biografia</label>
+                                <input type="text" class="form-control" id="biographyInput" placeholder="Inserisci la biografia">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordoldInput">Password Attuale <span style="color: red;">*</span></label>
+                                <input type="password" class="form-control" id="passwordoldInput" placeholder="Inserisci la password" required>
+                                <span style="color: red;">* Campo obbligatorio</span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                        <button type="button" class="btn btn-primary" onclick="saveChanges()">Salva modifiche</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="searchPlayerModal" tabindex="-1" role="dialog" aria-labelledby="searchPlayerModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="searchPlayerModalLabel">Ricerca Player</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="key_search">Chiave di Ricerca</label>
+                                <input type="text" class="form-control" id="key_search" placeholder="Inserisci l'id dell'utente o la sua email">
+                            </div>
+                        </form>
+                        <!-- Contenitore per i risultati della ricerca -->
+                        <div id="searchResults" class="mt-3">
+                            <!-- I risultati saranno aggiunti dinamicamente qui -->
+                        </div>
+                    </div>                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                        <button type="button" class="btn btn-primary" onclick="search()">Cerca</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="missionsModal" tabindex="-1" role="dialog" aria-labelledby="missionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="missionsModalLabel">Lista Missioni</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div th:each="element: ${missions}">
+                            <li class="list-group-item">
+                                <h5 th:text="${element.name}"></h5>
+                                <p th:text="${element.description}"></p>
+                                <p th:text="'Premio: ' + ${element.numToken} + ' Token'">Descrizione della prima missione.</p>
+                            </li>
+                        </div>
+                    </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
 
-        <span id="user_id" style="display: none;" th:text="${userID}"></span>
+        <!--<span id="user_id" style="display: none;" th:text="${userID}"></span> -->
+
+        <script th:inline="javascript">
+            let user = /*[[${user}]]*/ {};
+            let userUpdate = JSON.parse(JSON.stringify(user)); // Copia dell'oggetto
+        </script>
+        <script src="t5/js/profile.js"></script>
     </body>
 </html>

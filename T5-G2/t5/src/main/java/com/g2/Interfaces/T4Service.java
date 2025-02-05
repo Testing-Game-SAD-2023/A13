@@ -111,14 +111,13 @@ public class T4Service extends BaseService {
     }
 
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
-        MultiValueMap<String, String> jsonMap = new LinkedMultiValueMap<>();
-        jsonMap.put("playerId", Collections.singletonList(String.valueOf(playerID)));
-        jsonMap.put("statistic", Collections.singletonList(statisticID));
-        jsonMap.put("progress", Collections.singletonList(String.valueOf(progress)));
+        JSONObject obj = new JSONObject();
+        obj.put("playerId", playerID);
+        obj.put("statistic", statisticID);
+        obj.put("progress", progress);
         String endpoint = "/phca/" + playerID + "/" + statisticID;
-        String response = callRestPut(endpoint, jsonMap, new HashMap<>(), String.class);
-        return response;
-    }
+        String response = callRestPut(endpoint, obj, null, null, String.class);
+        return response;    }
     
 /*
     private String updateStatisticProgress(int playerID, String statisticID, float progress) {
@@ -195,15 +194,17 @@ public class T4Service extends BaseService {
     }
 
     private String EndRound(String Time, int roundId) {
-        // Anche qui non è stato previsto un parametro per la chiamata rest e quindi va
-        // costruito a mano
+        //Anche qui non è stato previsto un parametro per la chiamata rest e quindi va costruito a mano
         final String endpoint = "rounds/" + String.valueOf(roundId);
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("closedAt", Time);
-        String response = callRestPut(endpoint, formData, null, String.class);
-        return response;
+        try {
+            JSONObject formData = new JSONObject();
+            formData.put("closedAt", Time);
+            String response = callRestPut(endpoint, formData, null, null, String.class);
+            return response;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[EndRound]: " + e.getMessage());
+        }
     }
-
     private String CreateTurn(String Player_id, int Round_id, String Time) {
         final String endpoint = "/turns";
         JSONObject obj = new JSONObject();

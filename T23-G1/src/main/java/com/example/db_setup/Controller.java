@@ -11,10 +11,12 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,6 +41,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,6 +75,7 @@ public class Controller {
 
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
+
 
     @Autowired
     private MyPasswordEncoder myPasswordEncoder;
@@ -131,7 +136,7 @@ public class Controller {
         // NOME -- Modifica (02/02/2024) : Possibilità di inserire più nomi separati da uno spazio
         // regex_old = "[a-zA-Z]+" , regex_new = "[a-zA-Z]+(\s[a-zA-Z]+)*"
         //if ((name.length() >= 2) && (name.length() <= 30) && (Pattern.matches("[a-zA-Z]+", name))) {
-        if ((name.length() >= 2) && (name.length() <= 30) && (Pattern.matches("[a-zA-Z]+(\\s[a-zA-Z]+)*", name))) {
+        if ((name.length() >= 2) && (name.length() <= 30) && (Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", name))) {
             n.setName(name);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Name not valid");
@@ -141,7 +146,7 @@ public class Controller {
         //                                  da un apostrofo
         // regex_old = "[a-zA-Z]+" , regex_new = [a-zA-Z]+(\s?[a-zA-Z]+\'?)*
         //if ((name.length() >= 2) && (surname.length() <= 30) && (Pattern.matches("[a-zA-Z]+", surname))) {
-        if ((name.length() >= 2) && (surname.length() <= 30) && (Pattern.matches("[a-zA-Z]+(\\s?[a-zA-Z]+\\'?)*", surname))) {
+        if ((surname.length() >= 2) && (surname.length() <= 30) && (Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", surname))) {
             n.setSurname(surname);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Surname not valid");
@@ -180,6 +185,10 @@ public class Controller {
         // STUDIES
         n.setStudies(studies);
         n.setRegisteredWithFacebook(false);
+
+
+        n.setBiography("");
+        n.setMissionToken(0);
 
         userRepository.save(n);
         Integer ID = n.getID();
@@ -618,16 +627,194 @@ public class Controller {
 
     @GetMapping("/students_list")
     public List<User> getAllStudents() {
+
         return userRepository.findAll();
     }
 
     @GetMapping("/students_list/{ID}")
     @ResponseBody
-    public User getStudent(@PathVariable String ID) {
-        return userRepository.findByID(Integer.parseInt(ID));
+    public ResponseEntity<User> getStudent(@PathVariable String ID) {
+
+        User user = userRepository.findByID(Integer.parseInt(ID));
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header("Content-Type", "application/json")
+                    .body(user);
+    }
+    
+
+    @PostMapping("/addFollow")
+    public ResponseEntity<String> addFollow(@RequestParam("userID_1") String userID_1,
+                                                @RequestParam("userID_2") String userID_2, HttpServletRequest request) {
+            
+            User follower = userRepository.findByID(Integer.parseInt(userID_1));
+            User followed = userRepository.findByID(Integer.parseInt(userID_2));
+            
+            if( follower == null ){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 non esiste");
+            } else if ( followed == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 non esiste");
+            }
+            
+            // Controllo per evitare che un utente segua se stesso
+            if (follower.getID().equals(followed.getID())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower non può seguire se stesso");
+            }
+
+            if (userRepository.existsFollowRelationship(follower.ID, followed.ID) > 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower già segue followed");
+            }
+        
+
+            // Aggiungi l'utente alla lista di following e viceversa
+            follower.getFollowing().add(followed);
+            followed.getFollowers().add(follower);
+
+            // Salva le modifiche
+            userRepository.save(follower);
+            userRepository.save(followed);
+
+
+            return ResponseEntity.status(HttpStatus.OK).body("Operazione completata con successo");
+
+    }
+    
+    
+    @PostMapping("/rmFollow")
+    public ResponseEntity<String> rmFollow(@RequestParam("userID_1") String userID_1,
+                                                @RequestParam("userID_2") String userID_2,
+                                                HttpServletRequest request) {
+            
+            User follower = userRepository.findByID(Integer.parseInt(userID_1));
+            User followed = userRepository.findByID(Integer.parseInt(userID_2));
+            
+            if( follower == null ){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User1 non esiste");
+            } else if ( followed == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User2 non esiste");
+            }
+
+            // Controllo per evitare che un utente segua se stesso
+            if (follower.getID().equals(followed.getID())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Operazione non consentita");
+            }
+
+            //Controlla se io provo a defolloware una persona che già non follow
+            if (!(userRepository.existsFollowRelationship(follower.ID, followed.ID) > 0)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("follower già non segue followed");
+            }
+        
+
+            // Aggiungi l'utente alla lista di following e viceversa
+            follower.getFollowing().remove(followed);
+            followed.getFollowers().remove(follower);
+
+            // Salva le modifiche
+            userRepository.save(follower);
+            userRepository.save(followed);
+
+
+            return ResponseEntity.status(HttpStatus.OK).body("Operazione eseguita con successo");
+
+    }
+    
+    @GetMapping("/searchPlayer")
+    public ResponseEntity<User> searchPlayer (@RequestParam("key_search") String key_search,HttpServletRequest request){
+
+        User user = null;
+
+        if(key_search.matches(".*[a-zA-Z]+.*")){
+            user = userRepository.findByEmail(key_search);
+        }else if(key_search.matches("^\\d+$")){
+            user = userRepository.findByID(Integer.parseInt(key_search));
+        }
+
+        if(user == null){
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }else{
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        }
+
     }
 
-    
+
+    @PutMapping("/modifyUser")
+    public ResponseEntity<String> modifyUser (@RequestBody User user_updated, @RequestParam("old_psw") String old_psw,
+                                                HttpServletRequest request) {
+                
+        User user = userRepository.findByID(user_updated.ID);
+        Matcher m = p.matcher(user_updated.password);
+        Boolean change_psw = false;
+
+        if(user != null){
+
+            if (!myPasswordEncoder.matches(old_psw, user.password)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password vecchia sbagliata.");
+            }
+
+            if(!(user.name.equals(user_updated.name)) && (!(user_updated.name.length() >= 2) || !(user_updated.name.length() <= 30) || !(Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", user_updated.name)))){
+                
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome nuovo non valido");
+
+            }else if(!(user.surname.equals(user_updated.surname)) && (!(user_updated.surname.length() >= 2) || !(user_updated.surname.length() <= 30) || !(Pattern.matches("^[A-Za-zÀ-ÿ][a-zà-ÿ]*(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*(?:\\s[A-Za-zÀ-ÿa-zà-ÿ]+(?:'?[A-Za-zÀ-ÿa-zà-ÿ]+)*)*$", user_updated.surname)))){
+                
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cognome nuovo non valido");
+
+            }else if(!user.email.equals(user_updated.email)){
+
+                if ((user_updated.email.contains("@")) && (user_updated.email.contains("."))) {
+
+                    User user_email = userRepository.findByEmail(user_updated.email);
+
+                    if (user_email != null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utente con questa email nuova già registrato");
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email nuova non valida");
+                }
+
+            }else if(!(user.biography.equals(user_updated.biography)) && (!(user_updated.biography.length() >= 2) || !(user_updated.biography.length() <= 130) || !(Pattern.matches("^[A-Za-zÀ-ÿ0-9\\s.,'!?-]+$", user_updated.biography)))){
+                
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Biografia nuova non valido");
+
+            }else if((!myPasswordEncoder.matches(old_psw, user_updated.password)) && ((user_updated.password.length() >16) || (user_updated.password.length() < 8) || !(m.matches()))){
+             /*
+                Per controllare se ho cambiato la psw faccio il confronto tra old_psw e quella ipoteticamente nuova
+                Se è vecchia, ho confronto tra la vecchia row e quella criptata e quindi è true
+                Se è nuova, ho confronto tra la vecchia row e la nuova row che dovrebbe restituire un false. 
+             */
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password nuova non valida");
+            }
+
+            if(!myPasswordEncoder.matches(old_psw, user_updated.password)){
+                user_updated.password = myPasswordEncoder.encode(user_updated.password);
+                change_psw = true;
+            }
+
+            String old_email = user.email;
+            userRepository.save(user_updated);
+
+            if(!old_email.equals(user_updated.email)){
+                try {
+                    emailService.sendMailUpdate(user_updated.email, user_updated.ID);
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            if(change_psw){
+                try {
+                    emailService.sendMailPassword(user_updated.email, user_updated.ID);
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body("Agiornamento Completato");
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Utente non esiste");
+        }
+    }
+
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main"); 
@@ -672,7 +859,8 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Session is not active");
     }
 }
-    @GetMapping("/test_prova")
+
+@GetMapping("/test_prova")
     @ResponseBody
     public String test() {
         return "test T23";

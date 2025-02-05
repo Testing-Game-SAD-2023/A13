@@ -1,0 +1,224 @@
+.achievements-container::-webkit-scrollbar {
+display: none;
+}
+
+
+.achievements-container {
+    max-height: 200px; /* Altezza massima per il contenuto */
+    overflow-y: auto; /* Abilita lo scroll verticale */
+    padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
+}
+
+.container-fluid {
+    height: 100vh; /* Usa tutta l'altezza dello schermo */
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+.top-bar {
+    height: 50px; /* Riduce l'altezza */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    background-color: #1c1c2b; /* Sfondo scuro */
+}
+
+/* Layout a due colonne */
+.row {
+    flex: 1;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.col-6 {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Card con altezza bilanciata */
+.card {
+    flex: 1; /* Ogni card occupa metà della colonna */
+    margin: 5px 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.card-body {
+    flex: 1; /* Occupa tutto lo spazio disponibile nella card */
+    overflow-y: auto; /* Scroll interno se il contenuto eccede */
+    -ms-overflow-style: none; /* Rimuovi le scrollbar su Internet Explorer e Edge */
+    scrollbar-width: none; /* Rimuovi le scrollbar su Firefox */
+}
+.card-body::-webkit-scrollbar {
+    display: none; /* Rimuovi le scrollbar su Chrome, Safari e Edge */
+}
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+
+.followed-list-container::-webkit-scrollbar {
+    display: none; /* Nasconde la barra per i browser basati su Webkit */
+}
+
+.followed-list-container {
+    max-height: 150px; /* Altezza massima per limitare l'espansione */
+    overflow-y: auto; /* Scroll verticale se il contenuto eccede */
+    padding-right: 10px; /* Spazio per evitare sovrapposizione con lo scroll */
+}
+
+.followed-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Separatore tra gli elementi */
+    font-size: 0.9rem; /* Riduci leggermente il testo se necessario */
+}
+
+/* Immagine profilo */
+.propic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Sezione informazioni profilo */
+.profile-container {
+    display: flex;
+    align-items: center;
+}
+
+.profile-info {
+    margin-left: 20px;
+}
+
+.profile-info .name-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.statistics-container::-webkit-scrollbar{
+    display: none;
+}
+
+.statistics-container {
+    max-height: 200px; /* Altezza massima per il contenuto */
+    overflow-y: auto; /* Abilita lo scroll verticale */
+    padding-right: 10px; /* Spazio per evitare sovrapposizioni con la scrollbar */
+    
+}
+
+/*PRESI DA ALTRI MAIN*/
+
+.bg-custom {
+    background-color: #1c1c28;
+    /* background-image: url("/t5/images/gamemode_background.jpg"); */
+}
+
+  .user_position_main{
+    padding-top: 1%;
+    padding-left: 8%;
+    
+}
+
+.logout-button {
+    background-color: rgba(57,57,83,1);
+    color: #fff;
+    border: rgba(57,57,83,1);
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    top: 10px;
+    right: 60px;
+}
+  
+  .logout-button:focus {
+    outline:none; /* Rimuove il colore di sfondo dei bordi quando il tasto è attivo (focus) */
+}
+  .logout-button:hover {
+    background-color: white; /* Cambia il colore di sfondo al passaggio del cursore */
+    color: black;
+}
+
+.unobtained {
+    filter: grayscale(1);
+    mix-blend-mode: multiply;
+}
+
+.token-display {
+    display: flex; /* Usa Flexbox per centrare il contenuto */
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra orizzontalmente */
+    margin-left: 10px; /* Spazio tra il bottone e il riquadro */
+    padding: 0 10px; /* Margine interno solo ai lati */
+    background-color: #f0f0f0; /* Sfondo chiaro */
+    border: 1px solid #ccc; /* Bordo sottile */
+    border-radius: 5px; /* Angoli arrotondati */
+    font-size: 14px; /* Dimensione del testo */
+    font-weight: bold; /* Testo in grassetto */
+    color: #333; /* Colore del testo */
+    height: 30px; /* Stessa altezza del bottone (modificabile se necessario) */
+    box-sizing: border-box; /* Considera padding e bordo nella dimensione totale */
+}
+
+.topRightContainer{
+    top: 10px; /* Distanza dall'alto */
+    right: 10px; /* Distanza dal bordo destro */
+    display: flex; /* Allinea gli elementi in fila */
+    align-items: center; /* Centra verticalmente gli elementi */
+    gap: 10px; /* Spazio tra gli elementi */
+}
+
+.topRightContainer .item {
+    background-color: #1c1c2b; /* Sfondo scuro */
+    color: #fff; /* Colore del testo */
+    padding: 10px 15px; /* Spaziatura interna */
+    border-radius: 5px; /* Angoli arrotondati */
+    font-size: 14px; /* Dimensione del testo */
+    text-align: center; /* Centra il testo */
+    cursor: pointer; /* Indica che sono cliccabili */
+}
+
+
+
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .col-6 {
+        height: auto; /* Consenti alle colonne di adattarsi */
+    }
+}
+
+
+.d-flex.gap-2 > * {
+    margin-left: 0.5rem;
+}
+
+/* Rimuove il margine iniziale al primo elemento */
+.d-flex.gap-2 > *:first-child {
+    margin-left: 0;
+}
+
+.d-flex.justify-content-between.align-items-center {
+    gap: 1rem; /* Aggiunge un po' di spazio orizzontale */
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Evita lo scrolling della pagina */
+}
