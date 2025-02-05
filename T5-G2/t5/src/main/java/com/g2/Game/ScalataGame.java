@@ -103,7 +103,7 @@ public class ScalataGame extends GameLogic {
                 currentGame.EndTurn(getTurnID(), now, userScore);
 
                 System.out.println("[SCALATAGAME][T5] Round " + currentRound + " lost.");
-                currentStatus = ScalataGamestatus.LOST;
+                
 
                 //gestione scalata persa
                 this.CloseScalata(id_scalata, getRoundID(), false, 0);
