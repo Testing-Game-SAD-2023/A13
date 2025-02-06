@@ -249,12 +249,8 @@ public class GameController {
                 if (mode.equals("Sfida")) {
                     return ResponseEntity.ok().build();
                 } else if (mode.equals("Scalata")) {
-                    System.out.println("Entro in scalata di game controller");
-                    JSONObject obj = new JSONObject();
-                    obj.put("roundID", ((ScalataGame) gameLogic).getCurrentRoundID());
-                    obj.put("gameID", ((ScalataGame) gameLogic).getCurrentGameID());
-                    obj.put("turnID", ((ScalataGame) gameLogic).getCurrentTurnID());
-                    obj.put("scalataID", ((ScalataGame) gameLogic).getId_scalata());
+                    
+                    JSONObject obj = buildScalataResponse(gameLogic);
                     System.out.println(obj.toString());
                     return ResponseEntity.ok(obj.toString());
                 }
@@ -268,9 +264,24 @@ public class GameController {
 
             String errorMessage = null;
             String errorCode = null;
+
+
+
             if (isGameExisting) {
-                errorMessage = "errore esiste già la partita";
-                errorCode = "2";
+                if (currentMode.equals("Scalata")) {
+                    if (((ScalataGame)gameLogic).isRoundTransition()) {
+                        System.out.println("NON sono io il problema");
+                        errorMessage = "Transizione al round successivo in corso";
+                        errorCode = "6";
+                        ((ScalataGame)gameLogic).toggleRoundTransition();
+
+                        JSONObject obj = buildScalataResponse(gameLogic);
+                        
+                        return ResponseEntity.ok(obj.toString());
+                    }
+                }
+                    errorMessage = "errore esiste già la partita";
+                    errorCode = "2";
             } else {
                 errorMessage = "errore l'utente ha cambiato le impostazioni della partita";
                 errorCode = "1";
@@ -453,12 +464,22 @@ public class GameController {
      *  3 -  è avvenuta un eccezione
      *  4 -  non esiste la partita
      *  5 -  partita eliminata
+     *  6 -  cambio round all'interno di una scalata
      */
     private ResponseEntity<String> createErrorResponse(String errorMessage, String errorCode) {
         JSONObject error = new JSONObject();
         error.put("error", errorMessage);
         error.put("errorCode", errorCode);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.toString());
+    }
+    private JSONObject buildScalataResponse(GameLogic gameLogic){
+        JSONObject obj = new JSONObject();
+        System.out.println("Costruzione risposta scalata in corso");
+        obj.put("roundID", ((ScalataGame) gameLogic).getCurrentRoundID());
+        obj.put("gameID", ((ScalataGame) gameLogic).getCurrentGameID());
+        obj.put("turnID", ((ScalataGame) gameLogic).getCurrentTurnID());
+        obj.put("scalataID", ((ScalataGame) gameLogic).getId_scalata());
+        return obj;
     }
 
 }

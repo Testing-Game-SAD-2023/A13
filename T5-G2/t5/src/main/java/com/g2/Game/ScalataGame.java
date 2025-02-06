@@ -40,7 +40,7 @@ public class ScalataGame extends GameLogic {
     private int currentRound;       //usata per contare il progresso della scalata
     private int currentRoundIndex;  //indice usato per la lettura della lista interna
     private int totalScore;
-    
+    private boolean nextRoundTransition;
 
     public ScalataGame(ServiceManager serviceManager, String playerID,  String classeUT,
                         String scalata_name,List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
@@ -51,6 +51,7 @@ public class ScalataGame extends GameLogic {
         this.totalScore = 0 ;
         this.currentStatus = ScalataGamestatus.IN_PROGRESS;
         this.scalata_name = scalata_name;
+        this.nextRoundTransition = false;
 
         for (int i = 0; i < classes.size(); i++) {
             String classe = classes.get(i);
@@ -81,6 +82,7 @@ public class ScalataGame extends GameLogic {
                 currentRoundIndex++; // Passa al gioco successivo
                 currentRound++;
                 this.totalScore += userScore;
+                this.toggleRoundTransition();
                 //aggiornamento del prossimo turno
                 
                     //adesso viene controllato se la scalata è terminata
@@ -140,7 +142,7 @@ public class ScalataGame extends GameLogic {
     public int GetScore(int coverage) {
         // restituisce il punteggio di un round, e incrementa il punteggio totale all'interno della scalata
         //Inoltre, salva all'interno della scalata la copertura della classe, in modo da confrontarla in seguito con il punteggio del robot.
-        ;
+        
         int score = games.get(currentRoundIndex).GetScore(coverage);
         
         return  score;
@@ -173,7 +175,7 @@ public class ScalataGame extends GameLogic {
             this.getDifficulty().equals(difficulty) &&
             this.getClasseUT().equals(underTestClassName)){
                 return true;
-            }else{
+            }else{                
                 return false;
             }
     }
@@ -192,7 +194,12 @@ public class ScalataGame extends GameLogic {
         }
     }
 
-
+    public boolean isRoundTransition(){
+        return this.nextRoundTransition;
+    }
+    public void toggleRoundTransition(){
+        this.nextRoundTransition = !this.nextRoundTransition;
+    }
     //Chiamate a T4
 
     public void createScalata(String player_id, String scalata_name){
