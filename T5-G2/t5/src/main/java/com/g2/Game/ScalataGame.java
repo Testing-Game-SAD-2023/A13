@@ -40,7 +40,7 @@ public class ScalataGame extends GameLogic {
     private int currentRound;       //usata per contare il progresso della scalata
     private int currentRoundIndex;  //indice usato per la lettura della lista interna
     private int totalScore;
-    private int gameCoverage;   //coverage di ogni partita usato per passare o meno al round successivo.
+    
 
     public ScalataGame(ServiceManager serviceManager, String playerID,  String classeUT,
                         String scalata_name,List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
@@ -69,9 +69,10 @@ public class ScalataGame extends GameLogic {
             Sfida currentGame = games.get(currentRoundIndex);
             currentGame.playTurn(userScore, robotScore,isRoundEnd);
             
+            int gameCoverage = currentGame.GetCoverage();
             // Verifica se il gioco corrente è finito. Per gioco s'intende il round della scalata
             // Non so se per il passaggio al turno successivo serva il punteggio o la copertura. In tal caso, la scalata ha un sistema per recuperare entrambi
-            if (currentGame.isGameEnd() && userScore >= robotScore) {
+            if (currentGame.isGameEnd() && gameCoverage >= robotScore) {
                 currentGame.EndGame(now, robotScore, true);
                 currentGame.EndRound(now);
                 
@@ -96,7 +97,8 @@ public class ScalataGame extends GameLogic {
                     }
 
             }
-            else if (currentGame.isGameEnd() && this.gameCoverage< robotScore) {
+            // Non so se per il passaggio al turno successivo serva il punteggio o la copertura. In tal caso, la scalata ha un sistema per recuperare entrambi
+            else if (currentGame.isGameEnd() && gameCoverage< robotScore) {
                 this.currentStatus = ScalataGamestatus.LOST;
                 currentGame.EndGame(now, robotScore, false);
                 currentGame.EndRound(now);
@@ -138,7 +140,7 @@ public class ScalataGame extends GameLogic {
     public int GetScore(int coverage) {
         // restituisce il punteggio di un round, e incrementa il punteggio totale all'interno della scalata
         //Inoltre, salva all'interno della scalata la copertura della classe, in modo da confrontarla in seguito con il punteggio del robot.
-        this.gameCoverage = coverage;
+        ;
         int score = games.get(currentRoundIndex).GetScore(coverage);
         
         return  score;

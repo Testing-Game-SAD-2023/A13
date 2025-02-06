@@ -30,6 +30,7 @@ public class Sfida extends GameLogic {
     private int robotScore;
     private int totalTurns = 10;
     private Boolean isGameEnd;
+    private int gameCoverage;   //coverage di ogni partita. Può essere usata come winning condition per il passaggio al turno successivo.
 
     //Questa classe si specializza in una partita semplice basata sui turni, prende il nome di Sfida nella UI
     public Sfida(ServiceManager serviceManager, String PlayerID, String ClasseUT,
@@ -46,8 +47,13 @@ public class Sfida extends GameLogic {
         this.isGameEnd = isRoundEnd;
         System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
         
-        this.EndRound(Time);
-        this.EndGame(Time, userScore, userScore > robotScore);
+        this.CreateTurn(Time, userScore);
+        
+        if(isGameEnd){
+            this.EndRound(Time);
+            //può essere sostituito con userScore
+            this.EndGame(Time, userScore, gameCoverage > robotScore);
+        }
     }
 
     @Override
@@ -61,6 +67,7 @@ public class Sfida extends GameLogic {
         if (coverage == 0) {
             return 0;
         }
+        this.gameCoverage = coverage;
         // Calcolo della percentuale
         double locPerc = ((double) coverage) / 100;
         // Penalità crescente per ogni turno aggiuntivo
@@ -72,5 +79,9 @@ public class Sfida extends GameLogic {
 
 
     //Aggiunta di un set per la condizione di game over
+
+    public int GetCoverage(){
+        return this.gameCoverage;
+    }
 
 }
