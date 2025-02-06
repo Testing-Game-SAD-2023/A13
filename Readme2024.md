@@ -43,7 +43,11 @@ Siccome un'immagine vale più di mille parole, è buona norma inserire degli scr
 
 ### Creazione Scalata
 
-https://github.com/user-attachments/assets/06c78ace-06c5-4960-992c-325f01ea7bc2
+
+
+https://github.com/user-attachments/assets/bf4f783b-b733-4ecb-99a0-32038003fbc1
+
+
 
 ### Partita Scalata Vinta
 
