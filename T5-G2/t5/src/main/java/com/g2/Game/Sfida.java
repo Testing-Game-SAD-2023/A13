@@ -37,6 +37,8 @@ public class Sfida extends GameLogic {
                                 String type_robot, String difficulty, String gamemode) {
         super(serviceManager, PlayerID, ClasseUT, type_robot, difficulty, gamemode);
         currentTurn = 0;
+        this.isGameEnd = false;
+        this.gameCoverage = 0;
     }
 
     @Override

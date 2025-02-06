@@ -270,9 +270,9 @@ public class GameController {
             if (isGameExisting) {
                 if (currentMode.equals("Scalata")) {
                     if (((ScalataGame)gameLogic).isRoundTransition()) {
-                        System.out.println("NON sono io il problema");
-                        errorMessage = "Transizione al round successivo in corso";
-                        errorCode = "6";
+                        
+                        logger.info("[GAMECONTROLLER][StartGame] Transizione al round successivo in corso"); 
+                       
                         ((ScalataGame)gameLogic).toggleRoundTransition();
 
                         JSONObject obj = buildScalataResponse(gameLogic);
