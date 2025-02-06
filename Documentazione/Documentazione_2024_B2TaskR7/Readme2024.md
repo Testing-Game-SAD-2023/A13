@@ -45,7 +45,11 @@ Siccome un'immagine vale più di mille parole, è buona norma inserire degli scr
 
 
 
-https://github.com/user-attachments/assets/bf4f783b-b733-4ecb-99a0-32038003fbc1
+
+https://github.com/user-attachments/assets/f99409bc-27a0-434b-b6be-c3cefe0ec634
+
+
+
 
 
 
@@ -53,7 +57,12 @@ https://github.com/user-attachments/assets/bf4f783b-b733-4ecb-99a0-32038003fbc1
 
 
 
-https://github.com/user-attachments/assets/314b179e-a718-4110-9d29-1cb6ba548aaf
+
+
+https://github.com/user-attachments/assets/47d964cc-16d3-4867-865a-862b2c043bd8
+
+
+
 
 
 ### Partita Scalata Persa
