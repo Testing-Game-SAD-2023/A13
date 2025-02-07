@@ -4,6 +4,7 @@
 Questo progetto è stato realizzato nell'ambito del corso di **Software Architecture Design** (Anno Accademico 2024/2025) presso l'Università Federico II di Napoli e si inserisce nel contesto del progetto **ERASMUS ENACTEST** (European iNnovative AllianCe for TESTing educaTion). L'obiettivo principale è lo sviluppo di una piattaforma che favorisca l'apprendimento del software testing attraverso la gamification. Questo lavoro, in particolare, si concentra sull'espansione del sistema software esistente, introducendo la gestione d team di utenti e l'assegnazione di esercizi da parte di un amministratore.
 
 
+
 ## Funzionalità principali
 ### Gestione dei Team
 - **Creazione di un team**: L'amministratore può creare un nuovo team specificando nome e descrizione.
@@ -93,7 +94,7 @@ Il team ha adottato una metodologia **agile**, con cicli di sviluppo brevi e inc
 | DELETE | `/api/exercise/{id}` | Elimina un esercizio |
 
 ## Esempio di utilizzo dell'interfaccia
-**Video dimostrativo**: https://youtu.be/2qBnBaEI3Gk
+https://github.com/user-attachments/assets/b7363a27-c3d8-4b94-999a-c5bd30a62b4f
 
 ## Contributori
 Il progetto è stato sviluppato dal Team:
