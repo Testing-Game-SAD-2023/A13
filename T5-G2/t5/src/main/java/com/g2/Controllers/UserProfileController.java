@@ -42,16 +42,38 @@ public class UserProfileController {
 
     @GetMapping("/profile")
     public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        return handleProfileRequest(model, jwt, null);
+    }
+
+    @GetMapping("/friend/{playerID}")
+    public String friendProfilePage(Model model, @PathVariable("playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
+        return handleProfileRequest(model, jwt, playerID);
+    }
+
+    private String handleProfileRequest(Model model, String jwt, String playerID) {
+        // Se il playerID è null, significa che stiamo gestendo il profilo dell'utente corrente
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model, jwt);
-        profile.SetAuth();
-        User user = (User) serviceManager.handleRequest("T23", "GetUser", profile.getUserId());
-        if (user == null) {
-            //Qua gestisco utente sbagliato
+        profile.SetAuth();  // Gestisce l'autenticazione
+
+        String userId = (playerID != null) ? playerID : profile.getUserId();
+        if (userId == null) {
+            // Gestisci errore se l'ID non è valido
             return "error";
         }
+
+        // Recupera l'utente con l'ID specificato
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", userId);
+        if (user == null) {
+            // Gestisci caso in cui l'utente non esiste
+            return "error";
+        }
+
+        // Aggiungi il componente del profilo dell'utente
+        boolean isFriendProfile = playerID != null; // Se playerID è null, è il profilo dell'utente
         profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, user, profile.getUserId(), achievementService, false)
+                new UserProfileComponent(serviceManager, user, userId, achievementService, isFriendProfile)
         );
+
         return profile.handlePageRequest();
     }
 
@@ -119,27 +141,27 @@ public class UserProfileController {
         return profile.handlePageRequest();
     }
 
-    @GetMapping("/friend/{playerID}")
-    public String friendProfilePage(Model model, @PathVariable(value = "playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder profile = new PageBuilder(serviceManager, "friend_profile", model, jwt);
-        profile.SetAuth();
-        User Friend_user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
-        if (Friend_user == null) {
-            //Qua gestisco utente sbagliato
-            return "error";
-        }
-        User user = (User) serviceManager.handleRequest("T23", "GetUser", profile.getUserId());
-        boolean isFollowing = Friend_user.getFollowersList().contains(user.getUserProfile().getID());
-        profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, Friend_user, playerID, achievementService, true),
-                new GenericObjectComponent("isFollowing", isFollowing),
-                new GenericObjectComponent("userId", playerID)
-        );
-        return profile.handlePageRequest();
-    }
-
+    // @GetMapping("/friend/{playerID}")
+    // public String friendProfilePage(Model model, @PathVariable(value = "playerID") String playerID, 
+    //                                 @CookieValue(name = "jwt", required = false) String jwt) {
+    //     PageBuilder profile = new PageBuilder(serviceManager, "friend_profile", model, jwt);
+    //     profile.SetAuth();
+    //     User Friend_user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
+    //     if (Friend_user == null) {
+    //         //Qua gestisco utente sbagliato
+    //         return "error";
+    //     }
+    //     User user = (User) serviceManager.handleRequest("T23", "GetUser", profile.getUserId());
+    //     boolean isFollowing = Friend_user.getFollowersList().contains(user.getUserProfile().getID());
+    //     profile.setObjectComponents(
+    //             new UserProfileComponent(serviceManager, Friend_user, playerID, achievementService, true),
+    //             new GenericObjectComponent("isFollowing", isFollowing),
+    //             new GenericObjectComponent("userId", playerID)
+    //     );
+    //     return profile.handlePageRequest();
+    // }
     /*
-     * Andrebbe gestito che ogni uno può mettere la foto che vuole con i tipi Blob nel DB
+         * Andrebbe gestito che ogni uno può mettere la foto che vuole con i tipi Blob nel DB
      */
     private List<String> getProfilePictures() {
         List<String> list_images = new ArrayList<>();
