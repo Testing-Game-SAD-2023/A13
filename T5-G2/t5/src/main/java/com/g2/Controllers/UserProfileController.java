@@ -2,6 +2,7 @@ package com.g2.Controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,10 @@ import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.UserProfileComponent;
 import com.g2.Interfaces.ServiceManager;
+import com.g2.Model.AchievementProgress;
+import com.g2.Model.DTO.ResponseTeamComplete;
+import com.g2.Model.Statistic;
+import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
 
@@ -45,20 +50,51 @@ public class UserProfileController {
             return "error";
         }
         profile.setObjectComponents(
-            new UserProfileComponent(serviceManager, user, profile.getUserId(), achievementService, false)
+                new UserProfileComponent(serviceManager, user, profile.getUserId(), achievementService, false)
         );
         return profile.handlePageRequest();
     }
 
     @GetMapping("/Team")
-    public String ProfileTeamPage(Model model, @CookieValue(name = "jwt", required = false) String jwt){
-        PageBuilder profile = new PageBuilder(serviceManager, "team", model, jwt);
-        profile.SetAuth();
-        return null;
+    public String ProfileTeamPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder TeamPage = new PageBuilder(serviceManager, "Team", model, jwt);
+        TeamPage.SetAuth();
+
+        ResponseTeamComplete team = (ResponseTeamComplete) serviceManager.handleRequest("T1", "OttieniTeamCompleto", TeamPage.getUserId());
+        @SuppressWarnings("unchecked")
+        List<User> membri = (List<User>) serviceManager.handleRequest("T23", "GetUsersByList", team.getTeam().getStudenti());
+
+        model.addAttribute("response", team);
+        model.addAttribute("membri", membri);
+
+        return TeamPage.handlePageRequest();
+    }
+
+    @GetMapping("/Achievement")
+    public String Profileachievement(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder achievement = new PageBuilder(serviceManager, "Achivement", model, jwt);
+        achievement.SetAuth();
+        int playerID_int = Integer.parseInt(achievement.getUserId());
+        //Ottengo lista di Achievement
+        //Qui probabilmente ci sono delle inefficienze, andare a vedere achievementService
+        List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(playerID_int);
+        List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(playerID_int);
+        Map<String, Statistic> IdToStatistic = achievementService.GetIdToStatistic();
+
+        achievement.setObjectComponents(
+                new GenericObjectComponent("unlockedAchievements", achievementService.getUnlockedAchievementProgress(achievementProgresses)),
+                new GenericObjectComponent("lockedAchievements", achievementService.getLockedAchievementProgress(achievementProgresses)),
+                new GenericObjectComponent("statisticProgresses", statisticProgresses),
+                new GenericObjectComponent("IdToStatistic", IdToStatistic)
+        );
+
+        return achievement.handlePageRequest();
     }
 
     @GetMapping("/notification")
-    public String ProfileNotificationPage(Model model, @CookieValue(name = "jwt", required = false) String jwt){
+    public String ProfileNotificationPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder notification = new PageBuilder(serviceManager, "notification", model, jwt);
+        notification.SetAuth();
         return "notification";
     }
 
@@ -84,7 +120,7 @@ public class UserProfileController {
     }
 
     @GetMapping("/friend/{playerID}")
-    public String friendProfilePage(Model model, @PathVariable(value = "playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt){
+    public String friendProfilePage(Model model, @PathVariable(value = "playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder profile = new PageBuilder(serviceManager, "friend_profile", model, jwt);
         profile.SetAuth();
         User Friend_user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
@@ -95,9 +131,9 @@ public class UserProfileController {
         User user = (User) serviceManager.handleRequest("T23", "GetUser", profile.getUserId());
         boolean isFollowing = Friend_user.getFollowersList().contains(user.getUserProfile().getID());
         profile.setObjectComponents(
-            new UserProfileComponent(serviceManager, Friend_user, playerID, achievementService, true),
-            new GenericObjectComponent("isFollowing", isFollowing),
-            new GenericObjectComponent("userId", playerID)
+                new UserProfileComponent(serviceManager, Friend_user, playerID, achievementService, true),
+                new GenericObjectComponent("isFollowing", isFollowing),
+                new GenericObjectComponent("userId", playerID)
         );
         return profile.handlePageRequest();
     }
@@ -105,7 +141,7 @@ public class UserProfileController {
     /*
      * Andrebbe gestito che ogni uno può mettere la foto che vuole con i tipi Blob nel DB
      */
-    private List<String> getProfilePictures(){
+    private List<String> getProfilePictures() {
         List<String> list_images = new ArrayList<>();
         list_images.add("default.png");
         list_images.add("men-1.png");
@@ -119,9 +155,8 @@ public class UserProfileController {
         return list_images;
     }
 
-
     @GetMapping("/edit_profile")
-    public String aut_edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {        
+    public String aut_edit_profile(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder Edit_Profile = new PageBuilder(serviceManager, "Edit_Profile", model, jwt);
         Edit_Profile.SetAuth();
         User user = (User) serviceManager.handleRequest("T23", "GetUser", Edit_Profile.getUserId());
@@ -132,8 +167,8 @@ public class UserProfileController {
         // Prendiamo le risorse dal servizio UserProfileService
         List<String> list_images = getProfilePictures();
         Edit_Profile.setObjectComponents(
-            new GenericObjectComponent("user", user),
-            new GenericObjectComponent("images", list_images)
+                new GenericObjectComponent("user", user),
+                new GenericObjectComponent("images", list_images)
         );
         return Edit_Profile.handlePageRequest();
     }

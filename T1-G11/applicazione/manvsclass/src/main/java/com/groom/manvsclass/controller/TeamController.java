@@ -80,14 +80,20 @@ public class TeamController {
         return teamService.rimuoviStudenteTeam(idTeam, idStudente, jwt);
     }
 
-
     /*
     * Queste chiamate sono accedibili a un utente se fa parte di quel team  
     */
     @GetMapping("/ottieniTeamByStudentId")
     @ResponseBody
-    public ResponseEntity<?> ottieniTeamByStudentId(@CookieValue(name = "jwt", required = false) String jwt, @RequestParam String StudentId) {
-        return teamService.getTeamByStudentId(StudentId).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Team> getTeamByStudentId(@RequestParam("StudentId") String idStudente) {
+        // Invoca il servizio per recuperare il team in base all'ID dello studente
+        Team team = teamService.getTeamByStudentId(idStudente);
+        // Se il team non viene trovato, restituisce un 404 Not Found
+        if (team == null) {
+            return ResponseEntity.notFound().build();
+        }
+        // Se il team viene trovato, restituisce un 200 OK con il team in formato JSON
+        return ResponseEntity.ok(team);
     }
 
     @GetMapping("/GetStudentTeam")

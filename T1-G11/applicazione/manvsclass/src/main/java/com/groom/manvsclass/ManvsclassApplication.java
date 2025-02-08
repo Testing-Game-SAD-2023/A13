@@ -2,6 +2,8 @@ package com.groom.manvsclass;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 //MODIFICA (13/02/2024) : Autenticazione token provenienti players
 // import org.springframework.context.annotation.Bean;
@@ -15,11 +17,9 @@ public class ManvsclassApplication {
 		SpringApplication.run(ManvsclassApplication.class, args);
 	}
 
-	// //MODIFICA (13/02/2024) : Autenticazione token provenienti players
-	// @Bean
-    // public RestTemplate restTemplate() {
-    //     return new RestTemplate();
-    // }
-	//FINE MODIFICA (13/02/2024)
+	@Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
 }

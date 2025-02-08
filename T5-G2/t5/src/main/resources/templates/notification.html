@@ -16,29 +16,19 @@
     <div class="d-flex align-items-center justify-content-between p-3 my-3 rounded shadow-sm bg-dark-subtle">
         <div class="d-flex">
             <!-- filtro tipo -->
-            <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" 
-                        id="dropdownMenu1" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                    <i class="bi bi-gear-fill"></i>
-                <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu checkbox-menu allow-focus" aria-labelledby="dropdownMenu1" id="check_menu_1">
-                <li >
-                    <a class="dropdown-item">
-                        <input type="checkbox" checked> Info
-                    </a>
-                </li>
-                <li >
-                    <a class="dropdown-item">
-                        <input type="checkbox" checked> Team
-                    </a>
-                </li>
-                <li >
-                    <a class="dropdown-item">
-                        <input type="checkbox" checked> Achievement
-                    </a>
-                </li>
-                </ul>
+            <div id="checkbox-menu" class="mt-2">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="Team" checked>
+                    <label class="form-check-label" for="inlineCheckbox1"> Team </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="Achievement" checked>
+                    <label class="form-check-label" for="inlineCheckbox2"> Achievement </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="Info" checked>
+                    <label class="form-check-label" for="inlineCheckbox3"> Info </label>
+                </div>
             </div>
             <!-- filtro lette-->
             <div class="dropdown">
@@ -52,7 +42,7 @@
                 </ul>
             </div>  
             <!-- Ordine -->
-            <button id="toggleOrderBtn" class="btn btn-primary">
+            <button id="toggleOrderBtn" class="btn">
                 <i class="bi bi-sort-down"></i>
             </button>                   
         </div>
@@ -109,17 +99,17 @@
            </div>
         </div>
     </div>
-
+</div>
 
 <!-- FOOTER -->
 <div th:replace="fragments/footer :: footer"></div>
 <script>
    $(document).ready(function () {
     let currentPage = 0;
-    const pageSize = 5;
+    const pageSize = 10;
 
     // Variabili per i filtri
-    let selectedTypes = set_type();  // Lista di tipi di notifica
+    let selectedTypes = ["Info","Team","Achievement"];  // Lista di tipi di notifica
     let selectedIsRead = null;  // Stato di lettura: true, false, or null per tutti
     let orderDescending = true; // Di default: Più recenti prima
 
@@ -300,20 +290,18 @@
         }
     }
 
-    function set_type(){
-        selectedTypes = [];  // Reset la lista dei tipi selezionati
-        $("#check_menu_1 input[type='checkbox']:checked").each(function() {
-            const typeText = $(this).parent().text().trim().toLowerCase();
-            selectedTypes.push(typeText);  // Aggiungi il tipo selezionato
-        });
+    // Funzione per raccogliere i tipi selezionati dal menu a tendina
+    const $checkboxMenu = $('#checkbox-menu');
+    function updateSelection() {
+        selectedTypes = $checkboxMenu.find('input[type="checkbox"]:checked')
+                                    .map(function() { return $(this).val(); })
+                                    .get();
+        console.log('Tipi selezionati:', selectedTypes);
+        fetchNotifications(currentPage);
     }
 
-    // Funzione per raccogliere i tipi selezionati dal menu a tendina
-    $(document).on("change", "#check_menu_1 input[type='checkbox']", function () {
-        selectedTypes = [];  // Reset la lista dei tipi selezionati
-        set_type();
-        fetchNotifications(currentPage);  // Richiama la funzione per ottenere le notifiche con i nuovi filtri
-    });
+    // Ascolta le modifiche sui checkbox
+    $checkboxMenu.on('change', 'input[type="checkbox"]', updateSelection);
 
     // Gestione della selezione dello stato di lettura nel dropdown
     $(document).on("click", ".dropdown-menu .dropdown-item", function () {
@@ -334,7 +322,6 @@
         fetchNotifications(currentPage);  // Ricarica le notifiche con il nuovo stato
     });
 
-
     // Eventi di click per la paginazione
     $(document).on("click", ".page-num", function (e) {
         e.preventDefault();
@@ -353,6 +340,7 @@
         e.preventDefault();
         fetchNotifications(++currentPage);
     });
+
 
     // Eventi di click per "Leggi" e "Elimina"
     $(document).on("click", ".btn-mark-read", function () {

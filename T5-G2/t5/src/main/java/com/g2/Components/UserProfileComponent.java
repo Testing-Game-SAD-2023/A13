@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.g2.Interfaces.ServiceManager;
-import com.g2.Model.AchievementProgress;
-import com.g2.Model.Statistic;
-import com.g2.Model.StatisticProgress;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
 
@@ -73,29 +70,11 @@ public class UserProfileComponent extends GenericObjectComponent {
         try {
             // Inserisce i dati del profilo utente nel modello con la chiave specificata
             this.Model.put("user", this.user);
-            int playerID_int = Integer.parseInt(playerID);
             // Ottieni follower e following
             List<User> followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", this.playerID);
             List<User> followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", this.playerID);
             this.Model.put("followersList", followersList);
             this.Model.put("followingList", followingList);
-            //Ottengo lista di Achievement
-            //Qui probabilmente ci sono delle inefficienze, andare a vedere achievementService
-            List<AchievementProgress> achievementProgresses = achievementService.getProgressesByPlayer(playerID_int);
-            List<StatisticProgress> statisticProgresses = achievementService.getStatisticsByPlayer(playerID_int);
-            Map<String, Statistic> IdToStatistic = achievementService.GetIdToStatistic();
-            //Inserisco nel modello
-            this.Model.put("unlockedAchievements", achievementService.getUnlockedAchievementProgress(achievementProgresses));
-            this.Model.put("lockedAchievements", achievementService.getLockedAchievementProgress(achievementProgresses));
-            this.Model.put("statisticProgresses", statisticProgresses);
-            this.Model.put("IdToStatistic", IdToStatistic);
-            //Se è il profilo dell'utente carico delle info, sennò è un profilo amico e quindi carico altro
-            if (!IsFriendProfile) {
-                //Ottengo la lista delle notifiche 
-                // Per ora prendo le prime top 10
-                //List<Notification> notifications = (List<Notification>) serviceManager.handleRequest("T23", "getNotifications", user.getEmail(), 0, 10);
-                //this.Model.put("notifications", notifications);
-            }
             return this.Model;
         } catch (Exception e) {
             // Gestione delle eccezioni, ad esempio log dell'errore

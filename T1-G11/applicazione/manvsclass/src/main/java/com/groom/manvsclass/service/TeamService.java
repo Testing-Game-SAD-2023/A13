@@ -6,20 +6,15 @@ package com.groom.manvsclass.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.client.RestTemplate;
 
 import com.groom.manvsclass.controller.EmailService;
 import com.groom.manvsclass.model.Assignment;
@@ -48,6 +43,9 @@ public class TeamService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     //Metodo per creare un nuovo Team
     public ResponseEntity<?> creaTeam(Team team, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -96,33 +94,6 @@ public class TeamService {
         teamAdminRepository.save(teamManagement);
         // 9. Restituisci una risposta con il team creato
         return ResponseEntity.ok().body(savedTeam);
-    }
-
-    // Funzione per inviare la notifica
-    public String sendNotification(String email, String title, String message) {
-        // Crea una nuova istanza di RestTemplate
-        RestTemplate restTemplate = new RestTemplate();
-        // Prepara i parametri della richiesta
-        String url = "http://t23-g1-app-1:8080/new_notification";
-        // Aggiungi i parametri alla richiesta
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        String params = "email=" + email + "&title=" + title + "&message=" + message;
-        // Crea l'oggetto HttpEntity che contiene i parametri e gli header
-        HttpEntity<String> entity = new HttpEntity<>(params, headers);
-        try {
-            // Invia la richiesta POST
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-            // Verifica se la risposta è stata OK
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return "Notifica inviata con successo!";
-            } else {
-                return "Errore nell'invio della notifica: " + response.getStatusCode();
-            }
-        } catch (Exception e) {
-            // Gestione delle eccezioni
-            return "Errore durante la comunicazione con il server: " + e.getMessage();
-        }
     }
 
     // Elimina un team dato il nome del team
@@ -280,8 +251,8 @@ public class TeamService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team con l'ID '" + idTeam + "' non trovato.");
         }
 
-          // Restituisce il team
-          return ResponseEntity.ok().body(existingTeam);
+        // Restituisce il team
+        return ResponseEntity.ok().body(existingTeam);
     }
   
     //Modifica 03/12/2024: Aggiunta dell'aggiungiStudenti
@@ -347,7 +318,7 @@ public class TeamService {
         String message = "Ora fai parte di " + existingTeam.getName();
         for (String email : emails){
             try {
-                sendNotification(email,Title, message);
+                notificationService.sendNotification(email, null, Title, message, "Team");
             } catch (Exception e) {
                 System.out.println("Errore durante l'invio della notifica.");
             }
@@ -431,20 +402,26 @@ public class TeamService {
         return ResponseEntity.ok().body(updatedTeam);
     }
 
-    //Ritorna il team associato a un utente 
-    public Optional<Team> getTeamByStudentId(String studentId) {
-        return teamRepository.findByidStudentiContaining(studentId);
+   
+    /**
+     * Restituisce il team associato allo studente.
+     *
+     * @param idStudente l'identificativo dello studente
+     * @return il team a cui lo studente appartiene
+     */
+    public Team getTeamByStudentId(String idStudente) {
+        // Utilizzando il metodo di query derivata
+        return teamRepository.findByIdStudenti(idStudente);
     }
 
     // Permetti a uno studente di vedere i componenti del proprio team 
     public ResponseEntity<?> GetStudentTeam(String studentId, String jwt){
         // 1. Verifica se l'utente ha un team 
-        Optional<Team> team = getTeamByStudentId(studentId);
-        if(!team.isPresent()){
+        Team existingTeam = getTeamByStudentId(studentId);
+        if(existingTeam == null){
             //il team non esiste 
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("L'utente non è associato a un Team");
         }
-        Team existingTeam = team.get();
         // 2. Recupera la lista degli id degli studenti dei team
         List<String> studentiIds = existingTeam.getStudenti(); //Lista di id degli studenti
         if (studentiIds == null || studentiIds.isEmpty()) {

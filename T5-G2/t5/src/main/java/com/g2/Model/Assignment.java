@@ -1,16 +1,62 @@
 package com.g2.Model;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Assignment {
-    private String idAssignment;
-    private String teamId;
-    private String nomeTeam;
-    private String titolo;
-    private String descrizione;
-    private ZonedDateTime dataCreazione;
-    private ZonedDateTime dataScadenza;
 
+    @JsonProperty("idAssignment")
+    private String idAssignment;
+    
+    @JsonProperty("teamId")
+    private String teamId;
+    
+    @JsonProperty("nomeTeam")
+    private String nomeTeam;
+    
+    @JsonProperty("titolo")
+    private String titolo;
+    
+    @JsonProperty("descrizione")
+    private String descrizione;
+    
+    @JsonProperty("dataCreazione")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone = "UTC")
+    private Instant dataCreazione;
+    
+    @JsonProperty("dataScadenza")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone = "UTC")
+    private Instant dataScadenza;
+    
+    // Costruttore senza argomenti
+    public Assignment() { }
+    
+    // Costruttore con argomenti per Jackson
+    @JsonCreator
+    public Assignment(
+            @JsonProperty("idAssignment") String idAssignment,
+            @JsonProperty("teamId") String teamId,
+            @JsonProperty("nomeTeam") String nomeTeam,
+            @JsonProperty("titolo") String titolo,
+            @JsonProperty("descrizione") String descrizione,
+            @JsonProperty("dataCreazione") Instant dataCreazione,
+            @JsonProperty("dataScadenza") Instant dataScadenza) {
+        this.idAssignment = idAssignment;
+        this.teamId = teamId;
+        this.nomeTeam = nomeTeam;
+        this.titolo = titolo;
+        this.descrizione = descrizione;
+        this.dataCreazione = dataCreazione;
+        this.dataScadenza = dataScadenza;
+    }
+    
     // Getters e Setters
     public String getIdAssignment() {
         return idAssignment;
@@ -52,19 +98,19 @@ public class Assignment {
         this.descrizione = descrizione;
     }
 
-    public ZonedDateTime getDataCreazione() {
+    public Instant getDataCreazione() {
         return dataCreazione;
     }
 
-    public void setDataCreazione(ZonedDateTime dataCreazione) {
+    public void setDataCreazione(Instant dataCreazione) {
         this.dataCreazione = dataCreazione;
     }
 
-    public ZonedDateTime getDataScadenza() {
+    public Instant getDataScadenza() {
         return dataScadenza;
     }
 
-    public void setDataScadenza(ZonedDateTime dataScadenza) {
+    public void setDataScadenza(Instant dataScadenza) {
         this.dataScadenza = dataScadenza;
     }
 }

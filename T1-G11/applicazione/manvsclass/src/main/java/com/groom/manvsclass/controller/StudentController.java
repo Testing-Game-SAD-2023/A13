@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.groom.manvsclass.model.Assignment;
 import com.groom.manvsclass.model.Team;
@@ -22,18 +23,19 @@ import com.groom.manvsclass.service.TeamService;
 @CrossOrigin
 @Controller
 public class StudentController {
+
     @Autowired
     private TeamService teamService;
     @Autowired
     private AssignmentRepository assignmentRepository;
 
     @GetMapping("/ottieniDettagliTeamCompleto")
-    public ResponseEntity<?> ottieniDettagliTeamCompleto(String studentId, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> ottieniDettagliTeamCompleto(@RequestParam("StudentId") String studentId, @CookieValue(name = "jwt", required = false) String jwt) {
         try {
 
             // 1. Verifica se l'utente ha un team 
-            Team existingTeam = teamService.getTeamByStudentId(studentId).orElse(null);
-            if(existingTeam == null){
+            Team existingTeam = teamService.getTeamByStudentId(studentId);
+            if (existingTeam == null) {
                 //il team non esiste 
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("L'utente non è associato a un Team");
             }

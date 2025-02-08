@@ -30,6 +30,11 @@ public class AssignmentService {
     private JwtService jwtService;  // Servizio per la validazione del JWT
     @Autowired
     private AssignmentRepository assignmentRepository;
+    @Autowired 
+    private NotificationService notificationService;
+    @Autowired
+    private StudentService studentService;
+
 
     //Modifica 07/12/2024 : creazione funzione per la creazione di un assignment
     @Transactional
@@ -84,19 +89,19 @@ public class AssignmentService {
 
         // 9. Invia notifica agli utenti del team
         List<String> idsStudentiTeam = existingTeam.getStudenti();
-        inviaNotificaStudenti(idsStudentiTeam);
+        List<Integer> integerList = idsStudentiTeam.stream()
+                .map(Integer::parseInt) // Converte ogni stringa in intero
+                .collect(Collectors.toList());
+        
+        String Title = "Assignment";
+        String Message = "Nuovo Assignment: " + assignment.getTitolo();
+        notificationService.sendNotificationsToUsers(integerList, Title, Message, "Team");
 
         //10. Invio email agli utenti del team
-
         //emailService.sendTeamNewAssignment(idsStudentiTeam, existingTeam, assignment, jwt);
         
         // 13. Restituisci la risposta di successo
         return ResponseEntity.status(HttpStatus.CREATED).body("Assignment creato con successo e associato al Team.");
-    }
-
-    //Inviare notifiche agli studenti del team - Merge da fare.
-    public void inviaNotificaStudenti(List<String> idStudenti){
-
     }
 
     //Modifica 08/12/2024: creazione funzioni visualizzaTeamAssignment,visualizzaAssignments e deleteAssignment
@@ -131,7 +136,6 @@ public class AssignmentService {
 
             // 5. Recupera i dettagli degli Assignment associati al Team
             List<Assignment> assignments = assignmentRepository.findByTeamId(idTeam);
-
             if (assignments == null || assignments.isEmpty()) {
                 return ResponseEntity.ok("Nessun assignment trovato per il Team con ID " + idTeam);
             }

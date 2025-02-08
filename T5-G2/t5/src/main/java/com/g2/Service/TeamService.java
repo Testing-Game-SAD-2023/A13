@@ -20,18 +20,4 @@ public class TeamService {
             this.serviceManager = new ServiceManager(restTemplate);
         } 
 
-        /*
-        *    Fornisco Id del student e ottengo il team e recupero gli studenti che ne fanno parte da T23
-        */
-        public Team GetUsersByTeam(String IdStudent){
-            ResponseTeamComplete Team_all_info = (ResponseTeamComplete) serviceManager.handleRequest("T1", "OttieniTeamCompleto", IdStudent);
-            //Ora dagli Id recupero i profili degli users
-            Team team = Team_all_info.getTeam();
-            @SuppressWarnings("unchecked")
-            List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsersByList", team.getStudenti());
-            team.setUserList(users);
-            List<Assignment> assignments = Team_all_info.getAssignments();
-            team.setAssignments(assignments);
-            return team;
-        }
 }

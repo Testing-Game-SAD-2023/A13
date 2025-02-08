@@ -1,32 +1,52 @@
 package com.g2.Model;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Team {
     
+    @JsonProperty("idTeam")
     private String idTeam;
+    
+    @JsonProperty("name")
     private String name;
+    
+    @JsonProperty("creationDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone = "UTC")
     private Instant creationDate;
-    //Questi sono gli ID
+    
+    @JsonProperty("studenti")
     private List<String> studenti;
-    //Eventualmente posso avere una lista di oggetti User degli utenti 
-    private List<User> UserList;
+    
+    @JsonProperty("numStudenti")
     private int numStudenti;
-    private List<Assignment> assignments;
-
-    // Costruttore
-    public Team(String idTeam, String name, Instant creationDate, List<String> studenti, int numStudenti) {
+    
+    // Costruttore con argomenti per Jackson
+    @JsonCreator
+    public Team(
+            @JsonProperty("idTeam") String idTeam,
+            @JsonProperty("name") String name,
+            @JsonProperty("creationDate") Instant creationDate,
+            @JsonProperty("studenti") List<String> studenti,
+            @JsonProperty("numStudenti") int numStudenti) {
         this.idTeam = idTeam;
         this.name = name;
         this.creationDate = creationDate;
         this.studenti = studenti;
         this.numStudenti = numStudenti;
-        this.UserList = new ArrayList<>();
-        this.assignments = new ArrayList<>();
     }
-
+    
+    // Costruttore senza argomenti
+    public Team() { }
+    
     // Getters e Setters
     public String getIdTeam() {
         return idTeam;
@@ -66,21 +86,5 @@ public class Team {
 
     public void setNumStudenti(int numStudenti) {
         this.numStudenti = numStudenti;
-    }
-
-    public List<User> getUserList() {
-        return UserList;
-    }
-
-    public void setUserList(List<User> UserList) {
-        this.UserList = UserList;
-    }
-
-    public List<Assignment> getAssignments() {
-        return assignments;
-    }
-
-    public void setAssignments(List<Assignment> assignments) {
-        this.assignments = assignments;
     }
 }

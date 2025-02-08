@@ -14,7 +14,6 @@ public class Team {
     private Date creationDate; //Data di creazione del team
     private int numeroStudenti;
     private List<String> idStudenti; // Lista di ID o nomi degli studenti
-    
 
     // Costruttore
     public Team(String idTeam, String name) {

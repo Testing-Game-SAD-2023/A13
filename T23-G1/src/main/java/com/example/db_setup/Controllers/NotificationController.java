@@ -16,7 +16,6 @@
  */
 package com.example.db_setup.Controllers;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,20 +44,39 @@ public class NotificationController {
 
     @PostMapping("/new_notification")
     public ResponseEntity<String> updateNotifications(
-            @RequestParam("email") String email,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "studentID", required = false) Integer studentID,
             @RequestParam("title") String title,
             @RequestParam("message") String message,
-            @RequestParam(value = "type", required = false, defaultValue = "info") String type) { // Valore opzionale
-
-        UserProfile profile = userService.findProfileByEmail(email);
-        if (profile == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Profile not found");
+            @RequestParam(value = "type", required = false, defaultValue = "info") String type) {
+    
+        // Verifica che almeno uno dei due parametri sia fornito
+        if (email == null && studentID == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Devi fornire almeno un identificatore: email o studentID");
         }
-
-        // Salva la notifica con il tipo
-        notificationService.saveNotification(profile.getUser().getID(), title, message, type);
-        return ResponseEntity.ok("Profile notifications updated successfully");
+    
+        User profile = null;
+    
+        // Se è fornita l'email, cerca per email
+        if (email != null) {
+            profile = userService.getUserByEmail(email);
+        } 
+        // Se non è stata trovata con email o se l'email non è fornita, cerca per studentID
+        if (profile == null && studentID != null) {
+            profile = userService.getUserByID(studentID);
+        }
+    
+        // Se non troviamo il profilo, restituiamo errore
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profilo non trovato");
+        }
+    
+        // Salva la notifica
+        notificationService.saveNotification(profile.getID(), title, message, type);
+        return ResponseEntity.ok("Notifica inviata con successo");
     }
+    
 
     //Ottieni tutte le notifiche 
     @GetMapping("/get_notifications")
@@ -66,41 +84,35 @@ public class NotificationController {
             @RequestParam("email") String email,
             @RequestParam("page") int page,
             @RequestParam("size") int size,
-            @RequestParam(value = "type", required = false) String type, // Parametro opzionale per tipo
-            @RequestParam(value = "isRead", required = false) Boolean isRead) {  // Parametro opzionale per stato di lettura
-    
+            @RequestParam(value = "type", required = false) List<String> types, // Lista diretta
+            @RequestParam(value = "isRead", required = false) Boolean isRead) {
+
         UserProfile profile = userService.findProfileByEmail(email);
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-    
-        // Se il tipo è fornito e non è vuoto, lo elaboriamo
-        if (type != null && !type.isEmpty()) {
-            List<String> types = Arrays.asList(type.split(","));
-            // Se lo stato di lettura è fornito, filtra per tipo e stato di lettura
+
+        // Se il client non passa "type", la lista risulterà null
+        if (types != null && !types.isEmpty()) {
             if (isRead != null) {
                 Page<Notification> notifications = notificationService.getNotificationsByPlayerAndTypesAndIsRead(
                         profile.getUser().getID(), types, isRead, page, size);
                 return ResponseEntity.ok(notifications);
             } else {
-                // Se solo il tipo è fornito, filtra solo per tipo
                 Page<Notification> notifications = notificationService.getNotificationsByPlayerAndTypes(
                         profile.getUser().getID(), types, page, size);
                 return ResponseEntity.ok(notifications);
             }
         } else if (isRead != null) {
-            // Se solo lo stato di lettura è fornito, filtra per stato di lettura
             Page<Notification> notifications = notificationService.getNotificationsByPlayerAndReadStatus(
                     profile.getUser().getID(), isRead, page, size);
             return ResponseEntity.ok(notifications);
         } else {
-            // Se nessun filtro è fornito, restituisci tutte le notifiche
             Page<Notification> notifications = notificationService.getNotificationsByPlayer(
                     profile.getUser().getID(), page, size);
             return ResponseEntity.ok(notifications);
         }
     }
-    
 
     //Ottieni solo le notifiche non lette
     @GetMapping("/read_notifications")

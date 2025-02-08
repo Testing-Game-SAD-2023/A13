@@ -109,4 +109,6 @@ public class T1Service extends BaseService {
         return callRestGET("/ottieniDettagliTeamCompleto", queryParams, ResponseTeamComplete.class);
     }
 
+    
+
 }
