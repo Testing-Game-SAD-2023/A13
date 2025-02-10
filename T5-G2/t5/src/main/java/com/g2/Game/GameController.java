@@ -197,7 +197,6 @@ public class GameController {
         }
     }
 
-
     /*
      *  Chiamata che l'editor fa appena instanzia un nuovo gioco, controllo se la partita quindi esisteva già o meno
      *
@@ -418,4 +417,14 @@ public class GameController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.toString());
     }
 
+    //Gestione Notifiche
+    private void updateProgressAndNotifications(String playerId) {
+        List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
+        Long userId = Long.parseLong(playerId);
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        String email = user.getEmail();
+        List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(userId.intValue());
+        achievementService.updateNotificationsForAchievements(email, newAchievements);
+    }
+    
 }
