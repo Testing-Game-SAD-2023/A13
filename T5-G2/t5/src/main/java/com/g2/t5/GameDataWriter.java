@@ -18,7 +18,6 @@
 package com.g2.t5;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,9 +26,7 @@ import java.util.Optional;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -47,7 +44,7 @@ public class GameDataWriter {
     /*
      * Questo è codice legacy non più utilizzato ! 
      */
-    public JSONObject saveGame(Game game, String robot, String username, Optional<Integer> selectedScalata) {
+    public JSONObject saveGame(Game game, String username, Optional<Integer> selectedScalata) {
         try {
             String time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
             JSONObject obj = new JSONObject();
@@ -88,31 +85,10 @@ public class GameDataWriter {
 
             Integer game_id = responseObj.getInt("id"); // salvo il game id che l'Api mi restituisce
 
-            //GET per recuperare ID del robot da utilizzare 
-
-            URIBuilder builder = new URIBuilder("http://t4-g18-app-1:3000/robots");
-            builder.setParameter("testClassId", game.getClasse())
-                    .setParameter("type", robot)
-                    .setParameter("difficulty", game.getDifficulty());
-
-            HttpGet get = new HttpGet(builder.build());
-            System.out.println("(/run) Esecuzione GET verso /robots");
-            httpResponse = httpClient.execute(get);
-
-            get.releaseConnection();
-
-            responseEntity = httpResponse.getEntity();
-            responseBody = EntityUtils.toString(responseEntity);
-            responseObj = new JSONObject(responseBody);
-
-            Integer robotID = responseObj.getInt("id");
-
-
             JSONObject round = new JSONObject();
             round.put("gameId", game_id);
             round.put("testClassId", game.getClasse());
             round.put("startedAt", time);
-            round.put("robotID", robotID);
 
             httpPost = new HttpPost("http://t4-g18-app-1:3000/rounds");
             jsonEntity = new StringEntity(round.toString(), ContentType.APPLICATION_JSON);
@@ -166,12 +142,6 @@ public class GameDataWriter {
 
             return resp;
         } catch (IOException e) {
-            // Gestisci l'eccezione o restituisci un errore appropriato
-            System.err.println(e);
-            return null;
-        }
-
-        catch (URISyntaxException e ){
             // Gestisci l'eccezione o restituisci un errore appropriato
             System.err.println(e);
             return null;

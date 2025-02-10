@@ -35,9 +35,7 @@ summary {
 
 .file_manager .file .image,
 .file_manager .file .icon {
-    /*EDIT*/
-    /*max-height: 180px;*/
-    max-height: 300px; 
+    max-height: 180px;
     overflow: hidden;
     background-size: cover;
     background-position: top

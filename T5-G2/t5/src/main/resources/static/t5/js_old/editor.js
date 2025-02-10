@@ -97,8 +97,6 @@ $(document).ready(function () {
 
       // Gestione dell'errore
       console.log("Errore durante la ricezione del file "+ nameCUT+".java");
-      alert("Errore durante la ricezione del file "+ nameCUT+".java");
-      window.location.href = "/main";
     }
   });
 });
@@ -228,14 +226,14 @@ runButton.addEventListener("click", function () {
       formData.append("testClassId", localStorage.getItem("classe"));
 
       $.ajax({
-          url: "/api/run", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
-          type: "POST",
-          data: formData,
-          processData: false,
-          contentType: false,
-          dataType: "json",
-          //Prima comunicazione riguardante il solo esito della partita
-          success: function (response) {
+        url: "/api/run", // con questa verso il task 6, si salva e conclude la partita e si decreta il vincitore
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function (response) {
+
           console.log(response);
           // risp = response;                            
 
@@ -247,79 +245,28 @@ runButton.addEventListener("click", function () {
           //document.getElementById('loading-editor').style.display = 'none';
 
           // Check if the player has won
-          console.log("Handling victory...");
-          if (response.win) {
-            //.then cosi da dover cliccare tasto OK prima di passare a round successivo
-            swal("Complimenti!", "Hai vinto! Ecco il tuo punteggio: " + gameScore, "success").then(() => {
-              turno++;
-              isWin = true;
-              handleNextRound();
-            });
-          } 
+
+          if (response.win == true) {
+
+            // alert("Hai vinto! Punteggio: " + gameScore);
+            swal("Complimenti!", "Hai vinto! Ecco il tuo punteggio: " + gameScore, "success");
+            turno++;                                      // Increment the number of turns played so far
+            isWin = true;
+          }
           else {
-              swal("Peccato!", "Hai perso! Ecco il tuo punteggio: " + gameScore, "error").then(() => {
-                turno++;
-                isWin = false;
-              });
+
+            // alert("Hai perso! Punteggio: " + gameScore);
+            swal("Peccato!", "Hai perso! Ecco il tuo punteggio: " + gameScore, "error");
+            turno++;
           }
           orderTurno++;
 
-          //NUOVA
-          function handleNextRound() {
-            if (current_round_scalata >= total_rounds_scalata) {
-                console.log("Completing scalata...");
-                calculateFinalScore(localStorage.getItem("scalataId"))
-                    .then(data => {
-                        closeScalata(localStorage.getItem("scalataId"), true, data.finalScore, current_round_scalata)
-                            .then(() => {
-                                swal("Complimenti!", "Hai completato la scalata!", "success").then(() => {
-                                    window.location.href = "leaderboardScalata";
-                                });
-                            });
-                    })
-                    .catch(error => {
-                        console.error("Error calculating final score:", error);
-                        swal("Errore!", "Si è verificato un errore durante il calcolo del punteggio finale.", "error");
-                    });
-            } 
-            else {
-                current_round_scalata++;
-                localStorage.setItem("current_round_scalata", current_round_scalata);
-          
-                const classe = getScalataClasse(current_round_scalata - 1, localStorage.getItem("scalata_classes"));
-                const robot = getScalataRobot(current_round_scalata - 1, localStorage.getItem("scalata_robots"));
-                const difficulty = getScalataDifficulty(current_round_scalata - 1, localStorage.getItem("scalata_difficulties"));
-          
-                localStorage.setItem("classe", classe);
-                localStorage.setItem("robot", robot);
-                localStorage.setItem("difficulty", difficulty);
-          
-                incrementScalataRound(localStorage.getItem("scalataId"), current_round_scalata)
-                    .then(() => {
-                        createGame(robot, classe, difficulty, localStorage.getItem("scalataId"), localStorage.getItem("username"), localStorage.getItem("modalita"))
-                            .then(() => {
-                                console.log("Game created for next round.");
-                                window.location.href = "editor_old";
-                            })
-                            .catch(error => {
-                                console.error("Error creating game:", error);
-                                swal("Errore!", "Si è verificato un errore durante la creazione del nuovo round.", "error");
-                            });
-                    })
-                    .catch(error => {
-                        console.error("Error incrementing scalata round:", error);
-                        swal("Errore!", "Si è verificato un errore durante l'incremento del round.", "error");
-                    });
-            }
-          }
-
-          // Seconda comunicazione riguardante l'estrazione delle statistiche del robot
           // e.g VolumeT8/FolderTreeEvo/Calcolatrice/CalcolatriceSourceCode/Calcolatrice.java
           var classe = 'VolumeT8/FolderTreeEvo/' + localStorage.getItem("classe") + 
                         '/' + localStorage.getItem("classe") + 'SourceCode' +
                         '/' + localStorage.getItem("classe") + '.java';
 
-          // TODO:  This path is used also from task t8, so if change, check also t8
+          //  TODO:  This path is used also from task t8, so if change, check also t8
           // /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Sfida/Calcolatrice/Game1/Round1/Turn1/TestReport
           // /VolumeT8/FolderTreeEvo/StudentLogin/Player1/Scalata/Scalata1/Calcolatrice/Game1/Round1/Turn1/TestReport
           if (localStorage.getItem("modalita") === "Scalata") {
@@ -444,31 +391,19 @@ runButton.addEventListener("click", function () {
                             //The player has completed the round, not the Scalata
                             swal("Complimenti!", `Hai completato il round ${current_round_scalata}/${total_rounds_scalata}!\n${displayRobotPoints}`, "success").then((value) => {
                               current_round_scalata++;
-                              
                               localStorage.setItem("current_round_scalata", current_round_scalata);
-
-                              //TODO: passare come parametro anche robot e difficoltà
-
                               classe = getScalataClasse(current_round_scalata-1, localStorage.getItem("scalata_classes"));
-                              var robot = getScalataRobot(current_round_scalata-1, localStorage.getItem("scalata_robots"))
-                              var difficulty = getScalataDifficulty(current_round_scalata-1, localStorage.getItem("scalata_difficulties")); 
-
-
                               localStorage.setItem("classe", classe);
-                              localStorage.setItem("robot", robot);
-                              localStorage.setItem("difficulty", difficulty);
-
-
                               console.log("[editor.js] classes in scalata: "+localStorage.getItem("scalata_classes")+"\n\
                                         selected class: "+classe);
                               incrementScalataRound(localStorage.getItem("scalataId"), current_round_scalata).then((data) => {
                                 console.log("[editor.js] Creating new game for next round in scalata with parameters: \
-                                  Robot: "+robot+"\n\
+                                  Robot: evosuite\n\
                                   Classe: "+classe+"\n\
-                                  Difficulty: "+difficulty+"\n\
+                                  Difficulty: 1\n\
                                   ScalataId: "+localStorage.getItem("scalataId")+"\n\
                                   Username: "+localStorage.getItem("username")+".");
-                                createGame(robot, classe, difficulty, localStorage.getItem("scalataId"), localStorage.getItem("username"),localStorage.getItem("modalita")).then((data) => {
+                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username"),localStorage.getItem("modalita")).then((data) => {
                                   console.log(data);
                                   window.location.href = "editor_old";
                                 });

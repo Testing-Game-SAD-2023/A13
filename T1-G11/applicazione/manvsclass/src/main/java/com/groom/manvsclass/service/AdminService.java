@@ -11,7 +11,6 @@ import com.groom.manvsclass.controller.EmailService;
 import com.groom.manvsclass.model.Achievement;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Operation;
-import com.groom.manvsclass.model.Scalata;
 import com.groom.manvsclass.model.Statistic;
 import com.groom.manvsclass.model.filesystem.RobotUtil;
 import com.groom.manvsclass.model.filesystem.upload.FileUploadResponse;
@@ -20,7 +19,6 @@ import com.groom.manvsclass.model.repository.*;
 import com.commons.model.Gamemode;
 import com.commons.model.Robot;
 import com.commons.model.StatisticRole;
-
 
 
 //MODIFICA (14/05/2024) : Importazione delle classi Scalata e ScalataRepository
@@ -57,8 +55,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 //MODIFICA (11/02/2024) : Controlli sul form registrazione
 import java.util.regex.Matcher;
@@ -102,9 +98,6 @@ public class AdminService {
     //MODIFICA (07/10/2024) : Inizializzazione del repository per le Statistiche
     @Autowired
     private StatisticRepository statisticRepository;
-
-    
-
 
     
     private final LocalDate today = LocalDate.now();
@@ -264,90 +257,57 @@ public class AdminService {
     }
 
     public ResponseEntity<FileUploadResponse> uploadTest(MultipartFile classFile, String model, MultipartFile testFile, MultipartFile testFileEvo, String jwt, HttpServletRequest request) throws IOException {
-		System.out.println(("Il token JWT è valido (uploadTest)?"));
-		if (jwtService.isJwtValid(jwt)) {
+        if (jwtService.isJwtValid(jwt)) {
+            System.out.println("Token valido (uploadTest)");
+            ObjectMapper mapper = new ObjectMapper();
+            ClassUT classe = mapper.readValue(model, ClassUT.class);
 
-			System.out.println("Token valido (uploadTest)");
-			//Legge i metadati della classe della parte "model" del body HTTP e li salva in un oggetto ClasseUT
-			ObjectMapper mapper = new ObjectMapper();
-			ClassUT classe = mapper.readValue(model, ClassUT.class);
-			
-			//Salva il nome del file della classe caricato
-			String fileNameClass = StringUtils.cleanPath(classFile.getOriginalFilename());
+            String fileNameClass = StringUtils.cleanPath(classFile.getOriginalFilename());
 			long size = classFile.getSize();
-			
-			//Salva la classe nel filesystem condiviso
-			System.out.println("Salvataggio di "+fileNameClass+"nel filestystem condiviso");
+
+           System.out.println("Salvataggio di "+fileNameClass+"nel filestystem condiviso");
 			FileUploadUtil.saveCLassFile(fileNameClass, classe.getName(), classFile);
-			
-			//Salva i test nel filesystem condiviso
-			String fileNameTest = StringUtils.cleanPath(testFile.getOriginalFilename());
+
+            String fileNameTest = StringUtils.cleanPath(testFile.getOriginalFilename());
 			String fileNameTestEvo = StringUtils.cleanPath(testFileEvo.getOriginalFilename());
-			//Edit: passo la classe come parametro invece del nome
-			RobotUtil.saveRobots(fileNameClass, fileNameTest,fileNameTestEvo , classe, classFile ,testFile, testFileEvo);
-	
-			FileUploadResponse response = new FileUploadResponse();
-			response.setFileName(fileNameClass);
-			response.setSize(size);
-			response.setDownloadUri("/downloadFile");
-	
-			//Setta data di caricamento e percorso di download della classe
-			classe.setUri("Files-Upload/" + classe.getName() + "/" + fileNameClass);
-			classe.setDate(today.toString());
-			
-			//Creazione dell'oggetto riguardante l'operazione appena fatta
-			LocalDate currentDate = LocalDate.now();
+			RobotUtil.saveRobots(fileNameClass, fileNameTest,fileNameTestEvo , classe.getName(), classFile ,testFile, testFileEvo);
+
+            FileUploadResponse response = new FileUploadResponse();
+            response.setFileName(fileNameClass);
+            response.setSize(size);
+            response.setDownloadUri("/downloadFile");
+
+            classe.setUri("Files-Upload/" + classe.getName() + "/" + fileNameClass);
+            classe.setDate(today.toString());
+
+            LocalDate currentDate = LocalDate.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			String data = currentDate.format(formatter);
 			Operation operation1 = new Operation((int) orepo.count(), userAdmin.getUsername(), classe.getName() + " con Robot", 0, data);
-	
-			//Salva i dati sull'operazione fatta nel database
-			orepo.save(operation1);
-			//Salva i dati sulla classe nel database
-
-			//EDIT: inserisco robot e difficoltà nelle rispettive liste
-			List<String>robotList = new ArrayList<String>();
-			robotList.add("Randoop");
-			robotList.add("Evosuite");
-			classe.setRobotList(robotList);
-			List<String>robotDifficultyList = new ArrayList<String>();
-			robotDifficultyList.add("Beginner");
-			robotDifficultyList.add("Intermediate");
-			robotDifficultyList.add("Advanced");
-			classe.setRobotDifficulty(robotDifficultyList);
-			//FINE EDIT
-			System.out.println("Operazione completata con successo (uploadTest)");
-			repo.save(classe);
-			
-			System.out.println(classe.getcoverage());
-			return new ResponseEntity<>(response, HttpStatus.OK);
-
-		} else {
-
-			System.out.println("Token non valido (uploadTest)");
-			FileUploadResponse response = new FileUploadResponse();
-			response.setErrorMessage("Errore, il token non è valido");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-
-		}
+            
+            orepo.save(operation1);
+            repo.save(classe);
+            System.out.println("Operazione completata con successo (uploadTest)");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            FileUploadResponse response = new FileUploadResponse();
+            response.setErrorMessage("Errore, il token non è valido");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
     public ResponseEntity<?> eliminaClasse(String name, String jwt) {
         if (jwtService.isJwtValid(jwt)) {
-            System.out.println("Token valido, puo' rimuovere la classe selezionata (/delete/{name})");
-            
-
-            Query query = new Query(); 
+            Query query = new Query();
             query.addCriteria(Criteria.where("name").is(name));
-            this.eliminaFile(name, jwt); // Aggiunta parametro jwt
+            eliminaFile(name, jwt);
             LocalDate currentDate = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String data = currentDate.format(formatter);
-            Operation operation1 = new Operation((int)orepo.count(), userAdmin.getUsername(), name, 2, data);
+            Operation operation1 = new Operation((int) orepo.count(), "userAdmin", name, 2, data);
             orepo.save(operation1);
             ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
             if (deletedClass != null) {
-                System.out.println("Rimozione avvenuta con successo (/delete/{name})");
                 return ResponseEntity.ok().body(deletedClass);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
@@ -382,37 +342,30 @@ public class AdminService {
 
     public ResponseEntity<String> modificaClasse(String name, ClassUT newContent, String jwt, HttpServletRequest request) {
         if (jwtService.isJwtValid(jwt)) {
+            System.out.println("Token valido, può aggiornare informazioni inerenti le classi (update/{name})");
+            Query query = new Query();
+            query.addCriteria(Criteria.where("name").is(name));
+            Update update = new Update().set("name", newContent.getName())
+                    .set("date", newContent.getDate())
+                    .set("difficulty", newContent.getDifficulty())
+                    .set("description", newContent.getDescription())
+                    .set("category", newContent.getCategory());
+            long modifiedCount = mongoTemplate.updateFirst(query, update, ClassUT.class).getModifiedCount();
 
-			System.out.println("Token valido, può aggiornare informazioni inerenti le classi (update/{name})");
-			Query query= new Query();
-		
-			query.addCriteria(Criteria.where("name").is(name));
-			Update update = new Update().set("name", newContent.getName())
-					.set("date", newContent.getDate())
-					.set("difficulty", newContent.getDifficulty())
-					.set("description", newContent.getDescription())
-					.set("category", newContent.getCategory())
-					.set("robot", newContent.getRobotList())
-					.set("difficulty", newContent.getRobotDifficulty())
-					.set("coverage", newContent.getcoverage());//Modifica: aggiunta dei campi
-			long modifiedCount = mongoTemplate.updateFirst(query, update, ClassUT.class).getModifiedCount();
-
-			if (modifiedCount > 0) {
-				LocalDate currentDate = LocalDate.now();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-				String data = currentDate.format(formatter);
-				Operation operation1= new Operation((int)orepo.count(),userAdmin.getUsername(),newContent.getName(),1,data);
-				orepo.save(operation1);
-				return new ResponseEntity<>("Aggiornamento eseguito correttamente.", HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>("Nessuna classe trovata o nessuna modifica effettuata.", HttpStatus.NOT_FOUND);
-			}
-
-		} else {
-
-			System.out.println("Token non valido ((update/{name}))");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errore nel completamente dell'operazione");
-		}
+            if (modifiedCount > 0) {
+                LocalDate currentDate = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String data = currentDate.format(formatter);
+                Operation operation1 = new Operation((int) orepo.count(), userAdmin.getUsername(), newContent.getName(), 1, data);
+                orepo.save(operation1);
+                return new ResponseEntity<>("Aggiornamento eseguito correttamente.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Nessuna classe trovata o nessuna modifica effettuata.", HttpStatus.NOT_FOUND);
+            }
+        } else {
+            System.out.println("Token non valido ((update/{name}))");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Errore nel completamente dell'operazione");
+        }
     }
 
     public ResponseEntity<?> registraAdmin(Admin admin1, String jwt) {

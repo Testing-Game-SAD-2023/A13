@@ -1,46 +1,37 @@
 package round
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/alarmfox/game-repository/api/robot"
 	"github.com/alarmfox/game-repository/model"
 )
 
 type Round struct {
-	ID          int64       `json:"id"`
-	Order       int         `json:"order"`
-	TestClassId string      `json:"testClassId"`
-	GameID      int64       `json:"gameId"`
-	RobotID     int64       `json:"robotId"`
-	Robot       robot.Robot `json:"robot"`
-	CreatedAt   time.Time   `json:"createdAt"`
-	UpdatedAt   time.Time   `json:"updatedAt"`
-	StartedAt   *time.Time  `json:"startedAt"`
-	ClosedAt    *time.Time  `json:"closedAt"`
+	ID          int64      `json:"id"`
+	Order       int        `json:"order"`
+	TestClassId string     `json:"testClassId"`
+	GameID      int64      `json:"gameId"`
+	CreatedAt   time.Time  `json:"createdAt"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
+	StartedAt   *time.Time `json:"startedAt"`
+	ClosedAt    *time.Time `json:"closedAt"`
 }
 
 type CreateRequest struct {
 	GameId      int64      `json:"gameId"`
 	TestClassId string     `json:"testClassId"`
-	RobotID     int64      `json:"robotId"` // ID del Robot associato
 	StartedAt   *time.Time `json:"startedAt,omitempty"`
 	ClosedAt    *time.Time `json:"closedAt,omitempty"`
 }
 
-func (r CreateRequest) Validate() error {
-	if r.RobotID == 0 {
-		return fmt.Errorf("robotId is required")
-	}
+func (CreateRequest) Validate() error {
 	return nil
 }
 
 type UpdateRequest struct {
 	StartedAt *time.Time `json:"startedAt,omitempty"`
 	ClosedAt  *time.Time `json:"closedAt,omitempty"`
-	RobotID   *int64     `json:"robotId,omitempty"`
 }
 
 func (UpdateRequest) Validate() error {
@@ -68,6 +59,5 @@ func fromModel(r *model.Round) Round {
 		StartedAt:   r.StartedAt,
 		ClosedAt:    r.ClosedAt,
 		GameID:      r.GameID,
-		RobotID:     r.RobotID, // Associa l'ID del Robot
 	}
 }

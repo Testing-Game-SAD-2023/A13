@@ -1,42 +1,12 @@
-/**
-   non più in uso - queste chiamate vengono svolte in T5-GameLogic
-  **/
 
-
-//EDIT: Oltre al parse della classe per ogni round, viene effettuato il parse della classe per ogni robot e difficoltà
 function getScalataClasse(roundId, scalateJsonArray) {
     return JSON.parse(scalateJsonArray)[roundId];
 }
-function getScalataRobot(roundId, scalateJsonArray) {
-    return JSON.parse(scalateJsonArray)[roundId];
-}
-function getScalataDifficulty(roundId, scalateJsonArray) {
-    const difficulty =  JSON.parse(scalateJsonArray)[roundId];
-    return getDifficulty(JSON.parse(scalateJsonArray)[roundId]);
-}
-function getDifficulty(difficulty) {
-    switch (difficulty) {
-        case 'Beginner':
-            return 1;
-        case 'Intermediate':
-            return 2;
-        case 'Advanced':
-            return 3;
-        default:
-            return '';
-    }
-  }
 
-/**
-   non più in uso - Spostata in t5-GameLogic, viene usata la chiamata SaveGame
-  **/
 async function createGame(robot, classe, difficulty, scalataId, username, gamemode) {
-    
     console.log("[createGame] robot: ", robot, " classe: ", classe, " difficulty: ", difficulty, " scalataId: ", scalataId, " username: ", username, "gamemode: ", gamemode);
-     // salvo il nome della classe come underTestClassName
     return new Promise((resolve, reject) => { 
-        $.ajax({ 
-            /* Chiamata vecchia
+        $.ajax({
             url: '/api/save-data',
             data: {
             playerId: parseJwt(getCookie("jwt")).userId,
@@ -47,33 +17,15 @@ async function createGame(robot, classe, difficulty, scalataId, username, gamemo
             gamemode: gamemode,
             username: parseJwt(getCookie("jwt")).sub
             },
-            */
-           /*Chiamata nuova */
-           
-           url: '/StartGame',
-            data: {
-                playerId: parseJwt(getCookie("jwt")).userId,
-                type_robot: robot,
-                difficulty: difficulty,
-                mode:"Sfida", //Inseriamo Sfida perché le scalate non sono state implementate
-                underTestClassName: classe,
-                //scalata_
-            },
-           
             type: 'POST',
             traditional: true,
             success: function (response) {
-                //la risposta non fornisce ID e non fa chiamate a database 
-                if (!response || $.isEmptyObject(response)) {
-                    response = {data: 'SampleData'};
-                }
-                //localStorage.setItem("gameId", response.game_id);
-                //localStorage.setItem("turnId", response.turn_id);
-                //localStorage.setItem("roundId", response.round_id); 
+                localStorage.setItem("gameId", response.game_id);
+                localStorage.setItem("turnId", response.turn_id);
+                localStorage.setItem("roundId", response.round_id);
                 resolve(response);
-                
             },
-            //dataType: "json",
+            dataType: "json",
             error: function (error) {
                 console.log("Error details:", error);
                 console.log("USERNAME : ", localStorage.getItem("username"));
@@ -84,9 +36,8 @@ async function createGame(robot, classe, difficulty, scalataId, username, gamemo
         })
     })
 }
-/**
-   non più in uso - Spostata in t5-ScalataGame
-  **/
+
+
 async function incrementScalataRound(scalataId, roundId) {
     return new Promise((resolve, reject) => { 
         $.ajax({
@@ -109,9 +60,7 @@ async function incrementScalataRound(scalataId, roundId) {
     })
 }
 
-/**
-   non più in uso - Spostata in t5-ScalataGame
-  **/
+
 async function closeScalata(scalataId, isWin, finalScore, roundId) {
     data = JSON.stringify({
         CurrentRound: parseInt(roundId),
@@ -139,9 +88,7 @@ async function closeScalata(scalataId, isWin, finalScore, roundId) {
     })
 }
 
-/**
-   non più in uso - Spostata in t5-ScalataGame. Il punteggio finale tiene conto della somma del punteggio delle sfide, usando l'algoritmo implementato all'interno delle sfide stesse.
-  **/
+//TODO: implement in backend t6
 async function calculateFinalScore(scalataId) {
     return new Promise((resolve, reject) => { 
         $.ajax({

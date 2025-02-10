@@ -93,8 +93,6 @@ type Round struct {
 	Turns       []Turn     `gorm:"foreignKey:RoundID;constraint:OnDelete:CASCADE;"`
 	TestClassId string     `gorm:"not null"`
 	GameID      int64      `gorm:"not null"`
-	RobotID     int64      `gorm:"not null"`                       // Aggiungi riferimento al Robot
-    Robot       Robot      `gorm:"foreignKey:RobotID;constraint:OnDelete:CASCADE;"` // Relazione con Robot
 }
 
 func (Round) TableName() string {
@@ -138,7 +136,6 @@ type Robot struct {
 	Scores      string    `gorm:"default:null"`
 	Difficulty  string    `gorm:"not null;index:idx_robotquery"`
 	Type        int8      `gorm:"not null;index:idx_robotquery"`
-	Rounds      []Round   `gorm:"foreignKey:RobotID;constraint:OnDelete:CASCADE;"`
 }
 
 func (Robot) TableName() string {

@@ -20,7 +20,7 @@ public class Scalata {
     private String username;
     private String scalataDescription;
     private int numberOfRounds;
-    private List<SelectedClasses> selectedClasses;
+    private List<String> selectedClasses;
 
     //Void Constructor
     public Scalata() {
@@ -28,7 +28,7 @@ public class Scalata {
     }
 
     //Constructor
-    public Scalata(String username, String scalataName, String scalataDescription, int numberOfRounds, List<SelectedClasses> selectedClasses) {
+    public Scalata(String username, String scalataName, String scalataDescription, int numberOfRounds, List<String> selectedClasses) {
         
         this.username = username;
         this.scalataName = scalataName;
@@ -50,14 +50,10 @@ public class Scalata {
     public int getNumberOfRounds() {
         return numberOfRounds;
     }
-   
-    public List<SelectedClasses> getSelectedClasses() {
+    public List<String> getSelectedClasses() {
         return selectedClasses;
     }
-    
-    public void setSelectedClasses(List<SelectedClasses> selectedClasses) {
-        this.selectedClasses = selectedClasses;
-    }
+    //Setters
     
     public void setUsername(String username) {
         this.username = username;
@@ -71,7 +67,9 @@ public class Scalata {
     public void setNumberOfRounds(int numberOfRounds) {
         this.numberOfRounds = numberOfRounds;
     }
-
+    public void setSelectedClasses(List<String> selectedClasses) {
+        this.selectedClasses = selectedClasses;
+    }
     //Overriding the toString() method
     @Override
     public String toString() {

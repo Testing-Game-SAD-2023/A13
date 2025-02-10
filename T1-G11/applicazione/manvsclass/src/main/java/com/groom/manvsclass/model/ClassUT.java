@@ -12,22 +12,16 @@ public class ClassUT {
 	private String code_Uri;
 	private	String	description;
 	private List<String> category;
-	private List<String>robotList;
-	private List<String>robotDifficulty;
-	private List<String>coverage;
 	
 	
-	//Modifica: aggiunta della lista di Robot, delle difficoltà dei Robot e delle coverage
-	public ClassUT(String name, String date,String description, String difficulty, String code_Uri,List<String> category, List<String>robotList, List<String> robotDifficulty, List<String> coverage) {
+	
+	public ClassUT(String name, String date,String description, String difficulty, String code_Uri,List<String> category) {
         this.name = name;
         this.date = date;
         this.difficulty = difficulty;
         this.code_Uri = code_Uri;
         this.description=description;
         this.category = category;
-		this.robotList=robotList;
-		this.robotDifficulty=robotDifficulty;
-		this.coverage = coverage;
     }
 	
 	public ClassUT()
@@ -69,37 +63,12 @@ public class ClassUT {
 	public String getDifficulty() {
 		return difficulty;
 	}
-	public void setdifficulty(String difficulty) {
+	public void setDifficulty(String difficulty) {
 		this.difficulty = difficulty;
 	}
 	
-	//Modifica: Aggiunta dei get e set della lista dei robot
 	
-	public List<String> getRobotList() {
-        return robotList;
-    }
-
-    public void setRobotList(List<String> robotList) {
-        this.robotList = robotList;
-    }
-
-	public List<String> getRobotDifficulty() {
-        return robotDifficulty;
-    }
 	
-
-    public void setRobotDifficulty(List<String> robotDifficulty) {
-        this.robotDifficulty = robotDifficulty;
-    }
-
-	public List<String> getcoverage() {
-        return coverage;
-    }
-
-    public void setCoverage(List<String> coverage) {
-        this.coverage = coverage;
-    }
-
 	
 	@Override
 	public String toString() {
@@ -108,10 +77,7 @@ public class ClassUT {
 	            ", date='" + date + '\'' +
 	            ", difficulty='" + difficulty + '\'' +
 	            ", code_url='" + code_Uri + '\'' +
-	            ", category=" + category + '\'' + 
-				", coverage=" + coverage + '\'' + 
-				", robot=" + robotList + '\'' + 
-				", robotDifficulty "+ robotDifficulty +
+	            ", category=" + category +
 	            '}';
 	}
 

@@ -123,17 +123,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 allowInteraction: false
             },
             {
-                element: '#modeRobotSelect',
-                popover: {
-                    title: 'vuoi creare una scalata personalizzabile cioè con tutti i tipi di robot, o predefinita cioè che abbia una sola tipologia di robot?',
-                    description: 'grazie a questo menù a tendina se scegli la modalità personalizzabile puoi scegliere robot diversi per ogni classe, invece se scegli la modalità predefinita potrai selezionare il tipo di robot che deve possedere la tua scalata',
-                    side: "left",
-                    align: 'start' 
-                },
-                allowInteraction: false
-                
-            },
-            {
                 element: '#difficultyFilter',
                 popover: {
                     title: 'Non trovi quello che stai cercando?',
@@ -142,10 +131,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     align: 'start' 
                 },
                 allowInteraction: false
-                
             },
             {
-                element: '#summaryButton',
+                element: '#summarymButton',
                 popover: {
                     title: 'Ti serve un riepilogo?',
                     description: 'Cliccando questo bottone potrai avere una panoramica di come è stata configurata la "Scalata".',
@@ -169,18 +157,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // driverObj.drive();
     // Show a confirmation message to the user when the page loads
-    // Controlla se il pop-up è già stato mostrato
-    if (!localStorage.getItem('tourShown')) {
-        window.onload = function() {
+    window.onload = function() {
         if (confirm('Vuoi partecipare al tour guidato?')) {
 
         // Start the tour if the user accepts
         driverObj.drive();
     }
-    // Imposta il flag nel localStorage per indicare che il pop-up è stato mostrato
-    localStorage.setItem('tourShown', 'true');
-};
-}
+  };
 
 document.getElementById('nav-tour').addEventListener('click', function(event) {
 event.preventDefault(); 

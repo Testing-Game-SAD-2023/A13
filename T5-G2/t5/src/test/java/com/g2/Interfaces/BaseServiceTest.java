@@ -423,7 +423,7 @@ public class BaseServiceTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             baseService.buildUri_test("/validEndpoint", queryParams);
         });
-        assertEquals("Le chiavi dei parametri non possono essere nulle o vuote.", exception.getMessage());
+        assertEquals("URL malformato: Le chiavi dei parametri non possono essere nulle o vuote.", exception.getMessage());
 
     }
 
@@ -437,7 +437,7 @@ public class BaseServiceTest {
         Exception exception =  assertThrows(IllegalArgumentException.class, () -> {
             baseService.buildUri_test("/validEndpoint", queryParams);
         });
-        assertEquals("I valori dei parametri non possono essere nulli.", exception.getMessage());
+        assertEquals("URL malformato: I valori dei parametri non possono essere nulli.", exception.getMessage());
     }
 
     /*
@@ -469,7 +469,7 @@ public class BaseServiceTest {
         Exception exception =  assertThrows(IllegalArgumentException.class, () -> {
             baseService.buildUri_test("/validEndpoint", queryParams);
         });
-        assertEquals("Le chiavi dei parametri non possono essere nulle o vuote.", exception.getMessage());
+        assertEquals("URL malformato: Le chiavi dei parametri non possono essere nulle o vuote.", exception.getMessage());
 
     }
 

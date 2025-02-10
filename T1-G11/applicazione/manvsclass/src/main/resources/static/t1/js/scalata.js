@@ -63,6 +63,56 @@ $.ajax({
         console.log("Error",error);
     }
   });
+
+//Function to dispaly the retrieved classed into the HTML page
+function displayClasses(classes) {
+
+  const classUTList = $("#classUTList");
+
+  /*This line of code is used to select an HTML
+  element by its id (classUTList) infact the symbol
+  '#' is used to select an id and the symbol '$' is
+  a shorthand for the jQuery function.
+  */
+
+  // Clear the container before creating new cards
+  classUTList.empty();
+  console.log("Cleaning the container before creating new cards...\n");
+
+  $.each(classes, function(index, classUT) {
+      
+      //Create a new card for each class
+      const card = $('<div>').addClass('col-md-3 card border-primary mb-3 mr-5').attr('data-difficulty', classUT.difficulty.toLowerCase());
+      // const img = $('<img>').addClass('card-img-top').attr('src', '/t1/css/Images/logo_card.jpg');
+
+      //Generate a random image for the card
+      var image = images[Math.floor(Math.random() * images.length)];
+      const img = $('<img>').addClass('card-img-top').attr('src', image);
+
+      const cardBody = $('<div>').addClass('card-body');
+      const cardTitle = $('<h5>').addClass('card-title text-center').text(classUT.name);
+      const cardText = $('<p>').addClass('card-text').text(classUT.description);
+
+      // Create a new footer for the difficulty
+      const difficulty = $('<div>').addClass('card-footer text-muted text-center').text('Difficulty: ' + getStars(classUT.difficulty));
+
+      //Generate the color class for the difficulty
+      var colorClass = difficultyColors[classUT.difficulty];
+      difficulty.addClass(colorClass);
+
+      //Append the card title to the card body to the card
+      card.append(img);
+      cardBody.append(cardTitle);
+      cardBody.append(cardText);
+      cardBody.append(difficulty);
+      card.append(cardBody);
+
+      //Append the card to the container
+      classUTList.append(card);
+ 
+  });
+
+}
 //Get the number of 'stars' associated to the difficulty of the class
 function getStars(difficulty) {
   switch (difficulty) {
@@ -166,19 +216,13 @@ function updateTotalScalate() {
 // Define a function to handle changes on the rounds input
 function handleRoundsChange() {
 
-  selectedClasses.length = 0;
   //Get the addButton element
   var addButton = document.getElementById('addRoundButton');
 
-  // Event listener per impedire l'inserimento manuale tramite tastiera
-  document.getElementById('rounds').addEventListener('keydown', function(event) {
-     event.preventDefault();
-  });
-
   // Add an event listener for the click event
-  addButton.addEventListener('click', async function() {
+  addButton.addEventListener('click', function() {
 
-    console.log("addButton clicked!");
+    console.log("addButton clicked.");
 
     // Get the rounds input element
     var roundsInput = document.getElementById('rounds');
@@ -187,120 +231,81 @@ function handleRoundsChange() {
     rounds = parseInt(roundsInput.value);
     console.log("handleRoundsChange() rounds: " + rounds);
 
-  // Get the "Scalata" name
-  var scalataName = document.getElementById('form-name').value;
-  console.log("nome"+scalataName);
-   // Define the regex for the name validation
-  var nameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-
-  //Check if the user has assigned a name
-  if (!scalataName) {
-    swal("Errore!", "Inserisci un nome per la tua 'Scalata' prima di procedere.", "error");
-    return;
-  }
-  if (!nameRegex.test(scalataName)) {
-    swal("Errore!", "Il nome della 'Scalata' deve contenere da 3 a 20 caratteri alfanumerici separati da un underscore (_) e.g. 'Prova_scalata'", "error");
-    return;
-
-  }
-    
-  // Check if both rounds and selectedClasses are zero
-  if (rounds === 0 && selectedClasses.length === 0) {
-    swal("Errore!", "Definisci il numero di rounds prima di procedere.", "error");
-    return;
-  }
-
-  try {
-    // Check if the scalata name already exists
-    const nameExists = await checkName(scalataName);
-
-    if (nameExists) {
-        swal("Errore!", "Esiste già una 'Scalata' con quel nome, scegline un altro.", "error");
-        return;
-    }
-
-    // If the name check passes, proceed with the rounds check
+    //Check if the value is greater than or equal to 2
     if (rounds >= 2) {
-        swal("Rounds info", "La tua 'Scalata' sarà costituita da " + rounds + " rounds, puoi procedere con la scelta delle classi.", "info");
-        // Call selectClasses with the value of the rounds input
-        selectClasses(rounds);
-        // Remove the 'disabled' class from the 'classUTList' div
-        $('#classUTList').removeClass('disabled');
-        addButton.disabled = true; // Disabilita il tasto "Aggiungi"
-         // Disabilita gli input e le etichette
-         document.getElementById('form-name').disabled = true;
-         document.getElementById('FormControlTextareaDescription').disabled = true;
-         document.getElementById('rounds').disabled = true;
 
-         //roundsInput.disabled = true;
-    } else {
-        swal("Errore!", "La modalità 'Scalata' prevede un numero minimo di rounds pari a 2, imposta un valore corretto", "error");
+      swal("Rounds info", "La tua 'Scalata' sarà costituita da  "+ rounds + " rounds, puoi procedere con la scelta delle classi.", "info");
+
+      // Call selectClasses with the value of the rounds input
+      selectClasses(rounds);
+
+      // Remove the 'disabled' class from the 'classUTList' div
+      $('#classUTList').removeClass('disabled');
+
     }
-} catch (error) {
-    console.error('Error:', error);
-    swal("Errore!", "Si è verificato un errore durante il controllo del nome.", "error");
-}
-});
+    else {
+
+      swal("Errore!","La modalità 'Scalata' prevede un numero minimo di rounds pari a 2, imposta un valore corretto","error");
+
+    }
+
+  });
+
 }
 
-//Modificare la funzione selectClasses per memorizzare le selezioni di robot e difficoltà
 function selectClasses(rounds) {
-  console.log("selectClasses called");
-  
 
+  console.log("selectClasses called");
+
+  // Clear the selectedClasses array
+  selectedClasses.length = 0;
+
+  // Get the container with the id 'classUTList'
   var container = document.getElementById('classUTList');
+
+  // Get all div elements (cards) within the container
+  // var cards = container.getElementsByTagName('div');
+
+  // Get all div elements (cards) with the specific class within the container
   var cards = container.getElementsByClassName('col-md-3 card border-primary mb-3 mr-5');
 
+  // Add a click event listener to each card
   for (var i = 0; i < cards.length; i++) {
-      // Aggiungi i gestori di eventi per i menu a tendina
-      $(cards[i]).find('.robot-select, .difficulty-select').on('change', function() {
-          var parentCard = $(this).closest('.card');
-          var robot = parentCard.find('.robot-select').val();
-          var difficulty = parentCard.find('.difficulty-select').val();
-          var className = parentCard.find('.card-title').text();
 
-          // Controlla se sia il robot che la difficoltà sono stati selezionati
-          if (robot !== '' && difficulty !== '') {
-              // Controlla se il numero massimo di classi è stato raggiunto
-              if (selectedClasses.length >= rounds && !parentCard.hasClass('selected')) {
-                  swal("Attenzione!", "Hai già selezionato il numero massimo di classi.", "warning");
-                  return;
-              }
+    // console.log("Add EventListener to card" + i);
 
-              // Seleziona la card
-              parentCard.addClass('selected');
+    cards[i].addEventListener('click', function() {
 
-              // Aggiungi la classe selezionata all'array selectedClasses
-              var index = selectedClasses.findIndex(function(selectedClass) {
-                  return selectedClass.className === className;
-              });
-              if (index === -1) {
-                  selectedClasses.push({
-                      className: className,
-                      robot: robot,
-                      difficulty: difficulty
-                  });
-              } else {
-                  selectedClasses[index].robot = robot;
-                  selectedClasses[index].difficulty = difficulty;
-              }
-          } else {
-              // Deseleziona la card se uno dei due campi non è selezionato
-              parentCard.removeClass('selected');
+      //Check if the user has already selected the maximum number of classes
+      if (selectedClasses.length >= rounds && !this.classList.contains('selected')) {
 
-              // Rimuovi la classe selezionata dall'array selectedClasses
-              var index = selectedClasses.findIndex(function(selectedClass) {
-                  return selectedClass.className === className;
-              });
-              if (index > -1) {
-                  selectedClasses.splice(index, 1);
-              }
-          }
-      });
+        swal("Attenzione!", "Hai già selezionato il numero massimo di classi.", "warning");
+        return;
+      }
+
+      // Toggle the 'selected' class on the clicked card
+      this.classList.toggle('selected');
+
+      // Check if the class is already selected
+      var index = selectedClasses.indexOf(this);
+
+      if (index > -1) {
+
+        // The class is already selected, remove it from the array
+        selectedClasses.splice(index,1);
+      }
+      else {
+
+        // The class is not selected, add it to the array
+        selectedClasses.push(this);
+      }
+
+    });
   }
 }
 
 function getSummary() {
+
   // Get the "Riepilogo" button
   var summaryButton = document.getElementById('summaryButton');
 
@@ -309,48 +314,68 @@ function getSummary() {
 
     // Check if both rounds and selectedClasses are zero
     if (rounds === 0 && selectedClasses.length === 0) {
-      swal("Errore!", "Definisci il numero di rounds prima di procedere.", "error");
-      return;
+    swal("Errore!", "Definisci il numero di rounds prima di procedere.", "error");
+    return;
     }
 
-    // Check if the number of selected classes is equal to the number of rounds
+    //Check if the number of selected classes is equal to the number of rounds
     if (selectedClasses.length !== rounds) {
+
       swal("Errore!", "Seleziona un numero di classi pari al numero di rounds definiti in precedenza prima di procedere.", "error");
       return;
     }
 
-    // Create a string that contains the names of the selected classes, robots, and difficulty
+    // Create a string that contains tha names of the selected classes
     var summary = "";
     for (var i = 0; i < selectedClasses.length; i++) {
-      var className = selectedClasses[i].className;
-      var robot = selectedClasses[i].robot;
-      var difficulty = selectedClasses[i].difficulty;
 
-      
-      summary += "ROUND[" + (i + 1) + "]: " + className + " - Robot: " + robot + " - Difficulty: " + difficulty + "\n";
-    }
+      // Get the element with the class 'card-title' within the selected class
+      var titleElement = selectedClasses[i].querySelector('.card-title');
+
+      // Get the text content of the title element
+      var title = titleElement.textContent;
+
+      summary += "ROUND[" + (i +1) + "]: " + title + "\n";
+    } 
 
     // Show the summary in a pop-up
     swal("Riepilogo 'Scalata'", "La tua 'Scalata' è costituita da: " + rounds + " rounds così ripartiti:\n" + summary, "info");
   });
+
 }
 
 function handleConfirm() {
 
   console.log("handleConfirm called!");
-// Get the "conferma" button
+
+  // Get the "Conferma" button
   var confirmButton = document.getElementById('confirmButton');
 
-  // Add a click event listener to the "conferma" button
+  // Add a click event listener to the "Conferma" button
   confirmButton.addEventListener('click', function() {
 
+    // Get the "Scalata" name
+    var scalataName = document.getElementById('form-name').value;
+
+     // Define the regex for the name validation
+    var nameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+
+    //Check if the user has assigned a name
+    if (!scalataName) {
+      swal("Errore!", "Inserisci un nome per la tua 'Scalata' prima di procedere.", "error");
+      return;
+    }
+    if (!nameRegex.test(scalataName)) {
+      swal("Errore!", "Il nome della 'Scalata' deve contenere da 3 a 20 caratteri alfanumerici separati da un underscore (_) e.g. 'Prova_scalata'", "error");
+      return;
+
+    }
     
     // Check if both rounds and selectedClasses are zero
     if (rounds === 0 && selectedClasses.length === 0) {
       swal("Errore!", "Definisci il numero di rounds prima di procedere.", "error");
       return;
     }
-  
 
     //Check if the number of selected classes is equal to the number of rounds
     if (selectedClasses.length !== rounds) {
@@ -361,13 +386,91 @@ function handleConfirm() {
 
     // Show a confirmation pop-up
     if (confirm('Vuoi procedere con l\'operazione?')) {
-      submitScalataData();
-    }
 
-     
+      // If the user confirms, perform the POST request
+      checkName(scalataName)
+        .then(() => {
+
+          // If the Promise resolved, call submitScalataData
+          submitScalataData();
+        })
+        .catch((error) => {
+
+          // If the Promise rejected, handle the error
+          console.error('Error:', error);
+        });
+    }
+    else {
+      // If the user cancels, do nothing
+    }
   });
 }
 
+function submitScalataData() {
+
+  console.log("submitScalataData called");
+
+  // Get the Data
+  const username = parseJwt(getCookie("jwt")).sub;
+  const scalataName = document.getElementById('form-name').value;
+  const scalataDescription = document.getElementById('FormControlTextareaDescription').value;
+  const numberOfRounds = rounds;
+  const selectedClassesData = selectedClasses.map(function(classElement){
+
+    return classElement.querySelector('.card-title').textContent;
+
+  });
+
+  // Create a data object
+  const data = {
+
+    username: username,
+    scalataName: scalataName,
+    scalataDescription: scalataDescription,
+    numberOfRounds: numberOfRounds,
+    selectedClasses: selectedClassesData
+  };
+
+  // Send the data to the server
+
+  fetch('/configureScalata', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+
+    console.log('Response:', response);
+
+    if(response.status == 200) {
+
+      response.text().then(okMessage => {
+
+        swal("Operazione completata!", "La tua 'Scalata' è stata configurata con successo.", "success");
+
+        //Reload the page
+        // location.reload();
+      })
+    }
+    else {
+
+      response.text().then(errorMessage => {
+
+        swal("Errore!", errorMessage, "error");
+      })
+    }
+  })
+  .catch((error) => {
+
+    window.location.href = "/loginAdmin";
+    console.error('Error:', error);
+
+    //Aggiungi qui il codice per gestire gli errori
+  });
+
+}
 function checkName(name) {
 
   console.log("checkName called");
@@ -381,11 +484,14 @@ function checkName(name) {
 
       // If the response is ok, it means a Scalata with the same name exists
       if (response.ok) {
-        resolve(true); // La scalata esiste già
-      } else {
-          resolve(false); // La scalata non esiste
+      swal("Errore","Esiste già una 'Scalata' con quel nome, scegline un altro.","error");
+      reject(new Error("La 'Scalata' con il nome specificato: "+ name +  " esiste già!"));
+      }
+      else {
 
-    }
+        resolve();
+      }
+
     })
     .catch(error => {
 
@@ -397,85 +503,6 @@ function checkName(name) {
   });
 
 }
-
-//Funzione per visualizzare le classi
-function displayClasses(classes) {
-  const classUTList = $("#classUTList");
-
-  // Clear the container before creating new cards
-  classUTList.empty();
-  console.log("Cleaning the container before creating new cards...\n");
-
-  $.each(classes, function (index, classUT) {
-    // Create a new card for each class
-    const card = $('<div>')
-      .addClass('col-md-3 card border-primary mb-3 mr-5')
-      .attr('data-difficulty', classUT.difficulty.toLowerCase());
-
-    // Generate a random image for the card
-    var image = images[Math.floor(Math.random() * images.length)];
-    const img = $('<img>').addClass('card-img-top').attr('src', image);
-
-    const cardBody = $('<div>').addClass('card-body');
-    const cardTitle = $('<h5>')
-      .addClass('card-title text-center')
-      .text(classUT.name);
-    const cardText = $('<p>').addClass('card-text').text(classUT.description);
-
-    // Create a new footer for the difficulty
-    const difficulty = $('<div>')
-      .addClass('card-footer text-muted text-center')
-      .text('Difficulty: ' + getStars(classUT.difficulty));
-
-    let coverage = "<strong>Coperture da battere:</strong>";
-    if (
-      Array.isArray(classUT.robotList) 
-      && classUT.robotList.length > 0 
-      && Array.isArray(classUT.coverage)
-      && classUT.coverage.length > 0 
-      && Array.isArray(classUT.robotDifficulty)
-    ) {
-      for (let i = 0; i < classUT.robotList.length; i++) {
-        coverage += `<br><strong>${classUT.robotList[i]}: </strong>`;
-        for (let j = 0; j < classUT.robotDifficulty.length; j++) {
-          let index = 3 * i + j;
-          if (index < classUT.coverage.length) { 
-            coverage += `${classUT.robotDifficulty[j]}: ${classUT.coverage[index]}; `; // Mostra i valori correttamente
-      }
-    }
-        
-      }
-    } else {
-      coverage += 'N/A';
-    }
-    const coverageElement = $('<p>').addClass('card-text').html(coverage);
-
-    // Create dropdowns for robot and difficulty
-    const robotSelect = $('<select>').addClass('form-control robot-select').data('classUT', classUT);
-    robotSelect.append($('<option>').val('').text('')); // Aggiungi una riga vuota
-    classUT.robotList.forEach(function (robot) {
-      robotSelect.append($('<option>').text(robot).val(robot));
-    });
-
-    const difficultySelect = $('<select>').addClass('form-control difficulty-select');
-    difficultySelect.append($('<option>').val('').text('Select difficulty')); // Aggiungi una riga vuota
-
-    // Append the dropdowns to the card body
-    cardBody.append(cardTitle);
-    cardBody.append(cardText);
-    cardBody.append(coverageElement);
-    cardBody.append(difficulty);
-    cardBody.append('Select Robot: ', robotSelect);
-    cardBody.append('Select Difficulty: ', difficultySelect);
-
-    // Append the card to the container
-    card.append(img);
-    card.append(cardBody);
-    classUTList.append(card);
-  });
-}
-
-
 function displayScalate() {
 
   const scalateList = $("#scalateContainer");
@@ -523,16 +550,18 @@ function displayScalate() {
           body: JSON.stringify(data)
         })
         .then(response => {
-        console.log("Response:", response);
-      
-          if(response.status === 200) {
-      
+
+          console.log("Response:", response);
+
+          if(response.status == 200) {
+
             response.text().then(okMessage => {
             swal("Operazione completata!", "La 'Scalata' è stata cancellata con successo.", "success");
             badge.remove();
             })
-      
-          } else {      
+
+          } else {
+
             response.text().then(errorMessage => {
             swal("Errore!", errorMessage, "error");
             })
@@ -541,7 +570,7 @@ function displayScalate() {
         .catch(error => {
           console.error('Error:', error);
         });
-        
+
       }else {
         //Do nothing
       }
@@ -556,82 +585,9 @@ function displayScalate() {
 
 }
 
-
-//Modificare submitScalataData per includere robot e difficoltà
-function submitScalataData() {
-  console.log("submitScalataData called");
-
-  // Get the Data
-  const username = parseJwt(getCookie("jwt")).sub;
-  const scalataName = document.getElementById('form-name').value;
-  const scalataDescription = document.getElementById('FormControlTextareaDescription').value;
-  const numberOfRounds = rounds;
-  
-  // Prepare selected classes data with robot and difficulty
-  const selectedClassesData = selectedClasses.map(function(classElement) {
-    if (classElement.robot && classElement.difficulty) {
-      return {
-        className: classElement.className,
-        robot: classElement.robot,
-        difficulty: classElement.difficulty
-      };
-    }
-    return null;
-  }).filter(function(item) {
-    return item !== null; // Remove any null values if there are any
-  });
-
-  // Create a data object
-  const data = {
-    username: username,
-    scalataName: scalataName,
-    scalataDescription: scalataDescription,
-    numberOfRounds: numberOfRounds,
-    selectedClasses: selectedClassesData
-  };
-
-  // Send the data to the server
-  fetch('/configureScalata', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => {
-    console.log('Response:', response);
-    if(response.status == 200) {
-      document.getElementById('addRoundButton').disabled = false; // Riabilita il tasto "Aggiungi"
-      // abilita gli input e le etichette
-      document.getElementById('form-name').disabled = false;
-      document.getElementById('FormControlTextareaDescription').disabled = false;
-      document.getElementById('rounds').disabled = false;
-      response.text().then(okMessage => {
-        swal("Operazione completata!", "La tua 'Scalata' è stata configurata con successo.", "success")
-          .then(() => {
-            // Reload della pagina dopo che il popup è stato chiuso
-            location.reload();
-          });
-      });
-     
-    } else {
-      response.text().then(errorMessage => {
-        swal("Errore!", errorMessage, "error");
-      });
-    }
-  })
-  .catch((error) => {
-    window.location.href = "/loginAdmin";
-    console.error('Error:', error);
-  });
-}
-
 // Call the functions after the page has been loaded
 $(document).ready(function() {
-  // Le altre funzioni che vengono chiamate quando la pagina è pronta
   displayScalate();
-  displayClasses();
-  selectClasses();
   updateTotalClasses();
   updateTotalScalate();
   filterClassesByDifficulty();
@@ -639,77 +595,6 @@ $(document).ready(function() {
   handleRoundsChange();
   getSummary();
   handleConfirm();
-
-  // Aggiungi il codice per gestire il cambio nei select (robot e difficulty)
-  $(document).on('change', '.robot-select, .difficulty-select', function() {
-    // Trova il genitore (card) della selezione cambiata
-    var parentCard = $(this).closest('.card');
-    
-    // Ottieni i nuovi valori di robot e difficulty
-    var robot = parentCard.find('.robot-select').val();
-    var difficulty = parentCard.find('.difficulty-select').val();
-    var className = parentCard.find('.card-title').text();
-
-    // Trova l'indice della classe selezionata nell'array selectedClasses
-    var classIndex = selectedClasses.findIndex(function(item) {
-      return item.className === className;
-    });
-
-    // Se la classe è trovata, aggiorna i valori di robot e difficulty
-    if (classIndex > -1) {
-      selectedClasses[classIndex].robot = robot;
-      selectedClasses[classIndex].difficulty = difficulty;
-    }
-  });
-//codice per gestire il cambiamento di modalità
-$('#modeRobotSelect').on('change', function() {
-  const selectedOption = $(this).val();
-  
-  if (selectedOption.startsWith('predefinita')) {
-      const selectedRobot = selectedOption.split('-')[1]; // "Randoop" o "Evosuite"
-
-      // Imposta la selezione del robot su tutte le card
-      $('.robot-select').each(function() {
-          $(this).val(selectedRobot).trigger('change');
-          $(this).prop('disabled', true); // Disabilita la selezione nelle card
-      });
-  } else {
-      // Abilita la selezione libera del robot
-      $('.robot-select').each(function() {
-          $(this).val('').trigger('change'); // Resetta la selezione
-          $(this).prop('disabled', false); // Riabilita la selezione
-      });
-  }
 });
 
-// Funzione per aggiornare il menu delle difficoltà in base al robot selezionato
-function updateDifficultySelect(selectedRobot, difficultySelect, classUT) {
-  difficultySelect.empty(); // Svuota il menu delle difficoltà
-  difficultySelect.append($('<option>').val('').text('Select difficulty')); // Aggiungi una riga vuota
-  const robotIndex = classUT.robotList.indexOf(selectedRobot);
-  if (robotIndex !== -1) {
-      // Aggiungi le difficoltà valide per il robot selezionato
-      classUT.robotDifficulty.forEach(function(difficulty, index) {
-          const coverageValue = classUT.coverage[3 * robotIndex + index];
-          if (coverageValue != null) {
-              difficultySelect.append($('<option>').text(difficulty).val(difficulty));
-          }
-      });
-  }
-}
 
-// Event listener per la selezione del robot nelle card
-$(document).on('change', '.robot-select', function() {
-  const selectedRobot = $(this).val();
-  const difficultySelect = $(this).closest('.card-body').find('.difficulty-select');
-  const classUT = $(this).data('classUT');
-  updateDifficultySelect(selectedRobot, difficultySelect, classUT);
-});
-});
-if ("scrollRestoration" in history) {
-  history.scrollRestoration = "manual";  // Impedisce al browser di ripristinare la posizione
-}
-
-window.addEventListener('load', function() {
-  window.scrollTo(0, 0);
-});

@@ -190,8 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		 ClasseUT  + 	localStorage.getItem("underTestClassName") + "<br>" +
 		 Difficolta + 	localStorage.getItem("difficulty") + "<br>" +
 		"Robot: " 	   +	localStorage.getItem("robot");
-	if (localStorage.getItem("modalita") == "Scalata")
-		messaggio += "<br>"+ round_corrente_info +": "+ localStorage.getItem("current_round_scalata");
+	
 	var popover = new bootstrap.Popover(popoverButton, {
 		content: messaggio,  	  // Usa il contenuto dal localStorage
 		trigger: 'click',         // Mostra il popover al passaggio del mouse (puoi cambiare con 'click' o 'focus')
@@ -269,6 +268,7 @@ editor_utente.on('change', saveToLocalStorage);
 function flush_localStorage(){
 	//Pulisco i dati locali 
 	pulisciLocalStorage("difficulty");
+	pulisciLocalStorage("modalita");
 	pulisciLocalStorage("robot");
 	pulisciLocalStorage("roundId");
 	pulisciLocalStorage("turnId");
@@ -276,19 +276,4 @@ function flush_localStorage(){
 	pulisciLocalStorage("username");
 	pulisciLocalStorage("storico");
 	pulisciLocalStorage("codeMirrorContent");
-	if(localStorage.getItem("modalita") == "Scalata"){
-
-		pulisciLocalStorage("scalataId");
-		pulisciLocalStorage("SelectedScalata");
-		pulisciLocalStorage("gameId");
-		pulisciLocalStorage("scalata_name");
-		pulisciLocalStorage("scalata_classes");
-		pulisciLocalStorage("scalata_robots");
-		pulisciLocalStorage("scalata_difficulties");
-		pulisciLocalStorage("current_round_scalata");
-		pulisciLocalStorage("total_rounds_of_scalata");
-		pulisciLocalStorage("scalata_score");
-		
-	}
-	pulisciLocalStorage("modalita");
 }
