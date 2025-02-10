@@ -40,7 +40,7 @@ public class ScalataGame extends GameLogic {
     private int currentRound;       //usata per contare il progresso della scalata
     private int currentRoundIndex;  //indice usato per la lettura della lista interna
     private int totalScore;
-    private int gameCoverage;   //coverage di ogni partita usato per passare o meno al round successivo.
+    private boolean nextRoundTransition;
 
     public ScalataGame(ServiceManager serviceManager, String playerID,  String classeUT,
                         String scalata_name,List<String>classes, List<String> typesRobot, List<String> difficulties, String mode) {
@@ -51,6 +51,7 @@ public class ScalataGame extends GameLogic {
         this.totalScore = 0 ;
         this.currentStatus = ScalataGamestatus.IN_PROGRESS;
         this.scalata_name = scalata_name;
+        this.nextRoundTransition = false;
 
         for (int i = 0; i < classes.size(); i++) {
             String classe = classes.get(i);
@@ -69,8 +70,10 @@ public class ScalataGame extends GameLogic {
             Sfida currentGame = games.get(currentRoundIndex);
             currentGame.playTurn(userScore, robotScore,isRoundEnd);
             
+            int gameCoverage = currentGame.GetCoverage();
             // Verifica se il gioco corrente è finito. Per gioco s'intende il round della scalata
-            if (currentGame.isGameEnd() && this.gameCoverage >= robotScore) {
+            // Non so se per il passaggio al turno successivo serva il punteggio o la copertura. In tal caso, la scalata ha un sistema per recuperare entrambi
+            if (currentGame.isGameEnd() && gameCoverage >= robotScore) {
                 currentGame.EndGame(now, robotScore, true);
                 currentGame.EndRound(now);
                 
@@ -79,27 +82,32 @@ public class ScalataGame extends GameLogic {
                 currentRoundIndex++; // Passa al gioco successivo
                 currentRound++;
                 this.totalScore += userScore;
+                this.toggleRoundTransition();
+                //aggiornamento del prossimo turno
+                
                     //adesso viene controllato se la scalata è terminata
-                    if(isGameEnd()){
+                    if(currentRoundIndex >= games.size()){
                         System.out.println("[SCALATAGAME][T5] Scalata  completed.");
                         currentStatus = ScalataGamestatus.WIN;
 
                         this.CloseScalata(id_scalata, getRoundID(), true, totalScore);
                     }
                     else{
-                        
+                        loadNextRound();
                         games.get(currentRoundIndex).CreateGame(id_scalata);
                         this.updateScalata(id_scalata, currentRound);
                     }
 
             }
-            else if (currentGame.isGameEnd() && userScore< robotScore) {
+            // Non so se per il passaggio al turno successivo serva il punteggio o la copertura. In tal caso, la scalata ha un sistema per recuperare entrambi
+            else if (currentGame.isGameEnd() && gameCoverage< robotScore) {
+                this.currentStatus = ScalataGamestatus.LOST;
                 currentGame.EndGame(now, robotScore, false);
                 currentGame.EndRound(now);
                 currentGame.EndTurn(getTurnID(), now, userScore);
 
                 System.out.println("[SCALATAGAME][T5] Round " + currentRound + " lost.");
-                currentStatus = ScalataGamestatus.LOST;
+                
 
                 //gestione scalata persa
                 this.CloseScalata(id_scalata, getRoundID(), false, 0);
@@ -121,14 +129,20 @@ public class ScalataGame extends GameLogic {
 
     @Override
     public Boolean isGameEnd() {
-        return currentRoundIndex >= games.size();
+        if(currentStatus == ScalataGamestatus.IN_PROGRESS){
+            return false;
+        }
+        else{
+            return true;
+        }
+
     }
 
     @Override
     public int GetScore(int coverage) {
         // restituisce il punteggio di un round, e incrementa il punteggio totale all'interno della scalata
         //Inoltre, salva all'interno della scalata la copertura della classe, in modo da confrontarla in seguito con il punteggio del robot.
-        this.gameCoverage = coverage;
+        
         int score = games.get(currentRoundIndex).GetScore(coverage);
         
         return  score;
@@ -161,7 +175,7 @@ public class ScalataGame extends GameLogic {
             this.getDifficulty().equals(difficulty) &&
             this.getClasseUT().equals(underTestClassName)){
                 return true;
-            }else{
+            }else{                
                 return false;
             }
     }
@@ -172,11 +186,20 @@ public class ScalataGame extends GameLogic {
     }
 
     public int GetTotalScore() {
-
-        return this.totalScore;
+        if (currentStatus == ScalataGamestatus.LOST) {
+            return 0;
+        }
+        else{
+            return this.totalScore;
+        }
     }
 
-
+    public boolean isRoundTransition(){
+        return this.nextRoundTransition;
+    }
+    public void toggleRoundTransition(){
+        this.nextRoundTransition = !this.nextRoundTransition;
+    }
     //Chiamate a T4
 
     public void createScalata(String player_id, String scalata_name){
@@ -216,6 +239,14 @@ public class ScalataGame extends GameLogic {
             closeTime
             );
         System.out.println(response);
+    }
+
+    //Viene aggiornato il gameLogic al round successivo, in modo da far risultare il cambio di turno anche al sistema di gioco.
+    private void loadNextRound(){
+
+        this.setClasseUT(this.getClasseUT());
+        this.setType_Robot(this.getType_robot());
+        this.setDifficulty(this.getDifficulty());
     }
 
 

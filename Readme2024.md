@@ -12,11 +12,6 @@ Questa Web App è descritta anche nel seguente articolo scientifico:
 Anna Rita Fasolino, Caterina Maria Accetto, Porfirio Tramontana:
 "Testing Robot Challenge: A Serious Game for Testing Learning". Gamify@ISSTA 2024: 26-29, https://doi.org/10.1145/3678869.368568
 
-# Contributori del Branch/ Fork corrente
-- [Vincenzo Luigi Bruno](https://github.com/vlb20): vincenzol.bruno@studenti.unina.it
-- [Salvatore Cangiano](https://github.com/Salvr28): salva.cangiano@studenti.unina.it
-- [Cristina Carleo](https://github.com/iris-cmd22): cr.carleo@studenti.unina.it
-
 
 # Funzionalità dell'Applicazione
 L'applicazione prevede due tipi di utente (giocatore ed amministratore) che dovranno preliminarmente registrarsi al gioco con ruoli diversi.
@@ -34,38 +29,40 @@ Il giocatore può:
 - Giocare una Sfida di Testing contro i Robot Evosuite o Randoop
 - Giocare una Sfida Multi-livello (Scalata) contro i Robot Evosuite o Randoop
 - Allenarsi nella scrittura di Test JUnit per testare classi di codice in Java
-- Visualizzare il proprio Profilo Utente, accedendo ai propri achievement (traguardi raggiunti)
-- Ricercare e visualizzare Profili Utente di amici e seguirli
+
 
 L'amministratore del Gioco può:
 - Caricare nuove classi in Java su cui i giocatori potranno allenarsi e sfidare i Robot
 - Visualizzare l'elenco dei Giocatori iscritti e relativi traguardi
 
-# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
-1. Video dimostrativo della funzionalità: "Modifica Profilo"
-![Demo Edit Profile](Documentazione/Documentazione_2024/Video_Demo/Demo_Edit_Profile.mp4)
-
-2. Video dimostrativo della funzionalità: "Notifica Achievement"
-![Demo Notifica Achievement](Documentazione/Documentazione_2024/Video_Demo/Demo_Nuovo_Achievement.mp4)
-
-3. Video dimostrativo delle funzionalità: "Seguire un altro giocatore" e "Notifica Follow"
-![Demo Follow Player](Documentazione/Documentazione_2024/Video_Demo/Demo_Follow_Player.mp4)
-![Demo Notifica Follow](Documentazione/Documentazione_2024/Video_Demo/Demo_Notifica_Follow.mp4)
 
 # Come iniziare
 1. Assicurarsi di aver correttamente clonato sul proprio workspace, il repository A13 di riferimento; si consiglia, innanzitutto, di
-# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali (TBD).
+# Screenshot dell'applicazione e Video dimostrativi delle funzionalità principali.
 Siccome un'immagine vale più di mille parole, è buona norma inserire degli screenshot dell'applicativo in modo tale da comunicare visivamente il layout e/o alcune funzionalità del sito. E' anche possibile creare GIF animate che possono essere molto esplicative. Per farlo si può utilizzare ad esempio Recordit.
 
 ### Creazione Scalata
 
-https://github.com/user-attachments/assets/06c78ace-06c5-4960-992c-325f01ea7bc2
+
+
+
+https://github.com/user-attachments/assets/f99409bc-27a0-434b-b6be-c3cefe0ec634
+
+
+
+
+
 
 ### Partita Scalata Vinta
 
 
 
-https://github.com/user-attachments/assets/314b179e-a718-4110-9d29-1cb6ba548aaf
+
+
+https://github.com/user-attachments/assets/47d964cc-16d3-4867-865a-862b2c043bd8
+
+
+
 
 
 ### Partita Scalata Persa
