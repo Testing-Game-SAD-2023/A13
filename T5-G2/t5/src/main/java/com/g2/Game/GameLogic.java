@@ -20,16 +20,18 @@ package com.g2.Game;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import com.g2.Interfaces.ServiceManager;
 
 public abstract class GameLogic {
 
-    private final ServiceManager serviceManager;
+    protected final ServiceManager serviceManager;
 
     //IDs
     private int GameID;
     private int  RoundID;
+    //FLAVIO 25GEN: INT NON VA BENE PERCHE DOVREBBE FARE UN CAST CHE NON RIESCE A FARE
     private String TurnID;
     private final String PlayerID;
     private String ClasseUT;
@@ -51,7 +53,7 @@ public abstract class GameLogic {
     /*
      * PlayTurn deve aggiornalo lo stato della partita ad ogni turno, il concetto di turno può esser gestito come si vuole
      */
-    public abstract void playTurn(int userScore, int robotScore);
+    public abstract void playTurn(int userScore, int robotScore, boolean isRoundEnd);
     /*
      * Si deve personalizzare la condizione di fine del gioco, in generale l'utente può sempre decretarne la fine tramite l'editor.
      */
@@ -62,20 +64,47 @@ public abstract class GameLogic {
      */
     public abstract int GetScore(int cov);
 
-    /*
-     * Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
-     */
+    //Realizzati partendo dal Service Manager per semplificare l'interfacciamento con il task T4 
+    //FLAVIO 25GEN: AGGIUNTI FILE DI DEBUGGING
     protected void CreateGame() {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", this.gamemode, this.PlayerID);
-        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time);
+        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, this.difficulty, this.ClasseUT, this.gamemode, this.PlayerID,Optional.empty());
+        int robot_id =(int) serviceManager.handleRequest("T4", "GetRobotID", this.ClasseUT, this.type_robot, this.difficulty);
+        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time, robot_id);
+        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        System.out.println("ROUND:"+getRoundID()+ "GAME"+getGameID() + "TURN" + getTurnID());
     }
 
+    protected void CreateGame(int scalataID) {
+        String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, this.difficulty, this.ClasseUT, this.gamemode, this.PlayerID, Optional.of(scalataID));
+        int robot_id =(int) serviceManager.handleRequest("T4", "GetRobotID", this.ClasseUT, this.type_robot, this.difficulty);
+        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time, robot_id);
+        this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        System.out.println("ROUND:"+getRoundID()+ "GAME"+getGameID() + "TURN" + getTurnID());
+    }
+
+
     protected void CreateTurn(String Time, int userScore) {
+        
+        //Chiudo il turno precedente 
+        System.out.println("endturn chiamato da createturn");
+        serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
+
         //Apro un nuovo turno
         this.TurnID = (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
-        //Chiudo il turno 
+        
+        
+    }
+
+    //Flavio 25GEN: cambiato in string id
+    protected void EndTurn(String turn_id, String Time, int userScore) {
+        
+        System.out.println("endturn chiamato");
+        //Chiudo il turno precedente 
         serviceManager.handleRequest("T4", "EndTurn", userScore, Time, this.TurnID);
+  
+        
     }
 
     protected void EndRound(String Time) {
@@ -84,6 +113,10 @@ public abstract class GameLogic {
 
     protected void EndGame(String Time, int Score, Boolean isWinner){
         this.serviceManager.handleRequest("T4","EndGame", this.GameID, this.PlayerID, Time, Score, isWinner);
+    }
+
+    public String getPlayerID(){
+        return this.PlayerID;
     }
 
     public int getGameID() {
@@ -121,7 +154,20 @@ public abstract class GameLogic {
     public String getClasseUT() {
         return this.ClasseUT;
     }
+    public String getGameMode() {
+        return this.gamemode;
+    }
 
+//aggiunta dei set per robot, difficoltà e classeUT
+    public void setType_Robot(String type_robot) {
+        this.type_robot = type_robot;
+    }
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+    public void setClasseUT(String classeUT) {
+        this.ClasseUT = classeUT;
+    }
     public Boolean CheckGame(String type_robot, String difficulty, String underTestClassName){
         if( this.type_robot.equals(type_robot) && 
             this.difficulty.equals(difficulty) &&
