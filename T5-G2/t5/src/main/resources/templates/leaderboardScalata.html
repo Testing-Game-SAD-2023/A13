@@ -3,76 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard</title>
-    <link rel="stylesheet" href="/t5/css/leaderboardScalata.css">
+    <title>Leaderboard Scalata</title>
+    
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/t5/css/leaderboardScalata.css">
+</head>
+<body data-bs-theme="dark">
 
-    <script src="/t5/jquery/jquery-3.7.0.com.js"></script>
+    <!-- HEADER -->
+    <header>
+        <div th:replace="fragments/header :: header"></div>
+    </header>
+
+    <!-- NAVBAR -->
+    <nav>
+        <div th:replace="fragments/navbar :: navbar"></div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container-fluid mt-3">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Jumbotron -->
+                
+                    <div class="container">
+                        <h1 class="display-4">Leaderboard Scalata</h1>
+                    </div>
+                
+
+                <!-- Scalata Selector -->
+                <div class="form-group">
+                    <label for="scalataSelector" th:text="#{selezione_scalata}">Seleziona una partita:</label>
+                    <select class="form-control" id="scalataSelector">
+                        <!-- Opzioni generate dinamicamente -->
+                    </select>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="table-responsive mt-4">
+                    <table id="leaderboardTable" class="table table-striped table-bordered">
+                        <!-- Contenuto generato dinamicamente -->
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Leaderboard Scalata. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/t5/js_old/leaderboardScalata.js"></script>
-</head>
-<body>
-
-    <!--Navbar-->
-    <nav class="navbar navbar-light" style="background-color: #e3f2fd;" id="navbar">
-        <a class="navbar-brand" href="#">
-          <i class="fas fa-trophy" th:text="#{classifica_scalata}"></i>
-        </a>
-        <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" id="nav-home" href="/main" th:text="#{indietro}"> <span class="sr-only">(current)</span></a>
-            </li>
-            <!-- <li class="nav-item active">
-                <a class="nav-link" id="logout-button" href="/login">Logout <span class="sr-only">(current)</span></a>
-              </li> -->
-          </ul>
-        </div>
-      </nav>
-    
-    <!--Jumbotron-->
-    <div class="jumbotron jumbotron-fluid" id="my-jumbotron">
-        <div class="container">
-          <h1 class="display-4">LeaderboardScalate.</h1>
-          <!-- <p class="lead">
-            Ciascuna partita in modalità "Scalata" sarà caratterizzata da un certo numero di "<em>rounds</em>", ovvero di classi da testare e <b>sarai tu</b> a deciderne l'ordine ed il numero!<br>
-            Metti alla prova le capacità di testing dei giocatori realizzando sfide stimolanti ed elettrizzanti.  
-          </p> -->
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="selector">
-            <label for="scalataSelector" th:text="#{selezione_scalata}"></label>
-            <select id="scalataSelector">
-                <!-- <option value="partita1">Partita 1</option>
-                <option value="partita2">Partita 2</option> -->
-                <!-- Altri tipi di partite... -->
-                 <!-- La tabella verrà popolata dinamicamente -->
-            </select>
-        </div>
-        <div class="participant" th:text="#{classifica_personale}">
-            <table>
-                <thead>
-                    <tr>
-                        <th th:text="#{posizione}"></th>
-                        <th th:text="#{name}"></th>
-                        <th th:text="#{punti}"></th>
-                        <th th:text="#{time}"></th>
-                    </tr>
-                </thead>
-                <tbody id="participantRow">
-                    <!-- La riga del partecipante verrà popolata dinamicamente -->
-                </tbody>
-            </table>
-        </div>
-        <table id="leaderboardTable">
-            <!-- La tabella verrà popolata dinamicamente -->
-        </table>
-    </div>
 </body>
 </html>

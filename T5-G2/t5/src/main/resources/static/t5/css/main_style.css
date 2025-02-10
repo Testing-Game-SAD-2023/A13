@@ -25,3 +25,18 @@
   border-color: #e0ad4d !important;
   color: #fff !important;
 }
+
+
+.progress-bar-container {
+  width: 100%;
+  height: 30px; /* Altezza della barra */
+  background-color: #e0e0e0; /* Colore di sfondo della barra non caricata */
+  border-radius: 5px; /* Angoli arrotondati */
+  overflow: hidden; /* Nasconde eventuali elementi in overflow */
+  position: relative; /* Necessario per il posizionamento assoluto del testo */
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 0.5s; /* Transizione fluida */
+}

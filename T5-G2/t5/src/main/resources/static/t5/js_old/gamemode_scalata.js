@@ -160,15 +160,12 @@ function pressedSubmit() {
                         console.log("ScalataGameId: " + result.scalataGameId);
                         localStorage.setItem("scalataId", result.scalataGameId);
                         localStorage.setItem("difficulty", 1);
-                        localStorage.setItem("robot", "evosuite");
+                        localStorage.setItem("robot", "randoop");
                         localStorage.setItem("current_round_scalata", 1);
                         localStorage.setItem("scalata_name", selectedScalata);
 
                         retrieveScalata(selectedScalata)
-                            .then( data => {return createGame("evosuite", data[0].selectedClasses[0], 1, result.scalataGameId, username, "Scalata")})
-                            .then( data => {
-                                return swal("Successo!", "La tua scelta è stata confermata, a breve verrai reindirizzato all'arena di gioco.", "success");
-                            })
+                            .then( data => {return createGame("randoop", data[0].selectedClasses[0], 1, result.scalataGameId, username, "Scalata")})
                             .then( () => {
                                 console.log(data);
                                 window.location.href = "editor_old";
