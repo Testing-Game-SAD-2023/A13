@@ -89,16 +89,19 @@
   <!-- NAV-->
   <ul class="nav">
     <li class="nav-item flex-grow-1">
-      <a
-        href="/logout"
-        class="btn btn-sm text-light"
-        tabindex="-1"
-        role="button"
-        aria-disabled="true"
-      >
-        <i class="bi bi-arrow-90deg-left"></i>
-        Logout
-      </a>
+             <!-- GO BACK -->
+             <div>
+              <a
+                id="go_back_button"
+                href="/main"
+                class="btn btn-sm"
+                tabindex="-1"
+                role="button"
+                aria-disabled="true"
+              >
+                <i class="bi bi-arrow-90deg-left" th:text="#{indietro}"></i>
+              </a>
+            </div>
     </li>
     <li class="nav-item">
       <div class="form-check form-switch mt-1">

@@ -15,64 +15,52 @@
  *   limitations under the License.
  */
 
-package com.g2.Game;
+ package com.g2.Game;
 
-import java.util.ArrayList;
-import java.util.List;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+ import com.commons.model.Gamemode;
+ import com.g2.Interfaces.ServiceManager;
+ 
+ public class ScalataGame extends GameLogic {
+     
+     private boolean youlose;
+     private int tot_score;
+     private int currentRound;
+ 
 
-import com.commons.model.Gamemode;
-import com.g2.Interfaces.ServiceManager;
+        public ScalataGame(ServiceManager serviceManager, String playerID, String classeUT,
+                          String typeRobot, String difficulty, String mode) {
 
-public class ScalataGame extends GameLogic {
-    private final List<Sfida> games;
-    private int currentRound;
-    private int currentGameIndex;
-
-    public ScalataGame(ServiceManager serviceManager, String playerID, String classeUT,
-                       List<String> typesRobot, List<String> difficulties, String mode) {
-        super(serviceManager, playerID, classeUT, typesRobot.get(0), difficulties.get(0), mode); 
-        this.games = new ArrayList<>();
-        this.currentRound = 1; // Inizia dal round 1
-        this.currentGameIndex = 0; // Indice del gioco corrente
-
-        for (int i = 0; i < typesRobot.size(); i++) {
-            String typeRobot = typesRobot.get(i);
-            String difficulty = difficulties.get(i);
-            games.add(new Sfida(serviceManager, playerID, classeUT, typeRobot, difficulty, mode));
-        }
-    }
-
-    @Override
-    public void playTurn(int userScore, int robotScore) {
-        if (currentGameIndex < games.size()) {
-            Sfida currentGame = games.get(currentGameIndex);
-            currentGame.playTurn(userScore, robotScore);
-
-            // Verifica se il gioco corrente è finito
-            if (currentGame.isGameEnd()) {
-                System.out.println("Round " + currentRound + " completed.");
-                currentGameIndex++; // Passa al gioco successivo
-                currentRound++; // Incrementa il contatore dei round
+            super(serviceManager, playerID, classeUT, typeRobot, difficulty, mode); 
+            youlose=false;
+            tot_score=0;
+            currentRound=0;
             }
-        } else {
-            System.out.println("All games have been played.");
-        }
-    }
-
-    @Override
-    public Boolean isGameEnd() {
-        return currentGameIndex >= games.size();
-    }
-
-    @Override
-    public int GetScore(int coverage) {
-        // Implementa la logica per calcolare il punteggio totale tra tutti i giochi
-        int totalScore = 0;
-        for (Sfida game : games) {
-            totalScore += game.GetScore(coverage); // Calcola il punteggio per ogni gioco
-        }
-        return totalScore;
-    }
-
-    // Altri metodi necessari per gestire la logica del gioco
-}
+            
+ 
+     @Override
+     public void playTurn(int userScore, int robotScore) {
+        currentRound++;
+         if (robotScore>userScore){
+            youlose=true;
+         }else{
+            youlose=false;
+         }
+     }
+ 
+     @Override
+     public Boolean isGameEnd() {
+         return youlose;
+     }
+ 
+     @Override
+     public int GetScore(int coverage) {
+         // Implementa la logica per calcolare il punteggio totale tra tutti i giochi
+         tot_score=tot_score+coverage;
+         return tot_score;
+     }
+ 
+     // Altri metodi necessari per gestire la logica del gioco
+ }

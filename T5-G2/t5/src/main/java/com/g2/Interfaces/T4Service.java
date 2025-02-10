@@ -90,7 +90,29 @@ public class T4Service extends BaseService {
         registerAction("GetRisultati", new ServiceActionDefinition(
                 params -> GetRisultati((String) params[0], (String) params[1], (String) params[2]),
                 String.class, String.class, String.class));
+
+        registerAction("incrementScalataRound", new ServiceActionDefinition(
+                params -> incrementScalataRound((int) params[0], (int) params[1]),
+                Integer.class, Integer.class));
+
     }
+
+
+    
+
+    private String incrementScalataRound(int scalataId, int roundId) {
+        final String endpoint = "/scalates/" + scalataId;
+
+        // Crea il corpo JSON
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("CurrentRound", roundId);
+
+        return callRestPut(endpoint, jsonBody, null, null, String.class);
+    }
+
+
+
+
 
     // usa /games per ottenere una lista di giochi
     private List<Game> getGames(int playerId) {

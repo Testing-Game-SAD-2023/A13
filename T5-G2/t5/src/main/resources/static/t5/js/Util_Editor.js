@@ -109,6 +109,7 @@ function getConsoleTextCoverage(valori_csv, gameScore, coverageDetails) {
 	let lineCoveragePercentage = (coverageDetails.line.covered / (coverageDetails.line.covered + coverageDetails.line.missed)) * 100;
 	let BranchCoveragePercentage = (coverageDetails.branch.covered / (coverageDetails.branch.covered + coverageDetails.branch.missed)) * 100;
 	let instructionCoveragePercentage = (coverageDetails.instruction.covered / (coverageDetails.instruction.covered + coverageDetails.instruction.missed)) * 100;
+	let robot= localStorage.getItem("robot");
 
 	var consoleText = 
 `============================== Results ===============================
@@ -125,22 +126,22 @@ missed: ${coverageDetails.branch.missed}
 Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
 covered: ${coverageDetails.instruction.covered} 
 missed: ${coverageDetails.instruction.missed}
-============================== EvoSuite ===============================
+============================== ${robot} ===============================
 la tua Coverage:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+Il tuo punteggio ${robot}: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+Il tuo punteggio ${robot}: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+Il tuo punteggio ${robot}: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+Il tuo punteggio ${robot}: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+Il tuo punteggio ${robot}: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+Il tuo punteggio ${robot}: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+Il tuo punteggio ${robot}: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato
@@ -152,6 +153,8 @@ function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScor
 	let BranchCoveragePercentage = (coverageDetails.branch.covered / (coverageDetails.branch.covered + coverageDetails.branch.missed)) * 100;
 	let instructionCoveragePercentage = (coverageDetails.instruction.covered / (coverageDetails.instruction.covered + coverageDetails.instruction.missed)) * 100;
 	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
+	let robot= localStorage.getItem("robot");
+
 	consoleText =
 `===================================================================== \n` +
 		consoleText2 +
@@ -172,22 +175,22 @@ missed: ${coverageDetails.branch.missed}
 Instruction Coverage COV%:  ${instructionCoveragePercentage}% LOC
 covered: ${coverageDetails.instruction.covered} 
 missed: ${coverageDetails.instruction.missed}
-============================== EvoSuite ===============================
+============================== ${robot} ===============================
 la tua Coverage:  ${valori_csv[0]*100}% LOC
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[1]*100}% Branch
+Il tuo punteggio ${robot}: ${valori_csv[1]*100}% Branch
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[2]*100}% Exception
+Il tuo punteggio ${robot}: ${valori_csv[2]*100}% Exception
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[3]*100}% WeakMutation
+Il tuo punteggio ${robot}: ${valori_csv[3]*100}% WeakMutation
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[4]*100}% Output
+Il tuo punteggio ${robot}: ${valori_csv[4]*100}% Output
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[5]*100}% Method
+Il tuo punteggio ${robot}: ${valori_csv[5]*100}% Method
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[6]*100}% MethodNoException
+Il tuo punteggio ${robot}: ${valori_csv[6]*100}% MethodNoException
 ----------------------------------------------------------------------
-Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
+Il tuo punteggio ${robot}: ${valori_csv[7]*100}% CBranch
 ======================================================================`;
 
 	// Restituisce il testo generato
@@ -323,7 +326,7 @@ function getFormData() {
 	const formData = new FormData();
 	const className = localStorage.getItem("underTestClassName");
 
-	//formData.append("testingClassName", `Test${className}.java`);
+	formData.append("testingClassName", `Test${className}.java`);
 	formData.append("testingClassCode", editor_utente.getValue());
 	formData.append("underTestClassName", `${className}.java`);
 	formData.append("underTestClassCode", editor_robot.getValue());
@@ -366,134 +369,6 @@ async function ajaxRequest(
 	}
 }
 
-function controlloScalata(
-	iswin,
-	current_round_scalata,
-	total_rounds_scalata,
-	displayRobotPoints
-) {
-	// Check if the player has won the round
-	if (isWin) {
-		/*The player has won the round, check if the player has 
-        completed the Scalata (current_round_scalata == total_rounds_scalata)
-        */
-		if (current_round_scalata == total_rounds_scalata) {
-			// alert("Hai completato la scalata!");
-			calculateFinalScore(localStorage.getItem("scalataId"))
-				.then((data) => {
-					console.log("calculateFinalScore response: ", data.finalScore);
-					closeScalata(
-						localStorage.getItem("scalataId"),
-						true,
-						data.finalScore,
-						current_round_scalata
-					).then((data) => {
-						swal(
-							"Complimenti!",
-							`Hai completato la scalata!\n${displayRobotPoints}\n A breve verrai reindirizzato alla classifica.`,
-							"success"
-						).then((value) => {
-							window.location.href = "/leaderboardScalata";
-						});
-					});
-				})
-				.catch((error) => {
-					console.log("Error:", error);
-					swal(
-						"Errore!",
-						"Si è verificato un errore durante il recupero dei dati. Riprovare.",
-						"error"
-					);
-				});
-		} else {
-			//The player has completed the round, not the Scalata
-			swal(
-				"Complimenti!",
-				`Hai completato il round ${current_round_scalata}/${total_rounds_scalata}!\n${displayRobotPoints}`,
-				"success"
-			).then((value) => {
-				current_round_scalata++;
-				localStorage.setItem("current_round_scalata", current_round_scalata);
-				classe = getScalataClasse(
-					current_round_scalata - 1,
-					localStorage.getItem("scalata_classes")
-				);
-				localStorage.setItem("classe", classe);
-				console.log(
-					"[editor.js] classes in scalata: " +
-						localStorage.getItem("scalata_classes") +
-						"\n\
-                      selected class: " +
-						classe
-				);
-				incrementScalataRound(
-					localStorage.getItem("scalataId"),
-					current_round_scalata
-				)
-					.then((data) => {
-						console.log(
-							"[editor.js] Creating new game for next round in scalata with parameters: \
-                Robot: evosuite\n\
-                Classe: " +
-								classe +
-								"\n\
-                Difficulty: 1\n\
-                ScalataId: " +
-								localStorage.getItem("scalataId") +
-								"\n\
-                Username: " +
-								localStorage.getItem("username") +
-								"."
-						);
-						createGame(
-							"evosuite",
-							classe,
-							1,
-							localStorage.getItem("scalataId"),
-							localStorage.getItem("username")
-						).then((data) => {
-							console.log(data);
-							window.location.href = "/editor";
-						});
-					})
-					.catch((error) => {
-						console.log("Error:", error);
-						swal(
-							"Errore!",
-							"Si è verificato un errore durante il recupero dei dati. Riprovare.",
-							"error"
-						);
-					});
-			});
-		}
-	} else {
-		//The player has lost the round
-		closeScalata(
-			localStorage.getItem("scalataId"),
-			false,
-			0,
-			current_round_scalata
-		)
-			.then((data) => {
-				console.log("Close Scalata response: ", data);
-				swal(
-					"Peccato!",
-					`Hai perso al round ${current_round_scalata}/${total_rounds_scalata} della scalata, la prossima volta andrà meglio!\n${displayRobotPoints}`,
-					"error"
-				).then((value) => {
-					window.location.href = "/main";
-				});
-			})
-			.catch((error) => {
-				console.log("Error:", error);
-				swal(
-					"Errore!",
-					"Si è verificato un errore durante il recupero dei dati. Riprovare.",
-					"error"
-				);
-			});
-	}
-}
 
 // Funzione per analizzare l'output di Maven
 function parseMavenOutput(output) {
@@ -558,31 +433,43 @@ function getParameterByName(name) {
 
 // modal info
 function openModalWithText(text_title, text_content, buttons = []) {
-	document.getElementById('Modal_title').innerText = text_title;
-	// Imposta il testo nel corpo del modal
-	document.getElementById('Modal_body').innerText = text_content;
+    // Imposta il titolo e il contenuto del modal
+    document.getElementById('Modal_title').innerText = text_title;
+    document.getElementById('Modal_body').innerHTML = text_content;
 
-	// Pulisci eventuali bottoni esistenti nel footer
-	var modalFooter = document.getElementById('Modal_footer');
-	modalFooter.innerHTML = '';
+    // Pulisci eventuali bottoni esistenti nel footer
+    var modalFooter = document.getElementById('Modal_footer');
+    modalFooter.innerHTML = '';
 
-	// Aggiungi bottoni personalizzati se sono stati forniti
-	if (buttons.length > 0) {
-		buttons.forEach(button => {
-			let btn = document.createElement('a');
-			btn.innerText = button.text;
-			btn.href = button.href;  // Assegna il link al pulsante
-			btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
-			btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
-			modalFooter.appendChild(btn);
-		});
-	}
+    // Aggiungi bottoni personalizzati se sono stati forniti
+    if (buttons.length > 0) {
+        buttons.forEach(button => {
+            let btn = document.createElement('a');
+            btn.innerText = button.text;
+            btn.href = button.href;  // Assegna il link al pulsante
+            btn.className = button.class || 'btn btn-primary'; // Classe di default se non specificata
+            btn.target = button.target || '_self'; // Target opzionale, default è nella stessa finestra
+            modalFooter.appendChild(btn);
+        });
+    }
 
-	// Ottieni il modal
-	var modal = new bootstrap.Modal(document.getElementById('Modal'));
+    const mode=localStorage.getItem("modalita");
 
-	// Mostra il modal
-	modal.show();
+    // Se la modalità è "scalata", aggiungi la barra di progresso
+    if (mode === 'Scalata') {
+		ProgressBar();
+    }
+
+    // Ottieni il modal
+    var modalElement = document.getElementById('Modal');
+    var modalOptions = {
+        backdrop: 'static', // Impedisce la chiusura cliccando sull'overlay
+        keyboard: false     // Impedisce la chiusura con ESC
+    };
+    var modal = new bootstrap.Modal(modalElement, modalOptions);
+
+    // Mostra il modal
+    modal.show();
 }
 
 // modal error 

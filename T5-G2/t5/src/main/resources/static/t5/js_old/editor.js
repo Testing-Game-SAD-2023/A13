@@ -9,6 +9,7 @@ var orderTurno = 0;
 var perc_robot = '0';           // percentuale di copertura del robot scelto
 var gameScore = 0;
 var locGiocatore = 0;
+var robotScalata= null;
 
 // (MODIFICA 23/04/2024) Get actual date
 var currentDate = new Date();
@@ -19,6 +20,7 @@ $(document).ready(function () {
   current_round_scalata = localStorage.getItem("current_round_scalata");
   total_rounds_scalata = localStorage.getItem("total_rounds_of_scalata");
   selectedScalata = localStorage.getItem("scalata_name");
+  robotScalata= localStorage.getItem("robot");
 
   var idUtente = parseJwt(getCookie("jwt")).userId;
   var idPartita = localStorage.getItem("gameId");       // set by <task x> at the start of the game
@@ -351,17 +353,17 @@ runButton.addEventListener("click", function () {
                     console.log('Terzo elemento della seconda riga:', terzoElemento);
                     
                     displayRobotPoints = `Esito Risultati (percentuale di linee coperte)
-                  Il tuo punteggio EvoSuite: ${terzoElemento}% LOC
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento}% LOC
                   Il tuo punteggio Jacoco: ${response.score.toString()}% LOC
                   Il punteggio del robot: ${response.robotScore.toString()}% LOC
                   Informazioni aggiuntive di copertura:
-                  Il tuo punteggio EvoSuite: ${terzoElemento1}% Branch
-                  Il tuo punteggio EvoSuite: ${terzoElemento2}% Exception
-                  Il tuo punteggio EvoSuite: ${terzoElemento3}% WeakMutation
-                  Il tuo punteggio EvoSuite: ${terzoElemento4}% Output
-                  Il tuo punteggio EvoSuite: ${terzoElemento5}% Method
-                  Il tuo punteggio EvoSuite: ${terzoElemento6}% MethodNoException
-                  Il tuo punteggio EvoSuite: ${terzoElemento7}% CBranch`
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento1}% Branch
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento2}% Exception
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento3}% WeakMutation
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento4}% Output
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento5}% Method
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento6}% MethodNoException
+                  Il tuo punteggio ${robotScalata}: ${terzoElemento7}% CBranch`
                     consoleArea2.setValue(displayRobotPoints);
                   
                     // scalata mode handling
@@ -398,12 +400,12 @@ runButton.addEventListener("click", function () {
                                         selected class: "+classe);
                               incrementScalataRound(localStorage.getItem("scalataId"), current_round_scalata).then((data) => {
                                 console.log("[editor.js] Creating new game for next round in scalata with parameters: \
-                                  Robot: evosuite\n\
+                                  Robot: "+localStorage.getItem("robot")+"\n\
                                   Classe: "+classe+"\n\
-                                  Difficulty: 1\n\
+                                  Difficulty: "+localStorage.getItem("difficulty")+"\n\
                                   ScalataId: "+localStorage.getItem("scalataId")+"\n\
                                   Username: "+localStorage.getItem("username")+".");
-                                createGame("evosuite", classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username"),localStorage.getItem("modalita")).then((data) => {
+                                createGame(localStorage.getItem("robot"), classe, 1, localStorage.getItem("scalataId"), localStorage.getItem("username"),localStorage.getItem("modalita")).then((data) => {
                                   console.log(data);
                                   window.location.href = "editor_old";
                                 });
@@ -592,13 +594,13 @@ function processJaCoCoReport() {
           consoleArea.setValue(`Esito Risultati (percentuale di linee coperte)
     Il tuo punteggio: ${locGiocatore}% LOC
     Informazioni aggiuntive di copertura:
-    Il tuo punteggio EvoSuite: ${terzoElemento1}% Branch
-    Il tuo punteggio EvoSuite: ${terzoElemento2}% Exception
-    Il tuo punteggio EvoSuite: ${terzoElemento3}% WeakMutation
-    Il tuo punteggio EvoSuite: ${terzoElemento4}% Output
-    Il tuo punteggio EvoSuite: ${terzoElemento5}% Method
-    Il tuo punteggio EvoSuite: ${terzoElemento6}% MethodNoException
-    Il tuo punteggio EvoSuite: ${terzoElemento7}% CBranch`);
+    Il tuo punteggio ${robotScalata}: ${terzoElemento1}% Branch
+    Il tuo punteggio ${robotScalata}: ${terzoElemento2}% Exception
+    Il tuo punteggio ${robotScalata}: ${terzoElemento3}% WeakMutation
+    Il tuo punteggio ${robotScalata}: ${terzoElemento4}% Output
+    Il tuo punteggio ${robotScalata}: ${terzoElemento5}% Method
+    Il tuo punteggio ${robotScalata}: ${terzoElemento6}% MethodNoException
+    Il tuo punteggio ${robotScalata}: ${terzoElemento7}% CBranch`);
         }
       };
 

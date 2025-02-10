@@ -93,7 +93,7 @@ function selectGameMode(mode) {
           if (data.length > 0) {
 
             console.log("Nel sistema sono presenti" + data.lenght + " 'Scalate' disponibili.");
-            window.location.href = "/gamemode_scalata";
+            window.location.href = "/gamemode";
 
           } else {
 

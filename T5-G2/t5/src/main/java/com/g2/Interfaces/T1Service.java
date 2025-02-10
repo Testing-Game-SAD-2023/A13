@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.g2.Model.ClassUT;
+import com.g2.Model.Scalata; // Importa il modello Scalata
 
 @Service
 public class T1Service extends BaseService {
@@ -49,6 +50,16 @@ public class T1Service extends BaseService {
         registerAction("getClasses", new ServiceActionDefinition(
                 params -> getClasses() // Metodo senza argomenti
         ));
+        registerAction("getScalate", new ServiceActionDefinition(
+            params -> getScalate()
+        ));
+
+        registerAction("retrieveScalata", new ServiceActionDefinition(
+        params -> RetrieveScalata((String) params[0]), // Prende l'ID della scalata come parametro
+        String.class
+));
+
+    
         registerAction("getClassUnderTest", new ServiceActionDefinition(
                 params -> getClassUnderTest((String) params[0]),
                 String.class));
@@ -58,6 +69,12 @@ public class T1Service extends BaseService {
     private List<ClassUT> getClasses(){
         return callRestGET("/home", null, new ParameterizedTypeReference<List<ClassUT>>() {});
     }
+
+    // Metodo per recuperare le scalate
+    private List<Scalata> getScalate() {
+        return callRestGET("/scalate_list", null, new ParameterizedTypeReference<List<Scalata>>() {});
+    }
+    
 
     private List<Statistic> getStatistics() {
         return callRestGET("/statistics/list", null, new ParameterizedTypeReference<List<Statistic>>() {});
@@ -71,5 +88,22 @@ public class T1Service extends BaseService {
         byte[] result = callRestGET("/downloadFile/" + nomeCUT, null, byte[].class);
         return removeBOM(convertToString(result));
     }
+
+
+    private Scalata RetrieveScalata(String selectedScalata) {
+        final String endpoint = "/retrieve_scalata/" + selectedScalata;
+        
+        // Chiamata GET per recuperare i dati della scalata
+        List<Scalata> data = callRestGET(endpoint, null, new ParameterizedTypeReference<List<Scalata>>() {});
+    
+        // Log dei dati ricevuti
+        if (data != null && !data.isEmpty()) {
+            System.out.println("Dati ricevuti da retrieveScalata: " + data.get(0)); // Log di debug
+        }
+    
+        return data != null && !data.isEmpty() ? data.get(0) : null;
+    }
+    
+    
 
 }

@@ -21,7 +21,7 @@
 		<link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
 		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
 		<link rel="stylesheet" href="./t5/codemirror/theme/mdn-like.css" />
-
+		
 		<link rel="stylesheet" href="/t5/css/main_style.css" />
 
 		<style>
@@ -649,12 +649,12 @@ public class TestClasse {
 				<div class="modal-content">
 					<div class="modal-header">
 						<h1 class="modal-title fs-5" id="Modal_title">Modal title</h1>
-						<button
+						<!--<button
 							type="button"
 							class="btn-close"
 							data-bs-dismiss="modal"
 							aria-label="Close"
-						></button>
+						></button>-->
 					</div>
 					<div class="modal-body" id="Modal_body">...</div>
 					<div class="modal-footer" id="Modal_footer"></div>
@@ -782,6 +782,11 @@ public class TestClasse {
 		</script>
 		<script
 			th:src="@{/t5/js/GUI_Editor.js}"
+			th:inline="javascript"
+		>
+		</script>
+		<script
+			th:src="@{/t5/js/Gest_Scalata.js}"
 			th:inline="javascript"
 		>
 		</script>
