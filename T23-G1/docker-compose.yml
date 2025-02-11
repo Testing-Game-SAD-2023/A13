@@ -19,8 +19,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Usa la variabile per la password di root
       MYSQL_DATABASE: ${MYSQL_DATABASE}  # Usa il nome del database
-      MYSQL_USER: ${MYSQL_USER}  # Crea un utente con la password specificata
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # La password per l'utente
     ports:
       - "3306:3306"
     healthcheck:
