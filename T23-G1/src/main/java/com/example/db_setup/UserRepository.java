@@ -28,6 +28,10 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User,Integer> {
 
     User findByEmail(String email);
+
+    @Query("SELECT u FROM User u WHERE u.email LIKE %:searchTerm%")
+    List<User> findByEmailLike(@Param("searchTerm") String searchTerm);
+
     List<User> findByName(String name);
     User findByResetToken(String resetToken);
     User findByID(Integer ID);

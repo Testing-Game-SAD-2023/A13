@@ -48,10 +48,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class UserService {
 
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserProfileRepository userProfileRepository;
 
@@ -70,6 +68,10 @@ public class UserService {
 
     public User getUserByID(Integer ID){
         return userRepository.findByID(ID);
+    }
+
+    public List<User> GetUserListByEmail(String email){
+        return userRepository.findByEmailLike(email);
     }
 
     // Modifica 06/12/2024: Aggiunta end-point per restituire solo i campi non sensibili dello USER

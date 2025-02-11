@@ -65,7 +65,6 @@ import com.example.db_setup.MyPasswordEncoder;
 import com.example.db_setup.MyResponseClass;
 import com.example.db_setup.Studies;
 import com.example.db_setup.User;
-import com.example.db_setup.UserProfile;
 import com.example.db_setup.UserRepository;
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
@@ -638,26 +637,6 @@ public class Controller {
         return userRepository.findByID(Integer.parseInt(ID));
     }
 
-    @GetMapping("/user_by_email")
-    @ResponseBody
-    public User getUserByEmail(@RequestParam("email") String email) {
-        return userService.getUserByEmail(email);
-    }
-
-    @PostMapping("/update_profile")
-    public ResponseEntity<Boolean> editProfile(@RequestParam("email") String email,
-                                              @RequestParam("bio") String bio,
-                                              @RequestParam("profilePicturePath") String profilePicturePath) {
-        UserProfile profile = userService.findProfileByEmail(email);
-        if (profile == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(false); // Ritorna false in caso di errore
-        }
-        profile.setBio(bio);
-        profile.setProfilePicturePath(profilePicturePath);
-        userService.saveProfile(profile);
-        return ResponseEntity.ok(true); // Ritorna true se l'operazione ha avuto successo
-    }
-
     @GetMapping("/password_reset")
     public ModelAndView showResetForm(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
         if(isJwtValid(jwt)) return new ModelAndView("redirect:/main");
@@ -711,32 +690,7 @@ public class Controller {
     return "redirect:" + (referer != null ? referer : "/");
 }
 
-    //Rotta per Seguire o smettere di seguire un utente
-    @PostMapping("/add-follow")
-    public ResponseEntity<?> toggleFollow(@RequestParam("targetUserId") String targetUserId,
-                                        @RequestParam("authUserId") String authUserId) {
-        System.out.println(targetUserId);
-        System.out.println(authUserId);
-        return userService.toggleFollow(targetUserId, authUserId);
-    }
-
-    //Rotta per ottenere i followers di un utente
-    @GetMapping("/get-followers")
-    public List<User> getFollowers(@RequestParam("userId") String userId) {
-        return userService.getFollowers(userId);
-    }
-
-    //Rotta per ottenere gli utenti seguiti da un utente
-    @GetMapping("/get-following")
-    public List<User> getFollowing(@RequestParam("userId") String userId) {
-        return userService.getFollowing(userId);
-    }
-
-    //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
-    @PostMapping("/getStudentiTeam")
-    public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti){
-        return userService.getStudentiTeam(idsStudenti);
-    }
+ 
 
 }
 
