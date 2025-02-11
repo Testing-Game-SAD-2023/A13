@@ -36,7 +36,10 @@ function initFriendSearch() {
             debounceTimeout = setTimeout(async function () {
                 try {
                     if (email) {
-                        displayUserSuggestions(email, suggestionsContainer);
+                        const user = await fetchUserByEmail(query);
+                        if (user) {
+                            displayUserSuggestions(user, suggestionsContainer);
+                        } 
                     } else {
                         suggestionsContainer.style.display = "none";
                     }

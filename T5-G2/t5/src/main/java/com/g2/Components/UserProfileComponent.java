@@ -21,7 +21,6 @@ import java.util.Map;
 
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.User;
-import com.g2.Service.AchievementService;
 
 /**
  * Componente che recupera i dati del profilo utente dal servizio e li inserisce
@@ -30,7 +29,6 @@ import com.g2.Service.AchievementService;
 public class UserProfileComponent extends GenericObjectComponent {
 
     private final ServiceManager serviceManager;
-    private final AchievementService achievementService;
     private final User user;
     private final String playerID;
     private final Boolean IsFriendProfile;
@@ -47,14 +45,12 @@ public class UserProfileComponent extends GenericObjectComponent {
     public UserProfileComponent(ServiceManager serviceManager,
             User user,
             String playerID,
-            AchievementService achievementService,
             Boolean IsFriendProfile
     ) {
         super(null, null);  // Il costruttore della superclasse è invocato senza parametri
         this.serviceManager = serviceManager;
         this.user = user;
         this.playerID = playerID;
-        this.achievementService = achievementService;
         this.IsFriendProfile = IsFriendProfile;
     }
 
@@ -75,6 +71,7 @@ public class UserProfileComponent extends GenericObjectComponent {
             List<User> followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", this.playerID);
             this.Model.put("followersList", followersList);
             this.Model.put("followingList", followingList);
+            this.Model.put("isFriendProfile", IsFriendProfile);
             return this.Model;
         } catch (Exception e) {
             // Gestione delle eccezioni, ad esempio log dell'errore

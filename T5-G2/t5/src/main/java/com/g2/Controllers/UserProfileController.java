@@ -42,39 +42,41 @@ public class UserProfileController {
 
     @GetMapping("/profile")
     public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        return handleProfileRequest(model, jwt, null);
+        PageBuilder profile = new PageBuilder(serviceManager, "profile", model, jwt);
+        profile.SetAuth();  // Gestisce l'autenticazione
+        String userId = profile.getUserId();
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", userId);
+        if (user != null) {
+            // Aggiungi il componente del profilo dell'utente
+            profile.setObjectComponents(new UserProfileComponent(serviceManager, user, userId, false));
+        }
+        return profile.handlePageRequest();
     }
 
     @GetMapping("/friend/{playerID}")
     public String friendProfilePage(Model model, @PathVariable("playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
-        return handleProfileRequest(model, jwt, playerID);
-    }
-
-    private String handleProfileRequest(Model model, String jwt, String playerID) {
-        // Se il playerID è null, significa che stiamo gestendo il profilo dell'utente corrente
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model, jwt);
         profile.SetAuth();  // Gestisce l'autenticazione
-
-        String userId = (playerID != null) ? playerID : profile.getUserId();
-        if (userId == null) {
-            // Gestisci errore se l'ID non è valido
-            return "error";
+        String userId = profile.getUserId();
+        if(userId.equals(playerID)){
+            return "redirect:/profile";
         }
 
-        // Recupera l'utente con l'ID specificato
-        User user = (User) serviceManager.handleRequest("T23", "GetUser", userId);
-        if (user == null) {
-            // Gestisci caso in cui l'utente non esiste
-            return "error";
+        User user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
+        if(user != null){
+                /*
+            *   Se segui l'utente
+            */
+            Integer userID_int = Integer.valueOf(userId);
+            boolean isFollowing = user.getFollowersList().contains(userID_int);
+            profile.setObjectComponents(
+                new UserProfileComponent(serviceManager, user, playerID, true),
+                new GenericObjectComponent("isFollowing", isFollowing),
+                new GenericObjectComponent("playerID", playerID)
+            );
         }
-
-        // Aggiungi il componente del profilo dell'utente
-        boolean isFriendProfile = playerID != null; // Se playerID è null, è il profilo dell'utente
-        profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, user, userId, achievementService, isFriendProfile)
-        );
-
-        return profile.handlePageRequest();
+       
+        return profile.handlePageRequest();      
     }
 
     @GetMapping("/Team")
@@ -83,12 +85,12 @@ public class UserProfileController {
         TeamPage.SetAuth();
 
         ResponseTeamComplete team = (ResponseTeamComplete) serviceManager.handleRequest("T1", "OttieniTeamCompleto", TeamPage.getUserId());
-        @SuppressWarnings("unchecked")
-        List<User> membri = (List<User>) serviceManager.handleRequest("T23", "GetUsersByList", team.getTeam().getStudenti());
-
-        model.addAttribute("response", team);
-        model.addAttribute("membri", membri);
-
+        if(team != null){
+            @SuppressWarnings("unchecked")
+            List<User> membri = (List<User>) serviceManager.handleRequest("T23", "GetUsersByList", team.getTeam().getStudenti());
+            model.addAttribute("response", team);
+            model.addAttribute("membri", membri);
+        }
         return TeamPage.handlePageRequest();
     }
 
@@ -136,7 +138,7 @@ public class UserProfileController {
             //Qua gestisco utente sbagliato
         }
         profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, user, playerID, achievementService, false)
+                new UserProfileComponent(serviceManager, user, playerID, false)
         );
         return profile.handlePageRequest();
     }

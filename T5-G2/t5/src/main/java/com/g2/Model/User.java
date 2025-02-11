@@ -17,6 +17,7 @@
 
 package com.g2.Model;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {

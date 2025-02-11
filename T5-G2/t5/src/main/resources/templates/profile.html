@@ -11,9 +11,9 @@
 <div th:replace="fragments/navbar :: navbar"></div>
 
 <!-- PAGE -->
-<div class="container">
+<div class="container mt-3">
   <!-- Dati profilo -->
-  <div class="card text-center">
+  <div class="card text-center" th:if="${user != null}">
       <div class="container">
         <div class="row">
             <!-- FOTO profilo nome cognome --> 
@@ -59,14 +59,27 @@
                   </div>
                 </div>
                 <!-- Button-->
-                <div class="row ">
+                <div class="row ">                  
                   <div class="d-flex align-items-center m-4 justify-content-center">
-                    <button type="button" class="btn btn-primary me-2"> 
-                      Edit <i class="bi bi-pencil-fill"></i>
-                    </button>
-                    <button type="button" class="btn btn-primary">
-                       Teams <i class="bi bi-people-fill"></i>
-                    </button>
+                    <!-- Se profilo utente -->
+                    <div th:if="${isFriendProfile == false}">
+                      <a class="btn btn-primary me-2" href="/edit_profile" role="button">
+                        Edit <i class="bi bi-pencil-fill"></i>
+                      </a>
+                      <a class="btn btn-primary me-2" href="/Team" role="button">
+                        Teams  <i class="bi bi-people-fill"></i>
+                      </a>
+                    </div>
+                    <!-- Se pagina amico -->
+                    <div th:if="${isFriendProfile == true}">
+                          <button id="followButton"
+                                  class="btn" type="button"
+                                  th:classappend="${!isFollowing ? 'btn-danger' : 'btn-primary'}"
+                                  th:text="${!isFollowing ? 'Unfollow' : 'Follow'}"
+                                  th:attr="data-user-id=${playerID}">
+                          </button>
+
+                    </div>                    
                   </div>
                 </div>
               </div>
@@ -99,13 +112,6 @@
               <div class="tab-pane fade show active" id="pills-games" role="tabpanel" aria-labelledby="pills-games-tab" tabindex="0">
                 <!-- Sec Top -->
                   <div class="d-sm-flex align-items-center justify-content-between mt-3 mb-4">
-                      <!-- Bottoni -->
-                      <div class="d-flex align-items-center">
-                        <input type="radio" class="btn-check" name="-base" id="" autocomplete="off" checked>
-                        <label class="btn fw-semibold" for="option5">Followers </label>
-                        <input type="radio" class="btn-check" name="-base" id="" autocomplete="off">
-                        <label class="btn" for="option6">Following </label>
-                      </div>
                       <!-- Cerca -->
                       <form class="position-relative">
                         <input type="text" class="form-control search-chat py-2 ps-5" id="text-srh" placeholder="Search Followers">
@@ -164,7 +170,14 @@
             <!-- Social -->
             <div class="tab-content" id="pills-tabContent">
               <div class="tab-pane fade" id="pills-followers" role="tabpanel" aria-labelledby="pills-followers-tab" tabindex="1">
-                <!-- Sec Top -->
+                <!-- Search Friend-->
+                <div class="friend-search" th:if="${isFriendProfile == false}">
+                  <i class="fas fa-search search-icon"></i>
+                  <input type="text" id="friend-search-input" class="form-control"
+                  th:placeholder="#{profile.friends_search}" autocomplete="off">
+                  <ul id="friend-suggestions" class="list-group"></ul>
+                </div>
+                <!-- Nav Top -->
                 <div class="d-sm-flex align-items-center justify-content-between mt-3 mb-4">
                   <!-- Bottoni -->
                   <div class="d-flex align-items-center">
@@ -206,7 +219,8 @@
                       <p>Nessun Following.</p>
                     </div>
                     <!-- Profile card -->
-                    <div class="col mb-4" th:if="${followingList != null and !followingList.empty}" th:each="following : ${followingList}">
+                    <div class="col mb-4" th:if="${followingList != null and !followingList.empty}" 
+                                          th:each="following : ${followingList}">
                     <div class="card">
                       <div class="card-body p-4 d-flex align-items-center gap-3">
                           <div class="text-start">
@@ -215,7 +229,7 @@
                               email@email.it
                             </span>
                           </div>
-                          <a class="btn btn-primary py-1 px-2 ms-auto" href="#" role="button" th:href="@{'/friend/' + ${follower.id}}" th:text="#{profile.visualize_profile}">Link</a>                     
+                          <a class="btn btn-primary py-1 px-2 ms-auto" href="#" role="button" th:href="@{'/friend/' + ${following.id}}" th:text="#{profile.visualize_profile}">Link</a>                     
                         </div>
                     </div>
                     </div>
@@ -227,6 +241,9 @@
           </div>
         </div>
       </div>
+  </div>
+  <div class="card text-center" th:if="${user == null}">
+    profilo non trovato ! 
   </div>
    
 </div>
@@ -294,6 +311,37 @@ $(document).ready(function () {
 </script>
 
 
+<div th:if="${isFriendProfile == true}">
+  <script>
+      $(document).ready(function() {
+    $("#followButton").click(function() {
+        let button = $(this);
+        let targetUserId = button.data("user-id");
+        let authUserId = userId; //prendo da util.js
+        
+        $.ajax({
+            url: "/add-follow",
+            type: "POST",
+            data: {
+                targetUserId: targetUserId,
+                authUserId: authUserId
+            },
+            success: function(response) {
+                 // Toggle tra btn-danger (Unfollow) e btn-primary (Follow)
+                if (button.hasClass("btn-primary")) {
+                    button.removeClass("btn-primary").addClass("btn-danger").text("Unfollow");
+                } else {
+                    button.removeClass("btn-danger").addClass("btn-primary").text("Follow");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Errore durante la richiesta AJAX: ", error);
+            }
+        });
+    });
+});
+  </script>
+</div>
 
 </body>
 </html>

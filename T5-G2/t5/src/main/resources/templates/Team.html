@@ -11,8 +11,7 @@
 <div th:replace="fragments/navbar :: navbar"></div>
 
 <div class="container-fluid">
-    <div class="row mt-3">
-
+    <div class="row mt-3" th:if="${response != null}">
         <!-- Main -->
         <div class="col-9 d-flex flex-column my-2 gap-3">
                 <!-- Nome Team-->
@@ -90,7 +89,6 @@
                     </div>
                 </div>
         </div>
-
         <!-- Scheda INFO -->
         <div class="col-3 d-flex flex-column my-2 gap-3">
             <!-- INFO TEAM-->
@@ -147,6 +145,13 @@
                     </li>
                 </div>
             </div> 
+        </div>
+    </div>
+    <div class="row mt-3" th:unless="${response != null}">
+        <div class="container">
+            <div class="alert alert-primary" role="alert">
+                Non fai parte di nessun Team ! 
+            </div>
         </div>
     </div>
 </div>

@@ -147,8 +147,7 @@
 <div th:replace="fragments/navbar :: navbar"></div>
 
 <!-- PAGE -->
-<div class="container">
-    
+<div class="container"> 
     <!-- Progress circle -->
     <div class="d-sm-flex align-items-center justify-content-around mt-3 mb-5">
         <div class="text-center">
@@ -163,12 +162,14 @@
           <span class="progress_circle-right">
               <span class="progress_circle-bar"></span>
           </span>
-          <div class="progress_circle-value" th:text="${unlockedAchievements.size()}*100 / (${unlockedAchievements.size()} + ${lockedAchievements.size()}) + '%'">
+          <div class="progress_circle-value" 
+               th:text="${unlockedAchievements.size()}*100 / (${unlockedAchievements.size()} + ${lockedAchievements.size()}) + '%'">
 
           </div>
         </div>
         <div class="text-center">
-          <h4 class="mb-0 fw-semibold lh-1" th:text="${unlockedAchievements.size()} + ${lockedAchievements.size()}"> 
+          <h4 class="mb-0 fw-semibold lh-1" 
+              th:text="${unlockedAchievements.size()} + ${lockedAchievements.size()}"> 
             90
           </h4>
           <p class="mb-0 fs-5"> Disponibili </p>
