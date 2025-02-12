@@ -18,7 +18,6 @@ package com.g2.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -157,33 +156,7 @@ public class UserProfileService {
         // Mi prendo l'utente che mi interessa con l'id
         User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
 
-        return user.getUserProfile().getID();
-
-    }
-
-    public List<Integer> getFollowingList(int playerID) {
-        // Mi prendo l'id del giocatore
-        int userId = playerID;
-        // Mi prendo prima tutti gli utenti
-        @SuppressWarnings("unchecked")
-        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
-        // Mi prendo l'utente che mi interessa con l'id
-        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-        return user.getUserProfile().getFollowingList();
-    }
-
-    public List<Integer> getFollowersList(int playerID) {
-        // Mi prendo l'id del giocatore
-        int userId = playerID;
-
-        // Mi prendo prima tutti gli utenti
-        @SuppressWarnings("unchecked")
-        List<User> users = (List<com.g2.Model.User>) serviceManager.handleRequest("T23", "GetUsers");
-
-        // Mi prendo l'utente che mi interessa con l'id
-        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElseThrow(() -> new RuntimeException("User not found"));
-
-        return user.getUserProfile().getFollowersList();
+        return user.getUserProfile().getId();
 
     }
 

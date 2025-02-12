@@ -40,6 +40,13 @@ public class UserProfileController {
         this.serviceManager = new ServiceManager(restTemplate);
     }
 
+    @GetMapping("/SearchFriend")
+    public String search_page(Model model, @CookieValue(name = "jwt", required = false) String jwt){
+        PageBuilder search_page = new PageBuilder(serviceManager, "search", model, jwt);
+        search_page.SetAuth();  // Gestisce l'autenticazione
+        return search_page.handlePageRequest();
+    }
+
     @GetMapping("/profile")
     public String profilePagePersonal(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model, jwt);
@@ -48,7 +55,7 @@ public class UserProfileController {
         User user = (User) serviceManager.handleRequest("T23", "GetUser", userId);
         if (user != null) {
             // Aggiungi il componente del profilo dell'utente
-            profile.setObjectComponents(new UserProfileComponent(serviceManager, user, userId, false));
+            profile.setObjectComponents(new UserProfileComponent(serviceManager, user, user.getUserProfile().getId(), false));
         }
         return profile.handlePageRequest();
     }
@@ -57,6 +64,7 @@ public class UserProfileController {
     public String friendProfilePage(Model model, @PathVariable("playerID") String playerID, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model, jwt);
         profile.SetAuth();  // Gestisce l'autenticazione
+        
         String userId = profile.getUserId();
         if(userId.equals(playerID)){
             return "redirect:/profile";
@@ -64,14 +72,11 @@ public class UserProfileController {
 
         User user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
         if(user != null){
-                /*
+            /*
             *   Se segui l'utente
             */
-            Integer userID_int = Integer.valueOf(userId);
-            boolean isFollowing = user.getFollowersList().contains(userID_int);
             profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, user, playerID, true),
-                new GenericObjectComponent("isFollowing", isFollowing),
+                new UserProfileComponent(serviceManager, user, user.getUserProfile().getId(), true),
                 new GenericObjectComponent("playerID", playerID)
             );
         }
@@ -138,30 +143,11 @@ public class UserProfileController {
             //Qua gestisco utente sbagliato
         }
         profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, user, playerID, false)
+                new UserProfileComponent(serviceManager, user, user.getUserProfile().getId(), false)
         );
         return profile.handlePageRequest();
     }
 
-    // @GetMapping("/friend/{playerID}")
-    // public String friendProfilePage(Model model, @PathVariable(value = "playerID") String playerID, 
-    //                                 @CookieValue(name = "jwt", required = false) String jwt) {
-    //     PageBuilder profile = new PageBuilder(serviceManager, "friend_profile", model, jwt);
-    //     profile.SetAuth();
-    //     User Friend_user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
-    //     if (Friend_user == null) {
-    //         //Qua gestisco utente sbagliato
-    //         return "error";
-    //     }
-    //     User user = (User) serviceManager.handleRequest("T23", "GetUser", profile.getUserId());
-    //     boolean isFollowing = Friend_user.getFollowersList().contains(user.getUserProfile().getID());
-    //     profile.setObjectComponents(
-    //             new UserProfileComponent(serviceManager, Friend_user, playerID, achievementService, true),
-    //             new GenericObjectComponent("isFollowing", isFollowing),
-    //             new GenericObjectComponent("userId", playerID)
-    //     );
-    //     return profile.handlePageRequest();
-    // }
     /*
          * Andrebbe gestito che ogni uno può mettere la foto che vuole con i tipi Blob nel DB
      */

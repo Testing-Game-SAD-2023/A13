@@ -16,7 +16,6 @@
  */
 package com.g2.Components;
 
-import java.util.List;
 import java.util.Map;
 
 import com.g2.Interfaces.ServiceManager;
@@ -30,7 +29,7 @@ public class UserProfileComponent extends GenericObjectComponent {
 
     private final ServiceManager serviceManager;
     private final User user;
-    private final String playerID;
+    private final Integer userProfileId;
     private final Boolean IsFriendProfile;
     /**
      * Costruttore per il componente.
@@ -44,13 +43,13 @@ public class UserProfileComponent extends GenericObjectComponent {
      */
     public UserProfileComponent(ServiceManager serviceManager,
             User user,
-            String playerID,
+            Integer userProfileId,
             Boolean IsFriendProfile
     ) {
         super(null, null);  // Il costruttore della superclasse è invocato senza parametri
         this.serviceManager = serviceManager;
         this.user = user;
-        this.playerID = playerID;
+        this.userProfileId = userProfileId;
         this.IsFriendProfile = IsFriendProfile;
     }
 
@@ -66,11 +65,6 @@ public class UserProfileComponent extends GenericObjectComponent {
         try {
             // Inserisce i dati del profilo utente nel modello con la chiave specificata
             this.Model.put("user", this.user);
-            // Ottieni follower e following
-            List<User> followersList = (List<User>) serviceManager.handleRequest("T23", "getFollowers", this.playerID);
-            List<User> followingList = (List<User>) serviceManager.handleRequest("T23", "getFollowing", this.playerID);
-            this.Model.put("followersList", followersList);
-            this.Model.put("followingList", followingList);
             this.Model.put("isFriendProfile", IsFriendProfile);
             return this.Model;
         } catch (Exception e) {
@@ -80,7 +74,8 @@ public class UserProfileComponent extends GenericObjectComponent {
         }
     }
 
-    public String getUserId() {
-        return playerID;
+    public String getUserProfileId() {
+        String userProfileId_string = String.valueOf(this.userProfileId);
+        return userProfileId_string;
     }
 }

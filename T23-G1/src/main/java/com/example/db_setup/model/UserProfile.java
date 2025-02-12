@@ -17,6 +17,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
@@ -55,7 +56,7 @@ public class UserProfile {
     @Column(length = 30, nullable = false)
     public String surname;
     @Column(length = 30, nullable = false)
-    public String nickname = "nickname" + this.ID;
+    public String nickname;
     @Column(length = 20)
     public String email;
 
@@ -86,10 +87,15 @@ public class UserProfile {
 
     @Override
     public String toString() {
-        return "UserProfile{" +
-                "ID=" + ID +
-                ", bio='" + bio + '\'' +
-                ", profilePicturePath='" + profilePicturePath + '\'' +
-                '}';
+        return "UserProfile{"
+                + "ID=" + ID
+                + ", bio='" + bio + '\''
+                + ", profilePicturePath='" + profilePicturePath + '\''
+                + '}';
+    }
+
+    @JsonProperty("userId")
+    public Integer getUserId() {
+        return user != null ? user.getID() : null;
     }
 }

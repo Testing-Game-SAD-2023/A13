@@ -238,7 +238,7 @@ public class T23Service extends BaseService {
     *   il authUserId è chi segue 
      */
     public String followUser(Integer targetUserId, Integer authUserId) {
-        final String endpoint = "/add-follow";
+        final String endpoint = "/toggle_follow";
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("targetUserId", String.valueOf(targetUserId));
         map.add("authUserId", String.valueOf(authUserId));
@@ -246,14 +246,14 @@ public class T23Service extends BaseService {
     }
 
     public List<User> getFollowers(String userId) {
-        final String endpoint = "/get-followers";
+        final String endpoint = "/followers";
         Map<String, String> queryParams = Map.of("userId", userId);
         return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
         });
     }
 
     public List<User> getFollowing(String userId) {
-        final String endpoint = "/get-following";
+        final String endpoint = "/following";
         Map<String, String> queryParams = Map.of("userId", userId);
         return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
         });

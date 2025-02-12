@@ -26,9 +26,11 @@
                   </div>
                   <div class="col-md-8 text-start">
                     <div class="card-body">
-                      <h5 class="card-title" th:text="${user.name} + ' ' + ${user.surname}"> 
+                      <h5 class="card-title" th:text="${user.userProfile.name} + ' ' + ${user.userProfile.surname}"> 
                       </h5>
-                      <p class="card-text"><small class="text-body-secondary" id="user-email" th:text="${user.email}"></small></p>
+                      <div th:if="${isFriendProfile == true}">
+                        <p class="card-text"><small class="text-body-secondary" id="user-email" th:text="${user.email}"></small></p>
+                      </div>
                       <!-- BIO -->
                       <p class="card-text border-start border-danger border-4 ps-1" th:text="${user.userProfile.bio}"></p>
                     </div>
@@ -45,14 +47,14 @@
                     <div class="text-center">
                       <i class="fa fa-check fs-6 d-block mb-2"></i>
                       <h4 class="mb-0 fw-semibold lh-1"> 
-                        <span th:text="${followersList.size()}"></span>
+                        <span> metti </span>
                       </h4>
                       <p class="mb-0 fs-5">Followers</p>
                     </div>
                     <div class="text-center">
                       <i class="fa fa-check fs-6 d-block mb-2"></i>
                       <h4 class="mb-0 fw-semibold lh-1">
-                        <span th:text="${followingList.size()}"></span>
+                        <span> metti </span>
                       </h4>
                       <p class="mb-0 fs-5">Following</p>
                     </div>
@@ -74,8 +76,6 @@
                     <div th:if="${isFriendProfile == true}">
                           <button id="followButton"
                                   class="btn" type="button"
-                                  th:classappend="${!isFollowing ? 'btn-danger' : 'btn-primary'}"
-                                  th:text="${!isFollowing ? 'Unfollow' : 'Follow'}"
                                   th:attr="data-user-id=${playerID}">
                           </button>
 
@@ -170,13 +170,6 @@
             <!-- Social -->
             <div class="tab-content" id="pills-tabContent">
               <div class="tab-pane fade" id="pills-followers" role="tabpanel" aria-labelledby="pills-followers-tab" tabindex="1">
-                <!-- Search Friend-->
-                <div class="friend-search" th:if="${isFriendProfile == false}">
-                  <i class="fas fa-search search-icon"></i>
-                  <input type="text" id="friend-search-input" class="form-control"
-                  th:placeholder="#{profile.friends_search}" autocomplete="off">
-                  <ul id="friend-suggestions" class="list-group"></ul>
-                </div>
                 <!-- Nav Top -->
                 <div class="d-sm-flex align-items-center justify-content-between mt-3 mb-4">
                   <!-- Bottoni -->
@@ -185,6 +178,9 @@
                     <label class="btn fw-semibold" for="option_Followers"> Followers </label>
                     <input type="radio" class="btn-check" name="options-follow" id="option_Following" autocomplete="off">
                     <label class="btn" for="option_Following"> Following </label>
+                    <a class="btn btn-primary py-1 px-2 ms-auto" href="/SearchFriend">
+                      <i class="bi bi-person-add"></i> Aggiungi
+                    </a>  
                   </div>
                   <!-- Cerca -->
                   <form class="position-relative">
@@ -194,45 +190,10 @@
                 </div>
                 <!-- Sec Bottom -->
                 <div class="row row-cols-2 text-center" id="followers_block">
-                    <!-- Se non ho followers -->
-                    <div class="alert alert-primary mb-4 row" role="alert" th:if="${followersList == null || followersList.isEmpty()}" >
-                      <p>Nessun Followers.</p>
-                    </div>
-                    <!-- Profile card -->
-                    <div class="col mb-4" th:if="${followersList != null and !followersList.empty}" th:each="follower : ${followersList}">
-                      <div class="card">
-                        <div class="card-body p-4 d-flex align-items-center gap-3">
-                            <div class="text-start">
-                              <h5 class="fw-semibold mb-0" th:text="${follower.name + ' ' + follower.surname}"></h5>
-                              <span class="fs-5 d-flex align-items-center" th:text="${follower.email}">
-                                email@email.it
-                              </span>
-                            </div>
-                            <a class="btn btn-primary py-1 px-2 ms-auto" href="#" role="button" th:href="@{'/friend/' + ${follower.id}}" th:text="#{profile.visualize_profile}">Link</a>                     
-                        </div>
-                      </div>
-                    </div>
+
                 </div>
                 <div class="row row-cols-2 text-center" id="following_block">
-                    <!-- Se non ho following -->
-                    <div class="alert alert-primary ms-4 mb-4 row" role="alert" th:if="${followingList == null or followingList.empty}" >
-                      <p>Nessun Following.</p>
-                    </div>
-                    <!-- Profile card -->
-                    <div class="col mb-4" th:if="${followingList != null and !followingList.empty}" 
-                                          th:each="following : ${followingList}">
-                    <div class="card">
-                      <div class="card-body p-4 d-flex align-items-center gap-3">
-                          <div class="text-start">
-                            <h5 class="fw-semibold mb-0" th:text="${following.name + ' ' + following.surname}"></h5>
-                            <span class="fs-5 d-flex align-items-center" th:text="${following.email}">
-                              email@email.it
-                            </span>
-                          </div>
-                          <a class="btn btn-primary py-1 px-2 ms-auto" href="#" role="button" th:href="@{'/friend/' + ${following.id}}" th:text="#{profile.visualize_profile}">Link</a>                     
-                        </div>
-                    </div>
-                    </div>
+                    
                 </div>
               </div>
             </div>
@@ -250,6 +211,10 @@
 
 
 <div th:replace="fragments/footer :: footer"></div>
+
+
+<span class="d-none" id="userProfileID" th:text="${user.userProfile.id}">
+</span>
 
 <!-- Script personalizzato per gestire la visibilità dei blocchi -->
 <script>
@@ -310,6 +275,80 @@ $(document).ready(function () {
 });
 </script>
 
+<!-- Following e followers -->
+<script>
+$(document).ready(function () {
+    var userId = $("#userProfileID").text();
+    // Funzione per ottenere i dati da un endpoint e aggiornare il blocco corrispondente
+    function fetchAndUpdateUserBlock(endpoint, blockId) {
+        $.ajax({
+            url: endpoint,
+            type: "GET",
+            data: { userId: userId },
+            dataType: "json",
+            success: function (response) {
+                updateUserBlock(blockId, response);
+            },
+            error: function (xhr) {
+                handleRequestError(xhr, blockId);
+            }
+        });
+    }
+
+    // Funzione per aggiornare il blocco con gli utenti ricevuti
+    function updateUserBlock(blockId, users) {
+        let container = $(blockId);
+        container.empty(); // Pulisce il contenitore
+
+        if (users.length === 0) {
+            container.append("<p>Nessun risultato trovato.</p>");
+            return;
+        }
+
+        users.forEach(user => {
+            container.append(createUserCard(user));
+        });
+    }
+
+    // Funzione per creare il template HTML di una card utente
+    function createUserCard(user) {
+        return `
+            <div class="col mb-4">
+                <div class="card">
+                    <div class="card-body p-4 d-flex align-items-center gap-3">
+                        <img src="${'/t5/images/profileImages/' + user.profilePicturePath}" 
+                        alt="twbs" width="32" height="32" 
+                        class="rounded-circle flex-shrink-0">
+                        <div class="text-start">
+                            <h5 class="fw-semibold mb-0">${user.name + " " + user.surname}</h5>
+                            <span class="fs-5 d-flex align-items-center">${user.email}</span>
+                        </div>
+                        <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${user.userId}">
+                          Vai al profilo 
+                          </a>                     
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // Funzione per gestire gli errori delle chiamate AJAX
+    function handleRequestError(xhr, blockId) {
+        let errorMessage = "Errore sconosciuto.";
+        if (xhr.status === 400) {
+            errorMessage = "Errore: " + xhr.responseText;
+        } else if (xhr.status === 500) {
+            errorMessage = "Si è verificato un errore imprevisto.";
+        }
+        $(blockId).html(`<p style='color: red;'>${errorMessage}</p>`);
+    }
+
+    // Carica i follower e gli utenti seguiti all'avvio della pagina
+    fetchAndUpdateUserBlock("/followers", "#followers_block");
+    fetchAndUpdateUserBlock("/following", "#following_block");
+});
+
+
+</script>
 
 <div th:if="${isFriendProfile == true}">
   <script>

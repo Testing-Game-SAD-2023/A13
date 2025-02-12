@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <div th:replace ="fragments/header :: header"></div>
+    <title>Profile</title>
+</head>
+
+<body >
+
+<!-- NAVBAR -->
+<div th:replace="fragments/navbar :: navbar"></div>
+
+      <div class="container">
+        <div class="card">
+          <!-- Search Friend-->
+          <div class="d-flex align-items-center justify-content-between p-3 my-3 rounded shadow-sm bg-dark-subtle">
+            <div class="friend-search">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" id="friend-search-input" class="form-control" autocomplete="off">
+            </div>
+            <!-- Bottoni -->
+            <nav>
+                <ul class="pagination m-0">
+                    <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                    </li>
+                </ul>
+            </nav>
+          </div>
+          <!-- Sec Bottom -->
+          <div class="row row-cols-2 text-center" id="followers_block">
+              <!-- Profile card -->
+              <div class="col mb-4">
+                <!-- Friend card -->
+                <div class="card" style="display: none;">
+                  <div class="card-body p-4 d-flex align-items-center gap-3">
+                      <div class="text-start">
+                        <h5 class="fw-semibold mb-0">
+                            Nome Cognome
+                        </h5>
+                        <span class="fs-5 d-flex align-items-center">
+                          email@email.it
+                        </span>
+                      </div>
+                      <a class="btn btn-primary py-1 px-2 ms-auto" href="#" role="button">Link</a>                     
+                  </div>
+                </div>
+
+                <!-- Allert -->
+                <div class="alert alert-primary" role="alert" id="init_alert" style="display: none;">
+                   Cerca utenti per email, nome e cognome oppure nickname!
+                </div>
+
+                <!-- Loading -->
+                <div class="spinner-border" role="status" id="loadingAlert" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div>
+
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+  $(document).ready(function() {
+    let currentPage = 0;
+    let pageSize = 10;
+
+    $("#init_alert").show();
+
+    // Funzione per eseguire la ricerca
+    function searchUserProfiles(searchTerm, page, size) {
+        $.ajax({
+            url: "/searchUserProfiles",
+            type: "GET",
+            data: {
+                searchTerm: searchTerm,
+                page: page,
+                size: size
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("Risultati della ricerca:", response);
+                // Nascondi l'alert quando i risultati sono stati caricati
+                $("#loadingAlert").hide();
+
+                updateResults(response);
+                updatePagination(response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Errore nella richiesta:", error);
+                // Nascondi l'alert quando i risultati sono stati caricati
+                $("#loadingAlert").hide();
+            }
+        });
+    }
+
+    // Funzione per aggiornare i risultati
+    function updateResults(data) {
+        let resultsContainer = $("#followers_block");
+        resultsContainer.empty();
+
+        if (data.content.length === 0) {
+            resultsContainer.append("<p>Nessun risultato trovato.</p>");
+            return;
+        }
+
+        data.content.forEach(user => {
+            resultsContainer.append(
+                `<div class="col mb-4">
+                    <div class="card">
+                        <div class="card-body p-4 d-flex align-items-center gap-3">
+                            <img src=${'/t5/images/profileImages/' + user.profilePicturePath}
+                            alt="twbs" width="32" height="32" 
+                            class="rounded-circle flex-shrink-0">
+                            <div class="text-start">
+                                <h5 class="fw-semibold mb-0">${user.name + " " + user.surname}</h5>
+                                <span class="fs-5 d-flex align-items-center">${user.email}</span>
+                            </div>
+                            <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${user.userId}">Link</a>                     
+                        </div>
+                    </div>
+                </div>`
+            );
+        });
+    }
+
+    // Funzione per aggiornare la paginazione
+    function updatePagination(data) {
+        let paginationContainer = $(".pagination");
+        paginationContainer.empty();
+
+        // Aggiungi il pulsante "precedente"
+        paginationContainer.append(
+            `<li class="page-item ${data.pageable.pageNumber === 0 ? 'disabled' : ''}">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>`
+        );
+
+        // Aggiungi i numeri di pagina
+        let totalPages = data.totalPages;
+        for (let i = 0; i < totalPages; i++) {
+            paginationContainer.append(
+                `<li class="page-item ${i === data.pageable.pageNumber ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i + 1}</a>
+                </li>`
+            );
+        }
+
+        // Aggiungi il pulsante "successivo"
+        paginationContainer.append(
+            `<li class="page-item ${data.pageable.pageNumber === data.totalPages - 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>`
+        );
+    }
+
+    // Gestione della ricerca quando l'utente digita
+    $("#friend-search-input").on("input", function() {
+        let searchTerm = $(this).val();
+        // Mostra l'alert di caricamento
+        $("#loadingAlert").show();
+        $("#init_alert").hide();
+        searchUserProfiles(searchTerm, currentPage, pageSize);
+    });
+
+    // Gestione dei clic sui numeri di pagina
+    $(document).on("click", ".page-link", function(e) {
+        e.preventDefault();
+
+        // Se il link ha l'attributo data-page, è un numero di pagina
+        let page = $(this).data("page");
+        if (page !== undefined) {
+            currentPage = page;
+            let searchTerm = $("#friend-search-input").val();
+            searchUserProfiles(searchTerm, currentPage, pageSize);
+        }
+    });
+
+    });
+</script>
+
+</body>
+</html>

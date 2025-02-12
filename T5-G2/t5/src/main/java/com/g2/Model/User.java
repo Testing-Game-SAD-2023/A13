@@ -16,7 +16,6 @@
  */
 
 package com.g2.Model;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,10 +23,6 @@ public class User {
 
     @JsonProperty("id")
     private Long id;
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("surname")
-    private String surname;
     @JsonProperty("email")
     private String email;
     @JsonProperty("password")
@@ -40,12 +35,16 @@ public class User {
     private UserProfile userProfile;
     @JsonProperty("resetToken")
     private String resetToken;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("surname")
+    private String surname;
+    @JsonProperty("nickname")
+    private String nickname;
 
-    public User(Long id, String name, String surname, String email, String password,
+    public User(Long id, String email, String password,
     boolean isRegisteredWithFacebook, String studies, UserProfile userProfile,String resetToken) {
         this.id = id;
-        this.name = name;
-        this.surname = surname;
         this.email = email;
         this.password = password;
         this.isRegisteredWithFacebook = isRegisteredWithFacebook;
@@ -64,22 +63,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
     }
 
     public String getEmail() {
@@ -134,8 +117,6 @@ public class User {
     public String toString(){
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", isRegisteredWithFacebook=" + isRegisteredWithFacebook +
@@ -146,11 +127,28 @@ public class User {
 
     }
 
-    public List<Integer> getFollowersList(){
-        return this.userProfile.getFollowersList();
+    public String getName() {
+        return name;
     }
 
-    public List<Integer> getFollowingList(){
-        return this.userProfile.getFollowersList();
+    public void setName(String name) {
+        this.name = name;
     }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
 }

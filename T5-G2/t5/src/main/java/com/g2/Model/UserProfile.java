@@ -16,28 +16,44 @@
  */
 
 package com.g2.Model;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserProfile {
 
+    // ID del oggetto UserPRofile
     @JsonProperty("id")
-    private Integer ID;
+    private Integer id;
+    // ID dell'oggetto USER
+    @JsonProperty("userId")
+    private Integer userId;
     @JsonProperty("bio")
     private String bio;
     @JsonProperty("profilePicturePath")
     private String profilePicturePath;
-    @JsonProperty("followingIds")
-    private List<Integer> followingIds;
-    @JsonProperty("followerIds")
-    private List<Integer> followerIds;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("surname")
+    private String surname;
+    @JsonProperty("nickname")
+    private String nickname;
 
-    public UserProfile(Integer ID, String bio, String profilePicturePath, List<Integer> followingIds, List<Integer> followerIds) {
-        this.ID = ID;
+    @JsonCreator
+    public UserProfile(
+        @JsonProperty("id") Integer id, 
+        @JsonProperty("userId") Integer userId, 
+        @JsonProperty("bio") String bio, 
+        @JsonProperty("profilePicturePath") String profilePicturePath, 
+        @JsonProperty("name") String name, 
+        @JsonProperty("surname") String surname, 
+        @JsonProperty("nickname") String nickname) {
+        this.id = id;
+        this.userId = userId;
         this.bio = bio;
         this.profilePicturePath = profilePicturePath;
-        this.followingIds = followingIds;
-        this.followerIds = followerIds;
+        this.name = name;
+        this.surname = surname;
+        this.nickname = nickname;
     }
 
 
@@ -45,14 +61,6 @@ public class UserProfile {
     public UserProfile(){}
 
     // Getters and Setters
-    public Integer getID() {
-        return ID;
-    }
-
-    public void setID(Integer ID) {
-        this.ID = ID;
-    }
-
     public String getBio() {
         return bio;
     }
@@ -69,31 +77,53 @@ public class UserProfile {
         this.profilePicturePath = profilePicturePath;
     }
 
-    public List<Integer> getFollowingList() {
-        return followingIds;
-    }
-
-    public void setFollowingList(List<Integer> followingIds) {
-        this.followingIds = followingIds;
-    }
-
-    public List<Integer> getFollowersList() {
-        return followerIds;
-    }
-
-    public void setFollowersList(List<Integer> followerIds) {
-        this.followerIds = followerIds;
-    }
-
     @Override
     public String toString(){
         return "UserProfile{" +
-                "ID=" + ID +
+                "ID=" + id +
                 ", bio='" + bio + '\'' +
                 ", profilePicturePath='" + profilePicturePath + '\'' +
-                ", followingList=" + followingIds +
-                ", followersList=" + followerIds +
                 '}';
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getuserId() {
+        return userId;
+    }
+
+    public void setuserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
 
