@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
-package com.example.db_setup;
+package com.example.db_setup.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,15 +40,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-
     public Integer ID;
-
-    public String name;
-
-    public String surname;
-
-    public String email;
-
     public String password;
 
     //MODIFICA
@@ -90,17 +82,39 @@ public class User {
         this.userProfile = userProfile;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-            "id=" + ID +
-            ", name='" + name + '\'' +
-            ", surname='" + surname + '\'' +
-            ", email='" + email + '\'' +
-            '}';
-    }
-
     public Integer getID(){
         return this.ID;
+    }
+
+    public String getName(){
+        return this.userProfile.getName();
+    }
+
+    public void setName(String name){
+        this.userProfile.setName(name);
+    }
+
+    public String getSurname(){
+        return this.userProfile.getSurname();
+    }
+
+    public void setSurname(String surname){
+        this.userProfile.setSurname(surname);
+    }
+
+    public String getNickname(){
+        return this.userProfile.getNickname();
+    }
+
+    public void setNickname(String nickname){
+        this.userProfile.setNickname(nickname);
+    }
+
+    public String getEmail(){
+        return this.userProfile.getEmail();
+    }
+
+    public void setEmail(String email){
+        this.userProfile.setEmail(email);
     }
 }

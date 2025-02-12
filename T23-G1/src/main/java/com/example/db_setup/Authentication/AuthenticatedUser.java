@@ -6,7 +6,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.example.db_setup.User;
+import com.example.db_setup.model.User;
 
 import lombok.Data;
 

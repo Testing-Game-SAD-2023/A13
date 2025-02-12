@@ -19,27 +19,27 @@ package com.example.db_setup.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 import com.example.db_setup.OAuthUserGoogle;
-import com.example.db_setup.User;
-import com.example.db_setup.UserProfile;
+import com.example.db_setup.UserFollowRepository;
 import com.example.db_setup.UserProfileRepository;
 import com.example.db_setup.UserRepository;
+import com.example.db_setup.model.User;
+import com.example.db_setup.model.UserProfile;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -52,6 +52,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private UserProfileRepository userProfileRepository;
+    @Autowired
+    private UserFollowRepository userFollowRepository;
 
     private UserProfile userProfile;
 
@@ -61,22 +63,24 @@ public class UserService {
     @Autowired
     private AuthenticatedUserRepository authenticatedUserRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     // Recupera dal DB l'utente con l'email specificata
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByUserProfileEmail(email);
     }
 
-    public User getUserByID(Integer ID){
+    public User getUserByID(Integer ID) {
         return userRepository.findByID(ID);
     }
 
-    public List<User> GetUserListByEmail(String email){
-        return userRepository.findByEmailLike(email);
+    public List<User> GetUserListByEmail(String email) {
+        return userRepository.findByUserProfileEmailLike(email);
     }
 
     // Modifica 06/12/2024: Aggiunta end-point per restituire solo i campi non sensibili dello USER
     public ResponseEntity<?> getStudentByEmail(String email) {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByUserProfileEmail(email);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utente non trovato per email: " + email);
         }
@@ -109,7 +113,7 @@ public class UserService {
 
     public UserProfile findProfileByEmail(String email) {
         // Recupera l'utente con l'email specificata
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByUserProfileEmail(email);
 
         //Controlla se l'utente esiste
         if (user == null) {
@@ -128,23 +132,22 @@ public class UserService {
         return token;
     }
 
-
     // Genera un token JWT per l'utente specificato
     public static String generateToken(User user) {
-    Instant now = Instant.now();
-    Instant expiration = now.plus(1, ChronoUnit.HOURS);
-    // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
-    String token = Jwts.builder()
-            .setSubject(user.getEmail())
-            .setIssuedAt(Date.from(now))
-            .setExpiration(Date.from(expiration))
-            .claim("userId", user.getID())
-            .claim("role", "user")
-            .signWith(SignatureAlgorithm.HS256, "mySecretKey")
-            .compact();
+        Instant now = Instant.now();
+        Instant expiration = now.plus(1, ChronoUnit.HOURS);
+        // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
+        String token = Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiration))
+                .claim("userId", user.getID())
+                .claim("role", "user")
+                .signWith(SignatureAlgorithm.HS256, "mySecretKey")
+                .compact();
 
-            return token;
-        }
+        return token;
+    }
 
     public void saveProfile(UserProfile userProfile) {
         if (userProfile == null) {
@@ -190,69 +193,6 @@ public class UserService {
         }
     }
 
-    @Transactional
-    public ResponseEntity<?> toggleFollow(String UserId, String AuthUserId) {
-        try {
-            //Converto gli id in interi
-            Integer userId = Integer.parseInt(UserId);
-            Integer authUserId = Integer.parseInt(AuthUserId);
-            // Recupero gli utenti dal db
-            User autUser = userRepository.findById(authUserId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-            User followUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-            //Recupera i profili dal db
-            Integer autUserProfileId = autUser.getUserProfile().getID();
-            Integer followUserProfileId = followUser.getUserProfile().getID();
-            //Controlla se l'utente è già seguito
-            // Controllo nella li
-            boolean wasFollowing = autUser.getUserProfile().getFollowingIds().stream().anyMatch(u -> u.equals(followUserProfileId));
-            //Se l'utente è già seguito, lo rimuove dalla lista dei follower
-            if (wasFollowing) {
-                //Unfollow
-                followUser.getUserProfile().getFollowerIds().remove(autUserProfileId);
-                autUser.getUserProfile().getFollowingIds().remove(followUserProfileId);
-            } else {
-                //Altrimenti lo aggiunge - Follow
-                followUser.getUserProfile().getFollowerIds().add(autUserProfileId);
-                //userProfile.getFollowerIds().add(authUserProfile);
-                autUser.getUserProfile().getFollowingIds().add(followUserProfileId);
-                String titolo = "Hai un nuovo follower";
-                String messaggio = autUser.name + " " + autUser.surname + " ha iniziato a seguirti!";
-                notificationService.saveNotification((int) userId, titolo, messaggio);
-            }
-            //Salva le modifiche
-            userProfileRepository.save(autUser.getUserProfile());
-            userProfileRepository.save(followUser.getUserProfile());
-            return ResponseEntity.ok().body(Collections.singletonMap("message", "Follow status changed"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Internal server error"));
-        }
-    }
-
-    public List<User> getFollowers(String userId) {
-        Integer userId_int = Integer.parseInt(userId);
-        User user = userRepository.findById(userId_int)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    
-        List<Integer> followerIds = user.getUserProfile().getFollowerIds();
-        if (followerIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<UserProfile> followerProfiles = userProfileRepository.findAllById(followerIds);
-        return userRepository.findUsersByProfiles(followerProfiles);
-    }
-    
-    public List<User> getFollowing(String userId) {
-        Integer userId_int = Integer.parseInt(userId);
-        User user = userRepository.findById(userId_int)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<Integer> followingIds = user.getUserProfile().getFollowingIds();
-        if (followingIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<UserProfile> followingProfiles = userProfileRepository.findAllById(followingIds);
-        return userRepository.findUsersByProfiles(followingProfiles);
-    }
-
     // Modifica 04/12/2024 - Aggiunta gestione ID studenti
     public ResponseEntity<?> getStudentsByIds(List<String> idUtenti) {
         System.out.println("Inizio metodo getStudentsByIds. ID ricevuti: " + idUtenti);
@@ -266,8 +206,8 @@ public class UserService {
         try {
             // Converte gli ID in interi (utilizzando Collectors.toList() invece di toList())
             List<Integer> idIntegerList = idUtenti.stream()
-                                                  .map(Integer::valueOf)
-                                                  .collect(Collectors.toList()); // Utilizzo di Collectors.toList()
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList()); // Utilizzo di Collectors.toList()
 
             // Recupera gli utenti dal database
             List<User> utenti = userRepository.findAllById(idIntegerList);
@@ -296,11 +236,11 @@ public class UserService {
         } catch (NumberFormatException e) {
             System.out.println("Errore durante la conversione degli ID: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                 .body("Formato degli ID non valido. Devono essere numeri interi.");
+                    .body("Formato degli ID non valido. Devono essere numeri interi.");
         } catch (Exception e) {
             System.out.println("Errore durante il recupero degli utenti: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Errore interno del server.");
+                    .body("Errore interno del server.");
         }
     }
 
@@ -309,34 +249,31 @@ public class UserService {
         String surname = request.get("surname");
         String name = request.get("name");
         List<User> users = new ArrayList<>();
-    
+
         // Verifica se surname è "null" o vuoto
         if (isNullOrEmpty(surname) && !isNullOrEmpty(name)) {
-            users = userRepository.findByName(name);
-        }
-        // Verifica se name è "null" o vuoto
+            users = userRepository.findByUserProfileName(name);
+        } // Verifica se name è "null" o vuoto
         else if (!isNullOrEmpty(surname) && isNullOrEmpty(name)) {
-            users = userRepository.findBySurname(surname);
-        }
-        // Se entrambi i parametri sono forniti e non vuoti
+            users = userRepository.findByUserProfileSurname(surname);
+        } // Se entrambi i parametri sono forniti e non vuoti
         else if (!isNullOrEmpty(surname) && !isNullOrEmpty(name)) {
-            users = userRepository.findBySurnameAndName(surname, name);
-        }
-        // Gestisci caso in cui entrambi i parametri sono nulli o vuoti
+            users = userRepository.findByUserProfileSurnameAndUserProfileName(surname, name);
+        } // Gestisci caso in cui entrambi i parametri sono nulli o vuoti
         else {
             // Ad esempio, puoi restituire tutti gli utenti se entrambi i parametri sono nulli o vuoti
             users = userRepository.findAll();
         }
-    
+
         // Restituisci la lista degli utenti mappati in formato JSON
         return mapUsersToResponseList(users);
     }
-    
+
     // Metodo di utilità per verificare se una stringa è null o vuota
     private boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
-    
+
     // Metodo di utilità per mappare una lista di utenti in una lista di mappe
     private List<Map<String, Object>> mapUsersToResponseList(List<User> users) {
         List<Map<String, Object>> responseList = new ArrayList<>();
@@ -355,9 +292,9 @@ public class UserService {
         String email = request.get("email");
         String surname = request.get("surname");
         String name = request.get("name");
-        
+
         List<Map<String, Object>> responseList = new ArrayList<>();
-        
+
         // Caso 1: Cerca per email
         if (email != null && !email.isEmpty()) {
             ResponseEntity<?> response = getStudentByEmail(email); // Chiama il metodo per ottenere lo studente
@@ -373,18 +310,13 @@ public class UserService {
             return responseList;
         }
 
-        
         // Caso 2: Cerca per nome o cognome
         if ((surname != null && !surname.isEmpty()) || (name != null && !name.isEmpty())) {
             return getStudentsBySurnameAndName(request); // Passa la ricerca al metodo che gestisce nome e cognome
         }
-        
+
         // Caso 3: Nessun parametro valido fornito
         return responseList;
     }
 
-    
-
-
 }
-

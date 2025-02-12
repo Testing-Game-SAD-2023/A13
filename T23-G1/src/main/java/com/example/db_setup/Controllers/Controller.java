@@ -17,6 +17,8 @@
 
 package com.example.db_setup.Controllers;
 
+import com.example.db_setup.model.*;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -63,13 +65,13 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import com.example.db_setup.EmailService;
 import com.example.db_setup.MyPasswordEncoder;
 import com.example.db_setup.MyResponseClass;
-import com.example.db_setup.Studies;
-import com.example.db_setup.User;
 import com.example.db_setup.UserRepository;
 import com.example.db_setup.Authentication.AuthenticatedUser;
 import com.example.db_setup.Authentication.AuthenticatedUserRepository;
 import com.example.db_setup.Service.OAuthUserGoogleService;
 import com.example.db_setup.Service.UserService;
+import com.example.db_setup.model.Studies;
+import com.example.db_setup.model.User;
 //MODIFICA (Deserializzazione risposta JSON)
 import com.fasterxml.jackson.databind.ObjectMapper;
 //FINE MODIFICA
@@ -191,7 +193,7 @@ public class Controller {
 
         // EMAIL
         if ((email.contains("@")) && (email.contains("."))) {
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByUserProfileEmail(email);
             if (user != null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente con questa email già registrato");
             }
@@ -265,7 +267,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
         }
 
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByUserProfileEmail(email);
         
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email not found");
@@ -371,7 +373,7 @@ public class Controller {
             System.out.println("Token valido");
 
             //Ti sei già registrato?
-            User user = userRepository.findByEmail(email);
+            User user = userRepository.findByUserProfileEmail(email);
 
             if(user != null) {
 
@@ -521,7 +523,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
         }
 
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByUserProfileEmail(email);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email not found");
@@ -550,7 +552,7 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Already logged in");
         }
 
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByUserProfileEmail(email);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email not found");

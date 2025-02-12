@@ -28,11 +28,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.db_setup.Notification;
 import com.example.db_setup.Service.NotificationService;
 import com.example.db_setup.Service.UserService;
-import com.example.db_setup.User;
-import com.example.db_setup.UserProfile;
+import com.example.db_setup.model.Notification;
+import com.example.db_setup.model.User;
+import com.example.db_setup.model.UserProfile;
 
 @RestController
 public class NotificationController {

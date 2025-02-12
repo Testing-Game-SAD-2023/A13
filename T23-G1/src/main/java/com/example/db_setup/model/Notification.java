@@ -1,4 +1,4 @@
-package com.example.db_setup;
+package com.example.db_setup.model;
 
 import java.time.LocalDateTime;
 

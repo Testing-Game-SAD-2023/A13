@@ -24,15 +24,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.db_setup.model.User;
+import com.example.db_setup.model.UserProfile;
+
 @Repository
 public interface UserRepository extends JpaRepository<User,Integer> {
 
-    User findByEmail(String email);
+    User findByUserProfileEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.email LIKE %:searchTerm%")
-    List<User> findByEmailLike(@Param("searchTerm") String searchTerm);
+    @Query("SELECT u FROM UserProfile u WHERE u.email LIKE %:searchTerm%")
+    List<User> findByUserProfileEmailLike(@Param("searchTerm") String searchTerm);
 
-    List<User> findByName(String name);
+    List<User> findByUserProfileName(String name);
     User findByResetToken(String resetToken);
     User findByID(Integer ID);
     //MODIFICA
@@ -47,7 +50,7 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     List<User> findUsersByProfiles(@Param("userProfiles") List<UserProfile> userProfiles);
     
     //Modifica 12/12/2024
-    List<User> findBySurnameAndName(String surname,String name); //SELECT * FROM User WHERE surname = ? AND name = ?
-    List<User> findBySurname(String surname);
+    List<User> findByUserProfileSurnameAndUserProfileName(String surname,String name); //SELECT * FROM User WHERE surname = ? AND name = ?
+    List<User> findByUserProfileSurname(String surname);
 
 }

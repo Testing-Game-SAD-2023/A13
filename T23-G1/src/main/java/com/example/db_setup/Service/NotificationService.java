@@ -28,8 +28,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.db_setup.Notification;
 import com.example.db_setup.NotificationRepository;
+import com.example.db_setup.model.Notification;
 
 @Service
 public class NotificationService {
