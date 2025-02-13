@@ -52,11 +52,7 @@ public class UserProfileController {
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model, jwt);
         profile.SetAuth();  // Gestisce l'autenticazione
         String userId = profile.getUserId();
-        User user = (User) serviceManager.handleRequest("T23", "GetUser", userId);
-        if (user != null) {
-            // Aggiungi il componente del profilo dell'utente
-            profile.setObjectComponents(new UserProfileComponent(serviceManager, user, user.getUserProfile().getId(), false));
-        }
+        profile.setObjectComponents(new UserProfileComponent(serviceManager,false, userId));
         return profile.handlePageRequest();
     }
 
@@ -70,17 +66,9 @@ public class UserProfileController {
             return "redirect:/profile";
         }
 
-        User user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
-        if(user != null){
-            /*
-            *   Se segui l'utente
-            */
-            profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, user, user.getUserProfile().getId(), true),
-                new GenericObjectComponent("playerID", playerID)
-            );
-        }
-       
+        profile.setObjectComponents(
+            new UserProfileComponent(serviceManager, true, userId, playerID)
+        );    
         return profile.handlePageRequest();      
     }
 
@@ -138,12 +126,8 @@ public class UserProfileController {
 
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model);
         profile.SetAuth(jwt);
-        User user = (User) serviceManager.handleRequest("T23", "GetUser", playerID);
-        if (user == null) {
-            //Qua gestisco utente sbagliato
-        }
         profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, user, user.getUserProfile().getId(), false)
+                new UserProfileComponent(serviceManager, false, playerID)
         );
         return profile.handlePageRequest();
     }

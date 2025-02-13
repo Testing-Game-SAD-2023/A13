@@ -1,386 +1,559 @@
 <!DOCTYPE html>
 <html lang="it" data-bs-theme="dark">
-<head>
-    <div th:replace ="fragments/header :: header"></div>
-    <title>Profile</title>
-</head>
+	<head>
+		<div th:replace="fragments/header :: header"></div>
+		<title>Profile</title>
+	</head>
 
-<body >
+	<body>
+		<!-- NAVBAR -->
+		<div th:replace="fragments/navbar :: navbar"></div>
 
-<!-- NAVBAR -->
-<div th:replace="fragments/navbar :: navbar"></div>
+		<!-- PAGE -->
+		<div class="container mt-3">
+			<!-- Dati profilo -->
+			<div class="card text-center" th:if="${user != null}">
+				<div class="container">
+					<div class="row">
+						<!-- FOTO profilo nome cognome -->
+						<div class="col">
+							<div class="card my-3 p-0 ms-2" style="max-width: 540px">
+								<div class="row g-0">
+									<div class="col-md-4">
+										<img
+											th:src="${user.userProfile.profilePicturePath != null ? '/t5/images/profileImages/' + user.userProfile.profilePicturePath : '/t5/images/sample_propic.jpg'}"
+											class="img-fluid rounded-start"
+											alt="Profile Picture"
+										/>
+									</div>
+									<div class="col-md-8 text-start">
+										<div class="card-body">
+											<h5
+												class="card-title"
+												th:text="${user.userProfile.name} + ' ' + ${user.userProfile.surname}"
+											></h5>
+											<div>
+												<p class="card-text">
+													<small
+														class="text-body-secondary"
+														id="user-email"
+														th:text="${user.email}"
+													></small>
+												</p>
+												<p class="card-text">
+													<small
+														class="text-body-secondary"
+														id="user-nickname"
+														th:text="${user.nickmane}"
+													></small>
+												</p>
+											</div>
+											<!-- BIO -->
+											<p
+												class="card-text border-start border-danger border-4 ps-1"
+												th:text="${user.userProfile.bio}"
+											></p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- Stats -->
+						<div class="col">
+							<div class="container-fluid">
+								<!-- Statis -->
+								<div class="row">
+									<div
+										class="d-flex align-items-center justify-content-around m-4"
+									>
+										<div class="text-center">
+											<i class="fa fa-check fs-6 d-block mb-2"></i>
+											<h4 class="mb-0 fw-semibold lh-1">
+												<span id="followersCount"> </span>
+											</h4>
+											<p class="mb-0 fs-5">Followers</p>
+										</div>
+										<div class="text-center">
+											<i class="fa fa-check fs-6 d-block mb-2"></i>
+											<h4 class="mb-0 fw-semibold lh-1">
+												<span id="followingCount"> </span>
+											</h4>
+											<p class="mb-0 fs-5">Following</p>
+										</div>
+									</div>
+								</div>
+								<!-- Button-->
+								<div class="row">
+									<div
+										class="d-flex align-items-center m-4 justify-content-center"
+									>
+										<!-- Se profilo utente -->
+										<div th:if="${isFriendProfile == false}">
+											<a
+												class="btn btn-primary me-2"
+												href="/edit_profile"
+												role="button"
+											>
+												Edit <i class="bi bi-pencil-fill"></i>
+											</a>
+											<a
+												class="btn btn-primary me-2"
+												href="/Team"
+												role="button"
+											>
+												Teams <i class="bi bi-people-fill"></i>
+											</a>
+										</div>
+										<!-- Se pagina amico -->
+										<div th:if="${isFriendProfile == true}">
+											<button
+												id="followButton"
+												class="btn btn-primary"
+												type="button"
+											></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Sezioni -->
+					<div class="row">
+						<div class="card-header border-top">
+							<!-- Tab selezione -->
+							<ul
+								class="nav justify-content-end mt-2"
+								id="pills-tab"
+								role="tablist"
+							>
+								<li class="nav-item" role="presentation">
+									<button
+										class="nav-link position-relative rounded-0 active d-flex align-items-center justify-content-center bg-transparent fs-5 py-6"
+										id="pills-games-tab"
+										data-bs-toggle="pill"
+										data-bs-target="#pills-games"
+										type="button"
+										role="tab"
+										aria-controls="pills-games"
+										aria-selected="true"
+									>
+										<i class="fa fa-user me-2 fs-4"></i>
+										<span class="d-none d-md-block">Games</span>
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button
+										class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-5 py-6"
+										id="pills-followers-tab"
+										data-bs-toggle="pill"
+										data-bs-target="#pills-followers"
+										type="button"
+										role="tab"
+										aria-controls="pills-followers"
+										aria-selected="false"
+									>
+										<i class="fa fa-heart me-2 fs-4"></i>
+										<span class="d-none d-md-block">Social</span>
+									</button>
+								</li>
+							</ul>
+						</div>
+						<div class="card-body">
+							<!-- Tab  -->
+							<div class="card-body">
+								<!-- Games -->
+								<div class="tab-content" id="pills-tabContent">
+									<div
+										class="tab-pane fade show active"
+										id="pills-games"
+										role="tabpanel"
+										aria-labelledby="pills-games-tab"
+										tabindex="0"
+									>
+										<!-- Sec Top -->
+										<div
+											class="d-sm-flex align-items-center justify-content-between mt-3 mb-4"
+										>
+											<!-- Cerca -->
+											<form class="position-relative">
+												<input
+													type="text"
+													class="form-control search-chat py-2 ps-5"
+													id="text-srh"
+													placeholder="Search Followers"
+												/>
+												<i
+													class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"
+												></i>
+											</form>
+										</div>
+										<!-- Sec Bottom -->
+										<div class="row text-center">
+											<!-- Match history -->
+											<div class="col mb-4">
+												<table class="table">
+													<thead>
+														<tr>
+															<th scope="col">#</th>
+															<th scope="col">Gamemode</th>
+															<th scope="col">Class</th>
+															<th scope="col">Robot</th>
+															<th scope="col">Score</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<th scope="row">1</th>
+															<td>Mark</td>
+															<td>Otto</td>
+															<td>@mdo</td>
+															<td>
+																WIN
+																<span class="badge text-bg-primary">4 pt</span>
+															</td>
+														</tr>
+														<tr>
+															<th scope="row">2</th>
+															<td>Jacob</td>
+															<td>Thornton</td>
+															<td>@fat</td>
+															<td>
+																WIN
+																<span class="badge text-bg-primary">4 pt</span>
+															</td>
+														</tr>
+														<tr>
+															<th scope="row">3</th>
+															<td colspan="2">Larry the Bird</td>
+															<td>@twitter</td>
+															<td>
+																WIN
+																<span class="badge text-bg-primary">4 pt</span>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
 
-<!-- PAGE -->
-<div class="container mt-3">
-  <!-- Dati profilo -->
-  <div class="card text-center" th:if="${user != null}">
-      <div class="container">
-        <div class="row">
-            <!-- FOTO profilo nome cognome --> 
-            <div class="col">
-              <div class="card my-3 p-0 ms-2" style="max-width: 540px;">
-                <div class="row g-0">
-                  <div class="col-md-4">
-                   <img th:src="${user.userProfile.profilePicturePath != null ? '/t5/images/profileImages/' + user.userProfile.profilePicturePath : '/t5/images/sample_propic.jpg'}"
-                        class="img-fluid rounded-start" alt="Profile Picture">
-                  </div>
-                  <div class="col-md-8 text-start">
-                    <div class="card-body">
-                      <h5 class="card-title" th:text="${user.userProfile.name} + ' ' + ${user.userProfile.surname}"> 
-                      </h5>
-                      <div th:if="${isFriendProfile == true}">
-                        <p class="card-text"><small class="text-body-secondary" id="user-email" th:text="${user.email}"></small></p>
-                      </div>
-                      <!-- BIO -->
-                      <p class="card-text border-start border-danger border-4 ps-1" th:text="${user.userProfile.bio}"></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-             <!-- Stats -->
-            <div class = "col">
-              <div class="container-fluid">
-                <!-- Statis -->
-                <div class="row">
-                  <div class="d-flex align-items-center justify-content-around m-4">
-                    <div class="text-center">
-                      <i class="fa fa-check fs-6 d-block mb-2"></i>
-                      <h4 class="mb-0 fw-semibold lh-1"> 
-                        <span> metti </span>
-                      </h4>
-                      <p class="mb-0 fs-5">Followers</p>
-                    </div>
-                    <div class="text-center">
-                      <i class="fa fa-check fs-6 d-block mb-2"></i>
-                      <h4 class="mb-0 fw-semibold lh-1">
-                        <span> metti </span>
-                      </h4>
-                      <p class="mb-0 fs-5">Following</p>
-                    </div>
-                  </div>
-                </div>
-                <!-- Button-->
-                <div class="row ">                  
-                  <div class="d-flex align-items-center m-4 justify-content-center">
-                    <!-- Se profilo utente -->
-                    <div th:if="${isFriendProfile == false}">
-                      <a class="btn btn-primary me-2" href="/edit_profile" role="button">
-                        Edit <i class="bi bi-pencil-fill"></i>
-                      </a>
-                      <a class="btn btn-primary me-2" href="/Team" role="button">
-                        Teams  <i class="bi bi-people-fill"></i>
-                      </a>
-                    </div>
-                    <!-- Se pagina amico -->
-                    <div th:if="${isFriendProfile == true}">
-                          <button id="followButton"
-                                  class="btn" type="button"
-                                  th:attr="data-user-id=${playerID}">
-                          </button>
+								<!-- Social -->
+								<div class="tab-content" id="pills-tabContent">
+									<div
+										class="tab-pane fade"
+										id="pills-followers"
+										role="tabpanel"
+										aria-labelledby="pills-followers-tab"
+										tabindex="1"
+									>
+										<!-- Nav Top -->
+										<div
+											class="d-sm-flex align-items-center justify-content-between mt-3 mb-4"
+										>
+											<!-- Bottoni -->
+											<div class="d-flex align-items-center">
+												<input
+													type="radio"
+													class="btn-check"
+													name="options-follow"
+													id="option_Followers"
+													autocomplete="off"
+													checked
+												/>
+												<label class="btn fw-semibold" for="option_Followers">
+													Followers
+												</label>
+												<input
+													type="radio"
+													class="btn-check"
+													name="options-follow"
+													id="option_Following"
+													autocomplete="off"
+												/>
+												<label class="btn" for="option_Following">
+													Following
+												</label>
+												<a
+													class="btn btn-primary py-1 px-2 ms-auto"
+													href="/SearchFriend"
+												>
+													<i class="bi bi-person-add"></i> Aggiungi
+												</a>
+											</div>
+											<!-- Cerca -->
+											<form class="position-relative">
+												<input
+													type="text"
+													class="form-control search-chat py-2 ps-5"
+													id="text-srh_follow"
+													placeholder="Search Follow"
+												/>
+												<i
+													class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"
+												></i>
+											</form>
+										</div>
+										<!-- Sec Bottom -->
+										<div
+											class="row row-cols-2 text-center"
+											id="followers_block"
+										></div>
+										<div
+											class="row row-cols-2 text-center"
+											id="following_block"
+										></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card text-center" th:if="${user == null}">
+				profilo non trovato !
+			</div>
+		</div>
 
-                    </div>                    
-                  </div>
-                </div>
-              </div>
-            </div>
-        </div>
-        <!-- Sezioni -->
-        <div class="row">
-          <div class="card-header border-top">
-            <!-- Tab selezione -->
-            <ul class="nav justify-content-end mt-2" id="pills-tab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link position-relative rounded-0 active d-flex align-items-center justify-content-center bg-transparent fs-5 py-6" id="pills-games-tab" data-bs-toggle="pill" data-bs-target="#pills-games" type="button" role="tab" aria-controls="pills-games" aria-selected="true">
-                  <i class="fa fa-user me-2 fs-4"></i>
-                  <span class="d-none d-md-block">Games</span> 
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-5 py-6" id="pills-followers-tab" data-bs-toggle="pill" data-bs-target="#pills-followers" type="button" role="tab" aria-controls="pills-followers" aria-selected="false">
-                  <i class="fa fa-heart me-2 fs-4"></i>
-                  <span class="d-none d-md-block">Social</span> 
-                </button>
-              </li>
-            </ul>
-          </div>
-          <div class="card-body">
-          <!-- Tab  -->
-          <div class="card-body">
-            <!-- Games -->
-            <div class="tab-content" id="pills-tabContent">
-              <div class="tab-pane fade show active" id="pills-games" role="tabpanel" aria-labelledby="pills-games-tab" tabindex="0">
-                <!-- Sec Top -->
-                  <div class="d-sm-flex align-items-center justify-content-between mt-3 mb-4">
-                      <!-- Cerca -->
-                      <form class="position-relative">
-                        <input type="text" class="form-control search-chat py-2 ps-5" id="text-srh" placeholder="Search Followers">
-                        <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"></i>
-                      </form>
-                  </div>
-                <!-- Sec Bottom -->
-                <div class="row text-center">
-                  <!-- Match history -->
-                  <div class="col mb-4">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th scope="col"># </th>
-                          <th scope="col">Gamemode  </th>
-                          <th scope="col">Class </th>
-                          <th scope="col">Robot </th>
-                          <th scope="col">Score </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <th scope="row">1</th>
-                          <td>Mark</td>
-                          <td>Otto</td>
-                          <td>@mdo</td>
-                          <td>
-                            WIN <span class="badge text-bg-primary">4 pt</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th scope="row">2</th>
-                          <td>Jacob</td>
-                          <td>Thornton</td>
-                          <td>@fat</td>
-                          <td>
-                            WIN <span class="badge text-bg-primary">4 pt</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th scope="row">3</th>
-                          <td colspan="2">Larry the Bird</td>
-                          <td>@twitter</td>
-                          <td>
-                            WIN <span class="badge text-bg-primary">4 pt</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+		<div th:replace="fragments/footer :: footer"></div>
+		<!-- Id del profilo -->
+		<span class="d-none" id="userProfileID" th:text="${user.userProfile.id}">
+		</span>
+		<!-- Id di chi guarda il profilo -->
+		<span class="d-none" id="viewID" th:text="${viewID}"> </span>
 
-              </div>
-            </div>
+		<!-- Script personalizzato per gestire la visibilità dei blocchi -->
+		<script>
+			$(document).ready(function () {
+				function setupVisibilityAndSearch(config) {
+					let $radio1 = $("#" + config.radio1);
+					let $radio2 = $("#" + config.radio2);
+					let $block1 = $("#" + config.block1);
+					let $block2 = $("#" + config.block2);
+					let $searchInput = $("#" + config.searchInput); // Campo di ricerca
 
-            <!-- Social -->
-            <div class="tab-content" id="pills-tabContent">
-              <div class="tab-pane fade" id="pills-followers" role="tabpanel" aria-labelledby="pills-followers-tab" tabindex="1">
-                <!-- Nav Top -->
-                <div class="d-sm-flex align-items-center justify-content-between mt-3 mb-4">
-                  <!-- Bottoni -->
-                  <div class="d-flex align-items-center">
-                    <input type="radio" class="btn-check" name="options-follow" id="option_Followers" autocomplete="off" checked>
-                    <label class="btn fw-semibold" for="option_Followers"> Followers </label>
-                    <input type="radio" class="btn-check" name="options-follow" id="option_Following" autocomplete="off">
-                    <label class="btn" for="option_Following"> Following </label>
-                    <a class="btn btn-primary py-1 px-2 ms-auto" href="/SearchFriend">
-                      <i class="bi bi-person-add"></i> Aggiungi
-                    </a>  
-                  </div>
-                  <!-- Cerca -->
-                  <form class="position-relative">
-                    <input type="text" class="form-control search-chat py-2 ps-5" id="text-srh_follow" placeholder="Search Follow">
-                    <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"></i>
-                  </form>
-                </div>
-                <!-- Sec Bottom -->
-                <div class="row row-cols-2 text-center" id="followers_block">
+					// Funzione per aggiornare la visibilità e il placeholder
+					function aggiornaVisibilita() {
+						if ($radio1.is(":checked")) {
+							$block1.show();
+							$block2.hide();
+							$searchInput.attr("placeholder", config.placeholder1);
+						} else if ($radio2.is(":checked")) {
+							$block2.show();
+							$block1.hide();
+							$searchInput.attr("placeholder", config.placeholder2);
+						}
+					}
 
-                </div>
-                <div class="row row-cols-2 text-center" id="following_block">
-                    
-                </div>
-              </div>
-            </div>
+					// Aggiunge listener per il cambio dei radio button
+					$radio1.on("change", aggiornaVisibilita);
+					$radio2.on("change", aggiornaVisibilita);
 
-          </div>
-          </div>
-        </div>
-      </div>
-  </div>
-  <div class="card text-center" th:if="${user == null}">
-    profilo non trovato ! 
-  </div>
-   
-</div>
+					// Imposta lo stato iniziale
+					aggiornaVisibilita();
 
+					// Funzione per la ricerca dinamica nel blocco visibile
+					$searchInput.on("keyup", function () {
+						let searchText = $(this).val().toLowerCase();
+						let $activeBlock = $block1.is(":visible") ? $block1 : $block2;
 
-<div th:replace="fragments/footer :: footer"></div>
+						$activeBlock.find(".col.mb-4").each(function () {
+							let name = $(this).find("h5").text().toLowerCase();
+							let email = $(this).find("span").text().toLowerCase();
+							// Mostra/nasconde gli elementi in base alla ricerca
+							$(this).toggle(
+								name.includes(searchText) || email.includes(searchText)
+							);
+						});
+					});
+				}
 
+				let configFollowers = {
+					radio1: "option_Followers",
+					radio2: "option_Following",
+					block1: "followers_block",
+					block2: "following_block",
+					searchInput: "text-srh_follow",
+					placeholder1: "Search Followers",
+					placeholder2: "Search Following",
+				};
 
-<span class="d-none" id="userProfileID" th:text="${user.userProfile.id}">
-</span>
+				// Inizializza la logica per ogni gruppo
+				setupVisibilityAndSearch(configFollowers);
+			});
+		</script>
 
-<!-- Script personalizzato per gestire la visibilità dei blocchi -->
-<script>
-$(document).ready(function () {
-    function setupVisibilityAndSearch(config) {
-        let $radio1 = $("#" + config.radio1);
-        let $radio2 = $("#" + config.radio2);
-        let $block1 = $("#" + config.block1);
-        let $block2 = $("#" + config.block2);
-        let $searchInput = $("#" + config.searchInput); // Campo di ricerca
+		<!-- Following e followers -->
+		<script>
+			$(document).ready(function () {
+				var userId = $("#userProfileID").text();
 
-        // Funzione per aggiornare la visibilità e il placeholder
-        function aggiornaVisibilita() {
-            if ($radio1.is(":checked")) {
-                $block1.show();
-                $block2.hide();
-                $searchInput.attr("placeholder", config.placeholder1);
-            } else if ($radio2.is(":checked")) {
-                $block2.show();
-                $block1.hide();
-                $searchInput.attr("placeholder", config.placeholder2);
-            }
-        }
+				// Funzione per ottenere i dati da un endpoint e aggiornare il blocco corrispondente
+				function fetchAndUpdateUserBlock(endpoint, blockId, countId) {
+					$.ajax({
+						url: endpoint,
+						type: "GET",
+						data: { userId: userId },
+						dataType: "json",
+						success: function (response) {
+							updateUserBlock(blockId, response, countId);
+						},
+						error: function (xhr) {
+							handleRequestError(xhr, blockId);
+						},
+					});
+				}
 
-        // Aggiunge listener per il cambio dei radio button
-        $radio1.on("change", aggiornaVisibilita);
-        $radio2.on("change", aggiornaVisibilita);
+				// Funzione per aggiornare il blocco con gli utenti ricevuti
+				function updateUserBlock(blockId, users, countId) {
+					let container = $(blockId);
+					container.empty(); // Pulisce il contenitore
 
-        // Imposta lo stato iniziale
-        aggiornaVisibilita();
+					// Calcola la dimensione della lista
+					let count = users.length;
+					// Aggiorna lo span con l'ID specificato per mostrare il numero di utenti
+					$(countId).text(count);
 
-        // Funzione per la ricerca dinamica nel blocco visibile
-        $searchInput.on("keyup", function () {
-            let searchText = $(this).val().toLowerCase();
-            let $activeBlock = $block1.is(":visible") ? $block1 : $block2;
+					if (count === 0) {
+						container.append("<p>Nessun risultato trovato.</p>");
+						return;
+					}
 
-            $activeBlock.find(".col.mb-4").each(function () {
-                let name = $(this).find("h5").text().toLowerCase();
-                let email = $(this).find("span").text().toLowerCase();
-                // Mostra/nasconde gli elementi in base alla ricerca
-                $(this).toggle(name.includes(searchText) || email.includes(searchText));
-            });
-        });
-    }
+					users.forEach((user) => {
+						container.append(createUserCard(user));
+					});
+				}
 
-    let configFollowers = {
-        radio1: "option_Followers",
-        radio2: "option_Following",
-        block1: "followers_block",
-        block2: "following_block",
-        searchInput: "text-srh_follow",
-        placeholder1: "Search Followers",
-        placeholder2: "Search Following"
-    };
-
-    // Inizializza la logica per ogni gruppo
-    setupVisibilityAndSearch(configFollowers);
-});
-</script>
-
-<!-- Following e followers -->
-<script>
-$(document).ready(function () {
-    var userId = $("#userProfileID").text();
-    // Funzione per ottenere i dati da un endpoint e aggiornare il blocco corrispondente
-    function fetchAndUpdateUserBlock(endpoint, blockId) {
-        $.ajax({
-            url: endpoint,
-            type: "GET",
-            data: { userId: userId },
-            dataType: "json",
-            success: function (response) {
-                updateUserBlock(blockId, response);
-            },
-            error: function (xhr) {
-                handleRequestError(xhr, blockId);
-            }
-        });
-    }
-
-    // Funzione per aggiornare il blocco con gli utenti ricevuti
-    function updateUserBlock(blockId, users) {
-        let container = $(blockId);
-        container.empty(); // Pulisce il contenitore
-
-        if (users.length === 0) {
-            container.append("<p>Nessun risultato trovato.</p>");
-            return;
-        }
-
-        users.forEach(user => {
-            container.append(createUserCard(user));
-        });
-    }
-
-    // Funzione per creare il template HTML di una card utente
-    function createUserCard(user) {
-        return `
+				// Funzione per creare il template HTML di una card utente
+				function createUserCard(user) {
+					return `
             <div class="col mb-4">
                 <div class="card">
                     <div class="card-body p-4 d-flex align-items-center gap-3">
-                        <img src="${'/t5/images/profileImages/' + user.profilePicturePath}" 
+                        <img src="${
+													"/t5/images/profileImages/" + user.profilePicturePath
+												}" 
                         alt="twbs" width="32" height="32" 
                         class="rounded-circle flex-shrink-0">
                         <div class="text-start">
-                            <h5 class="fw-semibold mb-0">${user.name + " " + user.surname}</h5>
-                            <span class="fs-5 d-flex align-items-center">${user.email}</span>
+                            <h5 class="fw-semibold mb-0">${
+															user.name + " " + user.surname
+														}</h5>
+                            <span class="fs-5 d-flex align-items-center">${
+															user.email
+														}</span>
+							<span class="fs-5 d-flex align-items-center">${
+															user.nickname
+														}</span>
                         </div>
-                        <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${user.userId}">
+                        <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${
+													user.userId
+												}">
                           Vai al profilo 
-                          </a>                     
+                        </a>                     
                     </div>
                 </div>
             </div>`;
-    }
+				}
 
-    // Funzione per gestire gli errori delle chiamate AJAX
-    function handleRequestError(xhr, blockId) {
-        let errorMessage = "Errore sconosciuto.";
-        if (xhr.status === 400) {
-            errorMessage = "Errore: " + xhr.responseText;
-        } else if (xhr.status === 500) {
-            errorMessage = "Si è verificato un errore imprevisto.";
-        }
-        $(blockId).html(`<p style='color: red;'>${errorMessage}</p>`);
-    }
+				// Funzione per gestire gli errori delle chiamate AJAX
+				function handleRequestError(xhr, blockId) {
+					let errorMessage = "Errore sconosciuto.";
+					if (xhr.status === 400) {
+						errorMessage = "Errore: " + xhr.responseText;
+					} else if (xhr.status === 500) {
+						errorMessage = "Si è verificato un errore imprevisto.";
+					}
+					$(blockId).html(`<p style='color: red;'>${errorMessage}</p>`);
+				}
 
-    // Carica i follower e gli utenti seguiti all'avvio della pagina
-    fetchAndUpdateUserBlock("/followers", "#followers_block");
-    fetchAndUpdateUserBlock("/following", "#following_block");
-});
+				// Carica i follower e gli utenti seguiti all'avvio della pagina
+				fetchAndUpdateUserBlock(
+					"/followers",
+					"#followers_block",
+					"#followersCount"
+				);
+				fetchAndUpdateUserBlock(
+					"/following",
+					"#following_block",
+					"#followingCount"
+				);
+			});
+		</script>
 
+		<div th:if="${isFriendProfile == true}">
+			<script>
+				document.addEventListener("DOMContentLoaded", async function () {
+					const followButton = document.getElementById("followButton");
+					const followingID =document.getElementById("userProfileID").textContent;
+					const followerID = document.getElementById("viewID").textContent;
 
-</script>
+					if (!followButton) return;
+					// Funzione per aggiornare lo stato del pulsante
+					async function updateFollowButton() {
+						try {
+							const response = await fetch(
+								`/isFollowing?followerId=${followerID}&followingId=${followingID}`
+							);
+							if (!response.ok)
+								throw new Error("Errore nel recupero dello stato di follow");
 
-<div th:if="${isFriendProfile == true}">
-  <script>
-      $(document).ready(function() {
-    $("#followButton").click(function() {
-        let button = $(this);
-        let targetUserId = button.data("user-id");
-        let authUserId = userId; //prendo da util.js
-        
-        $.ajax({
-            url: "/add-follow",
-            type: "POST",
-            data: {
-                targetUserId: targetUserId,
-                authUserId: authUserId
-            },
-            success: function(response) {
-                 // Toggle tra btn-danger (Unfollow) e btn-primary (Follow)
-                if (button.hasClass("btn-primary")) {
-                    button.removeClass("btn-primary").addClass("btn-danger").text("Unfollow");
-                } else {
-                    button.removeClass("btn-danger").addClass("btn-primary").text("Follow");
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Errore durante la richiesta AJAX: ", error);
-            }
-        });
-    });
-});
-  </script>
-</div>
+							const isFollowing = await response.json();
 
-</body>
+							if (isFollowing) {
+								followButton.classList.remove("btn-info");
+								followButton.classList.add("btn-danger");
+								followButton.textContent = "Unfollow";
+							} else {
+								followButton.classList.remove("btn-danger");
+								followButton.classList.add("btn-info");
+								followButton.textContent = "Follow";
+							}
+						} catch (error) {
+							console.error(
+								"Errore durante il caricamento dello stato di follow:",
+								error
+							);
+						}
+					}
+
+					// Chiamata per ottenere lo stato attuale del follow
+					await updateFollowButton();
+
+					// Gestione del click per il follow/unfollow
+					followButton.addEventListener("click", async function () {
+						followButton.disabled = true; // Disabilita temporaneamente il pulsante
+
+						try {
+							// Creazione dell'URL con i parametri in modo pulito
+							const params = new URLSearchParams({
+								followerId: followerID,
+								followingId: followingID,
+							});
+
+							const response = await fetch(
+								`/toggle_follow?${params.toString()}`,
+								{
+									method: "POST",
+								}
+							);
+
+							if (!response.ok)
+								throw new Error("Errore durante il follow/unfollow");
+
+							const isFollowing = await response.json();
+
+							followButton.classList.toggle("btn-info", !isFollowing);
+							followButton.classList.toggle("btn-danger", isFollowing);
+							followButton.textContent = isFollowing ? "Unfollow" : "Follow";
+						} catch (error) {
+							console.error("Errore:", error);
+						} finally {
+							followButton.disabled = false; // Riabilita il pulsante
+						}
+					});
+				});
+			</script>
+		</div>
+	</body>
 </html>

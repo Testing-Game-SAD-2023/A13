@@ -28,9 +28,10 @@ import com.g2.Model.User;
 public class UserProfileComponent extends GenericObjectComponent {
 
     private final ServiceManager serviceManager;
-    private final User user;
-    private final Integer userProfileId;
     private final Boolean IsFriendProfile;
+    private final String userID;
+    private final String FriendID;
+
     /**
      * Costruttore per il componente.
      *
@@ -42,15 +43,26 @@ public class UserProfileComponent extends GenericObjectComponent {
      * @param action l'azione da eseguire per ottenere il profilo.
      */
     public UserProfileComponent(ServiceManager serviceManager,
-            User user,
-            Integer userProfileId,
-            Boolean IsFriendProfile
+            Boolean IsFriendProfile,
+            String userID
     ) {
         super(null, null);  // Il costruttore della superclasse è invocato senza parametri
         this.serviceManager = serviceManager;
-        this.user = user;
-        this.userProfileId = userProfileId;
         this.IsFriendProfile = IsFriendProfile;
+        this.userID = userID;
+        this.FriendID = null;
+    }
+
+    public UserProfileComponent(ServiceManager serviceManager,
+            Boolean IsFriendProfile,
+            String userID,
+            String FriendID
+    ) {
+        super(null, null);  // Il costruttore della superclasse è invocato senza parametri
+        this.serviceManager = serviceManager;
+        this.IsFriendProfile = IsFriendProfile;
+        this.userID = userID;
+        this.FriendID = FriendID;
     }
 
     /**
@@ -64,7 +76,16 @@ public class UserProfileComponent extends GenericObjectComponent {
     public Map<String, Object> getModel() {
         try {
             // Inserisce i dati del profilo utente nel modello con la chiave specificata
-            this.Model.put("user", this.user);
+            User user = (User) serviceManager.handleRequest("T23", "GetUser", this.userID);
+            if (this.IsFriendProfile) {
+                User FriendUser = (User) serviceManager.handleRequest("T23", "GetUser", this.FriendID);
+                this.Model.put("user", FriendUser);
+                this.Model.put("viewID", user.getUserProfile().getId());
+            } else {
+                // profilo privato dell'utente 
+                this.Model.put("user", user);
+                this.Model.put("viewID", null);
+            }
             this.Model.put("isFriendProfile", IsFriendProfile);
             return this.Model;
         } catch (Exception e) {
@@ -72,10 +93,5 @@ public class UserProfileComponent extends GenericObjectComponent {
             System.err.println("[UserProfileComponent]Errore durante il recupero del profilo utente: " + e.getMessage());
             return null;
         }
-    }
-
-    public String getUserProfileId() {
-        String userProfileId_string = String.valueOf(this.userProfileId);
-        return userProfileId_string;
     }
 }
