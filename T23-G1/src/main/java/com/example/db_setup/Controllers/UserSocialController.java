@@ -56,7 +56,6 @@ public class UserSocialController {
         return userService.getStudentiTeam(idsStudenti);
     }
 
-
     /*
      * Sezione following 
      */
@@ -116,7 +115,6 @@ public class UserSocialController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore imprevisto.");
         }
     }
-
 
     /*
      * Gestione Profilo 

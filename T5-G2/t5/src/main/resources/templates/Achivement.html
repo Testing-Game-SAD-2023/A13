@@ -205,11 +205,6 @@
           <input type="radio" class="btn-check" name="options-arc" id="option_Locked" autocomplete="off">
           <label class="btn" for="option_Locked"> Locked </label>
         </div>
-        <!-- Cerca -->
-        <form class="position-relative">
-          <input type="text" class="form-control search-chat py-2 ps-5" id="text-srh-arch" placeholder="Search Achievement">
-          <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"></i>
-        </form>
     </div>
       <!-- Sec bottom -->
     <div class="container-fluid px-1">
@@ -282,18 +277,15 @@
         let $radio2 = $("#" + config.radio2);
         let $block1 = $("#" + config.block1);
         let $block2 = $("#" + config.block2);
-        let $searchInput = $("#" + config.searchInput); // Campo di ricerca
 
         // Funzione per aggiornare la visibilità e il placeholder
         function aggiornaVisibilita() {
             if ($radio1.is(":checked")) {
                 $block1.show();
                 $block2.hide();
-                $searchInput.attr("placeholder", config.placeholder1);
             } else if ($radio2.is(":checked")) {
                 $block2.show();
                 $block1.hide();
-                $searchInput.attr("placeholder", config.placeholder2);
             }
         }
 
@@ -324,7 +316,6 @@
         radio2: "option_Locked",
         block1: "unlockedBlock",
         block2: "lockedBlock",
-        searchInput: "text-srh-arch",
         placeholder1: "Search Unlocked",
         placeholder2: "Search Locked"
     };
