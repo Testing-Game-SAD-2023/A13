@@ -2,7 +2,6 @@ package com.g2.Game.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONException;
@@ -12,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.g2.Game.GameModes.Coverage.CompileResult;
 import com.g2.Game.GameFactory.GameRegistry;
+import com.g2.Game.GameModes.Coverage.CompileResult;
 import com.g2.Game.GameModes.GameLogic;
 import com.g2.Game.Service.Exceptions.GameAlreadyExistsException;
 import com.g2.Game.Service.Exceptions.GameDontExistsException;
@@ -53,7 +52,7 @@ public class GameService {
     private int GetRobotScore(String testClass, String robot_type, String difficulty) {
         logger.info("getRobotScore: Richiesta punteggio robot per testClass={}, robotType={}, difficulty={}.", testClass, robot_type, difficulty);
         try {
-            String response_T4 = (String) serviceManager.handleRequest("T4", "GetRisultati",
+            String response_T4 = serviceManager.handleRequest("T4", "GetRisultati", String.class,
                     testClass, robot_type, difficulty);
 
             JSONObject jsonObject = new JSONObject(response_T4);            
@@ -78,8 +77,15 @@ public class GameService {
         GameLogic gameLogic = activeGames.get(playerId);
         if (gameLogic == null) {
             //Creo la nuova partita
+            /*
+             * gameRegistry istanzia dinamicamente uno degli oggetti gameLogic (sfida, allenamento, scalata e ecc)
+             * basta passargli il campo mode e dinamicamente se ne occupa lui  
+             */
             gameLogic = gameRegistry.createGame(mode, serviceManager, playerId, underTestClassName, type_robot, difficulty);
             activeGames.put(playerId, gameLogic);
+            /*
+             * Salvo su T4
+             */
             gameLogic.CreateGame();
             logger.info("createGame: Inizio creazione partita per playerId={}, mode={}.", playerId, mode);
             return gameLogic;
@@ -186,14 +192,11 @@ public class GameService {
         return response;
     }
 
-    //Gestione Notifiche
-    @SuppressWarnings("unchecked")
+    //Gestione Trofei e notifiche
     private void updateProgressAndNotifications(String playerId) {
-        List<User> users = (List<User>) serviceManager.handleRequest("T23", "GetUsers");
-        Long userId = Long.valueOf(playerId);
-        User user = users.stream().filter(u -> Objects.equals(u.getId(), userId)).findFirst().orElse(null);
+        User user = serviceManager.handleRequest("T23", "GetUser", User.class, playerId);
         String email = user.getEmail();
-        List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(userId.intValue());
+        List<AchievementProgress> newAchievements = achievementService.updateProgressByPlayer(user.getId().intValue());
         achievementService.updateNotificationsForAchievements(email, newAchievements);
     }
 }

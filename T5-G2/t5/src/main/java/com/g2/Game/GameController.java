@@ -58,7 +58,8 @@ public class GameController {
     }
 
     /*
-     *  Chiamata che l'editor fa appena instanzia un nuovo gioco, controllo se la partita quindi esisteva già o meno
+     *  Chiamata che controllo se la partita quindi esisteva già o meno
+     *  se non esiste instanzia un nuovo gioco 
      */
     @PostMapping("/StartGame")
     public ResponseEntity<GameLogic> StartGame(@RequestParam(required = true) String playerId,

@@ -17,6 +17,6 @@ public class SfidaFactory implements GameFactoryFunction {
     @Override
     public GameLogic create(ServiceManager sm, String playerId, String underTestClassName, 
                             String type_robot, String difficulty, String mode) {
-        return new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, mode);
+        return new Sfida(sm, playerId, underTestClassName, type_robot, difficulty, "sfida");
     }
 }

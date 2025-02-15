@@ -14,19 +14,16 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package com.g2.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.commons.model.Gamemode;
 import com.g2.Interfaces.ServiceManager;
@@ -38,11 +35,12 @@ import com.g2.Model.StatisticProgress;
 
 @Service
 public class AchievementService {
+
     private final ServiceManager serviceManager;
 
     @Autowired
-    public AchievementService(RestTemplate restTemplate) {
-        this.serviceManager = new ServiceManager(restTemplate);
+    public AchievementService(ServiceManager serviceManager) {
+        this.serviceManager = serviceManager;
     }
 
     /**
@@ -51,29 +49,32 @@ public class AchievementService {
      */
     public List<AchievementProgress> updateProgressByPlayer(int playerID) {
         List<Game> gamesList = getGames(playerID);
-        List<AchievementProgress> achievementProgressesPrevious = getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList();
+        Set<String> alreadyObtainedIDs = getProgressesByPlayer(playerID).stream()
+                .filter(a -> a.Progress >= a.ProgressRequired)
+                .map(a -> a.ID)
+                .collect(Collectors.toSet());
+
         List<Statistic> statisticList = getStatistics();
 
         for (Statistic statistic : statisticList) {
-            List<Game> filteredGameList = gamesList;
-            if(statistic.getGamemode() != Gamemode.All)
-                filteredGameList = gamesList.stream().filter(game -> Objects.equals(game.getDescription(), statistic.getGamemode().toString())).toList();
-
-            //TODO: filtrare anche per Robot (allo stato attuale non vi è associazione in DB tra robot e partita)
+            List<Game> filteredGameList = (statistic.getGamemode() != Gamemode.All)
+                    ? gamesList.stream()
+                            .filter(game -> game.getDescription().equals(statistic.getGamemode().toString()))
+                            .toList()
+                    : gamesList;
 
             float statisticValue = statistic.calculate(filteredGameList);
-            System.out.println("[CALCULATION] Calculating for games: " + filteredGameList);
-            System.out.println("Updated " + statistic.getName() + ": " + statisticValue);
             setProgress(playerID, statistic.getID(), statisticValue);
         }
 
-        List<AchievementProgress> obtainedAchievements = new ArrayList<>(getProgressesByPlayer(playerID).stream().filter(a -> a.Progress >= a.ProgressRequired).toList());
-        // filter out all the achievements already obtained, and return the others
-        obtainedAchievements.removeIf(x -> achievementProgressesPrevious.stream().anyMatch(y -> y.ID.equals(x.ID)));
-        System.out.println("Obtained achievements: " + obtainedAchievements);
+        List<AchievementProgress> obtainedAchievements = getProgressesByPlayer(playerID).stream()
+                .filter(a -> a.Progress >= a.ProgressRequired && !alreadyObtainedIDs.contains(a.ID))
+                .toList();
+
         return obtainedAchievements;
     }
 
+    @SuppressWarnings("unchecked")
     private List<Game> getGames(int playerId) {
         return (List<Game>) serviceManager.handleRequest("T4", "getGames", playerId);
     }
@@ -93,28 +94,30 @@ public class AchievementService {
         List<Achievement> achievementList = (List<Achievement>) serviceManager.handleRequest("T1", "getAchievements");
         List<StatisticProgress> categoryProgressList = getStatisticsByPlayer(playerID);
         List<AchievementProgress> achievementProgresses = new ArrayList<>();
-        for (Achievement a : achievementList)
-        {
-            List<StatisticProgress> filteredList = categoryProgressList.stream().filter(cat -> Objects.equals(cat.getStatisticID(), a.getStatisticID())).toList();
-            for (StatisticProgress c : filteredList)
-                achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), c.getProgress()));
-            if (filteredList.size() == 0) // if there is no progress recorded, just put progress 0
-                achievementProgresses.add(new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), 0));
+
+        Map<String, Float> progressMap = categoryProgressList.stream()
+                .collect(Collectors.toMap(StatisticProgress::getStatisticID, StatisticProgress::getProgress));
+
+        for (Achievement a : achievementList) {
+            float progress = progressMap.getOrDefault(a.getStatisticID(), 0f);
+            achievementProgresses.add(
+                    new AchievementProgress(a.getID(), a.getName(), a.getDescription(), a.getProgressRequired(), progress)
+            );
         }
         return achievementProgresses;
     }
 
-    public Map<String, Statistic> GetIdToStatistic(){
+    public Map<String, Statistic> GetIdToStatistic() {
         return getStatistics().stream().collect(Collectors.toMap(Statistic::getID, stat -> stat));
-    } 
-    
-    public List<AchievementProgress> getUnlockedAchievementProgress(List<AchievementProgress> achievementProgresses){
+    }
+
+    public List<AchievementProgress> getUnlockedAchievementProgress(List<AchievementProgress> achievementProgresses) {
         return achievementProgresses.stream().filter(a -> a.getProgress() >= a.getProgressRequired()).toList();
     }
-    
-    public List<AchievementProgress> getLockedAchievementProgress(List<AchievementProgress> achievementProgresses){
+
+    public List<AchievementProgress> getLockedAchievementProgress(List<AchievementProgress> achievementProgresses) {
         return achievementProgresses.stream().filter(a -> a.getProgress() < a.getProgressRequired()).toList();
-    } 
+    }
 
     public List<StatisticProgress> getStatisticsByPlayer(int playerID) {
         @SuppressWarnings("unchecked")
@@ -125,16 +128,16 @@ public class AchievementService {
         List<Statistic> statisticList = getStatistics();
         // Ottimizzazione con Set per rimuovere statistiche non valide
         Set<String> validStatisticIDs = statisticList.stream()
-                                                     .map(Statistic::getID)
-                                                     .collect(Collectors.toSet());
+                .map(Statistic::getID)
+                .collect(Collectors.toSet());
         statisticProgresses.removeIf(x -> !validStatisticIDs.contains(x.getStatisticID()));
         // Ottimizzazione con Set per aggiungere statistiche mancanti
         Set<String> existingStatisticIDs = statisticProgresses.stream()
-                                                                .map(StatisticProgress::getStatisticID)
-                                                                .collect(Collectors.toSet());
+                .map(StatisticProgress::getStatisticID)
+                .collect(Collectors.toSet());
         for (Statistic statistic : statisticList) {
             if (!existingStatisticIDs.contains(statistic.getID())) {
-                 // Aggiungi la statistica con il nome associato
+                // Aggiungi la statistica con il nome associato
                 statisticProgresses.add(new StatisticProgress(playerID, statistic.getID(), 0, statistic.getName()));
             }
         }
@@ -143,11 +146,14 @@ public class AchievementService {
     }
 
     public void updateNotificationsForAchievements(String userEmail, List<AchievementProgress> newAchievements) {
-        for (AchievementProgress achievement : newAchievements) {
-            String titolo = "Nuovo Achievement";
-            String message = "Congratulazioni! Hai ottenuto il nuovo achievement: " + achievement.Name + "!";
-            serviceManager.handleRequest("T23", "NewNotification", userEmail, titolo, message);
+        if (newAchievements.isEmpty()) {
+            return; // Evita operazioni inutili
 
-        }
+                }newAchievements.forEach(achievement -> {
+            String titolo = "Nuovo Achievement";
+            String message = "Congratulazioni! Hai ottenuto il nuovo achievement: " + achievement.getName() + "!";
+            serviceManager.handleRequest("T23", "NewNotification", userEmail, titolo, message);
+        });
     }
+
 }

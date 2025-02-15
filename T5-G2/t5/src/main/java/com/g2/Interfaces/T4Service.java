@@ -176,6 +176,9 @@ public class T4Service extends BaseService {
         JSONObject obj = new JSONObject();
         obj.put("difficulty", difficulty);
         obj.put("name", name);
+        /*
+         * Stiamo usando descrizione per salvare la modalità di gioco 
+         */
         obj.put("description", description);
         obj.put("startedAt", Time);
         JSONArray playersArray = new JSONArray();

@@ -73,13 +73,13 @@ public abstract class GameLogic {
      */
     public void CreateGame() {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        this.GameID = (int) serviceManager.handleRequest("T4", "CreateGame", Time, "difficulty", "name", this.gamemode, this.PlayerID);
-        this.RoundID = (int) serviceManager.handleRequest("T4", "CreateRound", this.GameID, this.ClasseUT, Time);
+        this.GameID = serviceManager.handleRequest("T4", "CreateGame", Integer.class, Time, this.difficulty, "name", this.gamemode, this.PlayerID);
+        this.RoundID = serviceManager.handleRequest("T4", "CreateRound", Integer.class, this.GameID, this.ClasseUT, Time);
     }
 
     protected void CreateTurn(String Time, int userScore) {
         //Apro un nuovo turno
-        String response= (String) serviceManager.handleRequest("T4", "CreateTurn", this.PlayerID, this.RoundID, Time);
+        String response= serviceManager.handleRequest("T4", "CreateTurn", String.class, this.PlayerID, this.RoundID, Time);
         //Chiudo il turno 
         JSONArray jsonArray = new JSONArray(response);
         this.TurnID = jsonArray.getJSONObject(0).getInt("id");

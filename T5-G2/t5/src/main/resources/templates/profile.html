@@ -44,7 +44,8 @@
 													<small
 														class="text-body-secondary"
 														id="user-nickname"
-														th:text="${user.nickmane}"
+														th:if="${user.nickname != null}"
+														th:text="${user.nickname}"
 													></small>
 												</p>
 											</div>

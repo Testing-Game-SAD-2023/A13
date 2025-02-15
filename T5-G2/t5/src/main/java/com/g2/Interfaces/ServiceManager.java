@@ -18,7 +18,6 @@
 // ServiceManager.java
 package com.g2.Interfaces;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,51 +31,50 @@ import org.springframework.web.client.RestTemplate;
 public class ServiceManager {
     protected final Map<String, ServiceInterface> services = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(ServiceManager.class);
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public ServiceManager(RestTemplate restTemplate) {
-        /*
-         * Registrazione dinamica dei servizi, si occupa lui di instanziare in
-         * automatico
-         */
-        registerService("T1", T1Service.class, restTemplate);
-        registerService("T23", T23Service.class, restTemplate);
-        registerService("T4", T4Service.class, restTemplate);
-        registerService("T7", T7Service.class, restTemplate);
+    public ServiceManager(ServiceConfig config, RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+
+        // Carica i servizi definiti nella configurazione
+        String[] enabledServices = config.getEnabled().split(",");
+        Map<String, String> serviceMapping = config.getMapping();
+
+        for (String serviceName : enabledServices) {
+            serviceName = serviceName.trim();
+            String className = serviceMapping.get(serviceName);
+            if (className == null) {
+                logger.warn("[SERVICE MANAGER] Nessuna classe associata a {}", serviceName);
+                continue;
+            }
+            try {
+                Class<?> clazz = Class.forName(className);
+                if (ServiceInterface.class.isAssignableFrom(clazz)) {
+                    @SuppressWarnings("unchecked")
+                    Class<? extends ServiceInterface> serviceClass = (Class<? extends ServiceInterface>) clazz;
+                    registerService(serviceName, serviceClass);
+                } else {
+                    logger.error("[SERVICE MANAGER] La classe {} non implementa ServiceInterface", className);
+                }
+            } catch (ClassNotFoundException e) {
+                logger.error("[SERVICE MANAGER] Classe {} non trovata", className, e);
+            }
+        }
     }
 
-    // Metodo helper per registrare i servizi
-    protected <T extends ServiceInterface> void registerService(String serviceName, Class<T> serviceClass, RestTemplate restTemplate) {
-        if (serviceClass == null){
-            throw new IllegalArgumentException("[SERVICE MANAGER] serviceClass Nullo !");
-        }
-        if (serviceName == null || serviceName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Il nome del servizio non può essere nullo o vuoto.");
-        }
-        if (restTemplate == null) {
-            throw new IllegalArgumentException("[SERVICE MANAGER] RestTemplate Nullo !");
-        }
+    // Metodo per registrare un servizio
+    private void registerService(String serviceName, Class<? extends ServiceInterface> serviceClass) {
         if (services.containsKey(serviceName)) {
-            logger.error("[SERVICE MANAGER] Il servizio: " + serviceName + " è già registrato.");
-            throw new IllegalArgumentException("Il servizio: " + serviceName + " è già registrato.");
+            logger.warn("[SERVICE MANAGER] Servizio già registrato: {}", serviceName);
+            return;
         }
-        // Creo il servizio da registrare nel manager
-        T service = createService(serviceClass, restTemplate);
-        if (service != null) {
-            services.put(serviceName, service);
-            logger.info("[SERVICE MANAGER] Servizio registrato: " + serviceName);
-        }
-    }
-
-    // Metodo per la creazione di un servizio
-    protected <T extends ServiceInterface> T createService(Class<T> serviceClass, RestTemplate restTemplate) {
         try {
-            T service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
-            logger.info("[SERVICE MANAGER] \"ServiceCreation: " + serviceClass.getSimpleName());
-            return service;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException  e) {
-            logger.error("[SERVICE MANAGER] Errore nella creazione del servizio: " + serviceClass.getName() + " Exception: " + e.getMessage());
-            throw new RuntimeException("Impossibile creare l'istanza del servizio: " + serviceClass.getName(), e);
+            ServiceInterface service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
+            services.put(serviceName, service);
+            logger.info("[SERVICE MANAGER] Servizio registrato: {} -> {}", serviceName, serviceClass.getSimpleName());
+        } catch (Exception e) {
+            logger.error("[SERVICE MANAGER] Errore durante la registrazione di {}", serviceName, e);
         }
     }
 
@@ -89,6 +87,20 @@ public class ServiceManager {
         }
         logger.info("[SERVICE MANAGER][HandleRequest]: " + serviceName + " - " + action);
         return service.handleRequest(action, params);
+    }
+
+    // Metodo per gestire le richieste in modo generico
+    public <T> T handleRequest(String serviceName, String action, Class<T> returnType, Object... params) {
+        // Ottenere la risposta dal servizio
+        Object response = handleRequest(serviceName, action, params);
+        // Verifica che la risposta sia compatibile con il tipo generico richiesto
+        if (returnType.isInstance(response)) {
+            return returnType.cast(response);
+        } else {
+            logger.error("[SERVICE MANAGER][HandleRequest] Tipo di ritorno incompatibile per il servizio: " + serviceName);
+            throw new ClassCastException("Il tipo di ritorno atteso è " + returnType.getName() +
+                                        ", ma è stato restituito " + (response != null ? response.getClass().getName() : "null"));
+        }
     }
 
     protected ServiceInterface getServices(String key) {

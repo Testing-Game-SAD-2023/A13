@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.client.RestTemplate;
 
 import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
@@ -33,11 +32,12 @@ import com.g2.Service.AchievementService;
 public class UserProfileController {
 
     private final ServiceManager serviceManager;
-    @Autowired
     private AchievementService achievementService;
 
-    public UserProfileController(RestTemplate restTemplate) {
-        this.serviceManager = new ServiceManager(restTemplate);
+    @Autowired
+    public UserProfileController(ServiceManager serviceManager, AchievementService achievementService) {
+        this.serviceManager = serviceManager;
+        this.achievementService = achievementService;
     }
 
     @GetMapping("/SearchFriend")

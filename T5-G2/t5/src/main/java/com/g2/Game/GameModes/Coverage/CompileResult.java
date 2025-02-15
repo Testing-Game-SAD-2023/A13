@@ -41,9 +41,9 @@ public class CompileResult {
         String underTestClassName = ClassName + ".java";
         this.serviceManager = serviceManager;
         // Recupero il codice della classe under test
-        String underTestClassCode = (String) this.serviceManager.handleRequest("T1", "getClassUnderTest", ClassName);
+        String underTestClassCode = this.serviceManager.handleRequest("T1", "getClassUnderTest", String.class, ClassName);
         // Chiamata a T7 per calcolare coverage
-        String response_T7 = (String) this.serviceManager.handleRequest("T7", "CompileCoverage", testingClassName, testingClassCode, underTestClassName, underTestClassCode);
+        String response_T7 = this.serviceManager.handleRequest("T7", "CompileCoverage", String.class, testingClassName, testingClassCode, underTestClassName, underTestClassCode);
         // Estraggo i valori dalla risposta
         JSONObject responseObj = new JSONObject(response_T7);
         this.XML_coverage = responseObj.optString("coverage", null);
