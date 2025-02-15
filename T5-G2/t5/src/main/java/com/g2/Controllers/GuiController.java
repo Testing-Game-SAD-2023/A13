@@ -64,6 +64,7 @@ public class GuiController {
     private final LocaleResolver localeResolver;
     @Autowired
     private AchievementService achievementService;
+
     public GuiController(RestTemplate restTemplate, LocaleResolver localeResolver) {
         this.serviceManager = new ServiceManager(restTemplate);
         this.localeResolver = localeResolver;
@@ -96,6 +97,7 @@ public class GuiController {
             @CookieValue(name = "jwt", required = false) String jwt,
             @RequestParam(value = "mode", required = false) String mode) {
 
+        
         if ("Sfida".equals(mode) || "Allenamento".equals(mode)) {
             PageBuilder gamemode = new PageBuilder(serviceManager, "gamemode", model);
             //controllo che sia stata fornita una modalità valida dall'utente

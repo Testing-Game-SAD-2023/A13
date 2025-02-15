@@ -56,14 +56,14 @@ public class UserProfile {
     @Column(length = 30, nullable = false)
     public String surname;
     @Column(length = 30, nullable = false)
-    public String nickname;
+    private String nickname = "default_nickname";
     @Column(length = 20)
     public String email;
 
     @PrePersist
     public void prePersist() {
-        if (nickname == null || nickname.isEmpty()) {
-            nickname = "nickname" + this.ID;
+        if (nickname == null || nickname.trim().isEmpty()) {
+            nickname = "default_nickname";
         }
     }
 

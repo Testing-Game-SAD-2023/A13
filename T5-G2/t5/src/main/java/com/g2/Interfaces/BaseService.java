@@ -133,7 +133,6 @@ public abstract class BaseService implements ServiceInterface {
     // Metodo per chiamate POST senza specificare content type -> default
     // application/x-www-form-urlencoded
     protected <R> R callRestPost(String endpoint, MultiValueMap<String, String> formData, Map<String, String> queryParams, Class<R> responseType) {
-
         return callRestPost(endpoint, formData, queryParams, null, responseType);
     }
 

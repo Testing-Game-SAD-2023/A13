@@ -15,12 +15,12 @@
  *   limitations under the License.
  */
 
-package com.g2.Game;
+package com.g2.Game.GameModes;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.commons.model.Gamemode;
+import com.g2.Game.GameModes.Coverage.CompileResult;
 import com.g2.Interfaces.ServiceManager;
 
 public class ScalataGame extends GameLogic {
@@ -43,10 +43,10 @@ public class ScalataGame extends GameLogic {
     }
 
     @Override
-    public void playTurn(int userScore, int robotScore) {
+    public void NextTurn(int userScore, int robotScore) {
         if (currentGameIndex < games.size()) {
             Sfida currentGame = games.get(currentGameIndex);
-            currentGame.playTurn(userScore, robotScore);
+            currentGame.NextTurn(userScore, robotScore);
 
             // Verifica se il gioco corrente è finito
             if (currentGame.isGameEnd()) {
@@ -65,14 +65,20 @@ public class ScalataGame extends GameLogic {
     }
 
     @Override
-    public int GetScore(int coverage) {
+    public int GetScore(CompileResult compileResult) {
         // Implementa la logica per calcolare il punteggio totale tra tutti i giochi
         int totalScore = 0;
         for (Sfida game : games) {
-            totalScore += game.GetScore(coverage); // Calcola il punteggio per ogni gioco
+            totalScore += game.GetScore(compileResult); // Calcola il punteggio per ogni gioco
         }
         return totalScore;
     }
 
+    @Override
+    public Boolean isWinner(){
+        return true;
+    }
+
     // Altri metodi necessari per gestire la logica del gioco
+
 }

@@ -15,12 +15,13 @@
  *   limitations under the License.
  */
 
-package com.g2.Game;
+package com.g2.Game.GameModes;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.g2.Game.GameModes.Coverage.CompileResult;
 import com.g2.Interfaces.ServiceManager;
 
 public class Sfida extends GameLogic {
@@ -28,9 +29,6 @@ public class Sfida extends GameLogic {
     private int currentTurn;
     private int userScore;
     private int robotScore;
-    private int totalTurns = 10;
-    private Boolean GameOVer = false;
-
 
     //Questa classe si specializza in una partita semplice basata sui turni, prende il nome di Sfida nella UI
     public Sfida(ServiceManager serviceManager, String PlayerID, String ClasseUT,
@@ -40,10 +38,11 @@ public class Sfida extends GameLogic {
     }
 
     @Override
-    public void playTurn(int userScore, int robotScore) {
+    public void NextTurn(int userScore, int robotScore) {
         String Time = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         currentTurn++;
-        //CreateTurn(Time, userScore);
+        this.robotScore = robotScore;
+        CreateTurn(Time, userScore);
         System.out.println("[GAME] Turn " + currentTurn + " played. User Score: " + userScore + ", Robot Score: " + robotScore);
     }
 
@@ -53,8 +52,14 @@ public class Sfida extends GameLogic {
     }
 
     @Override
-    public int GetScore(int coverage) {
+    public Boolean isWinner(){
+        return userScore > robotScore;
+    }
+
+    @Override
+    public int GetScore(CompileResult compileResult) {
         // Se loc è 0, il punteggio è sempre 0
+        int coverage = compileResult.getLineCoverage().getCovered();
         if (coverage == 0) {
             return 0;
         }
@@ -64,7 +69,8 @@ public class Sfida extends GameLogic {
         double penaltyFactor = Math.pow(0.9, currentTurn);
         // Calcolo del punteggio
         double score = locPerc * 100 * penaltyFactor;
-        return (int) Math.ceil(score);
+        this.userScore = (int) Math.ceil(score);
+        return userScore;
     }
 
 }

@@ -496,7 +496,7 @@ func setupRoutes(
 	*	Ogni rotta è associata a un handler che viene definito come una funzione.
 	*/
 	r.Route("/games", func(r chi.Router) {
-		// Get game
+		// Get game by his id
 		r.Get("/{id}", api.HandlerFunc(gc.FindByID))
 
 		// Get games by player id
