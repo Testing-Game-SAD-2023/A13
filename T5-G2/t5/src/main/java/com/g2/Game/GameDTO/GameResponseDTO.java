@@ -1,8 +1,8 @@
-package com.g2.Model.DTO;
+package com.g2.Game.GameDTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GameResponse {
+public class GameResponseDTO {
 
     @JsonProperty("outCompile")
     private String outCompile;

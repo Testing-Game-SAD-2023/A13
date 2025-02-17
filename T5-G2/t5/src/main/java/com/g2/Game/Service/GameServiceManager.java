@@ -3,14 +3,15 @@ package com.g2.Game.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.g2.Game.GameDTO.GameResponseDTO;
 import com.g2.Game.GameModes.Coverage.CompileResult;
 import com.g2.Game.GameModes.GameLogic;
 import com.g2.Game.Service.Exceptions.GameAlreadyExistsException;
 import com.g2.Game.Service.Exceptions.GameDontExistsException;
-import com.g2.Model.DTO.GameResponse;
 
 @Service
 public class GameServiceManager {
+
     private final GameService gameService;
 
     @Autowired
@@ -22,8 +23,7 @@ public class GameServiceManager {
             String mode,
             String underTestClassName,
             String type_robot,
-            String difficulty) throws GameAlreadyExistsException
-    {
+            String difficulty) throws GameAlreadyExistsException {
         return gameService.CreateGame(playerId, mode, underTestClassName, type_robot, difficulty);
     }
 
@@ -35,7 +35,7 @@ public class GameServiceManager {
         return gameService.handleCompile(game.getClasseUT(), testingClassCode);
     }
 
-    public GameResponse PlayGame(String playerId, String mode, String testingClassCode, Boolean isGameEnd) throws GameDontExistsException {
+    public GameResponseDTO PlayGame(String playerId, String mode, String testingClassCode, Boolean isGameEnd) throws GameDontExistsException {
         /*
          * Recupero la sessioen di gioco 
          */
@@ -55,7 +55,7 @@ public class GameServiceManager {
             *  vado avanti col gioco 
             *  restituisce l'oggetto json che rispecchia lo stato del game
             *  l'utente può imporre la fine del gioco con isGameEnd
-            */
+             */
             return gameService.handleGameLogic(compile, currentGame, isGameEnd);
         } else {
             /*

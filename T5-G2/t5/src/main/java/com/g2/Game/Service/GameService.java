@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.g2.Game.GameDTO.GameResponseDTO;
 import com.g2.Game.GameFactory.GameRegistry;
 import com.g2.Game.GameModes.Coverage.CompileResult;
 import com.g2.Game.GameModes.GameLogic;
@@ -18,7 +19,6 @@ import com.g2.Game.Service.Exceptions.GameAlreadyExistsException;
 import com.g2.Game.Service.Exceptions.GameDontExistsException;
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.AchievementProgress;
-import com.g2.Model.DTO.GameResponse;
 import com.g2.Model.User;
 import com.g2.Service.AchievementService;
 
@@ -64,24 +64,22 @@ public class GameService {
         }
     }
 
-    /*
-     *      quando ci sarà la sessione non dovrò crearla, ma solo recuperarla 
-     *      per ora ad ogni iterazione ho bisogno di fornire String underTestClassName, String type_robot, String difficulty
-     *      con l'implementazione della sessione, qui non creo e quindi non ne ho bisogno 
-     */
+
     public GameLogic CreateGame(String playerId, String mode,
             String underTestClassName,
             String type_robot,
             String difficulty) throws GameAlreadyExistsException {
-
-        GameLogic gameLogic = activeGames.get(playerId);
-        if (gameLogic == null) {
-            //Creo la nuova partita
+        try {
+            GetGame(mode, playerId);
+            logger.error("createGame: Esiste già una partita per il playerId={}.", playerId);
+            throw new GameAlreadyExistsException("Esiste già una partita per il giocatore con ID: " + playerId);
+        } catch (GameDontExistsException e) {
+            //Il game non esiste se lo cerco -> Posso creare la nuova partita
             /*
              * gameRegistry istanzia dinamicamente uno degli oggetti gameLogic (sfida, allenamento, scalata e ecc)
              * basta passargli il campo mode e dinamicamente se ne occupa lui  
              */
-            gameLogic = gameRegistry.createGame(mode, serviceManager, playerId, underTestClassName, type_robot, difficulty);
+            GameLogic gameLogic = gameRegistry.createGame(mode, serviceManager, playerId, underTestClassName, type_robot, difficulty);
             activeGames.put(playerId, gameLogic);
             /*
              * Salvo su T4
@@ -89,9 +87,6 @@ public class GameService {
             gameLogic.CreateGame();
             logger.info("createGame: Inizio creazione partita per playerId={}, mode={}.", playerId, mode);
             return gameLogic;
-        } else {
-            logger.error("createGame: Esiste già una partita per il playerId={}.", playerId);
-            throw new GameAlreadyExistsException("Esiste già una partita per il giocatore con ID: " + playerId);
         }
     }
 
@@ -123,7 +118,7 @@ public class GameService {
         return new CompileResult(Classname, testingClassCode, this.serviceManager);
     }
 
-    public GameResponse handleGameLogic(CompileResult compileResult, GameLogic currentGame, Boolean isGameEnd) {
+    public GameResponseDTO handleGameLogic(CompileResult compileResult, GameLogic currentGame, Boolean isGameEnd) {
         logger.info("handleGameLogic: Avvio logica di gioco per playerId={}.", currentGame.getPlayerID());
         /*
          *  Lo score è definito dalle performance del file XML del test 
@@ -157,14 +152,14 @@ public class GameService {
     /*
      * Utility che crea il DTO 
      */
-    public GameResponse createResponseRun(CompileResult compileResult,
+    public GameResponseDTO createResponseRun(CompileResult compileResult,
             Boolean gameFinished,
             int robotScore,
             int UserScore, 
             Boolean isWinner) {
         logger.info("createResponseRun: Creazione risposta per la partita (gameFinished={}, userScore={}, robotScore={}).", gameFinished, UserScore, robotScore);
 
-        GameResponse response = new GameResponse();
+        GameResponseDTO response = new GameResponseDTO();
         response.setOutCompile(compileResult.getCompileOutput());
         response.setCoverage(compileResult.getXML_coverage());
         response.setRobotScore(robotScore);
@@ -173,18 +168,18 @@ public class GameService {
         response.setIsWinner(isWinner);
 
         // Dettagli della copertura
-        GameResponse.CoverageDetails coverageDetails = new GameResponse.CoverageDetails();
+        GameResponseDTO.CoverageDetails coverageDetails = new GameResponseDTO.CoverageDetails();
 
         // Aggiungi i dettagli della copertura (Line, Branch, Instruction)
-        coverageDetails.setLine(new GameResponse.CoverageDetail(
+        coverageDetails.setLine(new GameResponseDTO.CoverageDetail(
                 compileResult.getLineCoverage().getCovered(),
                 compileResult.getLineCoverage().getMissed()
         ));
-        coverageDetails.setBranch(new GameResponse.CoverageDetail(
+        coverageDetails.setBranch(new GameResponseDTO.CoverageDetail(
                 compileResult.getBranchCoverage().getCovered(),
                 compileResult.getBranchCoverage().getMissed()
         ));
-        coverageDetails.setInstruction(new GameResponse.CoverageDetail(
+        coverageDetails.setInstruction(new GameResponseDTO.CoverageDetail(
                 compileResult.getInstructionCoverage().getCovered(),
                 compileResult.getInstructionCoverage().getMissed()
         ));

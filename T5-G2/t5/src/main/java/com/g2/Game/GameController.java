@@ -16,9 +16,6 @@
  */
 package com.g2.Game;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,33 +24,35 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.g2.Game.GameDTO.GameResponseDTO;
+import com.g2.Game.GameDTO.StartGameRequestDTO;
+import com.g2.Game.GameDTO.StartGameResponseDTO;
 import com.g2.Game.GameModes.GameLogic;
 import com.g2.Game.Service.Exceptions.GameAlreadyExistsException;
 import com.g2.Game.Service.Exceptions.GameDontExistsException;
 import com.g2.Game.Service.GameServiceManager;
-import com.g2.Model.DTO.GameResponse;
-
 
 //Qui introduco tutte le chiamate REST per la logica di gioco/editor
 @CrossOrigin
 @RestController
 public class GameController {
 
-    //Gestisco qui tutti i giochi aperti
-    private final Map<String, GameLogic> activeGames;
+    /*
+     * Interfaccia per gestire gli endpoint
+     */
     private final GameServiceManager gameServiceManager;
-
-    //Logger
+    /*
+     * Logger
+     */
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
     @Autowired
     public GameController(GameServiceManager gameServiceManager) {
-        this.activeGames = new ConcurrentHashMap<>();
         this.gameServiceManager = gameServiceManager;
     }
 
@@ -67,38 +66,31 @@ public class GameController {
      *     nuova    -> eliminare il vecchio game (nuovo /RemoveGame) 
      *                 e poi chiamare /StartGame con nuovi parametri 
      */
-
-    
-    
     /*
      *  Chiamata che controllo se la partita quindi esisteva già o meno
      *  se non esiste instanzia un nuovo gioco 
      */
     @PostMapping("/StartGame")
-    public ResponseEntity<GameLogic> StartGame(@RequestParam(required = true) String playerId,
-            @RequestParam(required = true) String type_robot,
-            @RequestParam(required = true) String difficulty,
-            @RequestParam(required = true) String mode,
-            @RequestParam(required = true) String underTestClassName) {
+    public ResponseEntity<StartGameResponseDTO> startGame(@RequestBody StartGameRequestDTO request) {
         try {
-            GameLogic game = gameServiceManager.CreateGameLogic(playerId, mode, underTestClassName, type_robot, difficulty);
-            return ResponseEntity.ok().body(game);
+            // Mappare il DTO nel modello di dominio
+            GameLogic game = gameServiceManager.CreateGameLogic(
+                                            request.getPlayerId(),
+                                            request.getMode(),
+                                            request.getUnderTestClassName(),
+                                            request.getTypeRobot(),
+                                            request.getDifficulty());
+
+            // Mappatura del modello di dominio nel DTO di risposta
+            StartGameResponseDTO response = new StartGameResponseDTO(game.getGameID(), "created");
+            return ResponseEntity.ok(response);
         } catch (GameAlreadyExistsException e) {
-            /*
-             * Già esiste una partita con questa modalità di gioco 
-             */
             logger.error("[GAMECONTROLLER][StartGame] " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            StartGameResponseDTO response = new StartGameResponseDTO(-1, "GameAlreadyExistsException");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
-    /*
-     *  chiamata Rest di debug, serve solo per vedere le partite attive
-     */
-    @GetMapping("/StartGame")
-    public Map<String, GameLogic> GetGame() {
-        return activeGames;
-    }
 
     /*
      *  Chiamata principale del game engine, l'utente ogni volta può comunicare la sua richiesta di
@@ -106,13 +98,13 @@ public class GameController {
      *  quindi vuole terminare la partita ed ottenere i risultati del robot
      */
     @PostMapping(value = "/run", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GameResponse> Runner(
+    public ResponseEntity<GameResponseDTO> Runner(
             @RequestParam(value = "testingClassCode", required = false, defaultValue = "") String testingClassCode,
-            @RequestParam("playerId") String playerId,
+            @RequestParam(value = "playerId") String playerId,
             @RequestParam("mode") String mode,
             @RequestParam("isGameEnd") Boolean isGameEnd) {
         try {
-            GameResponse response = gameServiceManager.PlayGame(playerId, mode , testingClassCode, isGameEnd);
+            GameResponseDTO response = gameServiceManager.PlayGame(playerId, mode, testingClassCode, isGameEnd);
             return ResponseEntity.ok().body(response);
         } catch (GameDontExistsException e) {
             /*
