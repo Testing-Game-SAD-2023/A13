@@ -61,7 +61,7 @@ public class GameServiceManager {
             /*
              * Restituisco un Json solo con info parziali 
              */
-            return gameService.createResponseRun(compile, false, 0, 0);
+            return gameService.createResponseRun(compile, false, 0, 0, false);
         }
     }
 

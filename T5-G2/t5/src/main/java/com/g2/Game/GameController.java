@@ -57,6 +57,19 @@ public class GameController {
         this.gameServiceManager = gameServiceManager;
     }
 
+
+    /*    LATO CLIENT
+     *    On load document - check game -> da usare in fetchPrevisusGame
+     *    
+     *     check game (nuovo /CheckGame)-> [sfida, allenamento]
+     * 
+     *     continua -> /editor
+     *     nuova    -> eliminare il vecchio game (nuovo /RemoveGame) 
+     *                 e poi chiamare /StartGame con nuovi parametri 
+     */
+
+    
+    
     /*
      *  Chiamata che controllo se la partita quindi esisteva già o meno
      *  se non esiste instanzia un nuovo gioco 
@@ -96,11 +109,10 @@ public class GameController {
     public ResponseEntity<GameResponse> Runner(
             @RequestParam(value = "testingClassCode", required = false, defaultValue = "") String testingClassCode,
             @RequestParam("playerId") String playerId,
-            @RequestParam("isGameEnd") Boolean isGameEnd,
-            @RequestParam(value = "eliminaGame", required = false, defaultValue = "false") Boolean eliminaGame) {
-
+            @RequestParam("mode") String mode,
+            @RequestParam("isGameEnd") Boolean isGameEnd) {
         try {
-            GameResponse response = gameServiceManager.PlayGame(playerId, "sfida", testingClassCode, isGameEnd);
+            GameResponse response = gameServiceManager.PlayGame(playerId, mode , testingClassCode, isGameEnd);
             return ResponseEntity.ok().body(response);
         } catch (GameDontExistsException e) {
             /*

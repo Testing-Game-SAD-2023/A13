@@ -142,7 +142,7 @@ public class GameService {
             EndGame(currentGame, userscore);
         }
         logger.info("handleGameLogic: Risposta creata per playerId={}.", currentGame.getPlayerID());
-        return createResponseRun(compileResult, gameFinished, robotScore, userscore);
+        return createResponseRun(compileResult, gameFinished, robotScore, userscore, currentGame.isWinner());
     }
 
     public void EndGame(GameLogic currentGame, int userscore) {
@@ -154,14 +154,14 @@ public class GameService {
         destroyGame(currentGame.getPlayerID());
     }
 
-
     /*
      * Utility che crea il DTO 
      */
     public GameResponse createResponseRun(CompileResult compileResult,
             Boolean gameFinished,
             int robotScore,
-            int UserScore) {
+            int UserScore, 
+            Boolean isWinner) {
         logger.info("createResponseRun: Creazione risposta per la partita (gameFinished={}, userScore={}, robotScore={}).", gameFinished, UserScore, robotScore);
 
         GameResponse response = new GameResponse();
@@ -170,6 +170,7 @@ public class GameService {
         response.setRobotScore(robotScore);
         response.setUserScore(UserScore);
         response.setGameOver(gameFinished);
+        response.setIsWinner(isWinner);
 
         // Dettagli della copertura
         GameResponse.CoverageDetails coverageDetails = new GameResponse.CoverageDetails();

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+	<head>
+		<div th:replace="fragments/header :: header"></div>
+		<title>Game History</title>
+	</head>
+
+	<body>
+		<!-- NAVBAR -->
+		<div th:replace="fragments/navbar :: navbar"></div>
+
+		<!-- PAGE -->
+		<div class="container">
+			<!-- Active Match -->
+			<div class="row"></div>
+			<!-- Search bar-->
+			<div
+				class="d-flex align-items-center justify-content-between p-3 my-3 rounded shadow-sm bg-dark-subtle"
+			>
+				<div class="d-flex">
+					<!-- filtro tipo -->
+					<div id="checkbox-menu" class="mt-2">
+						<div class="form-check form-check-inline">
+							<input
+								class="form-check-input"
+								type="checkbox"
+								id="inlineCheckbox1"
+								value="Team"
+								checked
+							/>
+							<label class="form-check-label" for="inlineCheckbox1">
+								Team
+							</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input
+								class="form-check-input"
+								type="checkbox"
+								id="inlineCheckbox2"
+								value="Achievement"
+								checked
+							/>
+							<label class="form-check-label" for="inlineCheckbox2">
+								Achievement
+							</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input
+								class="form-check-input"
+								type="checkbox"
+								id="inlineCheckbox3"
+								value="Info"
+								checked
+							/>
+							<label class="form-check-label" for="inlineCheckbox3">
+								Info
+							</label>
+						</div>
+					</div>
+					<!-- filtro lette-->
+					<div class="dropdown">
+						<button
+							class="btn btn-secondary dropdown-toggle"
+							type="button"
+							data-bs-toggle="dropdown"
+							aria-expanded="false"
+						>
+							Stato lettura
+						</button>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item active" href="#" data-status="all"
+									>All</a
+								>
+							</li>
+							<li>
+								<a class="dropdown-item" href="#" data-status="read">Lette</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="#" data-status="unread"
+									>Non Lette</a
+								>
+							</li>
+						</ul>
+					</div>
+					<!-- Ordine -->
+					<button id="toggleOrderBtn" class="btn">
+						<i class="bi bi-sort-down"></i>
+					</button>
+				</div>
+				<!-- Bottoni -->
+				<nav>
+					<ul class="pagination m-0">
+						<li class="page-item">
+							<a class="page-link" href="#" aria-label="Previous">
+								<span aria-hidden="true">&laquo;</span>
+							</a>
+						</li>
+						<li class="page-item"><a class="page-link" href="#">1</a></li>
+						<li class="page-item"><a class="page-link" href="#">2</a></li>
+						<li class="page-item"><a class="page-link" href="#">3</a></li>
+						<li class="page-item">
+							<a class="page-link" href="#" aria-label="Next">
+								<span aria-hidden="true">&raquo;</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+			<!-- match history -->
+			<div class="list-group" id="match_history">
+				<a
+					href="#"
+					class="list-group-item list-group-item-action"
+					aria-current="true"
+				>
+					<div class="d-flex justify-content-between">
+						<div>
+							<h4 class="mb-1">Sfida</h4>
+							<p class="mb-0">Calcolatrice - Randoop - Level 1</p>
+							<small>12/05/2025</small>
+						</div>
+
+						<div class="text-center p-3">
+							<div class="text-center">
+								<h4 class="mb-0 fw-semibold lh-1">
+									<span class="badge text-bg-success"> WIN </span>
+								</h4>
+								<small> 14pt. </small>
+							</div>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+
+		<!-- FOOTER -->
+		<div th:replace="fragments/footer :: footer"></div>
+		<script>
+			/**
+ * Effettua una chiamata AJAX per ottenere la cronologia delle partite di un giocatore.
+ * @param {string|number} playerId - L'ID del giocatore da utilizzare nell'URL.
+ * @param {function} callback - Funzione da eseguire in caso di successo.
+ */
+function fetchGameHistory(playerId, callback) {
+    $.ajax({
+        url: `/games/player/${playerId}`, // URL dinamico
+        type: "GET",
+        dataType: "json",
+        success: function (response) {
+            if (Array.isArray(response)) {
+                callback(response);
+            } else {
+                console.error("La risposta non è un array di partite.");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Errore nella chiamata AJAX:", status, error);
+        },
+    });
+}
+
+/**
+ * Converte una data ISO 8601 in formato DD/MM/YYYY HH:MM.
+ * @param {string} isoDate - La data in formato ISO 8601.
+ * @returns {string} La data formattata in DD/MM/YYYY HH:MM.
+ */
+ function formatDate(isoDate) {
+    const date = new Date(isoDate);
+    const day = ("0" + date.getDate()).slice(-2);
+    const month = ("0" + (date.getMonth() + 1)).slice(-2);
+    const year = date.getFullYear();
+    const hours = ("0" + date.getHours()).slice(-2);
+    const minutes = ("0" + date.getMinutes()).slice(-2);
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+/**
+ * Genera il template HTML per una partita e lo aggiunge al container #match_history.
+ * L'array delle partite viene ordinato dalla più recente alla più vecchia.
+ * @param {Array} games - Lista delle partite.
+ */
+function renderGameHistory(games) {
+    const $container = $("#match_history");
+    $container.empty(); // Pulisce il contenitore
+
+    // Ordina le partite dalla più recente (closedAt più alta) alla più vecchia
+    games.sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt));
+
+    games.forEach((game) => {
+        const formattedDate = formatDate(game.closedAt);
+        const badge = game.isWinner
+            ? '<span class="badge text-bg-success"> WIN </span>'
+            : '<span class="badge text-bg-danger"> LOSS </span>';
+
+        const gameItem = `
+            <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-1">${game.description}</h4>
+                        <p class="mb-0">${game.name} - ${game.difficulty}</p>
+                        <small>${formattedDate}</small>
+                    </div>
+                    <div class="text-center p-3">
+                        <h4 class="mb-0 fw-semibold lh-1">${badge}</h4>
+                        <small>${game.score}pt.</small>
+                    </div>
+                </div>
+            </a>
+        `;
+
+        $container.append(gameItem);
+    });
+}
+
+// Esegue il caricamento delle partite al caricamento della pagina
+$(document).ready(function () {
+    fetchGameHistory(userId, renderGameHistory);
+});
+
+		</script>
+	</body>
+</html>

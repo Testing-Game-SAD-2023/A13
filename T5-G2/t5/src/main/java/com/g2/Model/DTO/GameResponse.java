@@ -22,6 +22,9 @@ public class GameResponse {
     @JsonProperty("coverageDetails")
     private CoverageDetails coverageDetails;
 
+    @JsonProperty("isWinner")
+    private Boolean isWinner;
+
     // Getters and setters
     public String getOutCompile() {
         return outCompile;
@@ -69,6 +72,14 @@ public class GameResponse {
 
     public void setCoverageDetails(CoverageDetails coverageDetails) {
         this.coverageDetails = coverageDetails;
+    }
+
+    public Boolean getIsWinner() {
+        return isWinner;
+    }
+
+    public void setIsWinner(Boolean isWinner) {
+        this.isWinner = isWinner;
     }
 
     // Classe interna che rappresenta la struttura di coverageDetails

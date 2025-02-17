@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.g2.Components.GenericObjectComponent;
@@ -125,9 +124,10 @@ public class GuiController {
 
     @GetMapping("/editor")
     public String editorPage(Model model,
-            @CookieValue(name = "jwt", required = false) String jwt,
-            @RequestParam(value = "ClassUT", required = false) String ClassUT) {
+                            @CookieValue(name = "jwt", required = false) String jwt,
+                            @RequestParam(value = "ClassUT", required = false) String ClassUT) {
 
+        //Check Session
         PageBuilder editor = new PageBuilder(serviceManager, "editor", model);
         VariableValidationLogicComponent Valida_classeUT = new VariableValidationLogicComponent(ClassUT);
         Valida_classeUT.setCheckNull();

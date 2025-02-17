@@ -108,13 +108,19 @@ public class UserProfileController {
         return achievement.handlePageRequest();
     }
 
-    @GetMapping("/notification")
+    @GetMapping("/Notification")
     public String ProfileNotificationPage(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
         PageBuilder notification = new PageBuilder(serviceManager, "notification", model, jwt);
         notification.SetAuth();
         return "notification";
     }
 
+    @GetMapping("/Games")
+    public String profile_game(Model model, @CookieValue(name = "jwt", required = false) String jwt){
+        PageBuilder Games = new PageBuilder(serviceManager, "GameHistory", model, jwt);
+        Games.SetAuth();
+        return "GameHistory"; 
+    }
     /*
      *    TENERE QUESTA CHIAMATA SOLO PER DEBUG DA DISATTIVARE 
      * 

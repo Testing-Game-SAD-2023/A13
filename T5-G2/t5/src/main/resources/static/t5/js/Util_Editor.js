@@ -147,11 +147,12 @@ Il tuo punteggio EvoSuite: ${valori_csv[7]*100}% CBranch
 	return consoleText;
 }
 
-function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScore) {
+function getConsoleTextRun(valori_csv, coverageDetails, punteggioRobot, gameScore, isWinner) {
 	let lineCoveragePercentage = (coverageDetails.line.covered / (coverageDetails.line.covered + coverageDetails.line.missed)) * 100;
 	let BranchCoveragePercentage = (coverageDetails.branch.covered / (coverageDetails.branch.covered + coverageDetails.branch.missed)) * 100;
 	let instructionCoveragePercentage = (coverageDetails.instruction.covered / (coverageDetails.instruction.covered + coverageDetails.instruction.missed)) * 100;
-	var consoleText2 = (valori_csv[0]*100) >= punteggioRobot ? you_win : you_lose;
+	
+	var consoleText2 = (isWinner) ? you_win : you_lose;
 	consoleText =
 `===================================================================== \n` +
 		consoleText2 +
@@ -322,20 +323,9 @@ function highlightCodeCoverage(reportContent, editor) {
 function getFormData() {
 	const formData = new FormData();
 	const className = localStorage.getItem("underTestClassName");
-
-	//formData.append("testingClassName", `Test${className}.java`);
 	formData.append("testingClassCode", editor_utente.getValue());
-	formData.append("underTestClassName", `${className}.java`);
-	formData.append("underTestClassCode", editor_robot.getValue());
-	formData.append("className", className);
 	formData.append("playerId", String(parseJwt(getCookie("jwt")).userId));
-	formData.append("turnId", localStorage.getItem("turnId"));
-	formData.append("difficulty", localStorage.getItem("difficulty"));
-	formData.append("type", localStorage.getItem("robot"));
-	formData.append("order", orderTurno);
-	formData.append("username", localStorage.getItem("username"));
-	formData.append("testClassId", className);
-	formData.append("eliminaGame", false);
+	formData.append("mode", "sfida"); //Gestire modalità di gioco 
 	return formData;
 }
 
