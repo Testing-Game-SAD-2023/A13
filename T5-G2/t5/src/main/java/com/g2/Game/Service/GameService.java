@@ -45,7 +45,6 @@ public class GameService {
         this.achievementService = achievementService;
     }
 
-
     /*
     *  Sfrutto T4 per avere i risultati dei robot
      */
@@ -55,15 +54,16 @@ public class GameService {
             String response_T4 = serviceManager.handleRequest("T4", "GetRisultati", String.class,
                     testClass, robot_type, difficulty);
 
-            JSONObject jsonObject = new JSONObject(response_T4);            
-            //anche se scritto al plurale scores è un solo punteggio, cioè quello del robot
+            JSONObject jsonObject = new JSONObject(response_T4);
             return jsonObject.getInt("scores");
         } catch (JSONException e) {
-            logger.error("[GAMECONTROLLER] GetRobotScore:", e);
-            return 0;
+            logger.error("[GAMECONTROLLER] GetRobotScore: Errore nel parsing della risposta JSON", e);
+            throw new RuntimeException("Errore durante l'elaborazione della risposta del robot", e);
+        } catch (Exception e) {
+            logger.error("[GAMECONTROLLER] GetRobotScore: Errore generico nella richiesta a T4", e);
+            throw new RuntimeException("Errore durante il recupero del punteggio del robot", e);
         }
     }
-
 
     public GameLogic CreateGame(String playerId, String mode,
             String underTestClassName,
@@ -96,7 +96,7 @@ public class GameService {
     public GameLogic GetGame(String mode, String playerId) throws GameDontExistsException {
         logger.info("getGame: Recupero partita per playerId={}, mode={}.", playerId, mode);
         GameLogic gameLogic = activeGames.get(playerId);
-        if(gameLogic == null){
+        if (gameLogic == null) {
             logger.error("getGame: Nessuna partita trovata per playerId={}, mode={}.", playerId, mode);
             throw new GameDontExistsException("Non esiste un game per il giocatore con ID: " + playerId + "con modalità: " + mode);
         }
@@ -150,41 +150,16 @@ public class GameService {
     }
 
     /*
-     * Utility che crea il DTO 
+     * Wrapper che crea il DTO 
      */
     public GameResponseDTO createResponseRun(CompileResult compileResult,
             Boolean gameFinished,
             int robotScore,
-            int UserScore, 
+            int UserScore,
             Boolean isWinner) {
+
         logger.info("createResponseRun: Creazione risposta per la partita (gameFinished={}, userScore={}, robotScore={}).", gameFinished, UserScore, robotScore);
-
-        GameResponseDTO response = new GameResponseDTO();
-        response.setOutCompile(compileResult.getCompileOutput());
-        response.setCoverage(compileResult.getXML_coverage());
-        response.setRobotScore(robotScore);
-        response.setUserScore(UserScore);
-        response.setGameOver(gameFinished);
-        response.setIsWinner(isWinner);
-
-        // Dettagli della copertura
-        GameResponseDTO.CoverageDetails coverageDetails = new GameResponseDTO.CoverageDetails();
-
-        // Aggiungi i dettagli della copertura (Line, Branch, Instruction)
-        coverageDetails.setLine(new GameResponseDTO.CoverageDetail(
-                compileResult.getLineCoverage().getCovered(),
-                compileResult.getLineCoverage().getMissed()
-        ));
-        coverageDetails.setBranch(new GameResponseDTO.CoverageDetail(
-                compileResult.getBranchCoverage().getCovered(),
-                compileResult.getBranchCoverage().getMissed()
-        ));
-        coverageDetails.setInstruction(new GameResponseDTO.CoverageDetail(
-                compileResult.getInstructionCoverage().getCovered(),
-                compileResult.getInstructionCoverage().getMissed()
-        ));
-
-        response.setCoverageDetails(coverageDetails);
+        GameResponseDTO response = new GameResponseDTO(compileResult, gameFinished, robotScore, UserScore, isWinner);
         return response;
     }
 

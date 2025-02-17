@@ -1,6 +1,7 @@
 package com.g2.Game.GameDTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.g2.Game.GameModes.Coverage.CompileResult;
 
 public class GameResponseDTO {
 
@@ -24,6 +25,61 @@ public class GameResponseDTO {
 
     @JsonProperty("isWinner")
     private Boolean isWinner;
+
+    public GameResponseDTO() {
+        //costruttore vuoto 
+    }
+
+    public GameResponseDTO(
+            String outCompile,
+            String coverage,
+            int robotScore,
+            int userScore,
+            boolean gameOver,
+            Boolean isWinner,
+            CoverageDetails coverageDetails
+    ) {
+        this.outCompile = outCompile;
+        this.coverage = coverage;
+        this.robotScore = robotScore;
+        this.userScore = userScore;
+        this.gameOver = gameOver;
+        this.isWinner = isWinner;
+        this.coverageDetails = coverageDetails;
+    }
+
+    /*
+     * Costruttore che converte un CompileResult in un GameResponseDTO
+     */
+    public GameResponseDTO(CompileResult compileResult,
+                            Boolean gameFinished,
+                            int robotScore,
+                            int UserScore,
+                            Boolean isWinner) {
+
+        this.outCompile = compileResult.getCompileOutput();
+        this.coverage  =  compileResult.getXML_coverage();
+        this.robotScore = robotScore;
+        this.userScore = UserScore;
+        this.gameOver = gameFinished;
+        this.isWinner = isWinner;
+        // Dettagli della copertura
+        this.coverageDetails = new GameResponseDTO.CoverageDetails();
+        // Aggiungi i dettagli della copertura (Line, Branch, Instruction)
+        coverageDetails.setLine(new GameResponseDTO.CoverageDetail(
+                compileResult.getLineCoverage().getCovered(),
+                compileResult.getLineCoverage().getMissed()
+        ));
+        coverageDetails.setBranch(new GameResponseDTO.CoverageDetail(
+                compileResult.getBranchCoverage().getCovered(),
+                compileResult.getBranchCoverage().getMissed()
+        ));
+        coverageDetails.setInstruction(new GameResponseDTO.CoverageDetail(
+                compileResult.getInstructionCoverage().getCovered(),
+                compileResult.getInstructionCoverage().getMissed()
+        ));
+
+    }
 
     // Getters and setters
     public String getOutCompile() {
