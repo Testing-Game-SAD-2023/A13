@@ -21,4 +21,3 @@ All'atto della autenticazione, lo studente fornirà l'indirizzo e-mail fornito p
 	<code>docker exec –it g1-t2t3-app-1 bash</code> viene utilizzato per entrare all'interno di un container Docker in esecuzione e avviare una shell interattiva al suo interno. </p></li>  
 	<code>mysql –u root –p studentsrepo</code>: viene utilizzato per accedere all'interfaccia della riga di comando di MySQL e connettersi al database <code>studentsrepo</code> utilizzando l'utente <code>root</code> e richiedendo la password <code>password</code>. </p></li>
 <li><p>Utilizzare i comandi SQL per la gestione delle tabelle (<code>SELECT</code>, <code>DROP</code>, <code>SHOW TABLES </code>, ecc.) </p></li>
-

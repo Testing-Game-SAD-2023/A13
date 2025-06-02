@@ -95,13 +95,29 @@ async function handleGameAction(isGameEnd, compileUponEndTime=false) {
     if (isGameEnd) {
         try {
             //Esegue la terminazione del gioco
-            if (!compileUponEndTime)
+
+            if (!compileUponEndTime) {
                 requestBody["testingClassCode"] = "";
-            const response = await runGameAction("/EndGame", requestBody);
-            console.log("/EndGame", response);
-            setStatus("game_end");
-            handleGameEnd(response);
-            toggleLoading(false, loadingKey, buttonKey);
+                const response = await runGameAction("/CompileEvosuite", requestBody);
+                console.log("/EndGame", response);
+                setStatus("game_end");
+
+                handleGameRun(response, loadingKey, buttonKey, true);
+                const {
+                    userCoverageDetails, robotCoverageDetails,
+                    canWin, unlockedAchievements,
+                    userScore, robotScore,
+                } = response;
+                const endResponse = await runGameAction("/EndGame", requestBody);
+
+                handleGameEnd(endResponse, unlockedAchievements);
+                toggleLoading(false, loadingKey, buttonKey);
+            } else {
+                const endResponse = await runGameAction("/EndGame", requestBody);
+
+                handleGameEnd(endResponse, []);
+                toggleLoading(false, loadingKey, buttonKey);
+            }
         } catch (error) {
             console.error("[handleGameAction] Errore durante l'esecuzione:", error);
             handleServerInternalError(error, loadingKey, buttonKey);
@@ -111,7 +127,7 @@ async function handleGameAction(isGameEnd, compileUponEndTime=false) {
             //Esegue l'azione di gioco
             const response = await runGameAction("/run", requestBody);
             setStatus("compiling");
-            handleGameRun(response, loadingKey, buttonKey);
+            handleGameRun(response, loadingKey, buttonKey, false);
             resetButtons();
         } catch (error) {
             handleServerInternalError(error, loadingKey, buttonKey);
@@ -147,8 +163,12 @@ function handleServerInternalError(error, loadingKey, buttonKey) {
 }
 
 
-function handleGameEnd(response) {
-    const {userScore, robotScore, isWinner, expGained, achievementsUnlocked} = response;
+function handleGameEnd(response, compileAchievements) {
+    let {userScore, robotScore, isWinner, expGained, achievementsUnlocked} = response;
+    achievementsUnlocked = [...achievementsUnlocked, ...compileAchievements];
+    console.log("compileAchievements", compileAchievements);
+    console.log("achievementsUnlocked", achievementsUnlocked);
+
     generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked); // Gestisce la fine del gioco
 
     // Disattivo il timer
@@ -159,7 +179,7 @@ function handleGameEnd(response) {
     window.removeEventListener("beforeunload", handleBeforeUnload);
 }
 
-function handleGameRun(response, loadingKey, buttonKey) {
+function handleGameRun(response, loadingKey, buttonKey, isGameEnd) {
     const {
             userCoverageDetails, robotCoverageDetails,
             canWin, unlockedAchievements,
@@ -185,12 +205,12 @@ function handleGameRun(response, loadingKey, buttonKey) {
         userCoverageDetails, robotCoverageDetails,
         userScore, robotScore,
         canWin, unlockedAchievements,
-        loadingKey, buttonKey
+        loadingKey, buttonKey, isGameEnd
     );
 }
 
 // Processa la copertura del codice e aggiorna i dati di gioco
-async function processCoverage(userCoverage_ForHighlight, robotCoverage_ForHighlight, userCoverageDetails, robotCoverageDetails, userScore, robotScore, canWin, unlockedAchievements, loadingKey, buttonKey) {
+async function processCoverage(userCoverage_ForHighlight, robotCoverage_ForHighlight, userCoverageDetails, robotCoverageDetails, userScore, robotScore, canWin, unlockedAchievements, loadingKey, buttonKey, isGameEnd) {
     highlightCodeCoverage($.parseXML(userCoverage_ForHighlight), $.parseXML(robotCoverage_ForHighlight), editor_robot); // Evidenzia la copertura del codice nell'editor
     orderTurno++; // Incrementa l'ordine del turno
 
@@ -199,14 +219,14 @@ async function processCoverage(userCoverage_ForHighlight, robotCoverage_ForHighl
 
     setStatus("turn_end"); // Imposta lo stato di fine gioco o fine turno
     toggleLoading(false, loadingKey, buttonKey); // Nasconde l'indicatore di caricamento
-    displayUserPoints(userCoverageDetails, robotCoverageDetails, canWin, userScore, robotScore); // Mostra i punti dell'utente
-    if (unlockedAchievements.length !== 0)
+    displayUserPoints(userCoverageDetails, robotCoverageDetails, canWin, userScore, robotScore, isGameEnd); // Mostra i punti dell'utente
+    if (!isGameEnd && unlockedAchievements.length !== 0)
         handleUnlockedAchievements(unlockedAchievements);
 }
 
 // Mostra i punti dell'utente nella console
-function displayUserPoints(userCoverageDetails, robotCoverageDetails, canWin, userScore, robotScore) {
-    const displayUserPoints = getConsoleTextRun(userCoverageDetails, robotCoverageDetails, canWin, userScore, robotScore)
+function displayUserPoints(userCoverageDetails, robotCoverageDetails, canWin, userScore, robotScore, isGameEnd) {
+    const displayUserPoints = getConsoleTextRun(userCoverageDetails, robotCoverageDetails, canWin, userScore, robotScore, isGameEnd)
     console_robot.setValue(displayUserPoints); // Aggiorna la console del robot con i punti
 }
 

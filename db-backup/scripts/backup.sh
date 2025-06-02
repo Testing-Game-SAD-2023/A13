@@ -6,7 +6,7 @@ while true; do
   TS=$(date +"%Y-%m-%d_%H-%M-%S")
 
   echo "[T4] Backing up PostgreSQL..."
-  PGPASSWORD=postgres pg_dump -h t4-postgres_db -U postgres postgres | gzip > /Backups/T4_pg_backup_${TS}.sql.gz
+  PGPASSWORD=t4_password pg_dump -h t4-postgres_db -U t4_service t4_database | gzip > /Backups/T4_pg_backup_${TS}.sql.gz
 
   echo "[T23] Backing up MySQL..."
   mysqldump -h t23-mysql_db -uroot -ppassword studentsrepo | gzip > /Backups/T23_mysql_backup_${TS}.sql.gz

@@ -1,6 +1,5 @@
 package com.g2.Service;
 
-import com.g2.Game.Service.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,14 +28,13 @@ public class FileOperationService {
     }
 
     public void writeTurn(String underTestClassCode, String underTestClassName,
-                          String testingClassCode, String testingClassName,
-                          String response_T4, String response_T7,
-                          String userSrcDir, String userTestDir, String userCoverageDir) {
-
+                             String testingClassCode, String testingClassName,
+                             String response_T8, String response_T7,
+                             String userSrcDir, String userTestDir, String userCoverageDir) {
         try {
             Files.copy(new ByteArrayInputStream(underTestClassCode.getBytes()), Path.of(userSrcDir, underTestClassName), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(new ByteArrayInputStream(testingClassCode.getBytes()), Paths.get(userTestDir, "Test" + testingClassName), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new ByteArrayInputStream(response_T4.getBytes()), Paths.get(userCoverageDir, "statistics.csv"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new ByteArrayInputStream(response_T8.getBytes()), Paths.get(userCoverageDir, "statistics.csv"), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(new ByteArrayInputStream(response_T7.getBytes()), Paths.get(userCoverageDir, "coveragetot.xml"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException | NullPointerException e) {
             logger.error("[writeTurn] Errore durante la scrittura dei file in VolumeT0: ", e);
@@ -44,7 +42,17 @@ public class FileOperationService {
         }
     }
 
-    public void writeStartGame() {
-
+    public void writeTurnNew(String underTestClassCode, String underTestClassName,
+                             String testingClassCode, String testingClassName,
+                             String response, String filename,
+                             String userSrcDir, String userTestDir, String userCoverageDir) {
+        try {
+            Files.copy(new ByteArrayInputStream(underTestClassCode.getBytes()), Path.of(userSrcDir, underTestClassName), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new ByteArrayInputStream(testingClassCode.getBytes()), Paths.get(userTestDir, "Test" + testingClassName), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new ByteArrayInputStream(response.getBytes()), Paths.get(userCoverageDir, filename), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException | NullPointerException e) {
+            logger.error("[writeTurn] Errore durante la scrittura dei file in VolumeT0: ", e);
+            throw new RuntimeException("[writeTurn] Errore durante la scrittura dei file in VolumeT0: " + e);
+        }
     }
 }

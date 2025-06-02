@@ -51,7 +51,7 @@ ______ _____  _____   ____   _____
 '════════════════════════════════════════════════════════════════════════\n\n\n' +
  + '\n\n\n';
 
-function getConsoleTextRun(userCoverageDetails, robotCoverageDetails, canWin, gameScore, robotScore) {
+function getConsoleTextRun(userCoverageDetails, robotCoverageDetails, canWin, userScore, robotScore, isGameEnd) {
 	const maxLineLength = 62; // Ridotto per accomodare 4 spazi laterali
 
 	function wrapAtSpaces(str) {
@@ -143,16 +143,19 @@ function getConsoleTextRun(userCoverageDetails, robotCoverageDetails, canWin, ga
 		formatJacocoRow('Branch', userCoverageDetails.jacoco_branch, robotCoverageDetails.jacoco_branch) + '\n\n\n\n';
 
 	// EvoSuite
-	result +=
-		'    ' + '─'.repeat(maxLineLength) + '\n' +
-		`    ${centerText(terminalMessages.evosuite_table_title, maxLineLength)}\n` +
-		'    ' + '─'.repeat(maxLineLength) + '\n' +
-		header +
-		formatEvoRow('Line', userCoverageDetails.evosuite_line, robotCoverageDetails.evosuite_line) + '\n' +
-		formatEvoRow('Branch', userCoverageDetails.evosuite_branch, robotCoverageDetails.evosuite_branch) + '\n' +
-		formatEvoRow('Exception', userCoverageDetails.evosuite_exception, robotCoverageDetails.evosuite_exception) + '\n' +
-		formatEvoRow('WeakMutation', userCoverageDetails.evosuite_weak_mutation, robotCoverageDetails.evosuite_weak_mutation) + '\n' +
-		formatEvoRow('CBranch', userCoverageDetails.evosuite_cbranch, robotCoverageDetails.evosuite_cbranch) + '\n\n';
+	console.log("isGameEnd", isGameEnd)
+	if (isGameEnd) {
+		result +=
+			'    ' + '─'.repeat(maxLineLength) + '\n' +
+			`    ${centerText(terminalMessages.evosuite_table_title, maxLineLength)}\n` +
+			'    ' + '─'.repeat(maxLineLength) + '\n' +
+			header +
+			formatEvoRow('Line', userCoverageDetails.evosuite_line, robotCoverageDetails.evosuite_line) + '\n' +
+			formatEvoRow('Branch', userCoverageDetails.evosuite_branch, robotCoverageDetails.evosuite_branch) + '\n' +
+			formatEvoRow('Exception', userCoverageDetails.evosuite_exception, robotCoverageDetails.evosuite_exception) + '\n' +
+			formatEvoRow('WeakMutation', userCoverageDetails.evosuite_weak_mutation, robotCoverageDetails.evosuite_weak_mutation) + '\n' +
+			formatEvoRow('CBranch', userCoverageDetails.evosuite_cbranch, robotCoverageDetails.evosuite_cbranch) + '\n\n';
+	}
 
 	return result;
 }

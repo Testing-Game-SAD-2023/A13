@@ -18,7 +18,7 @@ public class AchievementService {
 
     private static final Logger logger = LoggerFactory.getLogger(AchievementService.class);
 
-    public Set<String> verifyUnlockedGameModeAchievement(
+    public Set<String> verifyGameModeAchievement(
             Map<String, BiFunction<CompileResult, CompileResult, Boolean>> achievements,
             CompileResult user,
             CompileResult robot) {

@@ -5,7 +5,7 @@ services:
     image: redis:latest
     container_name: t5-redis
     restart: always
-    ports:
+    expose:
       - "6379:6379"
     networks:
       - global-network

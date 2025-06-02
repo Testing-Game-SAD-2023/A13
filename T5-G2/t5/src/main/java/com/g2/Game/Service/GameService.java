@@ -28,8 +28,6 @@ import com.g2.Game.GameFactory.params.GameParams;
 import com.g2.Model.*;
 import com.g2.Service.FileOperationService;
 import com.g2.Service.AchievementService;
-import com.g2.util.AchievementDefinition.NumberAllRobotForClassBeaten;
-import com.g2.util.AchievementDefinition.NumberRobotBeaten;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +144,7 @@ public class GameService {
 
         // Chiamata a T8 per calcolare evosuite coverage solo se il codice è compilabile
         JSONObject response_T8 = new JSONObject();
+
         if (response_T7.optString("coverage", null) != null) {
             String responseT8Raw = this.serviceManager.handleRequest("T8", "evosuiteUserCoverage", String.class,
                     testingClassName, testingClassCode, underTestClassName, underTestClassCode, "");
@@ -167,6 +166,68 @@ public class GameService {
 
         return new CompileResult(response_T8, response_T7);
 
+    }
+
+    public CompileResult handleCompileNew(GameLogic currentGame, String testingClassCode, String compileTypes) {
+        logger.info("handleCompile: Inizio compilazione per ClassName={}.", currentGame.getClasseUT());
+
+        String underTestClassName = currentGame.getClasseUT();
+        String testingClassName = "Test" + currentGame.getClasseUT();
+        String testingClassFileName = testingClassName + ".java";
+        String underTestClassFileName = underTestClassName + ".java";
+
+        // Recupero il codice della classe under test
+        String underTestClassCode = this.serviceManager.handleRequest("T1", "getClassUnderTest", String.class, underTestClassName);
+
+        // Preparo il percorso per salvare le compilazioni nel volume T0
+        String suffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        String userDir = String.format("/VolumeT0/FolderTree/StudentTest/Player%s/%s/%s/%s/Game%s/Round%s/Turn%s",
+                currentGame.getPlayerID(), currentGame.getMode(), currentGame.getClasseUT(), suffix, currentGame.getGameID(), currentGame.getRoundID(), currentGame.getTurnID());
+        String userCoverageDir = String.format("%s/coverage", userDir);
+        String userSrcDir = String.format("%s/project/src/java/main", userDir);
+        String userTestDir = String.format("%s/project/src/test/main", userDir);
+        fileOperationService.createDirectory(userCoverageDir, userSrcDir, userTestDir);
+
+        JSONObject response_T7 = new JSONObject();
+        JSONObject response_T8 = new JSONObject();
+        String responseT7Raw;
+        switch (compileTypes) {
+            case "T7":
+                // Chiamata a T7 per calcolare jacoco coverage
+                responseT7Raw = this.serviceManager.handleRequest("T7", "CompileCoverage", String.class, testingClassFileName, testingClassCode, underTestClassFileName, underTestClassCode);
+                response_T7 = new JSONObject(responseT7Raw);
+
+                fileOperationService.writeTurnNew(underTestClassCode, underTestClassFileName, testingClassCode, testingClassFileName,
+                        response_T7.optString("coverage", ""), "coveragetot.xml", userSrcDir, userTestDir, userCoverageDir);
+
+                return new CompileResult(response_T8, response_T7);
+            case "T8":
+                // Chiamata a T8 per calcolare evosuite coverage solo se il codice è compilabile
+                if (currentGame.getUserCompileResult().getXML_coverage() != null) {
+                    String responseT8Raw = this.serviceManager.handleRequest("T8", "evosuiteUserCoverage", String.class,
+                            testingClassName, testingClassCode, underTestClassName, underTestClassCode, "");
+                    response_T8 = new JSONObject(responseT8Raw);
+                }
+
+                fileOperationService.writeTurnNew(underTestClassCode, underTestClassFileName, testingClassCode, testingClassFileName,
+                        response_T8.optString("statistics", ""), "statistics.csv", userSrcDir, userTestDir, userCoverageDir);
+
+                return new CompileResult(currentGame.getUserCompileResult(), response_T8);
+            default:
+                responseT7Raw = this.serviceManager.handleRequest("T7", "CompileCoverage", String.class, testingClassFileName, testingClassCode, underTestClassFileName, underTestClassCode);
+                response_T7 = new JSONObject(responseT7Raw);
+
+                if (response_T7.optString("coverage", null) != null) {
+                    String responseT8Raw = this.serviceManager.handleRequest("T8", "evosuiteUserCoverage", String.class,
+                            testingClassName, testingClassCode, underTestClassName, underTestClassCode, "");
+                    response_T8 = new JSONObject(responseT8Raw);
+                }
+
+                fileOperationService.writeTurn(underTestClassCode, underTestClassFileName, testingClassCode, testingClassFileName,
+                        response_T8.optString("statistics", ""), response_T7.optString("coverage", ""), userSrcDir, userTestDir, userCoverageDir);
+
+                return new CompileResult(response_T8, response_T7);
+        }
     }
 
     /*
@@ -207,7 +268,7 @@ public class GameService {
         logger.info("[achievementsUnlocked] Progresso sulla partita corrente: {}", currentGameProgress);
 
         logger.info("[achievementsUnlocked] Avvio verifica degli achievement sbloccati");
-        Set<String> achievementUnlockedInTurn = achievementService.verifyUnlockedGameModeAchievement(currentGame.gameModeAchievements(), user, robot);
+        Set<String> achievementUnlockedInTurn = achievementService.verifyGameModeAchievement(currentGame.gameModeAchievements(), user, robot);
         logger.info("[achievementsUnlocked] Achievement sbloccati nel turno: {}", achievementUnlockedInTurn);
 
         logger.info("[achievementsUnlocked] Avvio fetch degli achievement già sbloccati");
@@ -287,11 +348,9 @@ public class GameService {
 
     public EndGameResponseDTO handleGameEnd(GameLogic currentGame, boolean surrendered) {
         logger.info("handleGameEnd: Inizio operazioni di terminazione partita per playerId={}. Avvio aggiornamento progressi e notifiche.", currentGame.getPlayerID());
-
         /*
          * Verifico lo stato della compilazione che l'utente vuole consegnare (ultima compilazione)
          */
-        logger.error("currentGame.getUserCompileResult(): {}", currentGame.getUserCompileResult());
         if (currentGame.getUserCompileResult() == null ||
                 !currentGame.getUserCompileResult().hasSuccess() ||
                 surrendered ) {

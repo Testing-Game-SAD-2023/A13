@@ -101,7 +101,26 @@ public class CompileResult {
         calculateCoverage(); // Calcolo coverage
     }
 
-    // Costruttore che chiama T4 e T8 per i robot
+    // Costruttore (temporaneo) per elaborare la risposta di T8 solo al Submit dell'utente
+    public CompileResult(CompileResult compileResult, JSONObject response_T8) {
+        // Estraggo i valori dalle risposte
+        this.evosuiteLine = response_T8.optInt("evoSuiteLine", 0);
+        this.evosuiteBranch = response_T8.optInt("evoSuiteBranch", 0);
+        this.evosuiteException = response_T8.optInt("evoSuiteException", 0);
+        this.evosuiteWeakMutation = response_T8.optInt("evoSuiteWeakMutation", 0);
+        this.evosuiteOutput = response_T8.optInt("evoSuiteOutput", 0);
+        this.evosuiteMethod = response_T8.optInt("evoSuiteMethod", 0);
+        this.evosuiteMethodNoException = response_T8.optInt("evoSuiteMethodNoException", 0);
+        this.evosuiteCBranch = response_T8.optInt("evoSuiteCBranch", 0);
+
+        this.XML_coverage = compileResult.XML_coverage;
+        this.compileOutput = compileResult.compileOutput;
+        this.lineCoverage = compileResult.lineCoverage;
+        this.branchCoverage = compileResult.branchCoverage;
+        this.instructionCoverage = compileResult.instructionCoverage;
+    }
+
+    // Costruttore che chiama T4 per i robot
     public CompileResult(GameLogic currentGame, ServiceManager serviceManager, String testClass, String robot_type, String difficulty) {
         this.serviceManager = serviceManager;
         String response_T4 = this.serviceManager.handleRequest("T4", "GetRisultati",

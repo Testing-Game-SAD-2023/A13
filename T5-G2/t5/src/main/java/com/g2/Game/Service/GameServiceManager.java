@@ -58,12 +58,13 @@ public class GameServiceManager {
         return gameService.GetGame(mode, playerId);
     }
 
-    protected CompileResult compileGame(GameLogic game, String testingClassCode) {
-        return gameService.handleCompile(game, testingClassCode);
+    protected CompileResult compileGame(GameLogic game, String testingClassCode, String type) {
+        // return gameService.handleCompile(game, testingClassCode);
+        return gameService.handleCompileNew(game, testingClassCode, type);
     }
 
-    public RunGameResponseDTO PlayGame(String playerId, String mode, GameParams updateParams) {
-        String testingClassCode = updateParams.getTestingClassCode();
+    public RunGameResponseDTO PlayGame(String playerId, String mode, GameParams updateParams, String compilingType) {
+        String testingClassCode;
 
         logger.info("[PlayGame] Inizio esecuzione per playerId={} e mode={}", playerId, mode);
         /*
@@ -74,7 +75,14 @@ public class GameServiceManager {
         /*
          * Compilo il test dell'utente
          */
-        CompileResult Usercompile = compileGame(currentGame, testingClassCode);
+
+        if (compilingType.equals("T8")) {
+            testingClassCode = currentGame.getTestingClassCode();
+        } else {
+            testingClassCode = updateParams.getTestingClassCode();
+        }
+
+        CompileResult Usercompile = compileGame(currentGame, testingClassCode, compilingType);
         if (Usercompile == null) {
             throw new RuntimeException("compile is null");
         }

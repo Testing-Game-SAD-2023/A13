@@ -174,7 +174,7 @@ public class GameController {
             GameParams updateGameParams = GameParamsFactory.updateGameParams(request);
             String playerId = request.getPlayerId();
             String mode = request.getMode();
-            RunGameResponseDTO response = gameServiceManager.PlayGame(playerId, mode, updateGameParams);
+            RunGameResponseDTO response = gameServiceManager.PlayGame(playerId, mode, updateGameParams, "T7");
             return ResponseEntity.ok().body(response);
         } catch (GameModeDontExist e) {
             /*
@@ -225,7 +225,7 @@ public class GameController {
             String mode = request.getMode();
 
             if (!request.getTestingClassCode().isEmpty())
-                gameServiceManager.PlayGame(playerId, mode, updateGameParams);
+                gameServiceManager.PlayGame(playerId, mode, updateGameParams, "All");
 
             logger.info("[POST /EndGame] Ricevuta richiesta terminazione partita per playerId={}", playerId);
             EndGameResponseDTO response = gameServiceManager.EndGame(playerId, mode, false);
@@ -236,6 +236,23 @@ public class GameController {
              * Il player non ha impostato una partita prima di arrivare all'editor
              */
             logger.error("[GAMECONTROLLER][EndGame] " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PostMapping(value="/CompileEvosuite", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RunGameResponseDTO> CompileEvosuiteBeforeEnding(@RequestBody RunGameRequestDTO request) {
+        try {
+            GameParams updateGameParams = GameParamsFactory.updateGameParams(request);
+            String playerId = request.getPlayerId();
+            String mode = request.getMode();
+            RunGameResponseDTO response = gameServiceManager.PlayGame(playerId, mode, updateGameParams, "T8");
+            return ResponseEntity.ok().body(response);
+        } catch (GameModeDontExist e) {
+            /*
+             * Il player non ha impostato una partita prima di arrivare all'editor
+             */
+            logger.error("[GAMECONTROLLER][run] " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
