@@ -79,7 +79,6 @@ public class PlayerService {
         Optional<Player> player = playerRepository.findById(ID);
         if (player.isEmpty())
             throw new UserNotFoundException();
-
         return player.get();
     }
 

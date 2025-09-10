@@ -8,8 +8,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Model.*;
-import com.g2.Model.DTO.GameProgressDTO;
-import com.g2.Model.DTO.PlayerProgressDTO;
+import com.g2.Model.DTO.*;
 import com.g2.security.JwtRequestContext;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import com.g2.Components.GenericObjectComponent;
 import com.g2.Components.PageBuilder;
 import com.g2.Components.UserProfileComponent;
 import com.g2.Interfaces.ServiceManager;
-import com.g2.Model.DTO.ResponseTeamComplete;
 
 
 /*
@@ -121,12 +119,31 @@ public class UserProfileController {
         return achievement.handlePageRequest();
     }
 
+    @GetMapping("/leaderboard")
+    public String showLeaderboard(Model model) {
+        PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
+        List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
+        List<LeaderboardRecordDTO> leaderboard =  players.stream().map(LeaderboardRecordDTO::new).sorted().toList();
+        int playerPosition = -1;
+        int i = 0;
+        while(playerPosition < 0 && i < leaderboard.size()){
+            if(leaderboard.get(i).getId().equals(leaderboardPage.getUserId())){
+                playerPosition = i;
+            }
+            i++;
+        }
+        model.addAttribute("leaderboard", leaderboard);
+        model.addAttribute("playerPosition", playerPosition);
+        return leaderboardPage.handlePageRequest();
+    }
+
     @GetMapping("/Notification")
     public String ProfileNotificationPage(Model model) {
         PageBuilder notification = new PageBuilder(serviceManager, "notification", model, JwtRequestContext.getJwtToken());
         // notification.SetAuth();
         return "notification";
     }
+
 
     @GetMapping("/Games")
     public String profile_game(Model model){

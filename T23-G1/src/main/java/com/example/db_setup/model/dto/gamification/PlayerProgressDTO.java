@@ -2,6 +2,7 @@ package com.example.db_setup.model.dto.gamification;
 
 import com.example.db_setup.model.GameProgress;
 import com.example.db_setup.model.Opponent;
+import com.example.db_setup.model.PlayerProgress;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -25,5 +26,9 @@ public class PlayerProgressDTO {
             this.gameProgressesDTO.add(new GameProgressDTO(opponent.getClassUT(), opponent.getGameMode(), opponent.getType(),
                     opponent.getDifficulty(), gameProgress.isWinner(), gameProgress.getAchievements()));
         }
+    }
+
+    public PlayerProgressDTO(PlayerProgress playerProgress) {
+        this(playerProgress.getExperiencePoints(), playerProgress.getGlobalAchievements(), playerProgress.getProgresses());
     }
 }

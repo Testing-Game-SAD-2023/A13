@@ -1,6 +1,7 @@
 package com.example.db_setup.controller;
 
 import com.example.db_setup.model.Player;
+import com.example.db_setup.model.dto.gamification.PlayerDTO;
 import com.example.db_setup.model.repository.PlayerRepository;
 import com.example.db_setup.service.PlayerService;
 import org.slf4j.Logger;
@@ -24,18 +25,25 @@ public class PlayerController {
         this.playerRepository = playerRepository;
     }
 
+//    modified by GaetanoM
     @GetMapping("/players")
-    public ResponseEntity<List<Player>> getAllPlayers() {
+    public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
         logger.info("[GET /players] Received request");
         List<Player> players = playerRepository.findAll();
-
-        logger.info("[GET /players] Players retrieved: {}", players);
-        return ResponseEntity.ok(players);
+        List<PlayerDTO> playersDTO = players.stream().map(PlayerDTO::new).toList();
+        logger.info("[GET /players] Players retrieved: {}", playersDTO);
+        return ResponseEntity.ok(playersDTO);
     }
 
-
-
-
+//    added by GaetanoM
+    @GetMapping("/players/{playerId}")
+    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable("playerId") long playerId) {
+        logger.info("[GET /players/{}] Received request", playerId);
+        Player player = playerService.getUserByID(playerId);
+        PlayerDTO playerDTO = new PlayerDTO(player);
+        logger.info("[GET /players/{}] Player retrieved: {}", playerId, playerDTO);
+        return ResponseEntity.ok(playerDTO);
+    }
 
     @PostMapping("/players/studentsByIds")
     public ResponseEntity<?> getStudentsByIds(@RequestBody List<String> idsStudenti){
@@ -62,8 +70,6 @@ public class PlayerController {
     public List<Map<String,Object>> searchStudents(@RequestBody Map<String, String> request){
         return playerService.searchStudents(request);
     }
-
-
 
     @GetMapping("/players/students_list/{ID}")
     @ResponseBody

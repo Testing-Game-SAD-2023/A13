@@ -19,6 +19,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Model.DTO.GameProgressDTO;
+import com.g2.Model.DTO.PlayerDTO;
 import com.g2.Model.DTO.PlayerProgressDTO;
 import com.g2.Model.DTO.UpdateGameProgressDTO;
 import com.g2.Model.GeneralAchievement;
@@ -129,8 +130,6 @@ public class T23Service extends BaseService {
                 String.class
         ));
 
-
-
         registerAction("createPlayerProgressAgainstOpponent", new ServiceActionDefinition(
                 params -> createPlayerProgressAgainstOpponent((long) params[0], (GameMode) params[1], (String) params[2], (OpponentType) params[3], (OpponentDifficulty) params[4]),
                 Long.class, GameMode.class, String.class, OpponentType.class, OpponentDifficulty.class
@@ -161,8 +160,30 @@ public class T23Service extends BaseService {
                 params -> updateGlobalAchievements((long) params[0], (Set<String>) params[1]), Long.class, Set.class
         ));
 
+//        added by GaetanoM
+        registerAction("getAllPlayers", new ServiceActionDefinition(
+                params -> getAllPlayers()
+        ));
+
+//        added by GaetanoM
+//        registerAction("getPlayerById", new ServiceActionDefinition(
+//                params -> getPlayerById((long) params[0]),
+//                Long.class
+//        ));
 
     }
+
+//    added by GaetanoM
+    private List<PlayerDTO> getAllPlayers() {
+        final String endpoint = "/players";
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>(){});
+    }
+
+//    added by GaetanoM
+//    private PlayerDTO getPlayerById(long id) {
+//        final String endpoint = "/players/%s".formatted(id);
+//        return callRestGET(endpoint, null, PlayerDTO.class);
+//    }
 
     private GameProgressDTO createPlayerProgressAgainstOpponent(long playerId, GameMode gameMode, String classUT, OpponentType type, OpponentDifficulty difficulty) {
         final String endpoint = "/players/%s/progression/against".formatted(playerId);
@@ -214,15 +235,6 @@ public class T23Service extends BaseService {
         requestBody.put("unlockedAchievements", achievements);
         return (Set<String>) callRestPut(endpoint, requestBody, null, null, Set.class);
     }
-
-
-
-
-
-
-
-
-
 
     // Metodo per l'autenticazione
     private JwtValidationResponseDTO GetAuthenticated(String jwt) {
