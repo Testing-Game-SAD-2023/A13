@@ -35,7 +35,7 @@ if %ERRORLEVEL% neq 0 (
 cd /d "%ROOT_DIR%"
 
 echo Deploying T4
-cd /d "%ROOT_DIR%\T4"
+cd /d "%ROOT_DIR%\T4\gamerepo"
 docker compose up -d
 if %ERRORLEVEL% neq 0 (
     echo Error deploying T4-G18
