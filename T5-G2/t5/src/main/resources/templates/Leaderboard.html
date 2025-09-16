@@ -1,0 +1,328 @@
+<!--<!doctype html>-->
+<!--<html lang="en" data-bs-theme="dark" id="html-root" xmlns:th="http://thymeleaf.org">-->
+<!--    <head th:replace="fragments/header :: header">-->
+<!--<body>-->
+<!--    &lt;!&ndash; NAV &ndash;&gt;-->
+<!--    <div th:replace="fragments/navbar :: navbar"></div>-->
+<!--    &lt;!&ndash; LEADERBOARD&ndash;&gt;-->
+<!--    <div class="container">-->
+
+<!--        <h1 class="display-2 mt-2" th:text="#{classifica}"></h1>-->
+
+<!--        <div class="container-fluid">-->
+<!--            &lt;!&ndash; content &ndash;&gt;-->
+<!--            <div class="row mt-5 my-3">-->
+<!--                <div class="card col border-primary mr-3">-->
+<!--                    <div class="card-body row p-0">-->
+<!--                        <div class="col text-center py-4">-->
+<!--                            <i class="bi bi-brightness-high-fill display-5 text-primary"></i>-->
+<!--                        </div>-->
+<!--                        <div class="col text-start">-->
+<!--                            <p>-->
+<!--                                <h5> 1012 </h5> -->
+<!--                                <h5> Masters </h5>-->
+<!--                            </p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="card col border-danger mx-3">-->
+<!--                    <div class="card-body row p-0">-->
+<!--                        <div class="col text-center py-3">-->
+<!--                            <i class="bi bi-brightness-low-fill display-5 text-danger"></i>-->
+<!--                        </div>-->
+<!--                        <div class="col text-start">-->
+<!--                            <p>-->
+<!--                                <h5> 1012 </h5> -->
+<!--                                <h5> Experts </h5>-->
+<!--                            </p>-->
+<!--                            -->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="card col border-warning ml-3">-->
+<!--                    <div class="card-body row p-0">-->
+<!--                        <div class="col text-center py-4">-->
+<!--                            <i class="bi bi-brightness-alt-low-fill display-5 text-warning"></i>-->
+<!--                        </div>-->
+<!--                        <div class="col text-start">-->
+<!--                            <p>-->
+<!--                                <h5> 105 </h5> -->
+<!--                                <h5> Novices </h5>-->
+<!--                            </p>-->
+<!--                            -->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; TABLE &ndash;&gt;-->
+<!--        <div>-->
+<!--            <table class="table table-striped" -->
+<!--                   data-toggle="table" -->
+<!--                   data-search="true"-->
+<!--                   data-id-field="rank" -->
+<!--                   data-pagination="true"-->
+<!--                   data-side-pagination="server"-->
+<!--                   data-page-list="[10, 25, 50, 100, 200, All]" >-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th scope="col" data-sortable="true" th:text="#{posizione}"></th> -->
+<!--                    <th scope="col" data-sortable="true" th:text="#{primo}"></th>-->
+<!--                    <th scope="col" data-sortable="true" th:text="#{ultimo}"></th>-->
+<!--                    <th scope="col" data-sortable="true" data-searchable="false" th:text="#{punti}"></th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody class="table-group-divider  overflow-y-scroll">-->
+<!--                    &lt;!&ndash; <tr th:each="player : ${listaPlayers}">-->
+<!--                        <td th:text="${player.name}"></td>-->
+<!--                        <td th:text="${player.surname}"></td>-->
+<!--                    </tr>&ndash;&gt;-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    &lt;!&ndash; FOOTER &ndash;&gt;-->
+<!--    <div th:include="fragments/footer :: footer"></div>-->
+<!--    &lt;!&ndash; SCRIPT &ndash;&gt;-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/bootstrap-table.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+<!-- modified by Biagio S-->
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <div th:replace="fragments/header :: header"></div>
+    <title th:text="#{leaderboard.title}">Leaderboard</title>
+    <style>
+
+        .leaderboard-card {
+            background-color: #1f1f1f;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+        }
+
+        .leaderboard-card-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .leaderboard-card-left .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #d10b4f;
+        }
+
+        .leaderboard-card-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .leaderboard-card-info .name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .leaderboard-card-info .email {
+            font-size: 0.9rem;
+            color: #bbbbbb;
+            margin: 2px 0 0 0;
+        }
+
+        .leaderboard-card-score {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffd700; /* oro per dare risalto */
+        }
+
+        /* Tabella leaderboard */
+        .leaderboard-table {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .leaderboard-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table thead th {
+            padding: 12px 16px;
+            background-color: #2a2a2a;
+            color: #d10b4f;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .leaderboard-table tbody td {
+            padding: 12px 16px;
+            color: #ddd;
+        }
+
+        .leaderboard-table tbody tr:nth-child(odd) {
+            background-color: #262626;
+        }
+
+        .leaderboard-table tbody tr:nth-child(even) {
+            background-color: #1e1e1e;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background-color: rgba(209, 11, 79, 0.15);
+        }
+
+        .highlight-row {
+            background-color: rgba(209, 11, 79, 0.35) !important;
+            color: #fff;
+        }
+
+        /* Paginazione */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination .page-item .page-link {
+            color: #ccc;
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            margin: 0 3px;
+            border-radius: 4px;
+            padding: 6px 12px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #d10b4f;
+            border-color: #d10b4f;
+            color: #fff;
+        }
+
+        .page-link:hover {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<div class="container mt-4">
+
+    <!-- Badge del giocatore loggato -->
+    <div class="leaderboard-card"
+         th:if="${playerPosition >= 0}"
+         th:with="player=${leaderboard[playerPosition]}">
+        <div class="leaderboard-card-left">
+            <div class="avatar">
+                <i class="bi bi-person-fill"></i>  <!-- Icona utente, puoi cambiare -->
+            </div>
+            <div class="leaderboard-card-info">
+                <p class="name" th:text="${player.name} + ' ' + ${player.surname}">Nome Cognome</p>
+                <p class="email" th:text="${player.email}">email@esempio.com</p>
+            </div>
+        </div>
+        <div class="leaderboard-card-right">
+            <p th:text="#{leaderboard.your_position} + ' #' + (${playerPosition} + 1)" class="position">#1</p>
+            <p class="leaderboard-card-score" th:text="#{leaderboard.score} + ': ' + ${player.score}">Punteggio: 1234</p>
+        </div>
+    </div>
+
+    <!-- Tabella leaderboard -->
+    <div class="table-responsive leaderboard-table">
+        <table id="leaderboardTable">
+            <thead>
+            <tr>
+                <th th:text="#{leaderboard.rank}">#</th>
+                <th th:text="#{leaderboard.name}">Nome</th>
+                <th th:text="#{leaderboard.surname}">Cognome</th>
+                <th th:text="#{leaderboard.email}">Email</th>
+                <th th:text="#{leaderboard.score}">Punteggio</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="player, iterStat : ${leaderboard}"
+                th:classappend="${iterStat.index == playerPosition} ? 'highlight-row'">
+                <td th:text="${iterStat.index + 1}"></td>
+                <td th:text="${player.name}"></td>
+                <td th:text="${player.surname}"></td>
+                <td th:text="${player.email}"></td>
+                <td th:text="${player.score}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginazione -->
+    <nav class="pagination-container">
+        <ul class="pagination" id="pagination"></ul>
+    </nav>
+
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const rowsPerPage = 10;
+        const tableBody = document.getElementById("leaderboardTable").getElementsByTagName("tbody")[0];
+        const rows = tableBody.getElementsByTagName("tr");
+        const pagination = document.getElementById("pagination");
+
+        function showPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].style.display = (i >= start && i < end) ? "" : "none";
+            }
+        }
+
+        function setupPagination() {
+            const pageCount = Math.ceil(rows.length / rowsPerPage);
+            pagination.innerHTML = "";
+            for (let i = 1; i <= pageCount; i++) {
+                let li = document.createElement("li");
+                li.classList.add("page-item");
+                if (i === 1) li.classList.add("active");
+                let link = document.createElement("a");
+                link.classList.add("page-link");
+                link.href = "#";
+                link.innerText = i;
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    document.querySelectorAll(".page-item").forEach(p => p.classList.remove("active"));
+                    li.classList.add("active");
+                    showPage(i);
+                });
+                li.appendChild(link);
+                pagination.appendChild(li);
+            }
+        }
+
+        setupPagination();
+        showPage(1);
+    });
+</script>
+</body>
+</html>
+

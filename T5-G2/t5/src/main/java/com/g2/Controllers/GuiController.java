@@ -147,14 +147,14 @@ public class GuiController {
         return editor.handlePageRequest();
     }
 
-    @GetMapping("/leaderboard")
-    public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
-        PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
-        ServiceObjectComponent listaUtenti = new ServiceObjectComponent(serviceManager, "listaPlayers", "T23", "GetUsers");
-        leaderboard.setObjectComponents(listaUtenti);
-        //leaderboard.SetAuth(jwt);
-        return leaderboard.handlePageRequest();
-    }
+//    @GetMapping("/leaderboard")
+//    public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+//        PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
+//        ServiceObjectComponent listaUtenti = new ServiceObjectComponent(serviceManager, "listaPlayers", "T23", "GetUsers");
+//        leaderboard.setObjectComponents(listaUtenti);
+//        //leaderboard.SetAuth(jwt);
+//        return leaderboard.handlePageRequest();
+//    }
     /* 
     @PostMapping("/save-scalata")
     public ResponseEntity<String> saveScalata(@RequestParam("playerID") int playerID,
