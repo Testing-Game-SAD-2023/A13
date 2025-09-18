@@ -36,14 +36,14 @@ public class PlayerController {
     }
 
 //    added by GaetanoM
-    @GetMapping("/players/{playerId}")
-    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable("playerId") long playerId) {
-        logger.info("[GET /players/{}] Received request", playerId);
-        Player player = playerService.getUserByID(playerId);
-        PlayerDTO playerDTO = new PlayerDTO(player);
-        logger.info("[GET /players/{}] Player retrieved: {}", playerId, playerDTO);
-        return ResponseEntity.ok(playerDTO);
-    }
+//    @GetMapping("/players/{playerId}")
+//    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable("playerId") long playerId) {
+//        logger.info("[GET /players/{}] Received request", playerId);
+//        Player player = playerService.getUserByID(playerId);
+//        PlayerDTO playerDTO = new PlayerDTO(player);
+//        logger.info("[GET /players/{}] Player retrieved: {}", playerId, playerDTO);
+//        return ResponseEntity.ok(playerDTO);
+//    }
 
     @PostMapping("/players/studentsByIds")
     public ResponseEntity<?> getStudentsByIds(@RequestBody List<String> idsStudenti){

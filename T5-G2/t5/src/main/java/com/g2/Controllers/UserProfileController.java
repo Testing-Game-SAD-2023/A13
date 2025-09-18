@@ -2,15 +2,17 @@ package com.g2.Controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Model.*;
 import com.g2.Model.DTO.*;
+import com.g2.Service.LeaderboardService;
 import com.g2.security.JwtRequestContext;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,12 +34,14 @@ import com.g2.Interfaces.ServiceManager;
 public class UserProfileController {
 
     private final ServiceManager serviceManager;
-
+    private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
     private GameConfigData gameConfigData = null;
+    private final LeaderboardService leaderboardService;    // added by GaetanoM
 
     @Autowired
-    public UserProfileController(ServiceManager serviceManager) {
+    public UserProfileController(ServiceManager serviceManager, LeaderboardService leaderboardService) {
         this.serviceManager = serviceManager;
+        this.leaderboardService = leaderboardService; // added by GaetanoM
     }
 
     @PostConstruct
@@ -119,21 +123,36 @@ public class UserProfileController {
         return achievement.handlePageRequest();
     }
 
+//    added by GaetanoM
     @GetMapping("/leaderboard")
     public String showLeaderboard(Model model) {
         PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
         List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
-        List<LeaderboardRecordDTO> leaderboard =  players.stream().map(LeaderboardRecordDTO::new).sorted().toList();
-        int playerPosition = -1;
-        int i = 0;
-        while(playerPosition < 0 && i < leaderboard.size()){
-            if(leaderboard.get(i).getId().equals(leaderboardPage.getUserId())){
-                playerPosition = i;
-            }
-            i++;
+        logger.info("Players retrieved: {}", players);
+//        PlayerDTO currentPlayer = null;
+//        for (PlayerDTO player : players) {
+//            if (player.getId() == leaderboardPage.getUserId()) {
+//                currentPlayer = player;
+//                break;
+//            }
+//        }
+//        if (currentPlayer == null) {
+//            return "error";
+//        }
+        try{
+            PlayerDTO currentPlayer = players.stream().filter(player -> player.getId() == leaderboardPage.getUserId()).findFirst().get();
+            List<LeaderboardRecordDTO> leaderboard = leaderboardService.getLeaderboard(players);
+            logger.info("Leaderboard: {}", leaderboard);
+            LeaderboardRecordDTO currentPlayerRecord = new LeaderboardRecordDTO(currentPlayer, leaderboardService.getPlayerScore(currentPlayer));
+            logger.info("Current player record: {}", currentPlayerRecord);
+            int playerPosition = leaderboard.indexOf(currentPlayerRecord);
+            logger.info("Current player position: {}", playerPosition);
+            model.addAttribute("leaderboard", leaderboard);
+            model.addAttribute("playerPosition", playerPosition);
+            model.addAttribute("playerRecord", currentPlayerRecord);
+        } catch (NoSuchElementException e) {
+            return "error";
         }
-        model.addAttribute("leaderboard", leaderboard);
-        model.addAttribute("playerPosition", playerPosition);
         return leaderboardPage.handlePageRequest();
     }
 
