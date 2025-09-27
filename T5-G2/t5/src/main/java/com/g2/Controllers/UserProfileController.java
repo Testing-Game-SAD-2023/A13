@@ -128,31 +128,19 @@ public class UserProfileController {
     public String showLeaderboard(Model model) {
         PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
         List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
-        logger.info("Players retrieved: {}", players);
-//        PlayerDTO currentPlayer = null;
-//        for (PlayerDTO player : players) {
-//            if (player.getId() == leaderboardPage.getUserId()) {
-//                currentPlayer = player;
-//                break;
-//            }
-//        }
-//        if (currentPlayer == null) {
-//            return "error";
-//        }
-        try{
-            PlayerDTO currentPlayer = players.stream().filter(player -> player.getId() == leaderboardPage.getUserId()).findFirst().get();
-            List<LeaderboardRecordDTO> leaderboard = leaderboardService.getLeaderboard(players);
-            logger.info("Leaderboard: {}", leaderboard);
-            LeaderboardRecordDTO currentPlayerRecord = new LeaderboardRecordDTO(currentPlayer, leaderboardService.getPlayerScore(currentPlayer));
-            logger.info("Current player record: {}", currentPlayerRecord);
-            int playerPosition = leaderboard.indexOf(currentPlayerRecord);
-            logger.info("Current player position: {}", playerPosition);
-            model.addAttribute("leaderboard", leaderboard);
-            model.addAttribute("playerPosition", playerPosition);
-            model.addAttribute("playerRecord", currentPlayerRecord);
-        } catch (NoSuchElementException e) {
-            return "error";
-        }
+        logger.debug("Players retrieved: {}", players);
+        Optional<PlayerDTO> optCurrentPlayer = players.stream().filter(player -> player.getId() == leaderboardPage.getUserId()).findFirst();
+        if(optCurrentPlayer.isEmpty()) return "redirect:/error";
+        PlayerDTO currentPlayer = optCurrentPlayer.get();
+        List<LeaderboardRecordDTO> leaderboard = leaderboardService.getLeaderboard(players);
+        logger.debug("Leaderboard: {}", leaderboard);
+        LeaderboardRecordDTO currentPlayerRecord = new LeaderboardRecordDTO(currentPlayer);
+        logger.debug("Current player record: {}", currentPlayerRecord);
+        int playerPosition = leaderboard.indexOf(currentPlayerRecord);
+        logger.debug("Current player position: {}", playerPosition);
+        model.addAttribute("leaderboard", leaderboard);
+//        model.addAttribute("playerPosition", playerPosition); // TODO: to remove
+        model.addAttribute("playerRecord", currentPlayerRecord);
         return leaderboardPage.handlePageRequest();
     }
 
