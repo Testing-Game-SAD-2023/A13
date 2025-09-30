@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.g2.Components.LeaderboardComponent;
 import com.g2.Model.*;
 import com.g2.Model.DTO.*;
 import com.g2.Service.LeaderboardService;
@@ -124,23 +125,31 @@ public class UserProfileController {
     }
 
 //    added by GaetanoM
+//    @GetMapping("/leaderboard")
+//    public String showLeaderboard(Model model) {
+//        PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
+//        List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
+//        logger.debug("Players retrieved: {}", players);
+//        Optional<PlayerDTO> optCurrentPlayer = players.stream().filter(player -> player.getId() == leaderboardPage.getUserId()).findFirst();
+//        if(optCurrentPlayer.isEmpty()) return "redirect:/error";
+//        PlayerDTO currentPlayer = optCurrentPlayer.get();
+//        List<LeaderboardRecordDTO> leaderboard = leaderboardService.getLeaderboard(players);
+//        logger.debug("Leaderboard: {}", leaderboard);
+//        LeaderboardRecordDTO currentPlayerRecord = new LeaderboardRecordDTO(currentPlayer);
+//        logger.debug("Current player record: {}", currentPlayerRecord);
+//        model.addAttribute("leaderboard", leaderboard);
+//        model.addAttribute("playerRecord", currentPlayerRecord);
+//        return leaderboardPage.handlePageRequest();
+//    }
+
+//    added by GaetanoM
     @GetMapping("/leaderboard")
     public String showLeaderboard(Model model) {
         PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
-        List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
-        logger.debug("Players retrieved: {}", players);
-        Optional<PlayerDTO> optCurrentPlayer = players.stream().filter(player -> player.getId() == leaderboardPage.getUserId()).findFirst();
-        if(optCurrentPlayer.isEmpty()) return "redirect:/error";
-        PlayerDTO currentPlayer = optCurrentPlayer.get();
-        List<LeaderboardRecordDTO> leaderboard = leaderboardService.getLeaderboard(players);
-        logger.debug("Leaderboard: {}", leaderboard);
-        LeaderboardRecordDTO currentPlayerRecord = new LeaderboardRecordDTO(currentPlayer);
-        logger.debug("Current player record: {}", currentPlayerRecord);
-        int playerPosition = leaderboard.indexOf(currentPlayerRecord);
-        logger.debug("Current player position: {}", playerPosition);
-        model.addAttribute("leaderboard", leaderboard);
-//        model.addAttribute("playerPosition", playerPosition); // TODO: to remove
-        model.addAttribute("playerRecord", currentPlayerRecord);
+        GenericObjectComponent leaderboardObjectComponent = new GenericObjectComponent(null, null);
+        LeaderboardComponent leaderboardComponent = new LeaderboardComponent(leaderboardObjectComponent, leaderboardPage.getUserId(), serviceManager);
+        leaderboardPage.setLogicComponents(leaderboardComponent);
+        leaderboardPage.setObjectComponents(leaderboardObjectComponent);
         return leaderboardPage.handlePageRequest();
     }
 
