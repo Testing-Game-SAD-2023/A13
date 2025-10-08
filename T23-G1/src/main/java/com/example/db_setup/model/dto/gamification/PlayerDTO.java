@@ -2,7 +2,6 @@
 package com.example.db_setup.model.dto.gamification;
 
 import com.example.db_setup.model.Player;
-import com.example.db_setup.model.Studies;
 import lombok.*;
 
 @Getter

@@ -164,13 +164,6 @@ public class T23Service extends BaseService {
         registerAction("getAllPlayers", new ServiceActionDefinition(
                 params -> getAllPlayers()
         ));
-
-//        added by GaetanoM
-//        registerAction("getPlayerById", new ServiceActionDefinition(
-//                params -> getPlayerById((long) params[0]),
-//                Long.class
-//        ));
-
     }
 
 //    added by GaetanoM
@@ -178,12 +171,6 @@ public class T23Service extends BaseService {
         final String endpoint = "/players";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>(){});
     }
-
-//    added by GaetanoM
-//    private PlayerDTO getPlayerById(long id) {
-//        final String endpoint = "/players/%s".formatted(id);
-//        return callRestGET(endpoint, null, PlayerDTO.class);
-//    }
 
     private GameProgressDTO createPlayerProgressAgainstOpponent(long playerId, GameMode gameMode, String classUT, OpponentType type, OpponentDifficulty difficulty) {
         final String endpoint = "/players/%s/progression/against".formatted(playerId);

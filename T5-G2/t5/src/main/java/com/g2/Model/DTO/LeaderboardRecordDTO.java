@@ -1,4 +1,5 @@
 // added by GaetanoM
+// Classe DTO che rappresenta la singola riga della classifica
 package com.g2.Model.DTO;
 
 import com.g2.Model.OpponentSummary;
@@ -30,18 +31,18 @@ public class LeaderboardRecordDTO implements Comparable<LeaderboardRecordDTO> {
 		this.wins = getPlayerWins(player);
 	}
 
+//	Funzione per estrarre i punti esperienza da PlayerDTO
 	private int getPlayerExp(PlayerDTO player){
 		return player.getPlayerProgress().getExperiencePoints();
 	}
 
+//	Funzione per estrarre il numero di partite vinte da un giocatore (senza ripetizioni)
 	private int getPlayerWins(PlayerDTO player){
 		List<GameProgressDTO> gameProgresses = player.getPlayerProgress().getGameProgressesDTO();
-//		logger.info("Player {} - Game Progresses: {}", player.getId(), gameProgresses);
 		Set<OpponentSummary> gameProgressSet = gameProgresses.stream()
 			.filter(gameProgress -> gameProgress.getGameMode() == GameMode.PartitaSingola && gameProgress.isWon())
 			.map(gameProgress -> new OpponentSummary(gameProgress.getClassUT(), gameProgress.getType(), gameProgress.getDifficulty()))
 			.collect(Collectors.toSet());
-//		logger.info("Player {} - Game Progresses Set: {}", player.getId(), gameProgressSet);
 		return gameProgressSet.size();
 	}
 

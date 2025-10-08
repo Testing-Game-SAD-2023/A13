@@ -3,13 +3,11 @@ package com.g2.Controllers;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Predicate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.Components.LeaderboardComponent;
 import com.g2.Model.*;
 import com.g2.Model.DTO.*;
-import com.g2.Service.LeaderboardService;
 import com.g2.security.JwtRequestContext;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -37,12 +35,10 @@ public class UserProfileController {
     private final ServiceManager serviceManager;
     private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
     private GameConfigData gameConfigData = null;
-    private final LeaderboardService leaderboardService;    // added by GaetanoM
 
     @Autowired
-    public UserProfileController(ServiceManager serviceManager, LeaderboardService leaderboardService) {
+    public UserProfileController(ServiceManager serviceManager) {
         this.serviceManager = serviceManager;
-        this.leaderboardService = leaderboardService; // added by GaetanoM
     }
 
     @PostConstruct
@@ -125,24 +121,8 @@ public class UserProfileController {
     }
 
 //    added by GaetanoM
-//    @GetMapping("/leaderboard")
-//    public String showLeaderboard(Model model) {
-//        PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
-//        List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
-//        logger.debug("Players retrieved: {}", players);
-//        Optional<PlayerDTO> optCurrentPlayer = players.stream().filter(player -> player.getId() == leaderboardPage.getUserId()).findFirst();
-//        if(optCurrentPlayer.isEmpty()) return "redirect:/error";
-//        PlayerDTO currentPlayer = optCurrentPlayer.get();
-//        List<LeaderboardRecordDTO> leaderboard = leaderboardService.getLeaderboard(players);
-//        logger.debug("Leaderboard: {}", leaderboard);
-//        LeaderboardRecordDTO currentPlayerRecord = new LeaderboardRecordDTO(currentPlayer);
-//        logger.debug("Current player record: {}", currentPlayerRecord);
-//        model.addAttribute("leaderboard", leaderboard);
-//        model.addAttribute("playerRecord", currentPlayerRecord);
-//        return leaderboardPage.handlePageRequest();
-//    }
-
-//    added by GaetanoM
+//    Handler per la costruzione della pagine contenente la classifica
+//    La pagina è costruita utilizzando un ObjectComponent "riempito" da un LogicComponent
     @GetMapping("/leaderboard")
     public String showLeaderboard(Model model) {
         PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());

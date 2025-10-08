@@ -1,15 +1,16 @@
+// added by GaetanoM
 package com.g2.Components;
 
 import com.g2.Interfaces.ServiceManager;
 import com.g2.Model.DTO.LeaderboardRecordDTO;
 import com.g2.Model.DTO.PlayerDTO;
-import com.g2.Service.LeaderboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
+// LogicComponent che esegue la logica e la chiamata API per la costruzione della classifica
 public class LeaderboardComponent extends GenericLogicComponent {
 	private final String ErrorCode = "leaderboard_error";
 	private final ServiceManager serviceManager;
@@ -29,7 +30,7 @@ public class LeaderboardComponent extends GenericLogicComponent {
 
 	@Override
 	public boolean executeLogic() {
-		List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
+		List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", (Object) null);
 		logger.debug("Players retrieved: {}", players);
 		Optional<PlayerDTO> optCurrentPlayer = players.stream().filter(player -> player.getId() == this.currentPlayerId).findFirst();
 		if(optCurrentPlayer.isEmpty()) return false;
@@ -38,6 +39,8 @@ public class LeaderboardComponent extends GenericLogicComponent {
 		logger.debug("Leaderboard: {}", leaderboard);
 		LeaderboardRecordDTO currentPlayerRecord = new LeaderboardRecordDTO(currentPlayer);
 		logger.debug("Current player record: {}", currentPlayerRecord);
+//		la leaderboard è inserita all'interno di un ObjectComponent che sarà passato al PageBuilder per la
+//		costruzione della pagina della classifica
 		leaderboardObjectComponent.setObject("leaderboard", leaderboard);
 		leaderboardObjectComponent.setObject("playerRecord", currentPlayerRecord);
 		return true;
