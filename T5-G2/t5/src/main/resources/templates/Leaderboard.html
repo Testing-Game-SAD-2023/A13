@@ -1,134 +1,9 @@
-<!-- modified by Biagio S-->
-
 <!DOCTYPE html>
 <html lang="it" data-bs-theme="dark">
 <head>
     <div th:replace="fragments/header :: header"></div>
     <title th:text="#{leaderboard.title}">Leaderboard</title>
-    <style>
-        .leaderboard-card {
-            background-color: #1f1f1f;
-            border-radius: 12px;
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-        }
-
-        .leaderboard-card-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .leaderboard-card-left .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: #d10b4f;
-        }
-
-        .leaderboard-card-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .leaderboard-card-info .name {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin: 0;
-            color: #ffffff;
-        }
-
-        .leaderboard-card-info .email {
-            font-size: 0.9rem;
-            color: #bbbbbb;
-            margin: 2px 0 0 0;
-        }
-
-        .leaderboard-card-right {
-            text-align: right;
-        }
-
-        .leaderboard-card-right .position {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #d10b4f;
-            margin: 0 0 5px 0;
-        }
-
-        .leaderboard-card-score {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .leaderboard-table {
-            background-color: #1e1e1e;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .leaderboard-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .leaderboard-table thead th {
-            padding: 12px 16px;
-            background-color: #2a2a2a;
-            color: #d10b4f;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-
-        .leaderboard-table tbody td {
-            padding: 12px 16px;
-            color: #ddd;
-        }
-
-        .leaderboard-table tbody tr:nth-child(odd) {
-            background-color: #262626;
-        }
-
-        .leaderboard-table tbody tr:nth-child(even) {
-            background-color: #1e1e1e;
-        }
-
-        .leaderboard-table tbody tr:hover {
-            background-color: rgba(209, 11, 79, 0.15);
-        }
-
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        select#scoreTypeSelector {
-            background-color: #2a2a2a;
-            color: #d10b4f;
-            border: none;
-            font-size: 0.85rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            padding: 6px 8px;
-            border-radius: 4px;
-        }
-
-        select#scoreTypeSelector option {
-            background-color: #1f1f1f;
-            color: #fff;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/t5/css/leaderboard.css}">
 </head>
 <body>
 <div th:replace="fragments/navbar :: navbar"></div>
@@ -167,6 +42,7 @@
                     <select id="scoreTypeSelector">
                         <option value="exp" th:text="#{leaderboard.experience}" selected>Esperienza</option>
                         <option value="wins" th:text="#{leaderboard.wins}">Vittorie</option>
+                        <!-- Aggiungere nuove metriche QUI -->
                     </select>
                 </th>
             </tr>
@@ -179,6 +55,7 @@
                 <td th:text="${player.email}"></td>
                 <td class="player-score"
                     th:attr="data-exp=${player.exp}, data-wins=${player.wins}"></td>
+                    <!-- Aggiungere nuove metriche QUI -->
             </tr>
             </tbody>
         </table>
@@ -193,117 +70,11 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-        const rowsPerPage = 10;
-        const tableBody = document.querySelector("#leaderboardTable tbody");
-        const pagination = document.getElementById("pagination");
-        const selector = document.getElementById("scoreTypeSelector");
-
-        const playerEmail = /*[[${playerRecord.email}]]*/ '';
-
-        function updateLeaderboard(scoreType) {
-            const rows = Array.from(tableBody.querySelectorAll("tr"));
-
-            // aggiorna punteggi
-            rows.forEach(row => {
-                const scoreCell = row.querySelector(".player-score");
-                scoreCell.textContent = scoreCell.dataset[scoreType];
-            });
-
-            // ordina decrescente
-            rows.sort((a, b) => {
-                const scoreA = parseInt(a.querySelector(".player-score").dataset[scoreType]);
-                const scoreB = parseInt(b.querySelector(".player-score").dataset[scoreType]);
-                return scoreB - scoreA;
-            });
-
-            // reset tabella
-            tableBody.innerHTML = "";
-            let playerRank = null;
-            let playerScore = null;
-
-            // dense ranking
-            let currentRank = 1;
-            let lastScore = null;
-
-            rows.forEach((row, index) => {
-                const score = parseInt(row.querySelector(".player-score").dataset[scoreType]);
-
-                // se non è il primo utente e ha un punteggio diverso dal precedente
-                if (index > 0 && score !== lastScore) {
-                    currentRank++;
-                }
-
-                lastScore = score;
-
-                // assegna la posizione alla cella
-                row.querySelector(".rank").textContent = currentRank;
-
-                row.classList.remove("highlight-row");
-                if (row.dataset.email === playerEmail) {
-                    row.classList.add("highlight-row");
-                    playerRank = currentRank;
-                    playerScore = score;
-                }
-                tableBody.appendChild(row);
-            });
-
-            // aggiorna badge player
-            if (playerRank !== null) {
-                document.getElementById("playerPositionBadge").textContent = "# " + playerRank;
-                document.getElementById("playerScoreBadge").textContent =
-                    (scoreType === "exp"
-                        ? /*[[#{leaderboard.experience}]]*/ 'Esperienza'
-                        : /*[[#{leaderboard.wins}]]*/ 'Vittorie') + ": " + playerScore;
-            }
-
-            setupPagination();
-            showPage(1);
-        }
-
-        function showPage(page) {
-            const rows = tableBody.querySelectorAll("tr");
-            const start = (page - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-            rows.forEach((row, i) => {
-                row.style.display = (i >= start && i < end) ? "" : "none";
-            });
-        }
-
-        function setupPagination() {
-            const rows = tableBody.querySelectorAll("tr");
-            const pageCount = Math.ceil(rows.length / rowsPerPage);
-            pagination.innerHTML = "";
-            for (let i = 1; i <= pageCount; i++) {
-                let li = document.createElement("li");
-                li.classList.add("page-item");
-                if (i === 1) li.classList.add("active");
-                let link = document.createElement("a");
-                link.classList.add("page-link");
-                link.href = "#";
-                link.innerText = i;
-                link.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    document.querySelectorAll(".page-item").forEach(p => p.classList.remove("active"));
-                    li.classList.add("active");
-                    showPage(i);
-                });
-                li.appendChild(link);
-                pagination.appendChild(li);
-            }
-        }
-
-        // init con esperienza
-        updateLeaderboard("exp");
-
-        // cambia classifica
-        selector.addEventListener("change", function () {
-            updateLeaderboard(this.value);
-        });
-    });
+    const playerEmail = /*[[${playerRecord.email}]]*/ '';
+    const i18nExperience = /*[[#{leaderboard.experience}]]*/ 'Esperienza';
+    const i18nWins = /*[[#{leaderboard.wins}]]*/ 'Vittorie';
+    // Aggiungere nuove metriche QUI
 </script>
+<script th:src="@{/t5/js/leaderboard.js}"></script>
 </body>
 </html>
-
-
-
