@@ -30,7 +30,7 @@ public class LeaderboardComponent extends GenericLogicComponent {
 
 	@Override
 	public boolean executeLogic() {
-		List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", (Object) null);
+		List<PlayerDTO> players = (List<PlayerDTO>) serviceManager.handleRequest("T23", "getAllPlayers", null);
 		logger.debug("Players retrieved: {}", players);
 		Optional<PlayerDTO> optCurrentPlayer = players.stream().filter(player -> player.getId() == this.currentPlayerId).findFirst();
 		if(optCurrentPlayer.isEmpty()) return false;
