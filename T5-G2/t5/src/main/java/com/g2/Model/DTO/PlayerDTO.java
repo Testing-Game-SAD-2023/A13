@@ -16,5 +16,4 @@ public class PlayerDTO {
 	private String email;
 	private String studies;
 	private PlayerProgressDTO playerProgress;
-
 }

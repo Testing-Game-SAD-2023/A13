@@ -121,7 +121,7 @@ public class UserProfileController {
     }
 
 //    added by GaetanoM
-//    Handler per la costruzione della pagine contenente la classifica
+//    Handler per la costruzione della pagina contenente la classifica
 //    La pagina è costruita utilizzando un ObjectComponent "riempito" da un LogicComponent
     @GetMapping("/leaderboard")
     public String showLeaderboard(Model model) {

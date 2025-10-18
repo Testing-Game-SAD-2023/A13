@@ -2,6 +2,7 @@
 // Classe DTO che rappresenta la singola riga della classifica
 package com.g2.Model.DTO;
 
+import com.g2.Model.LeaderboardRecord;
 import com.g2.Model.OpponentSummary;
 import lombok.*;
 import testrobotchallenge.commons.models.opponent.GameMode;
@@ -16,50 +17,18 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @ToString
 @AllArgsConstructor
-public class LeaderboardRecordDTO implements Comparable<LeaderboardRecordDTO> {
+public class LeaderboardRecordDTO {
 	private String name;
 	private String surname;
 	private String email;
 	private int exp;
 	private int wins;
 
-	public LeaderboardRecordDTO(PlayerDTO player) {
-		this.name = player.getName();
-		this.surname = player.getSurname();
-		this.email = player.getEmail();
-		this.exp = getPlayerExp(player);
-		this.wins = getPlayerWins(player);
-	}
-
-//	Funzione per estrarre i punti esperienza da PlayerDTO
-	private int getPlayerExp(PlayerDTO player){
-		return player.getPlayerProgress().getExperiencePoints();
-	}
-
-//	Funzione per estrarre il numero di partite vinte da un giocatore (senza ripetizioni)
-	private int getPlayerWins(PlayerDTO player){
-		List<GameProgressDTO> gameProgresses = player.getPlayerProgress().getGameProgressesDTO();
-		Set<OpponentSummary> gameProgressSet = gameProgresses.stream()
-			.filter(gameProgress -> gameProgress.getGameMode() == GameMode.PartitaSingola && gameProgress.isWon())
-			.map(gameProgress -> new OpponentSummary(gameProgress.getClassUT(), gameProgress.getType(), gameProgress.getDifficulty()))
-			.collect(Collectors.toSet());
-		return gameProgressSet.size();
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o == null || getClass() != o.getClass()) return false;
-		LeaderboardRecordDTO that = (LeaderboardRecordDTO) o;
-		return getWins() == that.getWins() && getExp() == that.getExp() && Objects.equals(getName(), that.getName()) && Objects.equals(getSurname(), that.getSurname()) && Objects.equals(getEmail(), that.getEmail());
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(getName(), getSurname(), getEmail(), getExp(), getWins());
-	}
-
-	@Override
-	public int compareTo(LeaderboardRecordDTO otherRecord) {
-		return Integer.compare(otherRecord.getExp(), this.getExp()); // Ordina in ordine decrescente
+	public LeaderboardRecordDTO(LeaderboardRecord leaderboardRecord) {
+		this.name = leaderboardRecord.getName();
+		this.surname = leaderboardRecord.getSurname();
+		this.email = leaderboardRecord.getEmail();
+		this.exp = leaderboardRecord.getExp();
+		this.wins = leaderboardRecord.getWins();
 	}
 }
