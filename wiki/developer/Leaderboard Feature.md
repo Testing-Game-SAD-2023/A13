@@ -9,15 +9,14 @@ This enhancement aims to increase player engagement by providing clear visibilit
 
 The leaderboard provides two distinct ranking metrics:
 
-1. **Experience Points Ranking**: Players are ranked based on their total accumulated experience points earned by defeating robots throughout their gameplay.
-
-2. **Unique Wins Ranking**: Players are ranked by the number of unique victories achieved. A victory is considered unique when defined by the triplet (class, robot, difficulty level). Multiple wins by the same user against the same robot, on the same class, and at the same difficulty level count as a single victory for this ranking.
+1. **Experience Points Ranking**: players are ranked based on their total accumulated experience points earned by defeating robots throughout their gameplay.
+2. **Unique Wins Ranking**: players are ranked by the number of unique victories achieved in Single Match mode. A victory is considered unique when defined by the triplet (class, robot, difficulty level). Multiple wins by the same user against the same robot, on the same class, and at the same difficulty level count as a single victory for this ranking.
 
 ### User Interface
 
 Access to the leaderboard page is restricted to authenticated players only.
 
-**Access:** Players can access the leaderboard through the "Leaderboard" entry added to the ellipsis menu in the top-right corner of the application's homepage. This entry directs to the `/leaderboard` endpoint.
+Players can access the leaderboard through the "Leaderboard" entry added to the ellipsis menu in the top-right corner of the application's homepage. This entry directs to the `/leaderboard` endpoint.
 
 The interface includes:
 - A sortable table displaying player rankings with first name, last name, email, and score;
@@ -46,23 +45,26 @@ The backend implementation involves modifications to two microservices: **T5** a
 
 The **T5** service handles the leaderboard page rendering and orchestration:
 
-- **UserProfileController**: Exposes the `/leaderboard` endpoint (GET request) that initializes the page components and delegates to the `PageBuilder` for view construction;
-- **PageBuilder**: Implements the Builder pattern to construct page models in a modular and maintainable way, coordinating between logic components and data components;
-- **LeaderboardComponent**: Contains the core logic (`executeLogic`) for retrieving player data, building leaderboard records, and populating the page model. It fetches player information from T23 via **ServiceManager** through REST API calls and transforms received data into `LeaderboardRecordDTO` objects.
+- **UserProfileController**: exposes the `/leaderboard` endpoint (GET request) that initializes the page components and delegates to the `PageBuilder` for view construction;
+- **PageBuilder**: implements the Builder pattern to construct page models in a modular and maintainable way, coordinating between logic components and data components;
+- **LeaderboardComponent**: contains the core logic (`executeLogic`) for retrieving player data, building leaderboard records, and populating the page model. It fetches player information from T23 via **ServiceManager** through REST API calls and transforms received data into `LeaderboardRecordDTO` objects.
+
+![PageBuileder class diagram](images/cd_PageBuilder.jpg)
 
 #### T23 Service
 
 The **T23** service provides player data through its REST API:
 
-- **REST API:** T23 exposes a REST API at the `/players` endpoint (GET request) to return the list of all players and their game progress;
-- The API in `PlayerController.java` was modified to return `PlayerDTO` objects instead of raw domain entities, following the **DTO pattern** for proper data transfer between microservices;
+- **REST API:** T23 exposes a REST API at the `/players` endpoint (GET request) to return the list of all players and their game progress; this API in `PlayerController.java` was modified to return `PlayerDTO` objects instead of raw domain entities, following the **DTO pattern** for proper data transfer between microservices.
 
 #### Data Transfer Objects
 
 Two specialized DTO classes facilitate data exchange:
 
-- **PlayerDTO**: Encapsulates player identification and progress information retrieved from T23;
-- **LeaderboardRecordDTO**: Represents a single leaderboard entry, constructed from a `PlayerDTO`. It includes methods to calculate experience points and unique wins (`getPlayerExp` and `getPlayerWins`) and can be easily extended with additional metrics.
+- **PlayerDTO**: encapsulates player identification and progress information retrieved from T23;
+- **LeaderboardRecordDTO**: represents a single leaderboard entry, constructed from a `LeaderboardRecord`.
+
+`LeaderboardRecord` class contains the methods `getPlayerExp` and `getPlayerWins` to retrieve the two ranking metrics used to build the leaderboard. To extend the leaderboard with other metrics it is necessary (but not sufficient) to modify this class.
 
 ## Multilingual Support
 
