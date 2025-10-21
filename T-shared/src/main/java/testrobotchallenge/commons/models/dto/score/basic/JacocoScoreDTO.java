@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/** DTO che rappresenta le metriche di copertura calcolate da JaCoCo per un test JUnit.
+ * Contiene le coperture per linee, branch e istruzioni.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -1,9 +1,8 @@
 package com.groom.manvsclass.model.repository;
 
+import com.groom.manvsclass.model.ClassUT;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.groom.manvsclass.model.ClassUT;
-
-public interface ClassRepository extends MongoRepository<ClassUT,String>{
+public interface ClassRepository extends MongoRepository<ClassUT, String> {
 
 }

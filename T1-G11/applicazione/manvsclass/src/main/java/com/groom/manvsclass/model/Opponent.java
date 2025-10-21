@@ -1,15 +1,17 @@
 package com.groom.manvsclass.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
-import testrobotchallenge.commons.models.opponent.OpponentType;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import javax.persistence.*;
+import javax.persistence.Id;
 import java.time.Instant;
 
 @Document(collection = "opponents")
@@ -32,7 +34,7 @@ public class Opponent {
     private OpponentDifficulty opponentDifficulty;
 
     @Indexed
-    private OpponentType opponentType;
+    private String opponentType;
 
     private String coverage;
 

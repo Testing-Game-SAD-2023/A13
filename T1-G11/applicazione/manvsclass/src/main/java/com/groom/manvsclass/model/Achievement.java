@@ -7,7 +7,8 @@ import javax.persistence.GeneratedValue;
 
 @Document(collection = "achievements")
 public class Achievement {
-    @Id @GeneratedValue // Auto-Increment
+    @Id
+    @GeneratedValue // Auto-Increment
     private String ID;
 
     private String name;

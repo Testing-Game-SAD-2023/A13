@@ -92,6 +92,12 @@ spring:
             - Path=/userService/**
           filters:
             - RewritePath=/userService/(?<segment>.*), /${segment}
+        - id: T5-route
+          uri: http://t5-controller:8085
+          predicates:
+            - Path=/gameEngine/**
+          filters:
+            - RewritePath=/gameEngine/(?<segment>.*), /${segment}
 
 # Configurazioni aggiuntive per il logging e altre personalizzazioni
 logging:

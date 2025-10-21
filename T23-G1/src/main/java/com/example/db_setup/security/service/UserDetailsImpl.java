@@ -1,16 +1,18 @@
 package com.example.db_setup.security.service;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-
 import com.example.db_setup.model.Admin;
 import com.example.db_setup.model.Player;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+
 public class UserDetailsImpl implements UserDetails {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Getter
@@ -19,8 +21,6 @@ public class UserDetailsImpl implements UserDetails {
     private final String email;
     @Getter
     private final String password;
-
-    private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Long id, String email, String password) {
         this.id = id;
@@ -52,6 +52,11 @@ public class UserDetailsImpl implements UserDetails {
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override

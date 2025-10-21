@@ -4,6 +4,18 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Rappresenta i risultati delle metriche di copertura calcolate da JaCoCo per un test JUnit.
+ * <p>
+ * Ogni tipo di copertura (linee, branch, istruzioni) è rappresentata da un oggetto {@link Coverage},
+ * che contiene il numero di elementi coperti e non coperti.
+ * </p>
+ *
+ * <p>
+ * Questa classe è pensata per uso interno del dominio (principalmente persistenza) e come valore incorporabile in altre entità,
+ * non come DTO per comunicazione esterna.
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 @Embeddable

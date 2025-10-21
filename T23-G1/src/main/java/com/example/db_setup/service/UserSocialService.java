@@ -1,42 +1,43 @@
 package com.example.db_setup.service;
 
-import java.util.List;
-
+import com.example.db_setup.model.UserFollow;
+import com.example.db_setup.model.UserProfile;
+import com.example.db_setup.model.repository.UserFollowRepository;
+import com.example.db_setup.model.repository.UserProfileRepository;
 import com.example.db_setup.service.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.db_setup.model.repository.UserFollowRepository;
-import com.example.db_setup.model.repository.UserProfileRepository;
-import com.example.db_setup.model.UserFollow;
-import com.example.db_setup.model.UserProfile;
+import java.util.List;
 
 @Service
 public class UserSocialService {
 
-    @Autowired
-    private UserProfileRepository userProfileRepository;
-    @Autowired
-    private UserFollowRepository userFollowRepository;
-    @Autowired
-    private NotificationService notificationService;
-
     private static final Logger logger = LoggerFactory.getLogger(UserSocialService.class);
+    private final UserProfileRepository userProfileRepository;
+    private final UserFollowRepository userFollowRepository;
+    private final NotificationService notificationService;
+
+    public UserSocialService(UserProfileRepository userProfileRepository, UserFollowRepository userFollowRepository,
+                             NotificationService notificationService) {
+        this.userProfileRepository = userProfileRepository;
+        this.userFollowRepository = userFollowRepository;
+        this.notificationService = notificationService;
+    }
 
     // Verifica se un utente ne segue un altro
-    public boolean isFollowing(String followerId, String followingId) {
-        Integer followerId_int = Integer.valueOf(followerId);
-        Integer followingId_int = Integer.valueOf(followingId);
-        UserProfile follower = userProfileRepository.findById(followerId_int)
-                .orElseThrow(() -> new UserNotFoundException("Follower con ID " + followerId + " non trovato"));
-        UserProfile following = userProfileRepository.findById(followingId_int)
-                .orElseThrow(() -> new UserNotFoundException("Following con ID " + followingId + " non trovato"));
+    public boolean isFollowing(String followerIdStr, String followingIdStr) {
+        Integer followerId = Integer.valueOf(followerIdStr);
+        Integer followingId = Integer.valueOf(followingIdStr);
+        UserProfile follower = userProfileRepository.findById(followerId)
+                .orElseThrow(() -> new UserNotFoundException(generateFollowerNotFoundMessage(followerIdStr)));
+        UserProfile following = userProfileRepository.findById(followingId)
+                .orElseThrow(() -> new UserNotFoundException(generateFollowingNotFoundMessage(followingIdStr)));
 
         return userFollowRepository.existsByFollowerAndFollowing(follower, following);
     }
@@ -47,15 +48,15 @@ public class UserSocialService {
      * seguendo il target, aggiunge il follow
      */
     @Transactional
-    public boolean toggleFollow(String followerId, String followingId) {
+    public boolean toggleFollow(String followerIdStr, String followingIdStr) {
 
-        Integer followerId_int = Integer.valueOf(followerId);
-        Integer followingId_int = Integer.valueOf(followingId);
+        Integer followerId = Integer.valueOf(followerIdStr);
+        Integer followingId = Integer.valueOf(followingIdStr);
 
-        UserProfile follower = userProfileRepository.findById(followerId_int)
-                .orElseThrow(() -> new UserNotFoundException("Follower con ID " + followerId + " non trovato"));
-        UserProfile following = userProfileRepository.findById(followingId_int)
-                .orElseThrow(() -> new UserNotFoundException("Following con ID " + followingId + " non trovato"));
+        UserProfile follower = userProfileRepository.findById(followerId)
+                .orElseThrow(() -> new UserNotFoundException(generateFollowerNotFoundMessage(followerIdStr)));
+        UserProfile following = userProfileRepository.findById(followingId)
+                .orElseThrow(() -> new UserNotFoundException(generateFollowingNotFoundMessage(followingIdStr)));
 
         if (userFollowRepository.existsByFollowerAndFollowing(follower, following)) {
             // Se già segue, rimuovilo (unfollow)
@@ -65,49 +66,49 @@ public class UserSocialService {
             // Se non segue, aggiungilo (follow)
             userFollowRepository.save(new UserFollow(follower, following));
             /*
-             * Notifica 
+             * Notifica
              */
-            String Titolo = "Hai un nuovo follower";
-            String Messagge = "L'utente " + follower.getNickname() + "ha inizato a seguirti";
+            String title = "Hai un nuovo follower";
+            String message = "L'utente " + follower.getNickname() + " ha inizato a seguirti";
 
-            notificationService.saveNotification(following.getPlayer().getID(), Titolo, Messagge, "info"
+            notificationService.saveNotification(following.getPlayer().getID(), title, message, "info"
             );
             return true; // Ora sta seguendo
         }
     }
 
-    public List<UserProfile> getFollowers(String userId) {
+    public List<UserProfile> getFollowers(String userIdStr) {
         try {
-            Integer userId_int = Integer.valueOf(userId);
-            UserProfile user = userProfileRepository.findById(userId_int)
-                    .orElseThrow(() -> new UserNotFoundException("User con ID " + userId + " non trovato"));
+            Integer userId = Integer.valueOf(userIdStr);
+            UserProfile user = userProfileRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(generateUserNotFoundMessage(userIdStr)));
             return userFollowRepository.findFollowersByUserProfile(user);
         } catch (UserNotFoundException e) {
             // Log dell'eccezione
-            logger.error("Eccezione durante il recupero dei follower per l'utente con ID " + userId, e);
+            logger.error("Eccezione durante il recupero dei follower per l'utente con ID " + userIdStr, e);
             // Rilancio dell'eccezione
             throw e;
         } catch (Exception e) {
             // Gestione di altre eccezioni generiche, se necessario
-            logger.error("Errore imprevisto durante il recupero dei follower per l'utente con ID " + userId, e);
+            logger.error("Errore imprevisto durante il recupero dei follower per l'utente con ID " + userIdStr, e);
             throw e; // Rilancia l'eccezione generica
         }
     }
 
-    public List<UserProfile> getFollowing(String userId) {
+    public List<UserProfile> getFollowing(String userIdStr) {
         try {
-            Integer userId_int = Integer.valueOf(userId);
-            UserProfile user = userProfileRepository.findById(userId_int)
-                    .orElseThrow(() -> new UserNotFoundException("User con ID " + userId + " non trovato"));
+            Integer userId = Integer.valueOf(userIdStr);
+            UserProfile user = userProfileRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(generateUserNotFoundMessage(userIdStr)));
             return userFollowRepository.findFollowingByUserProfile(user);
         } catch (UserNotFoundException e) {
             // Log dell'eccezione
-            logger.error("Eccezione durante il recupero degli utenti seguiti per l'utente con ID " + userId, e);
+            logger.error("Eccezione durante il recupero degli utenti seguiti per l'utente con ID " + userIdStr, e);
             // Rilancio dell'eccezione
             throw e;
         } catch (Exception e) {
             // Gestione di altre eccezioni generiche, se necessario
-            logger.error("Errore imprevisto durante il recupero degli utenti seguiti per l'utente con ID " + userId, e);
+            logger.error("Errore imprevisto durante il recupero degli utenti seguiti per l'utente con ID " + userIdStr, e);
             throw e; // Rilancia l'eccezione generica
         }
     }
@@ -116,6 +117,22 @@ public class UserSocialService {
     public Page<UserProfile> searchUserProfiles(String searchTerm, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userProfileRepository.searchByNameSurnameEmailOrNickname(searchTerm, pageable);
+    }
+
+    /*
+     * Di seguito sono riportati i metodi per la generazione del messaggio di errore per UserNotFoundException.
+     * Sono necessari per risolvere l'issue identificata da SonarQube riguardo duplicazione della stringa "non trovato"
+     */
+    private String generateFollowerNotFoundMessage(String followerIdStr) {
+        return "Follower con ID %s non trovato".formatted(followerIdStr);
+    }
+
+    private String generateFollowingNotFoundMessage(String followingIdStr) {
+        return "Following con ID %s non trovato".formatted(followingIdStr);
+    }
+
+    private String generateUserNotFoundMessage(String userIdStr) {
+        return "User con ID %s non trovato".formatted(userIdStr);
     }
 
 }

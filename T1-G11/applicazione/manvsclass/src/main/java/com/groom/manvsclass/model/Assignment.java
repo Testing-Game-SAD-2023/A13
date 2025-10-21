@@ -1,9 +1,9 @@
 package com.groom.manvsclass.model;
 
-import java.util.Date;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Date;
 
 @Document(collection = "Assignment")
 public class Assignment {
@@ -13,12 +13,12 @@ public class Assignment {
     // Per la visualizzazione
     private String teamId;
     private String nomeTeam;
-    
+
     private String titolo;
     private String descrizione;
     private Date dataCreazione;
     private Date dataScadenza;
-    
+
 
     // Costruttore
     public Assignment(String titolo, String descrizione, Date dataScadenza) {

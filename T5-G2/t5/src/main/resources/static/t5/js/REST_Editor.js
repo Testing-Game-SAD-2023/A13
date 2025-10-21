@@ -21,10 +21,13 @@
 */
 
 async function getGameActionRequestBody() {
+    console.log("getGameActionRequestBody");
+    console.log(editor_robot.getValue());
     let requestBody = {
         playerId: jwtData.userId,
         mode: GetMode(),
         testingClassCode: editor_utente.getValue(),
+        classUTCode: editor_robot.getValue()
     };
 
     if (GetMode() === "PartitaSingola")
@@ -37,7 +40,7 @@ async function getGameActionRequestBody() {
 async function handleBeforeUnload(e) {
     let leaveGameRequestBody = await getGameActionRequestBody();
     console.log("[POST /leave] Sending request upon leaving");
-    navigator.sendBeacon("/leave", JSON.stringify(leaveGameRequestBody));
+    navigator.sendBeacon("/api/gameEngine/leave", JSON.stringify(leaveGameRequestBody));
 }
 window.addEventListener("beforeunload", handleBeforeUnload);
 
@@ -98,24 +101,19 @@ async function handleGameAction(isGameEnd, compileUponEndTime=false) {
 
             if (!compileUponEndTime) {
                 requestBody["testingClassCode"] = "";
-                const response = await runGameAction("/CompileEvosuite", requestBody);
-                console.log("/EndGame", response);
                 setStatus("game_end");
+                const endResponse = await runGameAction("/api/gameEngine/EndGame", requestBody);
 
-                handleGameRun(response, loadingKey, buttonKey, true);
-                const {
-                    userCoverageDetails, robotCoverageDetails,
-                    canWin, unlockedAchievements,
-                    userScore, robotScore,
-                } = response;
-                const endResponse = await runGameAction("/EndGame", requestBody);
+                console.error(endResponse);
 
-                handleGameEnd(endResponse, unlockedAchievements);
+                handleGameRun(endResponse.runGameResponse, loadingKey, buttonKey, true);
+                handleGameEnd(endResponse);
                 toggleLoading(false, loadingKey, buttonKey);
             } else {
-                const endResponse = await runGameAction("/EndGame", requestBody);
+                const endResponse = await runGameAction("/api/gameEngine/EndGame", requestBody);
 
-                handleGameEnd(endResponse, []);
+                handleGameRun(endResponse.runGameResponse, loadingKey, buttonKey, true);
+                handleGameEnd(endResponse);
                 toggleLoading(false, loadingKey, buttonKey);
             }
         } catch (error) {
@@ -125,7 +123,7 @@ async function handleGameAction(isGameEnd, compileUponEndTime=false) {
     } else {
         try {
             //Esegue l'azione di gioco
-            const response = await runGameAction("/run", requestBody);
+            const response = await runGameAction("/api/gameEngine/run", requestBody);
             setStatus("compiling");
             handleGameRun(response, loadingKey, buttonKey, false);
             resetButtons();
@@ -163,10 +161,8 @@ function handleServerInternalError(error, loadingKey, buttonKey) {
 }
 
 
-function handleGameEnd(response, compileAchievements) {
+function handleGameEnd(response) {
     let {userScore, robotScore, isWinner, expGained, achievementsUnlocked} = response;
-    achievementsUnlocked = [...achievementsUnlocked, ...compileAchievements];
-    console.log("compileAchievements", compileAchievements);
     console.log("achievementsUnlocked", achievementsUnlocked);
 
     generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked); // Gestisce la fine del gioco

@@ -107,9 +107,13 @@ function getConsoleTextRun(userCoverageDetails, robotCoverageDetails, canWin, us
 
 	function formatEvoRow(label, user, robot) {
 		let userPct = 0, robotPct = 0;
-		if (robot.covered + robot.missed > 0) {
-			userPct = roundToTwoDecimals(user.covered / (user.covered + user.missed) * 100);
-			robotPct = roundToTwoDecimals(robot.covered / (robot.covered + robot.missed) * 100);
+
+		const robotTotal = robot.covered + robot.missed;
+		const userTotal = user.covered + user.missed;
+
+		if (robotTotal > 0) {
+			userPct = userTotal > 0 ? roundToTwoDecimals((user.covered / userTotal) * 100) : 0;
+			robotPct = roundToTwoDecimals((robot.covered / robotTotal) * 100);
 		}
 
 		const userStr = `${userPct.toFixed(2)}%`;

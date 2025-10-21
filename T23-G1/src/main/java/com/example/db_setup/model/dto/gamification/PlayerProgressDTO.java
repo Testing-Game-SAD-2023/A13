@@ -13,11 +13,13 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @ToString
+@AllArgsConstructor
 public class PlayerProgressDTO {
     private int experiencePoints;
     private Set<String> globalAchievements;
     private List<GameProgressDTO> gameProgressesDTO = new ArrayList<>();
 
+    /*
     public PlayerProgressDTO(int experiencePoints, Set<String> globalAchievements, List<GameProgress> gameProgresses) {
         this.experiencePoints = experiencePoints;
         this.globalAchievements = globalAchievements;
@@ -28,7 +30,5 @@ public class PlayerProgressDTO {
         }
     }
 
-    public PlayerProgressDTO(PlayerProgress playerProgress) {
-        this(playerProgress.getExperiencePoints(), playerProgress.getGlobalAchievements(), playerProgress.getProgresses());
-    }
+     */
 }

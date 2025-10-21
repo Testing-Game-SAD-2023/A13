@@ -13,11 +13,11 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class ManvsclassApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ManvsclassApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ManvsclassApplication.class, args);
+    }
 
-	@Bean
+    @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

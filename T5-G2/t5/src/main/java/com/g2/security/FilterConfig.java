@@ -1,10 +1,10 @@
 package com.g2.security;
 
-import com.g2.Interfaces.ServiceManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.g2.interfaces.ServiceManager;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FilterConfig {

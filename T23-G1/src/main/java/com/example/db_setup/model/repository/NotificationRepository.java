@@ -17,8 +17,7 @@
 
 package com.example.db_setup.model.repository;
 
-import java.util.List;
-
+import com.example.db_setup.model.Notification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,7 +27,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.db_setup.model.Notification;
+import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
@@ -93,6 +92,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     // Trova le notifiche per un utente che corrispondono a più tipi
     Page<Notification> findByPlayerIDAndTypeIn(long playerID, List<String> types, Pageable pageable);
-    
-    
+
+
 }

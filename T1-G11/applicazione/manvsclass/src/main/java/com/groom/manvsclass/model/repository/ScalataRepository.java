@@ -1,16 +1,15 @@
 package com.groom.manvsclass.model.repository;
 
-import java.util.List;
-
+import com.groom.manvsclass.model.Scalata;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.groom.manvsclass.model.Scalata;
+import java.util.List;
 
 /*
  * ScalataRepository extends MongoRepository with:
  * 'Scalata' as the domain type and
  * 'String' as the type of the id field
- * 
+ *
  * ScalataRepository inherits several methods such as:
  * save(), findOne(), findAll(), count(), delete(), ... and
  * this allow to perform CRUD operation on the 'Scalata' objects

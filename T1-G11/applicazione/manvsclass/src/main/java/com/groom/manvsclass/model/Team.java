@@ -1,10 +1,11 @@
 package com.groom.manvsclass.model;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Document(collection = "Team")
 public class Team {
@@ -19,7 +20,7 @@ public class Team {
     public Team(String idTeam, String name) {
         this.idTeam = idTeam;
         this.name = name;
-        this.numeroStudenti=0; //Default
+        this.numeroStudenti = 0; //Default
         this.creationDate = new Date(); //Data attuale
         this.idStudenti = new ArrayList<>();
     }
@@ -41,11 +42,11 @@ public class Team {
         this.name = name;
     }
 
-    public void setCreazioneDate(Date creationDate){
+    public void setCreazioneDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
-    public Date getCreationDate(){
+    public Date getCreationDate() {
         return this.creationDate;
     }
 
@@ -70,8 +71,8 @@ public class Team {
         return "Team{" +
                 "idTeam='" + idTeam + '\'' +
                 ", name='" + name + '\'' +
-                ", dataCreazione='" + creationDate+'\''+
-                ", studenti=" + idStudenti 
-                +"}";
+                ", dataCreazione='" + creationDate + '\'' +
+                ", studenti=" + idStudenti
+                + "}";
     }
 }

@@ -1,10 +1,15 @@
 package com.robotchallenge.t8.controller;
 
 import com.robotchallenge.t8.config.CustomExecutorConfiguration;
-import com.robotchallenge.t8.dto.request.RobotCoverageRequestDTO;
+import com.robotchallenge.t8.dto.request.OpponentCoverageRequestDTO;
 import com.robotchallenge.t8.dto.request.StudentCoverageRequestDTO;
 import com.robotchallenge.t8.service.CoverageService;
-import com.robotchallenge.t8.util.BuildResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,12 +17,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import testrobotchallenge.commons.models.dto.api.ApiErrorBackend;
 import testrobotchallenge.commons.models.dto.score.EvosuiteCoverageDTO;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Controller
 @CrossOrigin
@@ -33,55 +42,114 @@ public class CoverageController {
         this.coverageService = coverageService;
     }
 
-    @PostMapping(value = "/coverage/opponent", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<EvosuiteCoverageDTO> calculateRobotEvosuiteCoverage(@RequestBody RobotCoverageRequestDTO request) {
-        logger.info("[CoverageController] [POST /score/opponent] Ricevuta richiesta con body: {}", request);
-        String result = coverageService.calculateRobotCoverage(request);
+    /*
+     * Le eccezioni lanciate da CoverageService sono gestite da advice.TaskExceptionHandler come ApiErrorBackend
+     */
 
-        EvosuiteCoverageDTO responseBody = BuildResponse.buildExtendedDTO(result);
+    @Operation(
+            summary = "Calculate EvoSuite coverage for an opponent",
+            description = "Uploads opponent coverage request data and a project file (ZIP/JAR) to calculate EvoSuite coverage."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Coverage successfully calculated",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EvosuiteCoverageDTO.class))),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Compilation or execution error (invalid test or source code)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorBackend.class))),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error (I/O or unexpected interruption)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorBackend.class))),
+            @ApiResponse(
+                    responseCode = "504",
+                    description = "Task exceeded maximum execution time (timeout)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorBackend.class)))
+    })
+    @PostMapping(
+            value = "/coverage/opponent",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    ResponseEntity<EvosuiteCoverageDTO> calculateRobotEvosuiteCoverage(
+            @Parameter(
+                    description = "Opponent coverage request payload (JSON)",
+                    required = true
+            )
+            @RequestPart("request") OpponentCoverageRequestDTO request,
+            @Parameter(
+                    description = "Maven Project file ZIP to analyze",
+                    required = true,
+                    content = @Content(mediaType = "application/zip",
+                            schema = @Schema(type = "binary"))
+            )
+            @RequestPart("project") MultipartFile project
+    ) {
+        logger.info("[CoverageController] [POST /score/opponent] Ricevuta richiesta con body {} e MultiPartFile {}", request, project.getOriginalFilename());
+        EvosuiteCoverageDTO responseBody = coverageService.calculateRobotCoverage(request, project);
 
         logger.info("[CoverageController] [POST /score/opponent] Risultato: {}", responseBody);
         logger.info("[CoverageController] [POST /score/opponent] OK 200");
         return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "application/json").body(responseBody);
     }
 
+
+    @Operation(
+            summary = "Calculate EvoSuite coverage for a player",
+            description = "Receives a JSON request with player coverage data and returns the calculated EvoSuite coverage metrics."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Coverage successfully calculated",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EvosuiteCoverageDTO.class))),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Compilation or execution error (invalid test or source code)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorBackend.class))),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too many requests in queue, the system is temporarily overloaded",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorBackend.class))),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error (I/O or unexpected interruption)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorBackend.class))),
+            @ApiResponse(
+                    responseCode = "504",
+                    description = "Task exceeded maximum execution time (timeout)",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorBackend.class)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "JSON payload containing the player coverage request data",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = StudentCoverageRequestDTO.class)
+            )
+    )
     @PostMapping(value = "/coverage/player", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<?> calculateStudentEvosuiteCoverage(@RequestBody StudentCoverageRequestDTO request) {
+    ResponseEntity<EvosuiteCoverageDTO> calculateStudentEvosuiteCoverage(
+            @RequestBody StudentCoverageRequestDTO request)
+            throws InterruptedException, ExecutionException {
         logger.info("[CoverageController] [POST /coverage/player] Ricevuta richiesta");
 
-        Callable<String> compilationTimedTask = () -> coverageService.calculatePlayerCoverage(request);
+        Callable<EvosuiteCoverageDTO> compilationTimedTask = () -> coverageService.calculatePlayerCoverage(request);
 
-        Future<String> future;
-        try {
-            future = compileExecutor.submitTask(compilationTimedTask);
-        } catch (RejectedExecutionException e) {
-            logger.warn("[CoverageController] Task rifiutato: sistema sovraccarico: {}", e.getStackTrace()[0]);
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body("Il sistema è temporaneamente sovraccarico. Riprova più tardi.");
-        }
+        Future<EvosuiteCoverageDTO> future = compileExecutor.submitTask(compilationTimedTask); // Se la coda è piena, viene lanciata una RejectedExecutionException
 
-        String score;
-        try {
-            score = future.get();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("[CoverageController] Il processo è stato interrotto: {}", e.getStackTrace()[0]);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Il processo è stato interrotto.");
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof TimeoutException) {
-                logger.warn("[CoverageController] Timeout: il task ha impiegato troppo tempo: {}", e.getStackTrace()[0]);
-                return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT)
-                        .body("Il task ha superato il tempo massimo disponibile.");
-            } else {
-                logger.error("[CoverageController] Errore interno durante l'esecuzione: ", e);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Errore durante la compilazione o l'esecuzione.");
-            }
-        }
-
-        EvosuiteCoverageDTO responseBody = BuildResponse.buildExtendedDTO(score);
+        EvosuiteCoverageDTO responseBody = future.get(); // può lanciare InterruptedException, TimeoutException o altre eccezioni generiche
 
         logger.info("[CoverageController] [POST /coverage/player] Risultato: {}", responseBody);
         logger.info("[CoverageController] [POST /coverage/player] OK 200");
@@ -89,9 +157,4 @@ public class CoverageController {
 
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        logger.error("[RuntimeException] Internal Server Error: ", e);
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

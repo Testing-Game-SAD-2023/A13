@@ -17,12 +17,7 @@
 
 package com.g2.t5;
 
-import java.io.IOException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-
+import com.g2.model.Game;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -34,15 +29,22 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.g2.Model.Game;
+import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
+/**
+ * Codice legacy
+ */
 public class GameDataWriter {
 
     private final HttpClient httpClient = HttpClientBuilder.create().build();
-    
+
 
     /*
-     * Questo è codice legacy non più utilizzato ! 
+     * Questo è codice legacy non più utilizzato !
      */
     public JSONObject saveGame(Game game, String username, Optional<Integer> selectedScalata) {
         try {
@@ -56,7 +58,7 @@ public class GameDataWriter {
             obj.put("description", game.getDescription());
             obj.put("username", game.getUsername());
             obj.put("startedAt", time);
-            if(selectedScalata.isPresent()) {
+            if (selectedScalata.isPresent()) {
                 obj.put("selectedScalata", selectedScalata.get());
             }
 
@@ -133,7 +135,7 @@ public class GameDataWriter {
 
             JSONArray responseArrayObj = new JSONArray(responseBody);
             Integer turn_id = responseArrayObj.getJSONObject(0).getInt("id"); // salvo il turn id che l'Api mi
-                                                                              // restituisce
+            // restituisce
 
             JSONObject resp = new JSONObject();
             resp.put("game_id", game_id);
@@ -146,6 +148,6 @@ public class GameDataWriter {
             System.err.println(e);
             return null;
         }
-        
+
     }
 }

@@ -1,16 +1,9 @@
 package com.example.db_setup.model;
 
-import java.time.LocalDateTime;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-
 import lombok.Data;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -18,7 +11,7 @@ import lombok.Data;
 public class Notification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) 
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(nullable = false)
@@ -39,7 +32,8 @@ public class Notification {
     @Column(nullable = false)
     private boolean isRead = false;
 
-    public Notification() {}
+    public Notification() {
+    }
 
     public Notification(int playerID, String titolo, String message, String type, boolean isRead) {
         this.playerID = playerID;

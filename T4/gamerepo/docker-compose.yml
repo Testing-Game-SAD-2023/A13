@@ -3,8 +3,6 @@ name: t4
 volumes:
   pgdata:
   appdata:
-  grafdata:
-  promdata:
   pglogs:
 
 services:
@@ -12,9 +10,9 @@ services:
     image: postgres:14-alpine3.17
     container_name: t4-postgres_db
     environment:
-      POSTGRES_PASSWORD: t4_password
-      POSTGRES_USER: t4_service
-      POSTGRES_DB: t4_database
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
     command: >
       postgres -c logging_collector=off
                -c log_statement=all
@@ -29,7 +27,7 @@ services:
       timeout: 60s
       retries: 5
       start_period: 80s
-    expose:
+    ports:
       - "5432:5432"
     networks:
       - global-network
@@ -40,6 +38,9 @@ services:
     container_name: t4-controller
     expose:
       - 8084
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
     depends_on:
       db:
         condition: service_healthy # parte solo se il db è attivo

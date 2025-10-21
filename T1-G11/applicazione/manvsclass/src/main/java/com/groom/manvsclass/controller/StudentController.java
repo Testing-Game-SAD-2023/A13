@@ -1,33 +1,34 @@
 package com.groom.manvsclass.controller;
 
+import com.groom.manvsclass.model.Assignment;
+import com.groom.manvsclass.model.Team;
+import com.groom.manvsclass.model.repository.AssignmentRepository;
+import com.groom.manvsclass.service.TeamService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import com.groom.manvsclass.model.Assignment;
-import com.groom.manvsclass.model.Team;
-import com.groom.manvsclass.model.repository.AssignmentRepository;
-import com.groom.manvsclass.service.TeamService;
-
 //Qui ci sono le chiamate che può fare uno student per accedere a dati che gli riguardano 
 @CrossOrigin
-@Controller
+@RestController
 public class StudentController {
 
-    @Autowired
-    private TeamService teamService;
-    @Autowired
-    private AssignmentRepository assignmentRepository;
+    private final TeamService teamService;
+    private final AssignmentRepository assignmentRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(StudentController.class);
+
+    public StudentController(TeamService teamService, AssignmentRepository assignmentRepository) {
+        this.teamService = teamService;
+        this.assignmentRepository = assignmentRepository;
+    }
 
     @GetMapping("/ottieniDettagliTeamCompleto")
     public ResponseEntity<?> ottieniDettagliTeamCompleto(@RequestParam("StudentId") String studentId, @CookieValue(name = "jwt", required = false) String jwt) {
@@ -56,7 +57,7 @@ public class StudentController {
 
         } catch (Exception e) {
             // Gestione degli errori
-            System.err.println("Errore durante il recupero delle informazioni del team: " + e.getMessage());
+            logger.error("Errore durante il recupero delle informazioni del team: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore durante il recupero delle informazioni del team.");
         }
     }

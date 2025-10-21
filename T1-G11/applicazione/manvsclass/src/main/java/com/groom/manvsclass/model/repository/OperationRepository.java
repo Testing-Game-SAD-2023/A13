@@ -1,9 +1,8 @@
 package com.groom.manvsclass.model.repository;
 
+import com.groom.manvsclass.model.Operation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.groom.manvsclass.model.Operation;
-
-public interface OperationRepository	extends MongoRepository<Operation,String>{
+public interface OperationRepository extends MongoRepository<Operation, String> {
 
 }

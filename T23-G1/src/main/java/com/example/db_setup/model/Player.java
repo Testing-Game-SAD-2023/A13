@@ -17,51 +17,70 @@
 
 package com.example.db_setup.model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Table (name = "players", schema = "studentsrepo")
+import javax.persistence.*;
+
+/**
+ * Entità che rappresenta un utente di tipo giocatore registrato nel sistema.
+ * <p>
+ * Contiene le informazioni di autenticazione, il corso di studi e i collegamenti al profilo
+ * {@link UserProfile} e ai progressi giocatore {@link PlayerProgress}.
+ * </p>
+ */
+@Table(name = "players", schema = "studentsrepo")
 @Data
 @Entity
 @Getter
 @Setter
 public class Player {
 
+    /**
+     * Identificatore univoco del giocatore.
+     */
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public long ID;
 
+    /**
+     * Password dell’utente hashata.
+     */
     public String password;
 
-    @Enumerated (EnumType.STRING)
+    /**
+     * Corso di studi dell’utente.
+     */
+    @Enumerated(EnumType.STRING)
     public Studies studies;
 
-    /* Informazioni Personali utente da aggiungere per il profilo
-    public String bio;
-    public List<User> friendsList;
-    public String profilePicturePath; -> questa potrebbe essere un percorso in un volume che contiene tutte le propic (T23)
-    */
-
+    /**
+     * Profilo utente contenente informazioni personali (nome, cognome, nickname, email).
+     */
     @OneToOne(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfile userProfile;
 
+    /**
+     * Progressi di gioco del giocatore.
+     * <p>
+     * Annotato con {@link JsonIgnore} per evitare serializzazione ricorsiva nelle API.
+     * </p>
+     */
     @JsonIgnore
     @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
     private PlayerProgress playerProgress;
 
+    /**
+     * Costruttore completo per creare un giocatore con informazioni iniziali di profilo.
+     *
+     * @param name     il nome del giocatore
+     * @param surname  il cognome del giocatore
+     * @param email    l'email del giocatore
+     * @param password la password del giocatore
+     * @param studies  il corso di studi del giocatore
+     */
     public Player(String name, String surname, String email, String password, Studies studies) {
         this();
         this.password = password;
@@ -71,40 +90,46 @@ public class Player {
         this.userProfile.setEmail(email);
     }
 
+    /**
+     * Costruttore di default.
+     * <p>
+     * Inizializza l'{@link UserProfile} e lo associa al giocatore.
+     * </p>
+     */
     public Player() {
-        this.userProfile=new UserProfile();
+        this.userProfile = new UserProfile();
         this.userProfile.setPlayer(this);
     }
 
-    public String getName(){
+    public String getName() {
         return this.userProfile.getName();
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.userProfile.setName(name);
     }
 
-    public String getSurname(){
+    public String getSurname() {
         return this.userProfile.getSurname();
     }
 
-    public void setSurname(String surname){
+    public void setSurname(String surname) {
         this.userProfile.setSurname(surname);
     }
 
-    public String getNickname(){
+    public String getNickname() {
         return this.userProfile.getNickname();
     }
 
-    public void setNickname(String nickname){
+    public void setNickname(String nickname) {
         this.userProfile.setNickname(nickname);
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return this.userProfile.getEmail();
     }
 
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.userProfile.setEmail(email);
     }
 }

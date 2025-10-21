@@ -1,15 +1,5 @@
 package com.groom.manvsclass.model.repository;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
-import org.springframework.stereotype.Component;
-
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.interaction;
@@ -18,14 +8,23 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Component
 public class SearchRepositoryImpl {
 
-	@Autowired
+    @Autowired
     MongoClient client;
- 
+
     @Autowired
     MongoConverter converter;
 
@@ -40,6 +39,7 @@ public class SearchRepositoryImpl {
 
         return count;
     }
+
     public List<interaction> findReport() {
 
         final List<interaction> posts = new ArrayList<>();
@@ -48,18 +48,18 @@ public class SearchRepositoryImpl {
         MongoCollection<Document> collection = database.getCollection("interaction");
 
         AggregateIterable<Document> result = collection.aggregate(
-            Arrays.asList(
-    		 new Document("$match",
-     	            new Document("type", 0)
-     	        )
-            )
+                Arrays.asList(
+                        new Document("$match",
+                                new Document("type", 0)
+                        )
+                )
         );
 
-        result.forEach(doc -> posts.add(converter.read(interaction.class,doc)));
+        result.forEach(doc -> posts.add(converter.read(interaction.class, doc)));
 
         return posts;
     }
-    
+
     public List<ClassUT> findByText(String text) {
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("ClassUT");
@@ -71,20 +71,18 @@ public class SearchRepositoryImpl {
 
         return posts;
     }
-    
-  
-    
-    
+
+
     public Admin findAdminByUsername(String username) {
-    	MongoDatabase database = client.getDatabase("manvsclass");
-    	MongoCollection<Document> collection = database.getCollection("Admin");
+        MongoDatabase database = client.getDatabase("manvsclass");
+        MongoCollection<Document> collection = database.getCollection("Admin");
         Bson filter = Filters.eq("username", username);
         Document result = collection.find(filter).first();
         if (result == null) {
             return null;
         }
         //Admin admin = new Admin("gg","ff","gg","hh");
-        Admin admin = new Admin("gg","ff","gg","hh","jj");
+        Admin admin = new Admin("gg", "ff", "gg", "hh", "jj");
         admin.setUsername(result.getString("username"));
         admin.setPassword(result.getString("password"));
         return admin;
@@ -92,15 +90,15 @@ public class SearchRepositoryImpl {
 
     //MODIFICA (15/02/2024) : Aggiunta ricerca per email
     public Admin findAdminByEmail(String email) {
-    	MongoDatabase database = client.getDatabase("manvsclass");
-    	MongoCollection<Document> collection = database.getCollection("Admin");
+        MongoDatabase database = client.getDatabase("manvsclass");
+        MongoCollection<Document> collection = database.getCollection("Admin");
         Bson filter = Filters.eq("email", email);
         Document result = collection.find(filter).first();
         if (result == null) {
             return null;
         }
         //Admin admin = new Admin("gg","ff","gg","hh");
-        Admin admin = new Admin("gg","ff","gg","hh","jj");
+        Admin admin = new Admin("gg", "ff", "gg", "hh", "jj");
         admin.setEmail(result.getString("email"));
         admin.setNome(result.getString("nome"));
         admin.setCognome(result.getString("cognome"));
@@ -109,20 +107,21 @@ public class SearchRepositoryImpl {
         return admin;
     }
 
-     public Admin findAdminByResetToken(String resetToken) {
-     	MongoDatabase database = client.getDatabase("manvsclass");
-     	MongoCollection<Document> collection = database.getCollection("Admin");
-         Bson filter = Filters.eq("resetToken", resetToken);
-         Document result = collection.find(filter).first();
-         if (result == null) {
-             return null;
-         }
-         //Admin admin = new Admin("gg","ff","gg","hh");
-         Admin admin = new Admin("gg","ff","gg","hh","jj");
-         admin.setResetToken(result.getString("resetToken"));
-         return admin;
-     }
-     public Admin findAdminByInvitationToken(String invitationToken) {
+    public Admin findAdminByResetToken(String resetToken) {
+        MongoDatabase database = client.getDatabase("manvsclass");
+        MongoCollection<Document> collection = database.getCollection("Admin");
+        Bson filter = Filters.eq("resetToken", resetToken);
+        Document result = collection.find(filter).first();
+        if (result == null) {
+            return null;
+        }
+        //Admin admin = new Admin("gg","ff","gg","hh");
+        Admin admin = new Admin("gg", "ff", "gg", "hh", "jj");
+        admin.setResetToken(result.getString("resetToken"));
+        return admin;
+    }
+
+    public Admin findAdminByInvitationToken(String invitationToken) {
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("Admin");
         Bson filter = Filters.eq("invitationToken", invitationToken);
@@ -131,7 +130,7 @@ public class SearchRepositoryImpl {
             return null;
         }
         //Admin admin = new Admin("gg","ff","gg","hh");
-        Admin admin = new Admin("gg","ff","gg","hh","jj");
+        Admin admin = new Admin("gg", "ff", "gg", "hh", "jj");
         admin.setInvitationToken(result.getString("invitationToken"));
         return admin;
     }
@@ -156,11 +155,11 @@ public class SearchRepositoryImpl {
                 )
         );
 
-        result.forEach(doc -> posts.add(converter.read(ClassUT.class,doc)));
+        result.forEach(doc -> posts.add(converter.read(ClassUT.class, doc)));
 
         return posts;
     }
-    
+
     public List<ClassUT> filterByCategory(String category) {
 
         final List<ClassUT> posts = new ArrayList<>();
@@ -168,58 +167,58 @@ public class SearchRepositoryImpl {
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("ClassUT");
 
-        AggregateIterable<Document> result = collection.aggregate(Arrays.asList(new Document("$search", 
-        	    new Document("index", "default")
-                .append("text", 
-        new Document("query", category)
-                    .append("path", "category")))));
+        AggregateIterable<Document> result = collection.aggregate(Arrays.asList(new Document("$search",
+                new Document("index", "default")
+                        .append("text",
+                                new Document("query", category)
+                                        .append("path", "category")))));
 
-        result.forEach(doc -> posts.add(converter.read(ClassUT.class,doc)));
+        result.forEach(doc -> posts.add(converter.read(ClassUT.class, doc)));
 
         return posts;
     }
-    
-    
+
+
     public List<ClassUT> orderByDate() {
 
         final List<ClassUT> posts = new ArrayList<>();
 
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("ClassUT");
-		
-		AggregateIterable<Document> result = collection.aggregate(
-	    Arrays.asList(
-	        new Document("$sort",
-	            new Document("date", 1)
-	        	)
-	    	)
-		);
 
-        result.forEach(doc -> posts.add(converter.read(ClassUT.class,doc)));
+        AggregateIterable<Document> result = collection.aggregate(
+                Arrays.asList(
+                        new Document("$sort",
+                                new Document("date", 1)
+                        )
+                )
+        );
+
+        result.forEach(doc -> posts.add(converter.read(ClassUT.class, doc)));
 
         return posts;
     }
-    
+
     public List<ClassUT> orderByName() {
 
         final List<ClassUT> posts = new ArrayList<>();
 
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("ClassUT");
-		
-		AggregateIterable<Document> result = collection.aggregate(
-	    Arrays.asList(
-	        new Document("$sort",
-	            new Document("name", 1)
-	        	)
-	    	)
-		);
 
-        result.forEach(doc -> posts.add(converter.read(ClassUT.class,doc)));
+        AggregateIterable<Document> result = collection.aggregate(
+                Arrays.asList(
+                        new Document("$sort",
+                                new Document("name", 1)
+                        )
+                )
+        );
+
+        result.forEach(doc -> posts.add(converter.read(ClassUT.class, doc)));
 
         return posts;
     }
-    
+
     public List<ClassUT> filterByDifficulty(String difficulty) {
         MongoDatabase database = client.getDatabase("manvsclass");
         MongoCollection<Document> collection = database.getCollection("ClassUT");
@@ -231,29 +230,29 @@ public class SearchRepositoryImpl {
 
         return posts;
     }
-        
-        public List<ClassUT> searchAndDFilter(String text, String difficulty) {
 
-            final List<ClassUT> posts = new ArrayList<>();
+    public List<ClassUT> searchAndDFilter(String text, String difficulty) {
 
-            MongoDatabase database = client.getDatabase("manvsclass");
-            MongoCollection<Document> collection = database.getCollection("ClassUT");
+        final List<ClassUT> posts = new ArrayList<>();
 
-            AggregateIterable<Document> result = collection.aggregate(
-                    Arrays.asList(
-                            new Document("$search",
-                                    new Document("index", "default")
-                                            .append("text",
-                                                    new Document("query", text)
-                                                            .append("path", Arrays.asList("name", "description")))),
-                            new Document("$match",
-                                    new Document("difficulty", difficulty))
-                    )
-            );
+        MongoDatabase database = client.getDatabase("manvsclass");
+        MongoCollection<Document> collection = database.getCollection("ClassUT");
 
-            result.forEach(doc -> posts.add(converter.read(ClassUT.class,doc)));
+        AggregateIterable<Document> result = collection.aggregate(
+                Arrays.asList(
+                        new Document("$search",
+                                new Document("index", "default")
+                                        .append("text",
+                                                new Document("query", text)
+                                                        .append("path", Arrays.asList("name", "description")))),
+                        new Document("$match",
+                                new Document("difficulty", difficulty))
+                )
+        );
 
-            return posts;
-        }    
-    
+        result.forEach(doc -> posts.add(converter.read(ClassUT.class, doc)));
+
+        return posts;
+    }
+
 }

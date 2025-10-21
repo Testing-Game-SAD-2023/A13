@@ -3,33 +3,18 @@
  */
 package com.groom.manvsclass.service;
 
+import com.groom.manvsclass.model.Admin;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
-import io.jsonwebtoken.Claims;
-import java.util.Date; 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;  
 
-import com.groom.manvsclass.model.Admin;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 @Service
 public class JwtService {
-
-    public boolean isJwtValid(String jwt) {
-		try {
-			Claims c = Jwts.parser().setSigningKey("mySecretKeyAdmin").parseClaimsJws(jwt).getBody();
-
-			if((new Date()).before(c.getExpiration())) {
-				return true;
-			}
-		} catch(Exception e) {
-			System.err.println(e);
-		}
-
-		return false;
-	}
-
 
     //MODIFICA 02/12/2024: modifica logica calcolo jwt con email.
     public static String generateToken(Admin admin) {
@@ -45,15 +30,19 @@ public class JwtService {
                 .compact(); //.compact() serve a compattare il token JWT in una stringa valida che può essere facilmente trasferita tramite HTTP o memorizzata in altri luoghi di archiviazione come cookie
     }
 
+    public boolean isJwtValid(String jwt) {
+        return false;
+    }
+
     // Estrae l'username dell'admin dal JWT
     public String getAdminFromJwt(String jwt) {
         try {
             Claims claims = Jwts.parser()
-                                .setSigningKey("mySecretKeyAdmin")
-                                .parseClaimsJws(jwt)
-                                .getBody();
+                    .setSigningKey("mySecretKeyAdmin")
+                    .parseClaimsJws(jwt)
+                    .getBody();
 
-            System.out.println("JWT:"+claims);
+            System.out.println("JWT:" + claims);
             // Estrae l'ID dell'admin dalla claim
             return claims.getSubject();
         } catch (Exception e) {
@@ -62,7 +51,7 @@ public class JwtService {
         }
     }
 
-    
+
 }
 
     

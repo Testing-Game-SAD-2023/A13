@@ -1,10 +1,12 @@
 //Modifica 08/12/2024: Creazione Service per Assignment
 package com.groom.manvsclass.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.groom.manvsclass.model.Assignment;
+import com.groom.manvsclass.model.Team;
+import com.groom.manvsclass.model.TeamAdmin;
+import com.groom.manvsclass.model.repository.AssignmentRepository;
+import com.groom.manvsclass.model.repository.TeamAdminRepository;
+import com.groom.manvsclass.model.repository.TeamRepository;
 import com.groom.manvsclass.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,16 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 
-import com.groom.manvsclass.model.Assignment;
-import com.groom.manvsclass.model.Team;
-import com.groom.manvsclass.model.TeamAdmin;
-import com.groom.manvsclass.model.repository.AssignmentRepository;
-import com.groom.manvsclass.model.repository.TeamAdminRepository;
-import com.groom.manvsclass.model.repository.TeamRepository;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AssignmentService {
-    
+
     @Autowired
     private TeamRepository teamRepository;
     @Autowired
@@ -31,7 +30,7 @@ public class AssignmentService {
     private JwtService jwtService;  // Servizio per la validazione del JWT
     @Autowired
     private AssignmentRepository assignmentRepository;
-    @Autowired 
+    @Autowired
     private NotificationService notificationService;
     @Autowired
     private StudentService studentService;
@@ -39,9 +38,9 @@ public class AssignmentService {
 
     //Modifica 07/12/2024 : creazione funzione per la creazione di un assignment
     @Transactional
-    public ResponseEntity<?> creaAssignment(Assignment assignment, 
-                                        String idTeam, 
-                                        @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> creaAssignment(Assignment assignment,
+                                            String idTeam,
+                                            @CookieValue(name = "jwt", required = false) String jwt) {
         System.out.println("Creazione dell'Assignment in corso...");
 
         // 1. Verifica il token JWT
@@ -71,8 +70,8 @@ public class AssignmentService {
 
         // 5. Verifica se l'Admin ha i permessi per questo Team
         TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
-        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || 
-            (!"Owner".equals(teamAdmin.getRole()) && !"Professor".equals(teamAdmin.getRole()))) {
+        if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) ||
+                (!"Owner".equals(teamAdmin.getRole()) && !"Professor".equals(teamAdmin.getRole()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per creare un Assignment per questo Team.");
         }
 
@@ -93,14 +92,14 @@ public class AssignmentService {
         List<Integer> integerList = idsStudentiTeam.stream()
                 .map(Integer::parseInt) // Converte ogni stringa in intero
                 .collect(Collectors.toList());
-        
+
         String Title = "Assignment";
         String Message = "Nuovo Assignment: " + assignment.getTitolo();
         notificationService.sendNotificationsToUsers(integerList, Title, Message, "Team");
 
         //10. Invio email agli utenti del team
         //emailService.sendTeamNewAssignment(idsStudentiTeam, existingTeam, assignment, jwt);
-        
+
         // 13. Restituisci la risposta di successo
         return ResponseEntity.status(HttpStatus.CREATED).body("Assignment creato con successo e associato al Team.");
     }
@@ -130,8 +129,8 @@ public class AssignmentService {
 
             // 4. Verifica se l'Admin ha i permessi per visualizzare gli Assignment del Team
             TeamAdmin teamAdmin = teamAdminRepository.findByTeamId(idTeam);
-            if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) || 
-                (!"Owner".equals(teamAdmin.getRole()) && !"Professor".equals(teamAdmin.getRole()))) {
+            if (teamAdmin == null || !teamAdmin.getAdminId().equals(adminUsername) ||
+                    (!"Owner".equals(teamAdmin.getRole()) && !"Professor".equals(teamAdmin.getRole()))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per visualizzare gli assignment di questo team.");
             }
 
@@ -242,7 +241,6 @@ public class AssignmentService {
     }
 
 
-  
 }
 
     

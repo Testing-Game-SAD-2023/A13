@@ -1,0 +1,1435 @@
+openapi: "3.1.0"
+info:
+  title: "T23 API"
+  description: "T23 API"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8082"
+    description: "Server for local development without dockerization"
+  - url: "http://t23-controller:8082"
+    description: "Server address inside the docker network"
+paths:
+  /players/{playerId}/progression:
+    get:
+      summary: "Get player progression by player ID"
+      description: "Retrieve the overall progression and achievements of a player\
+        \ given their ID"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "ID of the player to retrieve progression for"
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PlayerProgressDTO"
+  /players/{playerId}/progression/achievements/global:
+    get:
+      summary: "Get global achievements of a player"
+      description: "Retrieve all unlocked global achievements for a given player"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "ID of the player"
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+    put:
+      summary: "Update global achievements of a player"
+      description: "Update the set of unlocked global achievements for a player"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "ID of the player"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AchievementsDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+  /players/{playerId}/progression/against:
+    post:
+      summary: "Create player progress against an opponent"
+      description: "Create a new game progress record for a player against a specific\
+        \ opponent"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGameProgressDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GameProgressDTO"
+  /players/{playerId}/progression/against/{gameMode}/{classUT}/{opponentType}/{opponentDifficulty}:
+    get:
+      summary: "Get player progress against a specific opponent"
+      description: "Retrieve the progress of a player against a specific opponent\
+        \ defined by game mode, class UT, type, and difficulty"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "ID of the player"
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "gameMode"
+          in: "path"
+          required: true
+          description: "Game mode of the opponent"
+          schema:
+            type: "string"
+            enum:
+              - "PartitaSingola"
+              - "Allenamento"
+              - "Scalata"
+        - name: "classUT"
+          in: "path"
+          required: true
+          description: "Class under test"
+          schema:
+            type: "string"
+        - name: "opponentType"
+          in: "path"
+          required: true
+          description: "Opponent type"
+          schema:
+            type: "string"
+        - name: "opponentDifficulty"
+          in: "path"
+          required: true
+          description: "Opponent difficulty"
+          schema:
+            type: "string"
+            enum:
+              - "EASY"
+              - "MEDIUM"
+              - "HARD"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GameProgressDTO"
+    put:
+      summary: "Update player progress against a specific opponent"
+      description: "Update the result and achievements for a player against a specific\
+        \ opponent"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "ID of the player"
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "gameMode"
+          in: "path"
+          required: true
+          description: "Game mode of the opponent"
+          schema:
+            type: "string"
+            enum:
+              - "PartitaSingola"
+              - "Allenamento"
+              - "Scalata"
+        - name: "classUT"
+          in: "path"
+          required: true
+          description: "Class under test"
+          schema:
+            type: "string"
+        - name: "opponentType"
+          in: "path"
+          required: true
+          description: "Opponent type"
+          schema:
+            type: "string"
+        - name: "opponentDifficulty"
+          in: "path"
+          required: true
+          description: "Opponent difficulty"
+          schema:
+            type: "string"
+            enum:
+              - "EASY"
+              - "MEDIUM"
+              - "HARD"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGameProgressDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UpdateGameProgressDTO"
+  /players/{playerId}/progression/experience:
+    get:
+      summary: "Get player's total experience points"
+      description: "Retrieve the current experience points of the player"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "ID of the player"
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int32"
+    put:
+      summary: "Update player experience points"
+      description: "Update the experience points of a specific player"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "ID of the player"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExperienceDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int32"
+  /changeLanguage:
+    post:
+      summary: "POST changeLanguage"
+      operationId: "changeLanguage"
+      parameters:
+        - name: "lang"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /players:
+    get:
+      summary: "GET players"
+      operationId: "getAllPlayers"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Player"
+  /players/searchStudents:
+    post:
+      summary: "POST players/searchStudents"
+      operationId: "searchStudents"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Map"
+  /players/studentByEmail/{emailStudente}:
+    get:
+      summary: "GET players/studentByEmail/{emailStudente}"
+      operationId: "getStudentByEmail"
+      parameters:
+        - name: "emailStudente"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /players/studentsByIds:
+    post:
+      summary: "POST players/studentsByIds"
+      operationId: "getStudentsByIds"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /players/studentsByNameSurname:
+    get:
+      summary: "GET players/studentsByNameSurname"
+      operationId: "getStudentsBySurnameAndName"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Map"
+  /players/students_list/{ID}:
+    get:
+      summary: "GET players/students_list/{ID}"
+      operationId: "getStudent"
+      parameters:
+        - name: "ID"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Player"
+  /admins/:
+    get:
+      summary: "Get all administrators"
+      description: "Returns a list of administrators including their first name, last\
+        \ name, and email address"
+      operationId: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AdminSummaryDTO"
+  /auth/admin/change_password:
+    post:
+      summary: "Change password for admin user"
+      description: "Change password for an admin using the password reset token received\
+        \ by mail"
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/admin/login:
+    post:
+      summary: "Login as admin"
+      description: "Authenticate an admin with email and password and receive JWT\
+        \ + refresh token in cookies"
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/admin/register:
+    post:
+      summary: "Register a new admin user"
+      description: "Registers a new admin with provided personal details and credentials."
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminRegistrationDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/admin/reset_password:
+    post:
+      summary: "Request password reset for admin user"
+      description: "Send a reset password email to the admin"
+      operationId: ""
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/change_password:
+    post:
+      summary: "Change password for player user"
+      description: "Change password for a player using teh password reset token received\
+        \ by mail"
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/login:
+    post:
+      summary: "Login as player"
+      description: "Authenticate a player with email and password and receive JWT\
+        \ + refresh token in cookies"
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/logout:
+    post:
+      summary: "Logout"
+      description: "Invalidate player/admin JWT and refresh token"
+      operationId: ""
+      parameters:
+        - name: "jwt"
+          in: "cookie"
+          required: true
+          schema:
+            type: "string"
+        - name: "jwt-refresh"
+          in: "cookie"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /auth/refreshToken:
+    post:
+      summary: "Refresh JWT token"
+      description: "Generate a new JWT token using the refresh token cookie"
+      operationId: ""
+      parameters:
+        - name: "jwt-refresh"
+          in: "cookie"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /auth/register:
+    post:
+      summary: "Register a new player user"
+      description: "Registers a new player with provided personal details and credentials."
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistrationDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/reset_password:
+    post:
+      summary: "Request password reset for player user"
+      description: "Send a reset password email to the player"
+      operationId: ""
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+  /auth/validateToken:
+    post:
+      summary: "Validate JWT token"
+      description: "Check if a JWT token is valid and return its status"
+      operationId: ""
+      parameters:
+        - name: "jwt"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JwtValidationResponseDTO"
+  /notification/clear_notifications:
+    delete:
+      summary: "DELETE notification/clear_notifications"
+      operationId: "clearNotifications"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /notification/get_notifications:
+    get:
+      summary: "GET notification/get_notifications"
+      operationId: "getNotifications"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "page"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "size"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "type"
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        - name: "isRead"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Notification"
+  /notification/new_notification:
+    post:
+      summary: "POST notification/new_notification"
+      operationId: "updateNotifications"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "studentID"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "title"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "message"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "type"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            default: "info"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /notification/read_notification:
+    post:
+      summary: "POST notification/read_notification"
+      operationId: "Read_Notification"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "notificationID"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "isRead"
+          in: "query"
+          required: true
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /notification/read_notifications:
+    get:
+      summary: "GET notification/read_notifications"
+      operationId: "getUnreadNotifications"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Notification"
+  /notification/remove_notification:
+    delete:
+      summary: "DELETE notification/remove_notification"
+      operationId: "deleteNotification"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "notificationID"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /opponents/:
+    post:
+      summary: "Add a new opponent to track player's achievements"
+      description: "Add a new opponent with the provided game mode, classUT, type,\
+        \ and difficulty."
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpponentDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OpponentDTO"
+  /opponents/{classUT}:
+    delete:
+      summary: "Disables all opponents for a given classUT"
+      description: "Disables every opponent associated with the specified classUT."
+      operationId: ""
+      parameters:
+        - name: "classUT"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int32"
+  /profile/followers:
+    get:
+      summary: "GET profile/followers"
+      operationId: "getFollowers"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /profile/following:
+    get:
+      summary: "GET profile/following"
+      operationId: "getFollowing"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /profile/getStudentiTeam:
+    post:
+      summary: "POST profile/getStudentiTeam"
+      operationId: "getStudentiTeam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /profile/isFollowing:
+    get:
+      summary: "GET profile/isFollowing"
+      operationId: "isFollowing"
+      parameters:
+        - name: "followerId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "followingId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /profile/searchUserProfiles:
+    get:
+      summary: "GET profile/searchUserProfiles"
+      operationId: "searchUserProfiles"
+      parameters:
+        - name: "searchTerm"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "page"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "size"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+  /profile/toggle_follow:
+    post:
+      summary: "POST profile/toggle_follow"
+      operationId: "toggleFollow"
+      parameters:
+        - name: "followerId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "followingId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /profile/update_profile:
+    post:
+      summary: "POST profile/update_profile"
+      operationId: "editProfile"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "bio"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "profilePicturePath"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "nickname"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "boolean"
+  /profile/user_by_email:
+    get:
+      summary: "GET profile/user_by_email"
+      operationId: "getUserByEmail"
+      parameters:
+        - name: "email"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Player"
+  /home:
+    get:
+      summary: "GET home"
+      operationId: "showHome"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /admin/change_password:
+    get:
+      summary: "GET admin/change_password"
+      operationId: "showPasswordChangeAdmin"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /admin/login:
+    get:
+      summary: "GET admin/login"
+      operationId: "showLoginAdmin"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /admin/register:
+    get:
+      summary: "GET admin/register"
+      operationId: "showRegisterAdmin"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /admin/reset_password:
+    get:
+      summary: "GET admin/reset_password"
+      operationId: "showResetPasswordAdmin"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /change_password:
+    get:
+      summary: "GET change_password"
+      operationId: "showChangePasswordUser"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /login:
+    get:
+      summary: "GET login"
+      operationId: "showLoginUser"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /register:
+    get:
+      summary: "GET register"
+      operationId: "showRegisterUser"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /register/success:
+    get:
+      summary: "GET register/success"
+      operationId: "showRegistrationSuccess"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+  /reset_password:
+    get:
+      summary: "GET reset_password"
+      operationId: "showResetPasswordUser"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ModelAndView"
+components:
+  schemas:
+    GameProgressDTO:
+      type: "object"
+      properties:
+        classUT:
+          type: "string"
+        gameMode:
+          type: "string"
+          enum:
+            - "PartitaSingola"
+            - "Allenamento"
+            - "Scalata"
+        type:
+          type: "string"
+        difficulty:
+          type: "string"
+          enum:
+            - "EASY"
+            - "MEDIUM"
+            - "HARD"
+        achievements:
+          type: "array"
+          items:
+            type: "string"
+    PlayerProgressDTO:
+      type: "object"
+      properties:
+        experiencePoints:
+          type: "integer"
+          format: "int32"
+        globalAchievements:
+          type: "array"
+          items:
+            type: "string"
+        gameProgressesDTO:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/GameProgressDTO"
+    AchievementsDTO:
+      type: "object"
+      properties:
+        unlockedAchievements:
+          type: "array"
+          items:
+            type: "string"
+    CreateGameProgressDTO:
+      type: "object"
+      properties:
+        classUT:
+          type: "string"
+        gameMode:
+          type: "string"
+          enum:
+            - "PartitaSingola"
+            - "Allenamento"
+            - "Scalata"
+        type:
+          type: "string"
+        difficulty:
+          type: "string"
+          enum:
+            - "EASY"
+            - "MEDIUM"
+            - "HARD"
+    UpdateGameProgressDTO:
+      type: "object"
+      properties:
+        achievements:
+          type: "array"
+          items:
+            type: "string"
+    ExperienceDTO:
+      type: "object"
+      properties:
+        experiencePoints:
+          type: "integer"
+          format: "int32"
+    UserFollowId:
+      type: "object"
+      properties:
+        follower:
+          type: "integer"
+          format: "int32"
+        following:
+          type: "integer"
+          format: "int32"
+    UserFollow:
+      type: "object"
+      properties:
+        id:
+          $ref: "#/components/schemas/UserFollowId"
+        follower:
+          $ref: "#/components/schemas/UserProfile"
+        following:
+          $ref: "#/components/schemas/UserProfile"
+    UserProfile:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        surname:
+          type: "string"
+        email:
+          type: "string"
+        ID:
+          type: "integer"
+          format: "int32"
+        bio:
+          type: "string"
+        profilePicturePath:
+          type: "string"
+        followings:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/UserFollow"
+        followers:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/UserFollow"
+        nickname:
+          type: "string"
+    Player:
+      type: "object"
+      properties:
+        ID:
+          type: "integer"
+          format: "int64"
+        password:
+          type: "string"
+        studies:
+          type: "string"
+          enum:
+            - "BSc"
+            - "MSc"
+            - "ALTRO"
+        userProfile:
+          $ref: "#/components/schemas/UserProfile"
+    Map:
+      type: "object"
+      properties: { }
+    AdminSummaryDTO:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        name:
+          type: "string"
+        surname:
+          type: "string"
+    ChangePasswordRequestDTO:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        passwordResetToken:
+          type: "string"
+        password:
+          type: "string"
+        passwordCheck:
+          type: "string"
+    Object:
+      type: "object"
+      properties: { }
+    LoginDTO:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+        password:
+          type: "string"
+    AdminRegistrationDTO:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        surname:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
+        passwordCheck:
+          type: "string"
+    UserRegistrationDTO:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        surname:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
+        passwordCheck:
+          type: "string"
+        studies:
+          type: "string"
+          enum:
+            - "BSc"
+            - "MSc"
+            - "ALTRO"
+    JwtValidationResponseDTO:
+      type: "object"
+      properties:
+        valid:
+          type: "boolean"
+        role:
+          type: "string"
+          enum:
+            - "ADMIN"
+            - "PLAYER"
+        error:
+          type: "string"
+        message:
+          type: "string"
+    Notification:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        playerID:
+          type: "integer"
+          format: "int64"
+        titolo:
+          type: "string"
+        message:
+          type: "string"
+        type:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        isRead:
+          type: "boolean"
+    OpponentDTO:
+      type: "object"
+      properties:
+        classUT:
+          type: "string"
+        type:
+          type: "string"
+        difficulty:
+          type: "string"
+          enum:
+            - "EASY"
+            - "MEDIUM"
+            - "HARD"
+        gameMode:
+          type: "string"
+          enum:
+            - "PartitaSingola"
+            - "Allenamento"
+            - "Scalata"
+    ModelMap:
+      type: "object"
+      properties: { }
+    ModelAndView:
+      type: "object"
+      properties:
+        view:
+          $ref: "#/components/schemas/Object"
+        model:
+          $ref: "#/components/schemas/ModelMap"
+        status:
+          type: "string"
+          enum:
+            - "CONTINUE"
+            - "SWITCHING_PROTOCOLS"
+            - "PROCESSING"
+            - "CHECKPOINT"
+            - "OK"
+            - "CREATED"
+            - "ACCEPTED"
+            - "NON_AUTHORITATIVE_INFORMATION"
+            - "NO_CONTENT"
+            - "RESET_CONTENT"
+            - "PARTIAL_CONTENT"
+            - "MULTI_STATUS"
+            - "ALREADY_REPORTED"
+            - "IM_USED"
+            - "MULTIPLE_CHOICES"
+            - "MOVED_PERMANENTLY"
+            - "FOUND"
+            - "MOVED_TEMPORARILY"
+            - "SEE_OTHER"
+            - "NOT_MODIFIED"
+            - "USE_PROXY"
+            - "TEMPORARY_REDIRECT"
+            - "PERMANENT_REDIRECT"
+            - "BAD_REQUEST"
+            - "UNAUTHORIZED"
+            - "PAYMENT_REQUIRED"
+            - "FORBIDDEN"
+            - "NOT_FOUND"
+            - "METHOD_NOT_ALLOWED"
+            - "NOT_ACCEPTABLE"
+            - "PROXY_AUTHENTICATION_REQUIRED"
+            - "REQUEST_TIMEOUT"
+            - "CONFLICT"
+            - "GONE"
+            - "LENGTH_REQUIRED"
+            - "PRECONDITION_FAILED"
+            - "PAYLOAD_TOO_LARGE"
+            - "REQUEST_ENTITY_TOO_LARGE"
+            - "URI_TOO_LONG"
+            - "REQUEST_URI_TOO_LONG"
+            - "UNSUPPORTED_MEDIA_TYPE"
+            - "REQUESTED_RANGE_NOT_SATISFIABLE"
+            - "EXPECTATION_FAILED"
+            - "I_AM_A_TEAPOT"
+            - "INSUFFICIENT_SPACE_ON_RESOURCE"
+            - "METHOD_FAILURE"
+            - "DESTINATION_LOCKED"
+            - "UNPROCESSABLE_ENTITY"
+            - "LOCKED"
+            - "FAILED_DEPENDENCY"
+            - "TOO_EARLY"
+            - "UPGRADE_REQUIRED"
+            - "PRECONDITION_REQUIRED"
+            - "TOO_MANY_REQUESTS"
+            - "REQUEST_HEADER_FIELDS_TOO_LARGE"
+            - "UNAVAILABLE_FOR_LEGAL_REASONS"
+            - "INTERNAL_SERVER_ERROR"
+            - "NOT_IMPLEMENTED"
+            - "BAD_GATEWAY"
+            - "SERVICE_UNAVAILABLE"
+            - "GATEWAY_TIMEOUT"
+            - "HTTP_VERSION_NOT_SUPPORTED"
+            - "VARIANT_ALSO_NEGOTIATES"
+            - "INSUFFICIENT_STORAGE"
+            - "LOOP_DETECTED"
+            - "BANDWIDTH_LIMIT_EXCEEDED"
+            - "NOT_EXTENDED"
+            - "NETWORK_AUTHENTICATION_REQUIRED"

@@ -1,9 +1,11 @@
 package com.example.db_setup.model.dto.gamification;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
-import testrobotchallenge.commons.models.opponent.OpponentType;
 
 @Getter
 @Setter
@@ -11,7 +13,7 @@ import testrobotchallenge.commons.models.opponent.OpponentType;
 @ToString
 public class OpponentDTO {
     private String classUT;
-    private OpponentType type;
+    private String type;
     private OpponentDifficulty difficulty;
     private GameMode gameMode;
 }

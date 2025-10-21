@@ -1,11 +1,10 @@
 package com.groom.manvsclass.model.repository;
 
-import java.util.List;
-
-
 import com.groom.manvsclass.model.ClassUT;
+
+import java.util.List;
 
 public interface SearchRepository {
 
-	List<ClassUT> findByText(String text);
+    List<ClassUT> findByText(String text);
 }

@@ -1,6 +1,8 @@
 package com.example.db_setup.controller.advice;
 
+import com.example.db_setup.model.dto.exception.ApiErrorDTO;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,7 +21,7 @@ public class ValidationExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex, Locale locale) {
+    public ResponseEntity<ApiErrorDTO> handleValidationExceptions(MethodArgumentNotValidException ex, Locale locale) {
         List<Map<String, String>> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -32,12 +34,7 @@ public class ValidationExceptionHandler {
                 })
                 .toList();
 
-        return ResponseEntity.badRequest().body(Map.of(
-                //"status", 400,
-                //"error", "Bad Request",
-                //"message", "Validation failed",
-                "errors", errors
-        ));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiErrorDTO(errors));
     }
 }
 

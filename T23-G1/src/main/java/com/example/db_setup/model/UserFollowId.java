@@ -1,19 +1,21 @@
 package com.example.db_setup.model;
 
+import lombok.Data;
+
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
-import lombok.Data;
-import javax.persistence.Embeddable;
 
 @Data
 @Embeddable
-public class UserFollowId implements Serializable { 
+public class UserFollowId implements Serializable {
 
     private Integer follower;
     private Integer following;
 
     // Costruttore senza argomenti
-    public UserFollowId() {}
+    public UserFollowId() {
+    }
 
     // Costruttore con parametri
     public UserFollowId(Integer follower, Integer following) {

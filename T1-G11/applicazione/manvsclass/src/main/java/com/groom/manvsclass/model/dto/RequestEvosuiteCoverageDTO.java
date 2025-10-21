@@ -1,26 +1,18 @@
 package com.groom.manvsclass.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class RequestEvosuiteCoverageDTO {
     @JsonProperty("classUTName")
     private String classUTName;
 
-    @JsonProperty("classUTPath")
-    private String classUTPath;
-
     @JsonProperty("classUTPackage")
     private String classUTPackage;
 
-    @JsonProperty("unitTestPath")
-    private String unitTestPath;
-
-    @JsonProperty("evoSuiteWorkingDir")
-    private String evoSuiteWorkingDir;
-
-    public RequestEvosuiteCoverageDTO() {}
 }

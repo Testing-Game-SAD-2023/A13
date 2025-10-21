@@ -31,13 +31,12 @@ import java.util.Locale;
 public class LocaleConfig implements WebMvcConfigurer {
 
     // Usare i cookie per memorizzare il locale
-    @SuppressWarnings("deprecation")
     @Bean
     public LocaleResolver localeResolver() {
         CookieLocaleResolver cookieLocaleResolver = new CookieLocaleResolver();
         cookieLocaleResolver.setDefaultLocale(Locale.ITALIAN);
         cookieLocaleResolver.setCookieName("lang");
-        cookieLocaleResolver.setCookieMaxAge(7*24*60*60);  // Imposta la durata del cookie a una settimana
+        cookieLocaleResolver.setCookieMaxAge(7 * 24 * 60 * 60);  // Imposta la durata del cookie a una settimana
         cookieLocaleResolver.setCookiePath("/"); // Imposta il percorso per il cookie
         return cookieLocaleResolver;
     }

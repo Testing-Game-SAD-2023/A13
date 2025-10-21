@@ -12,8 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,6 +29,12 @@ public class Util {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    // Metodo per generare un ID univoco (esempio con UUID)
+    //Modifica 04/12/2024
+    public static String generateUniqueId() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    }
 
     public List<interaction> elencaInt() {
         return repo_int.findAll();
@@ -100,11 +104,5 @@ public class Util {
         Query query = new Query();
         query.addCriteria(Criteria.where("id_i").is(id_i));
         return mongoTemplate.findAndRemove(query, interaction.class);
-    }
-    
-    // Metodo per generare un ID univoco (esempio con UUID)
-    //Modifica 04/12/2024
-    public static String generateUniqueId() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 }

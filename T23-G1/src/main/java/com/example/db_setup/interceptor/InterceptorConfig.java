@@ -6,6 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Classe di configurazione che implementa WebMvcConfigurer di Spring MVC per la registrazione degli interceptor.
+ * <p>
+ * Aggiunge {@link AuthenticatedUserInterceptor} per intercettare
+ * tutte le richieste HTTP e gestire i redirect.
+ * </p>
+ */
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
 
@@ -17,6 +24,11 @@ public class InterceptorConfig implements WebMvcConfigurer {
         this.authService = authService;
     }
 
+    /**
+     * Sovrascrive il metodo per registrare i nuovi interceptor.
+     *
+     * @param registry il registro degli interceptor di Spring
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthenticatedUserInterceptor(jwtProvider, authService));

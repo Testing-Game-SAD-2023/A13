@@ -16,12 +16,13 @@ services:
       - ./mysql_init/init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data_volume:/var/lib/mysql
     expose:
-      - "3306:3306"
+      - 3306
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}" ]
       interval: 30s
-      timeout: 20s
+      timeout: 60s
       retries: 5
+      start_period: 80s
     networks:
       - global-network
     restart: always
@@ -32,12 +33,17 @@ services:
     expose:
       - 8082
     depends_on:
-      - db
+      db:
+        condition: service_healthy # parte solo se il db è attivo
     environment:
       DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}  # Usa il nome del DB definito nel .env
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_KEY_SECRET: ${JWT_KEY_SECRET}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     networks:
       - global-network
-  
+
 networks:
   global-network:
     external: true

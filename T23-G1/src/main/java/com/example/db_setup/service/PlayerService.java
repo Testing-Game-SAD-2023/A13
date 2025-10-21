@@ -16,44 +16,36 @@
  */
 package com.example.db_setup.service;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.example.db_setup.model.Player;
 import com.example.db_setup.model.Studies;
+import com.example.db_setup.model.UserProfile;
+import com.example.db_setup.model.repository.PlayerRepository;
+import com.example.db_setup.model.repository.UserProfileRepository;
 import com.example.db_setup.service.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import com.example.db_setup.model.repository.UserProfileRepository;
-import com.example.db_setup.model.repository.PlayerRepository;
-import com.example.db_setup.model.UserProfile;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
 
 // Questa classe è un servizio che gestisce le operazioni relative agli utenti
 @Service
 public class PlayerService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
     private final PlayerProgressService playerProgressService;
     private final PlayerRepository playerRepository;
     private final UserProfileRepository userProfileRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
 
     public PlayerService(PlayerProgressService playerProgressService, PlayerRepository playerRepository, UserProfileRepository userProfileRepository) {
         this.playerProgressService = playerProgressService;
         this.playerRepository = playerRepository;
         this.userProfileRepository = userProfileRepository;
     }
-
 
     @Transactional
     public Player addNewPlayer(String name, String surname, String email, String password, Studies studies) {
@@ -64,25 +56,19 @@ public class PlayerService {
         return playerRepository.save(player);
     }
 
-
-
-
-
-
-
     // Recupera dal DB l'utente con l'email specificata
     public Player getUserByEmail(String email) {
         return playerRepository.findByUserProfileEmail(email).orElse(null);
     }
 
-    public Player getUserByID(Long ID) {
-        Optional<Player> player = playerRepository.findById(ID);
+    public Player getUserByID(Long id) {
+        Optional<Player> player = playerRepository.findById(id);
         if (player.isEmpty())
             throw new UserNotFoundException();
         return player.get();
     }
 
-    public List<Player> GetUserListByEmail(String email) {
+    public List<Player> getUserListByEmail(String email) {
         return playerRepository.findByUserProfileEmailLike(email);
     }
 
@@ -104,7 +90,6 @@ public class PlayerService {
     }
 
 
-
     public UserProfile findProfileByEmail(String email) {
         // Recupera l'utente con l'email specificata
         Optional<Player> userOpt = playerRepository.findByUserProfileEmail(email);
@@ -118,23 +103,6 @@ public class PlayerService {
         return userOpt.get().getUserProfile();
     }
 
-    // Genera un token JWT per l'utente specificato
-    public static String generateToken(Player player) {
-        Instant now = Instant.now();
-        Instant expiration = now.plus(1, ChronoUnit.HOURS);
-        // usa per generare il token email, data di creazione, data di scadenza, ID utente e ruolo
-        String token = Jwts.builder()
-                .setSubject(player.getEmail())
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiration))
-                .claim("userId", player.getID())
-                .claim("role", "user")
-                .signWith(SignatureAlgorithm.HS256, "mySecretKey")
-                .compact();
-
-        return token;
-    }
-
     public void saveProfile(UserProfile userProfile) {
         if (userProfile == null) {
             throw new IllegalArgumentException("Profile not found");
@@ -144,11 +112,11 @@ public class PlayerService {
 
     //Modifica 04/12/2024 Giuleppe
     public ResponseEntity<?> getStudentiTeam(List<String> idUtenti) {
-        System.out.println("Inizio metodo getStudentiTeam. ID ricevuti: " + idUtenti);
+        logger.info("Inizio metodo getStudentiTeam. ID ricevuti: {}", idUtenti);
 
         // Controlla se la lista di ID è vuota
         if (idUtenti == null || idUtenti.isEmpty()) {
-            System.out.println("La lista degli ID è vuota.");
+            logger.info("La lista degli ID è vuota.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Lista degli ID vuota.");
         }
 
@@ -156,36 +124,36 @@ public class PlayerService {
             // Converte gli ID in interi
             List<Long> idIntegerList = idUtenti.stream()
                     .map(Long::valueOf)
-                    .collect(Collectors.toList());
+                    .toList();
             // Recupera gli utenti dal database
             List<Player> utenti = playerRepository.findAllById(idIntegerList);
             // Verifica se sono stati trovati utenti
-            if (utenti == null || utenti.isEmpty()) {
-                System.out.println("Nessun utente trovato per gli ID forniti.");
+            if (utenti.isEmpty()) {
+                logger.info("Nessun utente trovato per gli ID forniti.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nessun utente trovato.");
             }
-            System.out.println("Utenti trovati: " + utenti);
+            logger.info("Utenti trovati: {}", utenti);
             // Restituisce la lista di utenti trovati
             return ResponseEntity.ok(utenti);
 
         } catch (NumberFormatException e) {
-            System.out.println("Errore durante la conversione degli ID: " + e.getMessage());
+            logger.info("Errore durante la conversione degli ID: ", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Formato degli ID non valido. Devono essere numeri interi.");
         } catch (Exception e) {
-            System.out.println("Errore durante il recupero degli utenti: " + e.getMessage());
+            logger.info("Errore durante il recupero degli utenti: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Errore interno del server.");
         }
     }
 
     // Modifica 04/12/2024 - Aggiunta gestione ID studenti
-    public ResponseEntity<?> getStudentsByIds(List<String> idUtenti) {
-        System.out.println("Inizio metodo getStudentsByIds. ID ricevuti: " + idUtenti);
+    public ResponseEntity<Object> getStudentsByIds(List<String> idUtenti) {
+        logger.info("Inizio metodo getStudentsByIds. ID ricevuti: {}", idUtenti);
 
         // Controlla se la lista di ID è vuota
         if (idUtenti == null || idUtenti.isEmpty()) {
-            System.out.println("La lista degli ID è vuota.");
+            logger.info("La lista degli ID è vuota.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Lista degli ID vuota.");
         }
 
@@ -193,18 +161,18 @@ public class PlayerService {
             // Converte gli ID in interi (utilizzando Collectors.toList() invece di toList())
             List<Long> idIntegerList = idUtenti.stream()
                     .map(Long::valueOf)
-                    .collect(Collectors.toList()); // Utilizzo di Collectors.toList()
+                    .toList();
 
             // Recupera gli utenti dal database
             List<Player> utenti = playerRepository.findAllById(idIntegerList);
 
             // Verifica se sono stati trovati utenti
-            if (utenti == null || utenti.isEmpty()) {
-                System.out.println("Nessun utente trovato per gli ID forniti.");
+            if (utenti.isEmpty()) {
+                logger.info("Nessun utente trovato per gli ID forniti.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nessun utente trovato.");
             }
 
-            System.out.println("Utenti trovati: " + utenti);
+            logger.info("Utenti trovati: {}", utenti);
 
             // Mappa i dati degli utenti nei campi desiderati
             List<Map<String, Object>> response = utenti.stream().map(user -> {
@@ -214,17 +182,17 @@ public class PlayerService {
                 jsonMap.put("surname", user.getSurname());
                 jsonMap.put("email", user.getEmail());
                 return jsonMap;
-            }).collect(Collectors.toList()); // Utilizzo di Collectors.toList() per raccogliere i risultati
+            }).toList();
 
             // Restituisce la lista di utenti filtrati
             return ResponseEntity.ok(response);
 
         } catch (NumberFormatException e) {
-            System.out.println("Errore durante la conversione degli ID: " + e.getMessage());
+            logger.info("Errore durante la conversione degli ID: ", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Formato degli ID non valido. Devono essere numeri interi.");
         } catch (Exception e) {
-            System.out.println("Errore durante il recupero degli utenti: " + e.getMessage());
+            logger.info("Errore durante il recupero degli utenti: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Errore interno del server.");
         }
@@ -234,7 +202,7 @@ public class PlayerService {
     public List<Map<String, Object>> getStudentsBySurnameAndName(Map<String, String> request) {
         String surname = request.get("surname");
         String name = request.get("name");
-        List<Player> players = new ArrayList<>();
+        List<Player> players;
 
         // Verifica se surname è "null" o vuoto
         if (isNullOrEmpty(surname) && !isNullOrEmpty(name)) {

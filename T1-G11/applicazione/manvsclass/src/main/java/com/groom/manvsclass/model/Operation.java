@@ -15,7 +15,7 @@ public class Operation {
         this.username_admin = username_admin;
         this.nome_classe = nome_classe;
         this.type = type;
-        this.date= date;
+        this.date = date;
     }
 
     // Getter e setter per i campi
@@ -57,7 +57,7 @@ public class Operation {
     }
 
     public void setDate(String date) {
-        this.date=date;
+        this.date = date;
     }
 
     @Override

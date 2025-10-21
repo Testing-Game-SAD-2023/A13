@@ -16,22 +16,32 @@
  */
 
 package com.g2.t5;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Entry point del modulo T56 del sistema.
+ * <p>
+ * Questa classe avvia l'applicazione Spring Boot e configura la scansione dei
+ * pacchetti principali che compongono il modulo.
+ * </p>
+ */
+/* Lo scan dovrebbe essere necessario poichè la classe non è posizionata nella radice del modulo */
 @SpringBootApplication(
-    scanBasePackages = {
-        "com.g2.Controllers", 
-        "com.g2.factory", 
-        "com.g2.Interfaces", 
-        "com.g2.Game", 
-        "com.g2.t5", 
-        "com.g2.Service", 
-        "com.g2.Session",
-        "com.g2.security"
-    }
+        scanBasePackages = {
+                "com.g2.controllers",
+                "com.g2.factory",
+                "com.g2.interfaces",
+                "com.g2.game",
+                "com.g2.t5",
+                "com.g2.service",
+                "com.g2.session",
+                "com.g2.security",
+                "com.g2.language"
+        }
 )
 public class T5Application {
 

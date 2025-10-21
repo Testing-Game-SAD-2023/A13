@@ -8,7 +8,6 @@ if "%JAVA_HOME%"=="" set JAVA_HOME=C:\Program Files\Java\jdk-21
 
 rem Creazione dei volumi Docker se non esistono
 docker volume create VolumeT0 || echo VolumeT0 already exists
-docker volume create logs || echo logs already exists
 
 rem Creazione della rete Docker se non esiste
 docker network ls | findstr /C:"global-network" >nul || docker network create global-network

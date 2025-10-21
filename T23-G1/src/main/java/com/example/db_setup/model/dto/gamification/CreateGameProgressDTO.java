@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
-import testrobotchallenge.commons.models.opponent.OpponentType;
 
 @Getter
 @Setter
@@ -13,6 +12,6 @@ import testrobotchallenge.commons.models.opponent.OpponentType;
 public class CreateGameProgressDTO {
     private String classUT;
     private GameMode gameMode;
-    private OpponentType type;
+    private String type;
     private OpponentDifficulty difficulty;
 }

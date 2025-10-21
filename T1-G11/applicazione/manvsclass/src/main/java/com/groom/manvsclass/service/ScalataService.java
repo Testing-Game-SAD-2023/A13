@@ -4,29 +4,24 @@
 package com.groom.manvsclass.service;
 
 import com.groom.manvsclass.model.Scalata;
-import com.groom.manvsclass.model.repository.*;
-
+import com.groom.manvsclass.model.repository.ScalataRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class ScalataService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ScalataService.class);
     @Autowired
     private ScalataRepository scalata_repo;
-
     @Autowired
     private JwtService jwtService;
-
-    private static final Logger logger = LoggerFactory.getLogger(ScalataService.class);
 
     public ResponseEntity<?> uploadScalata(Scalata scalata, String jwt) {
         if (!jwtService.isJwtValid(jwt)) {

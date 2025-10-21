@@ -1,0 +1,394 @@
+openapi: "3.1.0"
+info:
+  title: "T4 API"
+  description: "T4 API"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8084"
+    description: "Server for local development without dockerization"
+  - url: "http://t4-controller:8084"
+    description: "Server address inside the docker network"
+paths:
+  /games/{gameId}:
+    get:
+      summary: "Get a game by its Id"
+      description: "Returns a single Game object identified by its unique Id"
+      operationId: ""
+      parameters:
+        - name: "gameId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GameDTO"
+    put:
+      summary: "Close a Game specified by its Id"
+      description: "Returns the updated Game"
+      operationId: ""
+      parameters:
+        - name: "gameId"
+          in: "path"
+          required: true
+          description: "Id of the game"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloseGameDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GameDTO"
+  /games/player/{playerId}:
+    get:
+      summary: "Get all games associated with a player by ID"
+      description: "Returns a list of Game objects in which the specified player appears\
+        \ in the 'players' field"
+      operationId: ""
+      parameters:
+        - name: "playerId"
+          in: "path"
+          required: true
+          description: "Id of the player"
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GameDTO"
+  /games:
+    get:
+      summary: "Get all games"
+      description: "Returns a list of all available games"
+      operationId: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GameDTO"
+    post:
+      summary: "Create a new Game"
+      description: "Returns the created Game object"
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGameDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GameDTO"
+  /games/{gameId}/rounds:
+    post:
+      summary: "Create a new Round for the specified Game"
+      description: "Returns the created Round object"
+      operationId: ""
+      parameters:
+        - name: "gameId"
+          in: "path"
+          required: true
+          description: "Id of the game"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoundDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RoundDTO"
+  /games/{gameId}/rounds/last/turns:
+    post:
+      summary: "Create a new Turn for the last Round in the specified Game"
+      description: "Returns the TurnDTO of the created Turn"
+      operationId: ""
+      parameters:
+        - name: "gameId"
+          in: "path"
+          required: true
+          description: "Id of the game"
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTurnDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TurnDTO"
+  /games/{gameId}/rounds/last/turns/{turnNumber}:
+    put:
+      summary: "Close the specified turn in the last turn of the specified Game"
+      description: "Returns the updated Turn"
+      operationId: ""
+      parameters:
+        - name: "gameId"
+          in: "path"
+          required: true
+          description: "Id of the game"
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "turnNumber"
+          in: "path"
+          required: true
+          description: "The number of the turn of the last round to close"
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloseTurnDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TurnDTO"
+  /games/{gameId}/rounds/last:
+    put:
+      summary: "Close the last round in the specified Game"
+      description: "Returns the updated Round"
+      operationId: ""
+      parameters:
+        - name: "gameId"
+          in: "path"
+          required: true
+          description: "Id of the game"
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RoundDTO"
+components:
+  schemas:
+    CoverageDTO:
+      type: "object"
+      properties:
+        covered:
+          type: "integer"
+          format: "int32"
+        missed:
+          type: "integer"
+          format: "int32"
+    EvosuiteScoreDTO:
+      type: "object"
+      properties:
+        lineCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        branchCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        cBranchCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        methodCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        exceptionCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        outputCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        weakMutationCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        methodNoExceptionCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+    JacocoScoreDTO:
+      type: "object"
+      properties:
+        lineCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        branchCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        instructionCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+    TurnScoreDTO:
+      type: "object"
+      properties:
+        evosuiteScoreDTO:
+          $ref: "#/components/schemas/EvosuiteScoreDTO"
+        jacocoScoreDTO:
+          $ref: "#/components/schemas/JacocoScoreDTO"
+    Timestamp:
+      type: "object"
+      properties:
+        nanos:
+          type: "integer"
+          format: "int32"
+    TurnDTO:
+      type: "object"
+      properties:
+        playerId:
+          type: "integer"
+          format: "int64"
+        turnNumber:
+          type: "integer"
+          format: "int32"
+        score:
+          $ref: "#/components/schemas/TurnScoreDTO"
+        startedAt:
+          $ref: "#/components/schemas/Timestamp"
+        closedAt:
+          $ref: "#/components/schemas/Timestamp"
+    RoundDTO:
+      type: "object"
+      properties:
+        classUT:
+          type: "string"
+        type:
+          type: "string"
+        difficulty:
+          type: "string"
+          enum:
+            - "EASY"
+            - "MEDIUM"
+            - "HARD"
+        roundNumber:
+          type: "integer"
+          format: "int32"
+        turns:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TurnDTO"
+        startedAt:
+          $ref: "#/components/schemas/Timestamp"
+        closedAt:
+          $ref: "#/components/schemas/Timestamp"
+    GameDTO:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        players:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+        status:
+          type: "string"
+          enum:
+            - "CREATED"
+            - "STARTED"
+            - "IN_PROGRESS"
+            - "FINISHED"
+            - "SURRENDERED"
+        gameMode:
+          type: "string"
+          enum:
+            - "PartitaSingola"
+            - "Allenamento"
+            - "Scalata"
+        playerResults:
+          type: "integer"
+          format: "int64"
+        rounds:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/RoundDTO"
+        startedAt:
+          $ref: "#/components/schemas/Timestamp"
+        closedAt:
+          $ref: "#/components/schemas/Timestamp"
+    CreateGameDTO:
+      type: "object"
+      properties:
+        gameMode:
+          type: "string"
+          enum:
+            - "PartitaSingola"
+            - "Allenamento"
+            - "Scalata"
+        players:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+    CreateRoundDTO:
+      type: "object"
+      properties:
+        classUT:
+          type: "string"
+        type:
+          type: "string"
+        difficulty:
+          type: "string"
+          enum:
+            - "EASY"
+            - "MEDIUM"
+            - "HARD"
+        roundNumber:
+          type: "integer"
+          format: "int32"
+    CreateTurnDTO:
+      type: "object"
+      properties:
+        playerId:
+          type: "integer"
+          format: "int64"
+        turnNumber:
+          type: "integer"
+          format: "int32"
+    CloseTurnDTO:
+      type: "object"
+      properties:
+        playerId:
+          type: "integer"
+          format: "int64"
+        turnScoreDTO:
+          $ref: "#/components/schemas/TurnScoreDTO"
+    CloseGameDTO:
+      type: "object"
+      properties:
+        results:
+          type: "integer"
+          format: "int64"

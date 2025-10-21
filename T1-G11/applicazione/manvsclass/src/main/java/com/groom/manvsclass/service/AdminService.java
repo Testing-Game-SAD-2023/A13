@@ -3,32 +3,22 @@
  */
 package com.groom.manvsclass.service;
 
-import org.springframework.stereotype.Service;
-
-import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.repository.*;
-
-
-//MODIFICA (14/05/2024) : Importazione delle classi Scalata e ScalataRepository
-
-//MODIFICA (12/02/2024) : Gestione autenticazione
 import com.groom.manvsclass.model.Admin;
+import com.groom.manvsclass.model.ClassUT;
+import com.groom.manvsclass.model.repository.AdminRepository;
+import com.groom.manvsclass.model.repository.ClassRepository;
+import com.groom.manvsclass.model.repository.OperationRepository;
+import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-//MODIFICA(11/02/2024): Gestione sessione tramite JWT
-
-//MODIFICA (13/02/2024) : Autenticazione token proveniente dai players
-
- //MODIFICA (15/02/2024) : Servizio di posta elettronica
 import javax.mail.MessagingException;
 import java.time.LocalDate;
 import java.util.List;
-
-//MODIFICA (11/02/2024) : Controlli sul form registrazione
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,40 +26,30 @@ import java.util.regex.Pattern;
 public class AdminService {
 
     @Autowired
-    private JwtService jwtService;
-
-    @Autowired
     private final SearchRepositoryImpl srepo;
-
+    private final Admin userAdmin = new Admin("default", "default", "default", "default", "default");
+    private final LocalDate today = LocalDate.now();
+    @Autowired
+    private JwtService jwtService;
     @Autowired
     private ClassRepository repo;
-
     @Autowired
     private OperationRepository orepo;
-
     @Autowired
     private MongoTemplate mongoTemplate;
-
     @Autowired
     private AdminRepository arepo;
-
     //MODIFICA (15/02/2024) : Servizio di posta elettronica
     @Autowired
     private EmailService emailService;
-
     //MODIFICA (11/02/2024) : Controlli sul form registrazione
     @Autowired
     private PasswordEncoder myPasswordEncoder;
 
-    private final Admin userAdmin= new Admin("default","default","default","default","default");
-    
-    private final LocalDate today = LocalDate.now();
-
     public AdminService(SearchRepositoryImpl srepo) {
-	    this.userAdmin.setUsername("default");
-	    this.srepo=srepo;
-	}
-
+        this.userAdmin.setUsername("default");
+        this.srepo = srepo;
+    }
 
 
     public ResponseEntity<List<ClassUT>> filtraClassi(String category, String jwt) {
@@ -170,18 +150,18 @@ public class AdminService {
     public ResponseEntity<Admin> getAdminByUsername(String username, String jwt) {
         if (jwtService.isJwtValid(jwt)) {
 
-			System.out.println("Token valido, può ricercare admin per username (/admins/{username})");
-			Admin admin = srepo.findAdminByUsername(username);
-			if (admin != null) {
+            System.out.println("Token valido, può ricercare admin per username (/admins/{username})");
+            Admin admin = srepo.findAdminByUsername(username);
+            if (admin != null) {
 
-				System.out.println("Operazione avvenuta con successo (/admins/{username})");
-				return ResponseEntity.ok().body(admin);
-			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Ritorna 404 Not Found
-			}
-		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ritorna 401 Unauthorized
-		}
+                System.out.println("Operazione avvenuta con successo (/admins/{username})");
+                return ResponseEntity.ok().body(admin);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Ritorna 404 Not Found
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ritorna 401 Unauthorized
+        }
     }
 
 }

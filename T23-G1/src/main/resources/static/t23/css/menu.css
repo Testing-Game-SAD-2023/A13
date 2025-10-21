@@ -7,7 +7,6 @@ html, body {
   }
 
   .container {
-    margin-top: 80px;
     margin: 0 30px;
     padding: 50px;
     display: flex;
@@ -47,7 +46,7 @@ html, body {
   .image-container{
     text-align: center;
   }
-  .header{
+.header {
     position: relative;
     display: flex;
     flex-basis: 100%;
@@ -55,9 +54,8 @@ html, body {
     align-items: center;
     background-color: #0e253bfe;
     color: white;
-    padding: 10px 0;
     padding: 1.5rem;
-    margin-top: 10px;
+    margin: 10px 15px;
     z-index: 100;
     top: 0;
     right: 0;
@@ -65,8 +63,8 @@ html, body {
     min-height: 1.5%;
     max-height: 40px;
     border-radius: 70px;
-    margin: 10px 15px;
 }
+
 
 .enac{
   height: 90px !important;

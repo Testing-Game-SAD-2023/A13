@@ -7,13 +7,17 @@ services:
     restart: always
     expose:
       - 8081
+    environment:
+      MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGODB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     depends_on:
       - mongo_db
     volumes:
       - ./FilesUpload:/Files-Upload
       - VolumeT0:/VolumeT0
     networks:
-      - global-network      
+      - global-network
 
   mongo_db:
     image: "mongo:6.0.6"
@@ -26,7 +30,7 @@ services:
       - mongodb_data_volume:/data/db
     networks:
       - global-network
-      
+
 networks:
   global-network:
     external: true

@@ -105,8 +105,8 @@ docker cp !CONTAINER_ID!:!RESULTS_DIR! "!HOST_OUTPUT_DIR!" || (
 echo Test results successfully copied to host at !HOST_OUTPUT_DIR!.
 
 :: Cleanup
-docker exec !CONTAINER_ID! rm -f !CLASS_DEST_PATH!
-docker exec !CONTAINER_ID! rm -rf /generator/FolderTreeEvo/!CLASS_NAME!
-docker exec !CONTAINER_ID! rm -rf /generator/RandoopGenerator/FolderTree/!CLASS_NAME!
+docker exec !CONTAINER_ID! bash -c "rm -rf /generator/RandoopGenerator/FolderTree/!CLASS_NAME!/*"
+docker exec !CONTAINER_ID! bash -c "rm -rf /generator/FolderTreeEvo/!CLASS_NAME!/*"
+docker exec !CONTAINER_ID! bash -c "rm -f !CLASS_DEST_PATH!"
 
 echo Cleanup completed.

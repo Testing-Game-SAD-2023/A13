@@ -1,6 +1,6 @@
 package com.groom.manvsclass.model.repository;
-import com.groom.manvsclass.model.TeamAdmin;
 
+import com.groom.manvsclass.model.TeamAdmin;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

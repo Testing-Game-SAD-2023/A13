@@ -47,7 +47,7 @@ public class RunRandoop {
             ProcessBuilder processBuilder = new ProcessBuilder("bash", "robot.sh", name, String.valueOf(timelimit), String.valueOf(iter), String.valueOf(seed), String.valueOf(vecchioiter));
             Process p = processBuilder.start();
 
-            //executor.submit(() -> streamGobbler(p.getInputStream(), "OUTPUT"));
+            executor.submit(() -> streamGobbler(p.getInputStream(), "OUTPUT"));
             executor.submit(() -> streamGobbler(p.getErrorStream(), "ERROR"));
 
             p.waitFor();

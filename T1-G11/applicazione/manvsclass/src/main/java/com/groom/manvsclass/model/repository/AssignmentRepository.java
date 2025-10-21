@@ -2,13 +2,12 @@
 
 package com.groom.manvsclass.model.repository;
 
-import java.util.List;
-
+import com.groom.manvsclass.model.Assignment;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.groom.manvsclass.model.Assignment;
+import java.util.List;
 
-public interface AssignmentRepository	extends MongoRepository<Assignment,String>{
+public interface AssignmentRepository extends MongoRepository<Assignment, String> {
 
     List<Assignment> findByTeamId(String idTeam);
 

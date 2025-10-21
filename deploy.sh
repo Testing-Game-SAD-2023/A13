@@ -8,7 +8,6 @@ export JAVA_HOME=${JAVA_HOME:-"/usr/lib/jvm/java-21-openjdk-amd64"}
 
 # Creazione dei volumi Docker se non esistono
 docker volume create VolumeT0 || echo "VolumeT0 already exists"
-docker volume create logs || echo "logs already exists"
 
 # Creazione della rete Docker se non esiste
 if ! docker network ls | grep -q "global-network"; then

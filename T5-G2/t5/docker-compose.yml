@@ -23,7 +23,6 @@ services:
     networks:
       - global-network
     volumes:
-      - logs:/logs  # Monta la directory dei log sul tuo host
       - VolumeT0:/VolumeT0
 
 networks:
@@ -31,7 +30,5 @@ networks:
     external: true
 
 volumes:
-  logs:
-    external: true
   VolumeT0:
     external: true

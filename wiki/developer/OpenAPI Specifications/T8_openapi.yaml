@@ -1,0 +1,114 @@
+openapi: "3.1.0"
+info:
+  title: "T8 API"
+  description: "T8 API"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8088"
+    description: "Server for local development without dockerization"
+  - url: "http://t8-controller:8088"
+    description: "Server address inside the docker network"
+paths:
+  /coverage/opponent:
+    post:
+      summary: "Calculate EvoSuite coverage for an opponent"
+      description: "Uploads opponent coverage request data and a project file (ZIP/JAR)\
+        \ to calculate EvoSuite coverage."
+      operationId: ""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              required:
+                - "request"
+                - "project"
+              properties:
+                request:
+                  $ref: "#/components/schemas/OpponentCoverageRequestDTO"
+                project:
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvosuiteCoverageDTO"
+  /coverage/player:
+    post:
+      summary: "Calculate EvoSuite coverage for a player"
+      description: "Receives a JSON request with player coverage data and returns\
+        \ the calculated EvoSuite coverage metrics."
+      operationId: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentCoverageRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvosuiteCoverageDTO"
+components:
+  schemas:
+    OpponentCoverageRequestDTO:
+      type: "object"
+      properties:
+        classUTName:
+          type: "string"
+        classUTPackage:
+          type: "string"
+    CoverageDTO:
+      type: "object"
+      properties:
+        covered:
+          type: "integer"
+          format: "int32"
+        missed:
+          type: "integer"
+          format: "int32"
+    EvosuiteScoreDTO:
+      type: "object"
+      properties:
+        lineCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        branchCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        cBranchCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        methodCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        exceptionCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        outputCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        weakMutationCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+        methodNoExceptionCoverageDTO:
+          $ref: "#/components/schemas/CoverageDTO"
+    EvosuiteCoverageDTO:
+      type: "object"
+      properties:
+        evosuiteScoreDTO:
+          $ref: "#/components/schemas/EvosuiteScoreDTO"
+        resultFileContent:
+          type: "string"
+    StudentCoverageRequestDTO:
+      type: "object"
+      properties:
+        testClassName:
+          type: "string"
+        testClassCode:
+          type: "string"
+        classUTName:
+          type: "string"
+        classUTCode:
+          type: "string"
+        classUTPackage:
+          type: "string"

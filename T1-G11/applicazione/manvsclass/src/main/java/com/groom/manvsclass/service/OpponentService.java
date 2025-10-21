@@ -6,17 +6,17 @@ import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Operation;
 import com.groom.manvsclass.model.Opponent;
+import com.groom.manvsclass.model.repository.ClassRepository;
+import com.groom.manvsclass.model.repository.OperationRepository;
 import com.groom.manvsclass.model.repository.OpponentRepository;
-import com.groom.manvsclass.service.exceptions.CoverageNotFoundException;
-import com.groom.manvsclass.service.exceptions.OpponentNotFoundException;
-import com.groom.manvsclass.service.exceptions.ScoreNotFoundException;
+import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
+import com.groom.manvsclass.service.exception.CoverageNotFoundException;
+import com.groom.manvsclass.service.exception.OpponentNotFoundException;
+import com.groom.manvsclass.service.exception.ScoreNotFoundException;
 import com.groom.manvsclass.util.filesystem.FileOperationUtil;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadUtil;
-import com.groom.manvsclass.model.repository.ClassRepository;
-import com.groom.manvsclass.model.repository.OperationRepository;
-import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -29,7 +29,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
-import testrobotchallenge.commons.models.opponent.OpponentType;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
@@ -46,30 +45,28 @@ import java.util.stream.Collectors;
 @Service
 public class OpponentService {
 
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(String.valueOf(OpponentService.class));
     private final OperationRepository operationRepository;
     @Autowired
     private final ClassRepository classRepository;
     private final MongoTemplate mongoTemplate;
     private final SearchRepositoryImpl searchRepository;
-    private final UploadRobotService uploadRobotService;
+    private final UploadOpponentService uploadOpponentService;
     @Autowired
     private final OpponentRepository opponentRepository;
-
-    private final Admin userAdmin= new Admin("default","default","default","default","default");
+    private final Admin userAdmin = new Admin("default", "default", "default", "default", "default");
     private final ApiGatewayClient apiGatewayClient;
-
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(String.valueOf(OpponentService.class));
 
     public OpponentService(OperationRepository operationRepository,
                            ClassRepository classRepository,
                            MongoTemplate mongoTemplate,
                            SearchRepositoryImpl searchRepository,
-                           UploadRobotService uploadRobotService, OpponentRepository opponentRepository, ApiGatewayClient apiGatewayClient) {
+                           UploadOpponentService uploadOpponentService, OpponentRepository opponentRepository, ApiGatewayClient apiGatewayClient) {
         this.operationRepository = operationRepository;
         this.classRepository = classRepository;
         this.mongoTemplate = mongoTemplate;
         this.searchRepository = searchRepository;
-        this.uploadRobotService = uploadRobotService;
+        this.uploadOpponentService = uploadOpponentService;
         this.opponentRepository = opponentRepository;
         this.apiGatewayClient = apiGatewayClient;
     }
@@ -113,7 +110,7 @@ public class OpponentService {
 
         // Salvataggio del file della classe e robot associati
         FileUploadUtil.saveCLassFile(classUTFileName, classe.getName(), classUTFile);
-        uploadRobotService.saveOpponentsFromZip(classUTFileName, classe.getName(), classUTFile, robotTestsZip);
+        uploadOpponentService.saveOpponentsFromZip(classUTFileName, classe.getName(), classUTFile, robotTestsZip);
 
         // Popola la risposta
         response.setFileName(classUTFileName);
@@ -122,8 +119,8 @@ public class OpponentService {
 
         // Imposta i metadati della classe
         classe.setUri(String.format("%s/%s/%s/%s",
-                UploadRobotService.VOLUME_T0_BASE_PATH,
-                UploadRobotService.UNMODIFIED_SRC,
+                UploadOpponentService.VOLUME_T0_BASE_PATH,
+                UploadOpponentService.UNMODIFIED_SRC,
                 classe.getName(),
                 classUTFileName));
 
@@ -141,14 +138,13 @@ public class OpponentService {
 
         System.out.println("/downloadFile/{name} (HomeController) - name: " + name);
         System.out.println("test");
-        try{
-            List<ClassUT> classe= searchRepository.findByText(name);
+        try {
+            List<ClassUT> classe = searchRepository.findByText(name);
             System.out.println("File download:");
             System.out.println(classe.get(0).getUri());
-            ResponseEntity file =  FileDownloadUtil.downloadClassFile(classe.get(0).getUri());
+            ResponseEntity file = FileDownloadUtil.downloadClassFile(classe.get(0).getUri());
             return file;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Classe UT non trovata");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ClasseUT " + name + " non trovata");
         }
@@ -217,8 +213,8 @@ public class OpponentService {
     }
 
     public void eliminaFile(String fileName) {
-        File directory = new File(String.format("%s/%s", UploadRobotService.VOLUME_T0_BASE_PATH, fileName));
-        File directoryUnmodifiedSrc = new File(String.format("%s/%s/%s", UploadRobotService.VOLUME_T0_BASE_PATH, UploadRobotService.UNMODIFIED_SRC,fileName));
+        File directory = new File(String.format("%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, fileName));
+        File directoryUnmodifiedSrc = new File(String.format("%s/%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, UploadOpponentService.UNMODIFIED_SRC, fileName));
 
         System.out.println("name: " + fileName);
         if (directory.exists() && directory.isDirectory()) {
@@ -239,7 +235,7 @@ public class OpponentService {
         return opponentRepository.findAllOpponents();
     }
 
-    public Opponent getOpponentData(String classUT, OpponentType opponentType, OpponentDifficulty opponentDifficulty) {
+    public Opponent getOpponentData(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
         Optional<Opponent> opponent = opponentRepository.findOpponent(classUT, opponentType, opponentDifficulty);
         if (opponent.isEmpty())
             throw new OpponentNotFoundException();
@@ -247,7 +243,7 @@ public class OpponentService {
         return opponent.get();
     }
 
-    public EvosuiteScore getOpponentEvosuiteScore(String classUT, OpponentType opponentType, OpponentDifficulty opponentDifficulty) {
+    public EvosuiteScore getOpponentEvosuiteScore(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
         Optional<EvosuiteScore> score = opponentRepository.findEvosuiteScore(classUT,
                 opponentType, opponentDifficulty);
 
@@ -257,7 +253,7 @@ public class OpponentService {
         return score.get();
     }
 
-    public JacocoScore getOpponentJacocoScore(String classUT, OpponentType opponentType, OpponentDifficulty opponentDifficulty) {
+    public JacocoScore getOpponentJacocoScore(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
         Optional<JacocoScore> score = opponentRepository.findJacocoScore(classUT,
                 opponentType, opponentDifficulty);
 
@@ -267,7 +263,7 @@ public class OpponentService {
         return score.get();
     }
 
-    public String getOpponentCoverage(String classUT, OpponentType opponentType, OpponentDifficulty opponentDifficulty) {
+    public String getOpponentCoverage(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
         Optional<String> coverage = opponentRepository.findCoverage(classUT,
                 opponentType, opponentDifficulty);
 

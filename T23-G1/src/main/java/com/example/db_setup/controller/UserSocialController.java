@@ -1,18 +1,17 @@
 package com.example.db_setup.controller;
 
-import java.util.List;
-
 import com.example.db_setup.model.Player;
+import com.example.db_setup.model.UserProfile;
+import com.example.db_setup.service.PlayerService;
+import com.example.db_setup.service.UserSocialService;
+import com.example.db_setup.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.db_setup.service.exception.UserNotFoundException;
-import com.example.db_setup.service.PlayerService;
-import com.example.db_setup.service.UserSocialService;
-import com.example.db_setup.model.UserProfile;
+import java.util.List;
 
 @RestController
 @RequestMapping("/profile")
@@ -24,28 +23,28 @@ public class UserSocialController {
     private PlayerService playerService;
 
     /*
-     *  Sezione ricerca utente 
-     * 
+     *  Sezione ricerca utente
+     *
      */
     @GetMapping("/searchUserProfiles")
     public Page<UserProfile> searchUserProfiles(
-            @RequestParam String searchTerm, 
-            @RequestParam int page, 
+            @RequestParam String searchTerm,
+            @RequestParam int page,
             @RequestParam int size) {
-        
+
         return userSocialService.searchUserProfiles(searchTerm, page, size);
     }
 
     @GetMapping("/user_by_email")
     @ResponseBody
     public List<Player> getUserByEmail(@RequestParam("email") String email) {
-        List<Player> players = playerService.GetUserListByEmail(email);
+        List<Player> players = playerService.getUserListByEmail(email);
         if (players.isEmpty()) {
             return null;
         }
         return players; // 200 OK con i risultati
     }
-  
+
     //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
     @PostMapping("/getStudentiTeam")
     public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti) {
@@ -53,7 +52,7 @@ public class UserSocialController {
     }
 
     /*
-     * Sezione following 
+     * Sezione following
      */
     @GetMapping("/followers")
     public ResponseEntity<?> getFollowers(@RequestParam String userId) {
@@ -101,25 +100,25 @@ public class UserSocialController {
         try {
             /*
              *   False - Smesso di seguire
-             *   True  - Iniziato a seguire 
+             *   True  - Iniziato a seguire
              */
             boolean FollowState = userSocialService.toggleFollow(followerId, followingId);
             return ResponseEntity.ok(FollowState);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore imprevisto.");
         }
     }
 
     /*
-     * Gestione Profilo 
+     * Gestione Profilo
      */
     @PostMapping("/update_profile")
     public ResponseEntity<Boolean> editProfile(@RequestParam("email") String email,
-            @RequestParam("bio") String bio,
-            @RequestParam("profilePicturePath") String profilePicturePath,
-            @RequestParam("nickname") String nickname) {
+                                               @RequestParam("bio") String bio,
+                                               @RequestParam("profilePicturePath") String profilePicturePath,
+                                               @RequestParam("nickname") String nickname) {
 
         UserProfile profile = playerService.findProfileByEmail(email);
         if (profile == null) {

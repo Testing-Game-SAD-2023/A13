@@ -5,6 +5,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
+/**
+ * DTO che rappresenta le metriche di copertura calcolate da EvoSuite.
+ * <p>
+ * Ogni metrica è incapsulata in un oggetto {@link CoverageDTO}.
+ * </p>
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
     List<PasswordResetToken> findByPlayer(Player player);
+
     List<PasswordResetToken> findByAdmin(Admin admin);
 
     Optional<PasswordResetToken> findByToken(String passwordResetToken);

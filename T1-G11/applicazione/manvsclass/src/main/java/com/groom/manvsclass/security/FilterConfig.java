@@ -1,10 +1,11 @@
 package com.groom.manvsclass.security;
 
 import com.groom.manvsclass.api.ApiGatewayClient;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import javax.servlet.Filter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 @Configuration
 public class FilterConfig {

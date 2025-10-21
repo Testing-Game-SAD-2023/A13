@@ -1,6 +1,7 @@
 // added by GaetanoM
 package com.example.db_setup.model.dto.gamification;
 
+import com.example.db_setup.mapper.MapperFacade;
 import com.example.db_setup.model.Player;
 import lombok.*;
 

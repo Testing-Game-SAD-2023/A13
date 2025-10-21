@@ -16,19 +16,18 @@
  */
 package com.example.db_setup.controller;
 
-import java.util.List;
-
+import com.example.db_setup.model.Notification;
 import com.example.db_setup.model.Player;
+import com.example.db_setup.model.UserProfile;
+import com.example.db_setup.service.NotificationService;
+import com.example.db_setup.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.db_setup.service.NotificationService;
-import com.example.db_setup.service.PlayerService;
-import com.example.db_setup.model.Notification;
-import com.example.db_setup.model.UserProfile;
+import java.util.List;
 
 @RestController
 @RequestMapping("/notification")
@@ -46,34 +45,34 @@ public class NotificationController {
             @RequestParam("title") String title,
             @RequestParam("message") String message,
             @RequestParam(value = "type", required = false, defaultValue = "info") String type) {
-    
+
         // Verifica che almeno uno dei due parametri sia fornito
         if (email == null && studentID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Devi fornire almeno un identificatore: email o studentID");
         }
-    
+
         Player profile = null;
-    
+
         // Se è fornita l'email, cerca per email
         if (email != null) {
             profile = playerService.getUserByEmail(email);
-        } 
+        }
         // Se non è stata trovata con email o se l'email non è fornita, cerca per studentID
         if (profile == null && studentID != null) {
             profile = playerService.getUserByID(studentID);
         }
-    
+
         // Se non troviamo il profilo, restituiamo errore
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profilo non trovato");
         }
-    
+
         // Salva la notifica
         notificationService.saveNotification(profile.getID(), title, message, type);
         return ResponseEntity.ok("Notifica inviata con successo");
     }
-    
+
 
     //Ottieni tutte le notifiche 
     @GetMapping("/get_notifications")
@@ -126,8 +125,8 @@ public class NotificationController {
     //Marca una singola notifica come letta/non letta
     @PostMapping("/read_notification")
     public ResponseEntity<String> Read_Notification(@RequestParam("email") String email,
-            @RequestParam("notificationID") String notificationID,
-            @RequestParam("isRead") Boolean isRead) {
+                                                    @RequestParam("notificationID") String notificationID,
+                                                    @RequestParam("isRead") Boolean isRead) {
         UserProfile profile = playerService.findProfileByEmail(email);
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");
@@ -148,7 +147,7 @@ public class NotificationController {
 
     @DeleteMapping("/remove_notification")
     public ResponseEntity<String> deleteNotification(@RequestParam("email") String email,
-            @RequestParam("notificationID") String notificationID) {
+                                                     @RequestParam("notificationID") String notificationID) {
         UserProfile profile = playerService.findProfileByEmail(email);
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[T23 Controller] UserProfile not found");

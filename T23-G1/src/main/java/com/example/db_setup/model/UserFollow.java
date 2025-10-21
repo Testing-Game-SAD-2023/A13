@@ -1,17 +1,11 @@
 package com.example.db_setup.model;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 
 @Entity
 @Table(name = "user_follow", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"followerId", "followingId"})
+        @UniqueConstraint(columnNames = {"followerId", "followingId"})
 })
 public class UserFollow {
 

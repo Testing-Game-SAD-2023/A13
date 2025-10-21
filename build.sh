@@ -7,10 +7,10 @@ echo "Build process started"
 ROOT_DIR=$(pwd)  # Salva la directory di partenza
 
 # Build commons
-echo "Building commons"
+echo "Building T-shared"
 export JAVA_HOME=${JAVA_HOME:-"/usr/lib/jvm/java-21-openjdk-amd64"}
 cd "$ROOT_DIR/T-shared"
-mvn install || { echo "Error in commons build during mvn install. Check JAVA_HOME." ; exit 1; }
+mvn install || { echo "Error in T-shared build during mvn install. Check JAVA_HOME." ; exit 1; }
 cd "$ROOT_DIR"
 
 # Build T1-G11

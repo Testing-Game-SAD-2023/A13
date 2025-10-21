@@ -16,6 +16,10 @@ import java.util.Map;
 @CrossOrigin
 public class PlayerController {
 
+    /*
+     * Classe da analizzare e rifattorizzare
+     */
+
     private final PlayerService playerService;
     private final PlayerRepository playerRepository;
     private final Logger logger = LoggerFactory.getLogger(PlayerController.class);
@@ -25,7 +29,6 @@ public class PlayerController {
         this.playerRepository = playerRepository;
     }
 
-//    modified by GaetanoM
     @GetMapping("/players")
     public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
         logger.info("[GET /players] Received request");
@@ -36,30 +39,31 @@ public class PlayerController {
     }
 
     @PostMapping("/players/studentsByIds")
-    public ResponseEntity<?> getStudentsByIds(@RequestBody List<String> idsStudenti){
+    public ResponseEntity<?> getStudentsByIds(@RequestBody List<String> idsStudenti) {
         return playerService.getStudentsByIds(idsStudenti);
     }
 
     //Modifica 06/12/2024 Giuleppe: Aggiunta rotta
     @GetMapping("/players/studentByEmail/{emailStudente}")
     @ResponseBody
-    public ResponseEntity<?> getStudentByEmail(@PathVariable("emailStudente") String emailStudent){
+    public ResponseEntity<?> getStudentByEmail(@PathVariable("emailStudente") String emailStudent) {
         return playerService.getStudentByEmail(emailStudent);
     }
 
     //Modifica 12/12/2024
     @GetMapping("/players/studentsByNameSurname")
     @ResponseBody
-    public List<Map<String,Object>> getStudentsBySurnameAndName(@RequestBody Map<String, String> request){
+    public List<Map<String, Object>> getStudentsBySurnameAndName(@RequestBody Map<String, String> request) {
         return playerService.getStudentsBySurnameAndName(request);
     }
 
     //Modifica 12/12/2024 Giuleppe: Aggiunta nuova rotta che verrà aggiunta per la ricerca degli studenti.
     @PostMapping("/players/searchStudents")
     @ResponseBody
-    public List<Map<String,Object>> searchStudents(@RequestBody Map<String, String> request){
+    public List<Map<String, Object>> searchStudents(@RequestBody Map<String, String> request) {
         return playerService.searchStudents(request);
     }
+
 
     @GetMapping("/players/students_list/{ID}")
     @ResponseBody

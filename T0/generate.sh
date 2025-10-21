@@ -85,15 +85,15 @@ fi
 echo "Test results successfully copied to host at ${HOST_OUTPUT_DIR}"
 
 # Remove the class file from the container
-if ! docker exec "$CONTAINER_ID" rm -f "$CLASS_DEST_PATH"; then
+if ! docker exec "$CONTAINER_ID" sh -c "rm -f $CLASS_DEST_PATH"; then
     echo "Error: Cleanup failed" >&2
     exit 1
 fi
-if ! docker exec "$CONTAINER_ID" rm -rf "/generator/FolderTreeEvo/*"; then
+if ! docker exec "$CONTAINER_ID" sh -c "rm -rf /generator/FolderTreeEvo/*"; then
     echo "Error: Cleanup failed" >&2
     exit 1
 fi
-if ! docker exec "$CONTAINER_ID" rm -rf "/generator/RandoopGenerator/FolderTree/*"; then
+if ! docker exec "$CONTAINER_ID" sh -c "rm -rf /generator/RandoopGenerator/FolderTree/*"; then
     echo "Error: Cleanup failed" >&2
     exit 1
 fi

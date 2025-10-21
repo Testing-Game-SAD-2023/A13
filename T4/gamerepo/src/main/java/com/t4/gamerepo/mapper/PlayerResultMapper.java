@@ -1,18 +1,14 @@
 package com.t4.gamerepo.mapper;
 
-import com.t4.gamerepo.model.dto.CloseGameDTO;
 import com.t4.gamerepo.model.PlayerResult;
+import com.t4.gamerepo.model.dto.common.PlayerResultDTO;
+import org.mapstruct.Mapper;
 
-public class PlayerResultMapper {
+@Mapper(componentModel = "spring")
+public interface PlayerResultMapper {
 
-    public static PlayerResult toEntity(CloseGameDTO.PlayerResultDTO playerResultDTO) {
-        if (playerResultDTO == null)
-            return null;
+    PlayerResultDTO playerResultToPlayerResultDTO(PlayerResult playerResult);
 
-        PlayerResult playerResult = new PlayerResult();
-        playerResult.setWinner(playerResultDTO.isWinner());
-        playerResult.setScore(playerResultDTO.getScore());
+    PlayerResult playerResultDTOToPlayerResult(PlayerResultDTO playerResultDTO);
 
-        return playerResult;
-    }
 }

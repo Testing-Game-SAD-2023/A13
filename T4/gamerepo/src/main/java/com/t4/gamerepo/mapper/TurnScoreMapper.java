@@ -1,26 +1,21 @@
 package com.t4.gamerepo.mapper;
 
 import com.t4.gamerepo.model.TurnScore;
-import com.t4.gamerepo.model.dto.CloseTurnDTO;
-import testrobotchallenge.commons.mappers.ScoreMapper;
+import com.t4.gamerepo.model.dto.common.TurnScoreDTO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import testrobotchallenge.commons.mappers.CoverageMapper;
+import testrobotchallenge.commons.mappers.EvosuiteScoreMapper;
+import testrobotchallenge.commons.mappers.JacocoScoreMapper;
 
-public class TurnScoreMapper {
+@Mapper(componentModel = "spring", uses = {JacocoScoreMapper.class, EvosuiteScoreMapper.class, CoverageMapper.class})
+public interface TurnScoreMapper {
 
-    public static TurnScore toEntity(CloseTurnDTO dto) {
-        if (dto == null) return null;
+    @Mapping(source = "evosuiteScore", target = "evosuiteScoreDTO", qualifiedByName = "evosuiteScoreToEvosuiteScoreDTO")
+    @Mapping(source = "jacocoScore", target = "jacocoScoreDTO", qualifiedByName = "jacocoScoreToJacocoScoreDTO")
+    TurnScoreDTO turnScoreToTurnScoreDTO(TurnScore turnScore);
 
-        TurnScore entity = new TurnScore();
-
-        // Jacoco
-        if (dto.getJacocoScoreDTO() != null) {
-            entity.setJacocoScore(ScoreMapper.toJacocoScore(dto.getJacocoScoreDTO()));
-        }
-
-        // Evosuite
-        if (dto.getEvosuiteScoreDTO() != null) {
-            entity.setEvosuiteScore(ScoreMapper.toEvosuiteScore(dto.getEvosuiteScoreDTO()));
-        }
-
-        return entity;
-    }
+    @Mapping(source = "evosuiteScoreDTO", target = "evosuiteScore", qualifiedByName = "evosuiteScoreDTOToEvosuiteScore")
+    @Mapping(source = "jacocoScoreDTO", target = "jacocoScore", qualifiedByName = "jacocoScoreDTOToJacocoScore")
+    TurnScore turnScoreDTOToTurnScore(TurnScoreDTO turnScoreDTO);
 }

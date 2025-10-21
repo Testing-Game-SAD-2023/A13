@@ -6,14 +6,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 public class FileDownloadUtil {
-	
-	public static ResponseEntity<Resource> downloadClassFile(String downloadpath) throws Exception {
-     
-		// Percorso del file Java da scaricare
+
+    public static ResponseEntity<Resource> downloadClassFile(String downloadpath) throws Exception {
+
+        // Percorso del file Java da scaricare
         Path path = Paths.get(downloadpath);
         // Rappresentazione del file come Resource
         Resource resource = new UrlResource(path.toUri());
@@ -23,7 +23,7 @@ public class FileDownloadUtil {
             throw new RuntimeException("Impossibile accedere al file" + downloadpath);
         }
 
-        
+
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ByteVector.java");
 
@@ -32,6 +32,6 @@ public class FileDownloadUtil {
                 .contentType(MediaType.parseMediaType("text/x-java-source"))
                 .body(resource);
     }
-	
-	
+
+
 }

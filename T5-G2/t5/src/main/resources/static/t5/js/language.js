@@ -1,6 +1,6 @@
 // Gestione tasto lingua navbar
 function changeLanguage(lang) {
-    fetch("/changeLanguage?lang=" + lang, {
+    fetch("/api/gameEngine/changeLanguage?lang=" + lang, {
         method: "POST",
     })
         .then((response) => {

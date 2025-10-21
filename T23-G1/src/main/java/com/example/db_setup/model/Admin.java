@@ -1,6 +1,9 @@
 package com.example.db_setup.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Table(name = "Admins", schema = "studentsrepo")

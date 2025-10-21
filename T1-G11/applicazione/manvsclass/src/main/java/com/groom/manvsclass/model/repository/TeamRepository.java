@@ -1,12 +1,12 @@
 package com.groom.manvsclass.model.repository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.groom.manvsclass.model.Team;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface TeamRepository extends MongoRepository<Team, String> {
     //MODIFICA 02/12/2024: aggiutna verifica se esiste un team con il nome specificato
     boolean existsByName(String name);
-    
+
 
     /**
      * Restituisce il Team in cui è presente l'id dello studente passato come parametro.

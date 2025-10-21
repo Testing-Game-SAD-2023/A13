@@ -1,5 +1,6 @@
 package com.g2.t5;
 
+import com.g2.model.ScalataGiocata;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -10,8 +11,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-import com.g2.Model.ScalataGiocata;
-
+/**
+ * Classe legata alla modalità di gioco Scalata, che attualmente è disabilitata in quanto necessita di essere riscritta completamente.
+ */
 public class ScalataDataWriter {
 
     private final HttpClient httpClient = HttpClientBuilder.create().build();
@@ -58,7 +60,7 @@ public class ScalataDataWriter {
             String responseBody = EntityUtils.toString(responseEntity);
             JSONObject responseObj = new JSONObject(responseBody);
 
-            Integer scalataGameId = responseObj.getInt("id"); 
+            Integer scalataGameId = responseObj.getInt("id");
             System.out.println("(ScalataDataWriter)[T5] ScalataGiocata successfully created: " + scalataGameId);
             System.out.println("(ScalataDataWriter)[T5] ScalataGiocata successfully created: " + responseObj);
 
@@ -68,7 +70,7 @@ public class ScalataDataWriter {
 
             JSONObject resp = new JSONObject();
             resp.put("scalataGameId", scalataGameId);
-           
+
             return resp;
 
         } catch (Exception error) {
@@ -77,8 +79,8 @@ public class ScalataDataWriter {
             System.err.println(error);
             return null;
         }
-     
+
 
     }
-    
+
 }

@@ -14,12 +14,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
 
+/*
+ * Questa classe definisce il template per le chiamate API interne ai moduli effettuate da T1
+ */
 @Component
 public class RestExchangeTemplateHelper {
 
     private final RestTemplate restTemplate;
     private final Logger logger = LoggerFactory.getLogger(RestExchangeTemplateHelper.class);
-
 
     public RestExchangeTemplateHelper(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;

@@ -41,7 +41,7 @@ public class StudentService {
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             System.out.println("Risposta HTTP ricevuta. Status code: " + statusCode);
 
-           // 5. Gestisci la risposta
+            // 5. Gestisci la risposta
             if (statusCode >= 200 && statusCode < 300) { // Successo
                 HttpEntity responseEntity = httpResponse.getEntity();
                 String responseBody = EntityUtils.toString(responseEntity, StandardCharsets.UTF_8);

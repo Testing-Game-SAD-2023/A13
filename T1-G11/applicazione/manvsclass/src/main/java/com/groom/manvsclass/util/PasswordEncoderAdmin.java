@@ -12,13 +12,13 @@ public class PasswordEncoderAdmin {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    public PasswordEncoderAdmin() {
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(STRENGTH);
+    }
+
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    public PasswordEncoderAdmin() {
-        bCryptPasswordEncoder = new BCryptPasswordEncoder(STRENGTH);
     }
 
     public String encode(String rawPassword) {

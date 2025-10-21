@@ -15,14 +15,14 @@ public class TeamAdmin {
     private boolean isActive; // Stato attuale della relazione
 
     // Costruttore
-    public TeamAdmin(String adminId, String teamId, String teamName,String role, boolean isActive) {
+    public TeamAdmin(String adminId, String teamId, String teamName, String role, boolean isActive) {
         this.adminId = adminId;
         this.teamId = teamId;
-        this.teamName=teamName;
+        this.teamName = teamName;
         this.role = role;
         this.isActive = isActive;
     }
-    
+
     // Getter e Setter
     public String getId() {
         return id;
@@ -51,6 +51,7 @@ public class TeamAdmin {
     public String getTeamName() {
         return this.teamName;
     }
+
     public void setTeamName(String teamName) {
         this.teamName = teamName;
     }

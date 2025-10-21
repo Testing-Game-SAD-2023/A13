@@ -5,6 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Rappresenta i risultati delle metriche di copertura calcolate da EvoSuite.
+ * <p>
+ * Ogni tipo di copertura (linee, branch, metodi, ecc.) è rappresentata da un oggetto {@link Coverage}, che
+ * contiene il numero di elementi coperti e non coperti.
+ * </p>
+ *
+ * <p>
+ * Questa classe è pensata per uso interno del dominio (principalmente persistenza) e come valore incorporabile in altre entità,
+ * non come DTO per comunicazione esterna.
+ * </p>
+ */
 @Getter
 @Setter
 @NoArgsConstructor

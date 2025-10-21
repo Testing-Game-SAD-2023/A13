@@ -21,90 +21,75 @@
 
 package com.groom.manvsclass.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.interaction;
 import com.groom.manvsclass.service.AdminService;
 import com.groom.manvsclass.util.Util;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @CrossOrigin
 @Controller
 public class HomeController {
 
-    @Autowired
-    private AdminService adminService;
+    private final AdminService adminService;
+    private final Util utilsService;
 
-    @Autowired
-    private Util utilsService;
+    public HomeController(AdminService adminService, Util utilsService) {
+        this.adminService = adminService;
+        this.utilsService = utilsService;
+    }
 
     //Solo x testing
     @GetMapping("/getLikes/{name}")
-    @ResponseBody
+
     public ResponseEntity<Long> likes(@PathVariable String name) {
-     long likesCount = utilsService.likes(name);
-     return ResponseEntity.ok(likesCount);
+        long likesCount = utilsService.likes(name);
+        return ResponseEntity.ok(likesCount);
     }
 
     @PostMapping("/newinteraction")
-    @ResponseBody
     public ResponseEntity<interaction> uploadInteraction(@RequestBody interaction interazione) {
-     interaction savedInteraction = utilsService.uploadInteraction(interazione);
-     return ResponseEntity.ok(savedInteraction);
+        interaction savedInteraction = utilsService.uploadInteraction(interazione);
+        return ResponseEntity.ok(savedInteraction);
     }
 
     @GetMapping("/Cfilterby/{category}")
-    @ResponseBody
     public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
-     return adminService.filtraClassi(category, jwt);
+        return adminService.filtraClassi(category, jwt);
     }
 
     @GetMapping("/Cfilterby/{text}/{category}")
-    @ResponseBody
     public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
-     return adminService.filtraClassi(text, category, jwt);
+        return adminService.filtraClassi(text, category, jwt);
     }
 
     @GetMapping("/interaction")
-    @ResponseBody
     public List<interaction> elencaInt() {
-     return utilsService.elencaInt();
+        return utilsService.elencaInt();
     }
 
     @GetMapping("/findReport")
-    @ResponseBody
     public List<interaction> elencaReport() {
-     return utilsService.elencaReport();
+        return utilsService.elencaReport();
     }
 
     @PostMapping("/newLike/{name}")
-    @ResponseBody
     public String newLike(@PathVariable String name) {
-     return utilsService.newLike(name);
+        return utilsService.newLike(name);
     }
 
     @PostMapping("/newReport/{name}")
-    @ResponseBody
     public String newReport(@PathVariable String name, @RequestBody String commento) {
-     return utilsService.newReport(name, commento);
+        return utilsService.newReport(name, commento);
     }
 
-    @PostMapping("/deleteint/{id_i}")
-    @ResponseBody
-    public interaction eliminaInteraction(@PathVariable int id_i) {
-     return utilsService.eliminaInteraction(id_i);
+    @PostMapping("/deleteint/{id}")
+    public interaction eliminaInteraction(@PathVariable int id) {
+        return utilsService.eliminaInteraction(id);
     }
 }
 

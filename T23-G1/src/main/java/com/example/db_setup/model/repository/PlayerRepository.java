@@ -17,16 +17,15 @@
 
 package com.example.db_setup.model.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.example.db_setup.model.Player;
+import com.example.db_setup.model.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.example.db_setup.model.Player;
-import com.example.db_setup.model.UserProfile;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
@@ -37,14 +36,18 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     List<Player> findByUserProfileEmailLike(@Param("searchTerm") String searchTerm);
 
     List<Player> findByUserProfileName(String name);
+
     //MODIFICA
     List<Player> findAll();
+
     @Query("SELECT u FROM Player u WHERE u.userProfile = :userProfile")
     Player findByUserProfile(@Param("userProfile") UserProfile userProfile);
+
     @Query("SELECT u FROM Player u WHERE u.userProfile IN :userProfiles")
     List<Player> findUsersByProfiles(@Param("userProfiles") List<UserProfile> userProfiles);
-    
+
     //Modifica 12/12/2024
     List<Player> findByUserProfileSurnameAndUserProfileName(String surname, String name); //SELECT * FROM User WHERE surname = ? AND name = ?
+
     List<Player> findByUserProfileSurname(String surname);
 }

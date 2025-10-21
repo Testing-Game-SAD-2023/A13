@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // --- Funzione per ottenere il gamemode dalla sessione  ---
 // Funzione getGameMode riscritta usando `fetch`
 async function getGameMode(playerId, mode) {
-	const url = `session/gamemode/${playerId}?mode=${mode}`;
+	const url = `/api/gameEngine/session/gamemode/${playerId}?mode=${mode}`;
 	try {
 		const response = await fetch(url, {
 			method: "GET", // tipo di richiesta GET
@@ -129,7 +129,7 @@ function putGameMode(
 function startGameRequest(requestData) {
 	return new Promise((resolve, reject) => {
 		$.ajax({
-			url: "/StartGame",
+			url: "/api/gameEngine/StartGame",
 			type: "POST",
 			contentType: "application/json",
 			data: requestData ? JSON.stringify(requestData) : null,
@@ -190,7 +190,7 @@ async function putGameMode() {
 async function deleteModalita(mode) {
 	const playerId = String(parseJwt(getCookie("jwt")).userId);
 	// const url = `/session/gamemode/${playerId}?mode=${mode}`
-	const url = `/SurrenderGame/${playerId}?mode=${mode}`;
+	const url = `/api/gameEngine/SurrenderGame/${playerId}?mode=${mode}`;
 	try {
 		const response = await fetch(url, {
 			method: "DELETE",

@@ -3,7 +3,6 @@ package com.example.db_setup.model.dto.gamification;
 import lombok.*;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
-import testrobotchallenge.commons.models.opponent.OpponentType;
 
 import java.util.Set;
 
@@ -15,7 +14,7 @@ import java.util.Set;
 public class GameProgressDTO {
     private String classUT;
     private GameMode gameMode;
-    private OpponentType type;
+    private String type;
     private OpponentDifficulty difficulty;
     private boolean isWon;
     private Set<String> achievements;
