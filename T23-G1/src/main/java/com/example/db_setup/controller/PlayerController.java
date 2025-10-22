@@ -21,21 +21,14 @@ public class PlayerController {
      */
 
     private final PlayerService playerService;
-    private final PlayerRepository playerRepository;
-    private final Logger logger = LoggerFactory.getLogger(PlayerController.class);
 
-    public PlayerController(PlayerService playerService, PlayerRepository playerRepository) {
+    public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
-        this.playerRepository = playerRepository;
     }
 
     @GetMapping("/players")
     public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
-        logger.info("[GET /players] Received request");
-        List<Player> players = playerRepository.findAll();
-        List<PlayerDTO> playersDTO = players.stream().map(PlayerDTO::new).toList();
-        logger.info("[GET /players] Players retrieved: {}", playersDTO);
-        return ResponseEntity.ok(playersDTO);
+        return ResponseEntity.ok(playerService.getAllPlayers());
     }
 
     @PostMapping("/players/studentsByIds")
