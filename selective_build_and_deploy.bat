@@ -27,6 +27,7 @@ echo 7 - ui_gateway
 echo 8 - api_gateway
 echo 9 - T0
 echo 10 - db-backup
+echo 11 - observability stack
 set /p SELECTION=Scelte (es. 0 1 2 o 'all'):
 
 :: Se l'utente ha scelto "all", builda tutto
@@ -155,6 +156,15 @@ for %%i in (%SELECTION%) do (
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
         echo Error deploying db-backup
+        exit /b 1
+        )
+        cd /d "%ROOT_DIR%"
+    ) else if %%i==10 (
+        echo Building observability stack
+        cd /d "%ROOT_DIR%\observability
+        docker compose up -d
+        if %ERRORLEVEL% neq 0 (
+        echo Error deploying observability stack
         exit /b 1
         )
         cd /d "%ROOT_DIR%"

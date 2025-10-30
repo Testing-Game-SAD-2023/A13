@@ -5,6 +5,9 @@ services:
     image: mick0974/a13:t7-g31
     container_name: t7-controller
     restart: always
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     expose:
       - 8087
     networks:
