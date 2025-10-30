@@ -6,6 +6,7 @@ volumes:
 services:
   db:
     image: mysql:latest
+    platform: linux/amd64
     container_name: t23-mysql_db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
