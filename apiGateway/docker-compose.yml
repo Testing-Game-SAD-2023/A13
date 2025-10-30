@@ -9,6 +9,8 @@ services:
     environment:
       REDIS_HOST: redis_cache
       REDIS_PORT: 6379
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     ports:
       - "8090:8090"
     networks:

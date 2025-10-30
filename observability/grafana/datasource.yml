@@ -1,0 +1,37 @@
+# https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources
+# Configuration file version
+apiVersion: 1
+
+# List of data sources to insert/update depending on what's
+# available in the database.
+datasources:
+  # <string, required> Sets the name you use to refer to
+  # the data source in panels and queries.
+  - name: Loki
+    # <string, required> Sets the data source type.
+    type: loki
+    # <string, required> Sets the access mode, either
+    # proxy or direct (Server or Browser in the UI).
+    # Some data sources are incompatible with any setting
+    # but proxy (Server).
+    access: proxy
+    # <int> Sets the organization id. Defaults to orgId 1.
+    orgId: 1
+    # <string> Sets the data source's URL, including the
+    # port.
+    url: http://loki:3100
+    # <bool> Toggles whether the data source is pre-selected
+    # for new panels. You can set only one default
+    # data source per organization.
+    isDefault: false
+    # <bool> Allows users to edit data sources from the
+    # Grafana UI.
+    editable: true
+
+  - name: Tempo
+    type: tempo
+    access: proxy
+    orgId: 1
+    url: http://tempo:3200
+    isDefault: false
+    editable: true
