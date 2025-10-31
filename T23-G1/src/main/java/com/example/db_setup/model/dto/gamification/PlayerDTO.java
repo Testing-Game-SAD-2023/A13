@@ -18,16 +18,4 @@ public class PlayerDTO {
 	private String email;
 	private String studies;
 	private PlayerProgressDTO playerProgress;
-
-//	public PlayerDTO(Player player) {
-//		this(
-//			player.getID(),
-//			player.getName(),
-//			player.getSurname(),
-//			player.getNickname(),
-//			player.getEmail(),
-//			player.getStudies().toString(),
-//			new PlayerProgressDTO(player.getPlayerProgress())
-//		);
-//	}
 }

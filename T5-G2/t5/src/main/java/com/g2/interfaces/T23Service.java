@@ -69,6 +69,7 @@ public class T23Service extends BaseService {
         registerGetUserActions();
         registerUserProfileActions();
         registerPlayerStatusActions();
+        registerPlayerActions();
     }
 
     /*
@@ -174,10 +175,12 @@ public class T23Service extends BaseService {
         registerAction("updateGlobalAchievements", new ServiceActionDefinition(
                 params -> updateGlobalAchievements((long) params[0], (Set<String>) params[1]), Long.class, Set.class
         ));
+    }
 
-	    registerAction("getAllPlayers", new ServiceActionDefinition(
-		    params -> getAllPlayers()
-	    ));
+    private void registerPlayerActions(){
+        registerAction("getAllPlayers", new ServiceActionDefinition(
+            params -> getAllPlayers()
+        ));
     }
 
     private List<PlayerDTO> getAllPlayers() {

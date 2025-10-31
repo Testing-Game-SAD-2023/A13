@@ -18,17 +18,4 @@ public class PlayerProgressDTO {
     private int experiencePoints;
     private Set<String> globalAchievements;
     private List<GameProgressDTO> gameProgressesDTO = new ArrayList<>();
-
-    /*
-    public PlayerProgressDTO(int experiencePoints, Set<String> globalAchievements, List<GameProgress> gameProgresses) {
-        this.experiencePoints = experiencePoints;
-        this.globalAchievements = globalAchievements;
-        for (GameProgress gameProgress : gameProgresses) {
-            Opponent opponent = gameProgress.getOpponent();
-            this.gameProgressesDTO.add(new GameProgressDTO(opponent.getClassUT(), opponent.getGameMode(), opponent.getType(),
-                    opponent.getDifficulty(), gameProgress.isWinner(), gameProgress.getAchievements()));
-        }
-    }
-
-     */
 }
