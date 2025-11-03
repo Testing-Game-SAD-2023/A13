@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.components.GenericObjectComponent;
 import com.g2.components.PageBuilder;
 import com.g2.components.UserProfileComponent;
+import com.g2.components.LeaderboardComponent;
 import com.g2.interfaces.ServiceManager;
 import com.g2.model.GameConfigData;
 import com.g2.model.User;
@@ -122,6 +123,18 @@ public class UserProfileController {
         model.addAttribute("maxLevel", gameConfigData.getMaxLevel());
 
         return achievement.handlePageRequest();
+    }
+
+//    Handler per la costruzione della pagina contenente la classifica
+//    La pagina è costruita utilizzando un ObjectComponent "riempito" da un LogicComponent
+    @GetMapping("/leaderboard")
+    public String showLeaderboard(Model model) {
+        PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
+        GenericObjectComponent leaderboardObjectComponent = new GenericObjectComponent(null, null);
+        LeaderboardComponent leaderboardComponent = new LeaderboardComponent(leaderboardObjectComponent, leaderboardPage.getUserId(), serviceManager);
+        leaderboardPage.setLogicComponents(leaderboardComponent);
+        leaderboardPage.setObjectComponents(leaderboardObjectComponent);
+        return leaderboardPage.handlePageRequest();
     }
 
     @GetMapping("/Notification")
