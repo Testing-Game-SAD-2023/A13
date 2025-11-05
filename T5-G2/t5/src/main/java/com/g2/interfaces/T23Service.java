@@ -16,6 +16,7 @@ package com.g2.interfaces;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.model.NotificationResponse;
 import com.g2.model.User;
+import com.g2.model.dto.PlayerDTO;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.model.dto.PlayerProgressDTO;
 import com.g2.model.dto.UpdateGameProgressDTO;
@@ -68,6 +69,7 @@ public class T23Service extends BaseService {
         registerGetUserActions();
         registerUserProfileActions();
         registerPlayerStatusActions();
+        registerPlayerActions();
     }
 
     /*
@@ -175,6 +177,16 @@ public class T23Service extends BaseService {
         ));
     }
 
+    private void registerPlayerActions(){
+        registerAction("getAllPlayers", new ServiceActionDefinition(
+            params -> getAllPlayers()
+        ));
+    }
+
+    private List<PlayerDTO> getAllPlayers() {
+        final String endpoint = "/players";
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>(){});
+    }
 
     private GameProgressDTO createPlayerProgressAgainstOpponent(long playerId, GameMode gameMode, String classUT, String type, OpponentDifficulty difficulty) {
         final String endpoint = "/players/%s/progression/against".formatted(playerId);

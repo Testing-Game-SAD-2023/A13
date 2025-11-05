@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <div th:replace="fragments/header :: header"></div>
+    <title th:text="#{leaderboard.title}">Leaderboard</title>
+    <link rel="stylesheet" th:href="@{/t5/css/leaderboard.css}">
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<div class="container mt-4">
+
+    <!-- Badge utente -->
+    <div class="leaderboard-card" th:if="${playerRecord != null}">
+        <div class="leaderboard-card-left">
+            <div class="avatar">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="leaderboard-card-info">
+                <p class="name" th:text="${playerRecord.name} + ' ' + ${playerRecord.surname}">Nome Cognome</p>
+                <p class="email" th:text="${playerRecord.email}">email@esempio.com</p>
+            </div>
+        </div>
+        <div class="leaderboard-card-right">
+            <p id="playerPositionBadge" class="position"
+               th:text=" '# 1'"> </p>
+            <p id="playerScoreBadge" class="leaderboard-card-score"
+               th:text="#{leaderboard.experience} + ': 0'">Esperienza: 0</p>
+        </div>
+    </div>
+
+    <!-- Tabella -->
+    <div class="table-responsive leaderboard-table">
+        <table id="leaderboardTable">
+            <thead>
+            <tr>
+                <th th:text="#{leaderboard.rank}">#</th>
+                <th th:text="#{leaderboard.name}">Nome</th>
+                <th th:text="#{leaderboard.surname}">Cognome</th>
+                <th th:text="#{leaderboard.email}">Email</th>
+                <th>
+                    <select id="scoreTypeSelector">
+                        <option value="exp" th:text="#{leaderboard.experience}" selected>Esperienza</option>
+                        <option value="wins" th:text="#{leaderboard.wins}">Vittorie</option>
+                        <!-- Aggiungere nuove metriche QUI -->
+                    </select>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="player : ${leaderboard}" th:attr="data-email=${player.email}">
+                <td class="rank"></td>
+                <td th:text="${player.name}"></td>
+                <td th:text="${player.surname}"></td>
+                <td th:text="${player.email}"></td>
+                <td class="player-score"
+                    th:attr="data-exp=${player.exp}, data-wins=${player.wins}"></td>
+                    <!-- Aggiungere nuove metriche QUI -->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <nav class="pagination-container">
+        <ul class="pagination" id="pagination"></ul>
+    </nav>
+
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script th:inline="javascript">
+    const playerEmail = /*[[${playerRecord.email}]]*/ '';
+    const i18nExperience = /*[[#{leaderboard.experience}]]*/ 'Esperienza';
+    const i18nWins = /*[[#{leaderboard.wins}]]*/ 'Vittorie';
+    // Aggiungere nuove metriche QUI
+</script>
+<script th:src="@{/t5/js/leaderboard.js}"></script>
+</body>
+</html>
