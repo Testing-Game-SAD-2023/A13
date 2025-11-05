@@ -55,7 +55,7 @@ public class UserProfileController {
             File file = new File("%s/%s".formatted(System.getProperty("user.dir"), gamificationConFile.replace("/", File.separator)));
             this.gameConfigData = objectMapper.readValue(file, GameConfigData.class);
         } catch (IOException e) {
-            logger.info("[PostConstruct init] Error in loading game_config.json, using default values: {}", e.getMessage());
+            logger.info("[PostConstruct init] Error in loading gamification_config.json, using default values: {}", e.getMessage());
             this.gameConfigData = new GameConfigData(10, 5, 1);
         }
     }

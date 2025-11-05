@@ -108,8 +108,8 @@ public class T23Service extends BaseService {
         ));
 
         registerAction("GetUser", new ServiceActionDefinition(
-                params -> getUser((String) params[0]),
-                String.class
+                params -> getUser((Long) params[0]),
+                Long.class
         ));
 
         registerAction("GetUsersByList", new ServiceActionDefinition(
@@ -254,20 +254,20 @@ public class T23Service extends BaseService {
 
     // Metodo per ottenere la lista degli utenti
     private List<User> getUsers() {
-        final String endpoint = "/student/students_list";
+        final String endpoint = "/players/students_list";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {
         });
     }
 
-    private User getUser(String userId) {
-        final String endpoint = "/student/students_list/" + userId;
+    private User getUser(long userId) {
+        final String endpoint = "/players/students_list/" + userId;
         return callRestGET(endpoint, null, User.class);
     }
 
     //Do una lista di ID e mi ritorna una lista di User
     // Implementata a mano perchè un po' strana è una POST che ottiene dati come una GET
     private List<User> getUserByList(List<String> idsStudenti) {
-        final String endpoint = "/student/getStudentiTeam";
+        final String endpoint = "/players/getStudentiTeam";
         // Crea un oggetto HttpEntity con i dati che vogliamo inviare (la lista degli ID)
         HttpEntity<List<String>> requestEntity = new HttpEntity<>(idsStudenti);
         // Esegui la chiamata POST all'endpoint

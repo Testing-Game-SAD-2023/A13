@@ -24,14 +24,16 @@
   <div class="hero-content">
     <h1 th:text="#{menu.title}"></h1>
     <p th:text="#{menu.text}"></p>
-    <a id="login_user_redirect_btn" th:text="#{button.student}" href="/login" class="button-3d"></a>
-    <a id="login_admin_redirect_btn" th:text="#{button.admin}" href="/loginAdmin" class="button-3d adm"></a>
+    <a id="login_user_redirect_btn" th:text="#{button.student}" href="" class="button-3d"></a>
+    <a id="login_admin_redirect_btn" th:text="#{button.admin}" href="" class="button-3d adm"></a>
   </div>
   <div class="image-container">
     <img th:src="@{t23/css/images/HeroImageNew.png}" width="650">
   </div>
 </div>
 <div th:insert="layouts/footer :: footer"></div>
+
+<script type="module" th:src="@{/t23/js/home.js}"></script>
 
 </body>
 </html>

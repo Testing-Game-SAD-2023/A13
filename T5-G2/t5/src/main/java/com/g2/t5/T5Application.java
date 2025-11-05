@@ -33,11 +33,9 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication(
         scanBasePackages = {
                 "com.g2.controllers",
-                "com.g2.factory",
                 "com.g2.interfaces",
                 "com.g2.game",
                 "com.g2.t5",
-                "com.g2.service",
                 "com.g2.session",
                 "com.g2.security",
                 "com.g2.language"
