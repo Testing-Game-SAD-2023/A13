@@ -273,20 +273,20 @@ function highlightCodeCoverage(reportContent, robotContent, editor) {
 	var partiallyCoveredLinesRobot = [];
 
 	reportContent.querySelectorAll("line").forEach(function (line) {
-		const mi = parseInt(line.getAttribute("mi"));
-		const ci = parseInt(line.getAttribute("ci"));
-		const mb = parseInt(line.getAttribute("mb"));
-		const cb = parseInt(line.getAttribute("cb"));
+		const missed_instruction = parseInt(line.getAttribute("mi"));
+		const covered_instruction = parseInt(line.getAttribute("ci"));
+		const missed_branch = parseInt(line.getAttribute("mb"));
+		const covered_branch = parseInt(line.getAttribute("cb"));
 
-		const totalInstructions = mi + ci;
-		const totalBranches = mb + cb;
+		const totalInstructions = missed_instruction + covered_instruction;
+		const totalBranches = missed_branch + covered_branch;
 
-		const allInstructionsCovered = (mi === 0);
-		const allBranchesCovered = (totalBranches === 0 || mb === 0);
+		const allInstructionsCovered = (totalInstructions === 0 || missed_instruction === 0);
+		const allBranchesCovered = (totalBranches === 0 || missed_branch === 0);
 
 		if (allInstructionsCovered && allBranchesCovered) {
 			coveredLines.push(line.getAttribute("nr"));
-		} else if ((ci > 0 || cb > 0)) {
+		} else if ((covered_instruction > 0 || covered_branch > 0)) {
 			partiallyCoveredLines.push(line.getAttribute("nr"));
 		} else {
 			uncoveredLines.push(line.getAttribute("nr"));
@@ -295,23 +295,23 @@ function highlightCodeCoverage(reportContent, robotContent, editor) {
 
 
 	robotContent.querySelectorAll("line").forEach(function (line) {
-		const mi = parseInt(line.getAttribute("mi"));
-		const ci = parseInt(line.getAttribute("ci"));
-		const mb = parseInt(line.getAttribute("mb"));
-		const cb = parseInt(line.getAttribute("cb"));
+		const missed_instruction = parseInt(line.getAttribute("mi"));
+		const covered_instruction = parseInt(line.getAttribute("ci"));
+		const missed_branch = parseInt(line.getAttribute("mb"));
+		const covered_branch = parseInt(line.getAttribute("cb"));
 
-		const totalInstructions = mi + ci;
-		const totalBranches = mb + cb;
+		const totalInstructions = missed_instruction + covered_instruction;
+		const totalBranches = missed_branch + covered_branch;
 
-		const allInstructionsCovered = (mi === 0);
-		const allBranchesCovered = (totalBranches === 0 || mb === 0);
+		const allInstructionsCovered = (totalInstructions === 0 || missed_instruction === 0);
+		const allBranchesCovered = (totalBranches === 0 || missed_branch === 0);
 
 		if (allInstructionsCovered && allBranchesCovered) {
 			coveredLinesRobot.push(line.getAttribute("nr"));
-		} else if ((ci > 0 || cb > 0)) {
-			uncoveredLinesRobot.push(line.getAttribute("nr"));
-		} else {
+		} else if ((covered_instruction > 0 || covered_branch > 0)) {
 			partiallyCoveredLinesRobot.push(line.getAttribute("nr"));
+		} else {
+			uncoveredLinesRobot.push(line.getAttribute("nr"));
 		}
 	});
 
@@ -322,9 +322,6 @@ function highlightCodeCoverage(reportContent, robotContent, editor) {
 		if (line.getAttribute("name") !== "") {
 			decreaseRobotLines = 2;
 			break; 
-		} else if (line.getAttribute("name") === "Calcolatrice") {
-			decreaseRobotLines = 2;
-			break;
 		}
 	}
 
