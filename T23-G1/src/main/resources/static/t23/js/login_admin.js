@@ -10,6 +10,10 @@ document.getElementById("password_reset_admin_redirect_btn").addEventListener("c
     window.location.href=VIEWS.RESET_PASSWORD_ADMIN;
 });
 
+document.getElementById("register_admin_redirect_btn").addEventListener("click", () => {
+    window.location.href=VIEWS.REGISTER_ADMIN;
+});
+
 document.getElementById("adminLogin_form").addEventListener("submit", async function (e) {
     e.preventDefault(); // blocco il submit classico
 
