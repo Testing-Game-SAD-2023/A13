@@ -1,0 +1,42 @@
+# https://opentelemetry.io/docs/collector/configuration/
+# Receivers collect telemetry from one or more sources
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+# Processors take the data collected by receivers and modify or transform it before sending it to the exporters
+processors:
+  batch:
+
+# Exporters send data to one or more backends or destinations
+exporters:
+  debug:
+    verbosity: detailed
+  otlphttp/logs:
+    endpoint: "http://loki:3100/otlp"
+    tls:
+      insecure: true
+  otlp/traces:
+    endpoint: "tempo:4319"
+    tls:
+      insecure: true
+
+# The service section is used to configure what components are enabled in the Collector based on the configuration found in the receivers, processors, exporters, and extensions sections
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/traces, debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp/logs, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]

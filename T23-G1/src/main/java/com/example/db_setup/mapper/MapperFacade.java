@@ -2,9 +2,11 @@ package com.example.db_setup.mapper;
 
 import com.example.db_setup.model.GameProgress;
 import com.example.db_setup.model.Opponent;
+import com.example.db_setup.model.Player;
 import com.example.db_setup.model.PlayerProgress;
 import com.example.db_setup.model.dto.gamification.GameProgressDTO;
 import com.example.db_setup.model.dto.gamification.OpponentDTO;
+import com.example.db_setup.model.dto.gamification.PlayerDTO;
 import com.example.db_setup.model.dto.gamification.PlayerProgressDTO;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +31,16 @@ public class MapperFacade {
     private final OpponentMapper opponentMapper;
     private final PlayerProgressMapper playerProgressMapper;
     private final GameProgressMapper gameProgressMapper;
+    private final PlayerMapper playerMapper;
 
     public MapperFacade(OpponentMapper opponentMapper,
                         PlayerProgressMapper playerProgressMapper,
-                        GameProgressMapper gameProgressMapper) {
+                        GameProgressMapper gameProgressMapper,
+                        PlayerMapper playerMapper) {
         this.opponentMapper = opponentMapper;
         this.playerProgressMapper = playerProgressMapper;
         this.gameProgressMapper = gameProgressMapper;
+        this.playerMapper = playerMapper;
     }
 
     public OpponentDTO toDTO(Opponent opponent) {
@@ -48,5 +53,9 @@ public class MapperFacade {
 
     public GameProgressDTO toDTO(GameProgress gameProgress) {
         return gameProgressMapper.gameProgressToGameProgressDTO(gameProgress);
+    }
+
+    public PlayerDTO toDTO(Player player){
+        return playerMapper.playerToPlayerDTO(player);
     }
 }

@@ -11,6 +11,8 @@ services:
       MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
       MONGODB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     depends_on:
       - mongo_db
     volumes:
@@ -18,6 +20,11 @@ services:
       - VolumeT0:/VolumeT0
     networks:
       - global-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   mongo_db:
     image: "mongo:6.0.6"

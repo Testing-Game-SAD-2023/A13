@@ -19,12 +19,13 @@ echo "7 - ui_gateway"
 echo "8 - api_gateway"
 echo "9 - T0"
 echo "10 - db-backup"
+echo "11 - observability stack"
 echo "Select: "
 read -r -a SELECTION
 
 # Se l'utente ha scelto "all", builda tutto
 if [[ "${SELECTION[0]}" == "all" ]]; then
-    SELECTION=( {0..10} )
+    SELECTION=( {0..11} )
 fi
 
 for i in "${SELECTION[@]}"; do
@@ -111,6 +112,12 @@ for i in "${SELECTION[@]}"; do
             echo "Building db-backup"
             cd "$ROOT_DIR/db-backup"
             docker build -t mick0974/a13:db-backup .
+            docker compose up -d
+            cd "$ROOT_DIR"
+            ;;
+        11)
+            echo "Building Observability stack"
+            cd "$ROOT_DIR/observability"
             docker compose up -d
             cd "$ROOT_DIR"
             ;;

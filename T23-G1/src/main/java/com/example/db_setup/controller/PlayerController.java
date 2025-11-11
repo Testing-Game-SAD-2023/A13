@@ -1,10 +1,14 @@
 package com.example.db_setup.controller;
 
 import com.example.db_setup.model.Player;
-import com.example.db_setup.model.repository.PlayerRepository;
+import com.example.db_setup.model.dto.gamification.PlayerDTO;
 import com.example.db_setup.service.PlayerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,21 +24,28 @@ public class PlayerController {
      */
 
     private final PlayerService playerService;
-    private final PlayerRepository playerRepository;
-    private final Logger logger = LoggerFactory.getLogger(PlayerController.class);
 
-    public PlayerController(PlayerService playerService, PlayerRepository playerRepository) {
+    public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
-        this.playerRepository = playerRepository;
     }
 
+    @Operation(
+            summary = "Get all players",
+            description = "Returns a list of all registered players"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of player returned successfully or empty if there are no players",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = PlayerDTO.class))
+                    )
+            )
+    })
     @GetMapping("/players")
-    public ResponseEntity<List<Player>> getAllPlayers() {
-        logger.info("[GET /players] Received request");
-        List<Player> players = playerRepository.findAll();
-
-        logger.info("[GET /players] Players retrieved: {}", players);
-        return ResponseEntity.ok(players);
+    public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
+        return ResponseEntity.ok(playerService.getAllPlayers());
     }
 
     @PostMapping("/players/studentsByIds")

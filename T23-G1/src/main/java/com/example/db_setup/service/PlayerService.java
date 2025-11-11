@@ -16,9 +16,11 @@
  */
 package com.example.db_setup.service;
 
+import com.example.db_setup.mapper.MapperFacade;
 import com.example.db_setup.model.Player;
 import com.example.db_setup.model.Studies;
 import com.example.db_setup.model.UserProfile;
+import com.example.db_setup.model.dto.gamification.PlayerDTO;
 import com.example.db_setup.model.repository.PlayerRepository;
 import com.example.db_setup.model.repository.UserProfileRepository;
 import com.example.db_setup.service.exception.UserNotFoundException;
@@ -40,11 +42,24 @@ public class PlayerService {
     private final PlayerProgressService playerProgressService;
     private final PlayerRepository playerRepository;
     private final UserProfileRepository userProfileRepository;
+    private final MapperFacade mapperFacade;
 
-    public PlayerService(PlayerProgressService playerProgressService, PlayerRepository playerRepository, UserProfileRepository userProfileRepository) {
+    public PlayerService(PlayerProgressService playerProgressService,
+                         PlayerRepository playerRepository,
+                         UserProfileRepository userProfileRepository,
+                         MapperFacade mapperFacade) {
         this.playerProgressService = playerProgressService;
         this.playerRepository = playerRepository;
         this.userProfileRepository = userProfileRepository;
+        this.mapperFacade = mapperFacade;
+    }
+
+    public List<PlayerDTO> getAllPlayers() {
+        logger.info("[GET /players] Received request");
+        List<Player> players = playerRepository.findAll();
+        List<PlayerDTO> playersDTO = players.stream().map(mapperFacade::toDTO).toList();
+        logger.info("[GET /players] Players retrieved");
+        return playersDTO;
     }
 
     @Transactional
@@ -65,7 +80,6 @@ public class PlayerService {
         Optional<Player> player = playerRepository.findById(id);
         if (player.isEmpty())
             throw new UserNotFoundException();
-
         return player.get();
     }
 

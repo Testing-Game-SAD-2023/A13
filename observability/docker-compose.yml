@@ -1,0 +1,61 @@
+name: "observability"
+services:
+  loki:
+    image: grafana/loki
+    container_name: loki
+    command: -config.file=/etc/loki/local-config.yaml
+    expose:
+      - "3100"
+    networks:
+      - global-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    depends_on:
+      - loki
+      - otel-collector
+      - tempo
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    networks:
+      - global-network
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    container_name: otel-collector
+    expose:
+      - "4317"   # OTLP gRPC
+      - "4318"   # OTLP HTTP
+    networks:
+      - global-network
+    volumes:
+      - ./collector/otel_collector_config.yml:/etc/otel/config.yaml
+    command: ["--config", "/etc/otel/config.yaml"]
+
+  tempo:
+    image: grafana/tempo
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo/config.yaml" ]
+    ports:
+      - "3200:3200"   # per Grafana datasource
+    expose:
+      - "4318"
+      - "4317"   # per ricevere i traces
+    volumes:
+      # - ./tempo:/etc/tempo
+      - ./tempo/tempo_config.yml:/etc/tempo/config.yaml
+    networks:
+      - global-network
+
+volumes:
+  grafana-storage:
+
+networks:
+  global-network:
+    external: true

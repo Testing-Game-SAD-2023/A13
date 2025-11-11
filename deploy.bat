@@ -105,6 +105,15 @@ if %ERRORLEVEL% neq 0 (
 )
 cd /d "%ROOT_DIR%"
 
+echo Deploying observability stack
+cd /d "%ROOT_DIR%\observability"
+docker compose up -d
+if %ERRORLEVEL% neq 0 (
+    echo Error deploying observability stack
+    exit /b 1
+)
+cd /d "%ROOT_DIR%"
+
 REM RunScript.bat
 echo "Executing RunCommands.ps1"
 powershell -ExecutionPolicy Bypass -File RunCommands.ps1
