@@ -1,0 +1,165 @@
+@startuml Upload_Class_Diagram_With_FE_v2
+
+' Server-side packages
+package "controller" {
+  class OpponentController {
+    +uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip) : ResponseEntity<FileUploadResponse>
+    +downloadClasse(name) : ResponseEntity<?>
+    note right: @RequestMapping("/opponents")
+  }
+}
+
+package "service" {
+  class OpponentService {
+    -uploadOpponentService : UploadOpponentService
+    -classRepository : ClassRepository
+    -opponentRepository : OpponentRepository
+    -apiGatewayClient : ApiGatewayClient
+    +uploadOpponent(classUTFile, classUTDetails, robotTestsZip) : ResponseEntity<FileUploadResponse>
+    +eliminaClasse(name) : ResponseEntity<?>
+    +eliminaFile(fileName) : void
+  }
+
+  class UploadOpponentService {
+    +VOLUME_T0_BASE_PATH : String = "/VolumeT0/FolderTree/ClassUT/"
+    +saveOpponentsFromZip(classUTFileName, classUTName, classUTFile, robotTestsZip) : void
+    +uploadNewOpponents(...) : void
+  }
+}
+
+package "util.filesystem.upload" {
+  class FileUploadUtil {
+    +saveCLassFile(fileName, className, file) : void
+  }
+}
+
+package "util.filesystem" {
+  class FileOperationUtil {
+    +saveFileInFileSystem(fileName, directory, multipartFile) : void
+    +extractZipIn(path) : void
+    +copyDirectoryRecursively(source, dest) : void
+    +zipDirectory(srcDir, zipPath) : void
+    +deleteDirectoryRecursively(path) : void
+  }
+
+  class FileDownloadUtil {
+    +downloadClassFile(uri) : ResponseEntity
+  }
+}
+
+package "api" {
+  class RestExchangeTemplateHelper {
+    +exchange(...) : ResponseEntity
+  }
+
+  class ApiGatewayClient {
+    -exchangeHelper : RestExchangeTemplateHelper
+    +callGenerateMissingEvoSuiteCoverage(classUTName, classUTPackageName, zip) : EvosuiteCoverageDTO
+    +callGenerateMissingJacocoCoverage(zip) : JacocoCoverageDTO
+    +callAddNewOpponent(classUT, gameMode, type, difficulty) : void
+    +callDeleteAllClassUTOpponents(classUT) : void
+  }
+}
+
+package "persistence" {
+  class OpponentRepository {
+    +saveOpponent(opponent) : void
+    +findOpponent(...) : Optional<Opponent>
+  }
+
+  class ClassRepository {
+    +save(classUT) : void
+    +findAll() : List<ClassUT>
+  }
+
+  class OperationRepository {
+    +save(operation) : void
+    +count() : long
+  }
+}
+
+' Domain / DTOs
+class FileUploadResponse {
+  +fileName : String
+  +size : long
+  +downloadUri : String
+  +errorMessage : String
+}
+
+class ClassUT
+class Opponent
+class EvosuiteCoverageDTO
+class JacocoCoverageDTO
+
+' Frontend package (client-side)
+package "frontend (templates + static JS)" {
+  class "opponents_upload.html" {
+    +className : input
+    +date : input
+    +difficulty : select
+    +description : textarea
+    +category1 : input
+    +category2 : input
+    +category3 : input
+    +fileInput : file input
+    +zipRobotInput : file input
+    +uploadButton : button
+    +loadingOverlay : overlay
+    +successModal : modal
+  }
+
+  class OpponentsUploadJS {
+    +uploadOpponent() : Promise
+    +uploadButtonState() : void
+    +goBack() : void
+    +redirectToClass() : void
+  }
+
+  class ApiJS {
+    +callUploadOpponent(body) : Promise
+    +returnDataOnSuccessTemplate(args, parseResponse) : Promise
+    +redirectOnSuccessTemplate(args, opts) : Promise
+    +handleApiErrors(response) : Promise
+  }
+
+  class EndpointsJS {
+    +API_ADMIN_SERVICE_PREFIX : "/api/adminService"
+    +APIS : object
+    +VIEWS : object
+  }
+
+  class RenderErrorsJS {
+    +addErrorDiv(parent, msg) : void
+    +clearPreviousErrorsMsgs(elements) : void
+  }
+}
+
+' Relationships - server side
+OpponentController --> OpponentService : delegates
+OpponentService --> UploadOpponentService : uses
+OpponentService --> FileUploadUtil : uses
+UploadOpponentService --> FileOperationUtil : uses
+UploadOpponentService --> ApiGatewayClient : uses
+UploadOpponentService --> OpponentRepository : persists
+OpponentService --> ClassRepository : persists
+OpponentService --> OperationRepository : persists
+OpponentService --> ApiGatewayClient : uses
+OpponentController --> FileDownloadUtil : uses
+
+' Relationships - frontend -> backend
+OpponentsUploadJS --> ApiJS : calls (callUploadOpponent)
+ApiJS --> "API Gateway (/api/adminService)" : POST /api/adminService/opponents (FormData)
+"API Gateway (/api/adminService)" --> OpponentController : route POST /opponents (FormData)
+EndpointsJS --> ApiJS : provides APIS.UPLOAD_OPPONENT
+"opponents_upload.html" --> OpponentsUploadJS : binds DOM elements (fileInput, zipRobotInput, uploadButton)
+"opponents_upload.html" --> RenderErrorsJS : uses for displaying field errors
+ApiJS --> RenderErrorsJS : uses to inject field errors into page
+ApiJS ..> FileUploadResponse : expects JSON response on success
+ApiJS ..> FileUploadResponse : expects error JSON (errors array or error DTO) on fail
+
+' Data contract (FormData fields)
+note "FormData (multipart/form-data) keys:\n - classUTFile (file)\n - classUTDetails (JSON string)\n - robotTestsZip (file)" as FD
+ApiJS .. FD
+OpponentController .. FD
+
+@enduml
