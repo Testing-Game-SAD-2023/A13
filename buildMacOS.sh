@@ -31,14 +31,14 @@ cd "$ROOT_DIR"
 echo "Building T4"
 cd "$ROOT_DIR/T4/gamerepo"
 mvn clean package -DskipTests=true -Dspring.profiles.active=prod || { echo "Error in T4 build during mvn clean package" ; exit 1; }
-docker build -t mick0974/a13:t4-g18 .
+docker buildx build --platform linux/amd64 -t mick0974/a13:t4-g18 .
 cd "$ROOT_DIR"
 
 # Build T5-G2
 echo "Building T5-G2"
 cd "$ROOT_DIR/T5-G2/t5"
 mvn clean package -DskipTests=true -Dspring.profiles.active=prod || { echo "Error in T5-G2 build during mvn clean package" ; exit 1; }
-docker build -t mick0974/a13:t5-g2 .
+docker buildx build --platform linux/amd64 -t mick0974/a13:t5-g2 .
 cd "$ROOT_DIR"
 
 # Build T7-G31
