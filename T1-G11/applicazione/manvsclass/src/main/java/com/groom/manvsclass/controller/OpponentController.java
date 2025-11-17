@@ -19,7 +19,6 @@ import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +36,14 @@ public class OpponentController {
     }
 
     @GetMapping("/elencoNomiClassiUT")
-    public ResponseEntity<?> getNomiClassiUT(@CookieValue(name = "jwt", required = false) String jwt) {
-        return opponentService.getNomiClassiUT(jwt);
+    public ResponseEntity<List<String>> getNomiClassiUT() {
+        return opponentService.getNomiClassiUT();
     }
 
 
     @PostMapping("/update/{name}")
-    public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
-        return opponentService.modificaClasse(name, newContent, jwt, request);
+    public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent) {
+        return opponentService.modificaClasse(name, newContent);
     }
 
 
@@ -123,7 +122,7 @@ public class OpponentController {
 
 
     @GetMapping("/downloadFile/{name}")
-    public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) {
+    public ResponseEntity<Object> downloadClasse(@PathVariable("name") String name) {
         try {
             return opponentService.downloadClasse(name);
         } catch (Exception e) {
@@ -134,7 +133,7 @@ public class OpponentController {
     }
 
     @DeleteMapping("/{classUT}")
-    public ResponseEntity<?> deleteClassUT(@PathVariable("classUT") String classUT) {
+    public ResponseEntity<Object> deleteClassUT(@PathVariable("classUT") String classUT) {
         return opponentService.eliminaClasse(classUT);
     }
 }

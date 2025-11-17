@@ -17,7 +17,9 @@ import com.groom.manvsclass.util.filesystem.FileOperationUtil;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,13 +28,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -40,19 +40,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class OpponentService {
-
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(String.valueOf(OpponentService.class));
+    private static final Logger logger = LoggerFactory.getLogger(OpponentService.class);
     private final OperationRepository operationRepository;
-    @Autowired
     private final ClassRepository classRepository;
     private final MongoTemplate mongoTemplate;
     private final SearchRepositoryImpl searchRepository;
     private final UploadOpponentService uploadOpponentService;
-    @Autowired
     private final OpponentRepository opponentRepository;
     private final Admin userAdmin = new Admin("default", "default", "default", "default", "default");
     private final ApiGatewayClient apiGatewayClient;
@@ -74,12 +70,12 @@ public class OpponentService {
     /*
      * Restituisce la lista di classi UT disponibili nel sistema
      */
-    public ResponseEntity<?> getNomiClassiUT(String jwt) {
+    public ResponseEntity<List<String>> getNomiClassiUT() {
         // 2. Recupera tutte le ClassUT dal repository e restituisce solo i nomi
         List<String> classNames = classRepository.findAll()
                 .stream()
                 .map(ClassUT::getName) // Estrae solo i nomi
-                .collect(Collectors.toList());
+                .toList();
 
         // 3. Ritorna i nomi delle classi con lo status HTTP 200 (OK)
         return ResponseEntity.ok(classNames);
@@ -106,7 +102,7 @@ public class OpponentService {
         String classUTFileName = StringUtils.cleanPath(Objects.requireNonNull(classUTFile.getOriginalFilename()));
         long size = classUTFile.getSize();
 
-        System.out.println("Salvataggio di " + classUTFileName + " nel filesystem condiviso");
+        logger.info("Salvataggio di {} nel filesystem condiviso", classUTFileName);
 
         // Salvataggio del file della classe e robot associati
         FileUploadUtil.saveCLassFile(classUTFileName, classe.getName(), classUTFile);
@@ -128,24 +124,25 @@ public class OpponentService {
 
         classRepository.save(classe);
 
-        System.out.println("Operazione completata con successo (uploadTest)");
+        logger.info("Operazione completata con successo (uploadTest)");
 
         return ResponseEntity.ok(response);
     }
 
 
-    public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
+    public ResponseEntity<Object> downloadClasse(String name) {
 
-        System.out.println("/downloadFile/{name} (HomeController) - name: " + name);
-        System.out.println("test");
+        logger.info("/downloadFile (OpponentService) - name: {}", name);
+        logger.debug("DownloadClasse invoked");
         try {
             List<ClassUT> classe = searchRepository.findByText(name);
-            System.out.println("File download:");
-            System.out.println(classe.get(0).getUri());
-            ResponseEntity file = FileDownloadUtil.downloadClassFile(classe.get(0).getUri());
-            return file;
+            logger.info("File download: uri={}", classe.get(0).getUri());
+            ResponseEntity<Resource> resourceResponse = FileDownloadUtil.downloadClassFile(classe.get(0).getUri());
+            return ResponseEntity.status(resourceResponse.getStatusCode())
+                    .headers(resourceResponse.getHeaders())
+                    .body(resourceResponse.getBody());
         } catch (Exception e) {
-            System.out.println("Classe UT non trovata");
+            logger.error("Classe UT non trovata: name={}", name, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ClasseUT " + name + " non trovata");
         }
     }
@@ -166,8 +163,8 @@ public class OpponentService {
         return searchRepository.orderByName();
     }
 
-    public ResponseEntity<String> modificaClasse(String name, ClassUT newContent, String jwt, HttpServletRequest request) {
-        System.out.println("Token valido, può aggiornare informazioni inerenti le classi (update/{name})");
+    public ResponseEntity<String> modificaClasse(String name, ClassUT newContent) {
+        logger.debug("Token valido, aggiornamento informazioni classi (update/{})", name);
         Query query = new Query();
         query.addCriteria(Criteria.where("name").is(name));
         Update update = new Update().set("name", newContent.getName())
@@ -189,7 +186,7 @@ public class OpponentService {
         }
     }
 
-    public ResponseEntity<?> eliminaClasse(String name) {
+    public ResponseEntity<Object> eliminaClasse(String name) {
         Query query = new Query();
         query.addCriteria(Criteria.where("name").is(name));
         eliminaFile(name);
@@ -216,16 +213,18 @@ public class OpponentService {
         File directory = new File(String.format("%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, fileName));
         File directoryUnmodifiedSrc = new File(String.format("%s/%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, UploadOpponentService.UNMODIFIED_SRC, fileName));
 
-        System.out.println("name: " + fileName);
+        logger.debug("name: {}", fileName);
         if (directory.exists() && directory.isDirectory()) {
             try {
                 FileOperationUtil.deleteDirectoryRecursively(directory.toPath());
                 FileOperationUtil.deleteDirectoryRecursively(directoryUnmodifiedSrc.toPath());
                 logger.info("Cartella eliminata con successo (/deleteFile/{fileName})");
             } catch (IOException e) {
+                logger.error("Impossibile eliminare la cartella: {}", fileName, e);
                 throw new RuntimeException("Impossibile eliminare la cartella.");
             }
         } else {
+            logger.warn("Cartella non trovata: {}", fileName);
             throw new RuntimeException("Cartella non trovata.");
         }
     }
