@@ -1,4 +1,4 @@
-FROM openjdk:8u342
+FROM eclipse-temurin:8-jdk
 
 RUN apt-get update && apt-get install -y bash && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
 
