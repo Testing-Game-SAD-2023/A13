@@ -339,7 +339,7 @@ public class UploadOpponentService {
                     FileOperationUtil.deleteDirectoryRecursively(tmpFolder_ToZip);
                 } else {
                     EvosuiteCoverageDTO coverageDTO = apiGatewayClient.callGenerateMissingEvoSuiteCoverage(classUTName, srcPackage, zip);
-                    FileOperationUtil.writeStringToFile(coverageDTO.getResultFileContent(), new File(String.format("%s/%s", toCoveragePath, "statistics.csv")));
+                    FileOperationUtil.writeStringToFile(coverageDTO.getResultFileContent(), new File(toCoveragePath.toFile(), EVOSUITE_COVERAGE_FILE));
                 }
 
                 Files.delete(zip.toPath());
@@ -363,7 +363,7 @@ public class UploadOpponentService {
                     FileOperationUtil.deleteDirectoryRecursively(tmpFolder_ToZip);
                 } else {
                     JacocoCoverageDTO coverageDTO = apiGatewayClient.callGenerateMissingJacocoCoverage(zip);
-                    FileOperationUtil.writeStringToFile(coverageDTO.getCoverage(), new File(String.format("%s/coveragetot.xml", toCoveragePath)));
+                    FileOperationUtil.writeStringToFile(coverageDTO.getCoverage(), new File(toCoveragePath.toFile(), JACOCO_COVERAGE_FILE));
                 }
 
                 Files.delete(zip.toPath());
