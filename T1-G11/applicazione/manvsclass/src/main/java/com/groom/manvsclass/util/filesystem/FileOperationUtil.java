@@ -97,6 +97,12 @@ public class FileOperationUtil {
     }
 
     public static void writeStringToFile(String content, File file) throws IOException {
+        // Verifica e crea le parent directory prima di scrivere
+        File parent = file.getParentFile();
+        if (parent != null) {
+            Files.createDirectories(parent.toPath());
+        }
+
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);
         }
