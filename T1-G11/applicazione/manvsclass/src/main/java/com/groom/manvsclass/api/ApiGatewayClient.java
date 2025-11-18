@@ -128,6 +128,7 @@ public class ApiGatewayClient {
         builder.part("project", new FileSystemResource(zip));
 
         MultiValueMap<String, HttpEntity<?>> requestBody = builder.build();
+        logger.info("call Evosuite coverage evaluation for classUTName: {}, classUTPackageName: {}", classUTName, classUTPackageName);
 
         ResponseEntity<EvosuiteCoverageDTO> response = exchangeHelper.exchange(evosuiteCoverageServiceUrl + "/coverage/opponent",
                 null, HttpMethod.POST, null, requestBody, EvosuiteCoverageDTO.class);
@@ -141,7 +142,7 @@ public class ApiGatewayClient {
         return responseBody;
     }
 
-    public JacocoCoverageDTO callGenerateMissingJacocoCoverage(File zip) {
+    public JacocoCoverageDTO callGenerateMissingJacocoCoverage(String classUTName, File zip) {
         FileSystemResource fileResource = new FileSystemResource(zip);
 
         MultiValueMap<String, Object> reqBody = new LinkedMultiValueMap<>();
@@ -149,6 +150,7 @@ public class ApiGatewayClient {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        logger.info("call Jacoco coverage evaluation for classUTName: {}", classUTName);
 
         ResponseEntity<JacocoCoverageDTO> response = exchangeHelper.exchange(jacocoCoverageServiceUrl + "/coverage/opponent",
                 null, HttpMethod.POST, headers, reqBody, JacocoCoverageDTO.class);

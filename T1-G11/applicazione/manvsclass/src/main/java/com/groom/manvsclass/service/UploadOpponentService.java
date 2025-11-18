@@ -362,7 +362,7 @@ public class UploadOpponentService {
                     logger.error("Errore: Il file ZIP non è stato creato correttamente.");
                     FileOperationUtil.deleteDirectoryRecursively(tmpFolder_ToZip);
                 } else {
-                    JacocoCoverageDTO coverageDTO = apiGatewayClient.callGenerateMissingJacocoCoverage(zip);
+                    JacocoCoverageDTO coverageDTO = apiGatewayClient.callGenerateMissingJacocoCoverage(classUTName, zip);
                     FileOperationUtil.writeStringToFile(coverageDTO.getCoverage(), new File(toCoveragePath.toFile(), JACOCO_COVERAGE_FILE));
                 }
 
