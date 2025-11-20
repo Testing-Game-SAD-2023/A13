@@ -1,0 +1,6 @@
+TODO:
+
+fare git stash
+applicare nuovamente check per non mandare file evosuite a jacoco e viceversa
+Testare nuovamente se il file robots bad.zip da ancora problemi
+per capire se il problema sono le modifiche

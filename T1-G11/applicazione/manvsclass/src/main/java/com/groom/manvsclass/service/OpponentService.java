@@ -13,7 +13,7 @@ import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
 import com.groom.manvsclass.service.exception.CoverageNotFoundException;
 import com.groom.manvsclass.service.exception.OpponentNotFoundException;
 import com.groom.manvsclass.service.exception.ScoreNotFoundException;
-import com.groom.manvsclass.util.filesystem.FileOperationUtil;
+import com.groom.manvsclass.service.FileStorageService;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadUtil;
@@ -52,12 +52,14 @@ public class OpponentService {
     private final OpponentRepository opponentRepository;
     private final Admin userAdmin = new Admin("default", "default", "default", "default", "default");
     private final ApiGatewayClient apiGatewayClient;
+    private final FileStorageService fileStorageService;
 
     public OpponentService(OperationRepository operationRepository,
                            ClassRepository classRepository,
                            MongoTemplate mongoTemplate,
                            SearchRepositoryImpl searchRepository,
-                           UploadOpponentService uploadOpponentService, OpponentRepository opponentRepository, ApiGatewayClient apiGatewayClient) {
+                           UploadOpponentService uploadOpponentService, OpponentRepository opponentRepository, ApiGatewayClient apiGatewayClient,
+                           FileStorageService fileStorageService) {
         this.operationRepository = operationRepository;
         this.classRepository = classRepository;
         this.mongoTemplate = mongoTemplate;
@@ -65,6 +67,7 @@ public class OpponentService {
         this.uploadOpponentService = uploadOpponentService;
         this.opponentRepository = opponentRepository;
         this.apiGatewayClient = apiGatewayClient;
+        this.fileStorageService = fileStorageService;
     }
 
     /*
@@ -81,7 +84,7 @@ public class OpponentService {
         return ResponseEntity.ok(classNames);
     }
 
-    public ResponseEntity<FileUploadResponse> uploadOpponent(
+    public ResponseEntity<FileUploadResponse> uploadClassAndOpponents(
             MultipartFile classUTFile,
             String classUTDetails,
             MultipartFile robotTestsZip) throws IOException {
@@ -216,8 +219,8 @@ public class OpponentService {
         logger.debug("name: {}", fileName);
         if (directory.exists() && directory.isDirectory()) {
             try {
-                FileOperationUtil.deleteDirectoryRecursively(directory.toPath());
-                FileOperationUtil.deleteDirectoryRecursively(directoryUnmodifiedSrc.toPath());
+                fileStorageService.deleteDirectoryRecursively(directory.toPath());
+                fileStorageService.deleteDirectoryRecursively(directoryUnmodifiedSrc.toPath());
                 logger.info("Cartella eliminata con successo (/deleteFile/{fileName})");
             } catch (IOException e) {
                 logger.error("Impossibile eliminare la cartella: {}", fileName, e);

@@ -9,8 +9,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileUploadUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadUtil.class);
 
     /**
      * @param fileName  nome del file
@@ -28,18 +32,18 @@ public class FileUploadUtil {
         String directoryPath = "Files-Upload/" + className;
         // Converto la directory espressa come stringa in un oggetto di tipo Path
         Path directory = Paths.get(directoryPath);
-        System.out.println("creazione directory:" + directory);
+        logger.debug("creazione directory: {}", directory);
         try {
             // Verifica se la directory esiste già
             if (!Files.exists(directory)) {
                 // Crea la directory
                 Files.createDirectories(directory);
-                System.out.println("La directory:" + directory + "è stata creata con successo.");
+                logger.info("La directory: {} è stata creata con successo.", directory);
             } else {
-                System.out.println("La directory:" + directory + " esiste già.");
+                logger.debug("La directory: {} esiste già.", directory);
             }
         } catch (Exception e) {
-            System.out.println("Errore durante la creazione della directory: " + directory + e.getMessage());
+            logger.error("Errore durante la creazione della directory: {} - {}", directory, e.getMessage(), e);
         }
 
         // Percorso completo della directory di upload
@@ -58,8 +62,7 @@ public class FileUploadUtil {
             // Copia il file nell'uploadDirectory con opzione di sovrascrittura se esiste già
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Errore durante il salvataggio del file in Files-Upload:" + e.getMessage());
+            logger.error("Errore durante il salvataggio del file in Files-Upload: {}", e.getMessage(), e);
         }
     }
 

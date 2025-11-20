@@ -117,7 +117,7 @@ public class OpponentController {
             @RequestParam("classUTDetails") String classUTDetails,
             @RequestParam("robotTestsZip") MultipartFile robotTestsZip
     ) throws IOException {
-        return opponentService.uploadOpponent(classUTFile, classUTDetails, robotTestsZip);
+        return opponentService.uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip);
     }
 
 

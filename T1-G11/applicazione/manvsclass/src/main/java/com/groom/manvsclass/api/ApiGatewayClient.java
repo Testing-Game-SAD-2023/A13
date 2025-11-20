@@ -25,6 +25,8 @@ import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
 import javax.annotation.PostConstruct;
+import java.nio.file.Files;
+import java.util.UUID;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -128,7 +130,14 @@ public class ApiGatewayClient {
         builder.part("project", new FileSystemResource(zip));
 
         MultiValueMap<String, HttpEntity<?>> requestBody = builder.build();
-        logger.info("call Evosuite coverage evaluation for classUTName: {}, classUTPackageName: {}", classUTName, classUTPackageName);
+        String requestId = UUID.randomUUID().toString();
+        long zipSize = -1;
+        try {
+            zipSize = Files.size(zip.toPath());
+        } catch (Exception ignored) {
+        }
+        logger.info("[{}] call Evosuite coverage evaluation for classUTName: {}, classUTPackageName: {}, zip={} (size={})",
+                requestId, classUTName, classUTPackageName, zip.getAbsolutePath(), zipSize);
 
         ResponseEntity<EvosuiteCoverageDTO> response = exchangeHelper.exchange(evosuiteCoverageServiceUrl + "/coverage/opponent",
                 null, HttpMethod.POST, null, requestBody, EvosuiteCoverageDTO.class);
@@ -137,7 +146,14 @@ public class ApiGatewayClient {
             throw new RuntimeException("Error generating evosuite coverage");
 
         EvosuiteCoverageDTO responseBody = response.getBody();
-        logger.info("responseBody: {}", responseBody);
+        if (responseBody == null) {
+            logger.warn("[{}] Evosuite service returned null body for class {}", requestId, classUTName);
+        } else {
+            logger.info("[{}] responseBody: {}", requestId, responseBody);
+            if (responseBody.getResultFileContent() == null) {
+                logger.warn("[{}] Evosuite returned empty resultFileContent for class {} (zip={})", requestId, classUTName, zip.getAbsolutePath());
+            }
+        }
 
         return responseBody;
     }
