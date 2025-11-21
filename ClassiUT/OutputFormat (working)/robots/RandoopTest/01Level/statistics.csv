@@ -1,0 +1,9 @@
+TARGET_CLASS,criterion,Coverage,Total_Goals,Covered_Goals
+mypackage.OutputFormat,LINE,0.9290322580645162,155,144
+mypackage.OutputFormat,BRANCH,0.7910447761194029,67,53
+mypackage.OutputFormat,EXCEPTION,1.0,0,0
+mypackage.OutputFormat,WEAKMUTATION,0.8602941176470589,272,234
+mypackage.OutputFormat,OUTPUT,0.0,74,0
+mypackage.OutputFormat,METHOD,0.0,35,0
+mypackage.OutputFormat,METHODNOEXCEPTION,0.0,35,0
+mypackage.OutputFormat,CBRANCH,0.0,67,0
