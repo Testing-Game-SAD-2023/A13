@@ -1,11 +1,11 @@
 package com.groom.manvsclass.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groom.manvsclass.api.ApiGatewayClient;
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Operation;
 import com.groom.manvsclass.model.Opponent;
+import com.groom.manvsclass.model.dto.ClassUTDetailsDTO;
 import com.groom.manvsclass.model.repository.ClassRepository;
 import com.groom.manvsclass.model.repository.OperationRepository;
 import com.groom.manvsclass.model.repository.OpponentRepository;
@@ -13,10 +13,11 @@ import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
 import com.groom.manvsclass.service.exception.CoverageNotFoundException;
 import com.groom.manvsclass.service.exception.OpponentNotFoundException;
 import com.groom.manvsclass.service.exception.ScoreNotFoundException;
-import com.groom.manvsclass.service.FileStorageService;
+import com.groom.manvsclass.service.upload.ClassUTUploadService;
+import com.groom.manvsclass.service.upload.FileStorageService;
+import com.groom.manvsclass.service.upload.UploadOpponentService;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
-import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
-import com.groom.manvsclass.util.filesystem.upload.FileUploadUtil;
+import com.groom.manvsclass.util.upload.FileUploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -33,13 +34,15 @@ import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.groom.manvsclass.util.upload.OpponentPathResolver.*;
 
 @Service
 public class OpponentService {
@@ -50,6 +53,7 @@ public class OpponentService {
     private final SearchRepositoryImpl searchRepository;
     private final UploadOpponentService uploadOpponentService;
     private final OpponentRepository opponentRepository;
+    private final ClassUTUploadService classUTUploadService;
     private final Admin userAdmin = new Admin("default", "default", "default", "default", "default");
     private final ApiGatewayClient apiGatewayClient;
     private final FileStorageService fileStorageService;
@@ -58,8 +62,11 @@ public class OpponentService {
                            ClassRepository classRepository,
                            MongoTemplate mongoTemplate,
                            SearchRepositoryImpl searchRepository,
-                           UploadOpponentService uploadOpponentService, OpponentRepository opponentRepository, ApiGatewayClient apiGatewayClient,
-                           FileStorageService fileStorageService) {
+                           UploadOpponentService uploadOpponentService, 
+                           OpponentRepository opponentRepository, 
+                           ApiGatewayClient apiGatewayClient,
+                           FileStorageService fileStorageService,
+                           ClassUTUploadService classUTUploadService) {
         this.operationRepository = operationRepository;
         this.classRepository = classRepository;
         this.mongoTemplate = mongoTemplate;
@@ -68,6 +75,7 @@ public class OpponentService {
         this.opponentRepository = opponentRepository;
         this.apiGatewayClient = apiGatewayClient;
         this.fileStorageService = fileStorageService;
+        this.classUTUploadService = classUTUploadService;
     }
 
     /*
@@ -91,44 +99,24 @@ public class OpponentService {
 
         FileUploadResponse response = new FileUploadResponse();
 
-        // Verifica che il file della classe sia stato ricevuto
         if (classUTFile == null || classUTFile.isEmpty()) {
             response.setErrorMessage("Errore: file della classe non ricevuto o vuoto.");
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Parsing dei dettagli della classe
-        ObjectMapper mapper = new ObjectMapper();
-        ClassUT classe = mapper.readValue(classUTDetails, ClassUT.class);
-
-        // Nome del file e dimensione
+        ClassUT classe = ClassUTDetailsDTO.parseFromJson(classUTDetails);
         String classUTFileName = StringUtils.cleanPath(Objects.requireNonNull(classUTFile.getOriginalFilename()));
-        long size = classUTFile.getSize();
-
-        logger.info("Salvataggio di {} nel filesystem condiviso", classUTFileName);
-
-        // Salvataggio del file della classe e robot associati
-        FileUploadUtil.saveCLassFile(classUTFileName, classe.getName(), classUTFile);
+        
+        classUTUploadService.saveClassUTFile(classUTFileName, classe.getName(), classUTFile);
         uploadOpponentService.saveOpponentsFromZip(classUTFileName, classe.getName(), classUTFile, robotTestsZip);
-
-        // Popola la risposta
+        
         response.setFileName(classUTFileName);
-        response.setSize(size);
+        response.setSize(classUTFile.getSize());
         response.setDownloadUri("/downloadFile");
 
-        // Imposta i metadati della classe
-        classe.setUri(String.format("%s/%s/%s/%s",
-                UploadOpponentService.VOLUME_T0_BASE_PATH,
-                UploadOpponentService.UNMODIFIED_SRC,
-                classe.getName(),
-                classUTFileName));
-
-        classe.setDate(LocalDate.now().toString());
-
-        classRepository.save(classe);
+        classUTUploadService.persistClassUTMetadata(classe, classUTFileName);
 
         logger.info("Operazione completata con successo (uploadTest)");
-
         return ResponseEntity.ok(response);
     }
 
@@ -213,15 +201,15 @@ public class OpponentService {
     }
 
     public void eliminaFile(String fileName) {
-        File directory = new File(String.format("%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, fileName));
-        File directoryUnmodifiedSrc = new File(String.format("%s/%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, UploadOpponentService.UNMODIFIED_SRC, fileName));
+        Path classUTDirectory = Path.of(VOLUME_T0_BASE_PATH, fileName);
+        Path unmodifiedSrcDirectory = getUnmodifiedSrcPath(fileName);
 
         logger.debug("name: {}", fileName);
-        if (directory.exists() && directory.isDirectory()) {
+        if (classUTDirectory.toFile().exists() && classUTDirectory.toFile().isDirectory()) {
             try {
-                fileStorageService.deleteDirectoryRecursively(directory.toPath());
-                fileStorageService.deleteDirectoryRecursively(directoryUnmodifiedSrc.toPath());
-                logger.info("Cartella eliminata con successo (/deleteFile/{fileName})");
+                fileStorageService.deleteDirectoryRecursively(classUTDirectory);
+                fileStorageService.deleteDirectoryRecursively(unmodifiedSrcDirectory);
+                logger.info("Cartella eliminata con successo (/deleteFile/{})", fileName);
             } catch (IOException e) {
                 logger.error("Impossibile eliminare la cartella: {}", fileName, e);
                 throw new RuntimeException("Impossibile eliminare la cartella.");

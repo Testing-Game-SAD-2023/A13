@@ -5,10 +5,14 @@ participant "api.js\ncallUploadOpponent" as ApiJS
 participant "API Gateway\n(/api/adminService)" as ApiGateway
 participant "OpponentController\n(/opponents)" as Controller
 participant "OpponentService\n.uploadClassAndOpponents(...)" as Service
-participant "FileUploadUtil" as UploadUtil
+participant "ClassUTUploadService\n.saveClassUTFile\n.persistClassUTMetadata" as ClassUTService
 participant "UploadOpponentService\n.saveOpponentsFromZip" as UploadService
 participant "FileStorageService" as FileStorage
+participant "JavaSourceFileService" as JavaFileService
 participant "CoverageService" as CovService
+participant "OpponentTransformationService\n.createAndPersistOpponent" as TransformService
+participant "CoverageReader" as CovReader
+participant "ScoreBuilder" as ScoreBuilder
 participant "ApiGatewayClient" as Gateway
 participant "OpponentPersistenceService" as PersistenceService
 participant "OpponentRepository" as OppRepo
@@ -21,7 +25,8 @@ ApiJS -> ApiGateway : POST /api/adminService/opponents (FormData, cookies)
 ApiGateway -> Controller : route POST /opponents (FormData)
 Controller -> Service : uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip)
 
-Service -> UploadUtil : saveCLassFile(classUTFileName, className, classUTFile)
+Service -> ClassUTService : saveClassUTFile(classUTFileName, className, classUTFile)
+ClassUTService -> FileStorage : saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile)
 note right: saves original .java into\n/VolumeT0/FolderTree/ClassUT/unmodified_src/<class>
 
 Service -> UploadService : saveOpponentsFromZip(classUTFileName, className, classUTFile, robotTestsZip)
@@ -32,23 +37,25 @@ UploadService -> FileStorage : extractZipIn(operationTmpFolder)
 UploadService -> FileStorage : saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile)
 
 loop for each robotType (Evosuite/Randoop)
-  UploadService -> UploadService : uploadNewOpponents(classUTFileName, className, classUTFile, robotFolder, robotType)
+  UploadService -> UploadService : processRobotFolders(classUTFileName, className, classUTFile, robotGroupFolder)
   
   loop for each level folder (01Level, 02Level, etc.)
     UploadService -> UploadService : processLevelFolder(...)
     
-    note right: Build paths for src, test, coverage
+    note right: Build paths for src, test, coverage using OpponentPathResolver
     
-    UploadService -> FileStorage : saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType)
-    FileStorage --> UploadService : splitPackageNames[][]
+    UploadService -> JavaFileService : saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType)
+    note right: Uses JavaPackageExtractor internally
+    JavaFileService --> UploadService : splitPackageNames[][]
     
-    UploadService -> FileStorage : saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName)
+    UploadService -> JavaFileService : saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName)
     
-    UploadService -> FileStorage : saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath)
-    FileStorage --> UploadService : coverageFound[jacoco, evosuite]
+    UploadService -> JavaFileService : saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath)
+    JavaFileService --> UploadService : coverageFound[jacoco, evosuite]
     
     alt coverage missing
       alt robotType == "evosuite" && !evosuiteFound
+        UploadService -> UploadService : ensureEvoCoverageIfMissing(...)
         UploadService -> FileStorage : copyDirectoryRecursively / zipDirectory
         UploadService -> CovService : generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
         CovService -> Gateway : callGenerateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
@@ -58,6 +65,7 @@ loop for each robotType (Evosuite/Randoop)
       end
       
       alt robotType == "randoop" && !jacocoFound
+        UploadService -> UploadService : ensureJacocoCoverageIfMissing(...)
         UploadService -> FileStorage : copyDirectoryRecursively / zipDirectory
         UploadService -> CovService : generateMissingJacocoCoverage(classUTName, zip)
         CovService -> Gateway : callGenerateMissingJacocoCoverage(classUTName, zip)
@@ -70,11 +78,22 @@ loop for each robotType (Evosuite/Randoop)
     end
     
     UploadService -> UploadService : computeScoresAndPersist(classUTName, robotType, levelFolder, toCoveragePath)
+    UploadService -> TransformService : createAndPersistOpponent(classUTName, robotType, levelFolder, evosuitePath, jacocoPath)
     
-    note right: Read coverage files\nExtract scores from statistics.csv / coveragetot.xml\nCreate Opponent object with scores
+    TransformService -> CovReader : readCoverageFiles(evosuitePath, jacocoPath)
+    note right: Reads both Evosuite statistics.csv\nand Jacoco coveragetot.xml
+    CovReader --> TransformService : CoverageData(evosuiteStatistics[][], jacocoStatistics[][], coverageXml)
     
-    UploadService -> PersistenceService : saveOpponentAndNotify(opponent)
-    PersistenceService -> OppRepo : saveOpponent(opponent)
+    TransformService -> ScoreBuilder : buildJacocoScore(jacocoStatistics)
+    ScoreBuilder --> TransformService : JacocoScore
+    
+    TransformService -> ScoreBuilder : buildEvosuiteScore(evosuiteStatistics)
+    ScoreBuilder --> TransformService : EvosuiteScore
+    
+    note right: Create Opponent object with:\n- classUT, robotType, difficulty (from LevelExtractor)\n- coverage XML, scores
+    
+    TransformService -> PersistenceService : saveOpponentAndNotify(opponent)
+    PersistenceService -> OppRepo : save(opponent)
     
     loop for each GameMode
       PersistenceService -> Gateway : callAddNewOpponent(classUT, gameMode, type, difficulty)
@@ -85,7 +104,8 @@ end
 
 == Cleanup and finalization ==
 UploadService -> FileStorage : deleteDirectoryRecursively(operationTmpFolder)
-Service -> ClassRepo : save(classUT)
+Service -> ClassUTService : persistClassUTMetadata(classe, classUTFileName)
+ClassUTService -> ClassRepo : save(classUT)
 note right: Save ClassUT metadata with URI
 
 Service --> Controller : return FileUploadResponse (200)

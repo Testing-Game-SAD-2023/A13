@@ -1,4 +1,4 @@
-package com.groom.manvsclass.service;
+package com.groom.manvsclass.service.upload;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,22 +15,17 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.SimpleFileVisitor;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-
+/**
+ * Service for basic file system operations including file storage,
+ * directory management, and zip/unzip operations.
+ */
 @Service
 public class FileStorageService {
-
-    private static final String JACOCO_COVERAGE_FILE = "coveragetot.xml";
-    private static final String EVOSUITE_COVERAGE_FILE = "statistics.csv";
-
-
     public void saveFileInFileSystem(String fileName, Path directory, MultipartFile file) throws IOException {
         if (!Files.exists(directory)) {
             Files.createDirectories(directory);
@@ -166,128 +161,5 @@ public class FileStorageService {
         try (FileWriter writer = new FileWriter(file)) {
             writer.write(content);
         }
-    }
-
-    public String[] extractTestPackageNameFromCode(String code) {
-        Pattern pattern = Pattern.compile("\\bpackage\\s*([\\w_][\\w0-9_]*(\\.[\\w_][\\w0-9_]*)*)\\s*;", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(code);
-
-        if (matcher.find()) {
-            String packageName = matcher.group(1).trim();
-            return packageName.split("\\.");
-        }
-
-        return null;
-    }
-
-    public String[] extractSrcPackageFromCode(String code, String className, String robotType) {
-        Pattern pattern;
-        Matcher matcher;
-
-        if ("Evosuite".equalsIgnoreCase(robotType)) {
-            String regex = "org\\.evosuite\\.runtime\\.RuntimeSettings\\.className\\s*=\\s*\"([\\w.]+)\\." + className + "\"";
-            pattern = Pattern.compile(regex);
-            matcher = pattern.matcher(code);
-
-            if (matcher.find()) {
-                String packageName = matcher.group(1);
-                return packageName.split("\\.");
-            }
-
-            return null;
-        } else {
-            pattern = Pattern.compile("\\bimport\\s+([\\w_][\\w0-9_]*(\\.[\\w_][\\w0-9_]*)*)\\." + className + "\\s*;");
-            matcher = pattern.matcher(code);
-
-            if (matcher.find()) {
-                String packageName = matcher.group(1);
-                return packageName.split("\\.");
-            }
-
-            return null;
-        }
-    }
-
-    public String[][] saveTestFilesInVolume(Path fromTestPath, Path toTestPath, String className, String robotType) throws IOException {
-        String[] testPackageName = null;
-        String[] srcPackageName = null;
-
-        File[] files = Objects.requireNonNull(fromTestPath.toFile().listFiles());
-        for (File src : files) {
-            if (!src.getName().contains(".java"))
-                continue;
-
-            String content = Files.readString(src.toPath());
-
-            testPackageName = extractTestPackageNameFromCode(content);
-            if (srcPackageName == null) {
-                srcPackageName = extractSrcPackageFromCode(content, className, robotType);
-            }
-
-            String testPackagePath = "";
-            if (testPackageName != null) {
-                testPackagePath = String.join("/", testPackageName);
-            }
-
-            Path targetDir = toTestPath.resolve(testPackagePath).normalize();
-            Files.createDirectories(targetDir);
-            Files.copy(src.toPath(), targetDir.resolve(src.getName()).normalize(), StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        return new String[][]{srcPackageName, testPackageName};
-    }
-
-    public void modifyAndSaveSrcFile(String fileName, Path directory, MultipartFile originalFile, String edit) throws IOException {
-        String content = new String(originalFile.getBytes());
-        String modifiedContent = "package " + edit + ";\n" + content;
-        Path filePath = directory.resolve(fileName);
-        File outputFile = filePath.toFile();
-        try (FileWriter writer = new FileWriter(outputFile)) {
-            writer.write(modifiedContent);
-        }
-    }
-
-    public void saveSrcFileInVolume(MultipartFile src, Path srcPath, String[] srcPackageName, String srcFileName) throws IOException {
-        String srcPackagePath = "";
-
-        if (srcPackageName != null) {
-            srcPackagePath = String.join("/", srcPackageName);
-            String srcPackageCodeLine = String.join(".", srcPackagePath);
-            Files.createDirectories(Paths.get(String.format("%s/%s", srcPath, srcPackagePath)));
-            modifyAndSaveSrcFile(srcFileName, Paths.get(String.format("%s/%s", srcPath, srcPackagePath)), src, srcPackageCodeLine);
-        } else {
-            Files.createDirectories(Paths.get(String.format("%s/%s", srcPath, srcPackagePath)));
-            saveFileInFileSystem(srcFileName, Paths.get(String.format("%s/%s", srcPath, srcPackagePath)), src);
-        }
-    }
-
-    public boolean[] saveCoverageFilesInVolume(Path searchIn, Path coveragePath) throws IOException {
-        boolean jacocoFound = false;
-        boolean evosuiteFound = false;
-
-        if (!Files.exists(searchIn)) {
-            return new boolean[]{false, false};
-        }
-
-        for (File coverageFile : Objects.requireNonNull(searchIn.toFile().listFiles())) {
-            Files.createDirectories(Paths.get(String.format("%s", coveragePath)));
-
-            if (coverageFile.getName().equals(JACOCO_COVERAGE_FILE)) {
-                String coverage = Files.readString(coverageFile.toPath());
-                if (coverage.contains("<coverage type=\"line, %\" value=")) {
-                    continue;
-                }
-
-                Files.copy(coverageFile.toPath(), Paths.get(String.format("%s/%s", coveragePath, coverageFile.getName())), StandardCopyOption.REPLACE_EXISTING);
-                jacocoFound = true;
-            }
-
-            if (coverageFile.getName().equals(EVOSUITE_COVERAGE_FILE)) {
-                Files.copy(coverageFile.toPath(), Paths.get(String.format("%s/%s", coveragePath, coverageFile.getName())), StandardCopyOption.REPLACE_EXISTING);
-                evosuiteFound = true;
-            }
-        }
-
-        return new boolean[]{jacocoFound, evosuiteFound};
     }
 }

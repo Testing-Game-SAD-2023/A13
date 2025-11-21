@@ -1,4 +1,4 @@
-package com.groom.manvsclass.service;
+package com.groom.manvsclass.service.upload;
 
 import com.groom.manvsclass.api.ApiGatewayClient;
 import com.groom.manvsclass.model.Opponent;

@@ -4,7 +4,7 @@ import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Opponent;
 import com.groom.manvsclass.model.dto.OpponentSummaryDTO;
 import com.groom.manvsclass.service.OpponentService;
-import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
+import com.groom.manvsclass.util.upload.FileUploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

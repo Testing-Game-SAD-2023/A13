@@ -12,6 +12,7 @@ package "controller" {
 package "service" {
   class OpponentService {
     -uploadOpponentService : UploadOpponentService
+    -classUTUploadService : ClassUTUploadService
     -classRepository : ClassRepository
     -opponentRepository : OpponentRepository
     -apiGatewayClient : ApiGatewayClient
@@ -30,6 +31,14 @@ package "service" {
     +getOpponentCoverage(classUT, type, difficulty) : String
   }
 
+  class CoverageService {
+    -apiGatewayClient : ApiGatewayClient
+    +generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip) : EvosuiteCoverageDTO
+    +generateMissingJacocoCoverage(classUTName, zip) : JacocoCoverageDTO
+  }
+}
+
+package "service.upload" <<Rectangle>> {
   class UploadOpponentService {
     +VOLUME_T0_BASE_PATH : String = "/VolumeT0/FolderTree/ClassUT/"
     +UNMODIFIED_SRC : String = "unmodified_src"
@@ -37,13 +46,24 @@ package "service" {
     +BASE_TEST_PATH : String = "src/test/java"
     +BASE_COVERAGE_PATH : String = "coverage"
     -fileStorageService : FileStorageService
+    -javaSourceFileService : JavaSourceFileService
     -coverageService : CoverageService
-    -opponentPersistenceService : OpponentPersistenceService
+    -opponentTransformationService : OpponentTransformationService
     +saveOpponentsFromZip(classUTFileName, classUTName, classUTFile, robotTestsZip) : void
-    -uploadNewOpponents(classUTFileName, classUTName, classUTFile, operationTmpFolder, robotType, volumeBasePath) : void
-    -processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, volumeBasePath, levelFolder) : void
-    -generateCoverageIfNeeded(robotType, coverageFound, classUTName, srcPackageNameSplit, paths, volumeBasePath) : void
+    -processRobotFolders(classUTFileName, classUTName, classUTFile, robotGroupFolder) : void
+    -uploadNewOpponents(classUTFileName, classUTName, classUTFile, operationTmpFolder, robotType) : void
+    -processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, levelFolder) : void
+    -generateCoverageIfNeeded(robotType, coverageFound, classUTName, srcPackageNameSplit, opponentPaths) : void
+    -ensureEvoCoverageIfMissing(...) : void
+    -ensureJacocoCoverageIfMissing(...) : void
     -computeScoresAndPersist(classUTName, robotType, levelFolder, toCoveragePath) : void
+  }
+
+  class ClassUTUploadService {
+    -classRepository : ClassRepository
+    -fileStorageService : FileStorageService
+    +saveClassUTFile(classUTFileName, classUTName, classUTFile) : void
+    +persistClassUTMetadata(classe, classUTFileName) : void
   }
 
   class FileStorageService {
@@ -52,16 +72,21 @@ package "service" {
     +copyDirectoryRecursively(source, dest) : void
     +zipDirectory(srcDir, zipPath) : void
     +deleteDirectoryRecursively(path) : void
-    +saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType) : String[][]
-    +saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName) : void
-    +saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath) : boolean[]
     +writeStringToFile(content, file) : void
   }
 
-  class CoverageService {
-    -apiGatewayClient : ApiGatewayClient
-    +generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip) : EvosuiteCoverageDTO
-    +generateMissingJacocoCoverage(classUTName, zip) : JacocoCoverageDTO
+  class JavaSourceFileService {
+    -fileStorageService : FileStorageService
+    +saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType) : String[][]
+    +saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName) : void
+    +saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath) : boolean[]
+    -modifyAndSaveSrcFile(fileName, directory, originalFile, packageDeclaration) : void
+    -isValidJacocoCoverage(coverageFile) : boolean
+  }
+
+  class OpponentTransformationService {
+    -opponentPersistenceService : OpponentPersistenceService
+    +createAndPersistOpponent(classUTName, robotType, levelFolder, evosuitePath, jacocoPath) : void
   }
 
   class OpponentPersistenceService {
@@ -71,9 +96,57 @@ package "service" {
   }
 }
 
-package "util.filesystem.upload" {
-  class FileUploadUtil {
-    +saveCLassFile(fileName, className, file) : void
+package "service.upload.score" <<Rectangle>> {
+  class CoverageReader <<utility>> {
+    +readCoverageFiles(evosuitePath, jacocoPath) : CoverageData
+    -readEvosuiteIfExists(evosuitePath) : int[][]
+    -readJacocoIfExists(jacocoPath) : int[][]
+    -readJacococXmlIfExists(jacocoPath) : String
+  }
+
+  class CoverageData {
+    +evosuiteStatistics : int[][]
+    +jacocoStatistics : int[][]
+    +jacococCoverageXml : String
+  }
+
+  class ScoreBuilder <<utility>> {
+    +buildJacocoScore(statistics) : JacocoScore
+    +buildEvosuiteScore(statistics) : EvosuiteScore
+  }
+}
+
+package "util.upload" <<Rectangle>> {
+  class JavaPackageExtractor <<utility>> {
+    +extractPackageFromDeclaration(code) : String[]
+    +extractSourcePackageFromTestCode(code, className, robotType) : String[]
+    -extractFromEvosuitePattern(code, className) : String[]
+    -extractFromImportStatement(code, className) : String[]
+  }
+
+  class LevelExtractor <<utility>> {
+    +extractLevelNumber(levelFolder) : int
+    +extractDifficulty(levelFolder) : OpponentDifficulty
+  }
+
+  class OpponentPathResolver <<utility>> {
+    +VOLUME_T0_BASE_PATH : String
+    +UNMODIFIED_SRC : String
+    +BASE_SRC_PATH : String
+    +BASE_TEST_PATH : String
+    +BASE_COVERAGE_PATH : String
+    +getUnmodifiedSrcPath(classUTName) : Path
+    +getTempOperationFolder(classUTName) : Path
+    +getTempZipFolder(classUTName) : Path
+    +buildOpponentPaths(classUTName, robotType, level) : OpponentPaths
+    +buildRobotTestPaths(levelFolderPath, robotType) : RobotTestPaths
+  }
+
+  class FileUploadResponse {
+    +fileName : String
+    +size : long
+    +downloadUri : String
+    +errorMessage : String
   }
 }
 
@@ -236,25 +309,44 @@ package "frontend (templates + static JS)" {
 
 ' Relationships - server side
 OpponentController --> OpponentService : delegates
-OpponentService --> UploadOpponentService : uses
-OpponentService --> FileUploadUtil : uses
-OpponentService --> FileStorageService : uses
-OpponentService --> ClassRepository : persists
-OpponentService --> OperationRepository : persists
-OpponentService --> OpponentRepository : queries
-OpponentService --> ApiGatewayClient : uses
+OpponentService --> UploadOpponentService : delegates upload
+OpponentService --> ClassUTUploadService : delegates ClassUT handling
+OpponentService --> FileStorageService : uses for file ops
+OpponentService --> ClassRepository : persists ClassUT
+OpponentService --> OperationRepository : persists operations
+OpponentService --> OpponentRepository : queries opponents
+OpponentService --> ApiGatewayClient : external calls
 OpponentService --> SearchRepositoryImpl : searches
-OpponentController --> FileDownloadUtil : uses
+OpponentController --> FileDownloadUtil : uses for downloads
 
-UploadOpponentService --> FileStorageService : uses
-UploadOpponentService --> CoverageService : generates coverage
-UploadOpponentService --> OpponentPersistenceService : persists opponents
+UploadOpponentService --> FileStorageService : basic file operations
+UploadOpponentService --> JavaSourceFileService : Java file handling
+UploadOpponentService --> CoverageService : coverage generation
+UploadOpponentService --> OpponentTransformationService : creates opponents
+UploadOpponentService ..> OpponentPathResolver : uses static methods
+UploadOpponentService ..> LevelExtractor : extracts level info
+
+ClassUTUploadService --> FileStorageService : saves files
+ClassUTUploadService --> ClassRepository : persists metadata
+ClassUTUploadService ..> OpponentPathResolver : uses static methods
+
+JavaSourceFileService --> FileStorageService : delegates basic ops
+JavaSourceFileService ..> JavaPackageExtractor : extracts packages
+
+OpponentTransformationService --> OpponentPersistenceService : persists opponents
+OpponentTransformationService ..> CoverageReader : reads coverage files
+OpponentTransformationService ..> ScoreBuilder : builds score objects
+OpponentTransformationService ..> LevelExtractor : extracts difficulty
 
 CoverageService --> ApiGatewayClient : calls external services
-OpponentPersistenceService --> OpponentRepository : persists
+OpponentPersistenceService --> OpponentRepository : persists to DB
 OpponentPersistenceService --> ApiGatewayClient : notifies other services
 
-ApiGatewayClient --> RestExchangeTemplateHelper : uses
+CoverageReader ..> CoverageData : creates
+ScoreBuilder ..> JacocoScore : creates
+ScoreBuilder ..> EvosuiteScore : creates
+
+ApiGatewayClient --> RestExchangeTemplateHelper : HTTP calls
 
 ' Relationships - frontend -> backend
 OpponentsUploadJS --> ApiJS : calls (callUploadOpponent)
