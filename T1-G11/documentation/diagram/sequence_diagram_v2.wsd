@@ -1,0 +1,107 @@
+@startuml Upload_Sequence_Diagram_v2
+actor AdminBrowser as Browser
+participant "opponents_upload.js\n(formData)" as FrontendJS
+participant "api.js\ncallUploadOpponent" as ApiJS
+participant "API Gateway\n(/api/adminService)" as ApiGateway
+participant "OpponentController\n(/opponents)" as Controller
+participant "OpponentService\n.uploadClassAndOpponents(...)" as Service
+participant "FileUploadUtil" as UploadUtil
+participant "UploadOpponentService\n.saveOpponentsFromZip" as UploadService
+participant "FileStorageService" as FileStorage
+participant "CoverageService" as CovService
+participant "ApiGatewayClient" as Gateway
+participant "OpponentPersistenceService" as PersistenceService
+participant "OpponentRepository" as OppRepo
+participant "ClassRepository" as ClassRepo
+
+== Upload request ==
+Browser -> FrontendJS : user clicks Upload (builds FormData\nclassUTFile, classUTDetails, robotTestsZip)
+FrontendJS -> ApiJS : callUploadOpponent(formData)
+ApiJS -> ApiGateway : POST /api/adminService/opponents (FormData, cookies)
+ApiGateway -> Controller : route POST /opponents (FormData)
+Controller -> Service : uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip)
+
+Service -> UploadUtil : saveCLassFile(classUTFileName, className, classUTFile)
+note right: saves original .java into\n/VolumeT0/FolderTree/ClassUT/unmodified_src/<class>
+
+Service -> UploadService : saveOpponentsFromZip(classUTFileName, className, classUTFile, robotTestsZip)
+
+== SaveOpponentsFromZip - Extract and organize files ==
+UploadService -> FileStorage : saveFileInFileSystem("robot.zip", operationTmpFolder, robotTestsZip)
+UploadService -> FileStorage : extractZipIn(operationTmpFolder)
+UploadService -> FileStorage : saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile)
+
+loop for each robotType (Evosuite/Randoop)
+  UploadService -> UploadService : uploadNewOpponents(classUTFileName, className, classUTFile, robotFolder, robotType)
+  
+  loop for each level folder (01Level, 02Level, etc.)
+    UploadService -> UploadService : processLevelFolder(...)
+    
+    note right: Build paths for src, test, coverage
+    
+    UploadService -> FileStorage : saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType)
+    FileStorage --> UploadService : splitPackageNames[][]
+    
+    UploadService -> FileStorage : saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName)
+    
+    UploadService -> FileStorage : saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath)
+    FileStorage --> UploadService : coverageFound[jacoco, evosuite]
+    
+    alt coverage missing
+      alt robotType == "evosuite" && !evosuiteFound
+        UploadService -> FileStorage : copyDirectoryRecursively / zipDirectory
+        UploadService -> CovService : generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
+        CovService -> Gateway : callGenerateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
+        Gateway --> CovService : EvosuiteCoverageDTO
+        CovService --> UploadService : EvosuiteCoverageDTO
+        UploadService -> FileStorage : writeStringToFile(statistics.csv)
+      end
+      
+      alt robotType == "randoop" && !jacocoFound
+        UploadService -> FileStorage : copyDirectoryRecursively / zipDirectory
+        UploadService -> CovService : generateMissingJacocoCoverage(classUTName, zip)
+        CovService -> Gateway : callGenerateMissingJacocoCoverage(classUTName, zip)
+        Gateway --> CovService : JacocoCoverageDTO
+        CovService --> UploadService : JacocoCoverageDTO
+        UploadService -> FileStorage : writeStringToFile(coveragetot.xml)
+      end
+      
+      UploadService -> FileStorage : deleteDirectoryRecursively(tmpFolderToZip)
+    end
+    
+    UploadService -> UploadService : computeScoresAndPersist(classUTName, robotType, levelFolder, toCoveragePath)
+    
+    note right: Read coverage files\nExtract scores from statistics.csv / coveragetot.xml\nCreate Opponent object with scores
+    
+    UploadService -> PersistenceService : saveOpponentAndNotify(opponent)
+    PersistenceService -> OppRepo : saveOpponent(opponent)
+    
+    loop for each GameMode
+      PersistenceService -> Gateway : callAddNewOpponent(classUT, gameMode, type, difficulty)
+      note right: Notify other services about new opponent
+    end
+  end
+end
+
+== Cleanup and finalization ==
+UploadService -> FileStorage : deleteDirectoryRecursively(operationTmpFolder)
+Service -> ClassRepo : save(classUT)
+note right: Save ClassUT metadata with URI
+
+Service --> Controller : return FileUploadResponse (200)
+Controller --> ApiGateway : HTTP 200 + JSON
+ApiGateway --> ApiJS : HTTP 200 + JSON
+ApiJS --> FrontendJS : parsed JSON (success)
+FrontendJS --> Browser : show success modal
+
+== Failure path (any exception) ==
+UploadService --> Service : throws Exception
+Service -> FileStorage : try deleteDirectoryRecursively(operationTmpFolder) [best-effort]
+note right: Compensating transaction:\nCleanup temporary files
+Service --> Controller : return error JSON { error, message, uploadId }
+Controller --> ApiGateway : HTTP 500 + JSON
+ApiGateway --> ApiJS : HTTP 500 + JSON
+ApiJS --> FrontendJS : handleApiErrors(response) -> show modal/alert with uploadId
+FrontendJS --> Browser : show error to admin
+
+@enduml

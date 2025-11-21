@@ -43,6 +43,14 @@ public class UploadOpponentService {
     private static final String JACOCO_COVERAGE_FILE = "coveragetot.xml";
     private static final String EVOSUITE_COVERAGE_FILE = "statistics.csv";
 
+    // Inner class to hold path context
+    private static class PathContext {
+        Path toSrcPath;
+        Path toTestPath;
+        Path toCoveragePath;
+        Path fromTestPath;
+        Path fromCoveragePath;
+    }
     private final Logger logger = LoggerFactory.getLogger(UploadOpponentService.class);
 
     private final FileStorageService fileStorageService;
@@ -107,64 +115,119 @@ public class UploadOpponentService {
 
     private void processLevelFolder(String classUTFileName, String classUTName, MultipartFile classUTFile,
                                     String robotType, Path volumeBasePath, File levelFolder) throws IOException {
-        if (!levelFolder.isDirectory()) {
-            logger.trace("Ignoring file {} because it is not a directory", levelFolder.getName());
-            return;
-        }
-
-        if (!levelFolder.getName().matches("\\d{2,}Level")) {
-            logger.trace("Ignoring folder {} because it is not a level", levelFolder.getName());
+        if (!isValidLevelFolder(levelFolder)) {
             return;
         }
 
         String level = levelFolder.getName();
-
         logger.info("Saving level {}", level);
-        Path toSrcPath = Paths.get(String.format("%s/%s/%s/%s/%s/%s", volumeBasePath, classUTName, robotType, BASE_CODE_PATH, level, BASE_SRC_PATH));
-        Path toTestPath = Paths.get(String.format("%s/%s/%s/%s/%s/%s", volumeBasePath, classUTName, robotType, BASE_CODE_PATH, level, BASE_TEST_PATH));
-        Path toCoveragePath = Paths.get(String.format("%s/%s/%s/%s/%s", volumeBasePath, classUTName, robotType, BASE_COVERAGE_PATH, level));
 
-        logger.info("Save SRC path {}", toSrcPath);
-        logger.info("Save TESTS path {}", toTestPath);
-        logger.info("Save COVERAGE path {}", toCoveragePath);
+        PathContext paths = buildPathContext(classUTName, robotType, volumeBasePath, level, levelFolder);
+        logPaths(paths);
 
-        Path fromTestPath;
-        Path fromCoveragePath;
-        if ("evosuite" .equalsIgnoreCase(robotType)) {
-            fromTestPath = Paths.get(String.format("%s/TestSourceCode/evosuite-tests", levelFolder));
-            fromCoveragePath = Paths.get(String.format("%s/%s", levelFolder.getPath(), "TestReport"));
-        } else {
-            fromTestPath = Paths.get(String.format("%s", levelFolder));
-            fromCoveragePath = Paths.get(String.format("%s", levelFolder.getPath()));
+        if (!isValidTestFolder(paths.fromTestPath)) {
+            return;
         }
 
-        logger.info("Robot TESTS path {}", fromTestPath);
-        logger.info("Robot COVERAGE path {}", fromCoveragePath);
+        String[][] splitPackageNames = saveSourceAndTestFiles(classUTFile, classUTFileName, classUTName,
+                robotType, paths);
+        logPackageNames(splitPackageNames);
 
+        boolean[] coverageFound = fileStorageService.saveCoverageFilesInVolume(paths.fromCoveragePath,
+                paths.toCoveragePath);
+        logCoverageStatus(levelFolder.getName(), coverageFound, paths.toCoveragePath);
+
+        generateCoverageIfNeeded(robotType, coverageFound, classUTName, splitPackageNames[0],
+                paths, volumeBasePath);
+
+        computeScoresAndPersist(classUTName, robotType, levelFolder, paths.toCoveragePath);
+    }
+
+    private boolean isValidLevelFolder(File levelFolder) {
+        if (!levelFolder.isDirectory()) {
+            logger.trace("Ignoring file {} because it is not a directory", levelFolder.getName());
+            return false;
+        }
+
+        if (!levelFolder.getName().matches("\\d{2,}Level")) {
+            logger.trace("Ignoring folder {} because it is not a level", levelFolder.getName());
+            return false;
+        }
+
+        return true;
+    }
+
+    private PathContext buildPathContext(String classUTName, String robotType, Path volumeBasePath,
+                                         String level, File levelFolder) {
+        PathContext ctx = new PathContext();
+
+        ctx.toSrcPath = Paths.get(String.format("%s/%s/%s/%s/%s/%s",
+                volumeBasePath, classUTName, robotType, BASE_CODE_PATH, level, BASE_SRC_PATH));
+        ctx.toTestPath = Paths.get(String.format("%s/%s/%s/%s/%s/%s",
+                volumeBasePath, classUTName, robotType, BASE_CODE_PATH, level, BASE_TEST_PATH));
+        ctx.toCoveragePath = Paths.get(String.format("%s/%s/%s/%s/%s",
+                volumeBasePath, classUTName, robotType, BASE_COVERAGE_PATH, level));
+
+        if ("evosuite".equalsIgnoreCase(robotType)) {
+            ctx.fromTestPath = Paths.get(String.format("%s/TestSourceCode/evosuite-tests", levelFolder));
+            ctx.fromCoveragePath = Paths.get(String.format("%s/TestReport", levelFolder.getPath()));
+        } else {
+            ctx.fromTestPath = Paths.get(levelFolder.getPath());
+            ctx.fromCoveragePath = Paths.get(levelFolder.getPath());
+        }
+
+        return ctx;
+    }
+
+    private void logPaths(PathContext paths) {
+        logger.info("Save SRC path {}", paths.toSrcPath);
+        logger.info("Save TESTS path {}", paths.toTestPath);
+        logger.info("Save COVERAGE path {}", paths.toCoveragePath);
+        logger.info("Robot TESTS path {}", paths.fromTestPath);
+        logger.info("Robot COVERAGE path {}", paths.fromCoveragePath);
+    }
+
+    private boolean isValidTestFolder(Path fromTestPath) {
         if (!Files.exists(fromTestPath)) {
             logger.info("Skipping folder {} because it does not exist", fromTestPath);
-            return;
+            return false;
         }
 
-        if (fromTestPath.toFile().listFiles().length == 0) {
+        File[] files = fromTestPath.toFile().listFiles();
+        if (files == null || files.length == 0) {
             logger.info("Skipping folder {} because it does not have any files", fromTestPath);
-            return;
+            return false;
         }
 
-        if (Arrays.stream(fromTestPath.toFile().listFiles()).noneMatch(file -> file.getName().endsWith(".java"))) {
+        if (Arrays.stream(files).noneMatch(file -> file.getName().endsWith(".java"))) {
             logger.info("Skipping folder {} because it does not contain any .java files", fromTestPath);
-            return;
+            return false;
         }
 
-        String[][] splitPackageNames = fileStorageService.saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType);
-        String[] srcPackageNameSplit = splitPackageNames[0];
-        fileStorageService.saveSrcFileInVolume(classUTFile, toSrcPath, srcPackageNameSplit, classUTFileName);
+        return true;
+    }
 
-        logger.info("SRC package names split {}", Arrays.toString(srcPackageNameSplit));
+    private String[][] saveSourceAndTestFiles(MultipartFile classUTFile, String classUTFileName,
+                                              String classUTName, String robotType, PathContext paths)
+            throws IOException {
+        String[][] splitPackageNames = fileStorageService.saveTestFilesInVolume(
+                paths.fromTestPath, paths.toTestPath, classUTName, robotType);
+
+        fileStorageService.saveSrcFileInVolume(classUTFile, paths.toSrcPath,
+                splitPackageNames[0], classUTFileName);
+
+        return splitPackageNames;
+    }
+
+    private void logPackageNames(String[][] splitPackageNames) {
+        logger.info("SRC package names split {}", Arrays.toString(splitPackageNames[0]));
         logger.info("TEST package names split {}", Arrays.toString(splitPackageNames[1]));
+    }
 
-        boolean[] coverageFound = fileStorageService.saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath);
-        logger.info("Coverage flags for {} - jacoco: {}, evosuite: {}", levelFolder.getName(), coverageFound[0], coverageFound[1]);
+    private void logCoverageStatus(String levelName, boolean[] coverageFound, Path toCoveragePath) {
+        logger.info("Coverage flags for {} - jacoco: {}, evosuite: {}",
+                levelName, coverageFound[0], coverageFound[1]);
+
         if (Files.exists(toCoveragePath)) {
             File[] covFiles = toCoveragePath.toFile().listFiles();
             if (covFiles != null) {
@@ -175,21 +238,24 @@ public class UploadOpponentService {
         } else {
             logger.info("Coverage path does not exist: {}", toCoveragePath);
         }
+    }
 
-        // Only generate Evosuite coverage when the robot type is Evosuite.
+    private void generateCoverageIfNeeded(String robotType, boolean[] coverageFound,
+                                          String classUTName, String[] srcPackageNameSplit,
+                                          PathContext paths, Path volumeBasePath) throws IOException {
         if ("evosuite".equalsIgnoreCase(robotType)) {
             logger.info("Generating Evosuite coverage for robot type {}", robotType);
-            ensureEvoCoverageIfMissing(coverageFound[1], classUTName, srcPackageNameSplit, toSrcPath, toTestPath, toCoveragePath, volumeBasePath);
+            ensureEvoCoverageIfMissing(coverageFound[1], classUTName, srcPackageNameSplit,
+                    paths.toSrcPath, paths.toTestPath,
+                    paths.toCoveragePath, volumeBasePath);
         } else if ("randoop".equalsIgnoreCase(robotType)) {
             logger.info("Skipping Evosuite coverage generation for robot type {}", robotType);
-            // Generate Jacoco coverage for non-Evosuite robots (and also for Evosuite if needed separately).
-            ensureJacocoCoverageIfMissing(coverageFound[0], classUTName, toSrcPath, toTestPath, toCoveragePath, volumeBasePath);
+            ensureJacocoCoverageIfMissing(coverageFound[0], classUTName,
+                    paths.toSrcPath, paths.toTestPath,
+                    paths.toCoveragePath, volumeBasePath);
         } else {
             logger.error("Unknown robot type {}, skipping coverage generation", robotType);
         }
-
-        
-        computeScoresAndPersist(classUTName, robotType, levelFolder, toCoveragePath);
     }
 
     private void ensureEvoCoverageIfMissing(boolean evosuiteFound, String classUTName, String[] srcPackageNameSplit,

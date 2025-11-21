@@ -1,0 +1,275 @@
+@startuml Upload_Class_Diagram_With_FE_v2
+
+' Server-side packages
+package "controller" {
+  class OpponentController {
+    +uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip) : ResponseEntity<FileUploadResponse>
+    +downloadClasse(name) : ResponseEntity<?>
+    note right: @RequestMapping("/opponents")
+  }
+}
+
+package "service" {
+  class OpponentService {
+    -uploadOpponentService : UploadOpponentService
+    -classRepository : ClassRepository
+    -opponentRepository : OpponentRepository
+    -apiGatewayClient : ApiGatewayClient
+    -fileStorageService : FileStorageService
+    -operationRepository : OperationRepository
+    -mongoTemplate : MongoTemplate
+    -searchRepository : SearchRepositoryImpl
+    +uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip) : ResponseEntity<FileUploadResponse>
+    +downloadClasse(name) : ResponseEntity<Object>
+    +eliminaClasse(name) : ResponseEntity<Object>
+    +getAllOpponents() : List<Opponent>
+    +getAllClassUTs() : List<ClassUT>
+    +getOpponentData(classUT, type, difficulty) : Opponent
+    +getOpponentEvosuiteScore(classUT, type, difficulty) : EvosuiteScore
+    +getOpponentJacocoScore(classUT, type, difficulty) : JacocoScore
+    +getOpponentCoverage(classUT, type, difficulty) : String
+  }
+
+  class UploadOpponentService {
+    +VOLUME_T0_BASE_PATH : String = "/VolumeT0/FolderTree/ClassUT/"
+    +UNMODIFIED_SRC : String = "unmodified_src"
+    +BASE_SRC_PATH : String = "src/main/java"
+    +BASE_TEST_PATH : String = "src/test/java"
+    +BASE_COVERAGE_PATH : String = "coverage"
+    -fileStorageService : FileStorageService
+    -coverageService : CoverageService
+    -opponentPersistenceService : OpponentPersistenceService
+    +saveOpponentsFromZip(classUTFileName, classUTName, classUTFile, robotTestsZip) : void
+    -uploadNewOpponents(classUTFileName, classUTName, classUTFile, operationTmpFolder, robotType, volumeBasePath) : void
+    -processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, volumeBasePath, levelFolder) : void
+    -generateCoverageIfNeeded(robotType, coverageFound, classUTName, srcPackageNameSplit, paths, volumeBasePath) : void
+    -computeScoresAndPersist(classUTName, robotType, levelFolder, toCoveragePath) : void
+  }
+
+  class FileStorageService {
+    +saveFileInFileSystem(fileName, directory, multipartFile) : void
+    +extractZipIn(path) : void
+    +copyDirectoryRecursively(source, dest) : void
+    +zipDirectory(srcDir, zipPath) : void
+    +deleteDirectoryRecursively(path) : void
+    +saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType) : String[][]
+    +saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName) : void
+    +saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath) : boolean[]
+    +writeStringToFile(content, file) : void
+  }
+
+  class CoverageService {
+    -apiGatewayClient : ApiGatewayClient
+    +generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip) : EvosuiteCoverageDTO
+    +generateMissingJacocoCoverage(classUTName, zip) : JacocoCoverageDTO
+  }
+
+  class OpponentPersistenceService {
+    -opponentRepository : OpponentRepository
+    -apiGatewayClient : ApiGatewayClient
+    +saveOpponentAndNotify(opponent) : void
+  }
+}
+
+package "util.filesystem.upload" {
+  class FileUploadUtil {
+    +saveCLassFile(fileName, className, file) : void
+  }
+}
+
+package "util.filesystem" {
+  class FileDownloadUtil {
+    +downloadClassFile(uri) : ResponseEntity
+  }
+}
+
+package "api" {
+  class RestExchangeTemplateHelper {
+    +exchange(url, uriVariables, method, headers, body, responseType) : ResponseEntity
+  }
+
+  class ApiGatewayClient {
+    -exchangeHelper : RestExchangeTemplateHelper
+    -userServiceUrl : String
+    -jacocoCoverageServiceUrl : String
+    -evosuiteCoverageServiceUrl : String
+    +callGenerateMissingEvoSuiteCoverage(classUTName, classUTPackageName, zip) : EvosuiteCoverageDTO
+    +callGenerateMissingJacocoCoverage(classUTName, zip) : JacocoCoverageDTO
+    +callAddNewOpponent(classUT, gameMode, type, difficulty) : void
+    +callDeleteAllClassUTOpponents(classUT) : void
+    +callValidateJwtToken(jwtToken) : JwtValidationResponseDTO
+    +callRefreshJwtToken(refreshToken) : String
+  }
+}
+
+package "persistence" {
+  class OpponentRepository {
+    +saveOpponent(opponent) : void
+    +findOpponent(classUT, type, difficulty) : Optional<Opponent>
+    +deleteAll() : void
+  }
+
+  class ClassRepository {
+    +save(classUT) : void
+    +findAll() : List<ClassUT>
+    +delete(classUT) : void
+  }
+
+  class OperationRepository {
+    +save(operation) : void
+    +count() : long
+  }
+
+  class SearchRepositoryImpl {
+    +findByText(name) : List<ClassUT>
+    +filterByDifficulty(difficulty) : List<ClassUT>
+    +orderByDate() : List<ClassUT>
+    +orderByName() : List<ClassUT>
+  }
+}
+
+' Domain / DTOs
+class FileUploadResponse {
+  +fileName : String
+  +size : long
+  +downloadUri : String
+  +errorMessage : String
+}
+
+class ClassUT {
+  +name : String
+  +date : String
+  +difficulty : String
+  +description : String
+  +category : String
+  +uri : String
+}
+
+class Opponent {
+  +classUT : String
+  +opponentType : String
+  +opponentDifficulty : OpponentDifficulty
+  +coverage : String
+  +evosuiteScore : EvosuiteScore
+  +jacocoScore : JacocoScore
+}
+
+class EvosuiteScore {
+  +lineCoverage : Coverage
+  +branchCoverage : Coverage
+  +exceptionCoverage : Coverage
+  +weakMutationCoverage : Coverage
+  +outputCoverage : Coverage
+  +methodCoverage : Coverage
+  +methodNoExceptionCoverage : Coverage
+  +cBranchCoverage : Coverage
+}
+
+class JacocoScore {
+  +lineCoverage : Coverage
+  +branchCoverage : Coverage
+  +instructionCoverage : Coverage
+}
+
+class Coverage {
+  +covered : int
+  +total : int
+}
+
+class EvosuiteCoverageDTO {
+  +resultFileContent : String
+}
+
+class JacocoCoverageDTO {
+  +coverage : String
+}
+
+class OpponentDTO {
+  +classUT : String
+  +gameMode : GameMode
+  +type : String
+  +difficulty : OpponentDifficulty
+}
+
+' Frontend package (client-side)
+package "frontend (templates + static JS)" {
+  class "opponents_upload.html" {
+    +className : input
+    +date : input
+    +difficulty : select
+    +description : textarea
+    +category1 : input
+    +category2 : input
+    +category3 : input
+    +fileInput : file input
+    +zipRobotInput : file input
+    +uploadButton : button
+    +loadingOverlay : overlay
+    +successModal : modal
+  }
+
+  class OpponentsUploadJS {
+    +uploadOpponent() : Promise
+    +uploadButtonState() : void
+    +goBack() : void
+    +redirectToClass() : void
+  }
+
+  class ApiJS {
+    +callUploadOpponent(body) : Promise
+    +returnDataOnSuccessTemplate(args, parseResponse) : Promise
+    +redirectOnSuccessTemplate(args, opts) : Promise
+    +handleApiErrors(response) : Promise
+  }
+
+  class EndpointsJS {
+    +API_ADMIN_SERVICE_PREFIX : "/api/adminService"
+    +APIS : object
+    +VIEWS : object
+  }
+
+  class RenderErrorsJS {
+    +addErrorDiv(parent, msg) : void
+    +clearPreviousErrorsMsgs(elements) : void
+  }
+}
+
+' Relationships - server side
+OpponentController --> OpponentService : delegates
+OpponentService --> UploadOpponentService : uses
+OpponentService --> FileUploadUtil : uses
+OpponentService --> FileStorageService : uses
+OpponentService --> ClassRepository : persists
+OpponentService --> OperationRepository : persists
+OpponentService --> OpponentRepository : queries
+OpponentService --> ApiGatewayClient : uses
+OpponentService --> SearchRepositoryImpl : searches
+OpponentController --> FileDownloadUtil : uses
+
+UploadOpponentService --> FileStorageService : uses
+UploadOpponentService --> CoverageService : generates coverage
+UploadOpponentService --> OpponentPersistenceService : persists opponents
+
+CoverageService --> ApiGatewayClient : calls external services
+OpponentPersistenceService --> OpponentRepository : persists
+OpponentPersistenceService --> ApiGatewayClient : notifies other services
+
+ApiGatewayClient --> RestExchangeTemplateHelper : uses
+
+' Relationships - frontend -> backend
+OpponentsUploadJS --> ApiJS : calls (callUploadOpponent)
+ApiJS --> "API Gateway (/api/adminService)" : POST /api/adminService/opponents (FormData)
+"API Gateway (/api/adminService)" --> OpponentController : route POST /opponents (FormData)
+EndpointsJS --> ApiJS : provides APIS.UPLOAD_OPPONENT
+"opponents_upload.html" --> OpponentsUploadJS : binds DOM elements (fileInput, zipRobotInput, uploadButton)
+"opponents_upload.html" --> RenderErrorsJS : uses for displaying field errors
+ApiJS --> RenderErrorsJS : uses to inject field errors into page
+ApiJS ..> FileUploadResponse : expects JSON response on success
+ApiJS ..> FileUploadResponse : expects error JSON (errors array or error DTO) on fail
+
+' Data contract (FormData fields)
+note "FormData (multipart/form-data) keys:\n - classUTFile (file)\n - classUTDetails (JSON string)\n - robotTestsZip (file)" as FD
+ApiJS .. FD
+OpponentController .. FD
+
+@enduml
