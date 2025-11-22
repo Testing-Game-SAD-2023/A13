@@ -23,6 +23,6 @@ public class ScalataViewController {
 
     @GetMapping("/main")
     public ModelAndView showScalata(HttpServletRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
-        return new ModelAndView("/scalata/scalata_main");
+        return new ModelAndView("scalata/scalata_main");
     }
 }
