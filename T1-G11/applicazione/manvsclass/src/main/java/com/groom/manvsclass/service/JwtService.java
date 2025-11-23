@@ -22,36 +22,59 @@ public class JwtService {
         Instant expiration = now.plus(1, ChronoUnit.HOURS);
 
         return Jwts.builder()
-                .setSubject(admin.getUsername()) // .setSubject() imposta il soggetto del token JWT; il soggetto di solito rappresenta l'identità a cui si applica il token
+                .setSubject(admin.getEmail())
+                .claim("nome", admin.getNome())
+                .claim("cognome", admin.getCognome())
                 .setIssuedAt(Date.from(now)) // .setIssuedAt() imposta il timestamp di emissione del token
                 .setExpiration(Date.from(expiration)) //.setExpiration() imposta il timestamp di scadenza del token
-                .claim("admin_email", admin.getEmail()) //.claim() aggiunge una serie di informazioni aggiuntive
-                .signWith(SignatureAlgorithm.HS256, "mySecretKeyAdmin") //.signWith() serve per firmare il token JWT utilizzando l'algoritmo di firma HMAC-SHA256 e una chiave segreta specificata
+                .signWith(SignatureAlgorithm.HS256, "mySecretKey") //.signWith() serve per firmare il token JWT utilizzando l'algoritmo di firma HMAC-SHA256 e una chiave segreta specificata
                 .compact(); //.compact() serve a compattare il token JWT in una stringa valida che può essere facilmente trasferita tramite HTTP o memorizzata in altri luoghi di archiviazione come cookie
     }
 
     public boolean isJwtValid(String jwt) {
-        return false;
+        try {
+            Jwts.parser()
+                    .setSigningKey("mySecretKey")
+                    .parseClaimsJws(jwt);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    // Estrae l'username dell'admin dal JWT
-    public String getAdminFromJwt(String jwt) {
+    // Estrae l'email dell'admin dal JWT
+    public String getAdminEmailFromJwt(String jwt) {
         try {
             Claims claims = Jwts.parser()
-                    .setSigningKey("mySecretKeyAdmin")
+                    .setSigningKey("mySecretKey")
                     .parseClaimsJws(jwt)
                     .getBody();
 
-            System.out.println("JWT:" + claims);
-            // Estrae l'ID dell'admin dalla claim
             return claims.getSubject();
         } catch (Exception e) {
-            System.err.println("Errore nell'estrazione dell'username dell'admin: " + e);
-            return null; // Ritorna null se non riesce a estrarre l'ID
+            System.err.println("Errore nell'estrazione dell'email dell'admin: " + e);
+            return null; // Ritorna null se non riesce a estrarre l'email
+        }
+    }
+
+    public Admin getAdminFromJwt(String jwt) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey("mySecretKey")
+                    .parseClaimsJws(jwt)
+                    .getBody();
+
+            Admin admin = new Admin();
+            admin.setEmail(claims.getSubject());
+            admin.setNome(claims.get("nome", String.class));
+            admin.setCognome(claims.get("cognome", String.class));
+
+            return admin;
+        } catch (Exception e) {
+            System.err.println("Errore nell'estrazione dell'admin dal token: " + e);
+            return null;
         }
     }
 
 
 }
-
-    

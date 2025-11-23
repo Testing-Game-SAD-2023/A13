@@ -2,8 +2,10 @@ package com.groom.manvsclass.controller;
 
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Opponent;
-import com.groom.manvsclass.model.dto.OpponentSummaryDTO;
+import com.groom.manvsclass.dto.OpponentSummaryDTO;
 import com.groom.manvsclass.service.OpponentService;
+import com.groom.manvsclass.service.JwtService;
+import com.groom.manvsclass.service.AdminService;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,43 +20,57 @@ import testrobotchallenge.commons.models.dto.score.basic.JacocoScoreDTO;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
+import com.groom.manvsclass.security.JwtRequestContext;
+import com.groom.manvsclass.exception.NotFoundException;
+import com.groom.manvsclass.exception.ForbiddenException;
+
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/opponents")
 public class OpponentController {
 
     private static final Logger logger = LoggerFactory.getLogger(OpponentController.class);
-    private final OpponentService opponentService;
 
-    public OpponentController(OpponentService opponentService) {
-        this.opponentService = opponentService;
-    }
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private OpponentService opponentService;
+    @Autowired
+    private AdminService adminService;
 
-    @GetMapping("/elencoNomiClassiUT")
+    @GetMapping("/opponents/elencoNomiClassiUT")
     public ResponseEntity<?> getNomiClassiUT(@CookieValue(name = "jwt", required = false) String jwt) {
         return opponentService.getNomiClassiUT(jwt);
     }
 
 
-    @PostMapping("/update/{name}")
+    @PostMapping("/opponents/update/{name}")
     public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
-        return opponentService.modificaClasse(name, newContent, jwt, request);
+
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'admin dal token JWT");
+        }
+
+        return opponentService.modificaClasse(name, newContent, adminEmail, request);
     }
 
-
-    // OPPONENTS ENDPOINT
-    @GetMapping("")
+    @GetMapping("/opponents")
     public ResponseEntity<List<Opponent>> getAllOpponents() {
         return ResponseEntity.ok(opponentService.getAllOpponents());
     }
 
-    @GetMapping("/classes/summary")
+    @GetMapping("/opponents/classes/summary")
     public ResponseEntity<List<String>> getAllClassesAsSummary() {
         logger.info("[GET /classes/summary] Request received");
         List<ClassUT> classes = opponentService.getAllClassUTs();
@@ -67,27 +83,27 @@ public class OpponentController {
         return ResponseEntity.ok(classesAsSummary);
     }
 
-    @GetMapping("/summary")
+    @GetMapping("/opponents/summary")
     public ResponseEntity<List<OpponentSummaryDTO>> getAllOpponentsAsSummary() {
         logger.info("[GET /summary] Request received");
         List<Opponent> opponents = opponentService.getAllOpponents();
         logger.info("[GET /summary] Opponents found: {}", opponents);
         List<OpponentSummaryDTO> response = new ArrayList<>();
         for (Opponent opponent : opponents) {
-            response.add(new OpponentSummaryDTO(opponent.getClassUT(),
-                    opponent.getOpponentType(), opponent.getOpponentDifficulty()));
+            response.add(new OpponentSummaryDTO(opponent.getClassUT().getName(),
+                    opponent.getType(), opponent.getOpponentDifficulty()));
         }
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{classUT}/{opponentType}/{opponentDifficulty}/score")
+    @GetMapping("/opponents/{classUT}/{opponentType}/{opponentDifficulty}/score")
     public ResponseEntity<Opponent> getOpponentData(@PathVariable("classUT") String classUT,
                                                     @PathVariable("opponentType") String type,
                                                     @PathVariable("opponentDifficulty") OpponentDifficulty difficulty) {
         return ResponseEntity.ok(opponentService.getOpponentData(classUT, type, difficulty));
     }
 
-    @GetMapping("/{classUT}/{opponentType}/{opponentDifficulty}/score/evosuite")
+    @GetMapping("/opponents/{classUT}/{opponentType}/{opponentDifficulty}/score/evosuite")
     public ResponseEntity<EvosuiteScoreDTO> getOpponentEvosuiteScore(@PathVariable("classUT") String classUT,
                                                                      @PathVariable("opponentType") String type,
                                                                      @PathVariable("opponentDifficulty") OpponentDifficulty difficulty) {
@@ -96,7 +112,7 @@ public class OpponentController {
         return ResponseEntity.ok(EvosuiteScoreMapper.toEvosuiteScoreDTO(score));
     }
 
-    @GetMapping("/{classUT}/{opponentType}/{opponentDifficulty}/score/jacoco")
+    @GetMapping("/opponents/{classUT}/{opponentType}/{opponentDifficulty}/score/jacoco")
     public ResponseEntity<JacocoScoreDTO> getOpponentJacocoScore(@PathVariable("classUT") String classUT,
                                                                  @PathVariable("opponentType") String type,
                                                                  @PathVariable("opponentDifficulty") OpponentDifficulty difficulty) {
@@ -104,7 +120,7 @@ public class OpponentController {
         return ResponseEntity.ok(JacocoScoreMapper.toJacocoScoreDTO(score));
     }
 
-    @GetMapping("/{classUT}/{opponentType}/{opponentDifficulty}/coverage")
+    @GetMapping("/opponents/{classUT}/{opponentType}/{opponentDifficulty}/coverage")
     public ResponseEntity<String> getOpponentCoverage(@PathVariable("classUT") String classUT,
                                                       @PathVariable("opponentType") String type,
                                                       @PathVariable("opponentDifficulty") OpponentDifficulty difficulty) {
@@ -112,17 +128,30 @@ public class OpponentController {
     }
 
 
-    @PostMapping("")
-    public ResponseEntity<FileUploadResponse> uploadClassAndOpponents(
+    @PostMapping("/opponents")
+    public ResponseEntity<?> uploadClassAndOpponents(
             @RequestParam("classUTFile") MultipartFile classUTFile,
             @RequestParam("classUTDetails") String classUTDetails,
             @RequestParam("robotTestsZip") MultipartFile robotTestsZip
     ) throws IOException {
-        return opponentService.uploadOpponent(classUTFile, classUTDetails, robotTestsZip);
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            throw new RuntimeException("Auth token is missing from context");
+        }
+
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        if(!adminService.existsAdminById(adminEmail)) {
+
+            adminService.saveAdmin(jwtService.getAdminFromJwt(jwt));
+        }
+
+        return opponentService.uploadOpponent(classUTFile, classUTDetails, robotTestsZip, adminEmail);
     }
 
 
-    @GetMapping("/downloadFile/{name}")
+    @GetMapping("/opponents/download/{name}")
     public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) {
         try {
             return opponentService.downloadClasse(name);
@@ -133,8 +162,26 @@ public class OpponentController {
         }
     }
 
-    @DeleteMapping("/{classUT}")
+    @DeleteMapping("/opponents/{classUT}")
     public ResponseEntity<?> deleteClassUT(@PathVariable("classUT") String classUT) {
-        return opponentService.eliminaClasse(classUT);
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            throw new RuntimeException("Auth token is missing from context");
+        }
+
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'admin dal token JWT");
+        }
+
+        try {
+            opponentService.eliminaClasse(classUT, adminEmail);
+            return ResponseEntity.status(HttpStatus.OK).body("Classe eliminata con successo.");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore" );
+        }
     }
 }

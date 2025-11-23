@@ -1,4 +1,4 @@
-package com.groom.manvsclass.service.exception;
+package com.groom.manvsclass.exception;
 
 public class OpponentNotFoundException extends RuntimeException {
     private final String field;

@@ -2,24 +2,35 @@ package com.groom.manvsclass.service;
 
 //E' giusto una classe per inviare correttamente la richiesta di modifica del nome
 //Da eliminare -> inutile
+
 public class TeamModificationRequest {
-    private String idTeam;
-    private String newName;
 
-    // Getters and setters
-    public String getIdTeam() {
-        return idTeam;
+    private String teamOldName;
+    private String teamNewName;
+
+    public TeamModificationRequest() {
+        teamOldName = "";
+        teamNewName = "";
     }
 
-    public void setIdTeam(String idTeam) {
-        this.idTeam = idTeam;
+    public TeamModificationRequest(String teamOldName, String teamNewName) {
+        this.teamOldName = teamOldName;
+        this.teamNewName = teamNewName;
     }
 
-    public String getNewName() {
-        return newName;
+    public String getTeamOldName() {
+        return teamOldName;
     }
 
-    public void setNewName(String newName) {
-        this.newName = newName;
+    public void setTeamOldName(String teamOldName) {
+        this.teamOldName = teamOldName;
+    }
+
+    public String getTeamNewName() {
+        return teamNewName;
+    }
+
+    public void setTeamNewName(String teamNewName) {
+        this.teamNewName = teamNewName;
     }
 }

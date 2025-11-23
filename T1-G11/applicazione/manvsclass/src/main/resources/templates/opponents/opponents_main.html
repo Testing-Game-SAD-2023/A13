@@ -1,130 +1,227 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title th:text="#{class_title}">Classi</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{class_title}">Classi</title>
 
-  <!-- Bootstrap & Font Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/t1/css/class.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/t1/css/class.css" rel="stylesheet">
 </head>
 
 <body>
 <div id="main-content" class="file_manager">
-  <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
-        <a id="navDashboardAdmin" class="navbar-brand" href="/#">
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
-            <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Zm9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382l.045-.148ZM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/>
-          </svg>
-        </a>
+    <div class="container">
 
-        <a id="navOpponentsMain" class="navbar-brand" href="/#" th:text="#{class_title}">Classi</a>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a id="navDashboardAdmin" class="navbar-brand" href="/#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                         class="bi bi-person-fill-gear" viewBox="0 0 16 16">
+                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Zm9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382l.045-.148ZM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/>
+                    </svg>
+                </a>
+                <a id="navOpponentsMain" class="navbar-brand" href="/#" th:text="#{class_title}">Classi</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a id="navDashboardAdmin2" class="nav-link" href="/#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="navOpponentsUpload" class="nav-link" href="/#" th:text="#{class_navbar_add}">
+                                Aggiungi Classe e Robot
+                            </a>
+                        </li>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a id="navDashboardAdmin2" class="nav-link" href="/#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a id="navOpponentsUpload" class="nav-link" href="/#" th:text="#{class_navbar_add}">Aggiungi Classe e Robot</a>
-            </li>
-
-            <!-- Ordina per -->
-            <ul class="navbar-nav">
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="sortByDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">Ordina per</a>
-                <div class="dropdown-menu" aria-labelledby="sortByDropdown">
-                  <a id="linkSortByDate" class="dropdown-item" href="#" th:text="#{class_navbar_sort_date}">Data</a>
-                  <a id="linkSortByName" class="dropdown-item" href="#" th:text="#{class_navbar_sort_name}">Nome</a>
+                        <li class="nav-item">
+                            <a id="navAddGuidelines" class="nav-link" href="#">Linee guida</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="sortByDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ordina per</a>
+                            <div class="dropdown-menu" aria-labelledby="sortByDropdown">
+                                <a id="linkSortByDate" class="dropdown-item" href="#"
+                                   th:text="#{class_navbar_sort_date}">Data</a>
+                                <a id="linkSortByName" class="dropdown-item" href="#"
+                                   th:text="#{class_navbar_sort_name}">Nome</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="filterDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filtra per difficoltà</a>
+                            <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                                <a id="linkFilterDifficultyEasy" class="dropdown-item" href="#"
+                                   th:text="#{difficulty_beginner}">Facile</a>
+                                <a id="linkFilterDifficultyMedium" class="dropdown-item" href="#"
+                                   th:text="#{difficulty_intermediate}">Medio</a>
+                                <a id="linkFilterDifficultyHard" class="dropdown-item" href="#"
+                                   th:text="#{difficulty_advanced}">Difficile</a>
+                            </div>
+                        </li>
+                    </ul>
+                    <form id="searchForm" class="form-inline my-2 my-lg-0">
+                        <input id="searchInput" class="form-control mr-sm-2" type="search" name="search"
+                               placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" th:text="#{search}">Cerca
+                        </button>
+                    </form>
                 </div>
-              </li>
+            </div>
+        </nav>
 
-              <!-- Filtra per -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="filterDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">Filtra per difficoltà</a>
-                <div class="dropdown-menu" aria-labelledby="filterDropdown">
-                  <a id="linkFilterDifficultyEasy" class="dropdown-item" href="#" th:text="#{difficulty_beginner}">Facile</a>
-                  <a id="linkFilterDifficultyMedium" class="dropdown-item" href="#" th:text="#{difficulty_intermediate}">Medio</a>
-                  <a id="linkFilterDifficultyHard" class="dropdown-item" href="#" th:text="#{difficulty_advanced}">Difficile</a>
+        <br>
+
+        <details id="global-guidelines-container" class="mb-4 shadow-sm">
+            <summary class="bg-info text-white p-3 rounded"
+                     style="cursor: pointer; outline: none;">
+
+                <h5 class="mb-0 d-inline align-middle">
+                    <i class="fa fa-info-circle mr-2"></i>
+                    Linee Guida Generali
+                </h5>
+
+                <div class="float-right" onclick="event.stopPropagation()">
+                    <input type="file"
+                           id="guidelinesInput"
+                           style="display: none;"
+                           accept=".json"
+                           onchange="handleGuidelinesUpload(this)">
+
+                    <label for="guidelinesInput" class="btn btn-light btn-sm text-info mb-0" style="cursor: pointer;">
+                        <i class="fa fa-upload"></i> Upload
+                    </label>
                 </div>
-              </li>
+            </summary>
+
+            <ul id="global-guidelines-list" class="list-group list-group-flush mt-2">
+                <li class="list-group-item bg-transparent text-muted text-center"></li>
             </ul>
-          </ul>
+        </details>
 
-          <!-- Form di ricerca -->
-          <form id="searchForm" class="form-inline my-2 my-lg-0">
-            <input id="searchInput" class="form-control mr-sm-2" type="search" name="search" placeholder="Search"
-                   aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" th:text="#{search}">Cerca</button>
-          </form>
-        </div>
-      </div>
-    </nav>
+        <details th:each="class : ${classUTs}">
+            <summary th:text="${class.name}"></summary>
+            <p>
+                <span th:each="cat : ${class.categories}" class="badge badge-info mr-1"
+                      th:text="${cat.name}"></span>
+                &emsp;&emsp;&emsp;&emsp;
+                <small class="date text-success"
+                       th:text="#{${'difficulty_' + class.difficulty.name().toLowerCase()}}"></small>
+                <span class="date text-muted" th:text="${class.date}"></span>
+            </p>
+            <p><small class="date text-muted" th:text="${class.description}"></small></p>
 
-    <br>
+            <p>
+                <button type="button"
+                        th:attr="onclick=|deleteClassUT('${class.name}')|"
+                        class="btn btn-icon btn-danger">
+                    <i class="fa fa-trash"></i>
+                </button>
 
-    <!-- Container classi -->
-    <details th:each="class : ${classUTs}">
-      <summary th:text="${class.name}"></summary>
-      <p>
-        <span class="badge badge-info" th:text="${class.category[0]}"></span>
-        <span class="badge badge-info" th:text="${class.category[1]}"></span>
-        <span class="badge badge-info" th:text="${class.category[2]}"></span>
-        &emsp;&emsp;&emsp;&emsp;
-        <small class="date text-success" th:text="#{${'difficulty_' + class.difficulty.toLowerCase()}}"></small>
-        <span class="date text-muted" th:text="${class.date}"></span>
-      </p>
-      <p><small class="date text-muted" th:text="${class.description}"></small></p>
-      <p>
-        <button type="button"
-                th:attr="onclick=|deleteClassUT('${class.name}')|"
-                class="btn btn-icon btn-danger">
-          <i class="fa fa-trash"></i>
-        </button>
-        <button type="button"
-                th:attr="onclick=|downloadClassUT('${class.name}')|"
-                class="btn btn-success btn-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-               class="bi bi-arrow-down-circle" viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-                  d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
-          </svg>
-          Download
-        </button>
-      </p>
-    </details>
+                <button type="button"
+                        th:attr="onclick=|downloadClassUT('${class.name}')|"
+                        class="btn btn-success btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-arrow-down-circle" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                              d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                    </svg>
+                    Download
+                </button>
 
+                <input type="file"
+                       th:id="|uploadInput_${class.name}|"
+                       style="display: none;"
+                       accept=".json"
+                       th:attr="onchange=|handleUpload(this, '${class.name}')|"/>
 
-    <!-- Script -->
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+                <label th:for="|uploadInput_${class.name}|"
+                       class="btn btn-primary btn-sm"
+                       style="margin-bottom: 0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-arrow-up-circle" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                              d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707l-2.146 2.147a.5.5 0 0 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                    </svg>
+                    Upload
+                </label>
+            </p>
 
-    <script th:src="@{/t1/js/utils/endpoints.js}"></script>
-    <script th:src="@{/t1/js/utils/api.js}"></script>
-    <script th:src="@{/t1/js/utils/cookie_util.js}"></script>
-    <script th:src="@{/t1/js/utils/renderErrors.js}"></script>
+            <details th:if="${class.suggestions != null && !class.suggestions.isEmpty()}"
+                     th:id="|suggestions-container_${class.name}|"
+                     style="margin-left: 20px; margin-top: 10px;">
 
-    <script th:src="@{/t1/js/opponents/opponents_main.js}"></script>
+                <summary>Suggerimenti</summary>
 
-    <script th:inline="javascript">
-        const errors = {
-            notHandled: /*[[#{error.nothandled}]]*/ "Si è verificato un errore, riprova più tardi"
-        };
-    </script>
-  </div>
+                <ul th:id="|suggestions-list_${class.name}|"
+                    style="font-size: 0.9em; color: #333; margin-top: 5px; padding-left: 0; list-style-type: none;">
+
+                    <li th:each="suggestion : ${class.suggestions}" class="d-flex justify-content-between align-items-start mb-1 border-bottom pb-2">
+                        <div class="w-100">
+                            <div class="d-flex align-items-center mb-1">
+                                <span th:text="${suggestion.title}" class="font-weight-bold mr-2"></span>
+
+                                <span th:if="${suggestion.level != null}"
+                                      th:text="${suggestion.level}"
+                                      th:classappend="${suggestion.level.name() == 'LOW' ? 'badge-success' : (suggestion.level.name() == 'MEDIUM' ? 'badge-warning' : 'badge-danger')}"
+                                      class="badge mr-2"></span>
+
+                                <small class="text-muted"
+                                       th:text="${#temporals.format(suggestion.date, 'yyyy-MM-dd')}">
+                                </small>
+                            </div>
+
+                            <div th:text="${suggestion.hint}" class="text-dark mb-1"></div>
+
+                            <div th:if="${suggestion.base64Image != null}" class="mt-2">
+                                <img th:src="${'data:image/png;base64,' + suggestion.base64Image}"
+                                     class="img-fluid rounded border"
+                                     style="max-height: 200px; max-width: 100%;"
+                                     alt="Immagine suggerimento" />
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger ml-3 mt-1"
+                                th:onclick="deleteSuggestion([[${class.name}]], [[${suggestion.title}]])"
+                                title="Elimina suggerimento">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </li>
+                </ul>
+            </details>
+
+        </details>
+
+        <details id="suggestions-container_TEMPLATE"
+                 style="display: none; margin-left: 20px; margin-top: 10px;">
+            <summary>Suggerimenti</summary>
+            <ul style="font-size: 0.9em; color: #333; margin-top: 5px; padding-left: 0; list-style-type: none;">
+            </ul>
+        </details>
+
+        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script th:src="@{/t1/js/utils/endpoints.js}"></script>
+        <script th:src="@{/t1/js/utils/api.js}"></script>
+        <script th:src="@{/t1/js/utils/cookie_util.js}"></script>
+        <script th:src="@{/t1/js/utils/renderErrors.js}"></script>
+
+        <script th:src="@{/t1/js/opponents/opponents_main.js}"></script>
+
+        <script th:inline="javascript">
+            const errors = {
+                notHandled: /*[[#{error.nothandled}]]*/ "Si è verificato un errore, riprova più tardi"
+            };
+        </script>
+    </div>
 </div>
 </body>
-
 </html>

@@ -1,81 +1,38 @@
 package com.groom.manvsclass.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.groom.manvsclass.model.Admin;
 
-import javax.persistence.GeneratedValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Document(collection = "achievements")
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "achievements")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Achievement {
-    @Id
-    @GeneratedValue // Auto-Increment
-    private String ID;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+	
     private String name;
     private String description;
     private String statistic;
     private float progressRequired;
-
-    public Achievement() {
-
-    }
-
-    public Achievement(String ID, String name, String description, String statistic, float progressRequired) {
-        this.ID = ID;
-        this.name = name;
-        this.description = description;
-        this.statistic = statistic;
-        this.progressRequired = progressRequired;
-    }
-
-    public String getID() {
-        return ID;
-    }
-
-    public void setID(String ID) {
-        this.ID = ID;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getStatistic() {
-        return statistic;
-    }
-
-    public void setStatistic(String statistic) {
-        this.statistic = statistic;
-    }
-
-    public float getProgressRequired() {
-        return progressRequired;
-    }
-
-    public void setProgressRequired(float progressRequired) {
-        this.progressRequired = progressRequired;
-    }
-
-    @Override
-    public String toString() {
-        return "Achievement{" +
-                "ID=" + ID +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", statistic=" + statistic +
-                ", progressRequired=" + progressRequired +
-                '}';
-    }
+	
+	@ManyToOne
+	@JoinColumn(name = "admin_email", referencedColumnName = "email")
+	private Admin admin;
 }

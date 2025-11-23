@@ -22,26 +22,32 @@
 package com.groom.manvsclass.controller;
 
 import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.interaction;
+import com.groom.manvsclass.model.Interaction;
 import com.groom.manvsclass.service.AdminService;
+import com.groom.manvsclass.service.JwtService;
 import com.groom.manvsclass.util.Util;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+
+import com.groom.manvsclass.exception.NotFoundException;
+import com.groom.manvsclass.exception.ForbiddenException;
 
 import java.util.List;
 
 @CrossOrigin
-@Controller
+@RestController
 public class HomeController {
 
-    private final AdminService adminService;
-    private final Util utilsService;
-
-    public HomeController(AdminService adminService, Util utilsService) {
-        this.adminService = adminService;
-        this.utilsService = utilsService;
-    }
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private AdminService adminService;
+    @Autowired
+    private Util utilsService;
 
     //Solo x testing
     @GetMapping("/getLikes/{name}")
@@ -52,28 +58,58 @@ public class HomeController {
     }
 
     @PostMapping("/newinteraction")
-    public ResponseEntity<interaction> uploadInteraction(@RequestBody interaction interazione) {
-        interaction savedInteraction = utilsService.uploadInteraction(interazione);
+    public ResponseEntity<Interaction> uploadInteraction(@RequestBody Interaction interazione) {
+        Interaction savedInteraction = utilsService.uploadInteraction(interazione);
         return ResponseEntity.ok(savedInteraction);
     }
 
     @GetMapping("/Cfilterby/{category}")
-    public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
-        return adminService.filtraClassi(category, jwt);
+    public ResponseEntity<?> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
+
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        try {
+            List<ClassUT> filteredClasses = adminService.filtraClassi(category);
+            return ResponseEntity.ok(filteredClasses);
+
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il recupero delle classi: " + e.getMessage());
+        }
+
     }
 
     @GetMapping("/Cfilterby/{text}/{category}")
-    public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
-        return adminService.filtraClassi(text, category, jwt);
+    public ResponseEntity<?> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
+
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        try {
+            List<ClassUT> filteredClasses = adminService.filtraClassi(text, category);
+            return ResponseEntity.ok(filteredClasses);
+
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il recupero delle classi: " + e.getMessage());
+        }
+
     }
 
     @GetMapping("/interaction")
-    public List<interaction> elencaInt() {
+    public List<Interaction> elencaInt() {
         return utilsService.elencaInt();
     }
 
     @GetMapping("/findReport")
-    public List<interaction> elencaReport() {
+    public List<Interaction> elencaReport() {
         return utilsService.elencaReport();
     }
 
@@ -88,8 +124,10 @@ public class HomeController {
     }
 
     @PostMapping("/deleteint/{id}")
-    public interaction eliminaInteraction(@PathVariable int id) {
-        return utilsService.eliminaInteraction(id);
+    public Interaction eliminaInteraction(@PathVariable String id) {
+
+        Long interactionId = Long.parseLong(id);
+        return utilsService.eliminaInteraction(interactionId);
     }
 }
 

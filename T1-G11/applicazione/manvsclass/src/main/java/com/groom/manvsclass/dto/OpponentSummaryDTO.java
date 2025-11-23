@@ -1,4 +1,4 @@
-package com.groom.manvsclass.model.dto;
+package com.groom.manvsclass.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

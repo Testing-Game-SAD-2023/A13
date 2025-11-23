@@ -1,4 +1,4 @@
-package com.groom.manvsclass.service.exception;
+package com.groom.manvsclass.exception;
 
 public class CoverageNotFoundException extends RuntimeException {
     private final String field;

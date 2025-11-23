@@ -2,7 +2,7 @@ package com.groom.manvsclass.controller;
 
 import com.groom.manvsclass.model.Assignment;
 import com.groom.manvsclass.model.Team;
-import com.groom.manvsclass.model.repository.AssignmentRepository;
+import com.groom.manvsclass.repository.AssignmentRepository;
 import com.groom.manvsclass.service.TeamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 //Qui ci sono le chiamate che può fare uno student per accedere a dati che gli riguardano 
 @CrossOrigin
@@ -35,14 +36,16 @@ public class StudentController {
         try {
 
             // 1. Verifica se l'utente ha un team 
-            Team existingTeam = teamService.getTeamByStudentId(studentId);
-            if (existingTeam == null) {
+            Optional<Team> teamOpt = teamService.getTeamByStudentId(studentId);
+            if (teamOpt.isEmpty()) {
                 //il team non esiste 
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("L'utente non è associato a un Team");
             }
 
+            Team existingTeam = teamOpt.get();
+
             // 2. Recupera gli Assignment associati al Team
-            List<Assignment> assignments = assignmentRepository.findByTeamId(existingTeam.getIdTeam());
+            List<Assignment> assignments = assignmentRepository.findByTeam_Id(existingTeam.getId());
             if (assignments == null || assignments.isEmpty()) {
                 assignments = new ArrayList<>();
             }
@@ -56,8 +59,7 @@ public class StudentController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            // Gestione degli errori
-            logger.error("Errore durante il recupero delle informazioni del team: ", e);
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore durante il recupero delle informazioni del team.");
         }
     }

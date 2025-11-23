@@ -1,4 +1,4 @@
-package com.groom.manvsclass.model.dto;
+package com.groom.manvsclass.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

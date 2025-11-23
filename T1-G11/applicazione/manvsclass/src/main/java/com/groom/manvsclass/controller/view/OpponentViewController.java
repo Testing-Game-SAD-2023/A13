@@ -1,7 +1,7 @@
 package com.groom.manvsclass.controller.view;
 
 import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.repository.ClassRepository;
+import com.groom.manvsclass.repository.ClassUTRepository;
 import com.groom.manvsclass.service.OpponentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +18,13 @@ import java.util.List;
 @Controller
 @RequestMapping("/opponents")
 public class OpponentViewController {
-    private final ClassRepository classRepository;
+    private final ClassUTRepository classUTRepository;
     private final OpponentService opponentService;
     private final Logger logger = LoggerFactory.getLogger(OpponentViewController.class);
 
 
-    public OpponentViewController(ClassRepository classRepository, OpponentService opponentService) {
-        this.classRepository = classRepository;
+    public OpponentViewController(ClassUTRepository classUTRepository, OpponentService opponentService) {
+        this.classUTRepository = classUTRepository;
         this.opponentService = opponentService;
     }
 
@@ -42,10 +42,10 @@ public class OpponentViewController {
             classUTList = switch (sortBy) {
                 case "Date" -> opponentService.orderByDate();
                 case "Name" -> opponentService.orderByName();
-                default -> classRepository.findAll();
+                default -> classUTRepository.findAll();
             };
         } else {
-            classUTList = classRepository.findAll();
+            classUTList = classUTRepository.findAll();
         }
 
         // Applichiamo la ricerca testuale

@@ -30,14 +30,7 @@ async function handleApiErrors(response) {
     }
 }
 
-/**
- * Effettua una chiamata fetch e ritorna i dati se la risposta è ok.
- * In caso di errore chiama handleApiErrors.
- *
- * @param {Object} param0 parametri di richiesta: url, method, headers, body
- * @param {Function} parseResponse funzione async per parsare response (es: r => r.json())
- * @returns dati parsati o null in caso di errore
- */
+
 async function returnDataOnSuccessTemplate({ url, method, headers, body }, parseResponse) {
     try {
         const init = { method };
@@ -67,13 +60,6 @@ async function returnDataOnSuccessTemplate({ url, method, headers, body }, parse
     }
 }
 
-/**
- * Effettua una chiamata fetch e se ok reindirizza o ricarica la pagina.
- * In caso di errore chiama handleApiErrors.
- *
- * @param {Object} param0 parametri di richiesta: url, method, headers, body
- * @param {Object} param1 opzioni: redirectTo (stringa URL opzionale), reload (booleano, default false)
- */
 async function redirectOnSuccessTemplate({ url, method, headers, body }, { redirectTo, reload = false }) {
     try {
         const init = { method };
@@ -99,9 +85,7 @@ async function redirectOnSuccessTemplate({ url, method, headers, body }, { redir
     }
 }
 
-
 /*      API calls        */
-
 
 async function callLogoutAdmin() {
     await redirectOnSuccessTemplate(
@@ -148,7 +132,7 @@ async function callGetAllGames() {
 
 async function callDownloadClassUT(className) {
     return await returnDataOnSuccessTemplate({
-        url: `${APIS.DOWNLOAD_CLASSUT}/${className}`,
+        url: APIS.DOWNLOAD_CLASSUT(className),
         method: "GET",
         headers: { 'Content-Type': 'application/json' }
     }, async response => await response.blob());
@@ -156,13 +140,27 @@ async function callDownloadClassUT(className) {
 
 async function callDeleteClassUT(className) {
     await redirectOnSuccessTemplate({
-        url: `${APIS.DELETE_OPPONENT}/${className}`,
-        method: "DELETE",
-        headers: { 'Content-Type': 'application/json' },
-    },
-    {
-        reload: true
+            url: APIS.DELETE_OPPONENT(className),
+            method: "DELETE",
+            headers: { 'Content-Type': 'application/json' },
+        },
+        {
+            reload: true
+        });
+}
+
+async function callDeleteSuggestion(className, suggestionTitle) {
+
+    const response = await fetch(APIS.DELETE_SUGGESTION(className, suggestionTitle), {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'}
     });
+
+    if (!response.ok) {
+        throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return true;
 }
 
 async function callUploadOpponent(body) {
@@ -173,7 +171,111 @@ async function callUploadOpponent(body) {
     }, async response => await response.json());
 }
 
+async function callUploadGuidelines(guideLines) {
+
+    try {
+        const response = await fetch(APIS.UPLOAD_GUIDELINES, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify( {
+                guidelines: guideLines
+            })
+        });
+        if (!response.ok) {
+            throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.text();
+
+    } catch (error) {
+        console.error("Errore in Guidelines:", error);
+        alert("Errore durante l'upload delle linee guida.");
+        throw error;
+    }
+}
+async function callGetGuidelines() {
+    try {
+
+        const response = await fetch(APIS.GET_GUIDELINES,  {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Errore HTTP ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Errore recupero linee guida:", error);
+        return [];
+    }
+}
+
+async function callDeleteGuideline(title) {
+    try {
+        const url = APIS.DELETE_GUIDELINE(title);
+
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error("Errore durante l'eliminazione");
+        }
+        return true;
+    } catch (error) {
+        console.error("Errore delete guideline:", error);
+        throw error;
+    }
+}
+
+async function callUploadSuggestions(className, suggestionsData) {
+    try {
+        const response = await fetch(APIS.UPLOAD_SUGGESTIONS, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                className,
+                suggestions: suggestionsData
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.text();
+
+    } catch (error) {
+        console.error("Errore in callUploadSuggestions:", error);
+        alert("Errore durante l'upload dei suggerimenti.");
+        throw error;
+    }
+}
 
 
+async function callGetSuggestions(className) {
+    try {
 
+        const url = APIS.GET_SUGGESTIONS(className);
 
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+
+    } catch (error) {
+
+        console.error(`Errore durante il recupero dei suggerimenti per ${className}:`, error);
+        throw error;
+    }
+}

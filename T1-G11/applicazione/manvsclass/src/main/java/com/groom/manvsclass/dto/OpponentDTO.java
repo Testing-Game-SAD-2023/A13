@@ -1,5 +1,6 @@
-package com.groom.manvsclass.model.dto;
+package com.groom.manvsclass.dto;
 
+import com.groom.manvsclass.model.ClassUT;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

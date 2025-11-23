@@ -3,16 +3,23 @@ package com.groom.manvsclass.controller;
 import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.service.TeamModificationRequest;
 import com.groom.manvsclass.service.TeamService;
+import com.groom.manvsclass.service.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
 public class TeamController {
 
     private final TeamService teamService;
+
+    @Autowired
+    private JwtService jwtService;
 
     public TeamController(TeamService teamService) {
         this.teamService = teamService;
@@ -67,19 +74,26 @@ public class TeamController {
      * Queste chiamate sono accedibili a un utente se fa parte di quel team
      */
     @GetMapping("/ottieniTeamByStudentId")
-    public ResponseEntity<Team> getTeamByStudentId(@RequestParam("StudentId") String idStudente) {
-        // Invoca il servizio per recuperare il team in base all'ID dello studente
-        Team team = teamService.getTeamByStudentId(idStudente);
-        // Se il team non viene trovato, restituisce un 404 Not Found
-        if (team == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getTeamByStudentId(
+            @RequestParam("StudentId") String idStudente,
+            @CookieValue(name = "jwt", required = false) String jwt) {
+
+
+        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
-        // Se il team viene trovato, restituisce un 200 OK con il team in formato JSON
-        return ResponseEntity.ok(team);
+
+        Optional<Team> teamOpt = teamService.getTeamByStudentId(idStudente);
+        if(teamOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team dello studente " + idStudente + " non trovato.");
+        }
+
+        Team studentTeam = teamOpt.get();
+        return ResponseEntity.ok().body(studentTeam);
     }
 
     @GetMapping("/GetStudentTeam")
-    public ResponseEntity<?> getStudentTeam(@CookieValue(name = "jwt", required = false) String jwt, @RequestParam String studentId) {
-        return teamService.GetStudentTeam(studentId, jwt);
+    public ResponseEntity<?> getStudentTeam(@RequestParam String studentId, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.getStudentTeam(studentId, jwt);
     }
 }

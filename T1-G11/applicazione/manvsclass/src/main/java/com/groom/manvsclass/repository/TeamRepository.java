@@ -1,0 +1,23 @@
+package com.groom.manvsclass.repository;
+
+import com.groom.manvsclass.model.Team;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface TeamRepository extends JpaRepository<Team, Long> {
+
+    boolean existsByName(String name);
+    // Team findByIdStudenti(String idStudente);
+
+    // Trova tutte le associazioni per un determinato Admin
+    List<Team> findByAdmin_Email(String adminEmail);
+
+    Optional<Team> findByName(String teamName);
+
+    @Query("SELECT t FROM Team t JOIN t.studentIds s WHERE s = :studentId")
+    Optional<Team> findByStudentId(@Param("studentId") String studentId);
+}
