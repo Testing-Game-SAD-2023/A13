@@ -1,0 +1,229 @@
+@startuml Upload Class Diagram
+
+!define COMPONENT_COLOR #E1F5FE
+!define SERVICE_COLOR #FFF3E0
+!define REPOSITORY_COLOR #F3E5F5
+!define MODEL_COLOR #E8F5E9
+
+skinparam class {
+    BackgroundColor<<Component>> COMPONENT_COLOR
+    BackgroundColor<<Service>> SERVICE_COLOR
+    BackgroundColor<<Repository>> REPOSITORY_COLOR
+    BackgroundColor<<Model>> MODEL_COLOR
+    BorderColor #424242
+    ArrowColor #424242
+}
+
+' Controller Layer
+class OpponentController <<Component>> {
+    - opponentService: OpponentService
+    --
+    + uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip): ResponseEntity
+    + getAllOpponents(): ResponseEntity
+    + getOpponentData(classUT, type, difficulty): ResponseEntity
+}
+
+class OpponentService <<Service>> {
+    - uploadOpponentService: UploadOpponentService
+    - classUTUploadService: ClassUTUploadService
+    - opponentRepository: OpponentRepository
+    - classRepository: ClassRepository
+    - apiGatewayClient: ApiGatewayClient
+    - fileStorageService: FileStorageService
+    - operationRepository: OperationRepository
+    - mongoTemplate: MongoTemplate
+    - searchRepository: SearchRepositoryImpl
+    --
+    + uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip): ResponseEntity
+    + getAllOpponents(): List<Opponent>
+    + getAllClassUTs(): List<ClassUT>
+    + getOpponentData(classUT, type, difficulty): Opponent
+    + eliminaClasse(name): ResponseEntity<Object>
+    + downloadClasse(name): ResponseEntity<Object>
+}
+
+' Service Layer - Upload Services
+class UploadOpponentService <<Service>> {
+    - fileStorageService: FileStorageService
+    - javaSourceFileService: JavaSourceFileService
+    - coverageService: CoverageService
+    - opponentTransformationService: OpponentTransformationService
+    --
+    + saveOpponentsFromZip(classUTFileName, classUTName, classUTFile, robotTestsZip): void
+    - processRobotFolders(classUTFileName, classUTName, classUTFile, robotGroupFolder): void
+    - processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, levelFolder): void
+    - generateCoverageIfNeeded(robotType, coverageFound, classUTName, srcPackage, paths): void
+}
+
+class ClassUTUploadService <<Service>> {
+    - classRepository: ClassRepository
+    - fileStorageService: FileStorageService
+    --
+    + saveClassUTFile(classUTFileName, classUTName, classUTFile): void
+    + persistClassUTMetadata(classe, classUTFileName): void
+}
+
+class OpponentTransformationService <<Service>> {
+    - opponentPersistenceService: OpponentPersistenceService
+    --
+    + createAndPersistOpponent(classUTName, robotType, levelFolder, evosuitePath, jacocoPath): void
+}
+
+class OpponentPersistenceService <<Service>> {
+    - opponentRepository: OpponentRepository
+    - apiGatewayClient: ApiGatewayClient
+    --
+    + saveOpponentAndNotify(opponent): void
+}
+
+' Utility Services
+class FileStorageService <<Service>> {
+    --
+    + saveFileInFileSystem(fileName, directory, file): void
+    + extractZipIn(folder): void
+    + deleteDirectoryRecursively(dirPath): void
+    + copyDirectoryRecursively(sourcePath, destinationPath): void
+    + zipDirectory(sourceDirPath, zipFilePath): void
+    + writeStringToFile(content, file): void
+}
+
+class JavaSourceFileService <<Service>> {
+    - fileStorageService: FileStorageService
+    --
+    + saveTestFilesInVolume(fromTestPath, toTestPath, className, robotType): String[][]
+    + saveSrcFileInVolume(src, srcPath, srcPackageName, srcFileName): void
+    + saveCoverageFilesInVolume(searchIn, coveragePath): boolean[]
+}
+
+class CoverageService <<Service>> {
+    - apiGatewayClient: ApiGatewayClient
+    --
+    + generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip): EvosuiteCoverageDTO
+    + generateMissingJacocoCoverage(classUTName, zip): JacocoCoverageDTO
+}
+
+class ApiGatewayClient <<Client>> {
+    --
+    + callGenerateMissingEvoSuiteCoverage(classUTName, srcPackage, zip): EvosuiteCoverageDTO
+    + callGenerateMissingJacocoCoverage(classUTName, zip): JacocoCoverageDTO
+    + callAddNewOpponent(classUT, gameMode, type, difficulty): void
+}
+
+' Utility Classes
+class CoverageReader <<Utility>> {
+    --
+    + {static} readCoverageFiles(evosuitePath, jacocoPath): CoverageData
+}
+
+class ScoreBuilder <<Utility>> {
+    --
+    + {static} buildJacocoScore(statistics): JacocoScore
+    + {static} buildEvosuiteScore(statistics): EvosuiteScore
+}
+
+class LevelExtractor <<Utility>> {
+    --
+    + {static} extractDifficulty(levelFolder): OpponentDifficulty
+    + {static} extractLevelNumber(levelFolder): int
+}
+
+class OpponentPathResolver <<Utility>> {
+    --
+    + {static} buildOpponentPaths(classUTName, robotType, level): OpponentPaths
+    + {static} buildRobotTestPaths(levelFolder, robotType): RobotTestPaths
+    + {static} getUnmodifiedSrcPath(classUTName): Path
+    + {static} getTempOperationFolder(classUTName): Path
+}
+
+' Models
+class ClassUT <<Model>> {
+    - name: String
+    - date: String
+    - difficulty: String
+    - uri: String
+    - description: String
+    - category: List<String>
+}
+
+class Opponent <<Model>> {
+    - id: String
+    - createdAt: Instant
+    - classUT: String
+    - opponentDifficulty: OpponentDifficulty
+    - opponentType: String
+    - coverage: String
+    - jacocoScore: JacocoScore
+    - evosuiteScore: EvosuiteScore
+}
+
+' Repositories
+interface ClassRepository <<Repository>> {
+    + save(classUT): ClassUT
+    + findAll(): List<ClassUT>
+}
+
+interface OpponentRepository <<Repository>> {
+    + saveOpponent(opponent): void
+    + findAllOpponents(): List<Opponent>
+    + findOpponent(classUT, type, difficulty): Optional<Opponent>
+    + findEvosuiteScore(classUT, type, difficulty): Optional<EvosuiteScore>
+    + findJacocoScore(classUT, type, difficulty): Optional<JacocoScore>
+    + findCoverage(classUT, type, difficulty): Optional<String>
+}
+
+' Relationships - Controller to Services
+OpponentController --> OpponentService : uses
+
+' OpponentService relationships
+OpponentService --> UploadOpponentService : uses
+OpponentService --> ClassUTUploadService : uses
+OpponentService --> OpponentRepository : uses
+OpponentService --> ClassRepository : uses
+OpponentService --> ApiGatewayClient : uses
+OpponentService --> FileStorageService : uses
+
+' Relationships - Service Dependencies
+UploadOpponentService --> FileStorageService : uses
+UploadOpponentService --> JavaSourceFileService : uses
+UploadOpponentService --> CoverageService : uses
+UploadOpponentService --> OpponentTransformationService : uses
+
+ClassUTUploadService --> FileStorageService : uses
+ClassUTUploadService --> ClassRepository : uses
+
+OpponentTransformationService --> OpponentPersistenceService : uses
+OpponentTransformationService --> CoverageReader : uses
+OpponentTransformationService --> ScoreBuilder : uses
+OpponentTransformationService --> LevelExtractor : uses
+
+OpponentPersistenceService --> OpponentRepository : uses
+OpponentPersistenceService --> ApiGatewayClient : uses
+
+CoverageService --> ApiGatewayClient : uses
+
+JavaSourceFileService --> FileStorageService : uses
+
+UploadOpponentService --> OpponentPathResolver : uses
+
+' Relationships - Models
+ClassUTUploadService ..> ClassUT : creates
+OpponentTransformationService ..> Opponent : creates
+
+ClassRepository ..> ClassUT : persists
+OpponentRepository ..> Opponent : persists
+
+note right of UploadOpponentService
+  Main orchestrator for opponent upload:
+  1. Extracts robot tests from ZIP
+  2. Processes each robot type (Evosuite/Randoop)
+  3. Processes difficulty levels
+  4. Generates missing coverage
+  5. Persists opponents
+end note
+
+note right of OpponentTransformationService
+  Transforms coverage data into
+  Opponent model with scores
+end note
+
+@enduml

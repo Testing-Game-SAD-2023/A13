@@ -1,0 +1,179 @@
+@startuml Opponents Functionality Class Diagram
+
+!define CONTROLLER_COLOR #E1F5FE
+!define SERVICE_COLOR #FFF3E0
+!define REPOSITORY_COLOR #F3E5F5
+!define MODEL_COLOR #E8F5E9
+!define CLIENT_COLOR #FFE0B2
+
+skinparam class {
+    BackgroundColor<<Controller>> CONTROLLER_COLOR
+    BackgroundColor<<Service>> SERVICE_COLOR
+    BackgroundColor<<Repository>> REPOSITORY_COLOR
+    BackgroundColor<<Model>> MODEL_COLOR
+    BackgroundColor<<Client>> CLIENT_COLOR
+    BorderColor #424242
+    ArrowColor #424242
+}
+
+' Controller Layer
+class OpponentController <<Controller>> {
+    - opponentService: OpponentService
+    --
+    + uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip): ResponseEntity
+    + getAllOpponents(): ResponseEntity<List<Opponent>>
+    + getAllClassesAsSummary(): ResponseEntity<List<String>>
+    + getAllOpponentsAsSummary(): ResponseEntity<List<OpponentSummaryDTO>>
+    + getOpponentData(classUT, type, difficulty): ResponseEntity<Opponent>
+    + getOpponentEvosuiteScore(classUT, type, difficulty): ResponseEntity<EvosuiteScoreDTO>
+    + getOpponentJacocoScore(classUT, type, difficulty): ResponseEntity<JacocoScoreDTO>
+    + getOpponentCoverage(classUT, type, difficulty): ResponseEntity<String>
+    + getNomiClassiUT(): ResponseEntity<List<String>>
+    + modificaClasse(name, newContent): ResponseEntity<String>
+    + downloadClasse(name): ResponseEntity<Object>
+    + deleteClassUT(classUT): ResponseEntity<Object>
+}
+
+' Service Layer
+class OpponentService <<Service>> {
+    - opponentRepository: OpponentRepository
+    - classRepository: ClassRepository
+    - apiGatewayClient: ApiGatewayClient
+    - fileStorageService: FileStorageService
+    --
+    + getAllOpponents(): List<Opponent>
+    + getAllClassUTs(): List<ClassUT>
+    + getOpponentData(classUT, type, difficulty): Opponent
+    + getOpponentEvosuiteScore(classUT, type, difficulty): EvosuiteScore
+    + getOpponentJacocoScore(classUT, type, difficulty): JacocoScore
+    + getOpponentCoverage(classUT, type, difficulty): String
+    + eliminaClasse(name): ResponseEntity<Object>
+    + downloadClasse(name): ResponseEntity<Object>
+    + modificaClasse(name, newContent): ResponseEntity<String>
+}
+
+' Repository Layer
+interface OpponentRepository <<Repository>> {
+    + findAllOpponents(): List<Opponent>
+    + findOpponent(classUT, type, difficulty): Optional<Opponent>
+    + findEvosuiteScore(classUT, type, difficulty): Optional<EvosuiteScore>
+    + findJacocoScore(classUT, type, difficulty): Optional<JacocoScore>
+    + findCoverage(classUT, type, difficulty): Optional<String>
+    + saveOpponent(opponent): void
+}
+
+interface ClassRepository <<Repository>> {
+    + findAll(): List<ClassUT>
+    + save(classUT): ClassUT
+}
+
+' Model Layer
+class Opponent <<Model>> {
+    - id: String
+    - createdAt: Instant
+    - classUT: String
+    - opponentDifficulty: OpponentDifficulty
+    - opponentType: String
+    - coverage: String
+    - jacocoScore: JacocoScore
+    - evosuiteScore: EvosuiteScore
+}
+
+class ClassUT <<Model>> {
+    - name: String
+    - date: String
+    - difficulty: String
+    - uri: String
+    - description: String
+    - category: List<String>
+}
+
+enum OpponentDifficulty <<Model>> {
+    EASY
+    MEDIUM
+    HARD
+}
+
+class JacocoScore <<Model>> {
+    - lineCoverage: Coverage
+    - branchCoverage: Coverage
+    - instructionCoverage: Coverage
+}
+
+class EvosuiteScore <<Model>> {
+    - lineCoverage: Coverage
+    - branchCoverage: Coverage
+    - exceptionCoverage: Coverage
+    - weakMutationCoverage: Coverage
+    - outputCoverage: Coverage
+    - methodCoverage: Coverage
+    - methodNoExceptionCoverage: Coverage
+    - cBranchCoverage: Coverage
+}
+
+class Coverage <<Model>> {
+    - covered: int
+    - total: int
+}
+
+' DTOs
+class OpponentSummaryDTO <<Model>> {
+    - classUT: String
+    - opponentType: String
+    - opponentDifficulty: OpponentDifficulty
+}
+
+' External Client
+class ApiGatewayClient <<Client>> {
+    --
+    + callDeleteAllClassUTOpponents(classUT): void
+    + callAddNewOpponent(classUT, mode, type, difficulty): void
+}
+
+' Relationships - Controller to Service
+OpponentController --> OpponentService : uses
+
+' Relationships - Service to Repositories
+OpponentService --> OpponentRepository : uses
+OpponentService --> ClassRepository : uses
+OpponentService --> ApiGatewayClient : uses
+
+' Relationships - Repository to Models
+OpponentRepository ..> Opponent : manages
+ClassRepository ..> ClassUT : manages
+
+' Relationships - Model Compositions
+Opponent *-- OpponentDifficulty : has
+Opponent *-- JacocoScore : has
+Opponent *-- EvosuiteScore : has
+Opponent --> ClassUT : references
+JacocoScore *-- Coverage : uses
+EvosuiteScore *-- Coverage : uses
+
+' DTO Relationships
+OpponentSummaryDTO ..> Opponent : created from
+
+note top of OpponentController
+  REST API endpoints for:
+  - Querying opponents
+  - Getting scores (Evosuite/Jacoco)
+  - Getting coverage reports
+  - Managing ClassUT lifecycle
+end note
+
+note right of OpponentService
+  Business logic for:
+  - Retrieving opponent data
+  - Score computation
+  - Coverage retrieval
+  - ClassUT CRUD operations
+  - External API notifications
+end note
+
+note bottom of OpponentRepository
+  MongoDB repository providing
+  filtered queries for opponents
+  by classUT, type, and difficulty
+end note
+
+@enduml
