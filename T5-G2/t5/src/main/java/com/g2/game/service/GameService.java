@@ -95,7 +95,8 @@ public class GameService {
      */
     public GameProgressDTO createNewGameProgress(GameParams gameParams) {
         return (GameProgressDTO) serviceManager.handleRequest("T23", "createPlayerProgressAgainstOpponent",
-                gameParams.getPlayerId(), gameParams.getGameMode(), gameParams.getClassUTName(), gameParams.getOpponentType(), gameParams.getOpponentDifficulty());
+                gameParams.getPlayerId(), gameParams.getGameMode(), gameParams.getClassUTName(),
+                gameParams.getOpponentType(), gameParams.getOpponentDifficulty());
     }
 
 

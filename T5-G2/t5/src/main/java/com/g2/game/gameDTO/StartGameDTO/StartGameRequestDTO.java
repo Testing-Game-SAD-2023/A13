@@ -16,9 +16,9 @@ import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "mode", include = JsonTypeInfo.As.EXISTING_PROPERTY, visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = StartPartitaSingolaRequestDTO.class, name = "PartitaSingola"),// Se "mode" è "PartitaSingola", usa questa classe
+        @JsonSubTypes.Type(value = StartPartitaSingolaRequestDTO.class, name = "PartitaSingola"), // Se "mode" è "PartitaSingola", usa questa classe
         @JsonSubTypes.Type(value = StartGameRequestDTO.class, name = "Allenamento"),
-        @JsonSubTypes.Type(value = StartGameRequestDTO.class, name = "ScalataGame"),
+        @JsonSubTypes.Type(value = StartScalataRequestDTO.class, name = "ScalataGame"), // Se "mode" è "ScalataGame", usa questa classe
         @JsonSubTypes.Type(value = StartGameRequestDTO.class, name = "Sfida")
 })
 @Getter
@@ -27,7 +27,7 @@ import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 @ToString
 public class StartGameRequestDTO {
 
-    @NotNull
+    @NotNull(message = "playerId is required")
     @JsonProperty("playerId")
     private Long playerId;
 
@@ -39,7 +39,7 @@ public class StartGameRequestDTO {
     @JsonProperty("difficulty")
     private OpponentDifficulty difficulty;
 
-    @NotNull
+    @NotNull(message = "mode is required")
     @JsonProperty("mode")
     private GameMode gameMode;
 
