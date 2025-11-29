@@ -4,10 +4,14 @@
 package com.groom.manvsclass.util;
 
 import com.groom.manvsclass.model.Interaction;
+import com.groom.manvsclass.model.InteractionType;
 import com.groom.manvsclass.model.ClassUT;
 
 import com.groom.manvsclass.repository.InteractionRepository;
 import com.groom.manvsclass.repository.ClassUTRepository;
+import com.groom.manvsclass.dto.InteractionDTO;
+import com.groom.manvsclass.exception.NotFoundException;
+import com.groom.manvsclass.mapper.InteractionMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,9 +27,11 @@ public class Util {
 
     @Autowired
     private InteractionRepository interactionRepository;
-
     @Autowired
     private ClassUTRepository classUTRepository;
+
+    @Autowired
+    private InteractionMapper interactionMapper;
 
     // Metodo per generare un ID univoco (esempio con UUID)
     //Modifica 04/12/2024
@@ -33,21 +39,30 @@ public class Util {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     }
 
-    public List<Interaction> elencaInt() {
-        return interactionRepository.findAll();
+    public List<InteractionDTO> elencaInt() {
+
+        List<Interaction> allInteractions = interactionRepository.findAll();
+
+        // effettua il mapping in uscita Model -> DTO
+        return interactionMapper.toDtoList(allInteractions);
     }
 
-    public List<Interaction> elencaReport() {
+    public List<InteractionDTO> elencaReport() {
+        
+        List<Interaction> reportInteractions = interactionRepository.findByType(InteractionType.REPORT);
 
-        return interactionRepository.findByType(0);
+        // effettua il mapping in uscita Model -> DTO
+        return interactionMapper.toDtoList(reportInteractions);
     }
 
-    public long likes(String className) {
-        return interactionRepository.countByClassUT_NameAndType(className, 1);
-    }
+    public long getClassLikes(String className) {
 
-    public Interaction uploadInteraction(Interaction interaction) {
-        return interactionRepository.save(interaction);
+        boolean classExists = classUTRepository.existsById(className);
+        if (!classExists) {
+            throw new NotFoundException("Classe " + className + " non trovata.");
+        }
+
+        return interactionRepository.countByClassUT_NameAndType(className, InteractionType.LIKE);
     }
 
     public int API_id() {
@@ -59,53 +74,29 @@ public class Util {
         return "prova." + id_u + "@email.com";
     }
 
-    public String newLike(String className) {
+    public void uploadInteraction(InteractionDTO interactionDTO) {
+
+        // effettua il mapping in ingresso DTO -> Model
+        String className = interactionDTO.getClassName();
+        Interaction interaction = interactionMapper.toEntity(interactionDTO);
 
         Optional<ClassUT> classUTOpt = classUTRepository.findById(className);
         if(classUTOpt.isEmpty()) {
-            return "Errore: Classe " + className + " non trovata";
+            throw new NotFoundException("Classe " + className + " non trovata");
         }
 
-        ClassUT classUT = classUTOpt.get();
+        interaction.setClassUT(classUTOpt.get());
 
-        Interaction newInteraction = new Interaction();
-        newInteraction.setType(1);
-        newInteraction.setDate(LocalDate.now());
-        newInteraction.setClassUT(classUT);
-
-        interactionRepository.save(newInteraction);
-
-        return "Nuova interazione di tipo 'like' inserita per la classe: " + className;
+        interactionRepository.save(interaction);
     }
 
-    public String newReport(String className, String commento) {
-
-        Optional<ClassUT> classUTOpt = classUTRepository.findById(className);
-        if(classUTOpt.isEmpty()) {
-            return "Errore: Classe " + className + " non trovata";
-        }
-
-        ClassUT classUT = classUTOpt.get();
-
-        Interaction newInteraction = new Interaction();
-        newInteraction.setType(0);
-        newInteraction.setDescription(commento);
-        newInteraction.setDate(LocalDate.now());
-        newInteraction.setClassUT(classUT);
-
-        interactionRepository.save(newInteraction);
-
-        return "Nuova interazione di tipo 'report' inserita per la classe: " + className;
-    }
-
-    public Interaction eliminaInteraction(Long interactionId) {
+    public void eliminaInteraction(Long interactionId) {
 
         Optional<Interaction> interactionOpt = interactionRepository.findById(interactionId);
         if (interactionOpt.isEmpty()) {
-            return null;
+            throw new NotFoundException("Interazione " + interactionId + " non trovata.");
         }
-        Interaction interactionToDelete = interactionOpt.get();
-        interactionRepository.delete(interactionToDelete);
-        return interactionToDelete;
+
+        interactionRepository.delete(interactionOpt.get());
     }
 }

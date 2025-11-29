@@ -3,6 +3,7 @@ package com.groom.manvsclass.controller;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Opponent;
 import com.groom.manvsclass.dto.OpponentSummaryDTO;
+import com.groom.manvsclass.service.ClassUTService;
 import com.groom.manvsclass.service.OpponentService;
 import com.groom.manvsclass.service.JwtService;
 import com.groom.manvsclass.service.AdminService;
@@ -42,13 +43,14 @@ public class OpponentController {
     @Autowired
     private OpponentService opponentService;
     @Autowired
+    private ClassUTService classUTService;
+    @Autowired
     private AdminService adminService;
 
     @GetMapping("/opponents/elencoNomiClassiUT")
     public ResponseEntity<?> getNomiClassiUT(@CookieValue(name = "jwt", required = false) String jwt) {
-        return opponentService.getNomiClassiUT(jwt);
+        return ResponseEntity.ok(classUTService.getClassUTNames());
     }
-
 
     @PostMapping("/opponents/update/{name}")
     public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
@@ -73,7 +75,7 @@ public class OpponentController {
     @GetMapping("/opponents/classes/summary")
     public ResponseEntity<List<String>> getAllClassesAsSummary() {
         logger.info("[GET /classes/summary] Request received");
-        List<ClassUT> classes = opponentService.getAllClassUTs();
+        List<ClassUT> classes = classUTService.getClassUTs();
         logger.info("[GET /classes/summary] Classes found: {}", classes);
         List<String> classesAsSummary = new ArrayList<>();
         for (ClassUT c : classes) {
@@ -91,7 +93,7 @@ public class OpponentController {
         List<OpponentSummaryDTO> response = new ArrayList<>();
         for (Opponent opponent : opponents) {
             response.add(new OpponentSummaryDTO(opponent.getClassUT().getName(),
-                    opponent.getType(), opponent.getOpponentDifficulty()));
+                    opponent.getType(), opponent.getClassUT().getDifficulty()));
         }
         return ResponseEntity.ok(response);
     }

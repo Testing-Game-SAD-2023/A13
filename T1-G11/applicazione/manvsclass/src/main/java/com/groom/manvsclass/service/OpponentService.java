@@ -13,6 +13,7 @@ import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.dto.ClassUTDTO;
 import com.groom.manvsclass.model.Category;
 import com.groom.manvsclass.model.Operation;
+import com.groom.manvsclass.model.OperationType;
 import com.groom.manvsclass.model.Opponent;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
@@ -77,36 +78,7 @@ public class OpponentService {
     @Autowired
     private ApiGatewayClient apiGatewayClient;
 
-    /*
-     * Restituisce la lista di classi UT disponibili nel sistema
-     */
-    public ResponseEntity<?> getNomiClassiUT(String jwt) {
 
-        // 1. Verifica se il token JWT è valido
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
-
-        // 2. Estrae l'email dell'admin dal JWT
-        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
-        if (adminEmail == null || adminEmail.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'Admin dal token JWT.");
-        }
-
-        // 3. Verifica se l'email estratta dal token esiste nel DB di Admin
-        if (!adminRepository.existsById(adminEmail)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Utente non autorizzato.");
-        }
-
-        // 4. Recupera tutte le ClassUT dal repository e restituisce solo i nomi
-        List<String> classNames = classUTRepository.findAll()
-                .stream()
-                .map(ClassUT::getName) // Estrae solo i nomi
-                .collect(Collectors.toList());
-
-        // 5. Ritorna i nomi delle classi con lo status HTTP 200 (OK)
-        return ResponseEntity.ok(classNames);
-    }
 
     @Transactional
     public ResponseEntity<FileUploadResponse> uploadOpponent(
@@ -228,22 +200,7 @@ public class OpponentService {
         }
     }
 
-    public List<ClassUT> getAllClassUTs() {
-        return classUTRepository.findAll();
-    }
 
-    public List<ClassUT> filterByDifficulty(String difficulty) {
-        OpponentDifficulty difficultyEnum = OpponentDifficulty.valueOf(difficulty.toUpperCase());
-        return classUTRepository.filterByDifficulty(difficultyEnum);
-    }
-
-    public List<ClassUT> orderByDate() {
-        return classUTRepository.orderByDate();
-    }
-
-    public List<ClassUT> orderByName() {
-        return classUTRepository.orderByName();
-    }
 
     @Transactional
     public ResponseEntity<String> modificaClasse(String className, ClassUT newContent, String adminEmail, HttpServletRequest request) {
@@ -269,7 +226,7 @@ public class OpponentService {
         Operation updateOperation = new Operation();
         updateOperation.setAdmin(adminOpt.get());
         updateOperation.setClassUT(classUT);
-        updateOperation.setType(1);
+        updateOperation.setType(OperationType.UPDATE);
         updateOperation.setDate(LocalDate.now());
         operationRepository.save(updateOperation);
 
@@ -293,7 +250,7 @@ public class OpponentService {
         Operation deletionOperation = new Operation();
         deletionOperation.setAdmin(adminOpt.get());
         deletionOperation.setClassUT(classToDelete);
-        deletionOperation.setType(2);
+        deletionOperation.setType(OperationType.DELETE);
         deletionOperation.setDate(LocalDate.now());
 
         operationRepository.save(deletionOperation);

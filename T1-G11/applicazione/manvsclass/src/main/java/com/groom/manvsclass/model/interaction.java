@@ -1,5 +1,6 @@
 package com.groom.manvsclass.model;
 
+import com.groom.manvsclass.model.InteractionType;
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
 
@@ -12,18 +13,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-/*
-enum InteractionType {
-    REPORT,
-    LIKE
-}
-*/
 
 @Entity
 @Getter
@@ -37,7 +33,9 @@ public class Interaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int type; // 0 Report - 1 Like
+    @Enumerated(EnumType.STRING)
+    private InteractionType type;
+
     private String description;
     private LocalDate date;
 

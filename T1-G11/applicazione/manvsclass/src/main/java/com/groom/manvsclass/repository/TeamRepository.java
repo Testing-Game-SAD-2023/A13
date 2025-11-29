@@ -11,9 +11,7 @@ import java.util.Optional;
 public interface TeamRepository extends JpaRepository<Team, Long> {
 
     boolean existsByName(String name);
-    // Team findByIdStudenti(String idStudente);
 
-    // Trova tutte le associazioni per un determinato Admin
     List<Team> findByAdmin_Email(String adminEmail);
 
     Optional<Team> findByName(String teamName);

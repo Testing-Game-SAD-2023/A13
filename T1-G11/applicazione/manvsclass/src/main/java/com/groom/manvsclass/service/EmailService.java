@@ -111,7 +111,7 @@ public class EmailService {
         // 12. Invia email di notifica agli studenti aggiunti
 
         try {
-            sendTeamNewAssignment(emails, team.getName(), assignment.getDataScadenza(), assignment.getTitle(), assignment.getDescrizione());
+            sendTeamNewAssignment(emails, team.getName(), assignment.getExpirationDate(), assignment.getTitle(), assignment.getDescription());
         } catch (MessagingException e) {
             System.out.println("Errore durante l'invio della email.");
         }

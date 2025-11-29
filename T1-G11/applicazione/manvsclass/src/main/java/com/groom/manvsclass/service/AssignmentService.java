@@ -59,7 +59,7 @@ public class AssignmentService {
         if (assignment.getTitle() == null || assignment.getTitle().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Il titolo dell'Assignment è obbligatorio.");
         }
-        if (assignment.getDataScadenza() == null || assignment.getDataScadenza().isBefore(LocalDate.now())) {
+        if (assignment.getExpirationDate() == null || assignment.getExpirationDate().isBefore(LocalDate.now())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La data di scadenza deve essere una data futura.");
         }
 
@@ -72,8 +72,7 @@ public class AssignmentService {
         Team existingTeam = teamOpt.get();
 
         // 5. Verifica se l'Admin ha i permessi per questo Team
-        if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail) ||
-                (!"Owner".equals(existingTeam.getAdminRole()) && !"Professor".equals(existingTeam.getAdminRole()))) {
+        if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per creare un Assignment per questo Team.");
         }
 
@@ -126,8 +125,7 @@ public class AssignmentService {
             Team existingTeam = teamOpt.get();
 
             // 4. Verifica se l'Admin ha i permessi per visualizzare gli Assignment del Team
-            if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail) ||
-                    (!"Owner".equals(existingTeam.getAdminRole()) && !"Professor".equals(existingTeam.getAdminRole()))) {
+            if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per visualizzare gli assignment di questo team.");
             }
 
@@ -231,8 +229,7 @@ public class AssignmentService {
         Team existingTeam = teamOpt.get();
 
         // 6. Verifica se l'Admin ha i permessi per rimuovere l'Assignment del Team
-        if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail) ||
-                (!"Owner".equals(existingTeam.getAdminRole()) && !"Professor".equals(existingTeam.getAdminRole()))) {
+        if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per rimuovere gli assignment di questo team.");
         }
 

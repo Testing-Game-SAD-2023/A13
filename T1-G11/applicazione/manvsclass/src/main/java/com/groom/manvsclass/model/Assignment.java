@@ -30,9 +30,9 @@ public class Assignment {
     private Long id;
 
     private String title;
-    private String descrizione;
-    private LocalDate dataCreazione;
-    private LocalDate dataScadenza;
+    private String description;
+    private LocalDate creationDate;
+    private LocalDate expirationDate;
 
     @ManyToOne
     @JoinColumn(name = "team_id", referencedColumnName = "id")

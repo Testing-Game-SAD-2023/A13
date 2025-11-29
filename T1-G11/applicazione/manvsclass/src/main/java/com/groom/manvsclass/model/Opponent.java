@@ -5,8 +5,7 @@ import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import org.springframework.data.annotation.CreatedDate;
-import java.time.Instant;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -37,16 +36,14 @@ public class Opponent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CreatedDate
-    private Instant createdAt;
-
+    private LocalDate date;
     private String type;
 
     @Column(columnDefinition="TEXT")
     private String coverage;
 
-    @Enumerated(EnumType.STRING)
-    private OpponentDifficulty opponentDifficulty;
+    // @Enumerated(EnumType.STRING)
+    // private OpponentDifficulty opponentDifficulty;
 
     @ManyToOne
     @JoinColumn(name = "class_name", referencedColumnName = "name")

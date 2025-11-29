@@ -44,8 +44,6 @@ public class Team {
     private int numStudents;
     private LocalDate date;
 
-    private String adminRole;
-
     @ManyToOne
     @JoinColumn(name = "admin_email", referencedColumnName = "email")
     private Admin admin;

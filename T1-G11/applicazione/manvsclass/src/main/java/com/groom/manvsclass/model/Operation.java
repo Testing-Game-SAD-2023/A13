@@ -1,5 +1,6 @@
 package com.groom.manvsclass.model;
 
+import com.groom.manvsclass.model.OperationType;
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
 
@@ -12,6 +13,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -30,7 +33,9 @@ public class Operation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int type;
+    @Enumerated(EnumType.STRING)
+    private OperationType type;
+
     private LocalDate date;
 
     @ManyToOne

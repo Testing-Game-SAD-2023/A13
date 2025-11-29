@@ -1,0 +1,53 @@
+package com.groom.manvsclass.mapper;
+
+import com.groom.manvsclass.dto.SuggestionDTO;
+import com.groom.manvsclass.model.Suggestion;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+import java.util.List;
+import java.util.Base64;
+import java.time.LocalDate;
+
+@Mapper(componentModel = "spring", imports = { LocalDate.class, Base64.class })
+public interface SuggestionMapper {
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "classUT", ignore = true)
+    @Mapping(target = "date", expression = "java(LocalDate.now())")
+    @Mapping(target = "image", source = "image", qualifiedByName = "base64ToBytes")
+    Suggestion toEntity(SuggestionDTO singleSuggestionDTO);
+
+    @Mapping(target= "image", source = "image", qualifiedByName = "bytesToBase64")
+    SuggestionDTO toDto(Suggestion suggestion);
+
+    List<Suggestion> toEntityList(List<SuggestionDTO> singleSuggestionDTOs);
+
+    List<SuggestionDTO> toDtoList(List<Suggestion> suggestions);
+
+    @Named("base64ToBytes")
+    default byte[] base64ToBytes(String base64Image) {
+        if (base64Image == null || base64Image.isEmpty()) {
+            return null;
+        }
+        try {
+            if (base64Image.contains(",")) {
+                base64Image = base64Image.split(",")[1];
+            }
+            return Base64.getDecoder().decode(base64Image);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    @Named("bytesToBase64")
+    default String bytesToBase64(byte[] bytesImage) {
+        if (bytesImage == null || bytesImage.length == 0) {
+            return null;
+        }
+        return Base64.getEncoder().encodeToString(bytesImage);
+    }
+
+}

@@ -4,6 +4,9 @@ import com.groom.manvsclass.model.Team;
 import com.groom.manvsclass.service.TeamModificationRequest;
 import com.groom.manvsclass.service.TeamService;
 import com.groom.manvsclass.service.JwtService;
+import com.groom.manvsclass.security.JwtRequestContext;
+import com.groom.manvsclass.exception.NotFoundException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -16,47 +19,81 @@ import java.util.Optional;
 @RestController
 public class TeamController {
 
-    private final TeamService teamService;
-
+    @Autowired
+    private TeamService teamService;
     @Autowired
     private JwtService jwtService;
 
-    public TeamController(TeamService teamService) {
-        this.teamService = teamService;
-    }
-
-    // Endpoint per aggiungere un nuovo team
     @PostMapping("/creaTeam")
-    public ResponseEntity<?> creaTeam(@RequestBody Team team, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.creaTeam(team, jwt);
+    public ResponseEntity<?> createTeam(@RequestBody Team team) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'Admin dal token JWT.");
+        }
+
+        return teamService.createTeam(team, adminEmail);
     }
 
     @GetMapping("/visualizzaTeams")
-    public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> visualizzaTeams() {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
         return teamService.visualizzaTeams(jwt);
     }
 
-    @GetMapping("/cercaTeam/{idTeam}")
-    public ResponseEntity<?> cercaTeam(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.cercaTeam(idTeam, jwt);
+    @GetMapping("/cercaTeam/{teamId}")
+    public ResponseEntity<?> cercaTeam(@PathVariable("teamId") String teamId) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        return teamService.cercaTeam(teamId, jwt);
     }
 
-    // Endpoint per aggiungere un nuovo team
     @DeleteMapping("/deleteTeam")
-    public ResponseEntity<?> deleteTeam(@RequestBody String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.deleteTeam(idTeam, jwt);
+    public ResponseEntity<?> deleteTeam(@RequestBody String teamId) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        return teamService.deleteTeam(teamId, jwt);
     }
 
-    // Endpoint per modificare il nome di un team
     @PutMapping("/modificaNomeTeam")
-    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
         return teamService.modificaNomeTeam(request, jwt);
     }
 
-    //Modifica 04/12/2024: aggiunta di una lista di idStudenti al team
-    @PutMapping("/aggiungiStudenti/{idTeam}")
-    public ResponseEntity<?> aggiungiStudenti(@PathVariable("idTeam") String idTeam, @RequestBody List<String> idStudenti, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.aggiungiStudenti(idTeam, idStudenti, jwt);
+    @PutMapping("/aggiungiStudenti/{teamId}")
+    public ResponseEntity<?> aggiungiStudenti(@PathVariable("teamId") String teamId, @RequestBody List<String> studentIds) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
+        return teamService.aggiungiStudenti(teamId, studentIds, jwt);
     }
 
     @GetMapping("/ottieniStudentiTeam/{idTeam}")
@@ -64,36 +101,37 @@ public class TeamController {
         return teamService.ottieniStudentiTeam(idTeam, jwt);
     }
 
-    //Modifica 05/12/2024: aggiunta rimozione studente da un team
     @PutMapping("/rimuoviStudenteTeam/{idTeam}")
     public ResponseEntity<?> rimuoviStudenteTeam(@PathVariable("idTeam") String idTeam, @RequestBody String idStudente, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.rimuoviStudenteTeam(idTeam, idStudente, jwt);
     }
 
-    /*
-     * Queste chiamate sono accedibili a un utente se fa parte di quel team
-     */
     @GetMapping("/ottieniTeamByStudentId")
-    public ResponseEntity<?> getTeamByStudentId(
-            @RequestParam("StudentId") String idStudente,
-            @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> getTeamByStudentId(@RequestParam("studentId") String studentId) {
 
-
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
 
-        Optional<Team> teamOpt = teamService.getTeamByStudentId(idStudente);
-        if(teamOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team dello studente " + idStudente + " non trovato.");
+        try {
+            Team studentTeam = teamService.getTeamByStudentId(studentId);
+            return ResponseEntity.ok(studentTeam);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore!" );
         }
-
-        Team studentTeam = teamOpt.get();
-        return ResponseEntity.ok().body(studentTeam);
     }
 
     @GetMapping("/GetStudentTeam")
-    public ResponseEntity<?> getStudentTeam(@RequestParam String studentId, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> getStudentTeam(@RequestParam String studentId) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        }
+
         return teamService.getStudentTeam(studentId, jwt);
     }
 }

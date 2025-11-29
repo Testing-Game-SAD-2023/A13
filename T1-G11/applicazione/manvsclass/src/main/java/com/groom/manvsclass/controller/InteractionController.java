@@ -15,16 +15,12 @@
  *   limitations under the License.
  */
 
-/*MODIFICA (5/11/2024) - Refactoring task T1
- * HomeController ora si occupa solo del mapping dei servizi aggiunti.
- */
-
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.Interaction;
+import com.groom.manvsclass.dto.InteractionDTO;
 import com.groom.manvsclass.service.AdminService;
 import com.groom.manvsclass.service.JwtService;
+
 import com.groom.manvsclass.util.Util;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +36,7 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-public class HomeController {
+public class InteractionController {
 
     @Autowired
     private JwtService jwtService;
@@ -49,46 +45,43 @@ public class HomeController {
     @Autowired
     private Util utilsService;
 
-    @GetMapping("/Cfilterby/{category}")
-    public ResponseEntity<?> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
-
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
+    @GetMapping("/getLikes/{className}")
+    public ResponseEntity<?> likes(@PathVariable String className) {
 
         try {
-            List<ClassUT> filteredClasses = adminService.filtraClassi(category);
-            return ResponseEntity.ok(filteredClasses);
-
-        } catch (NotFoundException e) {
+            long likesCount = utilsService.getClassLikes(className);
+            return ResponseEntity.ok(likesCount);
+        } catch(NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il recupero delle classi: " + e.getMessage());
         }
-
     }
 
-    @GetMapping("/Cfilterby/{text}/{category}")
-    public ResponseEntity<?> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
+    @GetMapping("/interaction")
+    public List<InteractionDTO> elencaInt() {
 
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
+        return utilsService.elencaInt();
+    }
 
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
+    @GetMapping("/findReport")
+    public List<InteractionDTO> elencaReport() {
+
+        return utilsService.elencaReport();
+    }
+
+    @PostMapping("/interaction/upload")
+    public ResponseEntity<?> uploadInteraction(@RequestBody InteractionDTO interactionDTO) {
 
         try {
-            List<ClassUT> filteredClasses = adminService.filtraClassi(text, category);
-            return ResponseEntity.ok(filteredClasses);
-
+            utilsService.uploadInteraction(interactionDTO);
+            return ResponseEntity.ok().body("");
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il recupero delle classi: " + e.getMessage());
         }
+    }
 
+    @PostMapping("/deleteint/{interactionId}")
+    public void eliminaInteraction(@PathVariable String interactionId) {
+
+        utilsService.eliminaInteraction(Long.parseLong(interactionId));
     }
 }
-
-
-

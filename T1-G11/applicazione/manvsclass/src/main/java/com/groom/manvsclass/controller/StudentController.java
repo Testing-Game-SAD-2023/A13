@@ -36,23 +36,17 @@ public class StudentController {
         try {
 
             // 1. Verifica se l'utente ha un team 
-            Optional<Team> teamOpt = teamService.getTeamByStudentId(studentId);
-            if (teamOpt.isEmpty()) {
-                //il team non esiste 
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("L'utente non è associato a un Team");
-            }
-
-            Team existingTeam = teamOpt.get();
+            Team studentTeam = teamService.getTeamByStudentId(studentId);
 
             // 2. Recupera gli Assignment associati al Team
-            List<Assignment> assignments = assignmentRepository.findByTeam_Id(existingTeam.getId());
+            List<Assignment> assignments = assignmentRepository.findByTeam_Id(studentTeam.getId());
             if (assignments == null || assignments.isEmpty()) {
                 assignments = new ArrayList<>();
             }
 
             // 3. Crea la struttura di risposta
             Map<String, Object> response = new HashMap<>();
-            response.put("team", existingTeam);
+            response.put("team", studentTeam);
             response.put("assignments", assignments);
 
             // 4. Restituisci la risposta

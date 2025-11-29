@@ -20,6 +20,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.NoArgsConstructor;
@@ -41,7 +43,9 @@ public class ClassUT {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
+    @Enumerated(EnumType.STRING)
     private OpponentDifficulty difficulty;
+
     private String uri;
     private String description;
 

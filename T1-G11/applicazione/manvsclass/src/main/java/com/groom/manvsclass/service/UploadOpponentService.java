@@ -586,7 +586,7 @@ public class UploadOpponentService {
             Opponent opponent = new Opponent();
             opponent.setClassUT(classUT);
             opponent.setType(robotType);
-            opponent.setOpponentDifficulty(difficulty);
+            // opponent.setOpponentDifficulty(difficulty);
             opponent.setCoverage(coverage);
             opponent.setEvosuiteScore(evosuiteScore);
             opponent.setJacocoScore(jacocoScore);

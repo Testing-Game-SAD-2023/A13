@@ -1,9 +1,9 @@
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.dto.SuggestionDTO;
+import com.groom.manvsclass.dto.GuidelineDTO;
 
 import com.groom.manvsclass.security.JwtRequestContext;
-import com.groom.manvsclass.service.SuggestionService;
+import com.groom.manvsclass.service.GuidelineService;
 
 import com.groom.manvsclass.exception.NotFoundException;
 import com.groom.manvsclass.exception.DuplicatedTitlesException;
@@ -24,15 +24,13 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-public class SuggestionController {
+public class GuidelineController {
 
     @Autowired
-    private SuggestionService suggestionService;
+    private GuidelineService guidelineService;
 
-    @PostMapping("/opponents/suggestions/{className}")
-    public ResponseEntity<?> uploadSuggestions(
-            @PathVariable("className") String className,
-            @RequestBody List<SuggestionDTO> suggestionsDTO) {
+    @PostMapping("/opponents/guidelines")
+    public ResponseEntity<?> uploadGuidelines(@RequestBody List<GuidelineDTO> guidelinesDTO) {
 
         String jwt = JwtRequestContext.getJwtToken();
         if (jwt == null) {
@@ -40,21 +38,15 @@ public class SuggestionController {
         }
 
         try {
-            suggestionService.uploadSuggestions(className, suggestionsDTO);
-            return ResponseEntity.status(HttpStatus.OK).body("Suggerimenti caricati con successo.");
-
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-
-        catch (Exception e) {
-
+            guidelineService.uploadGuidelines(guidelinesDTO);
+            return ResponseEntity.status(HttpStatus.OK).body("Linee guida caricate con successo.");
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore.");
         }
     }
 
-    @GetMapping("/opponents/suggestions/{className}")
-    public ResponseEntity<?> viewSuggestions(@PathVariable("className") String className) {
+    @GetMapping("/opponents/guidelines")
+    public ResponseEntity<?> viewGuidelines() {
 
         String jwt = JwtRequestContext.getJwtToken();
         if (jwt == null) {
@@ -62,8 +54,8 @@ public class SuggestionController {
         }
 
         try {
-            List<SuggestionDTO> suggestionsDTO = suggestionService.findSuggestions(className);
-            return ResponseEntity.ok(suggestionsDTO);
+            List<GuidelineDTO> guidelinesDTO = guidelineService.findGuidelines();
+            return ResponseEntity.ok(guidelinesDTO);
 
         } catch (Exception e) {
 
@@ -72,25 +64,22 @@ public class SuggestionController {
         }
     }
 
-    @DeleteMapping("/opponents/suggestions/{className}/suggestion")
-    public ResponseEntity<?> deleteSuggestion(
-            @PathVariable("className") String className,
-            @RequestParam("suggestionTitle") String suggestionTitle)
+    @DeleteMapping("/opponents/guidelines/{guidelineTitle}")
+    public ResponseEntity<?> deleteGuideline(@PathVariable("guidelineTitle") String guidelineTitle)
     {
 
         String jwt = JwtRequestContext.getJwtToken();
         if (jwt == null) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+            throw new RuntimeException("Token JWT non valido o mancante.");
         }
 
         try {
-            suggestionService.deleteSuggestion(className, suggestionTitle);
-            return ResponseEntity.status(HttpStatus.OK).body("Suggerimento eliminato con successo.");
+            guidelineService.deleteGuideline(guidelineTitle);
+            return ResponseEntity.status(HttpStatus.OK).body("Linea guida eliminata con successo.");
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore" );
         }
     }
-
 }
