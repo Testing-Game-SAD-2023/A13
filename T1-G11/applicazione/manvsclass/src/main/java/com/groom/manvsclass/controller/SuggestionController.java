@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -29,10 +30,10 @@ public class SuggestionController {
     @Autowired
     private SuggestionService suggestionService;
 
-    @PostMapping("/opponents/suggestions/{className}")
+    @PostMapping("/opponents/suggestions/upload/{className}")
     public ResponseEntity<?> uploadSuggestions(
             @PathVariable("className") String className,
-            @RequestBody List<SuggestionDTO> suggestionsDTO) {
+            @Valid @RequestBody List<SuggestionDTO> suggestionDTOs) {
 
         String jwt = JwtRequestContext.getJwtToken();
         if (jwt == null) {
@@ -40,7 +41,7 @@ public class SuggestionController {
         }
 
         try {
-            suggestionService.uploadSuggestions(className, suggestionsDTO);
+            suggestionService.uploadSuggestions(className, suggestionDTOs);
             return ResponseEntity.status(HttpStatus.OK).body("Suggerimenti caricati con successo.");
 
         } catch (NotFoundException e) {
@@ -49,7 +50,8 @@ public class SuggestionController {
 
         catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Errore nell'upload dei suggerimenti: " + e.getMessage());
         }
     }
 
@@ -62,13 +64,13 @@ public class SuggestionController {
         }
 
         try {
-            List<SuggestionDTO> suggestionsDTO = suggestionService.findSuggestions(className);
-            return ResponseEntity.ok(suggestionsDTO);
+            List<SuggestionDTO> suggestionDTOs = suggestionService.findSuggestions(className);
+            return ResponseEntity.ok(suggestionDTOs);
 
         } catch (Exception e) {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore nel download della classe: " + e.getMessage());
+                    .body("Errore nel recupero dei suggerimenti: " + e.getMessage());
         }
     }
 
@@ -89,7 +91,8 @@ public class SuggestionController {
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore" );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Errore nella cancellazione del suggerimento: " + e.getMessage());
         }
     }
 

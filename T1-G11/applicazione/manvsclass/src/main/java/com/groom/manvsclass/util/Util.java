@@ -6,12 +6,12 @@ package com.groom.manvsclass.util;
 import com.groom.manvsclass.model.Interaction;
 import com.groom.manvsclass.model.InteractionType;
 import com.groom.manvsclass.model.ClassUT;
+import com.groom.manvsclass.dto.InteractionDTO;
+import com.groom.manvsclass.mapper.InteractionMapper;
 
 import com.groom.manvsclass.repository.InteractionRepository;
 import com.groom.manvsclass.repository.ClassUTRepository;
-import com.groom.manvsclass.dto.InteractionDTO;
 import com.groom.manvsclass.exception.NotFoundException;
-import com.groom.manvsclass.mapper.InteractionMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,11 +1,11 @@
 package com.groom.manvsclass.service;
 
 import com.groom.manvsclass.model.Guideline;
+import com.groom.manvsclass.dto.GuidelineDTO;
+import com.groom.manvsclass.mapper.GuidelineMapper;
 import com.groom.manvsclass.repository.GuidelineRepository;
 
 import com.groom.manvsclass.exception.NotFoundException;
-import com.groom.manvsclass.mapper.GuidelineMapper;
-import com.groom.manvsclass.dto.GuidelineDTO;
 import com.groom.manvsclass.exception.DuplicatedTitlesException;
 
 import org.springframework.stereotype.Service;
@@ -26,10 +26,10 @@ public class GuidelineService {
     private GuidelineMapper guidelineMapper;
 
     @Transactional
-    public void uploadGuidelines(List<GuidelineDTO> guidelinesDTO) {
+    public void uploadGuidelines(List<GuidelineDTO> guidelineDTOs) {
 
         // effettua il mapping in ingresso DTO -> Model
-        List<Guideline> guidelines = guidelineMapper.toEntityList(guidelinesDTO);
+        List<Guideline> guidelines = guidelineMapper.toEntityList(guidelineDTOs);
 
         List<Guideline> guidelinesToSave = new ArrayList<>();
         // List<String> duplicatedTitles = new ArrayList<>();

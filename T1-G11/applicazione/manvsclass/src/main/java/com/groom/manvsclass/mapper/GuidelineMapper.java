@@ -22,7 +22,7 @@ public interface GuidelineMapper {
     @Mapping(target= "image", source = "image", qualifiedByName = "bytesToBase64")
     GuidelineDTO toDto(Guideline guideline);
 
-    List<Guideline> toEntityList(List<GuidelineDTO> singleGuidelineDTOs);
+    List<Guideline> toEntityList(List<GuidelineDTO> guidelineDTOs);
 
     List<GuidelineDTO> toDtoList(List<Guideline> guidelines);
 

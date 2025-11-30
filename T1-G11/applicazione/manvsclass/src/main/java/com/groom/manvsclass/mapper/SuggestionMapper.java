@@ -20,10 +20,10 @@ public interface SuggestionMapper {
     @Mapping(target = "image", source = "image", qualifiedByName = "base64ToBytes")
     Suggestion toEntity(SuggestionDTO singleSuggestionDTO);
 
-    @Mapping(target= "image", source = "image", qualifiedByName = "bytesToBase64")
+    @Mapping(target = "image", source = "image", qualifiedByName = "bytesToBase64")
     SuggestionDTO toDto(Suggestion suggestion);
 
-    List<Suggestion> toEntityList(List<SuggestionDTO> singleSuggestionDTOs);
+    List<Suggestion> toEntityList(List<SuggestionDTO> suggestionDTOs);
 
     List<SuggestionDTO> toDtoList(List<Suggestion> suggestions);
 

@@ -179,10 +179,10 @@ async function callUploadGuidelines(guideLines) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify( {
-                guidelines: guideLines
-            })
+            // MODIFICA QUI: Invia direttamente la lista, senza { guidelines: ... }
+            body: JSON.stringify(guideLines)
         });
+
         if (!response.ok) {
             throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
         }
@@ -195,12 +195,16 @@ async function callUploadGuidelines(guideLines) {
         throw error;
     }
 }
+
+// in api.js
+
 async function callGetGuidelines() {
     try {
 
         const response = await fetch(APIS.GET_GUIDELINES,  {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store'
         });
 
         if (!response.ok) {
@@ -233,17 +237,20 @@ async function callDeleteGuideline(title) {
     }
 }
 
+
 async function callUploadSuggestions(className, suggestionsData) {
+
     try {
-        const response = await fetch(APIS.UPLOAD_SUGGESTIONS, {
+
+        const url = APIS.UPLOAD_SUGGESTIONS(className);
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                className,
-                suggestions: suggestionsData
-            })
+
+            body: JSON.stringify(suggestionsData)
         });
 
         if (!response.ok) {
@@ -258,7 +265,6 @@ async function callUploadSuggestions(className, suggestionsData) {
         throw error;
     }
 }
-
 
 async function callGetSuggestions(className) {
     try {

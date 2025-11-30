@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class GuidelineController {
     @Autowired
     private GuidelineService guidelineService;
 
-    @PostMapping("/opponents/guidelines")
-    public ResponseEntity<?> uploadGuidelines(@RequestBody List<GuidelineDTO> guidelinesDTO) {
+    @PostMapping("/opponents/guidelines/upload")
+    public ResponseEntity<?> uploadGuidelines(@Valid @RequestBody List<GuidelineDTO> guidelineDTOs) {
 
         String jwt = JwtRequestContext.getJwtToken();
         if (jwt == null) {
@@ -38,10 +39,11 @@ public class GuidelineController {
         }
 
         try {
-            guidelineService.uploadGuidelines(guidelinesDTO);
+            guidelineService.uploadGuidelines(guidelineDTOs);
             return ResponseEntity.status(HttpStatus.OK).body("Linee guida caricate con successo.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Errore nell'upload delle linee guida: " + e.getMessage());
         }
     }
 
@@ -54,13 +56,13 @@ public class GuidelineController {
         }
 
         try {
-            List<GuidelineDTO> guidelinesDTO = guidelineService.findGuidelines();
-            return ResponseEntity.ok(guidelinesDTO);
+            List<GuidelineDTO> guidelineDTOs = guidelineService.findGuidelines();
+            return ResponseEntity.ok(guidelineDTOs);
 
         } catch (Exception e) {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore nel download della classe: " + e.getMessage());
+                    .body("Errore nel recupero delle linee guida: " + e.getMessage());
         }
     }
 
@@ -79,7 +81,8 @@ public class GuidelineController {
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore" );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Errore nella cancellazione della linea guida: " + e.getMessage());
         }
     }
 }

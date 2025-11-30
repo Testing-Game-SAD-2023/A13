@@ -2,13 +2,14 @@ package com.groom.manvsclass.service;
 
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Suggestion;
+import com.groom.manvsclass.dto.SuggestionDTO;
+import com.groom.manvsclass.mapper.SuggestionMapper;
 
 import com.groom.manvsclass.repository.ClassUTRepository;
 import com.groom.manvsclass.repository.SuggestionRepository;
-import com.groom.manvsclass.dto.SuggestionDTO;
 import com.groom.manvsclass.exception.NotFoundException;
-import com.groom.manvsclass.mapper.SuggestionMapper;
 
+import com.groom.manvsclass.exception.NotFoundException;
 import com.groom.manvsclass.exception.DuplicatedTitlesException;
 
 import org.springframework.stereotype.Service;
@@ -31,10 +32,10 @@ public class SuggestionService {
     private SuggestionMapper suggestionMapper;
 
     @Transactional
-    public void uploadSuggestions(String className, List<SuggestionDTO> suggestionsDTO) {
+    public void uploadSuggestions(String className, List<SuggestionDTO> suggestionDTOs) {
 
         // effettua il mapping in ingresso DTO -> Model
-        List<Suggestion> suggestions = suggestionMapper.toEntityList(suggestionsDTO);
+        List<Suggestion> suggestions = suggestionMapper.toEntityList(suggestionDTOs);
 
         Optional<ClassUT> classUTOpt = classUTRepository.findById(className);
         if (classUTOpt.isEmpty()) {

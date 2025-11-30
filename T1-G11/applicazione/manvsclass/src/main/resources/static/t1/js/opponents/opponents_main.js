@@ -3,7 +3,6 @@ const links = {
     navOpponentsMain: VIEWS.OPPONENTS_MAIN,
     navDashboardAdmin2: VIEWS.DASHBOARD_ADMIN,
     navOpponentsUpload: VIEWS.OPPONENTS_UPLOAD,
-    navAddGuidelines: VIEWS.ADD_GUIDELINES,
     linkSortByDate: VIEWS.OPPONENTS_SORT_BY_DATE,
     linkSortByName: VIEWS.OPPONENTS_SORT_BY_NAME,
     linkFilterDifficultyEasy: VIEWS.OPPONENTS_FILTER_DIFFICULTY_EASY,
@@ -27,14 +26,6 @@ document.getElementById("searchForm").addEventListener("search", event => {
 
     window.location.href = url.toString();
 });
-
-const addGuidelinesBtn = document.getElementById("navAddGuidelines");
-if (addGuidelinesBtn) {
-    addGuidelinesBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        document.getElementById("guidelinesInput").click();
-    });
-}
 
 async function downloadClassUT(classUTName) {
     try {
@@ -93,7 +84,6 @@ async function fetchAndDisplaySuggestions(className) {
             const divContent = document.createElement('div');
             divContent.className = 'w-100';
 
-            // Header Row (Title, Badge for level, Date)
             const headerRow = document.createElement('div');
             headerRow.className = 'd-flex align-items-center mb-1';
 
@@ -101,7 +91,6 @@ async function fetchAndDisplaySuggestions(className) {
             titleSpan.textContent = suggestion.title;
             titleSpan.className = 'font-weight-bold mr-2';
 
-            // Badge based on suggestion.level
             const levelSpan = document.createElement('span');
             levelSpan.textContent = suggestion.level;
             let badgeClass = 'badge-secondary';
@@ -183,25 +172,31 @@ function handleUpload(inputElement, expectedClassName) {
             const fileContent = event.target.result;
             const jsonData = JSON.parse(fileContent);
 
-            if (!jsonData || typeof jsonData !== 'object') throw new Error("JSON non valido.");
-
-            if (typeof jsonData.className !== 'string') throw new Error("JSON privo di 'className' valido.");
-
             const isValidSuggestion = s => (
                 typeof s === 'object' && s !== null &&
-                typeof s.title === 'string' &&
-                typeof s.hint === 'string' &&
-                (s.image === undefined || typeof s.image === 'string') &&
+
+                typeof s.title === 'string' && s.title.trim().length > 0 &&
+
+                typeof s.hint === 'string' && s.hint.trim().length > 0 &&
+
+                (s.image === undefined || s.image === null || typeof s.image === 'string') &&
+
                 typeof s.level === 'string'
             );
 
-            if (!Array.isArray(jsonData.suggestions) || !jsonData.suggestions.every(isValidSuggestion)) {
-                throw new Error("JSON non valido: ogni suggerimento deve avere 'title', 'hint', 'level' e opzionalmente 'image'.");
+            if (!Array.isArray(jsonData)) {
+                throw new Error("Formato non valido: Il file deve essere una lista JSON pura [...].");
             }
 
-            if (jsonData.className !== expectedClassName) throw new Error(`File per '${jsonData.className}', non per '${expectedClassName}'.`);
+            if (!jsonData.every(isValidSuggestion)) {
+                throw new Error("Dati non validi: 'title' e 'hint' sono obbligatori e non possono essere vuoti o contenere solo spazi.");
+            }
 
-            await callUploadSuggestions(expectedClassName, jsonData.suggestions);
+            const suggestionsPayload = jsonData;
+
+            await callUploadSuggestions(expectedClassName, suggestionsPayload);
+
+
             await fetchAndDisplaySuggestions(expectedClassName);
             await fetchAndDisplayGuidelines();
 
@@ -219,6 +214,9 @@ function handleUpload(inputElement, expectedClassName) {
 
 async function fetchAndDisplayGuidelines() {
     const listContainer = document.getElementById('global-guidelines-list');
+
+    const detailsContainer = document.getElementById('global-guidelines-container');
+
     if (!listContainer) return;
 
     try {
@@ -230,7 +228,12 @@ async function fetchAndDisplayGuidelines() {
             return;
         }
 
+        if (detailsContainer) {
+            detailsContainer.open = true;
+        }
+
         guidelines.forEach(guide => {
+
             const li = document.createElement('li');
             li.className = 'd-flex justify-content-between align-items-start mb-1 border-bottom pb-2';
 
@@ -264,6 +267,7 @@ async function fetchAndDisplayGuidelines() {
                 const imgContainer = document.createElement('div');
                 imgContainer.className = 'mt-2';
                 const img = document.createElement('img');
+
                 img.src = imageContent.startsWith('data:image') ? imageContent : `data:image/png;base64,${imageContent}`;
                 img.className = 'img-fluid rounded border';
                 img.style.maxHeight = '200px';
@@ -313,25 +317,36 @@ function handleGuidelinesUpload(inputElement) {
         try {
             const fileContent = event.target.result;
             const jsonData = JSON.parse(fileContent);
-            let rawList = [];
 
-            if (Array.isArray(jsonData)) rawList = jsonData;
-            else if (jsonData.guidelines && Array.isArray(jsonData.guidelines)) rawList = jsonData.guidelines;
-            else rawList = [jsonData];
+            if (!Array.isArray(jsonData)) {
+                throw new Error("Formato non valido: Il file delle linee guida deve essere una lista JSON pura [...].");
+            }
 
-            const guidelinesPayload = rawList.map(item => ({
+            const guidelinesPayload = jsonData.map(item => ({
                 title: item.title,
-                hint: item.hint || "",
+                hint: item.hint, // Non mettiamo default "" per poter validare se manca
                 image: item.image || item.base64Image || null
             }));
 
-            if (guidelinesPayload.length === 0 || !guidelinesPayload[0].title) {
-                throw new Error("Il file non contiene linee guida valide.");
+            const isValidGuideline = g => (
+                typeof g === 'object' && g !== null &&
+
+                typeof g.title === 'string' && g.title.trim().length > 0 &&
+
+                typeof g.hint === 'string' && g.hint.trim().length > 0 &&
+
+                (g.image === null || typeof g.image === 'string')
+            );
+
+            if (!guidelinesPayload.every(isValidGuideline)) {
+                throw new Error("Dati non validi: 'title' e 'hint' sono obbligatori e non possono essere vuoti o contenere solo spazi.");
             }
 
             await callUploadGuidelines(guidelinesPayload);
+
             alert("Linee guida caricate con successo!");
             await fetchAndDisplayGuidelines();
+
         } catch (e) {
             console.error("Errore upload linee guida:", e);
             alert(`Errore: ${e.message}`);

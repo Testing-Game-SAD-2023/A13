@@ -59,7 +59,7 @@ const APIS = {
     UPLOAD_GUIDELINES: '/opponents/guidelines/upload',
     GET_GUIDELINES: '/opponents/guidelines',
     DELETE_GUIDELINE: (guidelineTitle) =>`/opponents/guidelines/${encodeURIComponent(guidelineTitle)}`,
-    UPLOAD_SUGGESTIONS: `/opponents/suggestions/upload`,
+    UPLOAD_SUGGESTIONS: (className) => `/opponents/suggestions/upload/${encodeURIComponent(className)}`,
     GET_SUGGESTIONS: (name) => `/opponents/suggestions/${encodeURIComponent(name)}`,
     DELETE_SUGGESTION: (className, suggestionTitle) =>
         `/opponents/suggestions/${encodeURIComponent(className)}/suggestion?suggestionTitle=${encodeURIComponent(suggestionTitle)}`
