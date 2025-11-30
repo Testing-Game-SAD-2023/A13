@@ -28,9 +28,25 @@
     <script src="https://unpkg.com/tippy.js@6"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-    <!-- <script type= "text/javascript" src="/t5/js/opponents_main.js"></script> -->
-    <script type="text/javascript" src="/t5/js_old/common.js"></script>
-    <script type="text/javascript" src="/t5/js_old/gamemode_scalata.js"></script>
+    <!-- Script per passare i dati dal backend al frontend -->
+    <script th:inline="javascript">
+        // Usa la stringa JSON pre-formattata dal backend
+        var scalateJsonString = /*[[${available_scalate_json}]]*/ '[]';
+        
+        console.log("[gamemode_scalata.html] JSON string ricevuta:", scalateJsonString);
+        
+        // Parse del JSON
+        try {
+            window.available_scalate = JSON.parse(scalateJsonString);
+            console.log("[gamemode_scalata.html] Scalate parsate:", window.available_scalate);
+            console.log("[gamemode_scalata.html] Numero scalate:", window.available_scalate.length);
+        } catch (e) {
+            console.error("[gamemode_scalata.html] Errore nel parsing JSON:", e);
+            window.available_scalate = [];
+        }
+    </script>
+
+    <script type="text/javascript" src="/t5/js/gamemode_scalata.js"></script>
     
 
 </head>

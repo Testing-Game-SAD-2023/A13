@@ -19,8 +19,8 @@ public class Scalata {
 
     private String username;
     private String scalataDescription;
-    private int numberOfRounds;
-    private List<String> selectedClasses;
+    private int numberOfLevels;
+    private List<Integer> Levels;
 
     //Void Constructor
     public Scalata() {
@@ -28,13 +28,13 @@ public class Scalata {
     }
 
     //Constructor
-    public Scalata(String username, String scalataName, String scalataDescription, int numberOfRounds, List<String> selectedClasses) {
+    public Scalata(String username, String scalataName, String scalataDescription, int numberOfLevels, List<Integer> levels) {
 
         this.username = username;
         this.scalataName = scalataName;
         this.scalataDescription = scalataDescription;
-        this.numberOfRounds = numberOfRounds;
-        this.selectedClasses = selectedClasses;
+        this.numberOfLevels = numberOfLevels;
+        this.Levels = levels;
     }
     //Getters
 
@@ -63,20 +63,20 @@ public class Scalata {
         this.scalataDescription = scalataDescription;
     }
 
-    public int getNumberOfRounds() {
-        return numberOfRounds;
+    public int getNumberOfLevels() {
+        return numberOfLevels;
     }
 
-    public void setNumberOfRounds(int numberOfRounds) {
-        this.numberOfRounds = numberOfRounds;
+    public void setNumberOfLevels(int numberOfLevels) {
+        this.numberOfLevels = numberOfLevels;
     }
 
-    public List<String> getSelectedClasses() {
-        return selectedClasses;
+    public List<Integer> getLevels() {
+        return Levels;
     }
 
-    public void setSelectedClasses(List<String> selectedClasses) {
-        this.selectedClasses = selectedClasses;
+    public void setLevels(List<Integer> levels) {
+        this.Levels = levels;
     }
 
     //Overriding the toString() method
@@ -86,8 +86,8 @@ public class Scalata {
                 "author=" + username + ", " +
                 "scalataName=" + scalataName + "," +
                 "scalataDescription=" + scalataDescription + ", " +
-                "rounds=" + numberOfRounds + ", " +
-                "selectedClasses=" + selectedClasses +
+                "levels=" + numberOfLevels + ", " +
+                "levelsList=" + Levels +
                 "]";
     }
 

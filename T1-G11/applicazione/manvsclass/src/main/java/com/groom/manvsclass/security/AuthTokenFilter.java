@@ -32,10 +32,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private static final Logger customLogger = LoggerFactory.getLogger(AuthTokenFilter.class);
     private static final List<String> PLAYER_ALLOWED_URIS = List.of(
-            "/opponents/**",
-            "/ottieniTeamByStudentId",
-            "/ottieniDettagliTeamCompleto"
+        "/opponents/**",
+        "/ottieniTeamByStudentId",
+        "/ottieniDettagliTeamCompleto",
+        // allow players to list and retrieve scalate (needed by the T5 UI)
+        "/scalata/**"
     );
+
     private final ApiGatewayClient apiGatewayClient;
 
     @Override

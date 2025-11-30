@@ -81,6 +81,10 @@ public class T1Service extends BaseService {
         registerAction("getOpponentEvosuiteScore", new ServiceActionDefinition(
                 params -> getOpponentEvosuiteScore((String) params[0], (String) params[1], (OpponentDifficulty) params[2]),
                 String.class, String.class, OpponentDifficulty.class));
+
+        registerAction("getScalateList", new ServiceActionDefinition(
+                params -> getScalateList() // Recupera lista scalate da T1
+        ));
     }
 
 
@@ -133,11 +137,13 @@ public class T1Service extends BaseService {
     }
 
     private ResponseTeamComplete ottieniTeamCompleto(String studentId) {
-        Map<String, String> queryParams = Map.of(
-                STUDENT_ID_FIELD, studentId
-        );
-        return callRestGET("/ottieniDettagliTeamCompleto", queryParams, ResponseTeamComplete.class);
-    }
-
-
+    Map<String, String> queryParams = Map.of(
+            STUDENT_ID_FIELD, studentId
+    );
+    return callRestGET("/ottieniDettagliTeamCompleto", queryParams, ResponseTeamComplete.class);
 }
+
+// Restituisce la lista di tutte le scalate disponibili
+private List<Map<String, Object>> getScalateList() {
+    return callRestGET("/scalata/scalate_list", null, new ParameterizedTypeReference<List<Map<String, Object>>>() {});
+}}

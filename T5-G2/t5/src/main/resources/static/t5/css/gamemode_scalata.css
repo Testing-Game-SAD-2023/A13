@@ -45,17 +45,66 @@ body {
 #scalate-container {
     background-color: rgba(57,57,83,1);             /*Imposta il colore di sfondo del container */
     color: #C8C7D8;                                 /* Imposta il colore del testo */
-    font-size: 32px;                                  /* Imposta la dimensione del testo */
-
+    font-size: 18px;                                /* Imposta la dimensione del testo */
     padding: 24px;
     border-radius: 16px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 392px;
-    height: 440px;  
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 300px;
 }
+
+/* Stili per le card delle scalate */
+.scalata-card {
+    background-color: rgba(70, 70, 90, 0.9);
+    border: 2px solid #393953;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.scalata-card:hover {
+    border-color: #ff9b3a;
+    box-shadow: 0 4px 8px rgba(255, 155, 58, 0.3);
+    transform: translateY(-2px);
+}
+
+.scalata-card.selected {
+    border-color: #f018f0;
+    background-color: rgba(240, 24, 240, 0.1);
+    box-shadow: 0 4px 12px rgba(240, 24, 240, 0.4);
+}
+
+.scalata-card .card-title {
+    color: #ff9b3a;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.scalata-card .card-text {
+    color: #C8C7D8;
+}
+
+.btn-select-scalata {
+    background-color: #ff9b3a;
+    border: none;
+    color: #1c1c28;
+    font-weight: bold;
+    padding: 10px 30px;
+    transition: all 0.3s ease;
+}
+
+.btn-select-scalata:hover {
+    background-color: #f5b041;
+    transform: scale(1.05);
+}
+
+.scalata-card.selected .btn-select-scalata {
+    background-color: #f018f0;
+    color: white;
+}
+
 #scalate-container button {
     color: #C8C7D8;                                 /* Imposta il colore del testo */
     display: block;

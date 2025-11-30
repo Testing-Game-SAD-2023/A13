@@ -56,7 +56,7 @@ for i in "${SELECTION[@]}"; do
             echo "Building T4"
             cd "$ROOT_DIR/T4/gamerepo"
             mvn clean package -DskipTests=true -Dspring.profiles.active=prod || { echo "Error in T4 build"; exit 1; }
-            docker build -t mick0974/a13:t4-g18 .
+            docker buildx build --platform linux/amd64 -t mick0974/a13:t4-g18 .
             docker compose up -d
             cd "$ROOT_DIR"
             ;;

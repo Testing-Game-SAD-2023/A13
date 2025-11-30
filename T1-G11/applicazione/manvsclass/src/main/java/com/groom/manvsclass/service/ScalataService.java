@@ -23,17 +23,18 @@ public class ScalataService {
     @Autowired
     private JwtService jwtService;
 
-    public ResponseEntity<?> uploadScalata(Scalata scalata, String jwt) {
+     
+    public ResponseEntity<?> uploadScalata(Scalata scalata) {
+        /*
         if (!jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /configureScalata) Attenzione, non sei loggato!");
-        }
-
+        }*/
         Scalata new_scalata = new Scalata();
         new_scalata.setUsername(scalata.getUsername());
         new_scalata.setScalataName(scalata.getScalataName());
         new_scalata.setScalataDescription(scalata.getScalataDescription());
-        new_scalata.setNumberOfRounds(scalata.getNumberOfRounds());
-        new_scalata.setSelectedClasses(scalata.getSelectedClasses());
+        new_scalata.setNumberOfLevels(scalata.getNumberOfLevels());
+        new_scalata.setLevels(scalata.getLevels());
 
         scalata_repo.save(new_scalata);
         return ResponseEntity.ok().body(new_scalata);
@@ -44,6 +45,18 @@ public class ScalataService {
         return new ResponseEntity<>(scalate, HttpStatus.OK);
     }
 
+      public ResponseEntity<?> deleteScalataByName(String scalataName) {
+
+        List<Scalata> scalata = scalata_repo.findByScalataNameContaining(scalataName);
+        if (scalata.isEmpty()) {
+            return new ResponseEntity<>("Scalata con nome: " + scalataName + " non trovata", HttpStatus.NOT_FOUND);
+        } else {
+            scalata_repo.delete(scalata.get(0));
+            return new ResponseEntity<>("Scalata con nome: " + scalataName + " rimossa", HttpStatus.OK);
+        }
+    }
+
+    /*  metodo che verifica jwt, per testing eliminato per evitare dipendenza da JwtService in ScalataService
     public ResponseEntity<?> deleteScalataByName(String scalataName, String jwt) {
         if (!jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(DELETE /delete_scalata/{scalataName}) Attenzione, non sei loggato!");
@@ -57,7 +70,7 @@ public class ScalataService {
             return new ResponseEntity<>("Scalata con nome: " + scalataName + " rimossa", HttpStatus.OK);
         }
     }
-
+    */
     public ResponseEntity<?> retrieveScalataByName(String scalataName) {
         List<Scalata> scalata = scalata_repo.findByScalataNameContaining(scalataName);
         if (scalata.isEmpty()) {

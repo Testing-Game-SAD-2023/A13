@@ -16,12 +16,6 @@ import java.util.List;
  */
 public interface ScalataRepository extends MongoRepository<Scalata, String> {
 
-    // Returns all the Scalata objects with the given author
-    List<Scalata> findByUsernameContaining(String username);
-
-    // Returns all the Scalata objects with the given rounds
-    List<Scalata> findByNumberOfRoundsContaining(int numberOfRounds);
-
     // Returns all the Scalata objects with the given name
     List<Scalata> findByScalataNameContaining(String scalataName);
 

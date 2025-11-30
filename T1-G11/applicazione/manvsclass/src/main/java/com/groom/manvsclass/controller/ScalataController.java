@@ -3,13 +3,13 @@ package com.groom.manvsclass.controller;
 import com.groom.manvsclass.model.Scalata;
 import com.groom.manvsclass.service.ScalataService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin
-@Controller
+@RestController
+@RequestMapping("/scalata")
 public class ScalataController {
 
     private final ScalataService scalataService;
@@ -20,23 +20,20 @@ public class ScalataController {
 
     @PostMapping("/configureScalata")
     public ResponseEntity<?> uploadScalata(@RequestBody Scalata scalata, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
-        return scalataService.uploadScalata(scalata, jwt);
+        return scalataService.uploadScalata(scalata);
     }
 
     @GetMapping("/scalate_list")
-    @ResponseBody
     public ResponseEntity<?> listScalate() {
         return scalataService.listScalate();
     }
 
     @DeleteMapping("delete_scalata/{scalataName}")
-    @ResponseBody
     public ResponseEntity<?> deleteScalataByName(@PathVariable String scalataName, @CookieValue(name = "jwt", required = false) String jwt) {
-        return scalataService.deleteScalataByName(scalataName, jwt);
+        return scalataService.deleteScalataByName(scalataName);
     }
 
     @GetMapping("/retrieve_scalata/{scalataName}")
-    @ResponseBody
     public ResponseEntity<?> retrieveScalataByName(@PathVariable String scalataName) {
         return scalataService.retrieveScalataByName(scalataName);
     }
