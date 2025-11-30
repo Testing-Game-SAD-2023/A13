@@ -24,7 +24,7 @@ import java.time.LocalDate;
 
 
 @Entity
-@DiscriminatorValue("Suggestion")
+@Table(name = "suggestions")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

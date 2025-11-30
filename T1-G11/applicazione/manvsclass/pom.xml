@@ -63,13 +63,6 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
-        <!-- Per test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!--MODIFICA (07/05/2024) : Add spring-boot-starter-web-services dependency-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -87,7 +80,7 @@
         </dependency>
 
         <!-- ======================================= -->
-        <!-- ==    SICUREZZA E JWT                  == -->
+        <!-- ==    SICUREZZA E JWT                == -->
         <!-- ======================================= -->
 
         <dependency>
@@ -110,6 +103,28 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
+
+        <!-- ======================================= -->
+        <!-- ==     TEST                          == -->
+        <!-- ======================================= -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- ======================================= -->
         <!-- ==    UTILITIES VARIE                  == -->

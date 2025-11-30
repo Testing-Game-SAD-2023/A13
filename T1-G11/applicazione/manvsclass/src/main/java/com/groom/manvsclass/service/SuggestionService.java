@@ -74,20 +74,20 @@ public class SuggestionService {
     public List<SuggestionDTO> findSuggestions(String className) {
 
         List<Suggestion> suggestionsFound = suggestionRepository.findAllByClassUT_Name(className);
-        
+
         // effettua il mapping in uscita Model -> DTO
         return suggestionMapper.toDtoList(suggestionsFound);
     }
 
     public void deleteSuggestion(String className, String suggestionTitle) {
 
-        Optional<ClassUT> classOpt = classUTRepository.findById(className);
-        if(classOpt.isEmpty()) {
+        boolean classExists = classUTRepository.existsById(className);
+        if (!classExists) {
             throw new NotFoundException("Classe " + className + " non trovata.");
         }
 
         Optional<Suggestion> suggestionOpt = suggestionRepository.findByClassUT_NameAndTitle(className, suggestionTitle);
-        if(suggestionOpt.isEmpty()) {
+        if (suggestionOpt.isEmpty()) {
             throw new NotFoundException("Suggerimento " + suggestionTitle + " non trovato.");
         }
 
