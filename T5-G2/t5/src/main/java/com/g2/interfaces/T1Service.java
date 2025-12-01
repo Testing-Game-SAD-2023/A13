@@ -85,6 +85,11 @@ public class T1Service extends BaseService {
         registerAction("getScalateList", new ServiceActionDefinition(
                 params -> getScalateList() // Recupera lista scalate da T1
         ));
+
+        registerAction("getLevelById", new ServiceActionDefinition(
+                params -> getLevelById((Integer) params[0]), // Recupera un livello specifico per ID
+                Integer.class
+        ));
     }
 
 
@@ -146,4 +151,10 @@ public class T1Service extends BaseService {
 // Restituisce la lista di tutte le scalate disponibili
 private List<Map<String, Object>> getScalateList() {
     return callRestGET("/scalata/scalate_list", null, new ParameterizedTypeReference<List<Map<String, Object>>>() {});
-}}
+}
+
+// Restituisce i dettagli di un livello specifico per ID
+private Map<String, Object> getLevelById(Integer levelId) {
+    return callRestGET("/level/" + levelId, null, Map.class);
+}
+}
