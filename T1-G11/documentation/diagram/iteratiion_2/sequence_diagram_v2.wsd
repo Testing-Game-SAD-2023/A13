@@ -45,7 +45,7 @@ loop for each robotType (Evosuite/Randoop)
     note right: Build paths for src, test, coverage using OpponentPathResolver
     
     UploadService -> JavaFileService : saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType)
-    note right: Uses JavaPackageExtractor internally
+    note right: Uses JavaMetadataExtractor internally
     JavaFileService --> UploadService : splitPackageNames[][]
     
     UploadService -> JavaFileService : saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName)

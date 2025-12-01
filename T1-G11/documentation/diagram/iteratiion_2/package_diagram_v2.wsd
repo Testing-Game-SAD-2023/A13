@@ -62,7 +62,7 @@ package "Service Layer" <<Rectangle>> #LightYellow {
 ' Utility Layer
 package "Utility Layer" <<Rectangle>> #LightCoral {
   package "com.groom.manvsclass.util.upload" {
-    [JavaPackageExtractor]
+    [JavaMetadataExtractor]
     [LevelExtractor]
     [OpponentPathResolver]
     [FileUploadResponse]
@@ -141,7 +141,7 @@ database "MongoDB" {
 ' Service.Upload -> Utilities
 [UploadOpponentService] ..> [OpponentPathResolver] : path resolution
 [OpponentTransformationService] ..> [LevelExtractor] : extracts difficulty
-[JavaSourceFileService] ..> [JavaPackageExtractor] : extracts packages
+[JavaSourceFileService] ..> [JavaMetadataExtractor] : extracts packages
 
 ' Service -> Persistence
 [OpponentService] --> [OpponentRepository] : queries

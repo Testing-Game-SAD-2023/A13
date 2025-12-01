@@ -1,6 +1,6 @@
 package com.groom.manvsclass.service.upload;
 
-import com.groom.manvsclass.util.upload.JavaPackageExtractor;
+import com.groom.manvsclass.util.upload.JavaMetadataExtractor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,9 +51,9 @@ public class JavaSourceFileService {
 
             String content = Files.readString(src.toPath());
 
-            testPackageName = JavaPackageExtractor.extractPackageFromDeclaration(content);
+            testPackageName = JavaMetadataExtractor.extractPackageFromDeclaration(content);
             if (srcPackageName == null) {
-                srcPackageName = JavaPackageExtractor.extractSourcePackageFromTestCode(content, className, robotType);
+                srcPackageName = JavaMetadataExtractor.extractSourcePackageFromTestCode(content, className, robotType);
             }
 
             String testPackagePath = (testPackageName != null) ? String.join("/", testPackageName) : "";

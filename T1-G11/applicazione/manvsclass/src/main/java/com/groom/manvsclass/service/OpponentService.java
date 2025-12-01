@@ -18,6 +18,7 @@ import com.groom.manvsclass.service.upload.FileStorageService;
 import com.groom.manvsclass.service.upload.UploadOpponentService;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
 import com.groom.manvsclass.util.upload.FileUploadResponse;
+import com.groom.manvsclass.util.upload.JavaMetadataExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -62,8 +63,8 @@ public class OpponentService {
                            ClassRepository classRepository,
                            MongoTemplate mongoTemplate,
                            SearchRepositoryImpl searchRepository,
-                           UploadOpponentService uploadOpponentService, 
-                           OpponentRepository opponentRepository, 
+                           UploadOpponentService uploadOpponentService,
+                           OpponentRepository opponentRepository,
                            ApiGatewayClient apiGatewayClient,
                            FileStorageService fileStorageService,
                            ClassUTUploadService classUTUploadService) {
@@ -106,10 +107,30 @@ public class OpponentService {
 
         ClassUT classe = ClassUTDetailsDTO.parseFromJson(classUTDetails);
         String classUTFileName = StringUtils.cleanPath(Objects.requireNonNull(classUTFile.getOriginalFilename()));
-        
+
+        //-------------------------------------------------------------------------------------------
+        // Verifica che il nome della classe inserito dall'admin nel campo "Class Name" del form HTML
+        // sia effettivamente il nome della classe così come dichiarato nel file .java.
+        String classNameFromSourceFile = JavaMetadataExtractor.getClassNameFromJavaSourceFile(classUTFile.getBytes());
+
+        if(classNameFromSourceFile == null) {
+            response.setErrorMessage("Errore: Il file .java inviato non contiene alcuna dichiarazione di classe Java.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if(!classNameFromSourceFile.equalsIgnoreCase(classe.getName())) {
+            String errorMessage = "Errore: Il file .java inviato contiene dichiarazione di classe dal nome diverso da quello inserito nel form.\n"
+                    + "Il file .java contiene la dichiarazione della classe: " + classNameFromSourceFile + ".\n"
+                    + "Nel campo del form hai inserito: " + classe.getName() + ".";
+            response.setErrorMessage(errorMessage);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        //-------------------------------------------------------------------------------------------
+
         classUTUploadService.saveClassUTFile(classUTFileName, classe.getName(), classUTFile);
         uploadOpponentService.saveOpponentsFromZip(classUTFileName, classe.getName(), classUTFile, robotTestsZip);
-        
+
         response.setFileName(classUTFileName);
         response.setSize(classUTFile.getSize());
         response.setDownloadUri("/downloadFile");

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * Utility class for extracting Java package names from source code.
  * Provides methods to parse package declarations and imports from Java files.
  */
-public class JavaPackageExtractor {
+public class JavaMetadataExtractor {
 
     private static final Pattern PACKAGE_DECLARATION_PATTERN = 
         Pattern.compile("\\bpackage\\s+([\\w.]+?)\\s*;");
@@ -18,7 +18,7 @@ public class JavaPackageExtractor {
     private static final String IMPORT_STATEMENT_TEMPLATE = 
         "\\bimport\\s+(\\w+(?:\\.\\w+)*)\\.%s\\s*;";
 
-    private JavaPackageExtractor() {
+    private JavaMetadataExtractor() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -86,5 +86,47 @@ public class JavaPackageExtractor {
             return packageName.split("\\.");
         }
         return null;
+    }
+
+    /**
+     * Extracts class name
+     */
+    public static String getClassNameFromJavaSourceFile(byte[] classUTFileContent) {
+        String fileContent = new String(classUTFileContent);
+
+        StringBuilder buffer = new StringBuilder(fileContent);
+
+        // Remove single-line comments
+        Pattern pattern = Pattern.compile("^//.*", Pattern.MULTILINE);
+        buffer = new StringBuilder(pattern.matcher(buffer).replaceAll(" "));
+
+        // Remove multi-line comments
+        pattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
+        buffer = new StringBuilder(pattern.matcher(buffer).replaceAll(" "));
+
+        // Find the first occurrence of the word "class" (surrounded by whitespace)
+        pattern = Pattern.compile("\\s*class\\s*", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(buffer);
+
+        if (!matcher.find()) {
+            return null;
+        }
+
+        String foundSubString = matcher.group();
+        int index = buffer.indexOf(foundSubString);
+        StringBuilder className = new StringBuilder();
+
+        for (int i = index + foundSubString.length(); i < buffer.length(); i++) {
+            if (Character.isWhitespace(buffer.charAt(i))) {
+                break;
+            }
+            className.append(buffer.charAt(i));
+        }
+
+        if (className.length() < 1) {
+            return null;
+        }
+
+        return className.toString();
     }
 }

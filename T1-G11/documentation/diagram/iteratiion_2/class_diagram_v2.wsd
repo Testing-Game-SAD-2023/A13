@@ -117,7 +117,7 @@ package "service.upload.score" <<Rectangle>> {
 }
 
 package "util.upload" <<Rectangle>> {
-  class JavaPackageExtractor <<utility>> {
+  class JavaMetadataExtractor <<utility>> {
     +extractPackageFromDeclaration(code) : String[]
     +extractSourcePackageFromTestCode(code, className, robotType) : String[]
     -extractFromEvosuitePattern(code, className) : String[]
@@ -331,7 +331,7 @@ ClassUTUploadService --> ClassRepository : persists metadata
 ClassUTUploadService ..> OpponentPathResolver : uses static methods
 
 JavaSourceFileService --> FileStorageService : delegates basic ops
-JavaSourceFileService ..> JavaPackageExtractor : extracts packages
+JavaSourceFileService ..> JavaMetadataExtractor : extracts packages
 
 OpponentTransformationService --> OpponentPersistenceService : persists opponents
 OpponentTransformationService ..> CoverageReader : reads coverage files
