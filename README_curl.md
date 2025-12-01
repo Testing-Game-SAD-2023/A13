@@ -33,7 +33,7 @@ curl -s -X POST "http://localhost/scalata/configureScalata" \
   -H "Content-Type: application/json" \
   -H "Cookie: jwt=${JWT}" \
   -d '{
-    "scalataName": "TestScalata_'$(date +%s)'",
+    "scalataName": "ScalataDiProva",
     "username": "TestUser",
     "scalataDescription": "Scalata di test",
     "numberOfLevels": 3,
@@ -49,6 +49,28 @@ curl -s -X DELETE "http://localhost/scalata/delete_scalata/TestScalata_123456" \
   -H "Cookie: jwt=${JWT}"
 ```
 NOTA --> Sostituire `TestScalata_123456` con il nome della scalata da eliminare. Richiede JWT dell'admin.
+
+**IMPORTANTE**: Se il nome della scalata contiene spazi, usare URL encoding (`%20`):
+```bash
+# Esempio: eliminare "Scalata Prova"
+curl -s -X DELETE "http://localhost/scalata/delete_scalata/Scalata%20Prova" \
+  -H "Cookie: jwt=${JWT}"
+```
+
+## 7. Per recuperare il livello i-esimo di una scalata
+
+```bash
+# Esempio: recupera il livello 2 della scalata "ScalataDiProva"
+curl -s -X GET "http://localhost/scalata/ScalataDiProva/level/2" \
+  -H "Cookie: jwt=${JWT}" | jq '.'
+```
+
+**Con spazi nel nome (URL encoding):**
+```bash
+# Esempio: livello 1 della scalata "Scalata Facile"
+curl -s -X GET "http://localhost/scalata/Scalata%20Facile/level/1" \
+  -H "Cookie: jwt=${JWT}" | jq '.'
+```
 
 # Guida test API Level
 
@@ -97,3 +119,4 @@ curl -X PUT "http://localhost/level/1" \
 curl -X DELETE "http://localhost/level/1" \
   -H "Cookie: jwt=${JWT}"
 ```
+M 

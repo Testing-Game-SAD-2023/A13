@@ -37,4 +37,19 @@ public class ScalataController {
     public ResponseEntity<?> retrieveScalataByName(@PathVariable String scalataName) {
         return scalataService.retrieveScalataByName(scalataName);
     }
+
+    /**
+     * Recupera il livello i-esimo di una scalata.
+     * Path: /scalata/{scalataName}/level/{currentLevel}
+     * 
+     * @param scalataName Nome della scalata (es: "Scalata Facile")
+     * @param currentLevel Numero del livello (1-based: 1=primo, 2=secondo, etc.)
+     * @return I dati del Level corrispondente
+     */
+    @GetMapping("/{scalataName}/level/{currentLevel}")
+    public ResponseEntity<?> getLevelByPosition(
+            @PathVariable String scalataName,
+            @PathVariable int currentLevel) {
+        return scalataService.getLevelByPosition(scalataName, currentLevel);
+    }
 }

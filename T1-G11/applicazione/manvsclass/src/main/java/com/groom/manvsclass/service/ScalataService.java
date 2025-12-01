@@ -3,7 +3,9 @@
  */
 package com.groom.manvsclass.service;
 
+import com.groom.manvsclass.model.Level;
 import com.groom.manvsclass.model.Scalata;
+import com.groom.manvsclass.model.repository.LevelRepository;
 import com.groom.manvsclass.model.repository.ScalataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ScalataService {
@@ -20,6 +25,8 @@ public class ScalataService {
     private static final Logger logger = LoggerFactory.getLogger(ScalataService.class);
     @Autowired
     private ScalataRepository scalata_repo;
+    @Autowired
+    private LevelRepository levelRepository;
     @Autowired
     private JwtService jwtService;
 
@@ -77,6 +84,63 @@ public class ScalataService {
             return new ResponseEntity<>("Scalata with name: " + scalataName + " not found", HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(scalata, HttpStatus.OK);
+        }
+    }
+
+    /**
+     * Recupera il livello i-esimo di una scalata specifica.
+     * 
+     * @param scalataName Nome della scalata
+     * @param currentLevel Posizione del livello (1-based: 1 = primo livello, 2 = secondo, etc.)
+     * @return ResponseEntity con i dati del Level o errore
+     */
+    public ResponseEntity<?> getLevelByPosition(String scalataName, int currentLevel) {
+        try {
+            logger.info("Retrieving level {} for scalata: {}", currentLevel, scalataName);
+
+            // 1. Trova la scalata
+            List<Scalata> scalate = scalata_repo.findByScalataNameContaining(scalataName);
+            if (scalate.isEmpty()) {
+                logger.warn("Scalata '{}' not found", scalataName);
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Scalata non trovata: " + scalataName);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            }
+
+            Scalata scalata = scalate.get(0);
+            
+            // 2. Verifica che currentLevel sia valido
+            if (currentLevel < 1 || currentLevel > scalata.getLevels().size()) {
+                logger.warn("Invalid level {} for scalata '{}' (total levels: {})", 
+                           currentLevel, scalataName, scalata.getLevels().size());
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Livello non valido. Scalata ha " + scalata.getLevels().size() + " livelli");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            }
+
+            // 3. Estrai l'ID del livello dall'array (currentLevel è 1-based)
+            Integer levelId = scalata.getLevels().get(currentLevel - 1);
+            logger.info("Level {} of scalata '{}' corresponds to levelId: {}", 
+                       currentLevel, scalataName, levelId);
+
+            // 4. Carica il Level dal repository
+            Optional<Level> level = levelRepository.findById(levelId);
+            if (level.isEmpty()) {
+                logger.error("Level with ID {} not found (referenced by scalata '{}')", 
+                            levelId, scalataName);
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Dati livello corrotti - ID " + levelId + " non trovato");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            }
+
+            logger.info("Level found: {}", level.get());
+            return ResponseEntity.ok(level.get());
+
+        } catch (Exception e) {
+            logger.error("Error retrieving level for scalata '{}': {}", scalataName, e.getMessage(), e);
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Errore interno: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }

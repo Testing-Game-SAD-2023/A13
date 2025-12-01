@@ -88,16 +88,80 @@ public interface ScalataRepository extends MongoRepository<Scalata, String> {
 
 **Endpoints**:
 ```
-POST   /scalata/configureScalata     - Crea/aggiorna una scalata
-GET    /scalata/scalate_list          - Lista tutte le scalate
-GET    /scalata/retrieve_scalata/{name} - Dettagli scalata
-DELETE /scalata/delete_scalata/{name}   - Elimina scalata
+POST   /scalata/configureScalata            - Crea/aggiorna una scalata
+GET    /scalata/scalate_list                 - Lista tutte le scalate
+GET    /scalata/retrieve_scalata/{name}      - Dettagli scalata
+DELETE /scalata/delete_scalata/{name}        - Elimina scalata
+GET    /scalata/{scalataName}/level/{currentLevel}  - Recupera livello i-esimo di una scalata (NUOVO)
 ```
 
 **Annotazioni**:
 - `@CrossOrigin`: Permette richieste CORS
 - `@Controller`: Definisce come controller Spring
 - `@RequestMapping("/scalata")`: Base path per tutti gli endpoint
+
+**⚠️ IMPORTANTE - URL Encoding**:
+Se il nome della scalata contiene **spazi**, è necessario usare **URL encoding** (`%20`):
+```bash
+# ❌ ERRATO (con spazi)
+GET /scalata/Scalata Facile/level/1
+
+# ✅ CORRETTO (con URL encoding)
+GET /scalata/Scalata%20Facile/level/1
+```
+
+Questo vale per **tutti** gli endpoint che accettano `{scalataName}` come parametro di path.
+
+#### 1.5 Nuovo Metodo - `ScalataService.getLevelByPosition()`
+**Descrizione**: Recupera il livello i-esimo di una scalata specifica.
+
+**Parametri**:
+- `scalataName`: Nome della scalata
+- `currentLevel`: Posizione del livello (1-based: 1=primo, 2=secondo, etc.)
+
+**Logica**:
+1. Trova la scalata per nome
+2. Valida che `currentLevel` sia nel range valido (1 ≤ currentLevel ≤ numberOfLevels)
+3. Estrae l'ID del livello dall'array `levels[currentLevel - 1]`
+4. Carica i dati del Level dal repository usando l'ID
+5. Restituisce i dati completi del livello
+
+**Validazioni**:
+- Scalata non trovata → HTTP 404
+- Livello fuori range → HTTP 400
+- ID livello non trovato nel DB → HTTP 500 (dati corrotti)
+
+**Codice**:
+```java
+public ResponseEntity<?> getLevelByPosition(String scalataName, int currentLevel) {
+    // 1. Trova scalata
+    List<Scalata> scalate = scalata_repo.findByScalataNameContaining(scalataName);
+    if (scalate.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(Map.of("error", "Scalata non trovata: " + scalataName));
+    }
+    
+    Scalata scalata = scalate.get(0);
+    
+    // 2. Valida currentLevel
+    if (currentLevel < 1 || currentLevel > scalata.getLevels().size()) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(Map.of("error", "Livello non valido"));
+    }
+    
+    // 3. Estrai ID livello (array 0-based, currentLevel 1-based)
+    Integer levelId = scalata.getLevels().get(currentLevel - 1);
+    
+    // 4. Carica Level
+    Optional<Level> level = levelRepository.findById(levelId);
+    if (level.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("error", "Dati livello corrotti - ID non trovato"));
+    }
+    
+    return ResponseEntity.ok(level.get());
+}
+```
 
 ### 2. File Modificati
 
@@ -173,9 +237,56 @@ Costruisce URL: BASE_URL + "/" + SERVICE_PREFIX + "/scalata/scalate_list"
     ↓
 Risultato: http://api_gateway-controller:8090/adminService/scalata/scalate_list
     ↓
-API Gateway rewrites: /adminService/scalata/scalate_list → /scalata/scalate_list
+API Gateway rewrites: /adminService/scalata/scalate_list → /scalata/scalata_list
     ↓
 Inoltra a: http://t1-controller:8081/scalata/scalate_list
+```
+
+**Aggiunta action getLevelByScalataAndPosition**: Nuovo metodo per recuperare il livello i-esimo di una scalata
+
+```java
+registerAction("getLevelByScalataAndPosition", new ServiceActionDefinition(
+    params -> getLevelByScalataAndPosition((String) params[0], (Integer) params[1]),
+    String.class, Integer.class
+));
+
+@SuppressWarnings("unchecked")
+private Map<String, Object> getLevelByScalataAndPosition(String scalataName, Integer currentLevel) {
+    String path = "/scalata/" + scalataName + "/level/" + currentLevel;
+    return callRestGET(path, null, Map.class);
+}
+```
+
+**Parametri**:
+- `scalataName`: Nome della scalata (String)
+- `currentLevel`: Posizione del livello 1-based (Integer)
+
+**Flusso completo della chiamata**:
+```
+T5 chiama: getLevelByScalataAndPosition("ScalataDiProva", 2)
+    ↓
+Costruisce URL: BASE_URL + "/scalata/ScalataDiProva/level/2"
+    ↓
+Risultato: http://api_gateway-controller:8090/adminService/scalata/ScalataDiProva/level/2
+    ↓
+API Gateway rewrites: /adminService/scalata/... → /scalata/...
+    ↓
+Inoltra a: http://t1-controller:8081/scalata/ScalataDiProva/level/2
+    ↓
+T1 processa: ScalataController.getLevelByPosition()
+    ↓
+Restituisce: Level object (className, opponentName, tempoMax, etc.)
+```
+
+**Uso nel codice**:
+```java
+// Da GameManager o ScalataGame
+Map<String, Object> levelData = (Map<String, Object>) serviceManager
+    .handleRequest("T1", "getLevelByScalataAndPosition", "ScalataDiProva", 2);
+
+String className = (String) levelData.get("className");
+String opponentName = (String) levelData.get("opponentName");
+Integer tempoMax = (Integer) levelData.get("tempoMax");
 ```
 
 #### 2.2 `GuiController.java`

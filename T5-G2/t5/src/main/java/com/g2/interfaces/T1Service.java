@@ -90,6 +90,11 @@ public class T1Service extends BaseService {
                 params -> getLevelById((Integer) params[0]), // Recupera un livello specifico per ID
                 Integer.class
         ));
+
+        registerAction("getLevelByScalataAndPosition", new ServiceActionDefinition(
+                params -> getLevelByScalataAndPosition((String) params[0], (Integer) params[1]),
+                String.class, Integer.class
+        ));
     }
 
 
@@ -156,5 +161,18 @@ private List<Map<String, Object>> getScalateList() {
 // Restituisce i dettagli di un livello specifico per ID
 private Map<String, Object> getLevelById(Integer levelId) {
     return callRestGET("/level/" + levelId, null, Map.class);
+}
+
+/**
+ * Restituisce il livello i-esimo di una scalata specifica.
+ * 
+ * @param scalataName Nome della scalata
+ * @param currentLevel Posizione del livello (1-based: 1=primo, 2=secondo, etc.)
+ * @return Map con i dati del Level
+ */
+@SuppressWarnings("unchecked")
+private Map<String, Object> getLevelByScalataAndPosition(String scalataName, Integer currentLevel) {
+    String path = "/scalata/" + scalataName + "/level/" + currentLevel;
+    return callRestGET(path, null, Map.class);
 }
 }
