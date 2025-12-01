@@ -18,10 +18,13 @@
 package com.g2.game.gameMode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.g2.game.gameFactory.params.GameParams;
 import com.g2.game.gameFactory.params.ScalataParams;
 import com.g2.game.gameMode.Compile.CompileResult;
 import com.g2.interfaces.ServiceManager;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -30,19 +33,33 @@ import org.slf4j.LoggerFactory;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
-public class ScalataGame extends GameLogic {
-
-    private int currentLevel;
-    private int remainingTime;
-    private String scalataName;
-    private int totalLevels;
-    private PartitaSingola currentLevelGame;  // Delega la logica a PartitaSingola
+/**
+ * ScalataGame rappresenta una modalità di gioco a livelli progressivi.
+ * Estende TurnBasedGame, ereditando tutta la logica di calcolo punteggio, turni e achievement.
+ * Ogni livello della scalata è gestito come una PartitaSingola.
+ */
+@Getter
+@Setter
+public class ScalataGame extends TurnBasedGame {
 
     @JsonIgnore
     private static final Logger logger = LoggerFactory.getLogger(ScalataGame.class);
 
+    @JsonProperty("currentLevel")
+    private int currentLevel;
+
+    @JsonProperty("scalataName")
+    private String scalataName;
+
+    @JsonProperty("totalLevels")
+    private int totalLevels;
+
+    // ========================================
+    // COSTRUTTORI
+    // ========================================
+
     public ScalataGame() {
-        //Costruttore vuoto
+        super();
     }
 
     public ScalataGame(ServiceManager serviceManager, Long playerId, String classUT,
@@ -55,74 +72,60 @@ public class ScalataGame extends GameLogic {
                        String opponentType, OpponentDifficulty difficulty,
                        GameMode gamemode, String testingClassCode, int remainingTime,
                        String scalataName, int currentLevel, int totalLevels) {
-        super(serviceManager, playerId, classUT, opponentType, difficulty, gamemode, testingClassCode);
-        this.remainingTime = remainingTime;
+        super(serviceManager, playerId, classUT, opponentType, difficulty, gamemode, testingClassCode, remainingTime);
         this.currentLevel = currentLevel;
         this.scalataName = scalataName;
         this.totalLevels = totalLevels;
     }
 
-    @Override
-    public void nextTurn(CompileResult userScore, CompileResult robotScore) {
-        // Delega al gioco del livello corrente
-        currentLevelGame.nextTurn(userScore, robotScore);
-    }
+    // ========================================
+    // OVERRIDE METODI
+    // ========================================
 
     @Override
     public void updateState(GameParams gameParams, CompileResult userCompileResult, CompileResult robotCompileResult) {
         if (!(gameParams instanceof ScalataParams))
             throw new IllegalArgumentException("Impossibile aggiornare la logica corrente, i parametri ricevuti non son istanza di ScalataParams");
+        
+        // Chiama il metodo della superclasse per aggiornare i campi comuni
         super.updateState(gameParams, userCompileResult, robotCompileResult);
-        this.remainingTime = ((ScalataParams) gameParams).getRemainingTime();
-        this.currentLevel = ((ScalataParams) gameParams).getCurrentLevel();
-        this.scalataName = ((ScalataParams) gameParams).getScalataName();
-    }
-
-    @Override
-    public int getScore(CompileResult compileResult) {
-        // Delega al gioco del livello corrente
-        return currentLevelGame.getScore(compileResult);
+        
+        // Aggiorna i campi specifici della scalata
+        ScalataParams scalataParams = (ScalataParams) gameParams;
+        this.currentLevel = scalataParams.getCurrentLevel();
+        this.scalataName = scalataParams.getScalataName();
+        this.totalLevels = scalataParams.getTotalLevels();
     }
 
     /**
      * Verifica se il LIVELLO CORRENTE è terminato.
+     * La scalata non ha un "fine" per turno, ogni livello si comporta come PartitaSingola.
      */
     @Override
     public Boolean isGameEnd() {
-        return currentLevelGame.isGameEnd();
+        return false; // Come PartitaSingola, il giocatore può fare quanti turni vuole
     }
 
-    /**
-     * Verifica se l'utente ha vinto il LIVELLO CORRENTE.
-     */
-    @Override
-    public boolean isWinner() {
-        return currentLevelGame.isWinner();
-    }
+    // ========================================
+    // METODI SPECIFICI DELLA SCALATA
+    // ========================================
 
     /**
-     * Verifica se l'utente ha vinto la SCALATA.
+     * Verifica se l'utente ha vinto la SCALATA COMPLETA.
      */
     public boolean isScalataWon() {
         return isWinner() && currentLevel >= totalLevels;
     }
 
-    /** DA SISTEMARE
+    /** DA MODIFICARE
      * Achievement per la modalità Scalata.
-     * Combina gli achievement del livello corrente (da PartitaSingola)
-     * con gli achievement specifici della scalata completa.
+     * Combina gli achievement di TurnBasedGame con achievement specifici della scalata.
      */
     @Override
     public Map<String, BiFunction<CompileResult, CompileResult, Boolean>> gameModeAchievements() {
-        Map<String, BiFunction<CompileResult, CompileResult, Boolean>> achievements = new HashMap<>();
-        
-        // ========================================
-        // ACHIEVEMENT DEL LIVELLO CORRENTE
-        // ========================================
-        if (currentLevelGame != null) {
-            Map<String, BiFunction<CompileResult, CompileResult, Boolean>> levelAchievements = 
-                currentLevelGame.gameModeAchievements();
-        }
+        // Ottieni gli achievement di base da TurnBasedGame
+        Map<String, BiFunction<CompileResult, CompileResult, Boolean>> achievements = 
+            new HashMap<>(super.gameModeAchievements());
         
         // ========================================
         // ACHIEVEMENT DELLA SCALATA COMPLETA
@@ -130,19 +133,9 @@ public class ScalataGame extends GameLogic {
         
         // Achievement: Completa la scalata
         achievements.put("scalata_completed", (user, robot) -> isScalataWon());
-
-        /* SBAGLIATO, DA RIVEDERE
-        // Achievement: Completa la scalata senza mai perdere contro il robot
-        achievements.put("scalata_perfect", (user, robot) -> {
-            // Verifica che in TUTTI i livelli user >= robot
-            return isScalataWon() && currentLevelGame != null && isWinner();
-        });
-        */
         
         // Achievement: Completa un singolo livello
-        achievements.put("scalata_level_cleared", (user, robot) -> 
-            currentLevelGame != null && currentLevelGame.isWinner()
-        );
+        achievements.put("scalata_level_cleared", (user, robot) -> isWinner());
         
         logger.info("[SCALATA] gameModeAchievements: {} achievement definiti per livello {} di {}", 
                    achievements.size(), currentLevel, totalLevels);
@@ -158,8 +151,15 @@ public class ScalataGame extends GameLogic {
     @Override
     public void endGame(boolean isGameSurrendered) {
         super.endGame(isGameSurrendered);
-        if (!isScalataWon() && isWinner()) {
+        
+        // Se ha vinto il livello ma non la scalata completa, incrementa il livello
+        if (isWinner() && !isScalataWon()) {
             currentLevel++;
+            logger.info("[SCALATA] Livello {} completato! Prossimo livello: {}/{}", 
+                       currentLevel - 1, currentLevel, totalLevels);
+        } else if (isScalataWon()) {
+            logger.info("[SCALATA] Scalata '{}' completata con successo! Tutti i {} livelli superati.", 
+                       scalataName, totalLevels);
         }
     }
 }
