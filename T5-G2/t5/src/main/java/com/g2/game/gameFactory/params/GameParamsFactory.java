@@ -148,7 +148,7 @@ public class GameParamsFactory {
                             request.getRemainingTime());
                 } catch (ClassCastException e) {
                     logger.error("Failed to cast SessionDTO to PartitaSingolaSessionDTO", e);
-                    throw new RuntimeException("Invalid request type for Allenamento mode", e);
+                    throw new RuntimeException("Invalid request type for Partita Singola mode", e);
                 }
             case Scalata:
                 try {

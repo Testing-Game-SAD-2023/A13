@@ -84,12 +84,12 @@ public class T4Service extends BaseService {
                 params -> EndGame((long) params[0], (Map<Long, PlayerResult>) params[1], (boolean) params[2]),
                 Long.class, Map.class, Boolean.class));
 
-
+        /* Valutare se eliminare questa chiamata non utilizzata
         registerAction("CreateScalata", new ServiceActionDefinition(
                 params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]),
                 String.class, String.class, String.class, String.class));
 
-
+        */
     }
 
 
@@ -247,6 +247,7 @@ public class T4Service extends BaseService {
         return respose;
     }
 
+    /* Valutare se eliminare questa chiamata non utilizzata
     // Questa chiamata non è documentata nel materiale di caterina
     private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date) {
         final String endpoint = "/turns";
@@ -258,5 +259,5 @@ public class T4Service extends BaseService {
         String respose = callRestPost(endpoint, formData, null, String.class);
         return respose;
     }
-
+    */
 }
