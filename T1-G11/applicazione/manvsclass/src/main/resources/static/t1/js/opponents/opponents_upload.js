@@ -38,5 +38,11 @@ async function uploadOpponent() {
     if (data !== null) {
         console.log('Success:', data);
         $('#successModal').modal('show');
+        //-------------------------------------
+        // Se la classe è stata caricata correttamente, allora resetta il form.
+        const form = classInput?.form;
+        if (form) {
+            form.reset();
+        }
     }
 }
