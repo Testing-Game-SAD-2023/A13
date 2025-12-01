@@ -18,7 +18,7 @@ public interface SuggestionMapper {
     @Mapping(target = "classUT", ignore = true)
     @Mapping(target = "date", expression = "java(LocalDate.now())")
     @Mapping(target = "image", source = "image", qualifiedByName = "base64ToBytes")
-    Suggestion toEntity(SuggestionDTO singleSuggestionDTO);
+    Suggestion toEntity(SuggestionDTO suggestionDTO);
 
     @Mapping(target = "image", source = "image", qualifiedByName = "bytesToBase64")
     SuggestionDTO toDto(Suggestion suggestion);

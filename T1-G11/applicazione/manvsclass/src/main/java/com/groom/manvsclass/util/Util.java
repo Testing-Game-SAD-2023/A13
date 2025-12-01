@@ -48,7 +48,7 @@ public class Util {
     }
 
     public List<InteractionDTO> elencaReport() {
-        
+
         List<Interaction> reportInteractions = interactionRepository.findByType(InteractionType.REPORT);
 
         // effettua il mapping in uscita Model -> DTO

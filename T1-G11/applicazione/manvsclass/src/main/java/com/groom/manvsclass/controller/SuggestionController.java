@@ -2,7 +2,7 @@ package com.groom.manvsclass.controller;
 
 import com.groom.manvsclass.dto.SuggestionDTO;
 
-import com.groom.manvsclass.security.JwtRequestContext;
+import com.groom.manvsclass.service.SecurityService;
 import com.groom.manvsclass.service.SuggestionService;
 
 import com.groom.manvsclass.exception.NotFoundException;
@@ -28,14 +28,17 @@ import java.util.List;
 public class SuggestionController {
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     private SuggestionService suggestionService;
 
     @PostMapping("/opponents/suggestions/upload/{className}")
     public ResponseEntity<?> uploadSuggestions(
-            @PathVariable("className") String className,
+            @PathVariable String className,
             @Valid @RequestBody List<SuggestionDTO> suggestionDTOs) {
 
-        String jwt = JwtRequestContext.getJwtToken();
+        String jwt = securityService.getJwtToken();
         if (jwt == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
@@ -50,27 +53,26 @@ public class SuggestionController {
 
         catch (Exception e) {
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Errore nell'upload dei suggerimenti: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore.");
         }
     }
 
     @GetMapping("/opponents/suggestions/{className}")
     public ResponseEntity<?> viewSuggestions(@PathVariable("className") String className) {
 
-        String jwt = JwtRequestContext.getJwtToken();
+        String jwt = securityService.getJwtToken();
         if (jwt == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
 
         try {
-            List<SuggestionDTO> suggestionDTOs = suggestionService.findSuggestions(className);
-            return ResponseEntity.ok(suggestionDTOs);
+            List<SuggestionDTO> suggestions = suggestionService.findSuggestions(className);
+            return ResponseEntity.ok(suggestions);
 
         } catch (Exception e) {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore nel recupero dei suggerimenti: " + e.getMessage());
+                    .body("Errore nel download della classe: " + e.getMessage());
         }
     }
 
@@ -80,9 +82,9 @@ public class SuggestionController {
             @RequestParam("suggestionTitle") String suggestionTitle)
     {
 
-        String jwt = JwtRequestContext.getJwtToken();
+        String jwt = securityService.getJwtToken();
         if (jwt == null) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
 
         try {
@@ -91,8 +93,7 @@ public class SuggestionController {
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore nella cancellazione del suggerimento: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore" );
         }
     }
 

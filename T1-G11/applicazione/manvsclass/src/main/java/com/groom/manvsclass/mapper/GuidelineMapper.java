@@ -17,7 +17,7 @@ public interface GuidelineMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "date", expression = "java(LocalDate.now())")
     @Mapping(target = "image", source = "image", qualifiedByName = "base64ToBytes")
-    Guideline toEntity(GuidelineDTO singleGuidelineDTO);
+    Guideline toEntity(GuidelineDTO guidelineDTO);
 
     @Mapping(target= "image", source = "image", qualifiedByName = "bytesToBase64")
     GuidelineDTO toDto(Guideline guideline);

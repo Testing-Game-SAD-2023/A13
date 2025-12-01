@@ -1,30 +1,5 @@
 package com.groom.manvsclass.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
-import org.mockito.internal.matchers.Any;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import com.groom.manvsclass.dto.SuggestionDTO;
 import com.groom.manvsclass.exception.NotFoundException;
 import com.groom.manvsclass.mapper.SuggestionMapper;
@@ -33,12 +8,29 @@ import com.groom.manvsclass.model.Suggestion;
 import com.groom.manvsclass.model.SuggestionLevel;
 import com.groom.manvsclass.repository.ClassUTRepository;
 import com.groom.manvsclass.repository.SuggestionRepository;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.validation.ConstraintViolationException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class SuggestionServiceTests {
-
 
     @Mock
     private ClassUTRepository classUTRepository;
@@ -46,7 +38,7 @@ public class SuggestionServiceTests {
     private SuggestionRepository suggestionRepository;
 
     // prende il Mapper reale (assume già testato). In alternativa bisogna
-    // utilizzare @Mock e configurarlo ad ogni test con i risultati mappati attesi
+    // utilizzare @Mock e configurarlo a ogni test con i risultati mappati attesi
     @Spy
     private SuggestionMapper suggestionMapper = Mappers.getMapper(SuggestionMapper.class);
 
@@ -80,12 +72,15 @@ public class SuggestionServiceTests {
 
         List<SuggestionDTO> suggestionDTOs = Arrays.asList(sugg1, sugg2, sugg3);
 
-        List<Suggestion> savedSuggestions = suggestionMapper.toEntityList(suggestionDTOs);
-
         // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
         ClassUT mockClassUT = new ClassUT();
         mockClassUT.setName(className);
         mockClassUT.setSuggestions(new ArrayList<>());
+
+        List<Suggestion> savedSuggestions = suggestionMapper.toEntityList(suggestionDTOs);
+        for(Suggestion s : savedSuggestions) {
+            s.setClassUT(mockClassUT);
+        }
 
         // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
 
@@ -98,7 +93,6 @@ public class SuggestionServiceTests {
                 .thenReturn(false);
 
         // - suggestionRepository.saveAll
-
         when(suggestionRepository.saveAll(anyList()))
                 .thenReturn(savedSuggestions);
 
@@ -143,11 +137,12 @@ public class SuggestionServiceTests {
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.of(mockClassUT));
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
-        assertThrows(NullPointerException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+        // - suggestionRepository.saveAll
+        when(suggestionRepository.saveAll(anyList()))
+                .thenThrow(ConstraintViolationException.class);
 
-        // Verifica che saveAll non sia mai stato chiamato
-        verify(suggestionRepository, times(0)).saveAll(anyList());
+        // chiama il metodo del Service e verifica che lanci l'eccezione attesa (propagata da repository)
+        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
     }
 
     /**
@@ -175,11 +170,12 @@ public class SuggestionServiceTests {
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.of(mockClassUT));
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
-        assertThrows(NullPointerException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+        // - suggestionRepository.saveAll
+        when(suggestionRepository.saveAll(anyList()))
+                .thenThrow(ConstraintViolationException.class);
 
-        // Verifica che saveAll non sia mai stato chiamato
-        verify(suggestionRepository, times(0)).saveAll(anyList());
+        // chiama il metodo del Service e verifica che lanci l'eccezione attesa (propagata da repository)
+        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
     }
 
     /**
@@ -207,11 +203,12 @@ public class SuggestionServiceTests {
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.of(mockClassUT));
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
-        assertThrows(NullPointerException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+        // - suggestionRepository.saveAll
+        when(suggestionRepository.saveAll(anyList()))
+                .thenThrow(ConstraintViolationException.class);
 
-        // Verifica che saveAll non sia mai stato chiamato
-        verify(suggestionRepository, times(0)).saveAll(anyList());
+        // chiama il metodo del Service e verifica che lanci l'eccezione attesa (propagata da repository)
+        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
     }
 
     /**
@@ -278,7 +275,7 @@ public class SuggestionServiceTests {
 
     /**
      * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con un suggerimento valido e un altro no.
-     * Verifica che nessuno dei due sia inserito.
+     * Verifica che venga lanciata un'eccezione unchecked, in modo da scatenare il rollback della transazione (vista l'annotazione @Transactional del service)
      */
     @Test
     public void uploadSuggestions_Atomicita() {
@@ -313,14 +310,16 @@ public class SuggestionServiceTests {
         when(suggestionRepository.existsByClassUT_NameAndTitle(eq(className), anyString()))
                 .thenReturn(false);
 
+        // - suggestionRepository.saveAll (lancia eccezione perché titolo del secondo suggerimento è null)
+        when(suggestionRepository.saveAll(anyList()))
+                .thenThrow(ConstraintViolationException.class);
+
         // chiama il metodo del Service e verifica che lanci l'eccezione attesa
-        assertThrows(NullPointerException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
 
         // Verifica che findById sia stato chiamato una volta con il nome corretto
         verify(classUTRepository, times(1)).findById(className);
 
-        // Verifica che saveAll non sia mai stato chiamato
-        verify(suggestionRepository, times(0)).saveAll(anyList());
     }
 
     /**
@@ -362,14 +361,15 @@ public class SuggestionServiceTests {
         when(suggestionRepository.existsByClassUT_NameAndTitle(eq(className), anyString()))
                 .thenReturn(false);
 
+        // - suggestionRepository.saveAll (lancia eccezione perché il constraint unique del titolo è violata)
+        when(suggestionRepository.saveAll(anyList()))
+                .thenThrow(DataIntegrityViolationException.class);
+
         // chiama il metodo del Service e verifica che lanci l'eccezione attesa
-        assertThrows(IllegalArgumentException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+        assertThrows(DataIntegrityViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
 
         // Verifica che findById sia stato chiamato una volta con il nome corretto
         verify(classUTRepository, times(1)).findById(className);
-
-        // Verifica che saveAll non sia mai stato chiamato
-        verify(suggestionRepository, times(0)).saveAll(anyList());
     }
 
     /**

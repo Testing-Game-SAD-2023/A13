@@ -13,6 +13,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Basic;
 import jakarta.persistence.FetchType;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,9 +39,11 @@ public class Guideline {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @NotBlank
     private String title;
 
     @Column(nullable = false)
+    @NotBlank
     private String hint;
 
     @Lob
@@ -45,6 +51,8 @@ public class Guideline {
     @Column(name = "image", columnDefinition = "LONGBLOB")
     private byte[] image;
 
+    @NotNull
+    @Column(nullable = false)
     private LocalDate date;
 
     public String getBase64Image() {

@@ -2,7 +2,7 @@ package com.groom.manvsclass.controller;
 
 import com.groom.manvsclass.dto.GuidelineDTO;
 
-import com.groom.manvsclass.security.JwtRequestContext;
+import com.groom.manvsclass.service.SecurityService;
 import com.groom.manvsclass.service.GuidelineService;
 
 import com.groom.manvsclass.exception.NotFoundException;
@@ -28,12 +28,14 @@ import java.util.List;
 public class GuidelineController {
 
     @Autowired
+    private SecurityService securityService;
+    @Autowired
     private GuidelineService guidelineService;
 
     @PostMapping("/opponents/guidelines/upload")
     public ResponseEntity<?> uploadGuidelines(@Valid @RequestBody List<GuidelineDTO> guidelineDTOs) {
 
-        String jwt = JwtRequestContext.getJwtToken();
+        String jwt = securityService.getJwtToken();
         if (jwt == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
@@ -43,14 +45,14 @@ public class GuidelineController {
             return ResponseEntity.status(HttpStatus.OK).body("Linee guida caricate con successo.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Errore nell'upload delle linee guida: " + e.getMessage());
+                    .body("Errore nell'upload delle linee guida: " + e.getMessage());
         }
     }
 
     @GetMapping("/opponents/guidelines")
     public ResponseEntity<?> viewGuidelines() {
 
-        String jwt = JwtRequestContext.getJwtToken();
+        String jwt = securityService.getJwtToken();
         if (jwt == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
         }
@@ -70,9 +72,10 @@ public class GuidelineController {
     public ResponseEntity<?> deleteGuideline(@PathVariable("guidelineTitle") String guidelineTitle)
     {
 
-        String jwt = JwtRequestContext.getJwtToken();
+        String jwt = securityService.getJwtToken();
         if (jwt == null) {
-            throw new RuntimeException("Token JWT non valido o mancante.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token JWT non valido o mancante.");
         }
 
         try {

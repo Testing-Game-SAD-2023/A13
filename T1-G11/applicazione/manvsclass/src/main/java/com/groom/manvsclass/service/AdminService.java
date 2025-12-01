@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.groom.manvsclass.exception.NotFoundException;
-import com.groom.manvsclass.mapper.InteractionMapper;
 import com.groom.manvsclass.exception.ForbiddenException;
 
 import jakarta.mail.MessagingException;
@@ -39,9 +38,6 @@ public class AdminService {
     private EmailService emailService;
     @Autowired
     private PasswordEncoder myPasswordEncoder;
-
-    @Autowired
-    private InteractionMapper interactionMapper;
 
     public boolean existsAdminById(String adminEmail) {
 
