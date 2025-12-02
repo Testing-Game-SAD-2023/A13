@@ -67,13 +67,15 @@ body {
 .scalata-card:hover {
     border-color: #ff9b3a;
     box-shadow: 0 4px 8px rgba(255, 155, 58, 0.3);
-    transform: translateY(-2px);
+    transform: translateY(-5px);
 }
 
 .scalata-card.selected {
     border-color: #f018f0;
-    background-color: rgba(240, 24, 240, 0.1);
-    box-shadow: 0 4px 12px rgba(240, 24, 240, 0.4);
+    border-width: 3px;
+    background-color: rgba(240, 24, 240, 0.15);
+    box-shadow: 0 6px 16px rgba(240, 24, 240, 0.5);
+    transform: translateY(-5px);
 }
 
 .scalata-card .card-title {

@@ -16,7 +16,7 @@ import testrobotchallenge.commons.models.opponent.GameMode;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = RunPartitaSingolaRequestDTO.class, name = "PartitaSingola"), // Se "mode" è "PartitaSingola", usa questa classe
         @JsonSubTypes.Type(value = RunGameRequestDTO.class, name = "Allenamento"),
-        @JsonSubTypes.Type(value = RunScalataDTO.class, name = "ScalataGame"), // Se "mode" è "ScalataGame", usa questa classe
+        @JsonSubTypes.Type(value = RunScalataDTO.class, name = "Scalata"), // Se "mode" è "Scalata", usa questa classe
         @JsonSubTypes.Type(value = RunGameRequestDTO.class, name = "Sfida")
 })
 public class RunGameRequestDTO {

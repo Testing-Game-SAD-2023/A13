@@ -77,25 +77,16 @@ public class GuiController {
         }
         if ("Scalata".equals(mode)) {
             PageBuilder gameModePage = new PageBuilder(serviceManager, "gamemode_scalata", model);
+            VariableValidationLogicComponent valida = new VariableValidationLogicComponent(mode);
+            valida.setCheckNull();
             
-            // Recupera la lista delle scalate disponibili da T1 e convertila in JSON
-            try {
-                Object scalateData = serviceManager.handleRequest("T1", "getScalateList");
-                logger.info("[GuiController] Scalate ricevute da T1: {}", scalateData);
-                
-                // Converte in JSON string per evitare problemi con Thymeleaf
-                com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                String scalateJson = objectMapper.writeValueAsString(scalateData);
-                logger.info("[GuiController] Scalate JSON: {}", scalateJson);
-                
-                model.addAttribute("available_scalate_json", scalateJson);
-                model.addAttribute("available_scalate", scalateData);
-            } catch (Exception e) {
-                logger.error("[GuiController] Errore nel recupero scalate: {}", e.getMessage(), e);
-                model.addAttribute("available_scalate_json", "[]");
-                model.addAttribute("available_scalate", new java.util.ArrayList<>());
-            }
-            
+            // Recupera la lista delle scalate disponibili da T1
+            ServiceObjectComponent availableScalate = new ServiceObjectComponent(serviceManager, "lista_scalate", "T1", "getScalateList");
+            logger.info("[GuiController] Scalate ricevute da T1: {}", availableScalate);
+
+            // Recupera il livello corrente da T4 (per ora non scritto, sarà sempre 1 per test)
+
+            gameModePage.setObjectComponents(availableScalate);
             return gameModePage.handlePageRequest();
         }
         return "main";

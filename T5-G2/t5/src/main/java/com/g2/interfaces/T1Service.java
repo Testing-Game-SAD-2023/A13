@@ -18,6 +18,7 @@ package com.g2.interfaces;
 
 import com.g2.model.OpponentSummary;
 import com.g2.model.Team;
+import com.g2.model.dto.ScalataDTO;
 import com.g2.model.dto.ResponseTeamComplete;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -154,8 +155,8 @@ public class T1Service extends BaseService {
 }
 
 // Restituisce la lista di tutte le scalate disponibili
-private List<Map<String, Object>> getScalateList() {
-    return callRestGET("/scalata/scalate_list", null, new ParameterizedTypeReference<List<Map<String, Object>>>() {});
+private List<ScalataDTO> getScalateList() {
+    return callRestGET("/scalata/scalate_list", null, new ParameterizedTypeReference<List<ScalataDTO>>() {});
 }
 
 // Restituisce i dettagli di un livello specifico per ID
