@@ -18,6 +18,11 @@
         <java.version>17</java.version>
         <springsecurity.version>5.1.1.RELEASE</springsecurity.version>
 
+        <sonar.projectKey>sad-D13-R1</sonar.projectKey>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.token>sqp_6e3359850c75b7f8b4059ca164eec4641001ca1e</sonar.token>
+
+
         <!--MODIFICA
         (11/02/2024): Eliminazione springsecurity-->
 
@@ -174,6 +179,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>5.1.0.4751</version>
             </plugin>
         </plugins>
     </build>
