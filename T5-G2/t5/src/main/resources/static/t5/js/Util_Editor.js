@@ -617,9 +617,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	
 	// Recupera i dati specifici della Scalata da previousGameObject
 	if (previousGameObject && mode === "Scalata") {
-		if (previousGameObject.scalataName) scalata_name = previousGameObject.scalataName;
-		if (previousGameObject.currentLevel) scalata_currentLevel = previousGameObject.currentLevel;
-		if (previousGameObject.totalLevels) scalata_totalLevels = previousGameObject.totalLevels;
+		scalata_name = previousGameObject.scalataName;
+		scalata_currentLevel = previousGameObject.currentLevel;
+		scalata_totalLevels = previousGameObject.totalLevels;
 		
 		console.log("[Util_Editor] Variabili Scalata inizializzate da previousGameObject:", {
 			scalata_name,
