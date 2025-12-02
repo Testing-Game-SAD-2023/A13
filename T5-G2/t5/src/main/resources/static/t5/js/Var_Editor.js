@@ -133,7 +133,12 @@ const mode      = GetMode();
 const ClassName = GetClassName();
 
 let timer = null; // oggetto timer, da attivare solo per la modalità PartitaSingola
-let timer_remainingTime = 0; // tempo restante per terminare una partita PartitaSingola
+let timer_remainingTime = 0; // tempo restante per terminare una partita PartitaSingola e Scalata
+
+let scalata_name = null; // nome della scalata corrente
+let scalata_currentLevel = 0; // livello corrente della scalata
+let scalata_totalLevels = 0; // numero totale di livelli della scalata
+//let scalata_remainingTime = 0; // tempo restante per la scalata
 
 document.getElementById("Nome_modalita").textContent = get_mode_text(mode);
 

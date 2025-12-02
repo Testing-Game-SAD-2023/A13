@@ -614,6 +614,20 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (previousGameObject && (mode === "PartitaSingola" || mode === "Scalata") && previousGameObject.remainingTime) {
 		timer_remainingTime = previousGameObject.remainingTime;
 	}
+	
+	// Recupera i dati specifici della Scalata da previousGameObject
+	if (previousGameObject && mode === "Scalata") {
+		if (previousGameObject.scalataName) scalata_name = previousGameObject.scalataName;
+		if (previousGameObject.currentLevel) scalata_currentLevel = previousGameObject.currentLevel;
+		if (previousGameObject.totalLevels) scalata_totalLevels = previousGameObject.totalLevels;
+		
+		console.log("[Util_Editor] Variabili Scalata inizializzate da previousGameObject:", {
+			scalata_name,
+			scalata_currentLevel,
+			scalata_totalLevels,
+			timer_remainingTime
+		});
+	}
 });
 
 //Funzione per fare il replace del testo dell'editor

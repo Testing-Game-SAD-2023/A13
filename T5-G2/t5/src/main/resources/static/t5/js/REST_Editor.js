@@ -33,6 +33,13 @@ async function getGameActionRequestBody() {
     if (GetMode() === "PartitaSingola")
         requestBody["remainingTime"] = timer_remainingTime.toString();
 
+    if (GetMode() === "Scalata") {
+        requestBody["remainingTime"] = timer_remainingTime.toString();
+        requestBody["scalataName"] = scalata_name;
+        requestBody["currentLevel"] = scalata_currentLevel;
+        requestBody["totalLevels"] = scalata_totalLevels;
+    }
+
 	return requestBody;
 }
 
