@@ -82,10 +82,7 @@ public class GuiController {
             
             // Recupera la lista delle scalate disponibili da T1
             ServiceObjectComponent availableScalate = new ServiceObjectComponent(serviceManager, "lista_scalate", "T1", "getScalateList");
-            logger.info("[GuiController] Scalate ricevute da T1: {}", availableScalate);
-
-            // Recupera il livello corrente da T4 (per ora non scritto, sarà sempre 1 per test)
-
+            
             gameModePage.setObjectComponents(availableScalate);
             return gameModePage.handlePageRequest();
         }

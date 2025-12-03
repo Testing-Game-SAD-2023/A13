@@ -380,4 +380,49 @@ public class GameController {
         GameDTO closedGame = gameService.endGame(gameId, closeGameDTO);
         return ResponseEntity.ok(closedGame);
     }
+
+    @Operation(
+            summary = "Increment current level of a game",
+            description = "Increments the current level counter for games in Scalata mode"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Current level incremented successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GameDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Game not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorBackend.class))
+            )
+    })
+    @PatchMapping("/{gameId}/current-level-increment")
+    public ResponseEntity<GameDTO> incrementCurrentLevel(
+            @Parameter(name = "gameId", description = "Id of the game", required = true)
+            @PathVariable Long gameId) {
+        GameDTO updated = gameService.incrementCurrentLevel(gameId);
+        return ResponseEntity.ok(updated);
+    }
+
+    @Operation(
+            summary = "Get current level for a player's Scalata in progress",
+            description = "Returns the current level of a STARTED Scalata game for the given player and scalata name. Returns 1 if no game is found."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Current level returned (1 if no game found)",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))
+            )
+    })
+    @GetMapping("/scalata/current-level")
+    public ResponseEntity<Integer> getCurrentLevelForScalata(
+            @Parameter(name = "playerId", description = "ID of the player", required = true)
+            @RequestParam Long playerId,
+            @Parameter(name = "scalataName", description = "Name of the scalata", required = true)
+            @RequestParam String scalataName) {
+        Integer currentLevel = gameService.getCurrentLevelForScalata(playerId, scalataName);
+        return ResponseEntity.ok(currentLevel);
+    }
 }

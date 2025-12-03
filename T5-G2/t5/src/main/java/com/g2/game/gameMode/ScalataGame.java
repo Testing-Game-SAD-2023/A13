@@ -149,6 +149,21 @@ public class ScalataGame extends TurnBasedGame {
      *  Altrimenti, conclude la scalata.
      */
     @Override
+    public void startGame() {
+        // Chiama T4 con la nuova action che accetta 3 parametri (GameMode, playerId, scalataName)
+        this.setGameID(getServiceManager().handleRequest("T4", "CreateGameWithName", Long.class, 
+            getGameMode(), getPlayerID(), this.scalataName));
+        
+        logger.info("[SCALATA] Game created in T4 with ID={}, scalataName='{}'", 
+                   getGameID(), scalataName);
+    }
+
+    /**
+     *  Override di endGame per gestire la logica di fine scalata.
+     *  Se la scalata non è ancora terminata, avvia il livello successivo.
+     *  Altrimenti, conclude la scalata.
+     */
+    @Override
     public void endGame(boolean isGameSurrendered) {
         super.endGame(isGameSurrendered);
         

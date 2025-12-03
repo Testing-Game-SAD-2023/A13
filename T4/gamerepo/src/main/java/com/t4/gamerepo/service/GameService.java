@@ -92,6 +92,7 @@ public class GameService {
     public GameDTO createGame(CreateGameDTO dto) {
         GameMode gameMode = dto.getGameMode();
         List<Long> players = dto.getPlayers();
+        String scalataName = dto.getScalataName();
         Set<Long> playersSet = new HashSet<>(players);
 
         // Non è previsto che un giocatore possa giocare contro se stesso
@@ -100,6 +101,11 @@ public class GameService {
 
         Game newGame = new Game(gameMode, players);
         newGame.setStatus(GameStatus.CREATED);
+        
+        // Se è una partita Scalata, salva il nome della scalata
+        if (GameMode.Scalata.equals(gameMode) && scalataName != null) {
+            newGame.setScalataName(scalataName);
+        }
 
         return mapperFacade.toDTO(gameRepository.save(newGame));
     }
@@ -264,5 +270,50 @@ public class GameService {
         game.setPlayerResults(playersResult);
 
         return mapperFacade.toDTO(gameRepository.save(game));
+    }
+
+    /**
+     * Incrementa il livello corrente di una partita (usato per modalità Scalata).
+     *
+     * @param gameId l'ID del gioco da aggiornare
+     * @return il DTO della partita aggiornata
+     * @throws GameNotFoundException se la partita non esiste
+     */
+    @Transactional
+    public GameDTO incrementCurrentLevel(Long gameId) {
+        Game game = findGame(gameId);
+        
+        // Incrementa il livello corrente
+        Integer currentLevel = game.getCurrentLevel();
+        game.setCurrentLevel(currentLevel != null ? currentLevel + 1 : 1);
+        
+        logger.info("Incrementing current level for game {}: {} -> {}", 
+                gameId, currentLevel, game.getCurrentLevel());
+        
+        return mapperFacade.toDTO(gameRepository.save(game));
+    }
+
+    /**
+     * Recupera il livello corrente di una partita Scalata in corso per un giocatore.
+     * Ritorna 1 (default) se non esiste nessuna partita in corso.
+     *
+     * @param playerId l'ID del giocatore
+     * @param scalataName il nome della scalata
+     * @return il livello corrente (1 se non c'è partita in corso)
+     */
+    public Integer getCurrentLevelForScalata(Long playerId, String scalataName) {
+        Game game = gameRepository.findScalataInProgress(playerId, scalataName);
+        
+        if (game == null) {
+            logger.info("No STARTED Scalata game found for player {} and scalata '{}'. Returning default level 1.", 
+                    playerId, scalataName);
+            return 1;  // Default: nessuna partita in corso
+        }
+        
+        Integer currentLevel = game.getCurrentLevel();
+        logger.info("Found Scalata game {} for player {} and scalata '{}': current level = {}", 
+                game.getId(), playerId, scalataName, currentLevel);
+        
+        return currentLevel != null ? currentLevel : 1;
     }
 }

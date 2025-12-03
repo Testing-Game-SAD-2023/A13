@@ -78,6 +78,7 @@
   
   <!-- Container delle scalate - Renderizzato lato server con Thymeleaf -->
   <div id="scalate-container" class="container">
+    
     <div class="row">
       <!-- Itera su tutte le scalate disponibili -->
       <div th:each="scalata : ${lista_scalate}" class="col-md-4 mb-4">
@@ -95,6 +96,7 @@
               <span class="badge badge-primary badge-pill" 
                     th:text="${scalata.totalLevels}">0</span>
             </p>
+            
             <p class="card-text text-muted text-center mt-auto" 
                th:if="${scalata.description}"
                th:text="${scalata.description}">

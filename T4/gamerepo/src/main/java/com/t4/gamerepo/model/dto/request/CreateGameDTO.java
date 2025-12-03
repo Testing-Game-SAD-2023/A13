@@ -26,4 +26,9 @@ public class CreateGameDTO {
      * Giocatori partecipanti alla partita.
      */
     private List<Long> players;
+
+    /**
+     * Nome della scalata (opzionale, solo per modalità Scalata)
+     */
+    private String scalataName;
 }

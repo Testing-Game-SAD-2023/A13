@@ -213,7 +213,17 @@ public class SessionService {
 
     public boolean setGameMode(Long playerId, GameLogic game, Optional<Long> ttlSeconds) {
         logger.info("SetGameMode - Aggiunta del game mode: {} per il player: {}", game.getGameMode(), playerId);
-        Sessione session = getSession(playerId);
+        
+        // Recupera o crea la sessione se non esiste
+        Sessione session;
+        try {
+            session = getSession(playerId);
+        } catch (SessionDoesntExistException e) {
+            logger.info("SetGameMode - Sessione non trovata per playerId: {}, creazione nuova sessione", playerId);
+            createSession(playerId, ttlSeconds);
+            session = getSession(playerId);
+        }
+        
         if (session.hasModalita(game.getGameMode())) {
             //Già esiste
             throw new GameModeAlreadyExistException("Esiste già una partita avviata per la modalità %s per il player %d".

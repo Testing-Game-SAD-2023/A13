@@ -108,7 +108,7 @@ curl -X PUT "http://localhost/level/1" \
   -d '{
     "idLevel": 1,
     "scalataName": "ScalataDiProva",
-    "className": "UpdatedClass",
+    "className": "FTPFile",
     "tempoMax": 600,
     "opponentName": "Robot2"
   }'
@@ -119,4 +119,74 @@ curl -X PUT "http://localhost/level/1" \
 curl -X DELETE "http://localhost/level/1" \
   -H "Cookie: jwt=${JWT}"
 ```
-M 
+
+---
+
+# Guida test API Game (T4)
+
+## 0. Trova gameId di una partita
+
+### Opzione A: Via API (richiede JWT)
+```bash
+# Lista tutti i game del player 2
+curl -s -X GET "http://localhost/api/gamerepo/games/player/2" \
+  -H "Cookie: jwt=${JWT}" | jq '.[] | {id, gameMode, status, currentLevel}'
+
+# Prendi solo l'ID dell'ultima partita
+curl -s -X GET "http://localhost/api/gamerepo/games/player/2" \
+  -H "Cookie: jwt=${JWT}" | jq '.[-1].id'
+```
+
+### Opzione B: Query diretta al database
+```bash
+docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, game_mode, status, current_level, scalata_name, started_at FROM games ORDER BY id DESC LIMIT 5;"
+```
+
+## 1. Leggi dettagli di un Game
+```bash
+# Sostituisci 202 con un gameId valido
+curl -s -X GET "http://localhost/api/gamerepo/games/202" \
+  -H "Cookie: jwt=${JWT}" | jq '{id, gameMode, status, currentLevel}'
+```
+
+## 2. Incrementa currentLevel di una partita Scalata
+```bash
+# Incrementa di +1 il livello corrente
+curl -s -X PATCH "http://localhost/api/gamerepo/games/202/current-level-increment" \
+  -H "Cookie: jwt=${JWT}" | jq '.currentLevel'
+```
+
+## 3. Verifica dopo incremento
+```bash
+# Verifica che currentLevel sia aumentato
+curl -s -X GET "http://localhost/api/gamerepo/games/202" \
+  -H "Cookie: jwt=${JWT}" | jq '{id, currentLevel}'
+```
+
+**NOTA**: 
+- Gli endpoint di T4 richiedono il prefisso `/api/gamerepo/`
+- **Il base path del controller è `/games` (plurale, non singolare!)**
+- `currentLevel` è nullable (può essere null per partite non-Scalata)
+- L'incremento è atomico e thread-safe
+- Esempio path completo: `/api/gamerepo/games/202/current-level-increment`
+
+---
+
+## Utilizzo da T5 (ServiceManager)
+
+In T5, puoi usare il `ServiceManager` per chiamare l'incremento:
+
+```java
+// Esempio in un controller o service di T5
+Long gameId = 202L;
+
+String result = (String) ServiceManager.getInstance()
+    .executeService("T4Service", "IncrementCurrentLevel", gameId);
+
+// Il metodo ritorna il JSON completo del GameDTO aggiornato
+// con il nuovo currentLevel incrementato
+```
+
+**File modificati in T5:**
+- `T5-G2/t5/src/main/java/com/g2/interfaces/BaseService.java` - Aggiunto metodo `callRestPatch()`
+- `T5-G2/t5/src/main/java/com/g2/interfaces/T4Service.java` - Aggiunto metodo `IncrementCurrentLevel(long gameId)`

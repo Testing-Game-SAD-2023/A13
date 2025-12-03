@@ -59,10 +59,15 @@ public class T4Service extends BaseService {
                 Long.class
         ));
 
-
+        // Action CreateGame con 2 parametri (PartitaSingola, Allenamento)
         registerAction("CreateGame", new ServiceActionDefinition(
                 params -> CreateGame((GameMode) params[0], (long) params[1]),
                 GameMode.class, Long.class));
+
+        // Action CreateGame con 3 parametri (Scalata con nome)
+        registerAction("CreateGameWithName", new ServiceActionDefinition(
+                params -> CreateGame((GameMode) params[0], (long) params[1], (String) params[2]),
+                GameMode.class, Long.class, String.class));
 
         registerAction("CreateRound", new ServiceActionDefinition(
                 params -> CreateRound((long) params[0], (String) params[1], (String) params[2], (OpponentDifficulty) params[3], (int) params[4]),
@@ -83,6 +88,14 @@ public class T4Service extends BaseService {
         registerAction("EndGame", new ServiceActionDefinition(
                 params -> EndGame((long) params[0], (Map<Long, PlayerResult>) params[1], (boolean) params[2]),
                 Long.class, Map.class, Boolean.class));
+
+        registerAction("IncrementCurrentLevel", new ServiceActionDefinition(
+                params -> IncrementCurrentLevel((long) params[0]),
+                Long.class));
+
+        registerAction("GetCurrentLevelForScalata", new ServiceActionDefinition(
+                params -> GetCurrentLevelForScalata((long) params[0], (String) params[1]),
+                Long.class, String.class));
 
         /* Valutare se eliminare questa chiamata non utilizzata
         registerAction("CreateScalata", new ServiceActionDefinition(
@@ -118,7 +131,29 @@ public class T4Service extends BaseService {
         // Parsing della stringa JSON
         JSONObject jsonObject = new JSONObject(respose);
         // Estrazione del valore di id
-        return jsonObject.getInt("id");
+        return jsonObject.getLong("id");
+    }
+
+    // Overload per Scalata con scalataName
+    private long CreateGame(GameMode gameMode, long playerId, String scalataName) {
+        final String endpoint = "/games";
+
+        JSONObject obj = new JSONObject();
+
+        JSONArray playersArray = new JSONArray();
+        playersArray.put(String.valueOf(playerId));
+
+        obj.put("gameMode", gameMode);
+        obj.put("players", playersArray);
+        
+        // Aggiungi scalataName solo se non è null
+        if (scalataName != null && !scalataName.isEmpty()) {
+            obj.put("scalataName", scalataName);
+        }
+
+        String respose = callRestPost(endpoint, obj, null, null, String.class);
+        JSONObject jsonObject = new JSONObject(respose);
+        return jsonObject.getLong("id");
     }
 
 
@@ -245,6 +280,36 @@ public class T4Service extends BaseService {
 
         String respose = callRestPut(endpoint, requestBody, null, null, String.class);
         return respose;
+    }
+
+    private String IncrementCurrentLevel(long gameId) {
+        final String endpoint = "/games/%s/current-level-increment".formatted(gameId);
+        
+        try {
+            return callRestPatch(endpoint, null, String.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[IncrementCurrentLevel]: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Recupera il livello corrente di una partita Scalata per un giocatore.
+     * Ritorna 1 (default) se non esiste partita in corso.
+     * 
+     * @param playerId ID del giocatore
+     * @param scalataName Nome della scalata
+     * @return Livello corrente (1 se non esiste partita)
+     */
+    private Integer GetCurrentLevelForScalata(long playerId, String scalataName) {
+        final String endpoint = "/games/scalata/current-level?playerId=%d&scalataName=%s"
+                .formatted(playerId, scalataName);
+        
+        try {
+            return callRestGET(endpoint, null, Integer.class);
+        } catch (Exception e) {
+            // Se c'è un errore (es: 404), ritorna default 1
+            return 1;
+        }
     }
 
     /* Valutare se eliminare questa chiamata non utilizzata

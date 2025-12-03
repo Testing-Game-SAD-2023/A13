@@ -90,6 +90,18 @@ public class Game {
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp closedAt;
 
+    /**
+     * Livello corrente della partita (null per partite non-scalata)
+     */
+    @Column(name = "current_level")
+    private Integer currentLevel = 1;  // Default a 1
+
+    /**
+     * Nome della scalata (solo per game_mode = 'Scalata', altrimenti null)
+     */
+    @Column(name = "scalata_name")
+    private String scalataName;
+
     public Game(GameMode gameMode, List<Long> players) {
         this.gameMode = gameMode;
         this.players = players;
@@ -119,6 +131,15 @@ public class Game {
             return null;
         }
         return rounds.get(rounds.size() - 1);
+    }
+
+    // Getter/Setter
+    public Integer getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public void setCurrentLevel(Integer currentLevel) {
+        this.currentLevel = currentLevel;
     }
 
 }
