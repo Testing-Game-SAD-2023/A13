@@ -35,3 +35,25 @@ datasources:
     url: http://tempo:3200
     isDefault: false
     editable: true
+    jsonData:
+      # 1. Abilita la visualizzazione del Node Graph
+      nodeGraph:
+        enabled: true
+      
+      # 2. Configura il Service Graph collegandolo a Prometheus
+      serviceMap:
+        datasourceUid: 'prometheus' # Punta all'UID definito sotto
+      
+      # 3. Configura Trace to Metrics (Base, senza query/tag custom)
+      tracesToMetrics:
+        datasourceUid: 'prometheus'
+        spanStartTimeShift: '-2m'
+        spanEndTimeShift: '2m'
+
+  - name: Prometheus
+    type: prometheus
+    # UID aggiunto obbligatoriamente per permettere a Tempo di trovarlo
+    uid: prometheus 
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: false

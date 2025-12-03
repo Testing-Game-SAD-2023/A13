@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'microservice-1'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['t1-controller:8081']
+        labels:
+          service: 'AdminService'
+
+  - job_name: 'microservice-2'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['t23-controller:8082']
+        labels:
+          service: 'UserService'
+
+  - job_name: 'microservice-5'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['t5-controller:8085']
+        labels:
+          service: 'GameEngine'
+
+  - job_name: 'microservice-7'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['t7-controller:8087']
+        labels:
+          service: 'Compile_Randoop'
+
+  - job_name: 'microservice-8'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['t8-controller:8088']
+        labels:
+          service: 'Compile_EvoSuite'
