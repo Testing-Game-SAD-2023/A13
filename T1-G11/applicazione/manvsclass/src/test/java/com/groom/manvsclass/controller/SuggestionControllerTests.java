@@ -94,6 +94,63 @@ class SuggestionControllerTests {
                 .andExpect(content().string(errorMsg));
     }
 
+    @Test
+    void uploadSuggestions_NoTitle() throws Exception {
+
+        when(securityService.getJwtToken()).thenReturn("valid_jwt_token");
+
+        SuggestionDTO testDTO = new SuggestionDTO();
+        testDTO.setTitle(null);
+        testDTO.setHint("Testo_Suggerimento");
+        testDTO.setImage(null);
+        testDTO.setLevel(SuggestionLevel.LOW);
+
+        mockMvc.perform(post("/opponents/suggestions/upload/Calcolatrice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Collections.singletonList(testDTO))))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(suggestionService);
+    }
+
+    @Test
+    void uploadSuggestions_NoHint() throws Exception {
+
+        when(securityService.getJwtToken()).thenReturn("valid_jwt_token");
+
+        SuggestionDTO testDTO = new SuggestionDTO();
+        testDTO.setTitle("Suggerimento");
+        testDTO.setHint(null);
+        testDTO.setImage(null);
+        testDTO.setLevel(SuggestionLevel.LOW);
+
+        mockMvc.perform(post("/opponents/suggestions/upload/Calcolatrice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Collections.singletonList(testDTO))))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(suggestionService);
+    }
+
+    @Test
+    void uploadSuggestions_NoLevel() throws Exception {
+
+        when(securityService.getJwtToken()).thenReturn("valid_jwt_token");
+
+        SuggestionDTO testDTO = new SuggestionDTO();
+        testDTO.setTitle("Suggerimento");
+        testDTO.setHint("Testo_Suggerimento");
+        testDTO.setImage(null);
+        testDTO.setLevel(null);
+
+        mockMvc.perform(post("/opponents/suggestions/upload/Calcolatrice")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Collections.singletonList(testDTO))))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(suggestionService);
+    }
+
     // TEST VIEW (GET)
 
     @Test
@@ -162,4 +219,5 @@ class SuggestionControllerTests {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(errorMsg));
     }
+
 }

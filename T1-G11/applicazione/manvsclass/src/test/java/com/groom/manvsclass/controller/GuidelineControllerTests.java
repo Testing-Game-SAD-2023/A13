@@ -49,8 +49,8 @@ class GuidelineControllerTests {
         when(securityService.getJwtToken()).thenReturn("valid_jwt_token");
 
         GuidelineDTO testDTO = new GuidelineDTO();
-        testDTO.setTitle("Suggerimento");
-        testDTO.setHint("Testo_Suggerimento");
+        testDTO.setTitle("Linea_Guida");
+        testDTO.setHint("Testo_Linea_Guida");
         testDTO.setImage(null);
 
         mockMvc.perform(post("/opponents/guidelines/upload")
@@ -76,6 +76,42 @@ class GuidelineControllerTests {
         verifyNoInteractions(guidelineService);
     }
 
+    @Test
+    void uploadGuidelines_NoTitle() throws Exception {
+
+        when(securityService.getJwtToken()).thenReturn("valid_jwt_token");
+
+        GuidelineDTO testDTO = new GuidelineDTO();
+        testDTO.setTitle(null);
+        testDTO.setHint("Testo_Linea_Guida");
+        testDTO.setImage(null);
+
+        mockMvc.perform(post("/opponents/guidelines/upload")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Collections.singletonList(testDTO))))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(guidelineService);
+    }
+
+    @Test
+    void uploadGuidelines_NoHint() throws Exception {
+
+        when(securityService.getJwtToken()).thenReturn("valid_jwt_token");
+
+        GuidelineDTO testDTO = new GuidelineDTO();
+        testDTO.setTitle("Linea_Guida");
+        testDTO.setHint(null);
+        testDTO.setImage(null);
+
+        mockMvc.perform(post("/opponents/guidelines/upload")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Collections.singletonList(testDTO))))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(guidelineService);
+    }
+
     // TEST VIEW (GET)
 
     @Test
@@ -83,8 +119,8 @@ class GuidelineControllerTests {
         when(securityService.getJwtToken()).thenReturn("valid_token");
 
         GuidelineDTO testDTO = new GuidelineDTO();
-        testDTO.setTitle("Suggerimento");
-        testDTO.setHint("Testo_Suggerimento");
+        testDTO.setTitle("Linea_Guida");
+        testDTO.setHint("Testo_Linea_Guida");
         testDTO.setImage(null);
 
         when(guidelineService.findGuidelines())
@@ -92,7 +128,7 @@ class GuidelineControllerTests {
 
         mockMvc.perform(get("/opponents/guidelines"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Suggerimento"));
+                .andExpect(jsonPath("$[0].title").value("Linea_Guida"));
     }
 
     @Test
@@ -111,11 +147,11 @@ class GuidelineControllerTests {
 
         when(securityService.getJwtToken()).thenReturn("valid_token");
 
-        mockMvc.perform(delete("/opponents/guidelines/Suggerimento"))
+        mockMvc.perform(delete("/opponents/guidelines/Linea_Guida"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Linea guida eliminata con successo."));
 
-        verify(guidelineService).deleteGuideline("Suggerimento");
+        verify(guidelineService).deleteGuideline("Linea_Guida");
     }
 
     @Test
@@ -133,15 +169,15 @@ class GuidelineControllerTests {
     void deleteGuideline_NotFound() throws Exception {
 
         when(securityService.getJwtToken()).thenReturn("valid_token");
-        String errorMsg = "Suggerimento non trovato";
+        String errorMsg = "Linea_Guida non trovato";
 
         doThrow(new NotFoundException(errorMsg))
                 .when(guidelineService).deleteGuideline(anyString());
 
-        mockMvc.perform(delete("/opponents/guidelines/Suggerimento"))
+        mockMvc.perform(delete("/opponents/guidelines/Linea_Guida"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(errorMsg));
 
-        verify(guidelineService).deleteGuideline("Suggerimento");
+        verify(guidelineService).deleteGuideline("Linea_Guida");
     }
 }

@@ -8,15 +8,11 @@ import com.groom.manvsclass.model.Suggestion;
 import com.groom.manvsclass.model.SuggestionLevel;
 import com.groom.manvsclass.repository.ClassUTRepository;
 import com.groom.manvsclass.repository.SuggestionRepository;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.ArrayList;
@@ -27,547 +23,631 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
 public class SuggestionServiceTests {
 
     @Mock
     private ClassUTRepository classUTRepository;
+
     @Mock
     private SuggestionRepository suggestionRepository;
 
-    // prende il Mapper reale (assume già testato). In alternativa bisogna
-    // utilizzare @Mock e configurarlo a ogni test con i risultati mappati attesi
-    @Spy
-    private SuggestionMapper suggestionMapper = Mappers.getMapper(SuggestionMapper.class);
+    @Mock
+    private SuggestionMapper suggestionMapper;
 
     @InjectMocks
     private SuggestionService suggestionService;
 
+    /* ======================== METODI UTILI ======================== */
+    private SuggestionDTO createBaseSuggestionDTO() {
+
+        SuggestionDTO suggestionDTO = new SuggestionDTO();
+        suggestionDTO.setTitle("Suggerimento");
+        suggestionDTO.setHint("Testo_Suggerimento");
+        suggestionDTO.setImage(null);
+        suggestionDTO.setLevel(SuggestionLevel.LOW);
+
+        return suggestionDTO;
+    }
+
+    private Suggestion createBaseSuggestion() {
+
+        Suggestion suggestion = new Suggestion();
+        suggestion.setTitle("Suggerimento");
+        suggestion.setHint("Testo_Suggerimento");
+        suggestion.setImage(null);
+        suggestion.setLevel(SuggestionLevel.LOW);
+
+        return suggestion;
+    }
+
+    /* ======================== TEST UPLOAD_SUGGESTIONS ======================== */
+
     /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con dati in input nel formato valido e classe esistente nel database.
+     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con
+     * dati in input nel formato valido e classe esistente nel database.
      */
     @Test
-    public void uploadSuggestions_Corretto() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        SuggestionDTO sugg1 = new SuggestionDTO();
-        sugg1.setTitle("Suggestion1");
-        sugg1.setHint("Hint1");
-        sugg1.setImage(null);
-        sugg1.setLevel(SuggestionLevel.LOW);
+    public void uploadSuggestions_Correct() {
 
-        SuggestionDTO sugg2 = new SuggestionDTO();
-        sugg2.setTitle("Suggestion2");
-        sugg2.setHint("Hint2");
-        sugg2.setImage(null);
-        sugg2.setLevel(SuggestionLevel.MEDIUM);
+        // INPUT
 
-        SuggestionDTO sugg3 = new SuggestionDTO();
-        sugg3.setTitle("Suggestion3");
-        sugg3.setHint("Hint3");
-        sugg3.setImage(null);
-        sugg3.setLevel(SuggestionLevel.HIGH);
+        String className = "Classe_Esistente";
 
-        List<SuggestionDTO> suggestionDTOs = Arrays.asList(sugg1, sugg2, sugg3);
+        SuggestionDTO firstSuggestionDTO = createBaseSuggestionDTO();
+        firstSuggestionDTO.setTitle("Suggerimento_1");
 
-        // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
+        SuggestionDTO secondSuggestionDTO = createBaseSuggestionDTO();
+        secondSuggestionDTO.setTitle("Suggerimento_2");
+
+        List<SuggestionDTO> suggestionDTOs = Arrays.asList(firstSuggestionDTO, secondSuggestionDTO);
+
+        // OUTPUT MAPPER
+
+        Suggestion firstSuggestion = createBaseSuggestion();
+        firstSuggestion.setTitle("Suggerimento_1");
+
+        Suggestion secondSuggestion = createBaseSuggestion();
+        secondSuggestion.setTitle("Suggerimento_2");
+
+        List<Suggestion> suggestions = Arrays.asList(firstSuggestion, secondSuggestion);
+
+        // MOCK MAPPER
+
+        when(suggestionMapper.toEntityList(suggestionDTOs))
+                .thenReturn(suggestions);
+
+        // OUTPUT CLASS_UT REPOSITORY
+
         ClassUT mockClassUT = new ClassUT();
-        mockClassUT.setName(className);
-        mockClassUT.setSuggestions(new ArrayList<>());
+        mockClassUT.setName("Classe_Esistente");
 
-        List<Suggestion> savedSuggestions = suggestionMapper.toEntityList(suggestionDTOs);
-        for(Suggestion s : savedSuggestions) {
-            s.setClassUT(mockClassUT);
-        }
+        // MOCK CLASS_UT REPOSITORY
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
-
-        // - classUTRepository.findById
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.of(mockClassUT));
 
-        // - suggestionRepository.existsByClassUT_NameAndTitle
+        // MOCK DEL SUGGESTION REPOSITORY
+
         when(suggestionRepository.existsByClassUT_NameAndTitle(eq(className), anyString()))
                 .thenReturn(false);
 
-        // - suggestionRepository.saveAll
         when(suggestionRepository.saveAll(anyList()))
-                .thenReturn(savedSuggestions);
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // chiama il metodo del Service e verifica che non lanci eccezioni
+        // ESECUZIONE TEST
+
         assertDoesNotThrow(() -> suggestionService.uploadSuggestions(className, suggestionDTOs));
 
-        // Verifica che findById sia stato chiamato una volta con il nome corretto
+        // VERIFICA CHIAMATA MAPPER
+
+        verify(suggestionMapper, times(1)).toEntityList(suggestionDTOs);
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
         verify(classUTRepository, times(1)).findById(className);
 
-        // Verifica che existsByClassUT_NameAndTitle sia stato chiamato almeno per ogni titolo della lista
-        for (SuggestionDTO dto : suggestionDTOs) {
-            verify(suggestionRepository, times(1))
-                    .existsByClassUT_NameAndTitle(className, dto.getTitle());
-        }
+        // VERIFICA CHIAMATE SUGGESTION REPOSITORY
 
-        // Verifica che saveAll sia stato chiamato una volta con una lista di suggerimenti
+        verify(suggestionRepository, times(1)).existsByClassUT_NameAndTitle(className, "Suggerimento_1");
+        verify(suggestionRepository, times(1)).existsByClassUT_NameAndTitle(className, "Suggerimento_2");
+
         verify(suggestionRepository, times(1)).saveAll(anyList());
     }
 
     /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con dati in input con formato invalido (titolo null).
+     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con
+     * dati in input nel formato valido e classe inesistente nel database.
      */
     @Test
-    public void uploadSuggestions_SenzaTitolo() {
-        // Prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        SuggestionDTO sugg1 = new SuggestionDTO();
-        sugg1.setHint("Hint1");
-        sugg1.setImage(null);
-        sugg1.setLevel(SuggestionLevel.LOW);
+    public void uploadSuggestions_ClassNotFound() {
 
-        List<SuggestionDTO> suggestionDTOs = Arrays.asList(sugg1);
+        // INPUT
 
-        // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
-        ClassUT mockClassUT = new ClassUT();
-        mockClassUT.setName(className);
-        mockClassUT.setSuggestions(new ArrayList<>());
+        String className = "Classe_Non_Esistente";
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        SuggestionDTO suggestionDTO = createBaseSuggestionDTO();
 
-        // - classUTRepository.findById
-        when(classUTRepository.findById(className))
-                .thenReturn(Optional.of(mockClassUT));
+        List<SuggestionDTO> suggestionDTOs = Arrays.asList(suggestionDTO);
 
-        // - suggestionRepository.saveAll
-        when(suggestionRepository.saveAll(anyList()))
-                .thenThrow(ConstraintViolationException.class);
+        // OUTPUT MAPPER
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa (propagata da repository)
-        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
-    }
+        Suggestion suggestion = createBaseSuggestion();
 
-    /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con dati in input con formato invalido (hint null).
-     */
-    @Test
-    public void uploadSuggestions_SenzaHint() {
-        // Prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        SuggestionDTO sugg1 = new SuggestionDTO();
-        sugg1.setTitle("Suggestion1");
-        sugg1.setImage(null);
-        sugg1.setLevel(SuggestionLevel.LOW);
+        List<Suggestion> suggestions = Arrays.asList(suggestion);
 
-        List<SuggestionDTO> suggestionDTOs = Arrays.asList(sugg1);
+        // MOCK MAPPER
 
-        // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
-        ClassUT mockClassUT = new ClassUT();
-        mockClassUT.setName(className);
-        mockClassUT.setSuggestions(new ArrayList<>());
+        when(suggestionMapper.toEntityList(suggestionDTOs))
+                .thenReturn(suggestions);
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        // MOCK CLASS_UT REPOSITORY
 
-        // - classUTRepository.findById
-        when(classUTRepository.findById(className))
-                .thenReturn(Optional.of(mockClassUT));
-
-        // - suggestionRepository.saveAll
-        when(suggestionRepository.saveAll(anyList()))
-                .thenThrow(ConstraintViolationException.class);
-
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa (propagata da repository)
-        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
-    }
-
-    /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con dati in input con formato invalido (level null).
-     */
-    @Test
-    public void uploadSuggestions_SenzaLevel() {
-        // Prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        SuggestionDTO sugg1 = new SuggestionDTO();
-        sugg1.setTitle("Suggestion1");
-        sugg1.setHint("Hint1");
-        sugg1.setImage(null);
-
-        List<SuggestionDTO> suggestionDTOs = Arrays.asList(sugg1);
-
-        // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
-        ClassUT mockClassUT = new ClassUT();
-        mockClassUT.setName(className);
-        mockClassUT.setSuggestions(new ArrayList<>());
-
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
-
-        // - classUTRepository.findById
-        when(classUTRepository.findById(className))
-                .thenReturn(Optional.of(mockClassUT));
-
-        // - suggestionRepository.saveAll
-        when(suggestionRepository.saveAll(anyList()))
-                .thenThrow(ConstraintViolationException.class);
-
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa (propagata da repository)
-        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
-    }
-
-    /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con dati in input nel formato valido e classe inesistente nel database.
-     */
-    @Test
-    public void uploadSuggestions_ClasseInesistente() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseInesistente";
-        SuggestionDTO sugg1 = new SuggestionDTO();
-        sugg1.setTitle("Suggestion1");
-        sugg1.setHint("Hint1");
-        sugg1.setImage(null);
-        sugg1.setLevel(SuggestionLevel.LOW);
-
-        List<SuggestionDTO> suggestionDTOs = Arrays.asList(sugg1);
-
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
-
-        // - classUTRepository.findById -> simula l'assenza della classe nel DB
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.empty());
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
+        // ESECUIONE TEST
+
         assertThrows(NotFoundException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
 
-        // Verifica che findById sia stato chiamato una volta con il nome corretto
+        // VERIFICA CHIAMATA MAPPER
+
+        verify(suggestionMapper, times(1)).toEntityList(suggestionDTOs);
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
         verify(classUTRepository, times(1)).findById(className);
 
-        // Verifica che saveAll non sia mai stato chiamato
-        verify(suggestionRepository, times(0)).saveAll(anyList());
+        // VERIFICA ASSENZA CHIAMATE SUGGESTION REPOSITORY
+
+        verifyNoInteractions(suggestionRepository);
     }
 
     /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con lista dei suggerimenti vuota.
+     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con
+     * lista dei suggerimenti vuota.
      */
     @Test
-    public void uploadSuggestions_NessunSuggerimento() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
+    public void uploadSuggestions_EmptyList() {
+
+        // INPUT
+
+        String className = "Classe_Esistente";
 
         List<SuggestionDTO> suggestionDTOs = new ArrayList<>();
 
-        // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
+        // OUTPUT MAPPER
+
+        List<Suggestion> suggestions = new ArrayList<>();
+
+        // MOCK MAPPER
+
+        when(suggestionMapper.toEntityList(suggestionDTOs))
+                .thenReturn(suggestions);
+
+        // OUTPUT CLASS_UT REPOSITORY
+
         ClassUT mockClassUT = new ClassUT();
         mockClassUT.setName(className);
-        mockClassUT.setSuggestions(new ArrayList<>());
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        // MOCK CLASS_UT REPOSITORY
 
-        // - classUTRepository.findById
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.of(mockClassUT));
 
-        // chiama il metodo del Service e verifica che non modifichi il database
-        suggestionService.uploadSuggestions(className, suggestionDTOs);
+        // ESECUZIONE TEST
 
-        // Verifica che findById sia stato chiamato una volta con il nome corretto
+        assertDoesNotThrow(() -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+
+        // VERIFICA CHIAMATA MAPPER
+
+        verify(suggestionMapper, times(1)).toEntityList(suggestionDTOs);
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
         verify(classUTRepository, times(1)).findById(className);
 
-        // Verifica che saveAll non sia mai stato chiamato
+        // VERIFICA ASSENZA CHIAMATE SUGGESTION REPOSITORY
+
         verify(suggestionRepository, times(0)).saveAll(anyList());
     }
 
     /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con un suggerimento valido e un altro no.
-     * Verifica che venga lanciata un'eccezione unchecked, in modo da scatenare il rollback della transazione (vista l'annotazione @Transactional del service)
+     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con
+     * un suggerimento valido e un altro no.
+     * Verifica che venga lanciata un'eccezione unchecked, in modo da scatenare il
+     * rollback della transazione (vista l'annotazione @Transactional del service).
      */
     @Test
-    public void uploadSuggestions_Atomicita() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        SuggestionDTO suggValido = new SuggestionDTO();
-        suggValido.setTitle("Suggestion1");
-        suggValido.setHint("Hint1");
-        suggValido.setImage(null);
-        suggValido.setLevel(SuggestionLevel.LOW);
+    public void uploadSuggestions_Atomic() {
 
-        SuggestionDTO suggInvalido = new SuggestionDTO();
-        suggInvalido.setTitle(null);
-        suggInvalido.setHint("Hint1");
-        suggInvalido.setImage(null);
-        suggInvalido.setLevel(SuggestionLevel.LOW);
+        // INPUT
 
-        List<SuggestionDTO> suggestionDTOs = Arrays.asList(suggValido, suggInvalido);
+        String className = "Classe_Esistente";
 
-        // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
+        SuggestionDTO validSuggestionDTO = createBaseSuggestionDTO();
+        validSuggestionDTO.setTitle("Titolo_Valido");
+
+        SuggestionDTO invalidSuggestionDTO = createBaseSuggestionDTO();
+        invalidSuggestionDTO.setTitle(null);
+
+        List<SuggestionDTO> suggestionDTOs = Arrays.asList(validSuggestionDTO, invalidSuggestionDTO);
+
+        // OUTPUT MAPPER
+
+        Suggestion validSuggestion = createBaseSuggestion();
+        validSuggestion.setTitle("Titolo_Valido");
+
+        Suggestion invalidSuggestion = createBaseSuggestion();
+        invalidSuggestion.setTitle(null);
+
+        List<Suggestion> suggestions = Arrays.asList(validSuggestion, invalidSuggestion);
+
+        // MOCK MAPPER
+
+        when(suggestionMapper.toEntityList(suggestionDTOs))
+                .thenReturn(suggestions);
+
+        // OUTPUT CLASS_UT REPOSITORY
+
         ClassUT mockClassUT = new ClassUT();
         mockClassUT.setName(className);
-        mockClassUT.setSuggestions(new ArrayList<>());
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        // MOCK CLASS_UT REPOSITORY
 
-        // - classUTRepository.findById
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.of(mockClassUT));
 
-        // - suggestionRepository.existsByClassUT_NameAndTitle
-        when(suggestionRepository.existsByClassUT_NameAndTitle(eq(className), anyString()))
+        // MOCK SUGGESTION REPOSITORY
+
+        when(suggestionRepository.existsByClassUT_NameAndTitle(eq(className), eq("Titolo_Valido")))
                 .thenReturn(false);
 
-        // - suggestionRepository.saveAll (lancia eccezione perché titolo del secondo suggerimento è null)
-        when(suggestionRepository.saveAll(anyList()))
-                .thenThrow(ConstraintViolationException.class);
+        when(suggestionRepository.existsByClassUT_NameAndTitle(eq(className), isNull()))
+                .thenThrow(new DataIntegrityViolationException("Title is NULL"));
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
-        assertThrows(ConstraintViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+        // ESECUZIONE TEST
 
-        // Verifica che findById sia stato chiamato una volta con il nome corretto
+        assertThrows(DataIntegrityViolationException.class,
+                () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+
+        // VERIFICA CHIAMATA MAPPER
+
+        verify(suggestionMapper, times(1)).toEntityList(suggestionDTOs);
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
         verify(classUTRepository, times(1)).findById(className);
 
+        // VERIFICA CHIAMATE SUGGESTION REPOSITORY
+
+        verify(suggestionRepository, times(2)).existsByClassUT_NameAndTitle(eq(className), any());
+
+        verify(suggestionRepository, times(0)).saveAll(anyList());
     }
 
     /**
-     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con due suggerimenti identici.
-     * Verifica che nessuno dei due sia inserito.
+     * Effettua un test del metodo {@link SuggestionService#uploadSuggestions} con
+     * due suggerimenti identici.
+     * Verifica che venga lanciata un'eccezione unchecked, in modo da scatenare il
+     * rollback della transazione (vista l'annotazione @Transactional del service).
      */
     @Test
-    public void uploadSuggestions_SuggerimentiIdentici() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        SuggestionDTO sugg1 = new SuggestionDTO();
-        sugg1.setTitle("Suggestion1");
-        sugg1.setHint("Hint1");
-        sugg1.setImage(null);
-        sugg1.setLevel(SuggestionLevel.LOW);
+    public void uploadSuggestions_DuplicatedSuggestions() {
 
-        SuggestionDTO sugg2 = new SuggestionDTO();
-        sugg2.setTitle("Suggestion2");
-        sugg2.setHint("Hint1");
-        sugg2.setImage(null);
-        sugg2.setLevel(SuggestionLevel.LOW);
+        // INPUT
 
-        List<SuggestionDTO> suggestionDTOs = Arrays.asList(sugg1, sugg2);
+        String className = "Classe_Esistente";
 
-        List<Suggestion> savedSuggestions = suggestionMapper.toEntityList(suggestionDTOs);
+        SuggestionDTO firstSuggestionDTO = createBaseSuggestionDTO();
 
-        // crea l'oggetto Model che restituisce il Mock di ClassUTRepository (simulando l'esistenza della classe nel DB)
+        SuggestionDTO secondSuggestionDTO = createBaseSuggestionDTO();
+
+        List<SuggestionDTO> suggestionDTOs = Arrays.asList(firstSuggestionDTO, secondSuggestionDTO);
+
+        // OUTPUT MAPPER
+
+        Suggestion firstSuggestion = createBaseSuggestion();
+
+        Suggestion secondSuggestion = createBaseSuggestion();
+
+        List<Suggestion> suggestions = Arrays.asList(firstSuggestion, secondSuggestion);
+
+        // MOCK MAPPER
+
+        when(suggestionMapper.toEntityList(suggestionDTOs))
+                .thenReturn(suggestions);
+
+        // OUTPUT CLASS_UT REPOSITORY
+
         ClassUT mockClassUT = new ClassUT();
         mockClassUT.setName(className);
-        mockClassUT.setSuggestions(new ArrayList<>());
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        // MOCK CLASS_UT REPOSITORY
 
-        // - classUTRepository.findById
         when(classUTRepository.findById(className))
                 .thenReturn(Optional.of(mockClassUT));
 
-        // - suggestionRepository.existsByClassUT_NameAndTitle
+        // MOCK SUGGESTION REPOSITORY
+
         when(suggestionRepository.existsByClassUT_NameAndTitle(eq(className), anyString()))
                 .thenReturn(false);
 
-        // - suggestionRepository.saveAll (lancia eccezione perché il constraint unique del titolo è violata)
         when(suggestionRepository.saveAll(anyList()))
-                .thenThrow(DataIntegrityViolationException.class);
+                .thenThrow(new DataIntegrityViolationException("Suggestion is Duplicated"));
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
-        assertThrows(DataIntegrityViolationException.class, () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+        // ESECUZIONE TEST
 
-        // Verifica che findById sia stato chiamato una volta con il nome corretto
+        assertThrows(DataIntegrityViolationException.class,
+                () -> suggestionService.uploadSuggestions(className, suggestionDTOs));
+
+        // VERIFICA CHIAMATA MAPPER
+
+        verify(suggestionMapper, times(1)).toEntityList(suggestionDTOs);
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
         verify(classUTRepository, times(1)).findById(className);
+
+        // VERIFICA CHIAMATE SUGGESTION REPOSITORY
+
+        verify(suggestionRepository, times(2)).existsByClassUT_NameAndTitle(eq(className), any());
+
+        verify(suggestionRepository, times(1)).saveAll(anyList());
     }
 
-    /**
-     * Effettua un test del metodo {@link SuggestionService#findSuggestions} con dati in input nel formato valido, classe esistente nel database e suggerimenti presenti.
-     */
-    @Test
-    public void findSuggestions_SuggerimentiPresenti() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        Suggestion sugg1 = new Suggestion();
-        sugg1.setTitle("Suggestion1");
-        sugg1.setHint("Hint1");
-        sugg1.setImage(null);
-        sugg1.setLevel(SuggestionLevel.LOW);
-
-        Suggestion sugg2 = new Suggestion();
-        sugg2.setTitle("Suggestion2");
-        sugg2.setHint("Hint2");
-        sugg2.setImage(null);
-        sugg2.setLevel(SuggestionLevel.MEDIUM);
-
-        Suggestion sugg3 = new Suggestion();
-        sugg3.setTitle("Suggestion3");
-        sugg3.setHint("Hint3");
-        sugg3.setImage(null);
-        sugg3.setLevel(SuggestionLevel.HIGH);
-
-        List<Suggestion> returnedSuggestions = Arrays.asList(sugg1, sugg2, sugg3);
-        List<SuggestionDTO> expectedOutput = suggestionMapper.toDtoList(returnedSuggestions);
-
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
-
-        // - suggestionRepository.findAllByClassUT_Name
-        when(suggestionRepository.findAllByClassUT_Name(className))
-                .thenReturn(returnedSuggestions);
-
-        // chiama il metodo del Service e verifica che non lanci eccezioni
-        List<SuggestionDTO> actualOutput = assertDoesNotThrow(() -> suggestionService.findSuggestions(className));
-
-        // verifica output atteso (NOTA: in questo caso si assume che anche l'ordine sia uguale, si potrebbe rilassare la condizione)
-        assertEquals(expectedOutput.size(), actualOutput.size());
-        for (int i = 0; i < actualOutput.size(); i++) {
-            SuggestionDTO expected = expectedOutput.get(i);
-            SuggestionDTO actual = actualOutput.get(i);
-            assertEquals(expected, actual);
-        }
-
-        // Verifica che findAllByClassUT_Name sia stato chiamato una volta con il nome corretto
-        verify(suggestionRepository, times(1)).findAllByClassUT_Name(className);
-    }
+    /* ========================= TEST FIND_SUGGESTIONS ========================= */
 
     /**
-     * Effettua un test del metodo {@link SuggestionService#findSuggestions} con dati in input nel formato valido, classe esistente nel database e suggerimenti assenti.
+     * Effettua un test del metodo {@link SuggestionService#findSuggestions} con
+     * classe esistente nel database e suggerimenti associati presenti.
      */
     @Test
-    public void findSuggestions_SuggerimentiAssenti() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseSenzaSuggerimenti";
-        List<Suggestion> returnedSuggestions = new ArrayList<>();
+    public void findSuggestions_Correct() {
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        // INPUT
 
-        // - suggestionRepository.findAllByClassUT_Name
-        when(suggestionRepository.findAllByClassUT_Name(className))
-                .thenReturn(returnedSuggestions);
+        String className = "Classe_Esistente";
 
-        // chiama il metodo del Service e verifica che non lanci eccezioni
-        List<SuggestionDTO> output = assertDoesNotThrow(() -> suggestionService.findSuggestions(className));
+        // MOCK CLASS_UT REPOSITORY
 
-        // verifica output vuoto
-        assertEquals(true, output.isEmpty());
-        // Verifica che findAllByClassUT_Name sia stato chiamato una volta con il nome corretto
-        verify(suggestionRepository, times(1)).findAllByClassUT_Name(className);
-    }
-
-    /**
-     * Effettua un test del metodo {@link SuggestionService#findSuggestions} con dati in input nel formato valido e classe inesistente nel database.
-     */
-    @Test
-    public void findSuggestions_ClasseInesistente() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseInesistente";
-        List<Suggestion> returnedSuggestions = new ArrayList<>();
-
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
-
-        // - suggestionRepository.findAllByClassUT_Name
-        when(suggestionRepository.findAllByClassUT_Name(className))
-                .thenReturn(returnedSuggestions);
-
-        // chiama il metodo del Service e verifica che non lanci eccezioni
-        List<SuggestionDTO> output = assertDoesNotThrow(() -> suggestionService.findSuggestions(className));
-
-        // verifica output vuoto
-        assertEquals(true, output.isEmpty());
-        // Verifica che findAllByClassUT_Name sia stato chiamato una volta con il nome corretto
-        verify(suggestionRepository, times(1)).findAllByClassUT_Name(className);
-    }
-
-    /**
-     * Effettua un test del metodo {@link SuggestionService#deleteSuggestion} con dati in input nel formato valido e classe e suggerimento associato esistente nel database.
-     */
-    @Test
-    public void deleteSuggestion_Corretto() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        String suggestionTitle = "SuggerimentoEsistente";
-        Suggestion suggestion = new Suggestion();
-        suggestion.setTitle(suggestionTitle);
-        suggestion.setHint("Hint1");
-        suggestion.setImage(null);
-        suggestion.setLevel(SuggestionLevel.LOW);
-
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
-
-        // - classUTRepository.existsById
         when(classUTRepository.existsById(className))
                 .thenReturn(true);
 
-        // - suggestionRepository.findByClassUT_NameAndTitle
+        // OUTPUT SUGGESTION REPOSITORY
+
+        Suggestion firstSuggestion = createBaseSuggestion();
+        firstSuggestion.setTitle("Suggerimento_1");
+
+        Suggestion secondSuggestion = createBaseSuggestion();
+        secondSuggestion.setTitle("Suggerimento_2");
+
+        List<Suggestion> suggestions = Arrays.asList(firstSuggestion, secondSuggestion);
+
+        // MOCK SUGGESTION REPOSITORY
+
+        when(suggestionRepository.findAllByClassUT_Name(className))
+                .thenReturn(suggestions);
+
+        // OUTPUT MAPPER
+
+        SuggestionDTO firstSuggestionDTO = createBaseSuggestionDTO();
+        firstSuggestionDTO.setTitle("Suggerimento_1");
+
+        SuggestionDTO secondSuggestionDTO = createBaseSuggestionDTO();
+        secondSuggestionDTO.setTitle("Suggerimento_2");
+
+        List<SuggestionDTO> suggestionDTOs = Arrays.asList(firstSuggestionDTO, secondSuggestionDTO);
+
+        // MOCK MAPPER
+
+        when(suggestionMapper.toDtoList(suggestions))
+                .thenReturn(suggestionDTOs);
+
+        // ESECUZIONE TEST
+
+        List<SuggestionDTO> testResults = suggestionService.findSuggestions(className);
+
+        // VERIFICA OUTPUT
+
+        // verifica che l'output restituito dal service contenga esattamente i dto
+        // restituiti dal mapper
+        assertThat(testResults)
+                .hasSize(suggestionDTOs.size())
+                .containsExactlyInAnyOrderElementsOf(suggestionDTOs);
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
+        verify(classUTRepository, times(1)).existsById(className);
+
+        // VERIFICA CHIAMATA SUGGESTION REPOSITORY
+
+        verify(suggestionRepository, times(1)).findAllByClassUT_Name(className);
+
+        // VERIFICA CHIAMATA MAPPER
+        verify(suggestionMapper, times(1)).toDtoList(suggestions);
+    }
+
+    /**
+     * Effettua un test del metodo {@link SuggestionService#findSuggestions} con
+     * classe esistente nel database e nessun suggerimento associato.
+     */
+    @Test
+    public void findSuggestions_Correct_MissingSuggestions() {
+
+        // INPUT
+
+        String className = "Classe_Esistente";
+
+        // MOCK CLASS_UT REPOSITORY
+
+        when(classUTRepository.existsById(className))
+                .thenReturn(true);
+
+        // OUTPUT SUGGESTION REPOSITORY
+
+        List<Suggestion> suggestions = new ArrayList<>();
+
+        // MOCK SUGGESTION REPOSITORY
+
+        when(suggestionRepository.findAllByClassUT_Name(className))
+                .thenReturn(suggestions);
+
+        // OUTPUT MAPPER
+
+        List<SuggestionDTO> suggestionDTOs = new ArrayList<>();
+
+        // MOCK MAPPER
+
+        when(suggestionMapper.toDtoList(suggestions))
+                .thenReturn(suggestionDTOs);
+
+        // ESECUZIONE TEST
+
+        List<SuggestionDTO> testResults = suggestionService.findSuggestions(className);
+
+        // VERIFICA OUTPUT
+
+        assertEquals(0, testResults.size());
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
+        verify(classUTRepository, times(1)).existsById(className);
+
+        // VERIFICA CHIAMATA SUGGESTION REPOSITORY
+
+        verify(suggestionRepository, times(1)).findAllByClassUT_Name(className);
+
+        // VERIFICA CHIAMATA MAPPER
+        verify(suggestionMapper, times(1)).toDtoList(suggestions);
+    }
+
+    /**
+     * Effettua un test del metodo {@link SuggestionService#findSuggestions} con
+     * classe inesistente nel database.
+     */
+    @Test
+    public void findSuggestions_ClassNotFound() {
+
+        // INPUT
+
+        String className = "Classe_Non_Esistente";
+
+        // MOCK CLASS_UT REPOSITORY
+
+        when(classUTRepository.existsById(className))
+                .thenReturn(false);
+
+        // ESECUZIONE TEST
+
+        assertThrows(NotFoundException.class, () -> suggestionService.findSuggestions(className));
+
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
+        verify(classUTRepository, times(1)).existsById(className);
+
+        // VERIFICA ASSENZA CHIAMATE SUGGESTION REPOSITORY
+
+        verifyNoInteractions(suggestionRepository);
+    }
+
+    /* ======================== TEST DELETE_SUGGESTIONS ======================== */
+
+    /**
+     * Effettua un test del metodo {@link SuggestionService#deleteSuggestion} con
+     * classe e suggerimento associato esistenti nel database.
+     */
+    @Test
+    public void deleteSuggestion_Correct() {
+
+        // INPUT
+
+        String className = "Classe_Esistente";
+
+        String suggestionTitle = "Suggerimento_Esistente";
+
+        // MOCK CLASS_UT REPOSITORY
+
+        when(classUTRepository.existsById(className))
+                .thenReturn(true);
+
+        // OUTPUT SUGGESTION REPOSITORY
+
+        Suggestion suggestion = createBaseSuggestion();
+        suggestion.setTitle(suggestionTitle);
+        ClassUT classUT = new ClassUT();
+        classUT.setName(className);
+        suggestion.setClassUT(classUT);
+
+        // MOCK SUGGESTION REPOSITORY
+
         when(suggestionRepository.findByClassUT_NameAndTitle(className, suggestionTitle))
                 .thenReturn(Optional.of(suggestion));
 
-        // chiama il metodo del Service e verifica che non lanci eccezioni
+        // ESECUZIONE TEST
+
         assertDoesNotThrow(() -> suggestionService.deleteSuggestion(className, suggestionTitle));
 
-        // Verifica che existsById sia stato chiamato una volta con il nome corretto
+        // VERIFICA CHIAMATA SUGGESTION REPOSITORY
+
         verify(classUTRepository, times(1)).existsById(className);
 
-        // Verifica che findByClassUT_NameAndTitle sia stato chiamato una volta con nome classe e titolo suggerimento corretto
+        // VERIFICA CHIAMATE SUGGESTION REPOSITORY
+
         verify(suggestionRepository, times(1)).findByClassUT_NameAndTitle(className, suggestionTitle);
 
-        // Verifica che delete sia stato chiamato una volta con il suggerimento corretto
         verify(suggestionRepository, times(1)).delete(suggestion);
     }
 
     /**
-     * Effettua un test del metodo {@link SuggestionService#deleteSuggestion} con dati in input nel formato valido e classe inesistente nel database.
+     * Effettua un test del metodo {@link SuggestionService#deleteSuggestion} con
+     * classe inesistente nel database.
      */
     @Test
-    public void deleteSuggestion_ClasseInesistente() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseInesistente";
-        String suggestionTitle = "Suggerimento";
-        Suggestion suggestion = new Suggestion();
-        suggestion.setTitle(suggestionTitle);
-        suggestion.setHint("Hint1");
-        suggestion.setImage(null);
-        suggestion.setLevel(SuggestionLevel.LOW);
+    public void deleteSuggestion_ClassNotFound() {
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        // INPUT
 
-        // - classUTRepository.existsById
+        String className = "Classe_Non_Esistente";
+
+        String suggestionTitle = "Suggerimento_Esistente";
+
+        // MOCK CLASS_UT REPOSITORY
+
         when(classUTRepository.existsById(className))
                 .thenReturn(false);
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
+        // ESECUZIONE TEST
+
         assertThrows(NotFoundException.class, () -> suggestionService.deleteSuggestion(className, suggestionTitle));
 
-        // Verifica che existsById sia stato chiamato una volta con il nome corretto
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
         verify(classUTRepository, times(1)).existsById(className);
 
-        // Verifica che delete non sia mai stato chiamato
-        verify(suggestionRepository, times(0)).delete(any(Suggestion.class));
+        // VERIFICA ASSENZA CHIAMATE SUGGESTION REPOSITORY
+
+        verifyNoInteractions(suggestionRepository);
     }
 
     /**
-     * Effettua un test del metodo {@link SuggestionService#deleteSuggestion} con dati in input nel formato valido e suggerimento inesistente nel database.
+     * Effettua un test del metodo {@link SuggestionService#deleteSuggestion} con
+     * suggerimento inesistente nel database.
      */
     @Test
-    public void deleteSuggestion_SuggerimentoInesistente() {
-        // prepara gli input (simulando input del Controller)
-        String className = "ClasseEsistente";
-        String suggestionTitle = "SuggerimentoInesistente";
+    public void deleteSuggestion_SuggestionNotFound() {
 
-        // Configura il comportamento dei repository mock relativi ai metodi invocati da uploadSuggestions
+        // INPUT
 
-        // - classUTRepository.existsById
+        String className = "Classe_Esistente";
+
+        String suggestionTitle = "Suggerimento_Non_Esistente";
+
+        // MOCK CLASS_UT REPOSITORY
+
         when(classUTRepository.existsById(className))
                 .thenReturn(true);
 
-        // - suggestionRepository.findByClassUT_NameAndTitle
+        // MOCK SUGGESTION REPOSITORY
+
         when(suggestionRepository.findByClassUT_NameAndTitle(className, suggestionTitle))
                 .thenReturn(Optional.empty());
 
-        // chiama il metodo del Service e verifica che lanci l'eccezione attesa
+        // ESECUZIONE TEST
+
         assertThrows(NotFoundException.class, () -> suggestionService.deleteSuggestion(className, suggestionTitle));
 
-        // Verifica che existsById sia stato chiamato una volta con il nome corretto
+        // VERIFICA CHIAMATA CLASS_UT REPOSITORY
+
         verify(classUTRepository, times(1)).existsById(className);
 
-        // Verifica che findByClassUT_NameAndTitle sia stato chiamato una volta con nome classe e titolo suggerimento corretto
+        // VERIFICA CHIAMATE SUGGESTION REPOSITORY
+
         verify(suggestionRepository, times(1)).findByClassUT_NameAndTitle(className, suggestionTitle);
 
-        // Verifica che delete non sia mai stato chiamato
         verify(suggestionRepository, times(0)).delete(any(Suggestion.class));
     }
 
-
 }
-

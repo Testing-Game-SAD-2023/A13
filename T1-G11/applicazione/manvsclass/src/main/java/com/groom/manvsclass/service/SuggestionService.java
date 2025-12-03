@@ -73,6 +73,11 @@ public class SuggestionService {
     @Transactional
     public List<SuggestionDTO> findSuggestions(String className) {
 
+        boolean classExists = classUTRepository.existsById(className);
+        if (!classExists) {
+            throw new NotFoundException("Classe " + className + " non trovata.");
+        }
+
         List<Suggestion> suggestionsFound = suggestionRepository.findAllByClassUT_Name(className);
 
         // effettua il mapping in uscita Model -> DTO
