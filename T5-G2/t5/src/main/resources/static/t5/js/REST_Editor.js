@@ -174,8 +174,8 @@ function handleGameEnd(response) {
 
     generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked); // Gestisce la fine del gioco
 
-    // Disattivo il timer
-    if (GetMode() === "PartitaSingola")
+    // Disattivo il timer per PartitaSingola e Scalata
+    if (GetMode() === "PartitaSingola" || GetMode() === "Scalata")
         stopTimer();
 
     // Disattivo la chiamata a POST /leave all'uscita dalla pagina
