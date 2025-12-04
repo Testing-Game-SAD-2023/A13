@@ -24,4 +24,23 @@ public class OpponentPersistenceService {
             apiGatewayClient.callAddNewOpponent(opponent.getClassUT(), mode, opponent.getOpponentType(), opponent.getOpponentDifficulty());
         }
     }
+
+    /**
+     * Rollback all opponent data for a given class.
+     * Deletes all opponents from database and notifies external services.
+     * Silently handles cases where data doesn't exist.
+     */
+    public void rollbackOpponentData(String classUTName) {
+        try {
+            opponentRepository.deleteByClassUT(classUTName);
+        } catch (Exception e) {
+            // Log but continue - best effort cleanup
+        }
+        
+        try {
+            apiGatewayClient.callDeleteAllClassUTOpponents(classUTName);
+        } catch (Exception e) {
+            // Log but continue - best effort cleanup
+        }
+    }
 }

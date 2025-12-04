@@ -25,20 +25,32 @@ public class OpponentTransformationService {
     public void createAndPersistOpponent(String classUTName, String robotType, File levelFolder, 
                                          Path evosuitePath, Path jacocoPath) throws IOException {
         
-        CoverageReader.CoverageData coverageData = CoverageReader.readCoverageFiles(evosuitePath, jacocoPath);
-        
-        OpponentDifficulty difficulty = LevelExtractor.extractDifficulty(levelFolder);
-        JacocoScore jacocoScore = ScoreBuilder.buildJacocoScore(coverageData.jacocoStatistics);
-        EvosuiteScore evosuiteScore = ScoreBuilder.buildEvosuiteScore(coverageData.evosuiteStatistics);
+        try {
+            CoverageReader.CoverageData coverageData = CoverageReader.readCoverageFiles(evosuitePath, jacocoPath);
+            
+            OpponentDifficulty difficulty = LevelExtractor.extractDifficulty(levelFolder);
+            JacocoScore jacocoScore = ScoreBuilder.buildJacocoScore(coverageData.jacocoStatistics);
+            EvosuiteScore evosuiteScore = ScoreBuilder.buildEvosuiteScore(coverageData.evosuiteStatistics);
 
-        Opponent opponent = new Opponent();
-        opponent.setClassUT(classUTName);
-        opponent.setOpponentType(robotType);
-        opponent.setOpponentDifficulty(difficulty);
-        opponent.setCoverage(coverageData.jacococCoverageXml);
-        opponent.setEvosuiteScore(evosuiteScore);
-        opponent.setJacocoScore(jacocoScore);
+            Opponent opponent = new Opponent();
+            opponent.setClassUT(classUTName);
+            opponent.setOpponentType(robotType);
+            opponent.setOpponentDifficulty(difficulty);
+            opponent.setCoverage(coverageData.jacococCoverageXml);
+            opponent.setEvosuiteScore(evosuiteScore);
+            opponent.setJacocoScore(jacocoScore);
 
-        opponentPersistenceService.saveOpponentAndNotify(opponent);
+            opponentPersistenceService.saveOpponentAndNotify(opponent);
+        } catch (IllegalArgumentException e) {
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "Errore durante l'elaborazione del livello '" + levelFolder.getName() + "': " + e.getMessage(),
+                e
+            );
+        } catch (IOException e) {
+            throw new IOException(
+                "Errore durante la lettura dei file di coverage per il livello '" + levelFolder.getName() + "': " + e.getMessage(),
+                e
+            );
+        }
     }
 }

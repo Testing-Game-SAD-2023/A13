@@ -12,18 +12,50 @@ async function handleApiErrors(response) {
         const errorBody = await response.json();
         console.error('Errore dalla risposta:', errorBody);
 
+        // Handle new uniform error structure (ErrorResponseDTO)
+        if (errorBody?.message) {
+            // Show a more informative error message
+            const errorTitle = errorBody?.error || 'Errore';
+            const errorStatus = errorBody?.status ? ` (Codice: ${errorBody.status})` : '';
+            
+            // Format the message nicely, preserving line breaks
+            const message = errorBody.message.replace(/\\n/g, '\n');
+            
+            // Create a more structured error display
+            const fullMessage = `${errorTitle}${errorStatus}\n\n${message}`;
+            
+            // Use alert for now, but this preserves formatting
+            alert(fullMessage);
+            return;
+        }
+
+        // Handle validation errors with field-specific errors (ValidationErrorDTO)
         if (errorBody?.errors?.length > 0) {
+            let errorMessages = [];
             errorBody.errors.forEach(err => {
                 const container = document.getElementById(`${err.field}_label_container`);
                 if (container) {
                     addErrorDiv(container, err.message);
                 } else {
-                    alert(err.message);
+                    errorMessages.push(`• ${err.message}`);
                 }
             });
-        } else {
-            alert(errors.notHandled);
+            
+            if (errorMessages.length > 0) {
+                const errorTitle = errorBody?.message || 'Errori di validazione';
+                alert(`${errorTitle}\n\n${errorMessages.join('\n')}`);
+            }
+            return;
         }
+
+        // Fallback for other error formats
+        if (errorBody?.errorMessage) {
+            alert(errorBody.errorMessage);
+            return;
+        }
+
+        // Generic fallback
+        alert(errors.notHandled);
     } catch (e) {
         console.error('Errore durante la lettura del corpo JSON:', e);
         alert(errors.notHandled);

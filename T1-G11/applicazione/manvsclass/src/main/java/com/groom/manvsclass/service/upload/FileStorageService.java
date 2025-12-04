@@ -38,9 +38,23 @@ public class FileStorageService {
 
 
     public void extractZipIn(Path folder) throws IOException {
-        Path zipFile = Objects.requireNonNull((new File(String.valueOf(folder))).listFiles())[0].toPath();
-        unzip(String.valueOf(zipFile), folder.toFile());
-        Files.delete(zipFile);
+        File[] files = new File(String.valueOf(folder)).listFiles();
+        if (files == null || files.length == 0) {
+            throw new IOException(
+                "Impossibile estrarre il file ZIP: la cartella di destinazione è vuota o non accessibile. " +
+                "Verificare che il file ZIP sia stato salvato correttamente."
+            );
+        }
+        Path zipFile = files[0].toPath();
+        try {
+            unzip(String.valueOf(zipFile), folder.toFile());
+            Files.delete(zipFile);
+        } catch (IOException e) {
+            throw new IOException(
+                "Errore durante l'estrazione del file ZIP: " + e.getMessage() + 
+                ". Il file potrebbe essere corrotto o in un formato non valido.", e
+            );
+        }
     }
 
 
@@ -68,7 +82,11 @@ public class FileStorageService {
 
     public void copyDirectoryRecursively(Path sourcePath, Path destinationPath) throws IOException {
         if (!Files.exists(sourcePath) || !Files.isDirectory(sourcePath)) {
-            throw new IllegalArgumentException(String.format("Il percorso %s sorgente non esiste o non è una directory.", sourcePath));
+            throw new IOException(
+                "Impossibile copiare la directory: il percorso sorgente '" + sourcePath.getFileName() + 
+                "' non esiste o non è una directory valida. " +
+                "Questo errore può verificarsi se i file di test non sono stati estratti correttamente."
+            );
         }
         Files.walkFileTree(sourcePath, new java.nio.file.SimpleFileVisitor<Path>() {
             @Override
@@ -91,7 +109,10 @@ public class FileStorageService {
     public void zipDirectory(String sourceDirPath, String zipFilePath) throws IOException {
         File sourceDir = new File(sourceDirPath);
         if (!sourceDir.exists() || !sourceDir.isDirectory()) {
-            throw new IOException("La directory specificata non esiste o non è una cartella valida.");
+            throw new IOException(
+                "Impossibile creare l'archivio ZIP: la directory '" + sourceDirPath + "' non esiste o non è una cartella valida. " +
+                "Verificare che i file sorgente e di test siano stati salvati correttamente."
+            );
         }
         try (FileOutputStream fos = new FileOutputStream(zipFilePath);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
@@ -132,12 +153,18 @@ public class FileStorageService {
                 File newFile = new File(destDir, zipEntry.getName());
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
-                        throw new IOException("Failed to create directory " + newFile);
+                        throw new IOException(
+                            "Impossibile creare la directory '" + newFile.getName() + "' durante l'estrazione del file ZIP. " +
+                            "Verificare i permessi di scrittura sul file system."
+                        );
                     }
                 } else {
                     File parent = newFile.getParentFile();
                     if (!parent.isDirectory() && !parent.mkdirs()) {
-                        throw new IOException("Failed to create directory " + parent);
+                        throw new IOException(
+                            "Impossibile creare la directory padre '" + parent.getName() + "' durante l'estrazione. " +
+                            "Verificare i permessi di scrittura sul file system."
+                        );
                     }
                     try (FileOutputStream fos = new FileOutputStream(newFile)) {
                         int len;

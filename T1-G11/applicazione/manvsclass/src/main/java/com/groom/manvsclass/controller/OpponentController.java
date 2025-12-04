@@ -123,13 +123,9 @@ public class OpponentController {
 
     @GetMapping("/downloadFile/{name}")
     public ResponseEntity<Object> downloadClasse(@PathVariable("name") String name) {
-        try {
-            return opponentService.downloadClasse(name);
-        } catch (Exception e) {
-            // Gestisci l'eccezione e ritorna una risposta appropriata
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore nel download della classe: " + e.getMessage());
-        }
+        // The service already handles exceptions and returns appropriate ResponseEntity
+        // No need for try-catch here since we're not throwing to GlobalExceptionHandler
+        return opponentService.downloadClasse(name);
     }
 
     @DeleteMapping("/{classUT}")

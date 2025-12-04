@@ -107,21 +107,40 @@ public class ApiGatewayClient {
 
         HttpHeaders headers = new HttpHeaders();
 
-        ResponseEntity<String> response = exchangeHelper.exchange(userServiceUrl + "/opponents",
-                null, HttpMethod.POST, headers, requestBody, String.class);
+        try {
+            ResponseEntity<String> response = exchangeHelper.exchange(userServiceUrl + "/opponents",
+                    null, HttpMethod.POST, headers, requestBody, String.class);
 
-        if (response.getStatusCode().isError())
-            throw new RuntimeException("Error adding new opponent");
-
+            if (response.getStatusCode().isError()) {
+                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                    String.format("Errore durante l'aggiunta dell'avversario per la classe %s (tipo: %s, difficoltà: %s)",
+                        classUT, type, difficulty)
+                );
+            }
+        } catch (Exception e) {
+            logger.error("Errore nella chiamata a callAddNewOpponent: {}", e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                "Errore durante la comunicazione con il servizio utenti per l'aggiunta dell'avversario", e
+            );
+        }
     }
 
     public void callDeleteAllClassUTOpponents(String classUT) {
-        ResponseEntity<String> response = exchangeHelper.exchange(userServiceUrl + "/opponents/" + classUT,
-                null, HttpMethod.DELETE, null, null, String.class);
+        try {
+            ResponseEntity<String> response = exchangeHelper.exchange(userServiceUrl + "/opponents/" + classUT,
+                    null, HttpMethod.DELETE, null, null, String.class);
 
-        if (response.getStatusCode().isError())
-            throw new RuntimeException("Error deleting opponents");
-
+            if (response.getStatusCode().isError()) {
+                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                    String.format("Errore durante l'eliminazione degli avversari per la classe %s", classUT)
+                );
+            }
+        } catch (Exception e) {
+            logger.error("Errore nella chiamata a callDeleteAllClassUTOpponents: {}", e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                "Errore durante la comunicazione con il servizio utenti per l'eliminazione degli avversari", e
+            );
+        }
     }
 
     public EvosuiteCoverageDTO callGenerateMissingEvoSuiteCoverage(String classUTName, String classUTPackageName, File zip) {
@@ -134,28 +153,45 @@ public class ApiGatewayClient {
         long zipSize = -1;
         try {
             zipSize = Files.size(zip.toPath());
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            // Log suppression for file size read errors - non-critical
+            logger.debug("[{}] Could not read zip file size: {}", requestId, e.getMessage());
         }
         logger.info("[{}] call Evosuite coverage evaluation for classUTName: {}, classUTPackageName: {}, zip={} (size={})",
                 requestId, classUTName, classUTPackageName, zip.getAbsolutePath(), zipSize);
 
-        ResponseEntity<EvosuiteCoverageDTO> response = exchangeHelper.exchange(evosuiteCoverageServiceUrl + "/coverage/opponent",
-                null, HttpMethod.POST, null, requestBody, EvosuiteCoverageDTO.class);
+        try {
+            ResponseEntity<EvosuiteCoverageDTO> response = exchangeHelper.exchange(evosuiteCoverageServiceUrl + "/coverage/opponent",
+                    null, HttpMethod.POST, null, requestBody, EvosuiteCoverageDTO.class);
 
-        if (response.getStatusCode().isError())
-            throw new RuntimeException("Error generating evosuite coverage");
-
-        EvosuiteCoverageDTO responseBody = response.getBody();
-        if (responseBody == null) {
-            logger.warn("[{}] Evosuite service returned null body for class {}", requestId, classUTName);
-        } else {
-            logger.info("[{}] responseBody: {}", requestId, responseBody);
-            if (responseBody.getResultFileContent() == null) {
-                logger.warn("[{}] Evosuite returned empty resultFileContent for class {} (zip={})", requestId, classUTName, zip.getAbsolutePath());
+            if (response.getStatusCode().isError()) {
+                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                    String.format("Errore durante la generazione della copertura Evosuite per la classe %s", classUTName)
+                );
             }
-        }
 
-        return responseBody;
+            EvosuiteCoverageDTO responseBody = response.getBody();
+            if (responseBody == null) {
+                logger.warn("[{}] Evosuite service returned null body for class {}", requestId, classUTName);
+                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                    "Il servizio Evosuite ha restituito una risposta vuota"
+                );
+            }
+
+            logger.info("[{}] Evosuite coverage generated successfully for {}", requestId, classUTName);
+            if (responseBody.getResultFileContent() == null) {
+                logger.warn("[{}] Evosuite returned empty resultFileContent for class {} (zip={})", 
+                    requestId, classUTName, zip.getAbsolutePath());
+            }
+            return responseBody;
+        } catch (com.groom.manvsclass.service.exception.ExternalServiceException e) {
+            throw e; // Re-throw our custom exceptions
+        } catch (Exception e) {
+            logger.error("[{}] Errore nella chiamata a callGenerateMissingEvoSuiteCoverage: {}", requestId, e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                "Errore durante la comunicazione con il servizio di copertura Evosuite", e
+            );
+        }
     }
 
     public JacocoCoverageDTO callGenerateMissingJacocoCoverage(String classUTName, File zip) {
@@ -168,15 +204,34 @@ public class ApiGatewayClient {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         logger.info("call Jacoco coverage evaluation for classUTName: {}", classUTName);
 
-        ResponseEntity<JacocoCoverageDTO> response = exchangeHelper.exchange(jacocoCoverageServiceUrl + "/coverage/opponent",
-                null, HttpMethod.POST, headers, reqBody, JacocoCoverageDTO.class);
+        try {
+            ResponseEntity<JacocoCoverageDTO> response = exchangeHelper.exchange(jacocoCoverageServiceUrl + "/coverage/opponent",
+                    null, HttpMethod.POST, headers, reqBody, JacocoCoverageDTO.class);
 
-        if (response.getStatusCode().isError())
-            throw new RuntimeException("Error generating jacoco coverage");
+            if (response.getStatusCode().isError()) {
+                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                    String.format("Errore durante la generazione della copertura Jacoco per la classe %s", classUTName)
+                );
+            }
 
-        JacocoCoverageDTO responseBody = response.getBody();
-        logger.info("responseBody: {}", responseBody);
-        return responseBody;
+            JacocoCoverageDTO responseBody = response.getBody();
+            if (responseBody == null) {
+                logger.warn("Jacoco service returned null body for class {}", classUTName);
+                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                    "Il servizio Jacoco ha restituito una risposta vuota"
+                );
+            }
+
+            logger.info("Jacoco coverage generated successfully for {}", classUTName);
+            return responseBody;
+        } catch (com.groom.manvsclass.service.exception.ExternalServiceException e) {
+            throw e; // Re-throw our custom exceptions
+        } catch (Exception e) {
+            logger.error("Errore nella chiamata a callGenerateMissingJacocoCoverage: {}", e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                "Errore durante la comunicazione con il servizio di copertura Jacoco", e
+            );
+        }
     }
 
     public HttpResponse callOttieniStudentiDettagli(List<String> studentiIds, String jwt) throws IOException {

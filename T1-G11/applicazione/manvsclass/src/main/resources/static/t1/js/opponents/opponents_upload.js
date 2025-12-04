@@ -17,6 +17,22 @@ async function uploadOpponent() {
     const testInput = document.getElementById('zipRobotInput');
     const tests = testInput.files[0];
 
+    // Validazione lato client
+    if (!name || name.trim() === '') {
+        alert('Inserire il nome della classe.');
+        return;
+    }
+
+    if (!file) {
+        alert('Selezionare il file della classe .java da caricare.');
+        return;
+    }
+
+    if (!tests) {
+        alert('Selezionare il file ZIP dei test robot da caricare.');
+        return;
+    }
+
     const formData = new FormData();
     formData.append('classUTFile', file);
     formData.append('classUTDetails', JSON.stringify({

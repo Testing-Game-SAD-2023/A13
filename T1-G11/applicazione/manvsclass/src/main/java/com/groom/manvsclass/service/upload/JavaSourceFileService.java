@@ -43,24 +43,37 @@ public class JavaSourceFileService {
         String[] testPackageName = null;
         String[] srcPackageName = null;
 
-        File[] files = Objects.requireNonNull(fromTestPath.toFile().listFiles());
+        File[] files = fromTestPath.toFile().listFiles();
+        if (files == null || files.length == 0) {
+            throw new IOException(
+                "La cartella dei test '" + fromTestPath.getFileName() + "' è vuota o non accessibile. " +
+                "Verificare che il livello di test contenga file Java validi."
+            );
+        }
         for (File src : files) {
             if (!src.getName().endsWith(".java")) {
                 continue;
             }
 
-            String content = Files.readString(src.toPath());
+            try {
+                String content = Files.readString(src.toPath());
 
-            testPackageName = JavaMetadataExtractor.extractPackageFromDeclaration(content);
-            if (srcPackageName == null) {
-                srcPackageName = JavaMetadataExtractor.extractSourcePackageFromTestCode(content, className, robotType);
+                testPackageName = JavaMetadataExtractor.extractPackageFromDeclaration(content);
+                if (srcPackageName == null) {
+                    srcPackageName = JavaMetadataExtractor.extractSourcePackageFromTestCode(content, className, robotType);
+                }
+
+                String testPackagePath = (testPackageName != null) ? String.join("/", testPackageName) : "";
+
+                Path targetDir = toTestPath.resolve(testPackagePath).normalize();
+                Files.createDirectories(targetDir);
+                Files.copy(src.toPath(), targetDir.resolve(src.getName()).normalize(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new IOException(
+                    "Errore durante l'elaborazione del file di test '" + src.getName() + "': " + e.getMessage() + 
+                    ". Verificare che il file sia un file Java valido e leggibile.", e
+                );
             }
-
-            String testPackagePath = (testPackageName != null) ? String.join("/", testPackageName) : "";
-
-            Path targetDir = toTestPath.resolve(testPackagePath).normalize();
-            Files.createDirectories(targetDir);
-            Files.copy(src.toPath(), targetDir.resolve(src.getName()).normalize(), StandardCopyOption.REPLACE_EXISTING);
         }
 
         return new String[][]{srcPackageName, testPackageName};
@@ -109,7 +122,12 @@ public class JavaSourceFileService {
 
         Files.createDirectories(coveragePath);
 
-        for (File coverageFile : Objects.requireNonNull(searchIn.toFile().listFiles())) {
+        File[] coverageFiles = searchIn.toFile().listFiles();
+        if (coverageFiles == null) {
+            return new boolean[]{false, false};
+        }
+        
+        for (File coverageFile : coverageFiles) {
             String fileName = coverageFile.getName();
             
             if (fileName.equals(JACOCO_COVERAGE_FILE) && isValidJacocoCoverage(coverageFile)) {

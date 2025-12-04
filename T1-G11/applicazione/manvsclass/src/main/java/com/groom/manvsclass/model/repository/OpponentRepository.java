@@ -20,4 +20,9 @@ public interface OpponentRepository {
     Optional<JacocoScore> findJacocoScore(String classUT, String type, OpponentDifficulty difficulty);
 
     Optional<String> findCoverage(String classUT, String type, OpponentDifficulty difficulty);
+
+    /**
+     * Delete all opponents associated with a given classUT
+     */
+    void deleteByClassUT(String classUT);
 }

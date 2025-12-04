@@ -46,4 +46,37 @@ public class ClassUTUploadService {
         
         logger.info("ClassUT metadata persisted successfully: {}", classe.getName());
     }
+
+    /**
+     * Rollback class file upload by deleting the saved class file from filesystem.
+     * Used when upload operation fails and needs cleanup.
+     * Silently handles cases where files don't exist.
+     */
+    public void rollbackClassUTFile(String classUTName) {
+        try {
+            Path unmodifiedSrcCodePath = getUnmodifiedSrcPath(classUTName);
+            if (unmodifiedSrcCodePath.toFile().exists()) {
+                fileStorageService.deleteDirectoryRecursively(unmodifiedSrcCodePath);
+                logger.info("Rollback: deleted class file directory for {}", classUTName);
+            } else {
+                logger.debug("Rollback: class file directory does not exist for {}", classUTName);
+            }
+        } catch (Exception e) {
+            logger.warn("Error during rollback of class file for {}: {}", classUTName, e.getMessage());
+        }
+    }
+
+    /**
+     * Rollback class metadata by deleting the ClassUT entry from database.
+     * Used when upload operation fails and needs cleanup.
+     * Silently handles cases where entry doesn't exist.
+     */
+    public void rollbackClassUTMetadata(String classUTName) {
+        try {
+            classRepository.deleteByName(classUTName);
+            logger.info("Rollback: deleted ClassUT metadata for {}", classUTName);
+        } catch (Exception e) {
+            logger.warn("Error during rollback of ClassUT metadata for {}: {}", classUTName, e.getMessage());
+        }
+    }
 }

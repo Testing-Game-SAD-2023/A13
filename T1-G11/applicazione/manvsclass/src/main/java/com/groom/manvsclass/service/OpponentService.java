@@ -10,9 +10,7 @@ import com.groom.manvsclass.model.repository.ClassRepository;
 import com.groom.manvsclass.model.repository.OperationRepository;
 import com.groom.manvsclass.model.repository.OpponentRepository;
 import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
-import com.groom.manvsclass.service.exception.CoverageNotFoundException;
-import com.groom.manvsclass.service.exception.OpponentNotFoundException;
-import com.groom.manvsclass.service.exception.ScoreNotFoundException;
+import com.groom.manvsclass.service.exception.*;
 import com.groom.manvsclass.service.upload.ClassUTUploadService;
 import com.groom.manvsclass.service.upload.FileStorageService;
 import com.groom.manvsclass.service.upload.UploadOpponentService;
@@ -98,47 +96,163 @@ public class OpponentService {
             String classUTDetails,
             MultipartFile robotTestsZip) throws IOException {
 
-        FileUploadResponse response = new FileUploadResponse();
-
+        // Validate class file
         if (classUTFile == null || classUTFile.isEmpty()) {
-            response.setErrorMessage("Errore: file della classe non ricevuto o vuoto.");
-            return ResponseEntity.badRequest().body(response);
+            throw new FileUploadException(
+                "File della classe mancante o vuoto. " +
+                "Selezionare un file .java valido contenente la classe da testare. " +
+                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte."
+            );
         }
 
-        ClassUT classe = ClassUTDetailsDTO.parseFromJson(classUTDetails);
+        // Validate robot tests zip file
+        if (robotTestsZip == null || robotTestsZip.isEmpty()) {
+            throw new FileUploadException(
+                "File ZIP dei test robot mancante o vuoto. " +
+                "Selezionare un file ZIP valido contenente le cartelle EvoSuiteTest e/o RandoopTest. " +
+                "Il file deve avere la seguente struttura: ZIP/[EvoSuiteTest|RandoopTest]/[01Level, 02Level, ...]/[test files e coverage]. " +
+                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte."
+            );
+        }
+
+        ClassUT classe;
+        try {
+            classe = ClassUTDetailsDTO.parseFromJson(classUTDetails);
+        } catch (IOException e) {
+            throw new ClassValidationException(
+                "Errore nella lettura dei dettagli della classe: " + e.getMessage(),
+                e
+            );
+        }
+        
         String classUTFileName = StringUtils.cleanPath(Objects.requireNonNull(classUTFile.getOriginalFilename()));
+        String classUTName = classe.getName();
 
         //-------------------------------------------------------------------------------------------
         // Verifica che il nome della classe inserito dall'admin nel campo "Class Name" del form HTML
         // sia effettivamente il nome della classe così come dichiarato nel file .java.
-        String classNameFromSourceFile = JavaMetadataExtractor.getClassNameFromJavaSourceFile(classUTFile.getBytes());
+        byte[] classFileBytes;
+        try {
+            classFileBytes = classUTFile.getBytes();
+        } catch (IOException e) {
+            throw new FileUploadException(
+                "Impossibile leggere il contenuto del file .java: " + e.getMessage() + ". " +
+                "Il file potrebbe essere danneggiato o non accessibile. Riprovare con un altro file.",
+                e
+            );
+        }
+        
+        String classNameFromSourceFile = JavaMetadataExtractor.getClassNameFromJavaSourceFile(classFileBytes);
 
         if(classNameFromSourceFile == null) {
-            response.setErrorMessage("Errore: Il file .java inviato non contiene alcuna dichiarazione di classe Java.");
-            return ResponseEntity.badRequest().body(response);
+            throw new ClassValidationException(
+                "Il file .java inviato non contiene una dichiarazione di classe Java valida. " +
+                "Verificare che il file contenga una riga del tipo 'public class NomeClasse { ... }'. " +
+                "Il file potrebbe essere corrotto, vuoto, o non essere un file Java valido."
+            );
         }
 
-        if(!classNameFromSourceFile.equalsIgnoreCase(classe.getName())) {
-            String errorMessage = "Errore: Il file .java inviato contiene dichiarazione di classe dal nome diverso da quello inserito nel form.\n"
-                    + "Il file .java contiene la dichiarazione della classe: " + classNameFromSourceFile + ".\n"
-                    + "Nel campo del form hai inserito: " + classe.getName() + ".";
-            response.setErrorMessage(errorMessage);
-            return ResponseEntity.badRequest().body(response);
+        if(!classNameFromSourceFile.equalsIgnoreCase(classUTName)) {
+            throw new ClassValidationException(
+                String.format(
+                    "Mancata corrispondenza tra nome classe nel file e nome inserito nel form:%n" +
+                    "  • Nome nel file .java: '%s'%n" +
+                    "  • Nome inserito nel form: '%s'%n%n" +
+                    "Correggere il campo 'Class Name' nel form in modo che corrisponda esattamente al nome della classe " +
+                    "dichiarato nel file .java (verificare maiuscole/minuscole).",
+                    classNameFromSourceFile, classUTName
+                )
+            );
         }
 
         //-------------------------------------------------------------------------------------------
 
-        classUTUploadService.saveClassUTFile(classUTFileName, classe.getName(), classUTFile);
-        uploadOpponentService.saveOpponentsFromZip(classUTFileName, classe.getName(), classUTFile, robotTestsZip);
+        try {
+            // Save class file to filesystem
+            classUTUploadService.saveClassUTFile(classUTFileName, classUTName, classUTFile);
 
-        response.setFileName(classUTFileName);
-        response.setSize(classUTFile.getSize());
-        response.setDownloadUri("/downloadFile");
+            // Process and save opponents from ZIP
+            uploadOpponentService.saveOpponentsFromZip(classUTFileName, classUTName, classUTFile, robotTestsZip);
 
-        classUTUploadService.persistClassUTMetadata(classe, classUTFileName);
+            // Persist class metadata to database
+            classUTUploadService.persistClassUTMetadata(classe, classUTFileName);
 
-        logger.info("Operazione completata con successo (uploadTest)");
-        return ResponseEntity.ok(response);
+            // Success - build response
+            FileUploadResponse response = new FileUploadResponse();
+            response.setFileName(classUTFileName);
+            response.setSize(classUTFile.getSize());
+            response.setDownloadUri("/downloadFile");
+
+            logger.info("Operazione completata con successo (uploadClassAndOpponents) - class: {}", classUTName);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Rollback everything - just try to delete everything that might exist
+            logger.error("Error during upload of {}, initiating rollback. Error: {}", classUTName, e.getMessage(), e);
+            performRollback(classUTName);
+
+            // Re-throw the exception to be handled by GlobalExceptionHandler
+            if (e instanceof FileUploadException ||
+                e instanceof ClassValidationException ||
+                e instanceof RobotProcessingException ||
+                e instanceof ExternalServiceException) {
+                throw e;
+            } else if (e instanceof IOException ioException) {
+                throw new FileUploadException(
+                    "Errore I/O durante l'upload: " + ioException.getMessage() + 
+                    ". Verificare i permessi dei file e lo spazio disponibile su disco.", ioException
+                );
+            } else {
+                throw new FileUploadException(
+                    "Errore imprevisto durante l'upload: " + e.getMessage() + 
+                    ". Contattare l'amministratore se il problema persiste.", e
+                );
+            }
+        }
+    }
+
+    /**
+     * Performs rollback by attempting to delete everything that might have been created in case the upload fail.
+     */
+    private void performRollback(String classUTName) {
+        logger.warn("Starting rollback for class: {}", classUTName);
+
+        // Try to delete metadata from database
+        try {
+            classUTUploadService.rollbackClassUTMetadata(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: metadata cleanup - {}", e.getMessage());
+        }
+
+        // Try to delete opponent data from database
+        try {
+            opponentRepository.deleteByClassUT(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: opponent DB cleanup - {}", e.getMessage());
+        }
+
+        // Try to notify external service to delete opponents
+        try {
+            apiGatewayClient.callDeleteAllClassUTOpponents(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: external service cleanup - {}", e.getMessage());
+        }
+
+        // Try to delete all opponent files
+        try {
+            uploadOpponentService.rollbackOpponentFiles(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: opponent files cleanup - {}", e.getMessage());
+        }
+
+        // Try to delete class file
+        try {
+            classUTUploadService.rollbackClassUTFile(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: class file cleanup - {}", e.getMessage());
+        }
+
+        logger.info("Rollback completed for class: {}", classUTName);
     }
 
 
@@ -199,25 +313,31 @@ public class OpponentService {
     }
 
     public ResponseEntity<Object> eliminaClasse(String name) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(name));
-        eliminaFile(name);
-        LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String data = currentDate.format(formatter);
-        Operation operation1 = new Operation((int) operationRepository.count(), "userAdmin", name, 2, data);
-        operationRepository.save(operation1);
-        ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("name").is(name));
+            eliminaFile(name);
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String data = currentDate.format(formatter);
+            Operation operation1 = new Operation((int) operationRepository.count(), "userAdmin", name, 2, data);
+            operationRepository.save(operation1);
+            ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
 
-        Query query2 = new Query();
-        query2.addCriteria(Criteria.where("classUT").is(name));
-        mongoTemplate.findAndRemove(query, Opponent.class);
+            Query query2 = new Query();
+            query2.addCriteria(Criteria.where("classUT").is(name));
+            mongoTemplate.findAndRemove(query, Opponent.class);
 
-        apiGatewayClient.callDeleteAllClassUTOpponents(name);
-        if (deletedClass != null) {
-            return ResponseEntity.ok().body(deletedClass);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
+            apiGatewayClient.callDeleteAllClassUTOpponents(name);
+            if (deletedClass != null) {
+                return ResponseEntity.ok().body(deletedClass);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
+            }
+        } catch (RuntimeException e) {
+            logger.error("Errore durante l'eliminazione della classe {}: {}", name, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Errore durante l'eliminazione: " + e.getMessage());
         }
     }
 

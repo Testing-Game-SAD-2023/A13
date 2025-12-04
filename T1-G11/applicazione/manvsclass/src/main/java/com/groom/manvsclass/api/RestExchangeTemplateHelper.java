@@ -55,12 +55,21 @@ public class RestExchangeTemplateHelper {
 
             logger.info("Response received: {}", response);
             if (response.getStatusCode().isError()) {
-                throw new RuntimeException("Errore nella chiamata a " + url + ": " + response.getStatusCode());
+                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                    String.format("Il servizio esterno ha restituito un errore (%s): %s. " +
+                        "Verificare che tutti i servizi siano attivi e raggiungibili.",
+                        response.getStatusCode(), url)
+                );
             }
 
             return response;
         } catch (RestClientException e) {
-            throw new RuntimeException("Chiamata fallita a " + url + ": " + e.getMessage(), e);
+            logger.error("REST call failed to {}: {}", url, e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                "Impossibile comunicare con il servizio esterno (" + url + "): " + e.getMessage() + ". " +
+                "Verificare la connessione di rete e che il servizio sia attivo.",
+                e
+            );
         }
     }
 

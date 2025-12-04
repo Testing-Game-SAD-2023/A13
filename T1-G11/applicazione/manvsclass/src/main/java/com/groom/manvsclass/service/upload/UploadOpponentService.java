@@ -50,31 +50,86 @@ public class UploadOpponentService {
 
     public void saveOpponentsFromZip(String classUTFileName, String classUTName, MultipartFile classUTFile, MultipartFile robotTestsZip) throws IOException {
         Path operationTmpFolder = getTempOperationFolder(classUTName);
-        fileStorageService.saveFileInFileSystem("robot.zip", operationTmpFolder, robotTestsZip);
-        fileStorageService.extractZipIn(operationTmpFolder);
+        
+        try {
+            fileStorageService.saveFileInFileSystem("robot.zip", operationTmpFolder, robotTestsZip);
+            fileStorageService.extractZipIn(operationTmpFolder);
+        } catch (IOException e) {
+            logger.error("Errore durante l'estrazione del file ZIP dei robot test: {}", e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.FileUploadException(
+                "Errore nell'estrazione del file ZIP: " + e.getMessage() + 
+                ". Verificare che il file sia un archivio ZIP valido e non corrotto.", e
+            );
+        }
 
         Path unmodifiedSrcCodePath = getUnmodifiedSrcPath(classUTName);
         logger.info("Saving unmodified src in {}", unmodifiedSrcCodePath);
         fileStorageService.saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile);
 
-        File robotGroupFolder = Objects.requireNonNull(operationTmpFolder.toFile().listFiles())[0];
+        File[] robotGroupFiles = operationTmpFolder.toFile().listFiles();
+        if (robotGroupFiles == null || robotGroupFiles.length == 0) {
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "Il file ZIP è vuoto o non contiene cartelle di test robot. " +
+                "Assicurarsi che il file ZIP contenga le cartelle EvoSuiteTest e/o RandoopTest con i livelli di test."
+            );
+        }
+        
+        File robotGroupFolder = robotGroupFiles[0];
         logger.info("Robot tests folder {}", robotGroupFolder);
         
-        processRobotFolders(classUTFileName, classUTName, classUTFile, robotGroupFolder);
-        fileStorageService.deleteDirectoryRecursively(operationTmpFolder);
+        try {
+            processRobotFolders(classUTFileName, classUTName, classUTFile, robotGroupFolder);
+        } catch (IOException e) {
+            logger.error("Errore durante l'elaborazione delle cartelle robot: {}", e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "Errore nell'elaborazione dei test robot: " + e.getMessage() + 
+                ". Verificare che i file di test siano file Java validi e correttamente formattati.", e
+            );
+        } finally {
+            fileStorageService.deleteDirectoryRecursively(operationTmpFolder);
+        }
     }
 
     private void processRobotFolders(String classUTFileName, String classUTName, MultipartFile classUTFile, File robotGroupFolder) throws IOException {
-        for (File robotFolder : Objects.requireNonNull(robotGroupFolder.listFiles())) {
+        File[] robotFolders = robotGroupFolder.listFiles();
+        if (robotFolders == null || robotFolders.length == 0) {
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "La cartella dei robot test è vuota o non accessibile. " +
+                "Verificare che il file ZIP contenga cartelle di test valide (EvoSuiteTest, RandoopTest)."
+            );
+        }
+        
+        int validRobotFolders = 0;
+        int totalTestFilesFound = 0;
+        
+        for (File robotFolder : robotFolders) {
             if (!isValidRobotFolder(robotFolder)) {
                 continue;
             }
 
+            validRobotFolders++;
             String robotType = extractRobotType(robotFolder.getName());
             logger.info("Robot folder {}", robotFolder);
             logger.info("Saving robot type {}", robotType);
 
-            uploadNewOpponents(classUTFileName, classUTName, classUTFile, robotFolder.toPath(), robotType);
+            int testFilesInRobot = uploadNewOpponents(classUTFileName, classUTName, classUTFile, robotFolder.toPath(), robotType);
+            totalTestFilesFound += testFilesInRobot;
+        }
+        
+        if (validRobotFolders == 0) {
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "Il file ZIP non contiene cartelle di test robot valide. " +
+                "Le cartelle devono essere nominate 'EvoSuiteTest' o 'RandoopTest' " +
+                "(il nome deve terminare con 'Test')."
+            );
+        }
+        
+        if (totalTestFilesFound == 0) {
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "Il file ZIP non contiene alcun file di test Java (.java). " +
+                "Verificare che le cartelle dei livelli (01Level, 02Level, ecc.) contengano " +
+                "file di test con estensione .java all'interno della sottocartella 'TestSourceCode'."
+            );
         }
     }
 
@@ -98,22 +153,51 @@ public class UploadOpponentService {
         return Character.toUpperCase(robotType.charAt(0)) + robotType.substring(1);
     }
 
-    private void uploadNewOpponents(String classUTFileName, String classUTName, MultipartFile classUTFile, Path operationTmpFolder, String robotType) throws IOException {
-        for (File levelFolder : Objects.requireNonNull(operationTmpFolder.toFile().listFiles())) {
+    private int uploadNewOpponents(String classUTFileName, String classUTName, MultipartFile classUTFile, Path operationTmpFolder, String robotType) throws IOException {
+        File[] levelFolders = operationTmpFolder.toFile().listFiles();
+        
+        if (levelFolders == null || levelFolders.length == 0) {
+            logger.warn("Nessuna cartella di livello trovata per il tipo robot: {}", robotType);
+            return 0;
+        }
+        
+        int processedLevels = 0;
+        int totalTestFiles = 0;
+        
+        for (File levelFolder : levelFolders) {
             try {
-                processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, levelFolder);
+                int testFilesInLevel = processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, levelFolder);
+                if (testFilesInLevel > 0) {
+                    processedLevels++;
+                    totalTestFiles += testFilesInLevel;
+                }
             } catch (IOException e) {
-                logger.error("Error processing level folder {}: {}", levelFolder, e.getMessage(), e);
+                logger.error("Errore durante l'elaborazione della cartella di livello {}: {}", 
+                    levelFolder.getName(), e.getMessage(), e);
+                // Continua con gli altri livelli invece di fallire completamente
+                throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                    "Errore nell'elaborazione del livello '" + levelFolder.getName() + "': " + e.getMessage() + 
+                    ". Verificare che il livello contenga file di test validi.", e
+                );
             }
         }
 
+        if (processedLevels == 0) {
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                String.format("Nessun livello di test valido trovato per '%s'. " +
+                    "I livelli devono essere cartelle nominate nel formato '01Level', '02Level', ecc. " +
+                    "e contenere file di test Java.", robotType)
+            );
+        }
+
         fileStorageService.deleteDirectoryRecursively(operationTmpFolder);
+        return totalTestFiles;
     }
 
-    private void processLevelFolder(String classUTFileName, String classUTName, MultipartFile classUTFile,
+    private int processLevelFolder(String classUTFileName, String classUTName, MultipartFile classUTFile,
                                     String robotType, File levelFolder) throws IOException {
         if (!isValidLevelFolder(levelFolder)) {
-            return;
+            return 0;
         }
 
         String level = levelFolder.getName();
@@ -125,8 +209,11 @@ public class UploadOpponentService {
         logPaths(opponentPaths, robotPaths);
 
         if (!isValidTestFolder(robotPaths.testPath)) {
-            return;
+            return 0;
         }
+        
+        // Count test files in this level
+        int testFileCount = countJavaFiles(robotPaths.testPath);
 
         String[][] splitPackageNames = saveSourceAndTestFiles(classUTFile, classUTFileName, classUTName,
                 robotType, opponentPaths, robotPaths);
@@ -139,6 +226,8 @@ public class UploadOpponentService {
         generateCoverageIfNeeded(robotType, coverageFound, classUTName, splitPackageNames[0], opponentPaths);
 
         computeScoresAndPersist(classUTName, robotType, levelFolder, opponentPaths.coveragePath);
+        
+        return testFileCount;
     }
 
     private boolean isValidLevelFolder(File levelFolder) {
@@ -181,6 +270,21 @@ public class UploadOpponentService {
         }
 
         return true;
+    }
+    
+    private int countJavaFiles(Path testPath) {
+        if (!Files.exists(testPath)) {
+            return 0;
+        }
+        
+        File[] files = testPath.toFile().listFiles();
+        if (files == null) {
+            return 0;
+        }
+        
+        return (int) Arrays.stream(files)
+                .filter(file -> file.getName().endsWith(".java"))
+                .count();
     }
 
     private String[][] saveSourceAndTestFiles(MultipartFile classUTFile, String classUTFileName,
@@ -290,17 +394,34 @@ public class UploadOpponentService {
         logger.info("Calling Evosuite coverage generation for class {} with zip {} and srcPackage={}", 
                 classUTName, zip.getAbsolutePath(), srcPackage);
         
-        EvosuiteCoverageDTO coverageDTO = coverageService.generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip);
-        fileStorageService.writeStringToFile(coverageDTO.getResultFileContent(), 
-                new File(toCoveragePath.toFile(), EVOSUITE_COVERAGE_FILE));
+        try {
+            EvosuiteCoverageDTO coverageDTO = coverageService.generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip);
+            fileStorageService.writeStringToFile(coverageDTO.getResultFileContent(), 
+                    new File(toCoveragePath.toFile(), EVOSUITE_COVERAGE_FILE));
+        } catch (Exception e) {
+            logger.error("Errore durante la generazione della coverage EvoSuite per {}: {}", classUTName, e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "Errore durante la compilazione e generazione della coverage EvoSuite: " + e.getMessage() + 
+                ". Verificare che i test EvoSuite siano compilabili e che la classe sotto test sia valida.", e
+            );
+        }
     }
 
     private void generateJacocoCoverage(String classUTName, Path toCoveragePath, File zip) throws IOException {
         logger.info("Calling Jacoco coverage generation for class {} with zip {}", classUTName, zip.getAbsolutePath());
         
-        JacocoCoverageDTO coverageDTO = coverageService.generateMissingJacocoCoverage(classUTName, zip);
-        fileStorageService.writeStringToFile(coverageDTO.getCoverage(), 
-                new File(toCoveragePath.toFile(), JACOCO_COVERAGE_FILE));
+        try {
+            JacocoCoverageDTO coverageDTO = coverageService.generateMissingJacocoCoverage(classUTName, zip);
+            fileStorageService.writeStringToFile(coverageDTO.getCoverage(), 
+                    new File(toCoveragePath.toFile(), JACOCO_COVERAGE_FILE));
+        } catch (Exception e) {
+            logger.error("Errore durante la generazione della coverage JaCoCo per {}: {}", classUTName, e.getMessage(), e);
+            throw new com.groom.manvsclass.service.exception.RobotProcessingException(
+                "Errore durante la compilazione e generazione della coverage JaCoCo: " + e.getMessage() + 
+                ". Verificare che i test Randoop siano compilabili, che la classe sotto test sia valida " +
+                "e che non ci siano errori di compilazione.", e
+            );
+        }
     }
 
     private void cleanupTempFiles(File zip, Path tmpFolderToZip) throws IOException {
@@ -315,6 +436,33 @@ public class UploadOpponentService {
         Path jacocoPath = toCoveragePath.resolve(JACOCO_COVERAGE_FILE);
 
         opponentTransformationService.createAndPersistOpponent(classUTName, robotType, levelFolder, evosuitePath, jacocoPath);
+    }
+
+    /**
+     * Rollback all opponent files created during upload.
+     * Deletes the entire class directory from the volume.
+     * Silently handles cases where directories don't exist.
+     */
+    public void rollbackOpponentFiles(String classUTName) {
+        try {
+            Path classUTDirectory = Path.of(VOLUME_T0_BASE_PATH, classUTName);
+            if (classUTDirectory.toFile().exists()) {
+                fileStorageService.deleteDirectoryRecursively(classUTDirectory);
+                logger.info("Rollback: deleted opponent files directory for {}", classUTName);
+            } else {
+                logger.debug("Rollback: opponent files directory does not exist for {}", classUTName);
+            }
+
+            Path unmodifiedSrcDirectory = getUnmodifiedSrcPath(classUTName);
+            if (unmodifiedSrcDirectory.toFile().exists()) {
+                fileStorageService.deleteDirectoryRecursively(unmodifiedSrcDirectory);
+                logger.info("Rollback: deleted unmodified src directory for {}", classUTName);
+            } else {
+                logger.debug("Rollback: unmodified src directory does not exist for {}", classUTName);
+            }
+        } catch (Exception e) {
+            logger.warn("Error during rollback of opponent files for {}: {}", classUTName, e.getMessage());
+        }
     }
 
 }

@@ -89,9 +89,14 @@ public class JavaMetadataExtractor {
     }
 
     /**
-     * Extracts class name
+     * Extracts class name from Java source file content.
+     * Returns null if no valid class declaration is found.
      */
     public static String getClassNameFromJavaSourceFile(byte[] classUTFileContent) {
+        if (classUTFileContent == null || classUTFileContent.length == 0) {
+            return null;
+        }
+        
         String fileContent = new String(classUTFileContent);
 
         StringBuilder buffer = new StringBuilder(fileContent);
@@ -117,10 +122,13 @@ public class JavaMetadataExtractor {
         StringBuilder className = new StringBuilder();
 
         for (int i = index + foundSubString.length(); i < buffer.length(); i++) {
-            if (Character.isWhitespace(buffer.charAt(i))) {
+            char currentChar = buffer.charAt(i);
+            
+            // Stop at whitespace, braces, or special characters
+            if (Character.isWhitespace(currentChar) || currentChar == '{' || currentChar == '<') {
                 break;
             }
-            className.append(buffer.charAt(i));
+            className.append(currentChar);
         }
 
         if (className.length() < 1) {

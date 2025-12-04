@@ -74,4 +74,10 @@ public class OpponentRepositoryImpl implements OpponentRepository {
                         .and("opponentDifficulty").is(difficulty)
         );
     }
+
+    @Override
+    public void deleteByClassUT(String classUT) {
+        Query query = new Query(Criteria.where("classUT").is(classUT));
+        mongoTemplate.remove(query, Opponent.class, "opponents");
+    }
 }
