@@ -11,9 +11,50 @@
  * - SweetAlert
  */
 
+console.log("🚀 gamemode_scalata.js CARICATO!");
+
 // ------------------------------
 // UTILITY FUNCTIONS
 // ------------------------------
+
+/**
+ * Formatta i secondi in formato MM:SS
+ * @param {number} seconds - Secondi da formattare
+ * @returns {string} Tempo formattato (es. "04:51")
+ */
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+/**
+ * Recupera un parametro dall'URL
+ * @param {string} name - Nome del parametro
+ * @returns {string|null} Valore del parametro o null
+ */
+function getParameterByName(name) {
+    const url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    const results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return "";
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+/**
+ * Recupera la modalità di gioco dall'URL
+ * @returns {string} Modalità di gioco (default: "Sfida")
+ */
+function GetMode() {
+    const mode = getParameterByName("mode");
+    if (mode) {
+        const trimmed = mode.replace(/[^a-zA-Z0-9\s]/g, " ").trim();
+        return trimmed;
+    }
+    return "Sfida"; // Default
+}
 
 /**
  * Avvia una nuova partita tramite l'API StartGame
@@ -49,38 +90,232 @@ function startGameRequest(requestData) {
 // Variabile globale per tenere traccia della scalata selezionata
 let selectedScalata = null;
 
-// Quando il documento è pronto
-$(document).ready(function() {
-    console.log("[gamemode_scalata] Inizializzazione pagina");
+/**
+ * Verifica se esiste una sessione di gioco attiva per la modalità Scalata
+ * @param {number} playerId - ID del giocatore
+ * @returns {Promise<Object|null>} Dati della sessione esistente o null
+ */
+async function checkScalataSession(playerId) {
+    const mode = "Scalata";
+    const url = `/api/gameEngine/session/gamemode/${playerId}?mode=${mode}`;
     
-    // Verifica se ci sono scalate nel DOM
-    const scalateCards = $('.scalata-card');
-    
-    if (scalateCards.length === 0) {
-        console.warn("[gamemode_scalata] Nessuna scalata disponibile nel DOM");
-        return;
+    try {
+        const response = await $.ajax({
+            url: url,
+            type: "GET",
+            xhrFields: { withCredentials: true }
+        });
+        
+        console.log("[gamemode_scalata] Sessione esistente trovata:", response);
+        return response;
+    } catch (error) {
+        console.log("[gamemode_scalata] Nessuna sessione attiva");
+        return null;
     }
+}
+
+// ------------------------------
+// GESTIONE SESSIONE E SCHEDE
+// ------------------------------
+
+/**
+ * Aggiorna il DOM con i dati della sessione esistente
+ * Mostra scheda_continua_scalata se c'è una sessione, altrimenti scalate-container
+ */
+function updateDOMWithPreviousScalataData(sessionData) {
+    if (sessionData) {
+        console.log("[gamemode_scalata] Scalata in corso, mostro scheda continua");
+        
+        // Nascondi container scalate
+        const scalateContainer = document.getElementById("scalate-container");
+        const submitButton = document.getElementById("submit-button");
+        
+        if (scalateContainer) scalateContainer.classList.add("d-none");
+        if (submitButton) submitButton.parentElement.classList.add("d-none");
+        
+        // Mostra scheda continua
+        document.getElementById("scheda_continua_scalata").classList.remove("d-none");
+        
+        // Popola i dati nella scheda continua
+        // ATTENZIONE: Usiamo i nomi dei campi JSON (@JsonProperty) non i nomi Java!
+        // class_ut (non classUTName), remainingTime resta uguale perché non ha @JsonProperty custom
+        document.getElementById("gamemode_scalata_nome").innerText = sessionData.scalataName || "";
+        document.getElementById("gamemode_livello_corrente").innerText = sessionData.currentLevel || 1;
+        document.getElementById("gamemode_livelli_totali").innerText = sessionData.totalLevels || "N/A";
+        document.getElementById("gamemode_modalita").innerText = "Scalata";
+        
+        // Formatta e mostra il tempo rimanente
+        const remainingTime = sessionData.remainingTime || 0;
+        document.getElementById("gamemode_time_limit").innerText = formatTime(remainingTime);
+        
+        // Imposta il link per riprendere la partita con remainingTime
+        // Usa class_ut dal JSON, non classUTName
+        const linkRiprendi = document.getElementById("Continua");
+        const classUT = sessionData.class_ut || sessionData.classUTName || "";
+        
+        linkRiprendi.href = `/editor?ClassUT=${classUT}&mode=Scalata&remainingTime=${remainingTime}`;
+        
+        console.log("[gamemode_scalata] Link riprendi impostato:", linkRiprendi.href);
+        console.log("[gamemode_scalata] ClassUT dalla sessione:", classUT);
+        console.log("[gamemode_scalata] Remaining time dalla sessione:", remainingTime);
+        
+    } else {
+        console.log("[gamemode_scalata] Nessuna scalata in corso, mostro scheda nuovo");
+        
+        // Mostra container scalate
+        const scalateContainer = document.getElementById("scalate-container");
+        const submitButton = document.getElementById("submit-button");
+        
+        if (scalateContainer) scalateContainer.classList.remove("d-none");
+        if (submitButton) submitButton.parentElement.classList.remove("d-none");
+        
+        // Nascondi scheda continua
+        document.getElementById("scheda_continua_scalata").classList.add("d-none");
+    }
+}
+
+/**
+ * Controlla se esiste una sessione attiva per la modalità Scalata
+ * @param {number} playerId - ID del giocatore
+ * @returns {Promise<Object|null>} Dati della sessione o null se non esiste
+ */
+async function checkScalataSession(playerId) {
+    const mode = "Scalata";
+    const url = `/api/gameEngine/session/gamemode/${playerId}?mode=${mode}`;
     
-    console.log(`[gamemode_scalata] Trovate ${scalateCards.length} scalate nel DOM`);
+    try {
+        const response = await $.ajax({
+            url: url,
+            type: "GET",
+            xhrFields: { withCredentials: true }
+        });
+        
+        console.log("[gamemode_scalata] Sessione esistente trovata:", response);
+        return response;
+    } catch (error) {
+        console.log("[gamemode_scalata] Nessuna sessione attiva");
+        return null;
+    }
+}
+
+/**
+ * Elimina la sessione corrente per permettere di avviare una nuova scalata
+ */
+async function deleteScalataSession() {
+    // Recupera il playerId dal token JWT
+    const jwtToken = getCookie("jwt");
+    const playerId = parseJwt(jwtToken).userId;
     
-    // Aggiungi event listener a tutte le card
-    scalateCards.on('click', function() {
+    const url = `/api/gameEngine/session/gamemode/${playerId}?mode=Scalata`;
+    
+    try {
+        await $.ajax({
+            url: url,
+            type: "DELETE",
+            xhrFields: { withCredentials: true }
+        });
+        console.log("[gamemode_scalata] Sessione eliminata con successo");
+        return true;
+    } catch (error) {
+        console.error("[gamemode_scalata] Errore nell'eliminazione della sessione:", error);
+        return false;
+    }
+}
+
+// Quando il documento è pronto
+$(document).ready(async function() {
+    console.log("[gamemode_scalata] ========== INIZIALIZZAZIONE PAGINA ==========");
+    
+    // 1. CONTROLLA SE ESISTE UNA SESSIONE ATTIVA
+    const jwtToken = getCookie("jwt");
+    console.log("[gamemode_scalata] JWT Token:", jwtToken ? "presente" : "assente");
+    
+    const playerId = parseJwt(jwtToken).userId;
+    console.log("[gamemode_scalata] Player ID:", playerId);
+    
+    const existingSession = await checkScalataSession(playerId);
+    console.log("[gamemode_scalata] Existing session:", existingSession);
+    
+    updateDOMWithPreviousScalataData(existingSession);
+    
+    // 2. INIZIALIZZA LE CARD DELLE SCALATE con event delegation
+    // Usa event delegation sul container invece che sulle card direttamente
+    // Questo funziona anche se le card sono nascoste o caricate dinamicamente
+    $('#scalate-container').on('click', '.scalata-card', function() {
+        console.log("=== CLICK RILEVATO SU CARD SCALATA ===");
+        console.log("[gamemode_scalata] Click rilevato su card tramite delegation");
         selectScalata($(this));
     });
     
-    // Event listener per il bottone submit
-    $('#submit-button').on('click', function() {
-        if (selectedScalata) {
-            console.log("[gamemode_scalata] Avvio scalata:", selectedScalata);
-            startScalata();
-        } else {
+    const scalateCards = $('.scalata-card');
+    console.log("[gamemode_scalata] Numero di card trovate:", scalateCards.length);
+    console.log("[gamemode_scalata] Card HTML:", scalateCards.html());
+    
+    // 3. EVENT LISTENER PER IL BOTTONE SUBMIT (nella scheda nuovo)
+    $('#submit-button').on('click', async function() {
+        if (!selectedScalata) {
             swal({
                 title: "Attenzione!",
                 text: "Seleziona una scalata prima di procedere",
                 icon: "warning",
                 button: "OK"
             });
+            return;
         }
+        
+        // Avvia la scalata selezionata
+        console.log("[gamemode_scalata] Avvio scalata:", selectedScalata);
+        startScalata();
+    });
+    
+    // 4. EVENT LISTENER PER IL BOTTONE "NUOVA SCALATA" (nella scheda continua)
+    $('#new_game').on('click', async function() {
+        console.log("[gamemode_scalata] Click su 'Nuova partita'");
+        
+        // Chiedi conferma
+        swal({
+            title: "Sei sicuro?",
+            text: "Vuoi abbandonare la scalata corrente e iniziarne una nuova?",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "Annulla",
+                    value: null,
+                    visible: true
+                },
+                confirm: {
+                    text: "Sì, abbandona",
+                    value: true,
+                    className: "btn-danger"
+                }
+            },
+            dangerMode: true
+        }).then(async (willDelete) => {
+            if (willDelete) {
+                console.log("[gamemode_scalata] Confermato abbandono, elimino sessione");
+                
+                // Elimina la sessione
+                const deleted = await deleteScalataSession();
+                if (deleted) {
+                    console.log("[gamemode_scalata] Sessione eliminata, mostro scheda nuovo");
+                    
+                    // Nascondi scheda continua
+                    document.getElementById("scheda_continua_scalata").classList.add("d-none");
+                    
+                    // Mostra container scalate
+                    const scalateContainer = document.getElementById("scalate-container");
+                    const submitButton = document.getElementById("submit-button");
+                    
+                    if (scalateContainer) scalateContainer.classList.remove("d-none");
+                    if (submitButton) submitButton.parentElement.classList.remove("d-none");
+                    
+                    swal("Sessione eliminata!", "Puoi ora selezionare una nuova scalata", "success");
+                } else {
+                    console.error("[gamemode_scalata] Errore eliminazione sessione");
+                    swal("Errore!", "Impossibile eliminare la sessione", "error");
+                }
+            }
+        });
     });
 });
 
@@ -89,6 +324,8 @@ $(document).ready(function() {
  * @param {jQuery} $card - La card jQuery cliccata
  */
 function selectScalata($card) {
+    console.log("[gamemode_scalata] Card cliccata:", $card);
+    
     // Rimuovi la classe selected da tutte le card
     $('.scalata-card').removeClass('selected');
     

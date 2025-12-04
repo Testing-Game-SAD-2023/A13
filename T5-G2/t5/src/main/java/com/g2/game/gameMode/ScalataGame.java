@@ -95,6 +95,9 @@ public class ScalataGame extends TurnBasedGame {
         this.currentLevel = scalataParams.getCurrentLevel();
         this.scalataName = scalataParams.getScalataName();
         this.totalLevels = scalataParams.getTotalLevels();
+        
+        // IMPORTANTE: Aggiorna remainingTime (come fa PartitaSingola)
+        this.remainingTime = scalataParams.getRemainingTime();
     }
 
     /**

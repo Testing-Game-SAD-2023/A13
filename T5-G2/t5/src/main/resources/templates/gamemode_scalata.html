@@ -1,28 +1,25 @@
 <!DOCTYPE html>
 
 <!--Adding Thymeleaf-->
-<html lang ="en" 
+<html lang="it" 
     xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:th="http://www.thymeleaf.org">
+    xmlns:th="http://www.thymeleaf.org"
+    data-bs-theme="dark">
 
 <head>
-    <!--Enabling proper responsive behavior-->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <div th:replace="fragments/header :: header"></div>
+    
     <title id="title-scalata-gamemode" th:text="#{seleziona_scalata}"></title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale-extreme.css">
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/translucent.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/t5/css/gamemode_scalata.css">
+    <!-- CSS minimale SOLO per le card di selezione scalate -->
+    <link rel="stylesheet" href="/t5/css/gamemode_scalata_minimal.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
     <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
     <script src="https://unpkg.com/@popperjs/core@2"></script>
@@ -31,12 +28,6 @@
 
     <!-- Le scalate sono già renderizzate nel DOM da Thymeleaf -->
     <!-- Non serve più passare dati JSON a JavaScript -->
-
-    <!-- Utility functions condivise -->
-    <script type="text/javascript" src="/t5/js/common_utils.js"></script>
-    <!-- Logica specifica per scalata -->
-    <script type="text/javascript" src="/t5/js/gamemode_scalata.js"></script>
-    
 
 </head>
 
@@ -69,16 +60,78 @@
       </div>
   </nav>
 
-  <!--Jumbotron-->
-  <div class="jumbotron">
-    <h1 class="title" th:text="#{titolo_scalata}"></h1>
-    <h2 class="subtitle" th:text="#{descrizione_scalata}"></h2>
+  <!-- SCHEDA CONTINUA - COPIATA ESATTAMENTE DA PARTITA SINGOLA -->
+  <div class="container-fluid mt-3 d-none" id="scheda_continua_scalata">
+    <div class="row justify-content-center row-cols-3">
+      <div class="col"></div>
+      <div class="col">
+        <!-- Scheda continua gioco-->
+        <div class="card">
+          <h5 class="card-header text-center" th:text="#{scalata}"></h5>
+          <div class="card-body">
+            <!-- Form di selezione -->
+            <div class="row">
+              <div class="col">
+                <h3 class="text-center mb-4" th:text="#{gamemode_alert}"></h3>
+                <div class="row">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <label th:text="#{nome_scalata}"> </label>
+                      <span id="gamemode_scalata_nome"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{livello_corrente}"> </label>
+                      <span id="gamemode_livello_corrente"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{totale_livelli}"></label>
+                      <span id="gamemode_livelli_totali"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{modalità}"></label>
+                      <span id="gamemode_modalita"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{tempo_rimanente}"></label>
+                      <span id="gamemode_time_limit"> </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="d-flex gap-5 justify-content-between">
+                  <!-- Set new Game-->
+                  <div class="text-center pt-2">
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      id="new_game"
+                    >
+                      <i class="bi bi-plus-lg" th:text="#{nuova_partita}"></i>
+                    </button>
+                  </div>
+                  <!-- Link editor -->
+                  <div class="text-center pt-2">
+                    <a
+                      class="btn btn-primary"
+                      href="#"
+                      role="button"
+                      id="Continua"
+                    >
+                      <i class="bi bi-play-fill" th:text="#{riprendi_partita}"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col"></div>
+    </div>
   </div>
-  <br>
   
-  <!-- Container delle scalate - Renderizzato lato server con Thymeleaf -->
+  <!-- Container delle scalate - Renderizzato lato server con Thymeleaf (schermata di default) -->
   <div id="scalate-container" class="container">
-    
     <div class="row">
       <!-- Itera su tutte le scalate disponibili -->
       <div th:each="scalata : ${lista_scalate}" class="col-md-4 mb-4">
@@ -96,7 +149,6 @@
               <span class="badge badge-primary badge-pill" 
                     th:text="${scalata.totalLevels}">0</span>
             </p>
-            
             <p class="card-text text-muted text-center mt-auto" 
                th:if="${scalata.description}"
                th:text="${scalata.description}">
@@ -146,6 +198,9 @@
 
 <!-- Footer con UserUtil.js e altre utility -->
 <div th:replace="fragments/footer :: footer"></div>
+
+<!-- IMPORTANTE: Caricato DOPO footer per avere UserUtil.js già disponibile -->
+<script type="text/javascript" src="/t5/js/gamemode_scalata.js"></script>
 
 </body>
 
