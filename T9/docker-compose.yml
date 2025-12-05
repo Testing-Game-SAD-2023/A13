@@ -1,39 +1,56 @@
-name: t9-notification
+name: t9
 
 volumes:
-  notification_db_data:
+  notification_pgdata:
 
 services:
-  notification-db:
-    image: postgres:16
-    container_name: t9-notification-db
-    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    container_name: t9-postgres_db
     environment:
-      POSTGRES_DB: notificationdb
-      POSTGRES_USER: notification_user
-      POSTGRES_PASSWORD: notification_pass
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    volumes:
+      - notification_pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME} -d ${POSTGRES_DATABASE}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    ports:
+      - "5433:5432"         # così non confligge con T4 (che usa 5432)
     networks:
       - global-network
-    volumes:
-      - notification_db_data:/var/lib/postgresql/data
+    restart: always
 
-  notification-service:
+  app:
     build: ./notification-service
     container_name: t9-notification-service
-    depends_on:
-      - notification-db
-      - rabbitmq       # broker nel TB, stessa rete global-network
+    expose:
+      - 8080
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/notificationdb
-      SPRING_DATASOURCE_USERNAME: notification_user
-      SPRING_DATASOURCE_PASSWORD: notification_pass
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
-    ports:
-      - "8090:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
     networks:
       - global-network
 
 networks:
   global-network:
     external: true
+
+volumes:
+  notification_pgdata:
