@@ -10,7 +10,7 @@ Il servizio T9 gestisce le **notifiche applicative** generate dagli altri micros
     - recuperare le notifiche di un determinato utente (es. `GET /notifications?userId=...`);
     - in seguito, eventualmente, aggiornare lo stato delle notifiche (lette/non lette).
 
-## Architettura
+~~## Architettura~~
 
 Il servizio è pensato come microservizio Spring Boot con:
 
