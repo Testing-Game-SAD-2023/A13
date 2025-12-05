@@ -1,0 +1,39 @@
+name: t9-notification
+
+volumes:
+  notification_db_data:
+
+services:
+  notification-db:
+    image: postgres:16
+    container_name: t9-notification-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: notificationdb
+      POSTGRES_USER: notification_user
+      POSTGRES_PASSWORD: notification_pass
+    networks:
+      - global-network
+    volumes:
+      - notification_db_data:/var/lib/postgresql/data
+
+  notification-service:
+    build: ./notification-service
+    container_name: t9-notification-service
+    depends_on:
+      - notification-db
+      - rabbitmq       # broker nel TB, stessa rete global-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/notificationdb
+      SPRING_DATASOURCE_USERNAME: notification_user
+      SPRING_DATASOURCE_PASSWORD: notification_pass
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+    ports:
+      - "8090:8080"
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true
