@@ -38,9 +38,9 @@ spring:
           acquire-timeout: 5000  # Tempo massimo di attesa per una connessione libera
       routes:
         - id: fallback-route
-          uri: http://localhost:8080/fallback # Dove si gestisce il fallback
+          uri: forward:/fallback # MODIFICATO: Usa forward interno per il controller che abbiamo creato
           predicates:
-            - Path=/fallback
+            - Path=/fallback/**
         - id: test-route
           uri: http://httpbin.org
           predicates:
@@ -53,7 +53,7 @@ spring:
                 cachePrefix: "test_cache:"
                 methods: "GET, POST, PUT"
         - id: aggregated-route
-          uri: no://op  //il gateway non inoltra direttamente la richiesta a un backend
+          uri: no://op  #il gateway non inoltra direttamente la richiesta a un backend
           predicates:
             - Path=/aggregated
           filters:
@@ -72,18 +72,26 @@ spring:
                 ttl: 60
                 cachePrefix: "gamerepo_cache:"
                 methods: "GET"
+        
+        #  ROTTA T7 MODIFICATA PER IL TEST
         - id: T7-route
           uri: http://t7-controller:8087
           predicates:
             - Path=/compile/jacoco/**
           filters:
             - RewritePath=/compile/jacoco/(?<segment>.*), /${segment}
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
+            - name: AuthenticationFilter      
+            - name: RequestRateLimiter        
               args:
-                redis-rate-limiter.replenishRate: 2
-                redis-rate-limiter.burstCapacity: 10
-                redis-rate-limiter.requestedTokens: 1
+                 redis-rate-limiter.replenishRate: 2
+                 redis-rate-limiter.burstCapacity: 10
+                 redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker              
+              args:
+                name: t7CircuitBreaker
+                fallbackUri: forward:/fallback/t7
+
+        # ROTTA T8 AGGIORNATA
         - id: T8-route
           uri: http://t8-controller:8088
           predicates:
@@ -96,6 +104,11 @@ spring:
                 redis-rate-limiter.replenishRate: 2
                 redis-rate-limiter.burstCapacity: 15
                 redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker               
+              args:
+                name: t8CircuitBreaker
+                fallbackUri: forward:/fallback/t8
+
         - id: T1-route
           uri: http://t1-controller:8081
           predicates:
@@ -120,6 +133,7 @@ logging:
   level:
     org.springframework.cloud.gateway: TRACE
     reactor.netty.http.server: INFO
+    io.github.resilience4j: DEBUG # Aggiunto per vedere i log del Circuit Breaker
 
 management:
   endpoints:
@@ -136,3 +150,31 @@ management:
   metrics:
     tags:
       application: apiGateway
+
+
+# CONFIGURAZIONE RESILIENCE4J 
+resilience4j:
+  circuitbreaker:
+    instances:
+      t7CircuitBreaker:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+      t8CircuitBreaker:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 20s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+  timelimiter:
+    instances:
+      t7CircuitBreaker:
+        timeoutDuration: 180s
+      t8CircuitBreaker:
+        timeoutDuration: 300s
