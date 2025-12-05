@@ -64,7 +64,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.g2.t9notification.T9NotificationApplication</mainClass>
+                    <mainClass>com.NotificationApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
