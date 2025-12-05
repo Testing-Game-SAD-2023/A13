@@ -1,4 +1,4 @@
-name: t9
+name: t9-notification
 
 volumes:
   notification_db_data:
@@ -9,32 +9,26 @@ services:
     container_name: t9-notification-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-      POSTGRES_USER: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: notificationdb
+      POSTGRES_USER: notification_user
+      POSTGRES_PASSWORD: notification_pass
     networks:
       - global-network
     volumes:
       - notification_db_data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"          # opzionale per accesso da host
 
   notification-service:
     build: ./notification-service
     container_name: t9-notification-service
     depends_on:
-      notification-db:
-        condition: service_started
-      rabbitmq:
-        condition: service_started   # broker da TB, stessa rete
+      - notification-db
+      - rabbitmq       # broker nel TB, stessa rete global-network
     environment:
-      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
-      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/notificationdb
+      SPRING_DATASOURCE_USERNAME: notification_user
+      SPRING_DATASOURCE_PASSWORD: notification_pass
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
-      # opzionale: se vuoi usare direttamente spring.datasource.url da env
-      # SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/${POSTGRES_DATABASE}
     ports:
       - "8090:8080"
     networks:
