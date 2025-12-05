@@ -163,17 +163,30 @@ public class ScalataGame extends TurnBasedGame {
 
     /**
      *  Override di endGame per gestire la logica di fine scalata.
-     *  Se la scalata non è ancora terminata, incrementa il livello ma NON chiude il game.
-     *  Altrimenti, conclude definitivamente la scalata.
+     *  - Se vince il livello ma non la scalata: passa al livello successivo (NON chiude il game)
+     *  - Se perde il livello: permette di riprovare (NON chiude il game, NON incrementa livello)
+     *  - Se abbandona o completa tutta la scalata: chiude definitivamente il game
      */
     @Override
     public void endGame(boolean isGameSurrendered) {
         logger.info("[SCALATA] ========== endGame() chiamato ==========");
-        logger.info("[SCALATA] isWinner={}, isScalataWon={}, currentLevel={}/{}, gameID={}", 
-                   isWinner(), isScalataWon(), currentLevel, totalLevels, getGameID());
+        logger.info("[SCALATA] isGameSurrendered={}, isWinner={}, isScalataWon={}, currentLevel={}/{}, gameID={}", 
+                   isGameSurrendered, isWinner(), isScalataWon(), currentLevel, totalLevels, getGameID());
         
-        // Se ha vinto il livello ma non la scalata completa, incrementa il livello
-        if (isWinner() && !isScalataWon()) {
+        if (isGameSurrendered) {
+            // ❌ ABBANDONATA → chiudi tutto
+            super.endGame(true);
+            logger.info("[SCALATA] Scalata '{}' abbandonata al livello {}/{}.", 
+                       scalataName, currentLevel, totalLevels);
+            
+        } else if (isWinner() && isScalataWon()) {
+            // ✅ COMPLETATA → chiudi tutto
+            super.endGame(false);
+            logger.info("[SCALATA] Scalata '{}' completata con successo! Tutti i {} livelli superati.", 
+                       scalataName, totalLevels);
+            
+        } else if (isWinner()) {
+            // ✅ VINTO IL LIVELLO → passa al successivo
             currentLevel++;
             logger.info("[SCALATA] Livello {} completato! Prossimo livello: {}/{}", 
                        currentLevel - 1, currentLevel, totalLevels);
@@ -192,20 +205,29 @@ public class ScalataGame extends TurnBasedGame {
                 logger.warn("[SCALATA] GameID non valido ({}), impossibile aggiornare T4", gameId);
             }
             
-            // NON chiamiamo super.endGame() perché la scalata non è finita!
-            // La sessione in Redis viene salvata automaticamente
+            // NON chiamiamo super.endGame() perché la scalata continua!
             
         } else {
-            // Scalata completata o fallita → chiudi definitivamente il game
-            super.endGame(isGameSurrendered);
+            // ❌ PERSO IL LIVELLO → permetti retry
+            logger.info("[SCALATA] Livello {} fallito, giocatore può riprovare. currentLevel={}/{}", 
+                       currentLevel, currentLevel, totalLevels);
             
-            if (isScalataWon()) {
-                logger.info("[SCALATA] Scalata '{}' completata con successo! Tutti i {} livelli superati.", 
-                           scalataName, totalLevels);
-            } else {
-                logger.info("[SCALATA] Scalata '{}' fallita al livello {}/{}.", 
-                           scalataName, currentLevel, totalLevels);
+            // TODO: Incrementare round_number in T4 per tracciare i tentativi
+            // Quando implementerai la rotta in T4, decommenta:
+            /*
+            long gameId = getGameID();
+            if (gameId > 0) {
+                try {
+                    getServiceManager().handleRequest("T4", "IncrementRoundAttempt", gameId);
+                    logger.info("[SCALATA] round_number incrementato in T4 per gameID={}", gameId);
+                } catch (Exception e) {
+                    logger.error("[SCALATA] Errore incremento round_number in T4: {}", e.getMessage(), e);
+                }
             }
+            */
+            
+            // NON chiamiamo super.endGame() → la sessione rimane attiva
+            // Il giocatore può riprovare lo stesso livello
         }
     }
 }

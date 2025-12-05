@@ -354,21 +354,31 @@ public class GameManager {
         GameLogic currentGame = handleGetCurrentGame(updateParams.getPlayerId(), updateParams.getGameMode());
         logger.info("[EndGame] GameLogic recuperato: gameID={}", currentGame.getGameID());
 
-        // Per Scalata in corso (vinta ma non completata), NON chiudiamo la sessione
+        // Per Scalata, determina se chiudere o mantenere la sessione
         boolean shouldCloseSession = true;
+        boolean shouldLoadNextLevel = false; // Flag per caricare il livello successivo
+        
         if (currentGame instanceof ScalataGame) {
             ScalataGame scalataGame = (ScalataGame) currentGame;
-            // Se ha vinto il livello ma la scalata non è completa, mantieni la sessione attiva
-            shouldCloseSession = !scalataGame.isWinner() || scalataGame.isScalataWon();
-            logger.info("[EndGame] Scalata check: isWinner={}, isScalataWon={}, shouldCloseSession={}",
-                    scalataGame.isWinner(), scalataGame.isScalataWon(), shouldCloseSession);
+            boolean isWinner = scalataGame.isWinner();
+            boolean isScalataWon = scalataGame.isScalataWon();
+            
+            // Chiudi SOLO se ha vinto E completato tutta la scalata
+            // (Surrender è gestito da handleSurrendGame, non qui)
+            shouldCloseSession = isWinner && isScalataWon;
+            
+            // Carica livello successivo SOLO se ha vinto il livello MA la scalata non è completa
+            shouldLoadNextLevel = isWinner && !isScalataWon;
+            
+            logger.info("[EndGame] Scalata: isWinner={}, isScalataWon={}, shouldCloseSession={}, shouldLoadNextLevel={}",
+                    isWinner, isScalataWon, shouldCloseSession, shouldLoadNextLevel);
         }
         
         if (shouldCloseSession) {
             handleCloseGame(currentGame, false);
             logger.info("[EndGame] Sessione chiusa per playerId={}", currentGame.getPlayerID());
-        } else {
-            // Scalata in corso: mantieni sessione attiva e carica dati livello successivo
+        } else if (shouldLoadNextLevel) {
+            // Ha vinto il livello: carica dati livello successivo
             ScalataGame scalataGame = (ScalataGame) currentGame;
             
             try {
@@ -424,6 +434,41 @@ public class GameManager {
                 // In caso di errore, salva comunque la sessione con currentLevel aggiornato
                 sessionService.updateGameMode(currentGame.getPlayerID(), currentGame);
                 logger.warn("[EndGame] Sessione salvata senza dati livello successivo a causa di errore");
+            }
+        } else {
+            // Ha perso il livello: mantieni sessione attiva per permettere il retry
+            ScalataGame scalataGame = (ScalataGame) currentGame;
+            int currentLevel = scalataGame.getCurrentLevel();
+            String scalataName = scalataGame.getScalataName();
+            
+            logger.info("[EndGame] Livello {} fallito, reset dati per nuovo tentativo", currentLevel);
+            
+            try {
+                // Ricarica i dati del LIVELLO CORRENTE da T1 per resettare tempo
+                @SuppressWarnings("unchecked")
+                Map<String, Object> currentLevelData = (Map<String, Object>) scalataGame.getServiceManager().handleRequest(
+                    "T1", "getLevelByScalataAndPosition", scalataName, currentLevel
+                );
+                
+                // Reset tempo al valore originale del livello
+                Integer tempoMax = (Integer) currentLevelData.get("tempoMax");
+                scalataGame.setRemainingTime(tempoMax != null ? tempoMax : 600);
+                
+                logger.info("[EndGame] Tempo resettato a {} secondi per riprovare livello {}", 
+                           tempoMax, currentLevel);
+                
+                // TODO: Quando implementeremo la rotta in T4, incrementare round_number qui
+                // scalataGame.getServiceManager().handleRequest("T4", "IncrementRoundAttempt", gameId);
+                
+                // Salva la sessione con tempo resettato
+                sessionService.updateGameMode(currentGame.getPlayerID(), currentGame);
+                logger.info("[EndGame] Sessione aggiornata con tempo resettato, giocatore può riprovare");
+                
+            } catch (Exception e) {
+                logger.error("[EndGame] Errore caricamento dati livello corrente per reset: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione (con tempo non resettato)
+                sessionService.updateGameMode(currentGame.getPlayerID(), currentGame);
+                logger.warn("[EndGame] Sessione salvata senza reset tempo a causa di errore");
             }
         }
 
