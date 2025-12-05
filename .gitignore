@@ -37,3 +37,7 @@ build/
 logs/application.log
 
 k6-tests/node_modules/
+
+# macOS
+.DS_Store
+**/.DS_Store
