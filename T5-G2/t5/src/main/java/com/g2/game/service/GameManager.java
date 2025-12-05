@@ -411,6 +411,14 @@ public class GameManager {
                 sessionService.updateGameMode(currentGame.getPlayerID(), currentGame);
                 logger.info("[EndGame] Sessione aggiornata con dati livello successivo");
                 
+                // Chiudi il round precedente PRIMA di crearne uno nuovo
+                scalataGame.getServiceManager().handleRequest("T4", "EndRound", gameId);
+                logger.info("[EndGame] Round precedente chiuso in T4");
+                
+                // Crea un nuovo round in T4 per il livello successivo
+                scalataGame.startRound();
+                logger.info("[EndGame] Nuovo round creato in T4 per livello {}", nextLevel);
+                
             } catch (Exception e) {
                 logger.error("[EndGame] Errore caricamento dati livello successivo: {}", e.getMessage(), e);
                 // In caso di errore, salva comunque la sessione con currentLevel aggiornato
