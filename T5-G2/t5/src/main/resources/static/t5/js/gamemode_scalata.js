@@ -148,16 +148,42 @@ function updateDOMWithPreviousScalataData(sessionData) {
         const remainingTime = sessionData.remainingTime || 0;
         document.getElementById("gamemode_time_limit").innerText = formatTime(remainingTime);
         
-        // Imposta il link per riprendere la partita con remainingTime
-        // Usa class_ut dal JSON, non classUTName
+        // ✅ NUOVO: Configura il bottone "Riprendi partita" per recuperare i dati del livello corrente
         const linkRiprendi = document.getElementById("Continua");
-        const classUT = sessionData.class_ut || sessionData.classUTName || "";
         
-        linkRiprendi.href = `/editor?ClassUT=${classUT}&mode=Scalata&remainingTime=${remainingTime}`;
+        // Invece di usare href statico, usiamo onclick per chiamare fetchCurrentLevel
+        linkRiprendi.href = "javascript:void(0);"; // Previene il redirect di default
+        linkRiprendi.onclick = async function(e) {
+            e.preventDefault(); // Blocca il comportamento di default
+            
+            const currentLevel = sessionData.currentLevel || 1;
+            const scalataName = sessionData.scalataName;
+            
+            console.log(`[gamemode_scalata] Recupero dati livello ${currentLevel} di "${scalataName}"`);
+            
+            try {
+                // 1. Recupera i dati del livello corrente da T1
+                const levelData = await fetchCurrentLevel(scalataName, currentLevel);
+                
+                if (!levelData || levelData.error) {
+                    console.error("[gamemode_scalata] Errore recupero livello:", levelData);
+                    swal("Errore!", "Impossibile recuperare i dati del livello corrente", "error");
+                    return;
+                }
+                
+                console.log("[gamemode_scalata] Dati livello corrente ricevuti:", levelData);
+                
+                // 2. Redirect all'editor con la classe del livello corrente
+                const classUT = levelData.className;
+                window.location.href = `/editor?ClassUT=${classUT}&mode=Scalata&remainingTime=${remainingTime}`;
+                
+            } catch (error) {
+                console.error("[gamemode_scalata] Errore nel recupero del livello:", error);
+                swal("Errore!", "Si è verificato un errore. Riprova più tardi.", "error");
+            }
+        };
         
-        console.log("[gamemode_scalata] Link riprendi impostato:", linkRiprendi.href);
-        console.log("[gamemode_scalata] ClassUT dalla sessione:", classUT);
-        console.log("[gamemode_scalata] Remaining time dalla sessione:", remainingTime);
+        console.log("[gamemode_scalata] Bottone 'Riprendi' configurato per livello", sessionData.currentLevel);
         
     } else {
         console.log("[gamemode_scalata] Nessuna scalata in corso, mostro scheda nuovo");

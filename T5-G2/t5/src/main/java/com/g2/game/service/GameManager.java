@@ -20,6 +20,7 @@ package com.g2.game.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.game.gameDTO.EndGameDTO.EndGameResponseDTO;
+import com.g2.game.gameDTO.EndGameDTO.EndScalataGameResponseDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameRequestDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameResponseDTO;
 import com.g2.game.gameDTO.StartGameDTO.StartGameRequestDTO;
@@ -28,6 +29,8 @@ import com.g2.game.gameFactory.params.GameParams;
 import com.g2.game.gameFactory.params.GameParamsFactory;
 import com.g2.game.gameMode.Compile.CompileResult;
 import com.g2.game.gameMode.GameLogic;
+import com.g2.game.gameMode.ScalataGame;
+import com.g2.interfaces.ServiceManager;
 import com.g2.model.configuration.GameExecutionConfig;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.session.SessionService;
@@ -44,6 +47,7 @@ import testrobotchallenge.commons.models.opponent.GameMode;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -350,7 +354,70 @@ public class GameManager {
         GameLogic currentGame = handleGetCurrentGame(updateParams.getPlayerId(), updateParams.getGameMode());
         logger.info("[EndGame] GameLogic recuperato: gameID={}", currentGame.getGameID());
 
-        handleCloseGame(currentGame, false);
+        // Per Scalata in corso (vinta ma non completata), NON chiudiamo la sessione
+        boolean shouldCloseSession = true;
+        if (currentGame instanceof ScalataGame) {
+            ScalataGame scalataGame = (ScalataGame) currentGame;
+            // Se ha vinto il livello ma la scalata non è completa, mantieni la sessione attiva
+            shouldCloseSession = !scalataGame.isWinner() || scalataGame.isScalataWon();
+            logger.info("[EndGame] Scalata check: isWinner={}, isScalataWon={}, shouldCloseSession={}",
+                    scalataGame.isWinner(), scalataGame.isScalataWon(), shouldCloseSession);
+        }
+        
+        if (shouldCloseSession) {
+            handleCloseGame(currentGame, false);
+            logger.info("[EndGame] Sessione chiusa per playerId={}", currentGame.getPlayerID());
+        } else {
+            // Scalata in corso: mantieni sessione attiva e carica dati livello successivo
+            ScalataGame scalataGame = (ScalataGame) currentGame;
+            
+            try {
+                // Incrementa il livello PRIMA di caricare i dati
+                int oldLevel = scalataGame.getCurrentLevel();
+                scalataGame.setCurrentLevel(oldLevel + 1); // Incrementa currentLevel
+                int nextLevel = scalataGame.getCurrentLevel();
+                String scalataName = scalataGame.getScalataName();
+                
+                logger.info("[EndGame] Livello {} completato, passaggio al livello {}/{}", 
+                           oldLevel, nextLevel, scalataGame.getTotalLevels());
+                
+                // Aggiorna currentLevel in T4
+                long gameId = scalataGame.getGameID();
+                if (gameId > 0) {
+                    scalataGame.getServiceManager().handleRequest("T4", "IncrementCurrentLevel", gameId);
+                    logger.info("[EndGame] CurrentLevel aggiornato in T4: gameID={}, newLevel={}", gameId, nextLevel);
+                }
+                
+                logger.info("[EndGame] Caricamento dati livello {} della scalata '{}'", nextLevel, scalataName);
+                
+                // Chiama T1 per ottenere i dati del livello successivo
+                @SuppressWarnings("unchecked")
+                Map<String, Object> nextLevelData = (Map<String, Object>) scalataGame.getServiceManager().handleRequest(
+                    "T1", "getLevelByScalataAndPosition", scalataName, nextLevel
+                );
+                
+                // Aggiorna ScalataGame con i dati del nuovo livello
+                String nextClassName = (String) nextLevelData.get("className");
+                Integer nextTempoMax = (Integer) nextLevelData.get("tempoMax");
+                String nextOpponentName = (String) nextLevelData.get("opponentName");
+                
+                scalataGame.setClassUTName(nextClassName);
+                scalataGame.setRemainingTime(nextTempoMax != null ? nextTempoMax : 600);
+                
+                logger.info("[EndGame] Dati livello {} caricati: class={}, tempo={}, opponent={}", 
+                           nextLevel, nextClassName, nextTempoMax, nextOpponentName);
+                
+                // Salva la sessione aggiornata con i dati del livello successivo
+                sessionService.updateGameMode(currentGame.getPlayerID(), currentGame);
+                logger.info("[EndGame] Sessione aggiornata con dati livello successivo");
+                
+            } catch (Exception e) {
+                logger.error("[EndGame] Errore caricamento dati livello successivo: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione con currentLevel aggiornato
+                sessionService.updateGameMode(currentGame.getPlayerID(), currentGame);
+                logger.warn("[EndGame] Sessione salvata senza dati livello successivo a causa di errore");
+            }
+        }
 
         // Determino la forma della risposta in base allo stato di terminazione della partita ed eseguo le operazioni
         // aggiuntive in caso di vittoria
@@ -368,6 +435,28 @@ public class GameManager {
             // Gestisco il calcolo e l'aggiornamento dei punti esperienza e degli achievement sbloccati
             int expGained = playerStatService.assignExperiencePoints(currentGame);
             achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
+            
+            // Se è una Scalata, restituisco il DTO specifico con informazioni multilivello
+            if (currentGame instanceof ScalataGame) {
+                ScalataGame scalataGame = (ScalataGame) currentGame;
+                logger.info("[EndGame] Scalata detected: currentLevel={}, totalLevels={}, scalataName='{}'",
+                        scalataGame.getCurrentLevel(), scalataGame.getTotalLevels(), scalataGame.getScalataName());
+                
+                return new EndScalataGameResponseDTO(
+                        currentGame.getScore(currentGame.getRobotCompileResult()),
+                        currentGame.getScore(currentGame.getUserCompileResult()),
+                        currentGame.isWinner(),
+                        expGained,
+                        achievementsUnlocked,
+                        runGameResponse,
+                        scalataGame.getCurrentLevel(),
+                        scalataGame.getTotalLevels(),
+                        scalataGame.getScalataName(),
+                        scalataGame.isScalataWon()
+                );
+            }
+            
+            // Per altre modalità (PartitaSingola, Allenamento, etc.), uso il DTO standard
             return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),
                     currentGame.getScore(currentGame.getUserCompileResult()),

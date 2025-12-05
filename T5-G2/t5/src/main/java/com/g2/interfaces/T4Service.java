@@ -286,7 +286,7 @@ public class T4Service extends BaseService {
         final String endpoint = "/games/%s/current-level-increment".formatted(gameId);
         
         try {
-            return callRestPatch(endpoint, null, String.class);
+            return callRestPut(endpoint, null, String.class);
         } catch (Exception e) {
             throw new IllegalArgumentException("[IncrementCurrentLevel]: " + e.getMessage());
         }

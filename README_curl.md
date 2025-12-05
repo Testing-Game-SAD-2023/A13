@@ -36,8 +36,8 @@ curl -s -X POST "http://localhost/scalata/configureScalata" \
     "scalataName": "ScalataDiProva",
     "username": "TestUser",
     "scalataDescription": "Scalata di test",
-    "numberOfLevels": 3,
-    "levels": [1, 2, 3]
+    "numberOfLevels": 2,
+    "levels": [1, 2]
   }'
 ```
 NOTA --> verificare che il jwt sia quello dell'admin , altrimenti non si hanno i permessi per una richiesta di tipo POST
@@ -45,7 +45,7 @@ NOTA --> verificare che il jwt sia quello dell'admin , altrimenti non si hanno i
 ## 6. Per eliminare una scalata esistente
 
 ```bash
-curl -s -X DELETE "http://localhost/scalata/delete_scalata/TestScalata_123456" \
+curl -s -X DELETE "http://localhost/scalata/delete_scalata/ScalataDiProva" \
   -H "Cookie: jwt=${JWT}"
 ```
 NOTA --> Sostituire `TestScalata_123456` con il nome della scalata da eliminare. Richiede JWT dell'admin.
@@ -53,7 +53,7 @@ NOTA --> Sostituire `TestScalata_123456` con il nome della scalata da eliminare.
 **IMPORTANTE**: Se il nome della scalata contiene spazi, usare URL encoding (`%20`):
 ```bash
 # Esempio: eliminare "Scalata Prova"
-curl -s -X DELETE "http://localhost/scalata/delete_scalata/Scalata%20Prova" \
+curl -s -X DELETE "http://localhost/scalata/delete_scalata/ScalataDiProva" \
   -H "Cookie: jwt=${JWT}"
 ```
 
@@ -140,6 +140,10 @@ curl -s -X GET "http://localhost/api/gamerepo/games/player/2" \
 ### Opzione B: Query diretta al database
 ```bash
 docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, game_mode, status, current_level, scalata_name, started_at FROM games ORDER BY id DESC LIMIT 5;"
+```
+### Query diretta per visualizzare i round
+```bash
+docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, round_number, classut, type, difficulty, started_at FROM rounds ORDER BY id DESC LIMIT 10;"
 ```
 
 ## 1. Leggi dettagli di un Game

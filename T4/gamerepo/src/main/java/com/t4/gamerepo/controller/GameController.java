@@ -397,7 +397,7 @@ public class GameController {
                     content = @Content(schema = @Schema(implementation = ApiErrorBackend.class))
             )
     })
-    @PatchMapping("/{gameId}/current-level-increment")
+    @PutMapping("/{gameId}/current-level-increment")
     public ResponseEntity<GameDTO> incrementCurrentLevel(
             @Parameter(name = "gameId", description = "Id of the game", required = true)
             @PathVariable Long gameId) {

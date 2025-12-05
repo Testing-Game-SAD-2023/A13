@@ -163,21 +163,49 @@ public class ScalataGame extends TurnBasedGame {
 
     /**
      *  Override di endGame per gestire la logica di fine scalata.
-     *  Se la scalata non è ancora terminata, avvia il livello successivo.
-     *  Altrimenti, conclude la scalata.
+     *  Se la scalata non è ancora terminata, incrementa il livello ma NON chiude il game.
+     *  Altrimenti, conclude definitivamente la scalata.
      */
     @Override
     public void endGame(boolean isGameSurrendered) {
-        super.endGame(isGameSurrendered);
+        logger.info("[SCALATA] ========== endGame() chiamato ==========");
+        logger.info("[SCALATA] isWinner={}, isScalataWon={}, currentLevel={}/{}, gameID={}", 
+                   isWinner(), isScalataWon(), currentLevel, totalLevels, getGameID());
         
         // Se ha vinto il livello ma non la scalata completa, incrementa il livello
         if (isWinner() && !isScalataWon()) {
             currentLevel++;
             logger.info("[SCALATA] Livello {} completato! Prossimo livello: {}/{}", 
                        currentLevel - 1, currentLevel, totalLevels);
-        } else if (isScalataWon()) {
-            logger.info("[SCALATA] Scalata '{}' completata con successo! Tutti i {} livelli superati.", 
-                       scalataName, totalLevels);
+            
+            // Aggiorna currentLevel in T4 senza chiudere il game
+            long gameId = getGameID();
+            if (gameId > 0) {
+                try {
+                    getServiceManager().handleRequest("T4", "IncrementCurrentLevel", gameId);
+                    logger.info("[SCALATA] CurrentLevel aggiornato in T4: gameID={}, newLevel={}", 
+                               gameId, currentLevel);
+                } catch (Exception e) {
+                    logger.error("[SCALATA] Errore aggiornamento currentLevel in T4: {}", e.getMessage(), e);
+                }
+            } else {
+                logger.warn("[SCALATA] GameID non valido ({}), impossibile aggiornare T4", gameId);
+            }
+            
+            // NON chiamiamo super.endGame() perché la scalata non è finita!
+            // La sessione in Redis viene salvata automaticamente
+            
+        } else {
+            // Scalata completata o fallita → chiudi definitivamente il game
+            super.endGame(isGameSurrendered);
+            
+            if (isScalataWon()) {
+                logger.info("[SCALATA] Scalata '{}' completata con successo! Tutti i {} livelli superati.", 
+                           scalataName, totalLevels);
+            } else {
+                logger.info("[SCALATA] Scalata '{}' fallita al livello {}/{}.", 
+                           scalataName, currentLevel, totalLevels);
+            }
         }
     }
 }
