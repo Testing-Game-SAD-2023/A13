@@ -1,22 +1,19 @@
 /* CSS minimale per gamemode_scalata - SOLO per le card di selezione scalate */
 
-/* Container delle scalate */
+/* Sovrascrivi #scalate-container per renderlo trasparente */
 #scalate-container {
-    background-color: rgba(57,57,83,1);
-    color: #C8C7D8;
-    font-size: 18px;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     padding: 24px;
-    border-radius: 16px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     width: 100%;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
-    min-height: 300px;
 }
 
 /* Stili per le card delle scalate */
 .scalata-card {
-    background-color: rgba(70, 70, 90, 0.9);
+    background-color: transparent;
     border: 2px solid #393953;
     border-radius: 8px;
     transition: all 0.3s ease;
@@ -36,7 +33,7 @@
 .scalata-card.selected {
     border-color: #f018f0;
     border-width: 3px;
-    background-color: rgba(240, 24, 240, 0.15);
+    background-color: rgba(240, 24, 240, 0.1);
     box-shadow: 0 6px 16px rgba(240, 24, 240, 0.5);
     transform: translateY(-5px);
 }
@@ -51,7 +48,7 @@
     color: #C8C7D8;
 }
 
-#scalate-container .badge {
+.badge {
     margin-right: 20px;
     font-size: 0.65em;
     padding: 5px 10px;

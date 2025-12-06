@@ -11,11 +11,14 @@
     
     <title id="title-scalata-gamemode" th:text="#{seleziona_scalata}"></title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <!-- Rimosso Bulma CSS che potrebbe creare conflitti -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css"> -->
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale-extreme.css">
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/translucent.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- CSS per bg-custom e stili base -->
+    <link rel="stylesheet" href="/t5/css/gamemode_scalata.css">
     <!-- CSS minimale SOLO per le card di selezione scalate -->
     <link rel="stylesheet" href="/t5/css/gamemode_scalata_minimal.css">
 
@@ -31,34 +34,10 @@
 
 </head>
 
-<body class=bg-custom>
+<body>
   
-  <!--Navbar-->
-  <nav class="navbar navbar-dark bg-dark" id="navbar">
-      <a class="navbar-brand" href="javascript:void(0);">
-        <i class="fas fa-stairs" th:text="#{seleziona_scalata}"></i> 
-      </a>
-      <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" id="nav-go-back" href="/main" th:text="#{indietro}"> <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="nav-logout" href="/logout" th:text="#{logout}"> <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="nav-rules" href="#" data-toggle="modal" data-target="#rulesModal" th:text="#{regole}"></a>
-          </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" id="nav-tour" href=#>Inizia il tour</a>
-          </li> -->
-        </ul>
-      </div>
-  </nav>
+  <!-- NAVBAR -->
+  <div th:replace="fragments/navbar :: navbar"></div>
 
   <!-- SCHEDA CONTINUA - COPIATA ESATTAMENTE DA PARTITA SINGOLA -->
   <div class="container-fluid mt-3 d-none" id="scheda_continua_scalata">
@@ -131,8 +110,8 @@
   </div>
   
   <!-- Container delle scalate - Renderizzato lato server con Thymeleaf (schermata di default) -->
-  <div id="scalate-container" class="container">
-    <div class="row">
+  <div id="scalate-container" class="container-fluid mt-3">
+    <div class="row justify-content-center">
       <!-- Itera su tutte le scalate disponibili -->
       <div th:each="scalata : ${lista_scalate}" class="col-md-4 mb-4">
         <div class="card scalata-card h-100 shadow-sm" 
@@ -171,13 +150,11 @@
       </div>
     </div>
   </div>
-  <br>
-  <br>
-  <div class="text-center">
+
+  <div class="text-center mt-4 mb-5">
     <button type="button" id="submit-button" class="btn btn-light btn-lg" th:text="#{submit}"></button>
   </div>
-  <br>
-  <br>
+
 <!--Regolamento modal dialog-->
 <div class="modal fade" id="rulesModal" tabindex="-1" role="dialog" aria-labelledby="rulesModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
