@@ -83,36 +83,8 @@ function startGameRequest(requestData) {
     });
 }
 
-// ------------------------------
-// LOGICA SCALATA
-// ------------------------------
-
 // Variabile globale per tenere traccia della scalata selezionata
 let selectedScalata = null;
-
-/**
- * Verifica se esiste una sessione di gioco attiva per la modalità Scalata
- * @param {number} playerId - ID del giocatore
- * @returns {Promise<Object|null>} Dati della sessione esistente o null
- */
-async function checkScalataSession(playerId) {
-    const mode = "Scalata";
-    const url = `/api/gameEngine/session/gamemode/${playerId}?mode=${mode}`;
-    
-    try {
-        const response = await $.ajax({
-            url: url,
-            type: "GET",
-            xhrFields: { withCredentials: true }
-        });
-        
-        console.log("[gamemode_scalata] Sessione esistente trovata:", response);
-        return response;
-    } catch (error) {
-        console.log("[gamemode_scalata] Nessuna sessione attiva");
-        return null;
-    }
-}
 
 // ------------------------------
 // GESTIONE SESSIONE E SCHEDE
@@ -200,53 +172,6 @@ function updateDOMWithPreviousScalataData(sessionData) {
     }
 }
 
-/**
- * Controlla se esiste una sessione attiva per la modalità Scalata
- * @param {number} playerId - ID del giocatore
- * @returns {Promise<Object|null>} Dati della sessione o null se non esiste
- */
-async function checkScalataSession(playerId) {
-    const mode = "Scalata";
-    const url = `/api/gameEngine/session/gamemode/${playerId}?mode=${mode}`;
-    
-    try {
-        const response = await $.ajax({
-            url: url,
-            type: "GET",
-            xhrFields: { withCredentials: true }
-        });
-        
-        console.log("[gamemode_scalata] Sessione esistente trovata:", response);
-        return response;
-    } catch (error) {
-        console.log("[gamemode_scalata] Nessuna sessione attiva");
-        return null;
-    }
-}
-
-/**
- * Elimina la sessione corrente per permettere di avviare una nuova scalata
- */
-async function deleteScalataSession() {
-    // Recupera il playerId dal token JWT
-    const jwtToken = getCookie("jwt");
-    const playerId = parseJwt(jwtToken).userId;
-    
-    const url = `/api/gameEngine/session/gamemode/${playerId}?mode=Scalata`;
-    
-    try {
-        await $.ajax({
-            url: url,
-            type: "DELETE",
-            xhrFields: { withCredentials: true }
-        });
-        console.log("[gamemode_scalata] Sessione eliminata con successo");
-        return true;
-    } catch (error) {
-        console.error("[gamemode_scalata] Errore nell'eliminazione della sessione:", error);
-        return false;
-    }
-}
 
 // Quando il documento è pronto
 $(document).ready(async function() {
@@ -258,11 +183,15 @@ $(document).ready(async function() {
     
     const playerId = parseJwt(jwtToken).userId;
     console.log("[gamemode_scalata] Player ID:", playerId);
-    
-    const existingSession = await checkScalataSession(playerId);
-    console.log("[gamemode_scalata] Existing session:", existingSession);
-    
-    updateDOMWithPreviousScalataData(existingSession);
+
+    let previousGameObject = null;
+    try {
+        previousGameObject = await fetchPreviousGameData();
+        console.log("Oggetto partita precedente:", previousGameObject);
+    } catch (error) {
+        console.error("Errore durante il recupero dei dati del gioco:", error);
+    }
+    updateDOMWithPreviousScalataData(previousGameObject);
     
     // 2. INIZIALIZZA LE CARD DELLE SCALATE con event delegation
     // Usa event delegation sul container invece che sulle card direttamente
@@ -321,25 +250,20 @@ $(document).ready(async function() {
                 console.log("[gamemode_scalata] Confermato abbandono, elimino sessione");
                 
                 // Elimina la sessione
-                const deleted = await deleteScalataSession();
-                if (deleted) {
-                    console.log("[gamemode_scalata] Sessione eliminata, mostro scheda nuovo");
-                    
-                    // Nascondi scheda continua
-                    document.getElementById("scheda_continua_scalata").classList.add("d-none");
-                    
-                    // Mostra container scalate
-                    const scalateContainer = document.getElementById("scalate-container");
-                    const submitButton = document.getElementById("submit-button");
-                    
-                    if (scalateContainer) scalateContainer.classList.remove("d-none");
-                    if (submitButton) submitButton.parentElement.classList.remove("d-none");
-                    
-                    swal("Sessione eliminata!", "Puoi ora selezionare una nuova scalata", "success");
-                } else {
-                    console.error("[gamemode_scalata] Errore eliminazione sessione");
-                    swal("Errore!", "Impossibile eliminare la sessione", "error");
-                }
+                await deleteModalita(GetMode());
+                console.log("[gamemode_scalata] Sessione eliminata, mostro scheda nuovo");
+
+                // Nascondi scheda continua
+                document.getElementById("scheda_continua_scalata").classList.add("d-none");
+
+                // Mostra container scalate
+                const scalateContainer = document.getElementById("scalate-container");
+                const submitButton = document.getElementById("submit-button");
+
+                if (scalateContainer) scalateContainer.classList.remove("d-none");
+                if (submitButton) submitButton.parentElement.classList.remove("d-none");
+
+                swal("Sessione eliminata!", "Puoi ora selezionare una nuova scalata", "success");
             }
         });
     });
