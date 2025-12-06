@@ -146,10 +146,14 @@ management:
     env:
       enabled: true
       show-values: ALWAYS
-
+    prometheus:
+      enabled: true
   metrics:
     tags:
       application: apiGateway
+    export:
+      prometheus:
+        enabled: true
 
 
 # CONFIGURAZIONE RESILIENCE4J 

@@ -6,37 +6,53 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+
   - job_name: 'microservice-1'
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ['t1-controller:8081']
         labels:
-          service: 'AdminService'
+          service: 'T1' 
 
   - job_name: 'microservice-2'
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ['t23-controller:8082']
         labels:
-          service: 'UserService'
+          service: 'T23' 
+
+  - job_name: 'microservice-4'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['t4-controller:8084']
+        labels:
+          service: 'T4' 
 
   - job_name: 'microservice-5'
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ['t5-controller:8085']
         labels:
-          service: 'GameEngine'
+          service: 'T56' 
 
   - job_name: 'microservice-7'
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ['t7-controller:8087']
         labels:
-          service: 'Compile_Randoop'
+          service: 'T7' 
 
   - job_name: 'microservice-8'
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ['t8-controller:8088']
         labels:
-          service: 'Compile_EvoSuite'
+          service: 'T8' 
+
+  - job_name: 'api-gateway'
+    metrics_path: /actuator/prometheus
+    static_configs:
+
+      - targets: ['api-gateway:8090'] 
+        labels:
+          service: 'API Gateway'

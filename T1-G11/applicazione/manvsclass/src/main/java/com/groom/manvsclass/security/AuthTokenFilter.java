@@ -38,6 +38,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     );
     private final ApiGatewayClient apiGatewayClient;
 
+     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        // Lascia passare tutto ciò che inizia con /actuator senza controllare il JWT
+        return path.startsWith("/actuator");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
