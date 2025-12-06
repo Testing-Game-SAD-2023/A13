@@ -316,4 +316,42 @@ public class GameService {
         
         return currentLevel != null ? currentLevel : 1;
     }
+
+    /**
+     * Incrementa il contatore di tentativi (round_number) dell'ultimo Round attivo.
+     * Usato in modalità Scalata quando il giocatore fallisce un livello e vuole riprovare.
+     *
+     * @param gameId l'ID della partita
+     * @return il RoundDTO aggiornato
+     * @throws GameNotFoundException se la partita non esiste
+     * @throws GameAlreadyClosedException se la partita non è IN_PROGRESS
+     * @throws RoundNotFoundException se non c'è un round attivo
+     */
+    @Transactional
+    public RoundDTO incrementLastRoundAttempt(Long gameId) {
+        Game game = findGame(gameId);
+        
+        // Verifica che il game sia IN_PROGRESS
+        if (game.getStatus() != GameStatus.IN_PROGRESS) {
+            throw new GameAlreadyClosedException("Cannot increment round attempt, game is " + game.getStatus());
+        }
+        
+        // Trova l'ultimo round (quello non chiuso)
+        Round lastRound = game.getRounds().stream()
+                .filter(r -> r.getClosedAt() == null)
+                .findFirst()
+                .orElseThrow(() -> new RoundNotFoundException("No active round found for game " + gameId));
+        
+        // Incrementa round_number
+        int oldRoundNumber = lastRound.getRoundNumber();
+        lastRound.setRoundNumber(oldRoundNumber + 1);
+        
+        logger.info("Incrementing round attempt for game {}, round {}: attempt {} -> {}", 
+                gameId, lastRound.getId(), oldRoundNumber, lastRound.getRoundNumber());
+        
+        // Salva tramite RoundService
+        Round saved = roundService.saveRound(lastRound);
+        
+        return mapperFacade.toDTO(saved);
+    }
 }

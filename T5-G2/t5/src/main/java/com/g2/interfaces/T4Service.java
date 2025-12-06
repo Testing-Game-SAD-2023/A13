@@ -93,6 +93,10 @@ public class T4Service extends BaseService {
                 params -> IncrementCurrentLevel((long) params[0]),
                 Long.class));
 
+        registerAction("IncrementRoundAttempt", new ServiceActionDefinition(
+                params -> IncrementRoundAttempt((long) params[0]),
+                Long.class));
+
         registerAction("GetCurrentLevelForScalata", new ServiceActionDefinition(
                 params -> GetCurrentLevelForScalata((long) params[0], (String) params[1]),
                 Long.class, String.class));
@@ -289,6 +293,23 @@ public class T4Service extends BaseService {
             return callRestPut(endpoint, null, String.class);
         } catch (Exception e) {
             throw new IllegalArgumentException("[IncrementCurrentLevel]: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Incrementa il contatore di tentativi (round_number) dell'ultimo Round attivo.
+     * Usato in modalità Scalata quando il giocatore fallisce un livello e vuole riprovare.
+     * 
+     * @param gameId ID del game
+     * @return Risposta dal server (RoundDTO in JSON)
+     */
+    private String IncrementRoundAttempt(long gameId) {
+        final String endpoint = "/games/%s/rounds/last/increment-attempt".formatted(gameId);
+        
+        try {
+            return callRestPut(endpoint, null, String.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[IncrementRoundAttempt]: " + e.getMessage());
         }
     }
 

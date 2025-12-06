@@ -91,4 +91,14 @@ public class RoundService {
         round.setClosedAt(Timestamp.from(Instant.now()));
         return roundRepository.save(round);
     }
+
+    /**
+     * Salva un round modificato.
+     *
+     * @param round il round da salvare
+     * @return il round salvato
+     */
+    public Round saveRound(Round round) {
+        return roundRepository.save(round);
+    }
 }

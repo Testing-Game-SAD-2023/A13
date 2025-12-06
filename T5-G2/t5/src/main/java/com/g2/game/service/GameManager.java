@@ -454,11 +454,16 @@ public class GameManager {
                 Integer tempoMax = (Integer) currentLevelData.get("tempoMax");
                 scalataGame.setRemainingTime(tempoMax != null ? tempoMax : 600);
                 
-                logger.info("[EndGame] Tempo resettato a {} secondi per riprovare livello {}", 
+                // Reset currentTurn a 0 (così il primo Turn del nuovo tentativo sarà 1)
+                scalataGame.setCurrentTurn(0);
+                
+                logger.info("[EndGame] Tempo resettato a {} secondi, currentTurn resettato a 0 per riprovare livello {}", 
                            tempoMax, currentLevel);
                 
-                // TODO: Quando implementeremo la rotta in T4, incrementare round_number qui
-                // scalataGame.getServiceManager().handleRequest("T4", "IncrementRoundAttempt", gameId);
+                // Incrementa round_number in T4 per tracciare il tentativo fallito
+                long gameId = scalataGame.getGameID();
+                scalataGame.getServiceManager().handleRequest("T4", "IncrementRoundAttempt", gameId);
+                logger.info("[EndGame] Round attempt incrementato in T4 per game {}", gameId);
                 
                 // Salva la sessione con tempo resettato
                 sessionService.updateGameMode(currentGame.getPlayerID(), currentGame);

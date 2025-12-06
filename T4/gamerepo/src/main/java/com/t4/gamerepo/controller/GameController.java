@@ -406,6 +406,35 @@ public class GameController {
     }
 
     @Operation(
+            summary = "Increment round attempt counter",
+            description = "Increments the round_number of the last active round for a game (used when player retries a failed level in Scalata)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Round attempt incremented successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoundDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Game or active round not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorBackend.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Game is not in progress",
+                    content = @Content(schema = @Schema(implementation = ApiErrorBackend.class))
+            )
+    })
+    @PutMapping("/{gameId}/rounds/last/increment-attempt")
+    public ResponseEntity<RoundDTO> incrementLastRoundAttempt(
+            @Parameter(name = "gameId", description = "Id of the game", required = true)
+            @PathVariable Long gameId) {
+        RoundDTO updated = gameService.incrementLastRoundAttempt(gameId);
+        return ResponseEntity.ok(updated);
+    }
+
+    @Operation(
             summary = "Get current level for a player's Scalata in progress",
             description = "Returns the current level of a STARTED Scalata game for the given player and scalata name. Returns 1 if no game is found."
     )
