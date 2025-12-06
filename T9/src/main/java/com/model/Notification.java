@@ -1,58 +1,106 @@
 package com.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import java.time.Instant;
 
 @Entity
-@Table(name = "notification")
+@Table(name = "notifications")
 public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "message", nullable = false, length = 500)
-    private String message;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    @Column(name = "recipient", nullable = false, length = 255)
-    private String recipient;
+    @Column(name = "type", nullable = false, length = 100)
+    private String type;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
-    @Column(name = "read", nullable = false)
-    private boolean read;
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead;
+
+    @Column(name = "title", nullable = false, length = 200)
+    private String title;
+
+    @Column(name = "body", nullable = false, columnDefinition = "text")
+    private String body;
 
     // Costruttore vuoto richiesto da JPA
-    public Notification() {}
-
-    // Costruttore completo
-    public Notification(String message, String recipient, LocalDateTime createdAt, boolean read) {
-        this.message = message;
-        this.recipient = recipient;
-        this.createdAt = createdAt;
-        this.read = read;
+    public Notification() {
+        this.createdAt = Instant.now();
+        this.isRead = false;
     }
 
-    // Getter e Setter
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // Costruttore di comodo (senza id)
+    public Notification(Long userId, String type, String title, String body) {
+        this.userId = userId;
+        this.type = type;
+        this.title = title;
+        this.body = body;
+        this.createdAt = Instant.now();
+        this.isRead = false;
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    // Getter e setter
 
-    public String getRecipient() { return recipient; }
-    public void setRecipient(String recipient) { this.recipient = recipient; }
+    public Long getId() {
+        return id;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public boolean isRead() { return read; }
-    public void setRead(boolean read) { this.read = read; }
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    // In genere non si cambia createdAt, ma il setter può servire a JPA
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
 }
