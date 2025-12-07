@@ -414,7 +414,10 @@ public class GameManager {
                 scalataGame.setClassUTName(nextClassName);
                 scalataGame.setRemainingTime(nextTempoMax != null ? nextTempoMax : 600);
                 
-                logger.info("[EndGame] Dati livello {} caricati: class={}, tempo={}, opponent={}", 
+                // Reset currentTurn a 0 per il nuovo livello (così il primo Turn sarà 1)
+                scalataGame.setCurrentTurn(0);
+                
+                logger.info("[EndGame] Dati livello {} caricati: class={}, tempo={}, opponent={}, currentTurn resettato a 0", 
                            nextLevel, nextClassName, nextTempoMax, nextOpponentName);
                 
                 // Salva la sessione aggiornata con i dati del livello successivo

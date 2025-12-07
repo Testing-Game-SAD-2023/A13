@@ -143,7 +143,7 @@ docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, game
 ```
 ### Query diretta per visualizzare i round
 ```bash
-docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, round_number, classut, type, difficulty, started_at FROM rounds ORDER BY id DESC LIMIT 10;"
+docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, round_number, classut, type, difficulty, started_at, closed_at FROM rounds ORDER BY id DESC LIMIT 10;"
 ```
 
 ## 1. Leggi dettagli di un Game

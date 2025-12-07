@@ -127,27 +127,27 @@
             <!-- Separatore -->
             <span style="margin: 0 1.5rem; color: #6c757d;">|</span>
             
-            <!-- Livelli totali -->
-            <span class="card-text" style="display: inline-block; margin-right: 1.5rem;">
-              <i class="fas fa-layer-group"></i>
-              <strong>Livelli totali:</strong> 
-              <span class="badge badge-primary" 
-                    th:text="${scalata.totalLevels}">0</span>
-            </span>
-            
-            <!-- Separatore -->
-            <span style="margin: 0 0.5rem; color: #6c757d;">|</span>
-            
             <!-- Descrizione -->
             <span class="card-text text-muted" 
-                  style="display: inline-block;"
+                  style="display: inline-block; min-width: 250px;"
                   th:if="${scalata.description}"
                   th:text="${scalata.description}">
               Scalata di test
             </span>
             <small class="text-muted" 
-                   style="display: inline-block;"
+                   style="display: inline-block; min-width: 250px;"
                    th:unless="${scalata.description}">Clicca per selezionare</small>
+            
+            <!-- Separatore -->
+            <span style="margin: 0 1.5rem; color: #6c757d;">|</span>
+            
+            <!-- Livelli totali -->
+            <span class="card-text" style="display: inline-block;">
+              <i class="fas fa-layer-group"></i>
+              <strong>Livelli totali:</strong> 
+              <span class="badge badge-primary" 
+                    th:text="${scalata.totalLevels}">0</span>
+            </span>
           </div>
         </div>
       </div>
