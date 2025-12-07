@@ -1,4 +1,4 @@
-package com.t10;
+package com.t10.model.dto;
 
 public class NotificationResponseDTO {
 

@@ -1,4 +1,4 @@
-package com.t10;
+package com.t10.communication;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

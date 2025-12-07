@@ -1,7 +1,7 @@
 package com.t10;
 
-import com.t10.NotificationProducer;
-import com.t10.NotificationDTO;
+import com.t10.communication.NotificationProducer;
+import com.t10.model.dto.NotificationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -41,6 +41,6 @@ public class AchievementTestRunner implements CommandLineRunner {
         notificationProducer.sendCreateNotification(dto);
 
         log.info("T10 - DTO inviato, in attesa della risposta sulla coda {}",
-                com.t10.ClientRabbitConfig.REPLY_QUEUE);
+                com.t10.communication.ClientRabbitConfig.REPLY_QUEUE);
     }
 }

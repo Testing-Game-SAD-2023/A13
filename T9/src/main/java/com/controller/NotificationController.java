@@ -1,6 +1,6 @@
 package com.controller;
 
-import com.model.dto.NotificationResponseDTO;
+import com.model.dto.NotificationRestDTO;
 import com.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,32 +23,32 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    //  Recupera tutte le notifiche di un user (con filtri opzionali)
+    // Recupera tutte le notifiche di un user (con filtri opzionali)
     @GetMapping("/{userId}")
-    public ResponseEntity<List<NotificationResponseDTO>> getNotifications(
+    public ResponseEntity<List<NotificationRestDTO>> getNotifications(
             @PathVariable Long userId,
             @RequestParam(required = false) Boolean read,
             @RequestParam(required = false) String type
     ) {
-        List<NotificationResponseDTO> notifications =
+        List<NotificationRestDTO> notifications =
                 notificationService.getUserNotifications(userId, read, type);
 
         return ResponseEntity.ok(notifications);
     }
 
-    //  Recupera una singola notifica per ID
+    // Recupera una singola notifica per ID
     @GetMapping("/{userId}/{notificationId}")
-    public ResponseEntity<NotificationResponseDTO> getNotification(
+    public ResponseEntity<NotificationRestDTO> getNotification(
             @PathVariable Long userId,
             @PathVariable Long notificationId
     ) {
-        NotificationResponseDTO dto =
+        NotificationRestDTO dto =
                 notificationService.getNotification(userId, notificationId);
 
         return ResponseEntity.ok(dto);
     }
 
-    //  Segna una notifica come letta
+    // Segna una notifica come letta
     @PatchMapping("/{userId}/{notificationId}/read")
     public ResponseEntity<Void> markAsRead(
             @PathVariable Long userId,
@@ -58,7 +58,7 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
-    //  Elimina una singola notifica
+    // Elimina una singola notifica
     @DeleteMapping("/{userId}/{notificationId}")
     public ResponseEntity<Void> deleteNotification(
             @PathVariable Long userId,
@@ -68,7 +68,7 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
-    //  Elimina tutte le notifiche di un user
+    // Elimina tutte le notifiche di un user
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> clearNotifications(
             @PathVariable Long userId
