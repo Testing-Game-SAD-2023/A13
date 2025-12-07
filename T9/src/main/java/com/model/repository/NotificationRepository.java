@@ -19,15 +19,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     // Recupero notifiche in base al tipo (eventualmente filtrate per utente)
     List<Notification> findByUserIdAndTypeOrderByCreatedAtDesc(Long userId, String type);
 
-    // Segna una singola notifica come letta
-    @Modifying
-    @Transactional
-    @Query("UPDATE Notification n SET n.isRead = true WHERE n.id = :notificationId")
-    int markAsRead(Long notificationId);
 
-    // Segna tutte le notifiche di un utente come lette
-    @Modifying
-    @Transactional
-    @Query("UPDATE Notification n SET n.isRead = true WHERE n.userId = :userId AND n.isRead = false")
-    int markAllAsReadByUserId(Long userId);
 }

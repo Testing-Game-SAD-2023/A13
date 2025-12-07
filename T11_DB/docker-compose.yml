@@ -1,0 +1,16 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: t9-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: lukeesposito03@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: stayrovinato
+    ports:
+      - "8081:80"          # UI web su http://localhost:8081
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true
