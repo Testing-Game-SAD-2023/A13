@@ -36,12 +36,12 @@
       "id": 1,
       "options": {
         "edges": {
-          "mainStatUnit": "s",
+          "mainStatUnit": "ms",
           "secondaryStatUnit": "rps"
         },
         "nodes": {
-          "mainStatUnit": "rps",
-          "secondaryStatUnit": "ms"
+          "mainStatUnit": "ms",
+          "secondaryStatUnit": "rps"
         }
       },
       "targets": [

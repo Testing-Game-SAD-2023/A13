@@ -2,22 +2,39 @@ server:
   port: 8090
 
 # Configurazione OpenTelemetry con OpenTelemetry Protocol e OpenTelemetry Collector
-otel:
-  resource:
-    attributes:
-      service:
-        name: API Gateway
-  traces:
-    exporter: otlp
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: "http://otel-collector:4318/v1/traces"
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
+    env:
+      enabled: true
+      show-values: ALWAYS
+    prometheus:
+      enabled: true
   metrics:
-    exporter: otlp
-  exporter:
-    otlp:
-      traces:
-        endpoint: "http://otel-collector:4317"
-        protocol: grpc
-
+    tags:
+      application: apiGateway
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+    export:
+      prometheus:
+        enabled: true
 spring:
+  application:
+    name: apiGateway
   redis: 
     host: redis_rate_limiter
     port: 6380
@@ -135,25 +152,6 @@ logging:
     reactor.netty.http.server: INFO
     io.github.resilience4j: DEBUG # Aggiunto per vedere i log del Circuit Breaker
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    gateway:
-      enabled: true
-    env:
-      enabled: true
-      show-values: ALWAYS
-    prometheus:
-      enabled: true
-  metrics:
-    tags:
-      application: apiGateway
-    export:
-      prometheus:
-        enabled: true
 
 
 # CONFIGURAZIONE RESILIENCE4J 
