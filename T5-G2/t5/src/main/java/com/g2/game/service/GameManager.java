@@ -46,7 +46,9 @@ import testrobotchallenge.commons.models.opponent.GameMode;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -354,11 +356,23 @@ public class GameManager {
         GameLogic currentGame = handleGetCurrentGame(updateParams.getPlayerId(), updateParams.getGameMode());
         logger.info("[EndGame] GameLogic recuperato: gameID={}", currentGame.getGameID());
 
-        // Chiudo la partita
-        if (currentGame instanceof ScalataGame scalataGame
-                && scalataGame.getCurrentLevel() < scalataGame.getTotalLevels()) {
-            handleCloseLevel(scalataGame);
+        // Gestione della chiusura in base alla modalità di gioco
+        if (currentGame instanceof ScalataGame scalataGame) {
+            // Modalità Scalata: verifica se ha completato TUTTA la scalata
+            if (scalataGame.isWinner() 
+                    && scalataGame.getCurrentLevel() == scalataGame.getTotalLevels()) {
+                // Ha completato l'ULTIMO livello con vittoria → chiudi partita completamente
+                logger.info("[EndGame] Scalata completata! Livello {}/{} vinto → chiusura partita",
+                        scalataGame.getCurrentLevel(), scalataGame.getTotalLevels());
+                handleCloseGame(currentGame, false);
+            } else {
+                // O ha perso, o non è ancora all'ultimo livello → gestisci livello (passa al successivo o permetti retry)
+                logger.info("[EndGame] Scalata in corso: livello {}/{}, winner={} → gestione livello",
+                        scalataGame.getCurrentLevel(), scalataGame.getTotalLevels(), scalataGame.isWinner());
+                achievementsUnlocked.addAll(handleCloseLevel(scalataGame));
+            }
         } else {
+            // Altre modalità di gioco → chiudi partita
             handleCloseGame(currentGame, false);
         }
 
@@ -376,11 +390,20 @@ public class GameManager {
                     currentGame.isWinner(), 0, achievementsUnlocked, runGameResponse);
         } else {
             // Gestisco il calcolo e l'aggiornamento dei punti esperienza e degli achievement sbloccati
-            int expGained = playerStatService.assignExperiencePoints(currentGame);
-            achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
+            // Per Scalata: gli XP e achievement sono già stati assegnati in handleCloseLevel
+            // Per altre modalità: li assegniamo qui
+            int expGained = 0;
             
+            if (currentGame instanceof ScalataGame scalataGame 
+                    && scalataGame.getCurrentLevel() <= scalataGame.getTotalLevels()) {
+                // Scalata: livello completato, XP già assegnati in handleCloseLevel
+                logger.info("[EndGame] Scalata: livello completato, XP già assegnati, achievement: {}", achievementsUnlocked);
+            } else {
+                // Modalità normale: assegna XP e achievement qui
+                expGained = playerStatService.assignExperiencePoints(currentGame);
+                achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
+            }
             
-            // Per altre modalità (PartitaSingola, Allenamento, etc.), uso il DTO standard
             return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),
                     currentGame.getScore(currentGame.getUserCompileResult()),
@@ -498,17 +521,29 @@ public class GameManager {
 
     /**
      * Gestisce la chiusura di un livello nella modalità Scalata.
+     * @return lista degli achievement sbloccati durante questo livello
      */
-    public void handleCloseLevel(ScalataGame scalataGame) {
+    public List<String> handleCloseLevel(ScalataGame scalataGame) {
+
+        List<String> achievementsUnlocked = new ArrayList<>();
 
         if (scalataGame.isWinner()) {
-            // Ha vinto il livello: carica dati livello successivo
+            // Ha vinto il livello: assegna XP e achievement PRIMA di cambiare livello
 
             logger.info("[EndGame] Scalata: isWinner={}, isScalataWon={}",
                     scalataGame.isWinner(), scalataGame.isScalataWon());
 
             try {
-                // Incrementa il livello PRIMA di caricare i dati
+                // PRIMA: Assegna XP e sblocca achievement per il livello COMPLETATO (con i dati attuali)
+                logger.info("[EndGame] Assegnazione XP e achievement per livello completato: classe={}",
+                        scalataGame.getClassUTName());
+                
+                int expGained = playerStatService.assignExperiencePoints(scalataGame);
+                achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(scalataGame.getPlayerID()));
+                
+                logger.info("[EndGame] XP assegnati: {}, Achievement sbloccati: {}", expGained, achievementsUnlocked);
+
+                // POI: Incrementa il livello e carica dati livello successivo
                 int oldLevel = scalataGame.getCurrentLevel();
                 scalataGame.setCurrentLevel(oldLevel + 1); // Incrementa currentLevel
                 int nextLevel = scalataGame.getCurrentLevel();
@@ -594,6 +629,7 @@ public class GameManager {
             }
         }
 
+        return achievementsUnlocked;
     }
 
 }
