@@ -2,6 +2,7 @@ package com.groom.manvsclass.api;
 
 import com.groom.manvsclass.model.dto.OpponentDTO;
 import com.groom.manvsclass.model.dto.RequestEvosuiteCoverageDTO;
+import com.groom.manvsclass.service.exception.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -23,6 +24,7 @@ import testrobotchallenge.commons.models.dto.score.EvosuiteCoverageDTO;
 import testrobotchallenge.commons.models.dto.score.JacocoCoverageDTO;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
+
 
 import javax.annotation.PostConstruct;
 import java.nio.file.Files;
@@ -112,14 +114,14 @@ public class ApiGatewayClient {
                     null, HttpMethod.POST, headers, requestBody, String.class);
 
             if (response.getStatusCode().isError()) {
-                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                throw new ExternalServiceException(
                     String.format("Errore durante l'aggiunta dell'avversario per la classe %s (tipo: %s, difficoltà: %s)",
                         classUT, type, difficulty)
                 );
             }
         } catch (Exception e) {
             logger.error("Errore nella chiamata a callAddNewOpponent: {}", e.getMessage(), e);
-            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+            throw new ExternalServiceException(
                 "Errore durante la comunicazione con il servizio utenti per l'aggiunta dell'avversario", e
             );
         }
@@ -131,13 +133,13 @@ public class ApiGatewayClient {
                     null, HttpMethod.DELETE, null, null, String.class);
 
             if (response.getStatusCode().isError()) {
-                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                throw new ExternalServiceException(
                     String.format("Errore durante l'eliminazione degli avversari per la classe %s", classUT)
                 );
             }
         } catch (Exception e) {
             logger.error("Errore nella chiamata a callDeleteAllClassUTOpponents: {}", e.getMessage(), e);
-            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+            throw new ExternalServiceException(
                 "Errore durante la comunicazione con il servizio utenti per l'eliminazione degli avversari", e
             );
         }
@@ -165,7 +167,7 @@ public class ApiGatewayClient {
                     null, HttpMethod.POST, null, requestBody, EvosuiteCoverageDTO.class);
 
             if (response.getStatusCode().isError()) {
-                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                throw new ExternalServiceException(
                     String.format("Errore durante la generazione della copertura Evosuite per la classe %s", classUTName)
                 );
             }
@@ -173,7 +175,7 @@ public class ApiGatewayClient {
             EvosuiteCoverageDTO responseBody = response.getBody();
             if (responseBody == null) {
                 logger.warn("[{}] Evosuite service returned null body for class {}", requestId, classUTName);
-                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                throw new ExternalServiceException(
                     "Il servizio Evosuite ha restituito una risposta vuota"
                 );
             }
@@ -188,7 +190,7 @@ public class ApiGatewayClient {
             throw e; // Re-throw our custom exceptions
         } catch (Exception e) {
             logger.error("[{}] Errore nella chiamata a callGenerateMissingEvoSuiteCoverage: {}", requestId, e.getMessage(), e);
-            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+            throw new ExternalServiceException(
                 "Errore durante la comunicazione con il servizio di copertura Evosuite", e
             );
         }
@@ -209,7 +211,7 @@ public class ApiGatewayClient {
                     null, HttpMethod.POST, headers, reqBody, JacocoCoverageDTO.class);
 
             if (response.getStatusCode().isError()) {
-                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                throw new ExternalServiceException(
                     String.format("Errore durante la generazione della copertura Jacoco per la classe %s", classUTName)
                 );
             }
@@ -217,7 +219,7 @@ public class ApiGatewayClient {
             JacocoCoverageDTO responseBody = response.getBody();
             if (responseBody == null) {
                 logger.warn("Jacoco service returned null body for class {}", classUTName);
-                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                throw new ExternalServiceException(
                     "Il servizio Jacoco ha restituito una risposta vuota"
                 );
             }
@@ -228,7 +230,7 @@ public class ApiGatewayClient {
             throw e; // Re-throw our custom exceptions
         } catch (Exception e) {
             logger.error("Errore nella chiamata a callGenerateMissingJacocoCoverage: {}", e.getMessage(), e);
-            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+            throw new ExternalServiceException(
                 "Errore durante la comunicazione con il servizio di copertura Jacoco", e
             );
         }

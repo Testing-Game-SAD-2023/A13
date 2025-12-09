@@ -1,6 +1,7 @@
 package com.groom.manvsclass.api;
 
 import com.groom.manvsclass.security.JwtRequestContext;
+import com.groom.manvsclass.service.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -55,7 +56,7 @@ public class RestExchangeTemplateHelper {
 
             logger.info("Response received: {}", response);
             if (response.getStatusCode().isError()) {
-                throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+                throw new ExternalServiceException(
                     String.format("Il servizio esterno ha restituito un errore (%s): %s. " +
                         "Verificare che tutti i servizi siano attivi e raggiungibili.",
                         response.getStatusCode(), url)
@@ -65,7 +66,7 @@ public class RestExchangeTemplateHelper {
             return response;
         } catch (RestClientException e) {
             logger.error("REST call failed to {}: {}", url, e.getMessage(), e);
-            throw new com.groom.manvsclass.service.exception.ExternalServiceException(
+            throw new ExternalServiceException(
                 "Impossibile comunicare con il servizio esterno (" + url + "): " + e.getMessage() + ". " +
                 "Verificare la connessione di rete e che il servizio sia attivo.",
                 e
