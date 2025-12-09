@@ -6,31 +6,17 @@ import java.io.File;
 
 public class LevelExtractor {
 
-    private LevelExtractor() {
-        // Utility class
-    }
-
     public static int extractLevelNumber(File levelFolder) {
-        String folderName = levelFolder.toString();
-        int length = folderName.length();
+        String folderName = levelFolder.getPath();
         
-        if (length < 7) {
-            throw new IllegalArgumentException(
-                "Nome cartella livello non valido: '" + folderName + "'. " +
-                "Il nome deve terminare con il formato 'XXLevel' (es: 01Level, 02Level)."
-            );
-        }
+        if(folderName.matches("\\d{2}Level") == false) {
+			throw new IllegalArgumentException(
+				"Nome cartella livello non valido: " + folderName "."
+				+ "Il nome della cartella deve seguire il formato XXLevel (es. 01 Level, 02Level)."
+				);
+		}
         
-        try {
-            String levelStr = folderName.substring(length - 7, length - 5);
-            return Integer.parseInt(levelStr);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                "Impossibile estrarre il numero del livello dalla cartella '" + folderName + "'. " +
-                "Il nome deve contenere un numero a due cifre seguito da 'Level' (es: 01Level, 02Level).",
-                e
-            );
-        }
+		return Integer.parseInt(folderName.substring(0,2));
     }
 
     public static OpponentDifficulty extractDifficulty(File levelFolder) {
