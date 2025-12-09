@@ -17,6 +17,7 @@ public class ScalataParams extends GameParams {
     private int currentLevel;
     private int remainingTime;
     private int totalLevels;
+    private int timeMaxPerLevel;
 
     /**
      * Costruttore per creare una nuova partita Scalata.
@@ -30,15 +31,17 @@ public class ScalataParams extends GameParams {
      * @param difficulty Difficoltà dell'avversario
      * @param remainingTime Tempo rimanente
      * @param totalLevels Numero totale di livelli nella scalata
+     * @param timeMaxPerLevel Tempo massimo per livello
      */
     public ScalataParams(Long playerId, String classUTName, String typeRobot,
                         OpponentDifficulty difficulty, GameMode gameMode, int remainingTime,
-                        String scalataName, int currentLevel, int totalLevels) {
+                        String scalataName, int currentLevel, int totalLevels, int timeMaxPerLevel) {
         super(playerId, classUTName, typeRobot, difficulty, gameMode);
         this.scalataName = scalataName;
         this.currentLevel = currentLevel;
         this.remainingTime = remainingTime;
         this.totalLevels = totalLevels;
+        this.timeMaxPerLevel = timeMaxPerLevel;
     }
 
     /**
@@ -50,15 +53,19 @@ public class ScalataParams extends GameParams {
      * @param testClassCode Codice del test del giocatore
      * @param currentLevel Livello corrente
      * @param remainingTime Tempo rimanente
+     * @param scalataName Nome della scalata
+     * @param totalLevels Numero totale di livelli nella scalata
+     * @param timeMaxPerLevel Tempo massimo per livello
      */
     public ScalataParams(Long playerId, GameMode gameMode, String classUTCode,
                         String testClassCode, String scalataName, int remainingTime,
-                         int totalLevels, int currentLevel) {
+                         int totalLevels, int currentLevel, int timeMaxPerLevel) {
         super(playerId, gameMode, classUTCode, testClassCode);
         this.scalataName = scalataName;
         this.currentLevel = currentLevel;
         this.remainingTime = remainingTime;
         this.totalLevels = totalLevels;
+        this.timeMaxPerLevel = timeMaxPerLevel;
     }
 
     /**
@@ -74,17 +81,20 @@ public class ScalataParams extends GameParams {
      * @param remainingTime Tempo rimanente
      * @param scalataName Nome della scalata
      * @param currentLevel Livello corrente
+     * @param totalLevels Numero totale di livelli nella scalata
+     * @param timeMaxPerLevel Tempo massimo per livello
      */
 
     public ScalataParams(Long playerId, String classUTName, String classUTCode,
                          String typeRobot, OpponentDifficulty difficulty, GameMode mode,
                          String testingClassCode, String scalataName, int remainingTime,
-                         int totalLevels, int currentLevel) {
+                         int totalLevels, int currentLevel, int timeMaxPerLevel) {
         super(playerId, classUTName, classUTCode, typeRobot, difficulty, mode, testingClassCode);
         this.scalataName = scalataName;
         this.currentLevel = currentLevel;
         this.remainingTime = remainingTime;
         this.totalLevels = totalLevels;
+        this.timeMaxPerLevel = timeMaxPerLevel;
     }
 
 

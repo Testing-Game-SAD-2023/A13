@@ -39,5 +39,11 @@ public class ScalataSessionDTO extends SessionDTO {
     @JsonProperty("remainingTime")
     private int remainingTime;
 
+    /**
+     * Tempo massimo consentito per completare ogni livello della scalata.
+     */
+    @JsonProperty("timeMaxPerLevel")
+    private int timeMaxPerLevel;
+
 
 }

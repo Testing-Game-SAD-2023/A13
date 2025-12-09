@@ -16,7 +16,8 @@ public class ScalataFactory implements GameFactoryFunction {
             throw new IllegalArgumentException("Impossibile creare Scalata, params non è del tipo atteso");
         return new ScalataGame( serviceManager, params.getPlayerId(),  params.getClassUTName(),  params.getOpponentType(),
                 params.getOpponentDifficulty(), params.getGameMode(), params.getTestClassCode(), ((ScalataParams) params).getRemainingTime(),
-                ((ScalataParams) params).getScalataName(), ((ScalataParams) params).getCurrentLevel(), ((ScalataParams) params).getTotalLevels()
+                ((ScalataParams) params).getScalataName(), ((ScalataParams) params).getCurrentLevel(), ((ScalataParams) params).getTotalLevels(),
+                ((ScalataParams) params).getTimeMaxPerLevel()
         );
     }
 }

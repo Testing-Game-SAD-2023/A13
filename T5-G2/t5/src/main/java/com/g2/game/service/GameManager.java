@@ -355,6 +355,8 @@ public class GameManager {
         logger.info("[EndGame] GameLogic recuperato: gameID={}", currentGame.getGameID());
 
         // Per Scalata, determina se chiudere o mantenere la sessione
+        /**
+         * -----------------COMMENTO PER ORA PER MIGLIORE IMPLEMENTAZIONE------------------------------
         boolean shouldCloseSession = true;
         boolean shouldLoadNextLevel = false; // Flag per caricare il livello successivo
         
@@ -479,6 +481,13 @@ public class GameManager {
                 logger.warn("[EndGame] Sessione salvata senza reset tempo a causa di errore");
             }
         }
+        **/
+        if (currentGame instanceof ScalataGame scalataGame
+                && scalataGame.getCurrentLevel() < scalataGame.getTotalLevels()) {
+            handleCloseLevel(scalataGame);
+        } else {
+            handleCloseGame(currentGame, false);
+        }
 
         // Determino la forma della risposta in base allo stato di terminazione della partita ed eseguo le operazioni
         // aggiuntive in caso di vittoria
@@ -498,6 +507,7 @@ public class GameManager {
             achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
             
             // Se è una Scalata, restituisco il DTO specifico con informazioni multilivello
+            /** -----------------COMMENTO PER ORA PER MIGLIORE IMPLEMENTAZIONE------------------------------
             if (currentGame instanceof ScalataGame) {
                 ScalataGame scalataGame = (ScalataGame) currentGame;
                 logger.info("[EndGame] Scalata detected: currentLevel={}, totalLevels={}, scalataName='{}'",
@@ -518,6 +528,7 @@ public class GameManager {
             }
             
             // Per altre modalità (PartitaSingola, Allenamento, etc.), uso il DTO standard
+            **/
             return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),
                     currentGame.getScore(currentGame.getUserCompileResult()),
@@ -631,6 +642,106 @@ public class GameManager {
         // Chiudo la partita i T4 e rimuovo la sessione
         gameService.closeGame(currentGame, isGameSurrendered);
         sessionService.removeGameMode(currentGame.getPlayerID(), currentGame.getGameMode(), java.util.Optional.empty());
+    }
+
+    /**
+     * Gestisce la chiusura di un livello nella modalità Scalata.
+     */
+    public void handleCloseLevel(ScalataGame scalataGame) {
+
+        if (scalataGame.isWinner()) {
+            // Ha vinto il livello: carica dati livello successivo
+
+            logger.info("[EndGame] Scalata: isWinner={}, isScalataWon={}",
+                    scalataGame.isWinner(), scalataGame.isScalataWon());
+
+            try {
+                // Incrementa il livello PRIMA di caricare i dati
+                int oldLevel = scalataGame.getCurrentLevel();
+                scalataGame.setCurrentLevel(oldLevel + 1); // Incrementa currentLevel
+                int nextLevel = scalataGame.getCurrentLevel();
+                String scalataName = scalataGame.getScalataName();
+
+                logger.info("[EndGame] Livello {} completato, passaggio al livello {}/{}",
+                        oldLevel, nextLevel, scalataGame.getTotalLevels());
+
+                // Aggiorna currentLevel in T4
+                scalataGame.getServiceManager().handleRequest("T4", "IncrementCurrentLevel", scalataGame.getGameID());
+                logger.info("[EndGame] CurrentLevel aggiornato in T4: gameID={}, newLevel={}", scalataGame.getGameID(), nextLevel);
+
+                logger.info("[EndGame] Caricamento dati livello {} della scalata '{}'", nextLevel, scalataName);
+
+                // Chiama T1 per ottenere i dati del livello successivo
+                Map<String, Object> nextLevelData = (Map<String, Object>) scalataGame.getServiceManager().handleRequest(
+                        "T1", "getLevelByScalataAndPosition", scalataName, nextLevel);
+
+                // Aggiorna ScalataGame con i dati del nuovo livello
+                String nextClassName = (String) nextLevelData.get("className");
+                Integer nextTempoMax = (Integer) nextLevelData.get("tempoMax");
+                String nextOpponentName = (String) nextLevelData.get("opponentName");
+
+                scalataGame.setClassUTName(nextClassName);
+                scalataGame.setRemainingTime(nextTempoMax != null ? nextTempoMax : 600);
+
+                // Reset currentTurn a 0 per il nuovo livello (così il primo Turn sarà 1)
+                scalataGame.setCurrentTurn(0);
+
+                logger.info("[EndGame] Dati livello {} caricati: class={}, tempo={}, opponent={}, currentTurn resettato a 0",
+                        nextLevel, nextClassName, nextTempoMax, nextOpponentName);
+
+                // Salva la sessione aggiornata con i dati del livello successivo
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.info("[EndGame] Sessione aggiornata con dati livello successivo");
+
+                // Chiudi il round precedente PRIMA di crearne uno nuovo
+                scalataGame.getServiceManager().handleRequest("T4", "EndRound", scalataGame.getGameID());
+                logger.info("[EndGame] Round precedente chiuso in T4");
+
+                // Crea un nuovo round in T4 per il livello successivo
+                scalataGame.startRound();
+                logger.info("[EndGame] Nuovo round creato in T4 per livello {}", nextLevel);
+
+            } catch (Exception e) {
+                logger.error("[EndGame] Errore caricamento dati livello successivo: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione con currentLevel aggiornato
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.warn("[EndGame] Sessione salvata senza dati livello successivo a causa di errore");
+            }
+
+        } else {
+            // Ha perso il livello: mantieni sessione attiva per permettere il retry
+            int currentLevel = scalataGame.getCurrentLevel();
+            logger.info("[EndGame] Livello {} fallito, reset dati per nuovo tentativo", currentLevel);
+
+            try {
+
+                // Reset tempo al valore originale del livello
+                int tempoMax = scalataGame.getTimeMaxPerLevel();
+                scalataGame.setRemainingTime(tempoMax);
+
+                // Reset currentTurn a 0 (così il primo Turn del nuovo tentativo sarà 1)
+                scalataGame.setCurrentTurn(0);
+
+                logger.info("[EndGame] Tempo resettato a {} secondi, currentTurn resettato a 0 per riprovare livello {}",
+                        tempoMax, currentLevel);
+
+                // Incrementa round_number in T4 per tracciare il tentativo fallito
+                long gameId = scalataGame.getGameID();
+                scalataGame.getServiceManager().handleRequest("T4", "IncrementRoundAttempt", gameId);
+                logger.info("[EndGame] Round attempt incrementato in T4 per game {}", gameId);
+
+                // Salva la sessione con tempo resettato
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.info("[EndGame] Sessione aggiornata con tempo resettato, giocatore può riprovare");
+
+            } catch (Exception e) {
+                logger.error("[EndGame] Errore caricamento dati livello corrente per reset: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione (con tempo non resettato)
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.warn("[EndGame] Sessione salvata senza reset tempo a causa di errore");
+            }
+        }
+
     }
 
 }
