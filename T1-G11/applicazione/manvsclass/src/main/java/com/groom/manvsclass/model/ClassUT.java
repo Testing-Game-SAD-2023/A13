@@ -25,6 +25,22 @@ public class ClassUT {
     private String description;
     private List<String> category;
 
+	public String getName() {
+		return name;
+	}
+	
+	public String getDifficulty() {
+		return difficulty;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public List<String> getCategory() {
+		return category;
+	}
+
     @Override
     public String toString() {
         return "ClassUT{" +
@@ -37,3 +53,5 @@ public class ClassUT {
     }
 
 }
+
+

@@ -69,7 +69,7 @@
                 <form id="uploadForm">
                     <div class="form-group">
                         <label for="className" th:text="#{uploadRobots_class_name}">Class Name</label>
-                        <input type="text" class="form-control" id="className">
+                        <input type="text" class="form-control" id="className" maxlength=${CLASS_NAME_MAX_LENGTH}>
                     </div>
                     <div class="form-group">
                         <label for="date" th:text="#{uploadRobots_date}">Date</label>
@@ -85,19 +85,19 @@
                     </div>
                     <div class="form-group">
                         <label for="description" th:text="#{uploadRobots_description}">Description</label>
-                        <textarea class="form-control" id="description" rows="3"></textarea>
+                        <textarea class="form-control" id="description" rows="3" maxlength=${CLASS_DESCRIPTION_MAX_LENGTH}></textarea>
                     </div>
                     <div class="form-group">
                         <label for="category1" th:text="#{uploadRobots_category_1}">Category 1</label>
-                        <input type="text" class="form-control" id="category1">
+                        <input type="text" class="form-control" id="category1" maxlength=${CLASS_CATEGORY_MAX_LENGTH}>
                     </div>
                     <div class="form-group">
                         <label for="category2" th:text="#{uploadRobots_category_2}">Category 2</label>
-                        <input type="text" class="form-control" id="category2">
+                        <input type="text" class="form-control" id="category2" maxlength=${CLASS_CATEGORY_MAX_LENGTH}>
                     </div>
                     <div class="form-group">
                         <label for="category3" th:text="#{uploadRobots_category_3}">Category 3</label>
-                        <input type="text" class="form-control" id="category3">
+                        <input type="text" class="form-control" id="category3" maxlength=${CLASS_CATEGORY_MAX_LENGTH}>
                     </div>
                     <div class="form-group">
                         <label for="fileInput" th:text="#{uploadRobots_upload_class_text}">Upload Class</label>

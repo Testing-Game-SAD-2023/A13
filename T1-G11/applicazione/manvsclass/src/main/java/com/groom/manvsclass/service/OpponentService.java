@@ -165,6 +165,11 @@ public class OpponentService {
             );
         }
 
+		if(FormValidation.validateClassUT(classe) == false)
+		{
+			throw new ClassValidationException("Errore: la validazione del form non ha avuto successo.");
+		}
+
         //-------------------------------------------------------------------------------------------
 
         try {

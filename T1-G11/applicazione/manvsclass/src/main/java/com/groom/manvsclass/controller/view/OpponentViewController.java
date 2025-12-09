@@ -3,6 +3,8 @@ package com.groom.manvsclass.controller.view;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.repository.ClassRepository;
 import com.groom.manvsclass.service.OpponentService;
+import com.groom.manvsclass.config.FormValidation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -64,7 +66,11 @@ public class OpponentViewController {
 
     @GetMapping("/upload")
     public ModelAndView showUploadRobots() {
-        return new ModelAndView("opponents/opponents_upload");
+		ModelAndView modelAndView = newModelAndView("opponents/opponents_upload");
+		modelAndView.addObject("CLASS_NAME_MAX_LENGTH", FormValidation.CLASS_NAME_MAX_LENGTH);
+		modelAndView.addObject("CLASS_CATEGORY_MAX_LENGTH", FormValidation.CLASS_CATEGORY_MAX_LENGTH);
+		modelAndView.addObject("CLASS_DESCRIPTION_MAX_LENGTH", FormValidation.CLASS_DESCRIPTION_MAX_LENGTH);
+		return modelAndView;
     }
 
     @GetMapping("/edit")
