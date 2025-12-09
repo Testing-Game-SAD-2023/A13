@@ -72,6 +72,28 @@ public class GameService {
     }
 
     /**
+     * Recupera l'ultima partita Scalata del giocatore.
+     * Verifica lo status: se FINISHED ritorna null, se STARTED o IN_PROGRESS ritorna il game.
+     *
+     * @param playerId l'ID del giocatore
+     * @return il DTO della partita Scalata in corso oppure null se non esiste o se è FINISHED
+     */
+    public GameDTO getLastScalataInProgress(Long playerId) {
+        Game game = gameRepository.findLastScalataByPlayerId(playerId);
+        if (game == null) {
+            return null;
+        }
+        
+        // Se l'ultima partita è FINISHED, ritorna null
+        if (game.getStatus() == GameStatus.FINISHED) {
+            return null;
+        }
+        
+        // Altrimenti ritorna il game (STARTED o IN_PROGRESS)
+        return mapperFacade.toDTO(game);
+    }
+
+    /**
      * Recupera tutte le partite presenti nel database.
      *
      * @return la lista dei DTO di tutte le partite
