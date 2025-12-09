@@ -19,17 +19,20 @@ async function uploadOpponent() {
 
     // Validazione lato client
     if (!name || name.trim() === '') {
-        alert('Inserire il nome della classe.');
+		$('#errorModal').text('Inserire il nome della classe.');
+		$('#errorModal').modal('show');
         return;
     }
 
     if (!file) {
-        alert('Selezionare il file della classe .java da caricare.');
+        $('#errorModal').text('Selezionare il file della classe .java da caricare.');
+		$('#errorModal').modal('show');
         return;
     }
 
     if (!tests) {
-        alert('Selezionare il file ZIP dei test robot da caricare.');
+        $('#errorModal').text('Selezionare il file ZIP dei test robot da caricare.');
+		$('#errorModal').modal('show');
         return;
     }
 

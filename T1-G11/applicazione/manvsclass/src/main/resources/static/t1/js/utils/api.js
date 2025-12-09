@@ -24,8 +24,8 @@ async function handleApiErrors(response) {
             // Create a more structured error display
             const fullMessage = `${errorTitle}${errorStatus}\n\n${message}`;
             
-            // Use alert for now, but this preserves formatting
-            alert(fullMessage);
+            $('#errorModal').text(message);
+			$('#errorModal').modal('show');
             return;
         }
 
@@ -43,22 +43,25 @@ async function handleApiErrors(response) {
             
             if (errorMessages.length > 0) {
                 const errorTitle = errorBody?.message || 'Errori di validazione';
-                alert(`${errorTitle}\n\n${errorMessages.join('\n')}`);
+                $('#errorModal').text(`${errorMessages.join('\n')}`);
+				$('#errorModal').modal('show');
             }
             return;
         }
 
         // Fallback for other error formats
         if (errorBody?.errorMessage) {
-            alert(errorBody.errorMessage);
+            $('#errorModal').text(errorMessage);
+			$('#errorModal').modal('show');
             return;
         }
 
         // Generic fallback
-        alert(errors.notHandled);
+        $('#errorModal').text(errors.notHandled);
+		$('#errorModal').modal('show');
     } catch (e) {
-        console.error('Errore durante la lettura del corpo JSON:', e);
-        alert(errors.notHandled);
+        $('#errorModal').text('Errore durante la lettura del JSON.');
+		$('#errorModal').modal('show');
     }
 }
 
@@ -93,8 +96,8 @@ async function returnDataOnSuccessTemplate({ url, method, headers, body }, parse
         await handleApiErrors(response);
         return null;
     } catch (err) {
-        console.error(`Errore nella chiamata ${method} ${url}:`, err);
-        alert(errors.notHandled);
+        $('#errorModal').text(`Errore nella chiamata ${method} ${url}:`);
+		$('#errorModal').modal('show');
         return null;
     }
 }
@@ -126,8 +129,8 @@ async function redirectOnSuccessTemplate({ url, method, headers, body }, { redir
 
         await handleApiErrors(response);
     } catch (err) {
-        console.error(`Errore nella chiamata ${method} ${url}:`, err);
-        alert(errors.notHandled);
+        $('#errorModal').text(`Errore nella chiamata ${method} ${url}:`);
+		$('#errorModal').modal('show');
     }
 }
 
