@@ -49,7 +49,8 @@ public class GameParamsFactory {
                             scalataRequest.getRemainingTime(),
                             scalataRequest.getScalataName(),
                             scalataRequest.getCurrentLevel(),
-                            scalataRequest.getTotalLevels()
+                            scalataRequest.getTotalLevels(),
+                            scalataRequest.getTimeMaxPerLevel()
                     );
                 } catch (ClassCastException e) {
                     logger.error("Failed to cast StartGameRequestDTO to StartScalataRequestDTO", e);
@@ -106,7 +107,8 @@ public class GameParamsFactory {
                             scalataRequest.getScalataName(),
                             scalataRequest.getRemainingTime(),
                             scalataRequest.getTotalLevels(),
-                            scalataRequest.getCurrentLevel()
+                            scalataRequest.getCurrentLevel(),
+                            scalataRequest.getTimeMaxPerLevel()
                     );
                 } catch (ClassCastException e) {
                     logger.error("Failed to cast RunGameRequestDTO to RunScalataDTO", e);
@@ -164,7 +166,8 @@ public class GameParamsFactory {
                             request.getScalataName(),
                             request.getRemainingTime(),
                             request.getTotalLevels(),
-                            request.getCurrentLevel()
+                            request.getCurrentLevel(),
+                            request.getTimeMaxPerLevel()
                     );
                 } catch (ClassCastException e) {
                     logger.error("Failed to cast SessionDTO to ScalataSessionDTO", e);

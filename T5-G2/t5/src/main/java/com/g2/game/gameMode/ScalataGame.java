@@ -54,6 +54,9 @@ public class ScalataGame extends TurnBasedGame {
     @JsonProperty("totalLevels")
     private int totalLevels;
 
+    @JsonProperty("timeMaxPerLevel")
+    private int timeMaxPerLevel;
+
     // ========================================
     // COSTRUTTORI
     // ========================================
@@ -71,11 +74,12 @@ public class ScalataGame extends TurnBasedGame {
     public ScalataGame(ServiceManager serviceManager, Long playerId, String classUT,
                        String opponentType, OpponentDifficulty difficulty,
                        GameMode gamemode, String testingClassCode, int remainingTime,
-                       String scalataName, int currentLevel, int totalLevels) {
+                       String scalataName, int currentLevel, int totalLevels, int timeMaxPerLevel) {
         super(serviceManager, playerId, classUT, opponentType, difficulty, gamemode, testingClassCode, remainingTime);
         this.currentLevel = currentLevel;
         this.scalataName = scalataName;
         this.totalLevels = totalLevels;
+        this.timeMaxPerLevel = timeMaxPerLevel;
     }
 
     // ========================================
@@ -95,9 +99,7 @@ public class ScalataGame extends TurnBasedGame {
         this.currentLevel = scalataParams.getCurrentLevel();
         this.scalataName = scalataParams.getScalataName();
         this.totalLevels = scalataParams.getTotalLevels();
-        
-        // IMPORTANTE: Aggiorna remainingTime (come fa PartitaSingola)
-        this.remainingTime = scalataParams.getRemainingTime();
+        this.timeMaxPerLevel = scalataParams.getTimeMaxPerLevel();
     }
 
     /**
@@ -117,7 +119,7 @@ public class ScalataGame extends TurnBasedGame {
      * Verifica se l'utente ha vinto la SCALATA COMPLETA.
      */
     public boolean isScalataWon() {
-        return isWinner() && currentLevel >= totalLevels;
+        return currentLevel == totalLevels && isWinner();
     }
 
     /** DA MODIFICARE
@@ -179,7 +181,7 @@ public class ScalataGame extends TurnBasedGame {
             logger.info("[SCALATA] Scalata '{}' abbandonata al livello {}/{}.", 
                        scalataName, currentLevel, totalLevels);
             
-        } else if (isWinner() && isScalataWon()) {
+        } else if (isScalataWon()) {
             // ✅ COMPLETATA → chiudi tutto
             super.endGame(false);
             logger.info("[SCALATA] Scalata '{}' completata con successo! Tutti i {} livelli superati.", 

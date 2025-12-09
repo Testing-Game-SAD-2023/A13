@@ -48,4 +48,11 @@ public class RunScalataDTO extends RunGameRequestDTO {
     @JsonProperty("remainingTime")
     @NotNull(message = "remainingTime is required")
     private int remainingTime;
+
+    /**
+     * Tempo massimo consentito per completare ogni livello della scalata.
+     */
+    @JsonProperty("timeMaxPerLevel")
+    @NotNull(message = "timeMaxPerLevel is required")
+    private int timeMaxPerLevel;
 }
