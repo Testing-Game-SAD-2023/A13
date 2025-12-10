@@ -100,7 +100,13 @@ public class ScalataGame extends TurnBasedGame {
         this.scalataName = scalataParams.getScalataName();
         this.totalLevels = scalataParams.getTotalLevels();
         this.remainingTime = scalataParams.getRemainingTime();
-        this.timeMaxPerLevel = scalataParams.getTimeMaxPerLevel();
+        
+        // Preserva timeMaxPerLevel se il frontend non lo invia (valore default 0)
+        // Il valore corretto è già stato caricato da T1 durante StartGame o handleLevelWon
+        if (scalataParams.getTimeMaxPerLevel() > 0) {
+            this.timeMaxPerLevel = scalataParams.getTimeMaxPerLevel();
+        }
+        // Se è 0, mantieni il valore esistente (non sovrascrivere)
     }
 
     /**
@@ -267,7 +273,7 @@ public class ScalataGame extends TurnBasedGame {
             this.remainingTime = this.timeMaxPerLevel;
             
             // Reset currentTurn a 0 (il primo Turn del nuovo tentativo sarà 1)
-            this.setCurrentTurn(0);
+            //this.setCurrentTurn(0);
             
             logger.info("[SCALATA] Tempo resettato a {} secondi, currentTurn resettato a 0 per riprovare livello {}", 
                        timeMaxPerLevel, currentLevel);
