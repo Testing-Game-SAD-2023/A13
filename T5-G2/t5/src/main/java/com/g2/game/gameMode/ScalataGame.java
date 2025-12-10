@@ -150,9 +150,31 @@ public class ScalataGame extends TurnBasedGame {
     }
 
     /**
-     *  Override di endGame per gestire la logica di fine scalata.
-     *  Se la scalata non è ancora terminata, avvia il livello successivo.
-     *  Altrimenti, conclude la scalata.
+     * Carica i dati del livello corrente da T1.
+     * Chiama il microservizio T1 per ottenere className, tempoMax e opponentName
+     * del livello corrente della scalata.
+     */
+    public void loadLevelData() {
+        logger.info("[SCALATA] Caricamento dati livello {} della scalata '{}'", currentLevel, scalataName);
+        
+        // Chiama T1 per ottenere i dati del livello corrente
+        Map<String, Object> levelData = (Map<String, Object>) getServiceManager().handleRequest(
+                "T1", "getLevelByScalataAndPosition", scalataName, currentLevel);
+        
+        // Popola i dati del gioco con le informazioni del livello
+        this.setClassUTName((String) levelData.get("className"));
+        Integer tempoMax = (Integer) levelData.get("tempoMax");
+        this.remainingTime = tempoMax != null ? tempoMax : 600;
+        this.timeMaxPerLevel = this.remainingTime;
+        this.setTypeRobot("EvoSuite");
+        this.setDifficulty(OpponentDifficulty.EASY);
+
+        logger.info("[SCALATA] Dati livello {} caricati: class={}, tempo={}", 
+                   currentLevel, getClassUTName(), remainingTime);
+    }
+
+    /**
+     *  Override di startGame per gestire la creazione del game in T4 con il nome della scalata.
      */
     @Override
     public void startGame() {
@@ -162,6 +184,102 @@ public class ScalataGame extends TurnBasedGame {
         
         logger.info("[SCALATA] Game created in T4 with ID={}, scalataName='{}'", 
                    getGameID(), scalataName);
+    }
+
+    /**
+     * Gestisce la chiusura di un livello nella modalità Scalata.
+     * - Se il giocatore ha vinto: passa al livello successivo (carica dati da T1, crea nuovo round in T4)
+     * - Se il giocatore ha perso: resetta il livello per permettere un nuovo tentativo
+     */
+    public void handleCloseLevel() {
+        logger.info("[SCALATA] handleCloseLevel chiamato: isWinner={}, currentLevel={}/{}", 
+                   isWinner(), currentLevel, totalLevels);
+        
+        if (isWinner()) {
+            // ✅ HA VINTO IL LIVELLO: passa al livello successivo
+            handleLevelWon();
+        } else {
+            // ❌ HA PERSO IL LIVELLO: resetta per permettere retry
+            handleLevelLost();
+        }
+    }
+
+    /**
+     * Gestisce il caso di vittoria del livello corrente.
+     * Incrementa il livello, carica i dati del prossimo livello da T1 e crea un nuovo round in T4.
+     */
+    private void handleLevelWon() {
+        int oldLevel = currentLevel;
+        currentLevel++; // Incrementa il livello
+        
+        logger.info("[SCALATA] Livello {} completato, passaggio al livello {}/{}", 
+                   oldLevel, currentLevel, totalLevels);
+        
+        try {
+            // Aggiorna currentLevel in T4
+            getServiceManager().handleRequest("T4", "IncrementCurrentLevel", getGameID());
+            logger.info("[SCALATA] CurrentLevel aggiornato in T4: gameID={}, newLevel={}", 
+                       getGameID(), currentLevel);
+            
+            // Carica i dati del livello successivo da T1
+            logger.info("[SCALATA] Caricamento dati livello {} della scalata '{}'", currentLevel, scalataName);
+            
+            Map<String, Object> nextLevelData = (Map<String, Object>) getServiceManager().handleRequest(
+                    "T1", "getLevelByScalataAndPosition", scalataName, currentLevel);
+            
+            // Aggiorna i dati del gioco con il nuovo livello
+            String nextClassName = (String) nextLevelData.get("className");
+            Integer nextTempoMax = (Integer) nextLevelData.get("tempoMax");
+            
+            this.setClassUTName(nextClassName);
+            this.remainingTime = nextTempoMax != null ? nextTempoMax : 600;
+            this.timeMaxPerLevel = this.remainingTime;
+            
+            // Reset currentTurn a 0 per il nuovo livello (il primo Turn sarà 1)
+            this.setCurrentTurn(0);
+            
+            logger.info("[SCALATA] Dati livello {} caricati: class={}, tempo={}, currentTurn resettato a 0", 
+                       currentLevel, nextClassName, nextTempoMax);
+            
+            // Chiudi il round precedente PRIMA di crearne uno nuovo
+            getServiceManager().handleRequest("T4", "EndRound", getGameID());
+            logger.info("[SCALATA] Round precedente chiuso in T4");
+            
+            // Crea un nuovo round in T4 per il livello successivo
+            this.startRound();
+            logger.info("[SCALATA] Nuovo round creato in T4 per livello {}", currentLevel);
+            
+        } catch (Exception e) {
+            logger.error("[SCALATA] Errore caricamento dati livello successivo: {}", e.getMessage(), e);
+            throw new RuntimeException("Errore nel caricamento del livello successivo", e);
+        }
+    }
+
+    /**
+     * Gestisce il caso di sconfitta del livello corrente.
+     * Resetta il tempo e il turno per permettere al giocatore di riprovare.
+     */
+    private void handleLevelLost() {
+        logger.info("[SCALATA] Livello {} fallito, reset dati per nuovo tentativo", currentLevel);
+        
+        try {
+            // Reset tempo al valore originale del livello
+            this.remainingTime = this.timeMaxPerLevel;
+            
+            // Reset currentTurn a 0 (il primo Turn del nuovo tentativo sarà 1)
+            this.setCurrentTurn(0);
+            
+            logger.info("[SCALATA] Tempo resettato a {} secondi, currentTurn resettato a 0 per riprovare livello {}", 
+                       timeMaxPerLevel, currentLevel);
+            
+            // Incrementa round_number in T4 per tracciare il tentativo fallito
+            getServiceManager().handleRequest("T4", "IncrementRoundAttempt", getGameID());
+            logger.info("[SCALATA] Round attempt incrementato in T4 per game {}", getGameID());
+            
+        } catch (Exception e) {
+            logger.error("[SCALATA] Errore reset dati livello corrente: {}", e.getMessage(), e);
+            throw new RuntimeException("Errore nel reset del livello", e);
+        }
     }
 
     /**

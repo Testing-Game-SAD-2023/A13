@@ -80,7 +80,7 @@ function startGameRequest(requestData) {
                 reject(xhr.responseJSON || xhr.responseText);
             },
         });
-    });
+    }); // farsi dare dalla post il nome della classe
 }
 
 // Variabile globale per tenere traccia della scalata selezionata
@@ -97,6 +97,13 @@ let selectedScalata = null;
 function updateDOMWithPreviousScalataData(sessionData) {
     if (sessionData) {
         console.log("[gamemode_scalata] Scalata in corso, mostro scheda continua");
+        console.log("[gamemode_scalata] ========== DEBUG SESSION DATA ==========");
+        console.log("[gamemode_scalata] Session Data completo:", JSON.stringify(sessionData, null, 2));
+        console.log("[gamemode_scalata] remainingTime:", sessionData.remainingTime);
+        console.log("[gamemode_scalata] timeMaxPerLevel:", sessionData.timeMaxPerLevel);
+        console.log("[gamemode_scalata] currentLevel:", sessionData.currentLevel);
+        console.log("[gamemode_scalata] class_ut:", sessionData.class_ut);
+        console.log("[gamemode_scalata] =========================================");
         
         // Nascondi container scalate
         const scalateContainer = document.getElementById("scalate-container");
@@ -118,44 +125,16 @@ function updateDOMWithPreviousScalataData(sessionData) {
         
         // Formatta e mostra il tempo rimanente
         const remainingTime = sessionData.remainingTime || 0;
+        console.log("[gamemode_scalata] Tempo da mostrare:", remainingTime, "→", formatTime(remainingTime));
         document.getElementById("gamemode_time_limit").innerText = formatTime(remainingTime);
         
-        // ✅ NUOVO: Configura il bottone "Riprendi partita" per recuperare i dati del livello corrente
+        // Configura il bottone "Riprendi partita"
+        // I dati del livello sono già nella sessione Redis (incluso class_ut del livello corrente)
         const linkRiprendi = document.getElementById("Continua");
+        const classUT = sessionData.class_ut || "FTPFile"; // Fallback nel caso remoto in cui class_ut sia null
+        linkRiprendi.href = `/editor?ClassUT=${classUT}&mode=Scalata`;
         
-        // Invece di usare href statico, usiamo onclick per chiamare fetchCurrentLevel
-        linkRiprendi.href = "javascript:void(0);"; // Previene il redirect di default
-        linkRiprendi.onclick = async function(e) {
-            e.preventDefault(); // Blocca il comportamento di default
-            
-            const currentLevel = sessionData.currentLevel || 1;
-            const scalataName = sessionData.scalataName;
-            
-            console.log(`[gamemode_scalata] Recupero dati livello ${currentLevel} di "${scalataName}"`);
-            
-            try {
-                // 1. Recupera i dati del livello corrente da T1
-                const levelData = await fetchCurrentLevel(scalataName, currentLevel);
-                
-                if (!levelData || levelData.error) {
-                    console.error("[gamemode_scalata] Errore recupero livello:", levelData);
-                    swal("Errore!", "Impossibile recuperare i dati del livello corrente", "error");
-                    return;
-                }
-                
-                console.log("[gamemode_scalata] Dati livello corrente ricevuti:", levelData);
-                
-                // 2. Redirect all'editor con la classe del livello corrente
-                const classUT = levelData.className;
-                window.location.href = `/editor?ClassUT=${classUT}&mode=Scalata&remainingTime=${remainingTime}`;
-                
-            } catch (error) {
-                console.error("[gamemode_scalata] Errore nel recupero del livello:", error);
-                swal("Errore!", "Si è verificato un errore. Riprova più tardi.", "error");
-            }
-        };
-        
-        console.log("[gamemode_scalata] Bottone 'Riprendi' configurato per livello", sessionData.currentLevel);
+        console.log("[gamemode_scalata] Bottone 'Riprendi' configurato per livello", sessionData.currentLevel, "classe:", classUT);
         
     } else {
         console.log("[gamemode_scalata] Nessuna scalata in corso, mostro scheda nuovo");
@@ -297,9 +276,8 @@ function selectScalata($card) {
 
 /**
  * Avvia la scalata selezionata
- * 1. Recupera il primo livello da T1
- * 2. Prepara i dati per StartGame
- * 3. Effettua la chiamata POST
+ * T5 si occupa di chiamare T1 internamente tramite ScalataGame.loadLevelData()
+ * Il frontend invia solo: playerId, mode, scalataName, totalLevels, currentLevel
  */
 async function startScalata() {
     if (!selectedScalata) {
@@ -312,83 +290,39 @@ async function startScalata() {
 
     console.log("[gamemode_scalata] Avvio scalata:", selectedScalata);
 
-    // 1. CHIAMATA T1 PER OTTENERE IL PRIMO LIVELLO
-    const firstLevel = await fetchCurrentLevel(selectedScalata.name, 1);
-    
-    if (!firstLevel) {
-        console.error("Impossibile recuperare il primo livello della scalata");
-        swal({
-            title: "Errore!",
-            text: "Impossibile recuperare i dati del primo livello. Riprova più tardi.",
-            icon: "error",
-            button: "OK"
-        });
-        return;
-    }
-
-    console.log("[gamemode_scalata] Dati primo livello ricevuti da T1:", firstLevel);
-    
-    // Verifica se c'è un errore nella risposta
-    if (firstLevel.error) {
-        console.error("[gamemode_scalata] Errore dal backend:", firstLevel.error);
-        swal({
-            title: "Errore!",
-            text: firstLevel.error,
-            icon: "error",
-            button: "OK"
-        });
-        return;
-    }
-
-    // 2. MAPPA I CAMPI DA T1 AL FORMATO RICHIESTO
-    // T1 ritorna: { idLevel, scalataName, className, tempoMax, opponentName }
-    // StartScalataRequestDTO richiede: { underTestClassName, typeRobot, difficulty, remainingTime }
-    
-    const underTestClassName = firstLevel.className;  // ← Corretto!
-    const typeRobot = "EvoSuite";  // ← Default, T1 non lo fornisce ancora
-    const difficulty = "EASY";    // ← Default, T1 non lo fornisce ancora
-    const remainingTime = parseInt(firstLevel.tempoMax) || 300;  // ← Assicura sia int
-    
-    // Validazione campi obbligatori
-    if (!underTestClassName) {
-        console.error("[gamemode_scalata] className mancante nei dati del livello");
-        swal({
-            title: "Errore!",
-            text: "Dati del livello incompleti: classe di test mancante",
-            icon: "error",
-            button: "OK"
-        });
-        return;
-    }
-
-    // 3. PREPARA I DATI PER StartGame
+    // PREPARA I DATI MINIMI PER StartGame
+    // T5 chiamerà T1 internamente per ottenere className, remainingTime, ecc.
     let requestData = {
         playerId: playerId,
         mode: mode,
         scalataName: selectedScalata.name,
         currentLevel: 1,  // Inizia sempre dal livello 1
-        totalLevels: selectedScalata.totalLevels,
-        underTestClassName: underTestClassName,
-        typeRobot: typeRobot,
-        difficulty: difficulty,
-        remainingTime: remainingTime
+        totalLevels: selectedScalata.totalLevels
     };
     
-    console.log("[gamemode_scalata] RequestData preparato per StartGame:", JSON.stringify(requestData, null, 2));
+    console.log("[gamemode_scalata] Richiesta StartGame:", JSON.stringify(requestData, null, 2));
 
-    // 4. CHIAMATA AJAX (stessa di PartitaSingola)
-    console.log("[gamemode_scalata] Invio richiesta StartGame:", requestData);
-    
+    // CHIAMATA A T5 (che chiamerà T1 internamente)
     startGameRequest(requestData)
         .then((response) => {
             console.log("[gamemode_scalata] StartGame response:", response);
-            if (mode === "Scalata")
-					timer_remainingTime = remainingTime;
-                    scalata_name = selectedScalata.name;
-                    scalata_currentLevel = 1;
-                    scalata_totalLevels = selectedScalata.totalLevels;
-
-            window.location.href = `/editor?ClassUT=${underTestClassName}&mode=${mode}`;
+            
+            // T5 ha caricato i dati del livello da T1
+            // Ora possiamo reindirizzare all'editor
+            if (mode === "Scalata") {
+                // Nota: questi dati verranno caricati dalla sessione nell'editor
+                scalata_name = selectedScalata.name;
+                scalata_currentLevel = 1;
+                scalata_totalLevels = selectedScalata.totalLevels;
+                //scalata_classUTName = response.classUTName; // Recupera className dalla response
+               // console.log("[gamemode_scalata] Dati scalata impostati per l'editor");
+            }
+                if (!response.classUTName) {
+                swal("Errore!", "Classe non disponibile, impossibile avviare la partita.", "error");
+                return;
+                }
+            // Redirect all'editor - la className verrà recuperata dalla sessione
+            window.location.href = `/editor?ClassUT=${response.classUTName}&mode=${mode}`;
         })
         .catch((error) => {
             console.error("Errore nell'avvio della scalata:", error);
@@ -414,32 +348,6 @@ async function startScalata() {
                 button: "OK"
             });
         });
-}
-
-/**
- * Recupera i dati di un livello specifico della scalata da T1
- * @param {string} scalataName - Nome della scalata
- * @param {number} currentLevel - Numero del livello corrente da recuperare
- * @returns {Promise<Object>} Dati del livello richiesto (classUT, robot, difficulty, tempoMax, etc.)
- */
-async function fetchCurrentLevel(scalataName, currentLevel) {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: `/scalata/${scalataName}/level/${currentLevel}`,
-            type: "GET",
-            xhrFields: {
-                withCredentials: true
-            },
-            success: function (response) {
-                console.log(`[gamemode_scalata] Livello ${currentLevel} recuperato:`, response);
-                resolve(response);
-            },
-            error: function (xhr) {
-                console.error(`[gamemode_scalata] Errore recupero livello ${currentLevel}:`, xhr);
-                reject(xhr.responseJSON || xhr.responseText);
-            }
-        });
-    });
 }
 
 // ------------------------------

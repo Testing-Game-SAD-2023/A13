@@ -17,10 +17,10 @@
 
 package com.g2.game.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.game.gameDTO.EndGameDTO.EndGameResponseDTO;
-import com.g2.game.gameDTO.EndGameDTO.EndScalataGameResponseDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameRequestDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameResponseDTO;
 import com.g2.game.gameDTO.StartGameDTO.StartGameRequestDTO;
@@ -28,13 +28,15 @@ import com.g2.game.gameDTO.StartGameDTO.StartGameResponseDTO;
 import com.g2.game.gameFactory.params.GameParams;
 import com.g2.game.gameFactory.params.GameParamsFactory;
 import com.g2.game.gameMode.Compile.CompileResult;
+import com.g2.interfaces.ServiceManager;
 import com.g2.game.gameMode.GameLogic;
 import com.g2.game.gameMode.ScalataGame;
-import com.g2.interfaces.ServiceManager;
 import com.g2.model.configuration.GameExecutionConfig;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.session.SessionService;
 import jakarta.annotation.PostConstruct;
+import lombok.Setter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,13 +45,13 @@ import org.springframework.stereotype.Service;
 import testrobotchallenge.commons.models.dto.score.EvosuiteCoverageDTO;
 import testrobotchallenge.commons.models.dto.score.JacocoCoverageDTO;
 import testrobotchallenge.commons.models.opponent.GameMode;
+import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,8 +74,13 @@ public class GameManager {
     private String turnExecutionConfigFile;
     private GameExecutionConfig config;
 
-    public GameManager(GameService gameService, SessionService sessionService,
+    @Setter
+    @JsonIgnore
+    private transient ServiceManager serviceManager;
+
+    public GameManager(ServiceManager serviceManager, GameService gameService, SessionService sessionService,
                        PlayerStatService playerStatService, LogWriterService logWriterService) {
+        this.serviceManager = serviceManager;
         this.gameService = gameService;
         this.sessionService = sessionService;
         this.playerStatService = playerStatService;
@@ -110,12 +117,19 @@ public class GameManager {
      * e lo stato della creazione ("created")
      */
     public StartGameResponseDTO handleStartNewGame(StartGameRequestDTO requestDTO) {
-        // Converto il dto
+
+        // Se è Scalata, carica i dati del livello da T1
+        // Se è Scalata, popola il DTO con i dati reali del primo livello
+        if (requestDTO instanceof com.g2.game.gameDTO.StartGameDTO.StartScalataRequestDTO scalataDTO) {
+            populateFirstLevelDataForScalata(scalataDTO);
+        }
+
+                // Converto il dto
         GameParams gameParams = GameParamsFactory.generateCreateParams(requestDTO);
 
         // Creo una nuova partita, modellata da GameLogic
         GameLogic gameLogic = gameService.createNewGame(gameParams);
-
+        
         // Registra la creazione in T4
         gameLogic.startGame();
         gameLogic.startRound();
@@ -132,8 +146,29 @@ public class GameManager {
          */
         GameProgressDTO progress = gameService.createNewGameProgress(gameParams);
         logger.info("createGame: creato/recuperato con successo progress {} per playerId={}.", progress, gameLogic.getPlayerID());
-
-        return new StartGameResponseDTO(gameLogic.getGameID(), "created");
+        
+        return new StartGameResponseDTO(gameLogic.getGameID(), "created", gameLogic.getClassUTName());
+    }
+    
+    /**
+     * Popola il DTO di Scalata con i dati reali del primo livello da T1.
+     * Aggiorna i campi di requestDTO con classUTName, remainingTime, timeMaxPerLevel, ecc.
+     */
+    private void populateFirstLevelDataForScalata(com.g2.game.gameDTO.StartGameDTO.StartScalataRequestDTO requestDTO) {
+        // Chiama T1 per ottenere i dati del primo livello
+        int livello = requestDTO.getCurrentLevel() > 0 ? requestDTO.getCurrentLevel() : 1;
+        java.util.Map<String, Object> levelData = (java.util.Map<String, Object>) serviceManager.handleRequest(
+                "T1", "getLevelByScalataAndPosition", requestDTO.getScalataName(), livello);
+            
+        // Popola i dati nel DTO
+        requestDTO.setClassUTName((String) levelData.get("className"));
+        requestDTO.setTypeRobot("EvoSuite");
+        requestDTO.setDifficulty(OpponentDifficulty.EASY);
+        Integer tempoMax = (Integer) levelData.get("tempoMax");
+        int time = tempoMax != null ? tempoMax : 600;
+        requestDTO.setRemainingTime(time);
+        requestDTO.setTimeMaxPerLevel(time);
+        // Se vuoi puoi popolare anche altri campi se servono
     }
 
 
@@ -521,111 +556,60 @@ public class GameManager {
 
     /**
      * Gestisce la chiusura di un livello nella modalità Scalata.
+     * Delega tutta la logica a ScalataGame e aggiorna la sessione.
      * @return lista degli achievement sbloccati durante questo livello
      */
     public List<String> handleCloseLevel(ScalataGame scalataGame) {
-
         List<String> achievementsUnlocked = new ArrayList<>();
 
         if (scalataGame.isWinner()) {
             // Ha vinto il livello: assegna XP e achievement PRIMA di cambiare livello
-
-            logger.info("[EndGame] Scalata: isWinner={}, isScalataWon={}",
-                    scalataGame.isWinner(), scalataGame.isScalataWon());
+            logger.info("[CLOSE_LEVEL] Livello {} vinto, assegnazione XP e achievement", 
+                       scalataGame.getCurrentLevel());
 
             try {
-                // PRIMA: Assegna XP e sblocca achievement per il livello COMPLETATO (con i dati attuali)
-                logger.info("[EndGame] Assegnazione XP e achievement per livello completato: classe={}",
-                        scalataGame.getClassUTName());
-                
+                // Assegna XP e sblocca achievement per il livello COMPLETATO
                 int expGained = playerStatService.assignExperiencePoints(scalataGame);
                 achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(scalataGame.getPlayerID()));
                 
-                logger.info("[EndGame] XP assegnati: {}, Achievement sbloccati: {}", expGained, achievementsUnlocked);
+                logger.info("[CLOSE_LEVEL] XP assegnati: {}, Achievement: {}", expGained, achievementsUnlocked);
 
-                // POI: Incrementa il livello e carica dati livello successivo
-                int oldLevel = scalataGame.getCurrentLevel();
-                scalataGame.setCurrentLevel(oldLevel + 1); // Incrementa currentLevel
-                int nextLevel = scalataGame.getCurrentLevel();
-                String scalataName = scalataGame.getScalataName();
-
-                logger.info("[EndGame] Livello {} completato, passaggio al livello {}/{}",
-                        oldLevel, nextLevel, scalataGame.getTotalLevels());
-
-                // Aggiorna currentLevel in T4
-                scalataGame.getServiceManager().handleRequest("T4", "IncrementCurrentLevel", scalataGame.getGameID());
-                logger.info("[EndGame] CurrentLevel aggiornato in T4: gameID={}, newLevel={}", scalataGame.getGameID(), nextLevel);
-
-                logger.info("[EndGame] Caricamento dati livello {} della scalata '{}'", nextLevel, scalataName);
-
-                // Chiama T1 per ottenere i dati del livello successivo
-                Map<String, Object> nextLevelData = (Map<String, Object>) scalataGame.getServiceManager().handleRequest(
-                        "T1", "getLevelByScalataAndPosition", scalataName, nextLevel);
-
-                // Aggiorna ScalataGame con i dati del nuovo livello
-                String nextClassName = (String) nextLevelData.get("className");
-                Integer nextTempoMax = (Integer) nextLevelData.get("tempoMax");
-                String nextOpponentName = (String) nextLevelData.get("opponentName");
-
-                scalataGame.setClassUTName(nextClassName);
-                scalataGame.setRemainingTime(nextTempoMax != null ? nextTempoMax : 600);
-
-                // Reset currentTurn a 0 per il nuovo livello (così il primo Turn sarà 1)
-                scalataGame.setCurrentTurn(0);
-
-                logger.info("[EndGame] Dati livello {} caricati: class={}, tempo={}, opponent={}, currentTurn resettato a 0",
-                        nextLevel, nextClassName, nextTempoMax, nextOpponentName);
-
-                // Salva la sessione aggiornata con i dati del livello successivo
+                // Delega a ScalataGame la gestione del livello (carica dati da T1, chiama T4)
+                scalataGame.handleCloseLevel();
+                
+                // Aggiorna la sessione con i dati del livello successivo
                 sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
-                logger.info("[EndGame] Sessione aggiornata con dati livello successivo");
-
-                // Chiudi il round precedente PRIMA di crearne uno nuovo
-                scalataGame.getServiceManager().handleRequest("T4", "EndRound", scalataGame.getGameID());
-                logger.info("[EndGame] Round precedente chiuso in T4");
-
-                // Crea un nuovo round in T4 per il livello successivo
-                scalataGame.startRound();
-                logger.info("[EndGame] Nuovo round creato in T4 per livello {}", nextLevel);
+                logger.info("[CLOSE_LEVEL] Sessione aggiornata con dati livello successivo");
 
             } catch (Exception e) {
-                logger.error("[EndGame] Errore caricamento dati livello successivo: {}", e.getMessage(), e);
-                // In caso di errore, salva comunque la sessione con currentLevel aggiornato
+                logger.error("[CLOSE_LEVEL] Errore gestione livello: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione
                 sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
-                logger.warn("[EndGame] Sessione salvata senza dati livello successivo a causa di errore");
+                logger.warn("[CLOSE_LEVEL] Sessione salvata nonostante errore");
             }
 
         } else {
-            // Ha perso il livello: mantieni sessione attiva per permettere il retry
-            int currentLevel = scalataGame.getCurrentLevel();
-            logger.info("[EndGame] Livello {} fallito, reset dati per nuovo tentativo", currentLevel);
+            // Ha perso il livello: delega a ScalataGame il reset
+            logger.info("[CLOSE_LEVEL] Livello {} fallito, reset per retry (remainingTime PRIMA: {})", 
+                       scalataGame.getCurrentLevel(), scalataGame.getRemainingTime());
 
             try {
-
-                // Reset tempo al valore originale del livello
-                int tempoMax = scalataGame.getTimeMaxPerLevel();
-                scalataGame.setRemainingTime(tempoMax);
-
-                // Reset currentTurn a 0 (così il primo Turn del nuovo tentativo sarà 1)
-                scalataGame.setCurrentTurn(0);
-
-                logger.info("[EndGame] Tempo resettato a {} secondi, currentTurn resettato a 0 per riprovare livello {}",
-                        tempoMax, currentLevel);
-
-                // Incrementa round_number in T4 per tracciare il tentativo fallito
-                long gameId = scalataGame.getGameID();
-                scalataGame.getServiceManager().handleRequest("T4", "IncrementRoundAttempt", gameId);
-                logger.info("[EndGame] Round attempt incrementato in T4 per game {}", gameId);
-
-                // Salva la sessione con tempo resettato
+                // Delega a ScalataGame la gestione della sconfitta (reset tempo/turno, chiama T4)
+                scalataGame.handleCloseLevel();
+                
+                logger.info("[CLOSE_LEVEL] DOPO handleCloseLevel: remainingTime={}, timeMaxPerLevel={}, currentTurn={}",
+                           scalataGame.getRemainingTime(), scalataGame.getTimeMaxPerLevel(), scalataGame.getCurrentTurn());
+                
+                // Aggiorna la sessione con dati resettati
                 sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
-                logger.info("[EndGame] Sessione aggiornata con tempo resettato, giocatore può riprovare");
+                logger.info("[CLOSE_LEVEL] Sessione aggiornata in Redis, giocatore può riprovare livello {}",
+                           scalataGame.getCurrentLevel());
 
             } catch (Exception e) {
-                logger.error("[EndGame] Errore caricamento dati livello corrente per reset: {}", e.getMessage(), e);
-                // In caso di errore, salva comunque la sessione (con tempo non resettato)
+                logger.error("[CLOSE_LEVEL] Errore reset livello: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione
                 sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
-                logger.warn("[EndGame] Sessione salvata senza reset tempo a causa di errore");
+                logger.warn("[CLOSE_LEVEL] Sessione salvata nonostante errore");
             }
         }
 

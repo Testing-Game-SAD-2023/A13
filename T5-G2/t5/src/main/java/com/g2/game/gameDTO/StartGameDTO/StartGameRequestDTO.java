@@ -31,11 +31,11 @@ public class StartGameRequestDTO {
     @JsonProperty("playerId")
     private Long playerId;
 
-    @JsonProperty("typeRobot")
+    //@JsonProperty("typeRobot")
     @JsonAlias({"type_robot", "typeRobot"})
     private String typeRobot;
 
-    @NotNull
+    //@NotNull
     @JsonProperty("difficulty")
     private OpponentDifficulty difficulty;
 
@@ -44,7 +44,7 @@ public class StartGameRequestDTO {
     private GameMode gameMode;
 
     @JsonProperty("underTestClassName")
-    @NotBlank(message = "underTestClassName is required")
+    //@NotBlank(message = "underTestClassName is required")
     private String classUTName;
 
 }

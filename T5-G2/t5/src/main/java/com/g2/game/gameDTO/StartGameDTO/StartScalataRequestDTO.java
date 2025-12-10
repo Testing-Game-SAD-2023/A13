@@ -34,28 +34,28 @@ public class StartScalataRequestDTO extends StartGameRequestDTO {
      * Livello corrente dell'utente nella scalata.
      */
     @JsonProperty("currentLevel")
-    @NotNull(message = "currentLevel is required")
+    //@NotNull(message = "currentLevel is required")
     private int currentLevel;
 
     /**
      * Numero totale di livelli nella scalata.
      */
     @JsonProperty("totalLevels")
-    @NotNull(message = "totalLevels is required") 
+    // @NotNull(message = "totalLevels is required") 
     private int totalLevels;
 
     /**
      * Tempo rimanente per completare il livello corrente.
      */
     @JsonProperty("remainingTime")
-    @NotNull(message = "remainingTime is required")
+    //@NotNull(message = "remainingTime is required")
     private int remainingTime;
 
     /**
      * Tempo massimo consentito per completare ogni livello della scalata.
      */
     @JsonProperty("timeMaxPerLevel")
-    @NotNull(message = "timeMaxPerLevel is required")
+    //@NotNull(message = "timeMaxPerLevel is required")
     private int timeMaxPerLevel;
 
 }
