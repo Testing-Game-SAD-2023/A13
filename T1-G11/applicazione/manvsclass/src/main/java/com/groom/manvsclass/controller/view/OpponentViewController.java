@@ -66,7 +66,7 @@ public class OpponentViewController {
 
     @GetMapping("/upload")
     public ModelAndView showUploadRobots() {
-		ModelAndView modelAndView = newModelAndView("opponents/opponents_upload");
+		ModelAndView modelAndView = new ModelAndView("opponents/opponents_upload");
 		modelAndView.addObject("CLASS_NAME_MAX_LENGTH", FormValidation.CLASS_NAME_MAX_LENGTH);
 		modelAndView.addObject("CLASS_CATEGORY_MAX_LENGTH", FormValidation.CLASS_CATEGORY_MAX_LENGTH);
 		modelAndView.addObject("CLASS_DESCRIPTION_MAX_LENGTH", FormValidation.CLASS_DESCRIPTION_MAX_LENGTH);

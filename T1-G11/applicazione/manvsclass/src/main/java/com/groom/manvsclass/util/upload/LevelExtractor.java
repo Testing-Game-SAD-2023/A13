@@ -7,11 +7,11 @@ import java.io.File;
 public class LevelExtractor {
 
     public static int extractLevelNumber(File levelFolder) {
-        String folderName = levelFolder.getPath();
+        String folderName = levelFolder.getName();
         
         if(folderName.matches("\\d{2}Level") == false) {
 			throw new IllegalArgumentException(
-				"Nome cartella livello non valido: " + folderName "."
+				"Nome cartella livello non valido: " + folderName + "."
 				+ "Il nome della cartella deve seguire il formato XXLevel (es. 01 Level, 02Level)."
 				);
 		}

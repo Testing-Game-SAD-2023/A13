@@ -17,6 +17,7 @@ import com.groom.manvsclass.service.upload.UploadOpponentService;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
 import com.groom.manvsclass.util.upload.FileUploadResponse;
 import com.groom.manvsclass.util.upload.JavaMetadataExtractor;
+import com.groom.manvsclass.config.FormValidation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
