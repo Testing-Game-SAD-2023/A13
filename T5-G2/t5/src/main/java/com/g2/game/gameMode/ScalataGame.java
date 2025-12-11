@@ -243,6 +243,27 @@ public class ScalataGame extends TurnBasedGame {
             
             // Reset currentTurn a 0 per il nuovo livello (il primo Turn sarà 1)
             this.setCurrentTurn(0);
+
+            GameParams newLevelParams = new GameParams(
+                this.getPlayerID(),
+                nextClassName,
+                this.getTypeRobot(),
+                this.getDifficulty(),
+                GameMode.Scalata
+            );
+    
+            // Questa chiamata crea il GameProgress se non esiste, altrimenti lo recupera
+            getServiceManager().handleRequest("T23", "createPlayerProgressAgainstOpponent",
+                newLevelParams.getPlayerId(), 
+                newLevelParams.getGameMode(), 
+                newLevelParams.getClassUTName(),
+                newLevelParams.getOpponentType(), 
+                newLevelParams.getOpponentDifficulty()
+            );
+    
+    logger.info("[SCALATA] GameProgress creato/recuperato per livello {}: class={}, robot={}, difficulty={}", 
+               currentLevel, nextClassName, this.getTypeRobot(), this.getDifficulty());
+               
             
             logger.info("[SCALATA] Dati livello {} caricati: class={}, tempo={}, currentTurn resettato a 0", 
                        currentLevel, nextClassName, nextTempoMax);
