@@ -57,6 +57,23 @@ package "Service Layer" <<Rectangle>> #LightYellow {
     [CoverageReader]
     [ScoreBuilder]
   }
+  
+  package "com.groom.manvsclass.service.exception" {
+    [FileUploadException]
+    [ClassValidationException]
+    [RobotProcessingException]
+    [ExternalServiceException]
+    [OpponentNotFoundException]
+    [CoverageNotFoundException]
+    [ScoreNotFoundException]
+  }
+}
+
+' Config Layer
+package "Config Layer" <<Rectangle>> #LightGoldenRodYellow {
+  package "com.groom.manvsclass.config" {
+    [FormValidation]
+  }
 }
 
 ' Utility Layer
@@ -141,7 +158,17 @@ database "MongoDB" {
 ' Service.Upload -> Utilities
 [UploadOpponentService] ..> [OpponentPathResolver] : path resolution
 [OpponentTransformationService] ..> [LevelExtractor] : extracts difficulty
-[JavaSourceFileService] ..> [JavaMetadataExtractor] : extracts packages
+[JavaSourceFileService] ..> [JavaMetadataExtractor] : extracts packages/metadata
+[OpponentService] ..> [JavaMetadataExtractor] : validates class name
+[OpponentService] ..> [FormValidation] : validates form data
+
+' Service -> Exception handling
+[OpponentService] ..> [FileUploadException] : throws
+[OpponentService] ..> [ClassValidationException] : throws
+[OpponentService] ..> [RobotProcessingException] : throws
+[UploadOpponentService] ..> [FileUploadException] : throws
+[UploadOpponentService] ..> [RobotProcessingException] : throws
+[OpponentTransformationService] ..> [RobotProcessingException] : throws
 
 ' Service -> Persistence
 [OpponentService] --> [OpponentRepository] : queries
@@ -194,6 +221,18 @@ note left of [CoverageReader]
   Reads Evosuite CSV + Jacoco XML
   Returns CoverageData DTO
   Used by OpponentTransformationService
+end note
+
+note bottom of [FormValidation]
+  Validates class name length, difficulty,
+  categories, and description length
+  Used before upload processing
+end note
+
+note right of [JavaMetadataExtractor]
+  Extracts class name from source files
+  Used for validation and package extraction
+  Renamed from JavaPackageExtractor
 end note
 
 @enduml

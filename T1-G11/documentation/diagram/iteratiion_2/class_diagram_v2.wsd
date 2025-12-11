@@ -21,6 +21,7 @@ package "service" {
     -mongoTemplate : MongoTemplate
     -searchRepository : SearchRepositoryImpl
     +uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip) : ResponseEntity<FileUploadResponse>
+    -performRollback(classUTName) : void
     +downloadClasse(name) : ResponseEntity<Object>
     +eliminaClasse(name) : ResponseEntity<Object>
     +getAllOpponents() : List<Opponent>
@@ -50,9 +51,11 @@ package "service.upload" <<Rectangle>> {
     -coverageService : CoverageService
     -opponentTransformationService : OpponentTransformationService
     +saveOpponentsFromZip(classUTFileName, classUTName, classUTFile, robotTestsZip) : void
+    +rollbackOpponentFiles(classUTName) : void
     -processRobotFolders(classUTFileName, classUTName, classUTFile, robotGroupFolder) : void
-    -uploadNewOpponents(classUTFileName, classUTName, classUTFile, operationTmpFolder, robotType) : void
-    -processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, levelFolder) : void
+    -uploadNewOpponents(classUTFileName, classUTName, classUTFile, operationTmpFolder, robotType) : int
+    -processLevelFolder(classUTFileName, classUTName, classUTFile, robotType, levelFolder) : int
+    -countJavaFiles(testPath) : int
     -generateCoverageIfNeeded(robotType, coverageFound, classUTName, srcPackageNameSplit, opponentPaths) : void
     -ensureEvoCoverageIfMissing(...) : void
     -ensureJacocoCoverageIfMissing(...) : void
@@ -64,6 +67,8 @@ package "service.upload" <<Rectangle>> {
     -fileStorageService : FileStorageService
     +saveClassUTFile(classUTFileName, classUTName, classUTFile) : void
     +persistClassUTMetadata(classe, classUTFileName) : void
+    +rollbackClassUTFile(classUTName) : void
+    +rollbackClassUTMetadata(classUTName) : void
   }
 
   class FileStorageService {
@@ -120,6 +125,7 @@ package "util.upload" <<Rectangle>> {
   class JavaMetadataExtractor <<utility>> {
     +extractPackageFromDeclaration(code) : String[]
     +extractSourcePackageFromTestCode(code, className, robotType) : String[]
+    +getClassNameFromJavaSourceFile(classFileBytes) : String
     -extractFromEvosuitePattern(code, className) : String[]
     -extractFromImportStatement(code, className) : String[]
   }
@@ -156,6 +162,50 @@ package "util.filesystem" {
   }
 }
 
+package "config" <<Rectangle>> {
+  class FormValidation <<utility>> {
+    +CLASS_NAME_MAX_LENGTH : int = 30
+    +CLASS_CATEGORY_MAX_LENGTH : int = 30
+    +CLASS_DESCRIPTION_MAX_LENGTH : int = 150
+    +DIFFICULTY_LEVELS : String[] = {"Beginner", "Intermediate", "Advanced"}
+    +validateClassUT(classe) : boolean
+  }
+}
+
+package "service.exception" <<Rectangle>> {
+  class FileUploadException <<exception>> {
+    +FileUploadException(message)
+    +FileUploadException(message, cause)
+  }
+  
+  class ClassValidationException <<exception>> {
+    +ClassValidationException(message)
+    +ClassValidationException(message, cause)
+  }
+  
+  class RobotProcessingException <<exception>> {
+    +RobotProcessingException(message)
+    +RobotProcessingException(message, cause)
+  }
+  
+  class ExternalServiceException <<exception>> {
+    +ExternalServiceException(message)
+    +ExternalServiceException(message, cause)
+  }
+  
+  class OpponentNotFoundException <<exception>> {
+    +OpponentNotFoundException(message)
+  }
+  
+  class CoverageNotFoundException <<exception>> {
+    +CoverageNotFoundException(message)
+  }
+  
+  class ScoreNotFoundException <<exception>> {
+    +ScoreNotFoundException(message)
+  }
+}
+
 package "api" {
   class RestExchangeTemplateHelper {
     +exchange(url, uriVariables, method, headers, body, responseType) : ResponseEntity
@@ -180,12 +230,14 @@ package "persistence" {
     +saveOpponent(opponent) : void
     +findOpponent(classUT, type, difficulty) : Optional<Opponent>
     +deleteAll() : void
+    +deleteByClassUT(classUT) : void
   }
 
   class ClassRepository {
     +save(classUT) : void
     +findAll() : List<ClassUT>
     +delete(classUT) : void
+    +deleteByName(name) : void
   }
 
   class OperationRepository {
@@ -317,7 +369,18 @@ OpponentService --> OperationRepository : persists operations
 OpponentService --> OpponentRepository : queries opponents
 OpponentService --> ApiGatewayClient : external calls
 OpponentService --> SearchRepositoryImpl : searches
+OpponentService ..> JavaMetadataExtractor : validates class name
+OpponentService ..> FormValidation : validates form data
 OpponentController --> FileDownloadUtil : uses for downloads
+
+' Exception throwing relationships
+OpponentService ..> FileUploadException : throws
+OpponentService ..> ClassValidationException : throws
+OpponentService ..> RobotProcessingException : throws
+UploadOpponentService ..> FileUploadException : throws
+UploadOpponentService ..> RobotProcessingException : throws
+OpponentTransformationService ..> RobotProcessingException : throws
+JavaSourceFileService ..> IOException : throws
 
 UploadOpponentService --> FileStorageService : basic file operations
 UploadOpponentService --> JavaSourceFileService : Java file handling
@@ -331,7 +394,7 @@ ClassUTUploadService --> ClassRepository : persists metadata
 ClassUTUploadService ..> OpponentPathResolver : uses static methods
 
 JavaSourceFileService --> FileStorageService : delegates basic ops
-JavaSourceFileService ..> JavaMetadataExtractor : extracts packages
+JavaSourceFileService ..> JavaMetadataExtractor : extracts packages/metadata
 
 OpponentTransformationService --> OpponentPersistenceService : persists opponents
 OpponentTransformationService ..> CoverageReader : reads coverage files

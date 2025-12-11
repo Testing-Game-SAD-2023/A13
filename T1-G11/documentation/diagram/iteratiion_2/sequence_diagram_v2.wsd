@@ -5,6 +5,8 @@ participant "api.js\ncallUploadOpponent" as ApiJS
 participant "API Gateway\n(/api/adminService)" as ApiGateway
 participant "OpponentController\n(/opponents)" as Controller
 participant "OpponentService\n.uploadClassAndOpponents(...)" as Service
+participant "JavaMetadataExtractor" as MetadataExtractor
+participant "FormValidation" as FormValidator
 participant "ClassUTUploadService\n.saveClassUTFile\n.persistClassUTMetadata" as ClassUTService
 participant "UploadOpponentService\n.saveOpponentsFromZip" as UploadService
 participant "FileStorageService" as FileStorage
@@ -25,6 +27,28 @@ ApiJS -> ApiGateway : POST /api/adminService/opponents (FormData, cookies)
 ApiGateway -> Controller : route POST /opponents (FormData)
 Controller -> Service : uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip)
 
+== Validation Phase ==
+Service -> Service : validate classUTFile not empty
+note right: Throws FileUploadException if empty
+
+Service -> Service : validate robotTestsZip not empty  
+note right: Throws FileUploadException if empty
+
+Service -> Service : parse classUTDetails JSON
+note right: Throws ClassValidationException on parse error
+
+Service -> MetadataExtractor : getClassNameFromJavaSourceFile(classFileBytes)
+MetadataExtractor --> Service : classNameFromSourceFile
+note right: Throws ClassValidationException if no class declaration found
+
+Service -> Service : verify className matches
+note right: Compare form input vs. actual class name in file\nThrows ClassValidationException if mismatch
+
+Service -> FormValidator : validateClassUT(classe)
+FormValidator --> Service : boolean (validation result)
+note right: Validates name, difficulty, categories\nThrows ClassValidationException if validation fails
+
+== Upload Phase (try-catch block) ==
 Service -> ClassUTService : saveClassUTFile(classUTFileName, className, classUTFile)
 ClassUTService -> FileStorage : saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile)
 note right: saves original .java into\n/VolumeT0/FolderTree/ClassUT/unmodified_src/<class>
@@ -114,11 +138,36 @@ ApiGateway --> ApiJS : HTTP 200 + JSON
 ApiJS --> FrontendJS : parsed JSON (success)
 FrontendJS --> Browser : show success modal
 
-== Failure path (any exception) ==
-UploadService --> Service : throws Exception
-Service -> FileStorage : try deleteDirectoryRecursively(operationTmpFolder) [best-effort]
-note right: Compensating transaction:\nCleanup temporary files
-Service --> Controller : return error JSON { error, message, uploadId }
+== Failure path (exception handling with rollback) ==
+alt Any exception during upload
+  UploadService --> Service : throws Exception (FileUploadException/RobotProcessingException/ClassValidationException/IOException)
+  note right: Exception caught in try-catch block
+  
+  Service -> Service : performRollback(classUTName)
+  note right: Attempt to clean up all created resources
+  
+  Service -> ClassUTService : rollbackClassUTMetadata(classUTName)
+  ClassUTService -> ClassRepo : deleteByName(classUTName)
+  note right: Delete ClassUT from database (silent failure)
+  
+  Service -> OppRepo : deleteByClassUT(classUTName)
+  note right: Delete all opponents for this class (silent failure)
+  
+  Service -> Gateway : callDeleteAllClassUTOpponents(classUTName)
+  note right: Notify external services to delete (silent failure)
+  
+  Service -> UploadService : rollbackOpponentFiles(classUTName)
+  UploadService -> FileStorage : deleteDirectoryRecursively(classUTDirectory)
+  note right: Delete opponent files from volume (silent failure)
+  
+  Service -> ClassUTService : rollbackClassUTFile(classUTName)
+  ClassUTService -> FileStorage : deleteDirectoryRecursively(unmodifiedSrcPath)
+  note right: Delete original class file (silent failure)
+  
+  Service --> Service : re-throw original exception
+  note right: Let GlobalExceptionHandler handle the response
+  
+  Service --> Controller : throws Exception
 Controller --> ApiGateway : HTTP 500 + JSON
 ApiGateway --> ApiJS : HTTP 500 + JSON
 ApiJS --> FrontendJS : handleApiErrors(response) -> show modal/alert with uploadId
