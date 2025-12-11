@@ -300,7 +300,7 @@ public class T4Service extends BaseService {
         }
 
         requestBody.put("results", results);
-        requestBody.put("isGameSurrendered", isGameSurrendered);
+        requestBody.put("gameSurrendered", isGameSurrendered);
 
         String respose = callRestPut(endpoint, requestBody, null, null, String.class);
         return respose;
