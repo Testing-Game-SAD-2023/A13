@@ -31,7 +31,7 @@ import java.util.Map;
 public class FallbackController {
 
     // Fallback specifico per T7 (Student Test Runner / Compilazione)
-    @GetMapping("/t7")
+    @RequestMapping("/t7")
     public ResponseEntity<Map<String, String>> fallbackT7() {
         Map<String, String> response = new HashMap<>();
         response.put("error", "T7 Service Unavailable");
@@ -43,7 +43,7 @@ public class FallbackController {
     }
 
     // Fallback specifico per T8 (EvoSuite / Generazione Test)
-    @GetMapping("/t8")
+    @RequestMapping("/t8")
     public ResponseEntity<Map<String, String>> fallbackT8() {
         Map<String, String> response = new HashMap<>();
         response.put("error", "T8 Service Unavailable");
@@ -55,7 +55,7 @@ public class FallbackController {
     }
 
     // Fallback generico per altre rotte (mantiene la compatibilità con il vecchio metodo)
-    @GetMapping("")
+    @RequestMapping("")
     public ResponseEntity<Map<String, String>> fallbackGeneric() {
         Map<String, String> response = new HashMap<>();
         response.put("error", "Service Unavailable");
