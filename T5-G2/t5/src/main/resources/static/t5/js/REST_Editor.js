@@ -187,33 +187,33 @@ function handleGameEnd(response) {
             isScalataWon
         });
         
-        if (isWinner && !isScalataWon) {
-            // ✅ Vittoria livello, ma scalata non completata
-            console.log(`[handleGameEnd] Livello ${currentLevel - 1} superato! Prossimo: ${currentLevel}/${totalLevels}`);
-            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked);
+        if (isScalataWon) {
+            // 🏆 Scalata completata (tutti i livelli superati)
+            console.log(`[handleGameEnd] Scalata '${scalataName}' completata! Tutti i ${totalLevels} livelli superati!`);
+            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, gameEndData.scalata_won);
+            stopTimer();
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            
+            setTimeout(() => {
+                window.location.href = "/main";
+            }, 3000);
+            
+        } else if (isWinner) {
+            // ✅ Livello superato, ma scalata non completata
+            console.log(`[handleGameEnd] Livello ${currentLevel} superato! Prossimo: ${currentLevel + 1}/${totalLevels}`);
+            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, gameEndData.level_won);
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
             
             // Redirect alla schermata di selezione scalate per mostrare "Riprendi partita"
             setTimeout(() => {
                 window.location.href = "/gamemode?mode=Scalata";
-            }, 3000); // Aspetta 3s per far leggere il messaggio
-            
-        } else if (isWinner && isScalataWon) {
-            // ✅ Scalata completata (tutti i livelli superati)
-            console.log(`[handleGameEnd] Scalata '${scalataName}' completata! Tutti i ${totalLevels} livelli superati!`);
-            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked);
-            stopTimer();
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-            
-            setTimeout(() => {
-                window.location.href = "/main"; // O /leaderboard se preferisci
             }, 3000);
             
         } else {
-            // ❌ Sconfitta → scalata fallita
+            // ❌ Livello fallito
             console.log(`[handleGameEnd] Scalata fallita al livello ${currentLevel}/${totalLevels}`);
-            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked);
+            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, gameEndData.level_lost);
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
             
@@ -294,7 +294,7 @@ function handleCompileError(loadingKey, buttonKey) {
 }
 
 // Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
-function generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked) {
+function generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, customTitle = null) {
     let resultMessage = isWinner ? gameEndData.game_win : gameEndData.game_lose;
     let expMessage = "";
     let achievementsMessage = ""
@@ -317,8 +317,10 @@ function generateEndGameMessage(userScore, robotScore, isWinner, expGained, achi
         expMessage = gameEndData.game_retry;
     }
 
+    const modalTitle = customTitle !== null ? customTitle : gameEndData.game_end;
+
     openModalWithText(
-        gameEndData.game_end,
+        modalTitle,
         `${gameEndData.game_score}: ${userScore} pt.\n${resultMessage}\n${expMessage}${achievementsMessage}\n\n${rememberSaveMessage}`,
         [{ tagName: "button", text: `${modalButtonText.close}`, data_bs_dismiss: "modal", class: 'btn btn-primary' }]
     );

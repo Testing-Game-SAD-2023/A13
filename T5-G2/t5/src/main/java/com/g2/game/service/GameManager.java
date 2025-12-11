@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.game.gameDTO.EndGameDTO.EndGameResponseDTO;
+import com.g2.game.gameDTO.EndGameDTO.EndScalataGameResponseDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameRequestDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameResponseDTO;
 import com.g2.game.gameDTO.StartGameDTO.StartGameRequestDTO;
@@ -392,7 +393,14 @@ public class GameManager {
         logger.info("[EndGame] GameLogic recuperato: gameID={}", currentGame.getGameID());
 
         // Gestione della chiusura in base alla modalità di gioco
+        int currentLevelBeforeClose = -1;
+        boolean isScalataWonBeforeClose = false;
+        
         if (currentGame instanceof ScalataGame scalataGame) {
+            // Salvo i valori PRIMA che handleCloseLevel() modifichi currentLevel
+            currentLevelBeforeClose = scalataGame.getCurrentLevel();
+            isScalataWonBeforeClose = scalataGame.isScalataWon();
+            
             // Modalità Scalata: verifica se ha completato TUTTA la scalata
             if (scalataGame.isWinner() 
                     && scalataGame.getCurrentLevel() == scalataGame.getTotalLevels()) {
@@ -438,11 +446,28 @@ public class GameManager {
                 expGained = playerStatService.assignExperiencePoints(currentGame);
                 achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
             }
-            
-            return new EndGameResponseDTO(
+
+            if (currentGame instanceof ScalataGame scalataGame) {
+                return new EndScalataGameResponseDTO(
+                    currentGame.getScore(currentGame.getRobotCompileResult()),
+                    currentGame.getScore(currentGame.getUserCompileResult()),
+                    currentGame.isWinner(),
+                    expGained,
+                    achievementsUnlocked,
+                    runGameResponse,
+                    currentLevelBeforeClose,
+                    scalataGame.getTotalLevels(),
+                    scalataGame.getScalataName(),
+                    isScalataWonBeforeClose
+                );
+            } else {
+                return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),
                     currentGame.getScore(currentGame.getUserCompileResult()),
                     currentGame.isWinner(), expGained, achievementsUnlocked, runGameResponse);
+            }
+
+            
         }
     }
 
