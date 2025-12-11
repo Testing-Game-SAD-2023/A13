@@ -210,7 +210,7 @@ function handleGameEnd(response) {
             detailMessage += `\n\nIl tuo punteggio: ${userScore} | Robot: ${robotScore}`;
             
             generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, 
-                gameEndData.scalata_won, detailMessage, "/main");
+                gameEndData.scalata_won, detailMessage);
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
             
@@ -225,7 +225,7 @@ function handleGameEnd(response) {
             detailMessage += `\n\n${gameEndData.next_level_msg}`;
             
             generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, 
-                gameEndData.level_won, detailMessage, "/gamemode?mode=Scalata");
+                gameEndData.level_won, detailMessage);
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
             
@@ -239,7 +239,7 @@ function handleGameEnd(response) {
             detailMessage += `\nIl tuo punteggio: ${userScore} | Robot: ${robotScore}`;
             
             generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, 
-                gameEndData.level_lost, detailMessage, "/main");
+                gameEndData.level_lost, detailMessage);
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
         }
