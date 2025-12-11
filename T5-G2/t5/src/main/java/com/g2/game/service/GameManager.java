@@ -392,15 +392,25 @@ public class GameManager {
         GameLogic currentGame = handleGetCurrentGame(updateParams.getPlayerId(), updateParams.getGameMode());
         logger.info("[EndGame] GameLogic recuperato: gameID={}", currentGame.getGameID());
 
-        // Gestione della chiusura in base alla modalità di gioco
-        int currentLevelBeforeClose = -1;
-        boolean isScalataWonBeforeClose = false;
-        
+        // Per Scalata: creo subito il DTO con i valori corretti PRIMA di handleCloseLevel()
+        EndScalataGameResponseDTO scalataResponseDTO = null;
         if (currentGame instanceof ScalataGame scalataGame) {
-            // Salvo i valori PRIMA che handleCloseLevel() modifichi currentLevel
-            currentLevelBeforeClose = scalataGame.getCurrentLevel();
-            isScalataWonBeforeClose = scalataGame.isScalataWon();
-            
+            scalataResponseDTO = new EndScalataGameResponseDTO(
+                currentGame.getScore(currentGame.getRobotCompileResult()),
+                currentGame.getScore(currentGame.getUserCompileResult()),
+                currentGame.isWinner(),
+                0, // expGained verrà aggiornato dopo
+                achievementsUnlocked,
+                runGameResponse,
+                scalataGame.getCurrentLevel(),
+                scalataGame.getTotalLevels(),
+                scalataGame.getScalataName(),
+                scalataGame.isScalataWon()
+            );
+        }
+        
+        // Gestione della chiusura in base alla modalità di gioco
+        if (currentGame instanceof ScalataGame scalataGame) {
             // Modalità Scalata: verifica se ha completato TUTTA la scalata
             if (scalataGame.isWinner() 
                     && scalataGame.getCurrentLevel() == scalataGame.getTotalLevels()) {
@@ -424,9 +434,18 @@ public class GameManager {
         if (currentGame.getUserCompileResult() == null ||
                 !currentGame.getUserCompileResult().hasSuccess()
         ) {
+            if (scalataResponseDTO != null) {
+                // Aggiorno gli achievement che potrebbero essere stati aggiunti da handleCloseLevel()
+                scalataResponseDTO.setAchievementsUnlocked(achievementsUnlocked);
+                return scalataResponseDTO;
+            }
             return new EndGameResponseDTO(0, 0, false, 0, runGameResponse);
         } else if (!currentGame.isWinner()) {
-
+            if (scalataResponseDTO != null) {
+                // Aggiorno gli achievement che potrebbero essere stati aggiunti da handleCloseLevel()
+                scalataResponseDTO.setAchievementsUnlocked(achievementsUnlocked);
+                return scalataResponseDTO;
+            }
             return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),
                     currentGame.getScore(currentGame.getUserCompileResult()),
@@ -447,19 +466,10 @@ public class GameManager {
                 achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
             }
 
-            if (currentGame instanceof ScalataGame scalataGame) {
-                return new EndScalataGameResponseDTO(
-                    currentGame.getScore(currentGame.getRobotCompileResult()),
-                    currentGame.getScore(currentGame.getUserCompileResult()),
-                    currentGame.isWinner(),
-                    expGained,
-                    achievementsUnlocked,
-                    runGameResponse,
-                    currentLevelBeforeClose,
-                    scalataGame.getTotalLevels(),
-                    scalataGame.getScalataName(),
-                    isScalataWonBeforeClose
-                );
+            if (scalataResponseDTO != null) {
+                // Aggiorno expGained che ora è stato calcolato
+                scalataResponseDTO.setExpGained(expGained);
+                return scalataResponseDTO;
             } else {
                 return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),

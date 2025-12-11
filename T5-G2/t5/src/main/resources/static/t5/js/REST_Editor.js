@@ -179,47 +179,69 @@ function handleGameEnd(response) {
         // response contiene campi aggiuntivi: currentLevel, totalLevels, scalataName, isScalataWon
         const {currentLevel, totalLevels, scalataName, isScalataWon} = response;
         
+        console.log("[handleGameEnd] FULL RESPONSE:", response);
         console.log("[handleGameEnd] Scalata Info:", {
             isWinner,
             currentLevel,
             totalLevels,
             scalataName,
-            isScalataWon
+            isScalataWon,
+            userScore,
+            robotScore
         });
+        
+        // Controllo difensivo: se i campi Scalata non sono presenti, fallback a comportamento standard
+        if (currentLevel === undefined || totalLevels === undefined) {
+            console.error("[handleGameEnd] ERRORE: campi Scalata mancanti! Fallback a comportamento standard.");
+            console.error("[handleGameEnd] Response ricevuto:", JSON.stringify(response, null, 2));
+            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked);
+            stopTimer();
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            return;
+        }
         
         if (isScalataWon) {
             // 🏆 Scalata completata (tutti i livelli superati)
             console.log(`[handleGameEnd] Scalata '${scalataName}' completata! Tutti i ${totalLevels} livelli superati!`);
-            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, gameEndData.scalata_won);
+            
+            let detailMessage = gameEndData.scalata_won_detail
+                .replace('{0}', totalLevels)
+                .replace('{1}', scalataName);
+            detailMessage += `\n\nIl tuo punteggio: ${userScore} | Robot: ${robotScore}`;
+            
+            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, 
+                gameEndData.scalata_won, detailMessage, "/main");
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
-            
-            setTimeout(() => {
-                window.location.href = "/main";
-            }, 3000);
             
         } else if (isWinner) {
             // ✅ Livello superato, ma scalata non completata
             console.log(`[handleGameEnd] Livello ${currentLevel} superato! Prossimo: ${currentLevel + 1}/${totalLevels}`);
-            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, gameEndData.level_won);
+            
+            let detailMessage = gameEndData.level_won_detail
+                .replace('{0}', currentLevel)
+                .replace('{1}', totalLevels);
+            detailMessage += `\nIl tuo punteggio: ${userScore} | Robot: ${robotScore}`;
+            detailMessage += `\n\n${gameEndData.next_level_msg}`;
+            
+            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, 
+                gameEndData.level_won, detailMessage, "/gamemode?mode=Scalata");
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
-            
-            // Redirect alla schermata di selezione scalate per mostrare "Riprendi partita"
-            setTimeout(() => {
-                window.location.href = "/gamemode?mode=Scalata";
-            }, 3000);
             
         } else {
             // ❌ Livello fallito
             console.log(`[handleGameEnd] Scalata fallita al livello ${currentLevel}/${totalLevels}`);
-            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, gameEndData.level_lost);
+            
+            let detailMessage = gameEndData.level_lost_detail
+                .replace('{0}', currentLevel)
+                .replace('{1}', totalLevels);
+            detailMessage += `\nIl tuo punteggio: ${userScore} | Robot: ${robotScore}`;
+            
+            generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, 
+                gameEndData.level_lost, detailMessage, "/main");
             stopTimer();
             window.removeEventListener("beforeunload", handleBeforeUnload);
-            
-            setTimeout(() => {
-                window.location.href = "/main";
-            }, 3000);
         }
     } else {
         // PartitaSingola o altre modalità → comportamento standard
@@ -294,11 +316,19 @@ function handleCompileError(loadingKey, buttonKey) {
 }
 
 // Gestisce la fine del gioco, mostra un messaggio e pulisce i dati
-function generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, customTitle = null) {
+function generateEndGameMessage(userScore, robotScore, isWinner, expGained, achievementsUnlocked, customTitle = null, customDetail = null, redirectUrl = null) {
     let resultMessage = isWinner ? gameEndData.game_win : gameEndData.game_lose;
     let expMessage = "";
     let achievementsMessage = ""
     let rememberSaveMessage = gameEndData.game_remember_save;
+    
+    // Se c'è un dettaglio custom (per Scalata), usa quello invece del messaggio standard
+    let mainMessage;
+    if (customDetail) {
+        mainMessage = customDetail;
+    } else {
+        mainMessage = `${gameEndData.game_score}: ${userScore} pt.\n${resultMessage}`;
+    }
 
     if (isWinner) {
         if (expGained === 0) {
@@ -314,15 +344,24 @@ function generateEndGameMessage(userScore, robotScore, isWinner, expGained, achi
             achievementsMessage = achievementsMessage.slice(0, -1);
         }
     } else {
-        expMessage = gameEndData.game_retry;
+        expMessage = customDetail ? "" : gameEndData.game_retry;
     }
 
     const modalTitle = customTitle !== null ? customTitle : gameEndData.game_end;
 
+    // Se c'è un redirectUrl, crea un bottone che gestisce il redirect al click
+    const buttons = [{ 
+        tagName: "button", 
+        text: `${modalButtonText.close}`, 
+        data_bs_dismiss: "modal", 
+        class: 'btn btn-primary',
+        onclick: redirectUrl ? () => { window.location.href = redirectUrl; } : undefined
+    }];
+
     openModalWithText(
         modalTitle,
-        `${gameEndData.game_score}: ${userScore} pt.\n${resultMessage}\n${expMessage}${achievementsMessage}\n\n${rememberSaveMessage}`,
-        [{ tagName: "button", text: `${modalButtonText.close}`, data_bs_dismiss: "modal", class: 'btn btn-primary' }]
+        `${mainMessage}\n${expMessage}${achievementsMessage}\n\n${rememberSaveMessage}`,
+        buttons
     );
 }
 
