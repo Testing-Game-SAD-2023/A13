@@ -32,7 +32,7 @@ document.getElementById("logout_admin_btn").addEventListener("click", async () =
 
 // Imposto l'url del redirect alla pagina della modalità scalata
 document.querySelector(".button-scalata").addEventListener("click", () => {
-  window.location.href=VIEWS.SCALATA_MAIN;
+    window.location.href = VIEWS.SCALATA_MAIN + "?tour=true";
 });
 
 // Imposto l'url del redirect alla pagina dei team

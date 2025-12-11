@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{newscalata_title}"></title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="/t1/css/scalata.css">
+    <script defer th:src="@{/t1/js/scalata/scalata_edit.js}"></script>
+    <script defer th:src="@{/t1/js/utils/endpoints.js}"></script>
+    <script defer th:src="@{/t1/js/utils/api.js}"></script>
+
+</head>
+<body>
+
+<div class="container d-flex justify-content-center align-items-center my-4 w-75">
+    <div class="col-md-10 col-lg-8">
+
+        <div class="card shadow p-3 mb-3">
+            <div class="text-center">
+                <h2 th:text="#{newscalata_header}">Creazione Scalata</h2>
+            </div>
+        </div>
+
+        <form id="form" class="">
+            <div class="card shadow p-4">
+
+                <div class="mb-3">
+                    <label for="name" class="form-label fw-bold" th:text="#{newscalata_name_label}">Nome scalata</label>
+                    <input id="name" type="text" name="name" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label fw-bold" th:text="#{newscalata_description_label}">Descrizione</label>
+                    <textarea id="description" name="description" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-bold" th:text="#{newscalata_editor_label}">Editor livelli</div>
+                        <div class="fw-light"><span th:text="#{newscalata_levels_count_label}">Numero livelli:</span> <span id="numberOfLevels"></span></div>
+                    </div>
+                    <a class="btn btn-success" id="addLevel">
+                        <i class="bi bi-plus"></i>
+                    </a>
+                </div>
+
+                <hr>
+
+                <div class="levelsContainer">
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-between p-2 my-2">
+
+                <a type="reset" class="btn btn-danger" th:href="@{/scalata/main}">
+                        <span class="d-flex align-items-center justify-around">
+                            <i class="bi bi-x fs-4"></i>
+                            <span th:text="#{newscalata_cancel_btn}">Annulla</span>
+                        </span>
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                        <span class="d-flex align-items-center justify-around">
+                            <span th:text="#{newscalata_confirm_btn}">Conferma</span>
+                            <i class="bi bi-check fs-4"></i>
+                        </span>
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script th:inline="javascript">
+
+    // Variabili specifiche per i livelli (generate in JS)
+    const newscalata_level_badge = /*[[#{newscalata_level_badge}]]*/ "Livello";
+    const newscalata_opponent_placeholder = /*[[#{newscalata_opponent_placeholder}]]*/ "ClasseUTvsOpponent";
+    const newscalata_tempo_max_label = /*[[#{newscalata_tempo_max_label}]]*/ "Tempo(min)";
+
+    // Variabile per la gestione degli errori (esempio)
+    const notHandledError = /*[[#{error.nothandled}]]*/ "Si è verificato un errore, riprova più tardi";
+
+</script>
+
+</body>
+</html>
