@@ -146,6 +146,11 @@ docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, game
 docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, round_number, classut, type, difficulty, started_at, closed_at FROM rounds ORDER BY id DESC LIMIT 10;"
 ```
 
+### Query diretta per i turni
+```bash
+docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT t.id, t.round_id, t.turn_number, t.player_id, t.started_at, t.closed_at, r.round_number, r.classut FROM turns t JOIN rounds r ON t.round_id = r.id WHERE r.game_id = 1204 ORDER BY t.id DESC LIMIT 10;"
+```
+
 ## 1. Leggi dettagli di un Game
 ```bash
 # Sostituisci 202 con un gameId valido
