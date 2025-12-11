@@ -14,7 +14,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.gateway.apiGateway.config;
+/*package com.gateway.apiGateway.config;
 
 import org.springframework.context.annotation.Configuration;
 
@@ -22,3 +22,22 @@ import org.springframework.context.annotation.Configuration;
 public class GatewayConfig {
 
 }
+*/
+package com.gateway.apiGateway.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver; // Importa l'interfaccia
+
+//import com.gateway.apiGateway.config.PrincipalNameKeyResolver;(se lo mantengo in config non devo aggiungere l'import)
+@Configuration
+public class GatewayConfig {
+
+    // Aggiungi questo bean. Il nome del metodo è il nome del bean che userai nell'YAML: "@principalNameKeyResolver"
+    @Bean
+    public KeyResolver principalNameKeyResolver() {
+        return new PrincipalNameKeyResolver(); 
+    }
+
+}
+
