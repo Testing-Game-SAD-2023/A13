@@ -55,4 +55,4 @@ scrape_configs:
 
       - targets: ['api-gateway:8090'] 
         labels:
-          service: 'API Gateway'
+          service: 'apiGateway'
