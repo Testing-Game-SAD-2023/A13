@@ -54,7 +54,7 @@ public class Util {
 
     public int API_id() {
         Random random = new Random();
-        return random.nextInt(1000000 - 0 + 1) + 0;
+        return random.nextInt(1000001);
     }
 
     public String API_email(int id_u) {
