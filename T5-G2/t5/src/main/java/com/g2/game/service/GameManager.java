@@ -17,7 +17,7 @@
 
 package com.g2.game.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.game.gameDTO.EndGameDTO.EndGameResponseDTO;
@@ -29,14 +29,13 @@ import com.g2.game.gameDTO.StartGameDTO.StartGameResponseDTO;
 import com.g2.game.gameFactory.params.GameParams;
 import com.g2.game.gameFactory.params.GameParamsFactory;
 import com.g2.game.gameMode.Compile.CompileResult;
-import com.g2.interfaces.ServiceManager;
 import com.g2.game.gameMode.GameLogic;
 import com.g2.game.gameMode.ScalataGame;
 import com.g2.model.configuration.GameExecutionConfig;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.session.SessionService;
 import jakarta.annotation.PostConstruct;
-import lombok.Setter;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,13 +73,8 @@ public class GameManager {
     private String turnExecutionConfigFile;
     private GameExecutionConfig config;
 
-    @Setter
-    @JsonIgnore
-    private transient ServiceManager serviceManager;
-
-    public GameManager(ServiceManager serviceManager, GameService gameService, SessionService sessionService,
+    public GameManager( GameService gameService, SessionService sessionService,
                        PlayerStatService playerStatService, LogWriterService logWriterService) {
-        this.serviceManager = serviceManager;
         this.gameService = gameService;
         this.sessionService = sessionService;
         this.playerStatService = playerStatService;

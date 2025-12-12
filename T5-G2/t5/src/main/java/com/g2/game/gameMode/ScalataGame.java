@@ -283,13 +283,7 @@ public class ScalataGame extends TurnBasedGame {
         try {
             // Reset tempo al valore originale del livello
             this.remainingTime = this.timeMaxPerLevel;
-            
-            // Reset currentTurn a 0 (il primo Turn del nuovo tentativo sarà 1)
-            //this.setCurrentTurn(0);
-            
-            logger.info("[SCALATA] Tempo resettato a {} secondi, currentTurn resettato a 0 per riprovare livello {}", 
-                       timeMaxPerLevel, currentLevel);
-            
+                        
             // Incrementa round_number in T4 per tracciare il tentativo fallito
             getServiceManager().handleRequest("T4", "IncrementRoundAttempt", getGameID());
             logger.info("[SCALATA] Round attempt incrementato in T4 per game {}", getGameID());
