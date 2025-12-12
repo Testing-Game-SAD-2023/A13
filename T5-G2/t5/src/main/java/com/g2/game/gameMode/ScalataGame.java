@@ -23,6 +23,8 @@ import com.g2.game.gameFactory.params.GameParams;
 import com.g2.game.gameFactory.params.ScalataParams;
 import com.g2.game.gameMode.Compile.CompileResult;
 import com.g2.interfaces.ServiceManager;
+import com.g2.model.dto.LevelDataDTO;
+
 import lombok.Getter;
 import lombok.Setter;
 import java.util.HashMap;
@@ -163,14 +165,13 @@ public class ScalataGame extends TurnBasedGame {
     public void loadLevelData() {
         logger.info("[SCALATA] Caricamento dati livello {} della scalata '{}'", currentLevel, scalataName);
         
-        // Chiama T1 per ottenere i dati del livello corrente
-        Map<String, Object> levelData = (Map<String, Object>) getServiceManager().handleRequest(
+        // Chiama T1 per ottenere i dati del livello corrente usando il DTO type-safe
+        LevelDataDTO levelData = (LevelDataDTO) getServiceManager().handleRequest(
                 "T1", "getLevelByScalataAndPosition", scalataName, currentLevel);
         
-        // Popola i dati del gioco con le informazioni del livello
-        this.setClassUTName((String) levelData.get("className"));
-        Integer tempoMax = (Integer) levelData.get("tempoMax");
-        this.remainingTime = tempoMax != null ? tempoMax : 600;
+        // Popola i dati del gioco con le informazioni del livello usando i metodi type-safe del DTO
+        this.setClassUTName(levelData.getClassName());
+        this.remainingTime = levelData.getTempoMax() != null ? levelData.getTempoMax() : 600;
         this.timeMaxPerLevel = this.remainingTime;
         this.setTypeRobot("EvoSuite");
         this.setDifficulty(OpponentDifficulty.EASY);
@@ -230,12 +231,12 @@ public class ScalataGame extends TurnBasedGame {
             // Carica i dati del livello successivo da T1
             logger.info("[SCALATA] Caricamento dati livello {} della scalata '{}'", currentLevel, scalataName);
             
-            Map<String, Object> nextLevelData = (Map<String, Object>) getServiceManager().handleRequest(
+            LevelDataDTO nextLevelData = (LevelDataDTO) getServiceManager().handleRequest(
                     "T1", "getLevelByScalataAndPosition", scalataName, currentLevel);
             
-            // Aggiorna i dati del gioco con il nuovo livello
-            String nextClassName = (String) nextLevelData.get("className");
-            Integer nextTempoMax = (Integer) nextLevelData.get("tempoMax");
+            // Aggiorna i dati del gioco con il nuovo livello usando i metodi type-safe del DTO
+            String nextClassName = nextLevelData.getClassName();
+            Integer nextTempoMax = nextLevelData.getTempoMax();
             
             this.setClassUTName(nextClassName);
             this.remainingTime = nextTempoMax != null ? nextTempoMax : 600;

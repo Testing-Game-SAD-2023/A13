@@ -19,6 +19,7 @@ package com.g2.interfaces;
 import com.g2.model.OpponentSummary;
 import com.g2.model.Team;
 import com.g2.model.dto.ScalataDTO;
+import com.g2.model.dto.LevelDataDTO;
 import com.g2.model.dto.ResponseTeamComplete;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -179,11 +180,10 @@ private Map<String, Object> getLevelById(Integer levelId) {
  * 
  * @param scalataName Nome della scalata
  * @param currentLevel Posizione del livello (1-based: 1=primo, 2=secondo, etc.)
- * @return Map con i dati del Level
+ * @return {@link LevelDataDTO} con i dati del Level
  */
-@SuppressWarnings("unchecked")
-private Map<String, Object> getLevelByScalataAndPosition(String scalataName, Integer currentLevel) {
+private LevelDataDTO getLevelByScalataAndPosition(String scalataName, Integer currentLevel) {
     String path = "/scalata/" + scalataName + "/level/" + currentLevel;
-    return callRestGET(path, null, Map.class);
+    return callRestGET(path, null, LevelDataDTO.class);
 }
 }

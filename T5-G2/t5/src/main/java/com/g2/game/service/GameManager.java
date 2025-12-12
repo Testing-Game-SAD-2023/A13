@@ -46,7 +46,6 @@ import org.springframework.stereotype.Service;
 import testrobotchallenge.commons.models.dto.score.EvosuiteCoverageDTO;
 import testrobotchallenge.commons.models.dto.score.JacocoCoverageDTO;
 import testrobotchallenge.commons.models.opponent.GameMode;
-import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,7 +121,7 @@ public class GameManager {
         // Se è Scalata, carica i dati del livello da T1
         // Se è Scalata, popola il DTO con i dati reali del primo livello
         if (requestDTO instanceof com.g2.game.gameDTO.StartGameDTO.StartScalataRequestDTO scalataDTO) {
-            populateFirstLevelDataForScalata(scalataDTO);
+            requestDTO = gameService.populateFirstLevelDataForScalata(scalataDTO);
         }
 
                 // Converto il dto
@@ -155,24 +154,6 @@ public class GameManager {
      * Popola il DTO di Scalata con i dati reali del primo livello da T1.
      * Aggiorna i campi di requestDTO con classUTName, remainingTime, timeMaxPerLevel, ecc.
      */
-    private void populateFirstLevelDataForScalata(com.g2.game.gameDTO.StartGameDTO.StartScalataRequestDTO requestDTO) {
-        // Chiama T1 per ottenere i dati del primo livello
-        int livello = requestDTO.getCurrentLevel() > 0 ? requestDTO.getCurrentLevel() : 1;
-        java.util.Map<String, Object> levelData = (java.util.Map<String, Object>) serviceManager.handleRequest(
-                "T1", "getLevelByScalataAndPosition", requestDTO.getScalataName(), livello);
-            
-        // Popola i dati nel DTO
-        requestDTO.setClassUTName((String) levelData.get("className"));
-        requestDTO.setTypeRobot("EvoSuite");
-        requestDTO.setDifficulty(OpponentDifficulty.EASY);
-        Integer tempoMax = (Integer) levelData.get("tempoMax");
-        int time = tempoMax != null ? tempoMax : 600;
-        requestDTO.setRemainingTime(time);
-        requestDTO.setTimeMaxPerLevel(time);
-        // Se vuoi puoi popolare anche altri campi se servono
-    }
-
-
     /**
      * Gestisce l'esecuzione di un singolo turno di gioco per un giocatore.
      * <p>
