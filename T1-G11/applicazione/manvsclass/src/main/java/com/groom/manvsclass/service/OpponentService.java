@@ -100,19 +100,20 @@ public class OpponentService {
         // Validate class file
         if (classUTFile == null || classUTFile.isEmpty()) {
             throw new FileUploadException(
-                "File della classe mancante o vuoto. " +
-                "Selezionare un file .java valido contenente la classe da testare. " +
-                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte."
+                "File della classe mancante o vuoto. Selezionare un file .java valido contenente la classe da testare. " +
+                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte.",
+                "error.upload.file.empty"
             );
         }
 
         // Validate robot tests zip file
         if (robotTestsZip == null || robotTestsZip.isEmpty()) {
             throw new FileUploadException(
-                "File ZIP dei test robot mancante o vuoto. " +
-                "Selezionare un file ZIP valido contenente le cartelle EvoSuiteTest e/o RandoopTest. " +
-                "Il file deve avere la seguente struttura: ZIP/[EvoSuiteTest|RandoopTest]/[01Level, 02Level, ...]/[test files e coverage]. " +
-                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte."
+                "File ZIP dei test robot mancante o vuoto. Selezionare un file ZIP valido contenente le cartelle " +
+                "EvoSuiteTest e/o RandoopTest. Il file deve avere la seguente struttura: " +
+                "ZIP/[EvoSuiteTest|RandoopTest]/[01Level, 02Level, ...]/[test files e coverage]. " +
+                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte.",
+                "error.upload.zip.empty"
             );
         }
 
@@ -149,7 +150,8 @@ public class OpponentService {
             throw new ClassValidationException(
                 "Il file .java inviato non contiene una dichiarazione di classe Java valida. " +
                 "Verificare che il file contenga una riga del tipo 'public class NomeClasse { ... }'. " +
-                "Il file potrebbe essere corrotto, vuoto, o non essere un file Java valido."
+                "Il file potrebbe essere corrotto, vuoto, o non essere un file Java valido.",
+                "error.validation.class.noDeclaration"
             );
         }
 
@@ -162,13 +164,18 @@ public class OpponentService {
                     "Correggere il campo 'Class Name' nel form in modo che corrisponda esattamente al nome della classe " +
                     "dichiarato nel file .java (verificare maiuscole/minuscole).",
                     classNameFromSourceFile, classUTName
-                )
+                ),
+                "error.validation.class.nameMismatch",
+                classNameFromSourceFile, classUTName
             );
         }
 
 		if(FormValidation.validateClassUT(classe) == false)
 		{
-			throw new ClassValidationException("Errore: la validazione del form non ha avuto successo.");
+			throw new ClassValidationException(
+                "Errore: la validazione del form non ha avuto successo.",
+                "error.validation.class.failed"
+            );
 		}
 
         //-------------------------------------------------------------------------------------------
