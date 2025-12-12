@@ -123,7 +123,8 @@ public class OpponentService {
         } catch (IOException e) {
             throw new ClassValidationException(
                 "Errore nella lettura dei dettagli della classe: " + e.getMessage(),
-                e
+                "error.upload.json.parse",
+                e.getMessage()
             );
         }
         
@@ -140,7 +141,8 @@ public class OpponentService {
             throw new FileUploadException(
                 "Impossibile leggere il contenuto del file .java: " + e.getMessage() + ". " +
                 "Il file potrebbe essere danneggiato o non accessibile. Riprovare con un altro file.",
-                e
+                "error.upload.file.read",
+                e.getMessage()
             );
         }
         
@@ -213,12 +215,16 @@ public class OpponentService {
             } else if (e instanceof IOException ioException) {
                 throw new FileUploadException(
                     "Errore I/O durante l'upload: " + ioException.getMessage() + 
-                    ". Verificare i permessi dei file e lo spazio disponibile su disco.", ioException
+                    ". Verificare i permessi dei file e lo spazio disponibile su disco.",
+                    "error.upload.io",
+                    ioException.getMessage()
                 );
             } else {
                 throw new FileUploadException(
                     "Errore imprevisto durante l'upload: " + e.getMessage() + 
-                    ". Contattare l'amministratore se il problema persiste.", e
+                    ". Contattare l'amministratore se il problema persiste.",
+                    "error.upload.unexpected",
+                    e.getMessage()
                 );
             }
         }

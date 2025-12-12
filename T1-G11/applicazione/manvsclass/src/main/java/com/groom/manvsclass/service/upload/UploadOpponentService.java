@@ -60,7 +60,9 @@ public class UploadOpponentService {
             logger.error("Errore durante l'estrazione del file ZIP dei robot test: {}", e.getMessage(), e);
             throw new FileUploadException(
                 "Errore nell'estrazione del file ZIP: " + e.getMessage() + 
-                ". Verificare che il file sia un archivio ZIP valido e non corrotto.", e
+                ". Verificare che il file sia un archivio ZIP valido e non corrotto.",
+                "error.robot.zip.extract",
+                e.getMessage()
             );
         }
 
@@ -72,7 +74,8 @@ public class UploadOpponentService {
         if (robotGroupFiles == null || robotGroupFiles.length == 0) {
             throw new RobotProcessingException(
                 "Il file ZIP è vuoto o non contiene cartelle di test robot. " +
-                "Assicurarsi che il file ZIP contenga le cartelle EvoSuiteTest e/o RandoopTest con i livelli di test."
+                "Assicurarsi che il file ZIP contenga le cartelle EvoSuiteTest e/o RandoopTest con i livelli di test.",
+                "error.robot.zip.empty"
             );
         }
         
@@ -85,7 +88,9 @@ public class UploadOpponentService {
             logger.error("Errore durante l'elaborazione delle cartelle robot: {}", e.getMessage(), e);
             throw new RobotProcessingException(
                 "Errore nell'elaborazione dei test robot: " + e.getMessage() + 
-                ". Verificare che i file di test siano file Java validi e correttamente formattati.", e
+                ". Verificare che i file di test siano file Java validi e correttamente formattati.",
+                "error.robot.processing",
+                e.getMessage()
             );
         } finally {
             fileStorageService.deleteDirectoryRecursively(operationTmpFolder);
@@ -97,7 +102,8 @@ public class UploadOpponentService {
         if (robotFolders == null || robotFolders.length == 0) {
             throw new RobotProcessingException(
                 "La cartella dei robot test è vuota o non accessibile. " +
-                "Verificare che il file ZIP contenga cartelle di test valide (EvoSuiteTest, RandoopTest)."
+                "Verificare che il file ZIP contenga cartelle di test valide (EvoSuiteTest, RandoopTest).",
+                "error.robot.folder.empty"
             );
         }
         
@@ -122,7 +128,8 @@ public class UploadOpponentService {
             throw new RobotProcessingException(
                 "Il file ZIP non contiene cartelle di test robot valide. " +
                 "Le cartelle devono essere nominate 'EvoSuiteTest' o 'RandoopTest' " +
-                "(il nome deve terminare con 'Test')."
+                "(il nome deve terminare con 'Test').",
+                "error.robot.folder.noValid"
             );
         }
         
@@ -130,7 +137,8 @@ public class UploadOpponentService {
             throw new RobotProcessingException(
                 "Il file ZIP non contiene alcun file di test Java (.java). " +
                 "Verificare che le cartelle dei livelli (01Level, 02Level, ecc.) contengano " +
-                "file di test con estensione .java all'interno della sottocartella 'TestSourceCode'."
+                "file di test con estensione .java all'interno della sottocartella 'TestSourceCode'.",
+                "error.robot.noTests"
             );
         }
     }
@@ -179,7 +187,9 @@ public class UploadOpponentService {
                 // Continua con gli altri livelli invece di fallire completamente
                 throw new RobotProcessingException(
                     "Errore nell'elaborazione del livello '" + levelFolder.getName() + "': " + e.getMessage() + 
-                    ". Verificare che il livello contenga file di test validi.", e
+                    ". Verificare che il livello contenga file di test validi.",
+                    "error.robot.level.processing",
+                    levelFolder.getName(), e.getMessage()
                 );
             }
         }
@@ -188,7 +198,9 @@ public class UploadOpponentService {
             throw new RobotProcessingException(
                 String.format("Nessun livello di test valido trovato per '%s'. " +
                     "I livelli devono essere cartelle nominate nel formato '01Level', '02Level', ecc. " +
-                    "e contenere file di test Java.", robotType)
+                    "e contenere file di test Java.", robotType),
+                "error.robot.level.noValid",
+                robotType
             );
         }
 
@@ -404,7 +416,9 @@ public class UploadOpponentService {
             logger.error("Errore durante la generazione della coverage EvoSuite per {}: {}", classUTName, e.getMessage(), e);
             throw new RobotProcessingException(
                 "Errore durante la compilazione e generazione della coverage EvoSuite: " + e.getMessage() + 
-                ". Verificare che i test EvoSuite siano compilabili e che la classe sotto test sia valida.", e
+                ". Verificare che i test EvoSuite siano compilabili e che la classe sotto test sia valida.",
+                "error.robot.processing",
+                e.getMessage()
             );
         }
     }
@@ -421,7 +435,9 @@ public class UploadOpponentService {
             throw new RobotProcessingException(
                 "Errore durante la compilazione e generazione della coverage JaCoCo: " + e.getMessage() + 
                 ". Verificare che i test Randoop siano compilabili, che la classe sotto test sia valida " +
-                "e che non ci siano errori di compilazione.", e
+                "e che non ci siano errori di compilazione.",
+                "error.robot.processing",
+                e.getMessage()
             );
         }
     }

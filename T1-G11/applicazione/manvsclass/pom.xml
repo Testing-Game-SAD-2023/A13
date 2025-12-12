@@ -172,6 +172,12 @@
             <artifactId>opentelemetry-spring-boot-starter</artifactId>
             <version>2.7.0</version>
         </dependency>
+        <!-- OpenAPI / Swagger (compatible with Spring Boot 2.7.x) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.7.0</version>
+        </dependency>
     </dependencies>
 
     <build>
