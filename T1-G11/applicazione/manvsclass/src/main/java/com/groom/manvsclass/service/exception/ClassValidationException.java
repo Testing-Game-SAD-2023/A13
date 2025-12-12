@@ -10,9 +10,23 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ClassValidationException extends LocalizedException {
     
     /**
+     * Constructor with message key only (no detailed message needed)
+     */
+    public ClassValidationException(String messageKey) {
+        super(messageKey, messageKey);
+    }
+    
+    /**
+     * Constructor with message key and parameters
+     */
+    public ClassValidationException(String messageKey, Object... params) {
+        super(messageKey, messageKey, params);
+    }
+
+    /**
      * Constructor with detailed message only (legacy support)
      */
-    public ClassValidationException(String message) {
+    public ClassValidationException(String message, boolean legacy) {
         super(message, null);
     }
 
@@ -24,14 +38,14 @@ public class ClassValidationException extends LocalizedException {
     }
     
     /**
-     * Constructor with detailed message and message key for localization
+     * Constructor with detailed message and message key for localization (legacy)
      */
-    public ClassValidationException(String detailedMessage, String messageKey, Object... params) {
+    public ClassValidationException(String detailedMessage, String messageKey, boolean withDetail, Object... params) {
         super(detailedMessage, messageKey, params);
     }
     
     /**
-     * Constructor with detailed message, message key, cause, and parameters
+     * Constructor with detailed message, message key, cause, and parameters (legacy)
      */
     public ClassValidationException(String detailedMessage, String messageKey, Throwable cause, Object... params) {
         super(detailedMessage, messageKey, cause, params);

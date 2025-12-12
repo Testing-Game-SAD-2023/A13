@@ -100,8 +100,6 @@ public class OpponentService {
         // Validate class file
         if (classUTFile == null || classUTFile.isEmpty()) {
             throw new FileUploadException(
-                "File della classe mancante o vuoto. Selezionare un file .java valido contenente la classe da testare. " +
-                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte.",
                 "error.upload.file.empty"
             );
         }
@@ -109,10 +107,6 @@ public class OpponentService {
         // Validate robot tests zip file
         if (robotTestsZip == null || robotTestsZip.isEmpty()) {
             throw new FileUploadException(
-                "File ZIP dei test robot mancante o vuoto. Selezionare un file ZIP valido contenente le cartelle " +
-                "EvoSuiteTest e/o RandoopTest. Il file deve avere la seguente struttura: " +
-                "ZIP/[EvoSuiteTest|RandoopTest]/[01Level, 02Level, ...]/[test files e coverage]. " +
-                "Verificare che il file non sia danneggiato e abbia una dimensione maggiore di 0 byte.",
                 "error.upload.zip.empty"
             );
         }
@@ -122,7 +116,6 @@ public class OpponentService {
             classe = ClassUTDetailsDTO.parseFromJson(classUTDetails);
         } catch (IOException e) {
             throw new ClassValidationException(
-                "Errore nella lettura dei dettagli della classe: " + e.getMessage(),
                 "error.upload.json.parse",
                 e.getMessage()
             );
@@ -139,8 +132,6 @@ public class OpponentService {
             classFileBytes = classUTFile.getBytes();
         } catch (IOException e) {
             throw new FileUploadException(
-                "Impossibile leggere il contenuto del file .java: " + e.getMessage() + ". " +
-                "Il file potrebbe essere danneggiato o non accessibile. Riprovare con un altro file.",
                 "error.upload.file.read",
                 e.getMessage()
             );
@@ -150,23 +141,12 @@ public class OpponentService {
 
         if(classNameFromSourceFile == null) {
             throw new ClassValidationException(
-                "Il file .java inviato non contiene una dichiarazione di classe Java valida. " +
-                "Verificare che il file contenga una riga del tipo 'public class NomeClasse { ... }'. " +
-                "Il file potrebbe essere corrotto, vuoto, o non essere un file Java valido.",
                 "error.validation.class.noDeclaration"
             );
         }
 
         if(!classNameFromSourceFile.equalsIgnoreCase(classUTName)) {
             throw new ClassValidationException(
-                String.format(
-                    "Mancata corrispondenza tra nome classe nel file e nome inserito nel form:%n" +
-                    "  • Nome nel file .java: '%s'%n" +
-                    "  • Nome inserito nel form: '%s'%n%n" +
-                    "Correggere il campo 'Class Name' nel form in modo che corrisponda esattamente al nome della classe " +
-                    "dichiarato nel file .java (verificare maiuscole/minuscole).",
-                    classNameFromSourceFile, classUTName
-                ),
                 "error.validation.class.nameMismatch",
                 classNameFromSourceFile, classUTName
             );
@@ -175,7 +155,6 @@ public class OpponentService {
 		if(FormValidation.validateClassUT(classe) == false)
 		{
 			throw new ClassValidationException(
-                "Errore: la validazione del form non ha avuto successo.",
                 "error.validation.class.failed"
             );
 		}
@@ -214,15 +193,11 @@ public class OpponentService {
                 throw e;
             } else if (e instanceof IOException ioException) {
                 throw new FileUploadException(
-                    "Errore I/O durante l'upload: " + ioException.getMessage() + 
-                    ". Verificare i permessi dei file e lo spazio disponibile su disco.",
                     "error.upload.io",
                     ioException.getMessage()
                 );
             } else {
                 throw new FileUploadException(
-                    "Errore imprevisto durante l'upload: " + e.getMessage() + 
-                    ". Contattare l'amministratore se il problema persiste.",
                     "error.upload.unexpected",
                     e.getMessage()
                 );
