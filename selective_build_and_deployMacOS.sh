@@ -48,7 +48,7 @@ for i in "${SELECTION[@]}"; do
             echo "Building T23-G1"
             cd "$ROOT_DIR/T23-G1"
             mvn clean package || { echo "Error in T23-G1 build"; exit 1; }
-            docker build -t mick0974/a13:t23-g1 .
+            docker buildx build --platform linux/amd64 -t mick0974/a13:t23-g1 .
             docker compose up -d
             cd "$ROOT_DIR"
             ;;
