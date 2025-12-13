@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,28 +40,18 @@ public class GlobalErrorAttributesFilter implements GlobalFilter, Ordered {
         ServerHttpResponse originalResponse = exchange.getResponse();
         DataBufferFactory bufferFactory = originalResponse.bufferFactory();
 
-        // Creiamo il decoratore
         ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(originalResponse) {
 
+            // CASO 1: Risposte con body (es. da downstream o errori scritti esplicitamente)
             @Override
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
-                // In Spring 6 / Boot 3 getStatusCode ritorna HttpStatusCode
                 HttpStatusCode statusCode = getStatusCode();
-
-                // Controlliamo i codici 401 e 429
-                if (statusCode != null && (statusCode.value() == HttpStatus.UNAUTHORIZED.value() || statusCode.value() == HttpStatus.TOO_MANY_REQUESTS.value())) {
-
-                    // FLUSSO DI ERRORE:
-                    // 1. Convertiamo il body originale in Flux per consumarlo
-                    // 2. Usiamo doOnNext per rilasciare la memoria (DataBufferUtils.release)
-                    // 3. Usiamo .then() per eseguire la nostra scrittura custom DOPO aver pulito il vecchio body
+                if (shouldIntercept(statusCode)) {
+                    HttpStatusCode effectiveStatus = (statusCode != null) ? statusCode : HttpStatus.INTERNAL_SERVER_ERROR;
                     return Flux.from(body)
                             .doOnNext(DataBufferUtils::release)
-                            .then(Mono.defer(() -> writeCustomBody(statusCode, originalResponse, bufferFactory, exchange)));
+                            .then(Mono.defer(() -> writeCustomBody(effectiveStatus, getDelegate(), bufferFactory, exchange)));
                 }
-
-                // FLUSSO NORMALE:
-                // Se non è un errore gestito, lasciamo fare a Spring (super.writeWith)
                 return super.writeWith(body);
             }
 
@@ -68,18 +59,67 @@ public class GlobalErrorAttributesFilter implements GlobalFilter, Ordered {
             public Mono<Void> writeAndFlushWith(Publisher<? extends Publisher<? extends DataBuffer>> body) {
                 return writeWith(Flux.from(body).flatMap(p -> p));
             }
+
+            // CASO 2: Risposte vuote chiuse "gentilmente" (es. Rate Limiter 429)
+            @Override
+            public Mono<Void> setComplete() {
+                HttpStatusCode statusCode = getStatusCode();
+                if (shouldIntercept(statusCode)) {
+                    HttpStatusCode effectiveStatus = (statusCode != null) ? statusCode : HttpStatus.INTERNAL_SERVER_ERROR;
+                    return writeCustomBody(effectiveStatus, getDelegate(), bufferFactory, exchange);
+                }
+                return super.setComplete();
+            }
         };
 
-        return chain.filter(exchange.mutate().response(decoratedResponse).build());
+        // Esecuzione catena con gestione ECCEZIONI
+        return chain.filter(exchange.mutate().response(decoratedResponse).build())
+                .onErrorResume(ex -> {
+                    // CASO 3: Eccezioni lanciate dai filtri (es. Auth Filter che lancia 401 invece di settarlo)
+                    HttpStatusCode status = determineStatusFromException(ex);
+                    
+                    if (shouldIntercept(status) && !originalResponse.isCommitted()) {
+                        return writeCustomBody(status, originalResponse, bufferFactory, exchange);
+                    }
+                    // Se non è un errore che gestiamo noi, rilanciamo l'eccezione
+                    return Mono.error(ex);
+                });
     }
 
-    // Metodo helper che scrive direttamente sulla response originale
+    /**
+     * Determina se intervenire. 
+     * Intercetta: 401, 429, 500, NULL.
+     * Ignora: Circuit Breaker Fallback (es. 200, 503).
+     */
+    private boolean shouldIntercept(HttpStatusCode status) {
+        if (status == null) return true;
+        int val = status.value();
+        return val == HttpStatus.UNAUTHORIZED.value() || 
+               val == HttpStatus.TOO_MANY_REQUESTS.value() ||
+               val == HttpStatus.INTERNAL_SERVER_ERROR.value();
+    }
+
+    /**
+     * Estrae lo status code dall'eccezione se possibile
+     */
+    private HttpStatusCode determineStatusFromException(Throwable ex) {
+        if (ex instanceof ResponseStatusException) {
+            return ((ResponseStatusException) ex).getStatusCode();
+        }
+        // Se è un'altra eccezione generica, assumiamo sia un errore server
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
     private Mono<Void> writeCustomBody(HttpStatusCode statusCode, ServerHttpResponse response, DataBufferFactory bufferFactory, ServerWebExchange exchange) {
         try {
+            // Assicuriamoci che lo status sia corretto sulla response
+            if (response.getStatusCode() == null || response.getStatusCode().value() != statusCode.value()) {
+                response.setStatusCode(statusCode);
+            }
+
             Map<String, Object> problemDetails = new LinkedHashMap<>();
             problemDetails.put("type", "about:blank");
-
-            // Gestione titolo basata sul valore dello status
+            
             String reasonPhrase = (statusCode instanceof HttpStatus) ? ((HttpStatus) statusCode).getReasonPhrase() : "Error";
             problemDetails.put("title", reasonPhrase);
             problemDetails.put("status", statusCode.value());
@@ -88,16 +128,14 @@ public class GlobalErrorAttributesFilter implements GlobalFilter, Ordered {
 
             byte[] jsonBytes = objectMapper.writeValueAsBytes(problemDetails);
 
-            // Impostiamo gli header sulla risposta originale
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             response.getHeaders().setContentLength(jsonBytes.length);
 
-            // Scriviamo il buffer sulla risposta passata come argomento
             return response.writeWith(Mono.just(bufferFactory.wrap(jsonBytes)));
 
         } catch (JsonProcessingException e) {
-            logger.error("Errore nella serializzazione JSON dell'errore", e);
-            return response.writeWith(Mono.empty());
+            logger.error("Errore serializzazione JSON", e);
+            return response.setComplete();
         }
     }
 
@@ -107,12 +145,11 @@ public class GlobalErrorAttributesFilter implements GlobalFilter, Ordered {
         } else if (status.value() == HttpStatus.UNAUTHORIZED.value()) {
             return "Autenticazione mancante o non valida.";
         }
-        return "Errore nella richiesta.";
+        return "Si è verificato un errore interno al server.";
     }
 
     @Override
     public int getOrder() {
-        // Ordine prioritario per avvolgere gli altri filtri (-5)
         return -5;
     }
 }
