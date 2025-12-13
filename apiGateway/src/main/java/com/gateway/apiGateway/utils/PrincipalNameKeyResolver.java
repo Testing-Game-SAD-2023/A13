@@ -1,4 +1,4 @@
-package com.gateway.apiGateway.config; // Adatta il nome del pacchetto
+package com.gateway.apiGateway.utils; // Adatta il nome del pacchetto
 
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.web.server.ServerWebExchange;

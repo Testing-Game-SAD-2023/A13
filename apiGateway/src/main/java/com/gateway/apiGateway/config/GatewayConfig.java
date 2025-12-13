@@ -28,6 +28,9 @@ package com.gateway.apiGateway.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary; // Importa Primary
+
+import com.gateway.apiGateway.utils.PrincipalNameKeyResolver;
+
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver; // Importa l'interfaccia
 
 //import com.gateway.apiGateway.config.PrincipalNameKeyResolver;(se lo mantengo in config non devo aggiungere l'import)
