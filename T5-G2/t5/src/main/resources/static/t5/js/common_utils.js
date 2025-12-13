@@ -68,9 +68,14 @@ function GetMode() {
  * @returns {string} Tempo formattato (MM:SS)
  */
 function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return String(mins).padStart(2, '0') + ":" + String(secs).padStart(2, '0');
+	let hrs = Math.floor(seconds / 3600);
+	let mins = Math.floor((seconds % 3600) / 60);
+	let secs = seconds % 60;
+	return (
+		String(hrs).padStart(2, '0') + ":" +
+		String(mins).padStart(2, '0') + ":" +
+		String(secs).padStart(2, '0')
+	);
 }
 
 /**
