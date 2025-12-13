@@ -30,5 +30,5 @@ public class CreateGameDTO {
     /**
      * Nome della scalata (opzionale, solo per modalità Scalata)
      */
-    private String scalataName;
+    private String gameName;
 }

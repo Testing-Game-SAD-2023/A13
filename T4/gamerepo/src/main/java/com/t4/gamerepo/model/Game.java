@@ -99,8 +99,8 @@ public class Game {
     /**
      * Nome della scalata (solo per game_mode = 'Scalata', altrimenti null)
      */
-    @Column(name = "scalata_name")
-    private String scalataName;
+    @Column(name = "game_name")
+    private String gameName;
 
     public Game(GameMode gameMode, List<Long> players) {
         this.gameMode = gameMode;

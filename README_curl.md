@@ -139,7 +139,7 @@ curl -s -X GET "http://localhost/api/gamerepo/games/player/2" \
 
 ### Opzione B: Query diretta al database
 ```bash
-docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, game_mode, status, current_level, scalata_name, started_at FROM games ORDER BY id DESC LIMIT 5;"
+docker exec t4-postgres_db psql -U t4_service -d t4_database -c "SELECT id, game_mode, status, current_level, game_name, started_at FROM games ORDER BY id DESC LIMIT 5;"
 ```
 ### Query diretta per visualizzare i round
 ```bash

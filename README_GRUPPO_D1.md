@@ -20,7 +20,7 @@ La modalità termina quando il giocatore completa con successo l'ultimo livello 
 La modalità Scalata è stata implementata seguendo un approccio di **minima invasività** sui microservizi **T4** (gestione partite) e **T5** (game engine).
 
 **Architettura adottata:**
-- **T4**: Estensione del modello dati esistente con l'aggiunta di due attributi (`scalataName` e `currentLevel`) all'entità `Game`, mantenendo inalterata l'architettura relazionale. Sono state introdotte due nuove rotte REST per supportare le operazioni specifiche della Scalata (incremento currentLevel e incremento currentRound).
+- **T4**: Estensione del modello dati esistente con l'aggiunta di due attributi (`gameName` e `currentLevel`) all'entità `Game`, mantenendo inalterata l'architettura relazionale. Sono state introdotte due nuove rotte REST per supportare le operazioni specifiche della Scalata (incremento currentLevel e incremento currentRound).
 
 - **T5**: Implementazione di una nuova classe `ScalataGame` che estende `TurnBasedGame`, seguendo il pattern già utilizzato per le altre modalità. La logica di orchestrazione è stata centralizzata nel `GameManager`, che gestisce in modo trasparente sia le modalità esistenti che la nuova Scalata.
 
@@ -35,7 +35,7 @@ Questo approccio ha permesso di **riutilizzare l'infrastruttura esistente** (con
 | **Microservizio** | **Tipo di Modifica** | **Eventuali Nuove Tecnologie usate** |
 |-------------------|----------------------|--------------------------------------|
 | **T1-G11**        | Modifiche apportate dal gruppo D5 per la gestione delle scalate lato amministratore | Nessuna |
-| **T4-G18**        | **Aggiunta di due nuove rotte REST:**<br>- `PUT /games/{id}/current-level-increment`: incrementa il livello corrente della scalata<br>- `PUT /games/{id}/rounds/last/increment-attempt`: incrementa il numero di tentativi sul round corrente<br><br>**Estensione modello dati:**<br>- Aggiunta attributi `scalataName` e `currentLevel` all'entità `Game` | Nessuna |
+| **T4-G18**        | **Aggiunta di due nuove rotte REST:**<br>- `PUT /games/{id}/current-level-increment`: incrementa il livello corrente della scalata<br>- `PUT /games/{id}/rounds/last/increment-attempt`: incrementa il numero di tentativi sul round corrente<br><br>**Estensione modello dati:**<br>- Aggiunta attributi `gameName` e `currentLevel` all'entità `Game` | Nessuna |
 | **T5-G2**         | **Nuove classi Java:**<br>- `TurnBasedGame`: classe astratta base per modalità a turni<br>- `ScalataGame`: estende `TurnBasedGame`, gestisce la progressione dei livelli<br>- `ScalataParams`: DTO per i parametri specifici della Scalata<br>- `ScalataFactory`: factory per l'istanziazione di `ScalataGame`<br>- `EndScalataGameResponseDTO`: DTO di risposta con dati specifici della Scalata<br><br>**Modifiche a classi esistenti:**<br>- `GameManager`: esteso per gestire la progressione dei livelli<br>- `GameService`: aggiunto metodo `populateFirstLevelDataForScalata()`<br><br>**Frontend:**<br>- `scalata.html`: nuova pagina per selezione e gestione scalate<br>- `gamemode_scalata.js`: logica di interazione per la modalità Scalata<br>- `gamemode_scalata.css`: stili dedicati per l'interfaccia Scalata | Nessuna |
 ---
 
@@ -118,7 +118,7 @@ Per gestire il recupero dello stato della scalata in assenza di sessione Redis a
    - `gameName`: il nome della scalata in corso
    - `currentLevel`: il livello corrente raggiunto dal giocatore
 
-4. **Query a T1**: Utilizzare i dati estratti per interrogare T1 tramite `GET /scalata/{scalataName}/level/{currentLevel}` e ottenere i metadati del livello corrente (classe Under Test, robot, difficoltà, tempo massimo)
+4. **Query a T1**: Utilizzare i dati estratti per interrogare T1 tramite `GET /scalata/{gameName}/level/{currentLevel}` e ottenere i metadati del livello corrente (classe Under Test, robot, difficoltà, tempo massimo)
 
 5. **Ricostruzione dello stato**: Istanziare un nuovo oggetto `ScalataGame` con:
    - I dati recuperati da T4 (ID partita, stato, currentLevel)

@@ -479,9 +479,9 @@ public class GameController {
     public ResponseEntity<Integer> getCurrentLevelForScalata(
             @Parameter(name = "playerId", description = "ID of the player", required = true)
             @RequestParam Long playerId,
-            @Parameter(name = "scalataName", description = "Name of the scalata", required = true)
-            @RequestParam String scalataName) {
-        Integer currentLevel = gameService.getCurrentLevelForScalata(playerId, scalataName);
+            @Parameter(name = "gameName", description = "Name of the scalata", required = true)
+            @RequestParam String gameName) {
+        Integer currentLevel = gameService.getCurrentLevelForScalata(playerId, gameName);
         return ResponseEntity.ok(currentLevel);
     }
 }

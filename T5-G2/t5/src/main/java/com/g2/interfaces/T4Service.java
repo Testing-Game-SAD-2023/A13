@@ -170,9 +170,9 @@ public class T4Service extends BaseService {
         obj.put("gameMode", gameMode);
         obj.put("players", playersArray);
         
-        // Aggiungi scalataName solo se non è null
+        // Aggiungi gameName solo se non è null (T4 usa gameName, ma riceviamo scalataName da T1)
         if (scalataName != null && !scalataName.isEmpty()) {
-            obj.put("scalataName", scalataName);
+            obj.put("gameName", scalataName);
         }
 
         String respose = callRestPost(endpoint, obj, null, null, String.class);
@@ -334,15 +334,15 @@ public class T4Service extends BaseService {
     }
 
     /**
-     * Recupera il livello corrente di una partita Scalata per un giocatore.
+     * Recupera il livello corrente per una Scalata in corso (Game con status STARTED).
      * Ritorna 1 (default) se non esiste partita in corso.
      * 
      * @param playerId ID del giocatore
-     * @param scalataName Nome della scalata
+     * @param scalataName Nome della scalata (viene passato a T4 come gameName)
      * @return Livello corrente (1 se non esiste partita)
      */
     private Integer GetCurrentLevelForScalata(long playerId, String scalataName) {
-        final String endpoint = "/games/scalata/current-level?playerId=%d&scalataName=%s"
+        final String endpoint = "/games/scalata/current-level?playerId=%d&gameName=%s"
                 .formatted(playerId, scalataName);
         
         try {

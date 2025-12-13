@@ -18,6 +18,6 @@ public record GameDTO(
         Timestamp startedAt,
         Timestamp closedAt,
         Integer currentLevel,
-        String scalataName
+        String gameName
 ) {
 }

@@ -114,7 +114,7 @@ public class GameService {
     public GameDTO createGame(CreateGameDTO dto) {
         GameMode gameMode = dto.getGameMode();
         List<Long> players = dto.getPlayers();
-        String scalataName = dto.getScalataName();
+        String gameName = dto.getGameName();
         Set<Long> playersSet = new HashSet<>(players);
 
         // Non è previsto che un giocatore possa giocare contro se stesso
@@ -125,8 +125,8 @@ public class GameService {
         newGame.setStatus(GameStatus.CREATED);
         
         // Se è una partita Scalata, salva il nome della scalata
-        if (GameMode.Scalata.equals(gameMode) && scalataName != null) {
-            newGame.setScalataName(scalataName);
+        if (GameMode.Scalata.equals(gameMode) && gameName != null) {
+            newGame.setGameName(gameName);
         }
 
         return mapperFacade.toDTO(gameRepository.save(newGame));
@@ -320,21 +320,21 @@ public class GameService {
      * Ritorna 1 (default) se non esiste nessuna partita in corso.
      *
      * @param playerId l'ID del giocatore
-     * @param scalataName il nome della scalata
+     * @param gameName il nome della scalata
      * @return il livello corrente (1 se non c'è partita in corso)
      */
-    public Integer getCurrentLevelForScalata(Long playerId, String scalataName) {
-        Game game = gameRepository.findScalataInProgress(playerId, scalataName);
+    public Integer getCurrentLevelForScalata(Long playerId, String gameName) {
+        Game game = gameRepository.findScalataInProgress(playerId, gameName);
         
         if (game == null) {
             logger.info("No STARTED Scalata game found for player {} and scalata '{}'. Returning default level 1.", 
-                    playerId, scalataName);
+                    playerId, gameName);
             return 1;  // Default: nessuna partita in corso
         }
         
         Integer currentLevel = game.getCurrentLevel();
         logger.info("Found Scalata game {} for player {} and scalata '{}': current level = {}", 
-                game.getId(), playerId, scalataName, currentLevel);
+                game.getId(), playerId, gameName, currentLevel);
         
         return currentLevel != null ? currentLevel : 1;
     }
