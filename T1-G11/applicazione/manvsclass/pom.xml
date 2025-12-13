@@ -167,6 +167,29 @@
             <artifactId>opentelemetry-spring-boot-starter</artifactId>
             <version>2.7.0</version>
         </dependency>
+
+        <!-- Springdoc OpenAPI per Spring Boot 2.7 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
+        <!-- MapStruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>1.5.5.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+
     </dependencies>
 
     <build>

@@ -53,5 +53,15 @@ const APIS = {
     DOWNLOAD_CLASSUT: `${API_ADMIN_SERVICE_PREFIX}/opponents/download`,
     DELETE_OPPONENT: `${API_ADMIN_SERVICE_PREFIX}/opponents`,
     UPLOAD_OPPONENT: `${API_ADMIN_SERVICE_PREFIX}/opponents`,
+
+    OPPONENTS_SERVICE: {
+        GETALL_OPPONENTS: `${API_ADMIN_SERVICE_PREFIX}/opponents`,
+    },
+
+    SCALATA_SERVICE: {
+        CREATE_SCALATA: `${API_ADMIN_SERVICE_PREFIX}/scalata/create`,
+        GETALL_SCALATE: `${API_ADMIN_SERVICE_PREFIX}/scalata/getAll`,
+        DELETE_SCALATA: `${API_ADMIN_SERVICE_PREFIX}/scalata/delete`,
+    }
 };
 

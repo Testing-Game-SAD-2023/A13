@@ -261,12 +261,15 @@ public class GameService {
                 "T1", "getLevelByScalataAndPosition", requestDTO.getScalataName(), livello);
             
         // Popola i dati nel DTO usando i campi type-safe del LevelDataDTO
-        requestDTO.setClassUTName(levelData.getClassName());
-        requestDTO.setTypeRobot("EvoSuite");
-        requestDTO.setDifficulty(OpponentDifficulty.EASY);
-        int time = levelData.getTempoMax() != null ? levelData.getTempoMax() : 600;
-        requestDTO.setRemainingTime(time);
-        requestDTO.setTimeMaxPerLevel(time);
+        requestDTO.setClassUTName(levelData.getOpponentName().getClassUT());
+        requestDTO.setTypeRobot(levelData.getOpponentName().getType());
+        requestDTO.setDifficulty(levelData.getOpponentName().getDifficulty());
+        
+        // T1 ritorna tempoMax in secondi, ma il DB contiene minuti
+        // Quindi convertiamo minuti -> secondi (tempoMax * 60)
+        int timeInSeconds = levelData.getTempoMax() * 60;
+        requestDTO.setRemainingTime(timeInSeconds);
+        requestDTO.setTimeMaxPerLevel(timeInSeconds);
         
         return requestDTO;
     }

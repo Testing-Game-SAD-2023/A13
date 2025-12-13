@@ -17,6 +17,8 @@
 
 package com.g2.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.g2.model.OpponentSummary;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,10 @@ import lombok.NoArgsConstructor;
  * Questo DTO rappresenta i dati di un singolo livello all'interno di una Scalata,
  * includendo informazioni come la classe da testare, il tempo massimo disponibile,
  * e il nome dell'avversario.
+ * 
+ * NOTA: T1 invia l'oggetto Opponent completo (con id, createdAt, coverage, 
+ * jacocoScore, evosuiteScore) ma T5 riceve solo i campi essenziali tramite OpponentSummary.
+ * I campi extra vengono ignorati automaticamente da Jackson.
  */
 @Data
 @NoArgsConstructor
@@ -34,27 +40,14 @@ import lombok.NoArgsConstructor;
 public class LevelDataDTO {
     
     /**
-     * ID univoco del livello.
-     */
-    private Integer idLevel;
-    
-    /**
-     * Nome della Scalata a cui appartiene questo livello.
-     */
-    private String scalataName;
-    
-    /**
-     * Nome della classe Java da testare (es. "FTPFile", "ByteVector").
-     */
-    private String className;
-    
-    /**
      * Tempo massimo disponibile per completare il livello, espresso in secondi.
      */
-    private Integer tempoMax;
+    @JsonProperty("tempoMax")
+    private int tempoMax;
     
     /**
-     * Nome dell'avversario per questo livello (tipicamente "EvoSuite").
+     * Avversario per questo livello.
      */
-    private String opponentName;
+    @JsonProperty("opponent")
+    private OpponentSummary opponentName;
 }

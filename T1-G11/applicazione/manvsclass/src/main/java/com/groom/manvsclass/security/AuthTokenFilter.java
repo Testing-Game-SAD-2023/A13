@@ -35,12 +35,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         "/opponents/**",
         "/ottieniTeamByStudentId",
         "/ottieniDettagliTeamCompleto",
-        // allow players to list and retrieve scalate (needed by the T5 UI)
         "/scalata/**",
-        // allow players to access levels (needed for scalata functionality)
         "/level/**"
     );
-
     private final ApiGatewayClient apiGatewayClient;
 
     @Override

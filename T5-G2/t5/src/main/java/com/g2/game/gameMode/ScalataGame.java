@@ -170,11 +170,16 @@ public class ScalataGame extends TurnBasedGame {
                 "T1", "getLevelByScalataAndPosition", scalataName, currentLevel);
         
         // Popola i dati del gioco con le informazioni del livello usando i metodi type-safe del DTO
-        this.setClassUTName(levelData.getClassName());
-        this.remainingTime = levelData.getTempoMax() != null ? levelData.getTempoMax() : 600;
-        this.timeMaxPerLevel = this.remainingTime;
-        this.setTypeRobot("EvoSuite");
-        this.setDifficulty(OpponentDifficulty.EASY);
+        this.setClassUTName(levelData.getOpponentName().getClassUT());
+        
+        // T1 ritorna tempoMax in secondi, ma il DB contiene minuti
+        // Quindi convertiamo minuti -> secondi (tempoMax * 60)
+        int timeInSeconds = levelData.getTempoMax() * 60;
+        this.remainingTime = timeInSeconds;
+        this.timeMaxPerLevel = timeInSeconds;
+        
+        this.setTypeRobot(levelData.getOpponentName().getType());
+        this.setDifficulty(levelData.getOpponentName().getDifficulty());
 
         logger.info("[SCALATA] Dati livello {} caricati: class={}, tempo={}", 
                    currentLevel, getClassUTName(), remainingTime);

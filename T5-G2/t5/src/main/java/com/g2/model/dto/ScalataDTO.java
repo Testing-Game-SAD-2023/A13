@@ -1,22 +1,36 @@
 package com.g2.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+/**
+ * DTO per i dati di una Scalata ricevuti da T1.
+ * 
+ * NOTA: T1 invia anche i campi 'date' e 'listOfLevels' che vengono ignorati automaticamente da Jackson.
+ * I livelli vengono recuperati singolarmente tramite endpoint /getLevel/{name}/{number}
+ */
+
+@Getter
+@Setter
 public class ScalataDTO {
-    @JsonProperty("scalataName")
+
+    @JsonProperty("name")
     private String name;
     
     @JsonProperty("numberOfLevels")
-    private Integer totalLevels;
+    private int totalLevels;
     
-    @JsonProperty("scalataDescription")
+    @JsonProperty("description")
     private String description;
     
     @JsonProperty("username")
     private String username;
-    
+
+    /* logica di lista dei livelli rimossa
     @JsonProperty("levels")
-    private Integer[] levels;
+    private List<LevelDataDTO> levels;
+     */
     
     // Costruttore vuoto per Jackson
     public ScalataDTO() {}
@@ -26,47 +40,6 @@ public class ScalataDTO {
         this.name = name;
         this.totalLevels = totalLevels;
         this.description = description;
-    }
-    
-    // Getters e Setters
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public Integer getTotalLevels() {
-        return totalLevels;
-    }
-    
-    public void setTotalLevels(Integer totalLevels) {
-        this.totalLevels = totalLevels;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
-    public String getUsername() {
-        return username;
-    }
-    
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    public Integer[] getLevels() {
-        return levels;
-    }
-    
-    public void setLevels(Integer[] levels) {
-        this.levels = levels;
     }
     
     @Override

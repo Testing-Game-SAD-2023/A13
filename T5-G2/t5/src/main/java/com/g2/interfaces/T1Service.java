@@ -93,11 +93,6 @@ public class T1Service extends BaseService {
                 String.class
         ));
 
-        registerAction("getLevelById", new ServiceActionDefinition(
-                params -> getLevelById((Integer) params[0]), // Recupera un livello specifico per ID
-                Integer.class
-        ));
-
         registerAction("getLevelByScalataAndPosition", new ServiceActionDefinition(
                 params -> getLevelByScalataAndPosition((String) params[0], (Integer) params[1]),
                 String.class, Integer.class
@@ -162,17 +157,12 @@ public class T1Service extends BaseService {
 
 // Restituisce la lista di tutte le scalate disponibili
 private List<ScalataDTO> getScalateList() {
-    return callRestGET("/scalata/scalate_list", null, new ParameterizedTypeReference<List<ScalataDTO>>() {});
+    return callRestGET("/scalata/getAll", null, new ParameterizedTypeReference<List<ScalataDTO>>() {});
 }
 
 // Restituisce i dettagli di una scalata specifica per nome
-private Map<String, Object> retrieveScalataByName(String scalataName) {
-    return callRestGET("/scalata/retrieve_scalata/" + scalataName, null, Map.class);
-}
-
-// Restituisce i dettagli di un livello specifico per ID
-private Map<String, Object> getLevelById(Integer levelId) {
-    return callRestGET("/level/" + levelId, null, Map.class);
+private ScalataDTO retrieveScalataByName(String scalataName) {
+    return callRestGET("/scalata/get/" + scalataName, null, ScalataDTO.class);
 }
 
 /**
@@ -183,7 +173,7 @@ private Map<String, Object> getLevelById(Integer levelId) {
  * @return {@link LevelDataDTO} con i dati del Level
  */
 private LevelDataDTO getLevelByScalataAndPosition(String scalataName, Integer currentLevel) {
-    String path = "/scalata/" + scalataName + "/level/" + currentLevel;
+    String path = "/scalata/getLevel/" + scalataName + "/" + (currentLevel-1);
     return callRestGET(path, null, LevelDataDTO.class);
 }
 }
