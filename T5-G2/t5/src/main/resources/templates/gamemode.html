@@ -178,15 +178,22 @@
 				Scalata: /*[[#{scalata}]]*/ "Scalata",
 			}
 		</script>
-		<!-- Utility functions condivise -->
-		<script th:src="@{/t5/js/common_utils.js}" defer></script>
-		<!-- Logica specifica per gamemode -->
+		
+		<!-- Footer con UserUtil.js e altre utility (include jQuery, Bootstrap, UserUtil.js) -->
+		<div th:replace="fragments/footer :: footer"></div>
+		
+		<!-- IMPORTANTE: Ordine di caricamento critico -->
+		<!-- 1. common_utils.js (dipende da jQuery e UserUtil.js dal footer) -->
+		<script th:src="@{/t5/js/common_utils.js}"></script>
+		
+		<!-- 2. Gamemode_logic.js (dipende da common_utils.js) -->
 		<script
 			th:src="@{/t5/js/Gamemode_logic.js}"
 			th:inline="javascript"
-			defer
 		>
 		</script>
+		
+		<!-- 3. Util_Editor.js -->
 		<script
 		th:src="@{/t5/js/Util_Editor.js}"
 		th:inline="javascript"

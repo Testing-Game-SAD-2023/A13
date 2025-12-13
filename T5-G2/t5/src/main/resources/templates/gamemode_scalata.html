@@ -22,11 +22,6 @@
     <!-- CSS minimale SOLO per le card di selezione scalate -->
     <link rel="stylesheet" href="/t5/css/gamemode_scalata_minimal.css">
 
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
-    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
     <!-- Le scalate sono già renderizzate nel DOM da Thymeleaf -->
@@ -185,11 +180,15 @@
   </div>
 </div>
 
-<!-- Footer con UserUtil.js e altre utility -->
+<!-- Footer con UserUtil.js e altre utility (include jQuery, Bootstrap, UserUtil.js) -->
 <div th:replace="fragments/footer :: footer"></div>
 
-<!-- IMPORTANTE: Caricato DOPO footer per avere UserUtil.js già disponibile -->
-<script type="text/javascript" src="/t5/js/gamemode_scalata.js"></script>
+<!-- IMPORTANTE: Ordine di caricamento critico -->
+<!-- 1. common_utils.js (dipende da jQuery e UserUtil.js dal footer) -->
+<script th:src="@{/t5/js/common_utils.js}"></script>
+
+<!-- 2. gamemode_scalata.js (dipende da common_utils.js) -->
+<script th:src="@{/t5/js/gamemode_scalata.js}"></script>
 
 </body>
 
