@@ -1,4 +1,4 @@
-@startuml Upload_Sequence_Diagram_v2
+@startuml Upload_Sequence_Diagram_v1
 actor AdminBrowser as Browser
 participant "opponents_upload.js\n(formData)" as FrontendJS
 participant "api.js\ncallUploadOpponent" as ApiJS

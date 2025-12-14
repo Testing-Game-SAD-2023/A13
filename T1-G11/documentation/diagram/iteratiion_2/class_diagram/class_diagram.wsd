@@ -1,4 +1,4 @@
-@startuml Upload_Class_Diagram_With_FE_v2
+@startuml Class_Diagram_V1
 
 ' Server-side packages
 package "controller" {
