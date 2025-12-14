@@ -101,7 +101,7 @@ spring:
             - name: RequestRateLimiter        
               args:
                  redis-rate-limiter.replenishRate: 2
-                 redis-rate-limiter.burstCapacity: 10
+                 redis-rate-limiter.burstCapacity: 13
                  redis-rate-limiter.requestedTokens: 1
                  keyresolver: "#{@principalNameKeyResolver}"
             - name: CircuitBreaker              
@@ -119,8 +119,8 @@ spring:
             - name: AuthenticationFilter
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 2
-                redis-rate-limiter.burstCapacity: 15
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 8
                 redis-rate-limiter.requestedTokens: 1
                 keyresolver: "#{@principalNameKeyResolver}"
             - name: CircuitBreaker               
