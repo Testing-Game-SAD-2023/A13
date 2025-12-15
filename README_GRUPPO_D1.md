@@ -52,7 +52,7 @@ L'implementazione della modalità Scalata ha richiesto una **stretta collaborazi
 
 Sono state concordate le seguenti interfacce REST necessarie per l'integrazione:
 
-- **`GET /scalata/scalate_list`**: restituisce l'elenco di tutte le scalate disponibili nel sistema, con informazioni generali (nome, numero di livelli, descrizione).
+- **`GET /scalata/getAll`**: restituisce l'elenco di tutte le scalate disponibili nel sistema, con informazioni generali (nome, numero di livelli, descrizione).
 
 - **`GET /scalata/{scalataName}/level/{position}`**: recupera i dati di configurazione di uno specifico livello di una scalata (classe Under Test, tipo di robot, difficoltà, tempo massimo). Questa rotta è fondamentale per il caricamento dinamico dei parametri di gioco in T5.
 
