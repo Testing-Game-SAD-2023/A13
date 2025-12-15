@@ -114,3 +114,11 @@ public String sendReply(String message) {
 ```
 In questo caso, RabbitMQ capirà automaticamente a quale coda deve inviare la
 risposta.
+
+## Come fa il modulo a sapere l'indirizzo e il porto del broker?
+Per far in modo che il vostro modulo conosca l'indirizzo corretto, è necessario aggiungere al
+file di 'application.properties' queste due righe:
+```
+spring.rabbitmq.host=rabbitmq
+spring.rabbitmq.port=5672
+```
