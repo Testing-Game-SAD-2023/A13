@@ -1,0 +1,257 @@
+@startuml Upload_Data_Transformation_Pipeline
+
+title Data Transformation Pipeline - Upload Flow
+
+skinparam activity {
+  BackgroundColor #E8F5E9
+  BorderColor Black
+  FontSize 11
+}
+
+start
+
+:Browser uploads FormData;
+note right
+  **Raw Input**
+  - classUTFile: MultipartFile
+  - classUTDetails: JSON string
+  - robotTestsZip: MultipartFile
+end note
+
+partition "**Stage 1: Initial File Processing**" #FFF9C4 {
+  :Controller receives HTTP POST;
+  :OpponentService validates input;
+  
+  :ClassUTUploadService\nsaves original file;
+  note right
+    **Transformation**
+    MultipartFile to File System
+    
+    Output: /VolumeT0/.../unmodified_src/
+    {className}.java
+  end note
+}
+
+partition "**Stage 2: ZIP Extraction**" #E1F5FE {
+  :UploadOpponentService\nsaves ZIP to tmp/;
+  :Extract ZIP contents;
+  :Identify robot folders;
+  note right
+    **Transformation**
+    ZIP Archive to Directory Structure
+    
+    Detected:
+    - EvosuiteTest/ becomes "Evosuite"
+    - RandoopTest/ becomes "Randoop"
+    - 01Level/, 02Level/, etc.
+  end note
+}
+
+partition "**Stage 3: File Organization Loop**" #E1F5FE {
+  :For each Robot Type\n(Evosuite, Randoop);
+  :For each Level\n(01Level, 02Level, ...);
+  
+  :JavaSourceFileService\nextracts test files;
+  :Parse package names;
+  note right
+    **Transformation**
+    Raw .java to Organized files
+    
+    "package com.example.test;"
+    becomes ["com", "example", "test"]
+    becomes com/example/test/*.java
+  end note
+  
+  :Copy test files to\nsrc/test/java/{package}/;
+  
+  :Modify source file with\npackage declaration;
+  :Save to src/main/java/{package}/;
+  note right
+    **Transformation**
+    Original .java to
+    File with package declaration
+    
+    Add: "package com.example;"
+    Save: src/main/java/com/example/
+    {className}.java
+  end note
+  
+  :Copy coverage files if present;
+}
+
+partition "**Stage 4: Coverage Generation**" #FFF9C4 {
+  if (Coverage files missing?) then (yes)
+    :Create tmp_zip/ structure;
+    :Copy src/ and test/ into tmp_zip/;
+    :ZIP project files;
+    note right
+      **Transformation**
+      Organized files to ZIP package
+      
+      src.zip containing:
+      - src/main/java/{package}/*.java
+      - src/test/java/{package}/*Test.java
+    end note
+    
+    if (Robot type = Evosuite?) then (yes)
+      :CoverageService calls\nEvosuite Coverage API;
+      :Receive EvosuiteCoverageDTO;
+      :Write statistics.csv;
+      note right
+        **API Transformation**
+        ZIP to Coverage Statistics
+        
+        Input: src.zip
+        Output: statistics.csv content
+      end note
+    else (Randoop)
+      :CoverageService calls\nJacoco Coverage API;
+      :Receive JacocoCoverageDTO;
+      :Write coveragetot.xml;
+      note right
+        **API Transformation**
+        ZIP to Coverage Report
+        
+        Input: src.zip
+        Output: coveragetot.xml content
+      end note
+    endif
+    
+    :Delete tmp_zip/ and src.zip;
+  else (no)
+    :Coverage files ready;
+  endif
+}
+
+partition "**Stage 5: Score Computation**" #F3E5F5 {
+  :OpponentTransformationService\nreads coverage files;
+  
+  :CoverageReader parses\nstatistics.csv (Evosuite);
+  :Parse coveragetot.xml (Jacoco);
+  note right
+    **Transformation**
+    Text files to Structured data
+    
+    CSV: "line,10,8" becomes int[8][2]
+    XML: <counter covered="8" missed="2"/>
+    becomes int[3][2]
+  end note
+  
+  :Return CoverageData\n(arrays + XML string);
+  
+  :ScoreBuilder builds JacocoScore;
+  :Build EvosuiteScore;
+  note right
+    **Transformation**
+    Raw arrays to Domain objects
+    
+    int[][] {{8,10},{5,7},{100,120}}
+    becomes
+    JacocoScore {
+      lineCoverage: Coverage(8, 10)
+      branchCoverage: Coverage(5, 7)
+      instructionCoverage: Coverage(100, 120)
+    }
+  end note
+  
+  :LevelExtractor extracts difficulty\nfrom folder name;
+  note right
+    **Transformation**
+    "01Level" becomes BEGINNER
+    "02Level" becomes INTERMEDIATE
+    "03Level" becomes ADVANCED
+  end note
+  
+  :Create Opponent object;
+  note right
+    **Final Domain Object**
+    Opponent {
+      classUT: String
+      opponentType: String
+      opponentDifficulty: OpponentDifficulty
+      coverage: String (XML)
+      evosuiteScore: EvosuiteScore
+      jacocoScore: JacocoScore
+    }
+  end note
+}
+
+partition "**Stage 6: Persistence**" #F3E5F5 {
+  :OpponentPersistenceService\nsaves to MongoDB;
+  
+  :Notify external services\nfor each GameMode;
+  note right
+    **External Integration**
+    For SCALATA, SFIDA_1V1, etc:
+    POST /api/.../opponents
+    {
+      classUT: "..."
+      gameMode: "SCALATA"
+      type: "Evosuite"
+      difficulty: BEGINNER
+    }
+  end note
+  
+  :Loop continues for\nall levels and robot types;
+}
+
+partition "**Stage 7: Final Cleanup**" #E1F5FE {
+  :Delete tmp/ folder;
+  :All temporary files removed;
+}
+
+partition "**Stage 8: ClassUT Metadata**" #F3E5F5 {
+  :ClassUTUploadService\nparses classUTDetails JSON;
+  note right
+    **Transformation**
+    JSON string to ClassUT object
+    
+    {"name": "Calculator",
+     "date": "2025-11-26",
+     "difficulty": "Medium",
+     "description": "...",
+     "category": ["Math", "Basic"]}
+    becomes
+    ClassUT entity
+  end note
+  
+  :Set URI path;
+  :Save ClassUT to MongoDB;
+}
+
+:Controller builds\nFileUploadResponse;
+note right
+  **Final Response**
+  FileUploadResponse {
+    fileName: "Calculator.java"
+    size: 1234
+    downloadUri: "/api/.../download/Calculator"
+    errorMessage: null
+  }
+end note
+
+:Browser displays success modal;
+
+stop
+
+note right
+  Pipeline Summary:
+  1. Raw uploads to File system storage
+  2. ZIP archive to Extracted structure
+  3. Flat files to Package-organized files
+  4. Missing coverage to Generated via APIs
+  5. Text files to Parsed data arrays
+  6. Data arrays to Domain score objects
+  7. Components to Complete Opponent entity
+  8. Entity to MongoDB document and notifications
+  
+  Key Transformations:
+  MultipartFile to File System Paths
+  ZIP to Directory Tree
+  Java files to Package-organized structure
+  Text coverage to Structured scores
+  Raw data to Domain models
+  Domain models to Persisted entities
+end note
+
+@enduml

@@ -1,0 +1,159 @@
+@startuml Upload Class and Opponents Sequence
+
+!define CONTROLLER_COLOR #E1F5FE
+!define SERVICE_COLOR #FFF3E0
+!define REPOSITORY_COLOR #F3E5F5
+
+skinparam sequence {
+    ParticipantBackgroundColor CONTROLLER_COLOR
+    ActorBackgroundColor #C5E1A5
+    LifeLineBackgroundColor white
+    LifeLineBorderColor #424242
+    ArrowColor #424242
+}
+
+actor "Admin/Teacher" as Admin
+participant "OpponentController" as Controller <<Controller>> CONTROLLER_COLOR
+participant "OpponentService" as OpponentSvc <<Service>> SERVICE_COLOR
+participant "ClassUTUploadService" as ClassUploadSvc <<Service>> SERVICE_COLOR
+participant "UploadOpponentService" as OpponentUploadSvc <<Service>> SERVICE_COLOR
+participant "FileStorageService" as FileSvc <<Service>> SERVICE_COLOR
+participant "JavaSourceFileService" as JavaSvc <<Service>> SERVICE_COLOR
+participant "CoverageService" as CoverageSvc <<Service>> SERVICE_COLOR
+participant "OpponentTransformationService" as TransformSvc <<Service>> SERVICE_COLOR
+participant "OpponentPersistenceService" as PersistSvc <<Service>> SERVICE_COLOR
+database "ClassRepository" as ClassRepo <<Repository>> REPOSITORY_COLOR
+database "OpponentRepository" as OpponentRepo <<Repository>> REPOSITORY_COLOR
+
+Admin -> Controller: POST /opponents\n(classUTFile, classUTDetails, robotTestsZip)
+activate Controller
+
+Controller -> OpponentSvc: uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip)
+activate OpponentSvc
+
+' Save ClassUT File
+OpponentSvc -> ClassUploadSvc: saveClassUTFile(fileName, name, file)
+activate ClassUploadSvc
+ClassUploadSvc -> FileSvc: saveFileInFileSystem(fileName, path, file)
+activate FileSvc
+FileSvc --> ClassUploadSvc: file saved
+deactivate FileSvc
+ClassUploadSvc --> OpponentSvc: saved
+deactivate ClassUploadSvc
+
+' Process Robot Tests ZIP (synchronous processing)
+OpponentSvc -> OpponentUploadSvc: saveOpponentsFromZip(fileName, name, file, zip)
+activate OpponentUploadSvc
+
+' Extract ZIP
+OpponentUploadSvc -> FileSvc: saveFileInFileSystem("robot.zip", tmpFolder, zip)
+activate FileSvc
+FileSvc --> OpponentUploadSvc: saved
+deactivate FileSvc
+
+OpponentUploadSvc -> FileSvc: extractZipIn(tmpFolder)
+activate FileSvc
+FileSvc --> OpponentUploadSvc: extracted
+deactivate FileSvc
+
+' Save unmodified source code
+OpponentUploadSvc -> FileSvc: saveFileInFileSystem(fileName, unmodifiedPath, file)
+activate FileSvc
+FileSvc --> OpponentUploadSvc: saved
+deactivate FileSvc
+
+' Process each robot type (Evosuite/Randoop)
+loop for each Robot Folder
+    OpponentUploadSvc -> OpponentUploadSvc: processRobotFolders()
+    
+    loop for each Level Folder
+        OpponentUploadSvc -> OpponentUploadSvc: processLevelFolder()
+        
+        ' Save test files
+        OpponentUploadSvc -> JavaSvc: saveTestFilesInVolume(fromPath, toPath, className, robotType)
+        activate JavaSvc
+        JavaSvc --> OpponentUploadSvc: packageNames[][]
+        deactivate JavaSvc
+        
+        ' Save source files
+        OpponentUploadSvc -> JavaSvc: saveSrcFileInVolume(file, srcPath, packageName, fileName)
+        activate JavaSvc
+        JavaSvc -> FileSvc: saveFileInFileSystem(...)
+        activate FileSvc
+        FileSvc --> JavaSvc: saved
+        deactivate FileSvc
+        JavaSvc --> OpponentUploadSvc: saved
+        deactivate JavaSvc
+        
+        ' Save coverage files
+        OpponentUploadSvc -> JavaSvc: saveCoverageFilesInVolume(fromPath, toPath)
+        activate JavaSvc
+        JavaSvc --> OpponentUploadSvc: coverageFound[]
+        deactivate JavaSvc
+        
+        ' Generate missing coverage if needed
+        alt Coverage Missing
+            OpponentUploadSvc -> CoverageSvc: generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
+            activate CoverageSvc
+            CoverageSvc --> OpponentUploadSvc: EvosuiteCoverageDTO
+            deactivate CoverageSvc
+            
+            OpponentUploadSvc -> FileSvc: writeStringToFile(coverage, file)
+            activate FileSvc
+            FileSvc --> OpponentUploadSvc: written
+            deactivate FileSvc
+        end
+        
+        ' Transform and persist opponent
+        OpponentUploadSvc -> TransformSvc: createAndPersistOpponent(classUT, robotType, level, paths)
+        activate TransformSvc
+        
+        TransformSvc -> TransformSvc: readCoverageFiles()
+        TransformSvc -> TransformSvc: buildScores()
+        TransformSvc -> TransformSvc: createOpponent()
+        
+        TransformSvc -> PersistSvc: saveOpponentAndNotify(opponent)
+        activate PersistSvc
+        
+        PersistSvc -> OpponentRepo: saveOpponent(opponent)
+        activate OpponentRepo
+        OpponentRepo --> PersistSvc: saved
+        deactivate OpponentRepo
+        
+        PersistSvc -> PersistSvc: apiGatewayClient.callAddNewOpponent()
+        note right: Notify external API Gateway\nfor each game mode
+        
+        PersistSvc --> TransformSvc: saved
+        deactivate PersistSvc
+        
+        TransformSvc --> OpponentUploadSvc: opponent persisted
+        deactivate TransformSvc
+    end
+end
+
+' Cleanup temporary files
+OpponentUploadSvc -> FileSvc: deleteDirectoryRecursively(tmpFolder)
+activate FileSvc
+FileSvc --> OpponentUploadSvc: deleted
+deactivate FileSvc
+
+OpponentUploadSvc --> OpponentSvc: all opponents processed
+deactivate OpponentUploadSvc
+
+' Persist ClassUT Metadata (after opponent processing)
+OpponentSvc -> ClassUploadSvc: persistClassUTMetadata(classe, fileName)
+activate ClassUploadSvc
+ClassUploadSvc -> ClassRepo: save(classe)
+activate ClassRepo
+ClassRepo --> ClassUploadSvc: ClassUT persisted
+deactivate ClassRepo
+ClassUploadSvc --> OpponentSvc: metadata persisted
+deactivate ClassUploadSvc
+
+OpponentSvc --> Controller: FileUploadResponse
+deactivate OpponentSvc
+
+Controller --> Admin: 200 OK (FileUploadResponse)
+deactivate Controller
+
+@enduml

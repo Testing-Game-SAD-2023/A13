@@ -1,0 +1,64 @@
+@startuml Upload_Sequence_Diagram_v1
+actor AdminBrowser as Browser
+participant "opponents_upload.js\n(formData)" as FrontendJS
+participant "api.js\ncallUploadOpponent" as ApiJS
+participant "API Gateway\n(/api/adminService)" as ApiGateway
+participant "OpponentController\n(/opponents)" as Controller
+participant "OpponentService\n.uploadOpponent(...)" as Service
+participant "FileUploadUtil" as UploadUtil
+participant "UploadOpponentService\n.saveOpponentsFromZip" as UploadService
+participant "FileOperationUtil" as FileOps
+participant "ApiGatewayClient" as Gateway
+participant "OpponentRepository" as OppRepo
+participant "ClassRepository" as ClassRepo
+
+== Upload request ==
+Browser -> FrontendJS : user clicks Upload (builds FormData\nclassUTFile, classUTDetails, robotTestsZip)
+FrontendJS -> ApiJS : callUploadOpponent(formData)
+ApiJS -> ApiGateway : POST /api/adminService/opponents (FormData, cookies)
+ApiGateway -> Controller : route POST /opponents (FormData)
+Controller -> Service : uploadOpponent(classUTFile, classUTDetails, robotTestsZip)
+Service -> UploadUtil : saveCLassFile(classUTFileName, className, classUTFile)
+note right: saves original .java into\n/VolumeT0/FolderTree/ClassUT/unmodified_src/<class>
+Service -> UploadService : saveOpponentsFromZip(classUTFileName, className, ...)
+
+== SaveOpponentsFromZip (inside service) ==
+UploadService -> FileOps : saveFileInFileSystem("robot.zip", operationTmpFolder, robotTestsZip)
+UploadService -> FileOps : extractZipIn(operationTmpFolder)
+UploadService -> FileOps : saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile)
+UploadService -> FileOps : copyDirectoryRecursively / create dirs
+UploadService -> FileOps : zipDirectory(tmp_src_dir, tmp_zip)
+alt coverage missing
+  UploadService -> Gateway : callGenerateMissingEvoSuiteCoverage(classUTName, package, zip)
+  Gateway --> UploadService : EvosuiteCoverageDTO
+  UploadService -> FileOps : writeStringToFile(statistics.csv)
+  UploadService -> Gateway : callGenerateMissingJacocoCoverage(zip)
+  Gateway --> UploadService : JacocoCoverageDTO
+  UploadService -> FileOps : writeStringToFile(coveragetot.xml)
+end
+
+UploadService -> FileOps : read statistics.csv / coveragetot.xml
+UploadService -> OppRepo : saveOpponent(opponent)
+UploadService -> Gateway : callAddNewOpponent(...) [notify other services]
+note right: loop per robotType and per level
+
+== Finish upload ==
+UploadService -> FileOps : deleteDirectoryRecursively(operationTmpFolder)
+Service -> ClassRepo : save(classUT)
+Service --> Controller : return FileUploadResponse (200)
+Controller --> ApiGateway : HTTP 200 + JSON
+ApiGateway --> ApiJS : HTTP 200 + JSON
+ApiJS --> FrontendJS : parsed JSON (success)
+FrontendJS --> Browser : show success modal
+
+== Failure path (any exception) ==
+UploadService --> Service : throws Exception
+Service -> FileOps : try deleteDirectoryRecursively(operationTmpFolder) [best-effort]
+Service -> OppRepo : delete previously saved opponents (if any) [compensating delete]
+Service --> Controller : return error JSON { error, message, uploadId }
+Controller --> ApiGateway : HTTP 500 + JSON
+ApiGateway --> ApiJS : HTTP 500 + JSON
+ApiJS --> FrontendJS : handleApiErrors(response) -> show modal/alert with uploadId
+FrontendJS --> Browser : show error to admin
+
+@enduml
