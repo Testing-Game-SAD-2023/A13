@@ -5,7 +5,7 @@ services:
     image: redis:latest
     container_name: t5-redis
     restart: always
-    expose:
+    ports:
       - "6379:6379"
     networks:
       - global-network
@@ -16,10 +16,8 @@ services:
     expose:
       - 8085
     environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - redis
     networks:

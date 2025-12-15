@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class T7Service extends BaseService {
+public class T7Service extends BaseServiceREST {
 
     /*
      * Per il test locale senza container docker usare:

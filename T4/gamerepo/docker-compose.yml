@@ -41,8 +41,6 @@ services:
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     depends_on:
       db:
         condition: service_healthy # parte solo se il db è attivo

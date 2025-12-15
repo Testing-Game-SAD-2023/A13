@@ -19,8 +19,19 @@ public class FilterConfig {
     public FilterRegistrationBean<Filter> authTokenFilterRegistration() {
         FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new AuthTokenFilter(serviceManager));
-        registrationBean.addUrlPatterns("/*"); // Applico il filtro a tutte le richeste
-        registrationBean.setOrder(1); // Setto la priorità del filtro
+        
+        // Applica il filtro solo alle rotte che richiedono autenticazione
+        registrationBean.addUrlPatterns(
+                "/profile/*",
+                "/friend/*",
+                "/Team",
+                "/Achievement",
+                "/Notification",
+                "/Games",
+                "/edit_profile"
+        );
+        
+        registrationBean.setOrder(1); // Imposta la priorità del filtro
         return registrationBean;
     }
 }

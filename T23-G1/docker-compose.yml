@@ -6,7 +6,6 @@ volumes:
 services:
   db:
     image: mysql:latest
-    platform: linux/amd64
     container_name: t23-mysql_db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -14,7 +13,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - ./mysql_init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./mysql_init/init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data_volume:/var/lib/mysql
     expose:
       - 3306
@@ -42,8 +41,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       JWT_KEY_SECRET: ${JWT_KEY_SECRET}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     networks:
       - global-network
 

@@ -21,6 +21,7 @@ import com.g2.components.PageBuilder;
 import com.g2.components.ServiceObjectComponent;
 import com.g2.components.VariableValidationLogicComponent;
 import com.g2.interfaces.ServiceManager;
+import com.g2.model.User;
 import com.g2.security.JwtRequestContext;
 import com.g2.session.SessionService;
 import com.g2.session.Sessione;
@@ -65,7 +66,17 @@ public class GuiController {
                                @RequestParam(value = "mode", required = false) String mode) {
 
         if ("Sfida".equals(mode) || "Allenamento".equals(mode) || "PartitaSingola".equals(mode)) {
-            PageBuilder gameModePage = new PageBuilder(serviceManager, "gamemode", model);
+            PageBuilder gameModePage = new PageBuilder(serviceManager, "gamemode", model, JwtRequestContext.getJwtToken());
+
+            if ("PartitaSingola".equals(mode)) {
+                Long userId = gameModePage.getUserId();
+                User user = serviceManager.handleRequest("T23", "GetUser", User.class, String.valueOf(userId));
+                if (user != null) {
+                    serviceManager.handleRequest("Notification", "newNotification", String.class,
+                            user.getEmail(), "Nuova Partita", "Hai iniziato una nuova Partita Singola.");
+                }
+            }
+
             VariableValidationLogicComponent valida = new VariableValidationLogicComponent(mode);
             valida.setCheckNull();
             List<String> gameModes = Arrays.asList("Sfida", "Allenamento");
@@ -112,7 +123,15 @@ public class GuiController {
         return editor.handlePageRequest();
     }
 
-    /*
+    @GetMapping("/leaderboard")
+    public String leaderboard(Model model, @CookieValue(name = "jwt", required = false) String jwt) {
+        PageBuilder leaderboard = new PageBuilder(serviceManager, "leaderboard", model);
+        ServiceObjectComponent listaUtenti = new ServiceObjectComponent(serviceManager, "listaPlayers", "T23", "GetUsers");
+        leaderboard.setObjectComponents(listaUtenti);
+        return leaderboard.handlePageRequest();
+    }
+
+    /* 
     @PostMapping("/save-scalata")
     public ResponseEntity<String> saveScalata(@RequestParam("playerID") int playerID,
             @RequestParam("scalataName") String scalataName,

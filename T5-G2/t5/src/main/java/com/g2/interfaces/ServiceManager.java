@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,10 +34,14 @@ public class ServiceManager {
     private static final Logger logger = LoggerFactory.getLogger(ServiceManager.class);
     protected final Map<String, ServiceInterface> services = new HashMap<>();
     private final RestTemplate restTemplate;
+    private final RabbitTemplate rabbitTemplate;
+    private final AsyncRabbitTemplate asyncRabbitTemplate;
 
     @Autowired
-    public ServiceManager(ServiceConfig config, RestTemplate restTemplate) {
+    public ServiceManager(ServiceConfig config, RestTemplate restTemplate, RabbitTemplate rabbitTemplate, AsyncRabbitTemplate asyncRabbitTemplate) {
         this.restTemplate = restTemplate;
+        this.rabbitTemplate = rabbitTemplate;
+        this.asyncRabbitTemplate = asyncRabbitTemplate;
         // Carica i servizi definiti nella configurazione
         String[] enabledServices = config.getEnabled().split(",");
         Map<String, String> serviceMapping = config.getMapping();
@@ -68,7 +74,15 @@ public class ServiceManager {
             return;
         }
         try {
-            ServiceInterface service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
+            ServiceInterface service;
+            if (BaseServiceBroker.class.isAssignableFrom(serviceClass)) {
+                service = serviceClass.getDeclaredConstructor(RabbitTemplate.class, AsyncRabbitTemplate.class)
+                                      .newInstance(rabbitTemplate, asyncRabbitTemplate);
+            } else if (BaseServiceREST.class.isAssignableFrom(serviceClass)) {
+                service = serviceClass.getDeclaredConstructor(RestTemplate.class).newInstance(restTemplate);
+            } else {
+                throw new IllegalArgumentException("Unknown service type: "+serviceClass.getName()+".");
+            }
             services.put(serviceName, service);
             logger.info("[SERVICE MANAGER] Servizio registrato: {} -> {}", serviceName, serviceClass.getSimpleName());
         } catch (Exception e) {

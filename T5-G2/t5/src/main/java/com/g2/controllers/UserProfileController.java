@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.components.GenericObjectComponent;
 import com.g2.components.PageBuilder;
 import com.g2.components.UserProfileComponent;
-import com.g2.components.LeaderboardComponent;
+import com.g2.interfaces.NotificationService;
 import com.g2.interfaces.ServiceManager;
 import com.g2.model.GameConfigData;
+import com.g2.model.Notification;
+import com.g2.model.NotificationResponse;
 import com.g2.model.User;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.model.dto.PlayerProgressDTO;
@@ -17,11 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +57,7 @@ public class UserProfileController {
             File file = new File("%s/%s".formatted(System.getProperty("user.dir"), gamificationConFile.replace("/", File.separator)));
             this.gameConfigData = objectMapper.readValue(file, GameConfigData.class);
         } catch (IOException e) {
-            logger.info("[PostConstruct init] Error in loading gamification_config.json, using default values: {}", e.getMessage());
+            logger.info("[PostConstruct init] Error in loading game_config.json, using default values: {}", e.getMessage());
             this.gameConfigData = new GameConfigData(10, 5, 1);
         }
     }
@@ -125,23 +127,169 @@ public class UserProfileController {
         return achievement.handlePageRequest();
     }
 
-//    Handler per la costruzione della pagina contenente la classifica
-//    La pagina è costruita utilizzando un ObjectComponent "riempito" da un LogicComponent
-    @GetMapping("/leaderboard")
-    public String showLeaderboard(Model model) {
-        PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
-        GenericObjectComponent leaderboardObjectComponent = new GenericObjectComponent(null, null);
-        LeaderboardComponent leaderboardComponent = new LeaderboardComponent(leaderboardObjectComponent, leaderboardPage.getUserId(), serviceManager);
-        leaderboardPage.setLogicComponents(leaderboardComponent);
-        leaderboardPage.setObjectComponents(leaderboardObjectComponent);
-        return leaderboardPage.handlePageRequest();
-    }
-
+    /**
+     * Gestisce la richiesta GET per la pagina delle notifiche.
+     * Costruisce la pagina base 'notification' e la restituisce.
+     * Il caricamento effettivo delle notifiche avviene tramite una chiamata AJAX separata
+     * gestita dall'endpoint /get_notifications.
+     *
+     * @param model Il modello a cui aggiungere attributi per la vista.
+     * @return Il nome del template della pagina delle notifiche.
+     */
     @GetMapping("/Notification")
     public String showProfileNotificationPage(Model model) {
         PageBuilder notificationPage = new PageBuilder(serviceManager, "notification", model, JwtRequestContext.getJwtToken());
-
+        Long userID = notificationPage.getUserId();
+        User user = serviceManager.handleRequest("T23","GetUser",User.class,
+                String.valueOf(userID));
+//        serviceManager.handleRequest("T23", "NewNotification", String.class,
+//        user.getEmail(), "Notifica di Test", "Questa è una notifica di test generata automaticamente.");
+        serviceManager.handleRequest("Notification", "getNotifications", NotificationResponse.class,
+                user.getEmail(), 0, 10);
         return notificationPage.handlePageRequest();
+    }
+
+    /*
+     * Per testare le notifiche, consigliamo di utilizzare i WebDevTool
+     * del vostro browser (che potete aprire premendo F12 sul browser).
+     * Con questo tool, potrete inviare richieste di Get/Post/Delete tramite
+     * degli script JavaScript
+     * */
+
+    /*
+    * Get delle notifiche:
+    {
+        const email = "test@email.com";
+        const size = 10;
+        const page = 0;
+        let res = await fetch("/get_notifications?" + new URLSearchParams({
+            email : email,
+            size : size,
+            page : page
+        }), { method: 'GET' });
+        res.status + " " + await res.text();
+    }
+    * */
+    /**
+     * Endpoint per recuperare le notifiche in formato JSON.
+     * Viene chiamato tramite AJAX dallo script nella pagina 'notification.html'.
+     *
+     * @param email L'email dell'utente per cui recuperare le notifiche.
+     * @param page  Il numero di pagina (per la paginazione).
+     * @param size  La dimensione della pagina.
+     * @return Un ResponseEntity contenente un NotificationResponse con le notifiche o un errore.
+     */
+    @GetMapping("/get_notifications")
+    @ResponseBody
+    public ResponseEntity<NotificationResponse> getNotifications(@RequestParam("email") String email,
+                                                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+        try {
+            // Chiama il ServiceManager per inoltrare la richiesta al T23Service, che a sua volta usa RabbitMQ.
+            NotificationResponse response = serviceManager.handleRequest("Notification", "getNotifications", NotificationResponse.class, email, page, size);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error fetching notifications", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    /*
+    * Invio della notifica:
+    {
+        const email = "test@email.com";
+        const subject = "Oggetto Test";
+        const message = "Messaggio";
+        // "await" aspetta che la richiesta finisca
+        let res = await fetch("/notification/new?" + new URLSearchParams({
+            email: email,
+            subject: subject,
+            message: message
+        }), { method: 'POST' });
+        res.status + " " + await res.text();
+    }
+    */
+    /**
+     * Endpoint per inviare una nuova notifica.
+     *
+     * @param email   L'email del destinatario.
+     * @param subject Il titolo della notifica.
+     * @param message Il corpo del messaggio.
+     * @return Una conferma dell'invio della richiesta.
+     */
+    @PostMapping("/notification/new")
+    @ResponseBody
+    public ResponseEntity<String> sendNotification(@RequestParam("email") String email, @RequestParam("subject") String subject, @RequestParam("message") String message) {
+        try {
+            logger.info("Received new notification request for user: {}", email);
+            serviceManager.handleRequest("Notification", "newNotification", String.class, email, subject, message);
+            return ResponseEntity.ok("New notification request sent via RabbitMQ");
+        } catch (Exception e) {
+            logger.error("Error sending new notification request to RabbitMQ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending new notification request");
+        }
+    }
+
+    /*
+    * Delete della notifica:
+    {
+        const email = "test@email.com";
+        const notificationID = "12345";
+        let res = await fetch("/notification/delete?" + new URLSearchParams({
+            email: email,
+            notificationID: notificationID
+        }), { method: 'DELETE' });
+        res.status + " " + await res.text();
+    }
+    */
+    /**
+     * Endpoint per eliminare una singola notifica.
+     *
+     * @param email          L'email dell'utente proprietario della notifica.
+     * @param notificationID L'ID della notifica da eliminare.
+     * @return Una conferma dell'invio della richiesta di eliminazione.
+     */
+    @DeleteMapping("/notification/delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteNotification(@RequestParam("email") String email,
+                                                     @RequestParam("notificationID") String notificationID) {
+        try {
+            logger.info("Received delete request for notification ID: {} for user: {}", notificationID, email);
+            serviceManager.handleRequest("Notification", "deleteNotification", String.class, email, notificationID);
+            return ResponseEntity.ok("Delete request sent via RabbitMQ");
+        } catch (Exception e) {
+            logger.error("Error sending delete request to RabbitMQ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending delete request");
+        }
+    }
+
+    /*
+    * Clear delle notifiche di un utente:
+    {
+        const email = "test@email.com";
+        let res = await fetch("/notification/clear?" + new URLSearchParams({
+            email: email
+        }), { method: 'DELETE' });
+        res.status + " " + await res.text();
+    }
+    */
+    /**
+     * Endpoint per eliminare tutte le notifiche di un utente.
+     *
+     * @param email L'email dell'utente.
+     * @return Una conferma dell'invio della richiesta di pulizia.
+     */
+    @DeleteMapping("/notification/clear")
+    @ResponseBody
+    public ResponseEntity<String> clearAllNotifications(@RequestParam("email") String email) {
+        try {
+            logger.info("Received clear all notifications request for user: {}", email);
+            serviceManager.handleRequest("Notification", "clearNotifications", String.class, email);
+            return ResponseEntity.ok("Clear all notifications request sent via RabbitMQ");
+        } catch (Exception e) {
+            logger.error("Error sending clear all notifications request to RabbitMQ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending clear all notifications request");
+        }
     }
 
     @GetMapping("/Games")
