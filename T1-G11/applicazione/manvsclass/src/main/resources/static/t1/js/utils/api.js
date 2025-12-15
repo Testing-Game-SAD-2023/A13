@@ -173,7 +173,55 @@ async function callUploadOpponent(body) {
     }, async response => await response.json());
 }
 
+/**
+ * Chiama l'endopoint per eliminare una scalata e ricarica la pagina in caso di successo.
+ *
+ * @param {string} name Il nome della scalata da eliminare.
+ */
+async function callDeleteScalata(name) {
+    await redirectOnSuccessTemplate({
+            url: `${APIS.SCALATA_SERVICE.DELETE_SCALATA}/${name}`,
+            method: "DELETE",
+            headers: { 'Content-Type': 'application/json' },
+        },
+        {
+            reload: true
+        });
+}
 
+/**
+ * Recupera la lista degli opponents disponibili.
+ *
+ * @returns {Promise<Object[]|null>} Array di oggetti opponents o null in caso di errore.
+ */
+async function callGetOpponents() {
+    return await returnDataOnSuccessTemplate({
+        url: `${APIS.OPPONENTS_SERVICE.GETALL_OPPONENTS}`,
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' }
+    }, async response => await response.json());
+}
 
+/**
+ * Invia i dati per la creazione di una nuova scalata.
+ *
+ * @param {Object} data L'oggetto ScalataDTO da inviare.
+ * @returns {Promise<Object|null>} I dati parsati della risposta o null in caso di errore.
+ */
+async function callCreateScalata(data) {
+    await redirectOnSuccessTemplate(
+        {
+            url: APIS.SCALATA_SERVICE.CREATE_SCALATA,
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        },
+        {
+            // Il codice originale navigava a "/scalata/main"
+            redirectTo: "/scalata/main",
+            reload: false
+        }
+    );
+}
 
 
