@@ -74,7 +74,7 @@ A **Game** entity is created when a new match begins. It includes:
 
 For the **Scalata** game mode, the Game entity has been extended with two additional attributes:
 
-- **`gameName`**: identifies which Scalata sequence the player is progressing through (e.g., "Scalata Principianti"). This enables tracking and session recovery. This attribute remains `null` for other game modes.
+- **`gameName`**: identifies which Scalata sequence the player is progressing through (e.g., `Scalata Principianti`). This enables tracking and recovery of Scalata progress if the session expires. This attribute remains `null` for other game modes.
 - **`currentLevel`**: tracks the player's current position within the Scalata (starting from 1). This value is incremented upon successful level completion. For non-Scalata game modes, this attribute is set to 1 by default.
 
 Note: The database column is named `game_name` to maintain a generic naming convention, allowing future game modes to potentially use this field for similar purposes.
