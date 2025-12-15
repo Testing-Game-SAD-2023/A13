@@ -83,6 +83,23 @@ public class PlayerService {
         return player.get();
     }
 
+
+    // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
+    public Player getPlayerByProfile (int profileId) {
+        
+        UserProfile profile = userProfileRepository.findByID(profileId);
+        
+        if(profile == null) {
+            return null;
+        }
+
+        Optional<Player> player = playerRepository.findById(profile.getUserId());
+        return player.orElse(null);
+
+    }
+    
+
+
     public List<Player> getUserListByEmail(String email) {
         return playerRepository.findByUserProfileEmailLike(email);
     }

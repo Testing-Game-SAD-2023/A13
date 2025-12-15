@@ -17,16 +17,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -35,6 +42,7 @@ import java.util.Set;
  */
 @CrossOrigin
 @Controller
+
 public class UserProfileController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
@@ -95,7 +103,10 @@ public class UserProfileController {
     public String profileTeamPage(Model model) {
         PageBuilder teamPage = new PageBuilder(serviceManager, "Team", model, JwtRequestContext.getJwtToken());
 
-        ResponseTeamComplete team = (ResponseTeamComplete) serviceManager.handleRequest("T1", "OttieniTeamCompleto", teamPage.getUserId());
+        //ResponseTeamComplete team = (ResponseTeamComplete) serviceManager.handleRequest("T1", "OttieniTeamCompleto", teamPage.getUserId());
+        ResponseTeamComplete team = (ResponseTeamComplete) serviceManager.handleRequest("T1", "OttieniTeamCompleto", String.valueOf(teamPage.getUserId())); //=================== Richiesto un parametro String nella chiamata
+
+
         if (team != null) {
             @SuppressWarnings("unchecked")
             List<User> membri = (List<User>) serviceManager.handleRequest("T23", "GetUsersByList", team.getTeam().getStudenti());
@@ -105,37 +116,60 @@ public class UserProfileController {
         return teamPage.handlePageRequest();
     }
 
-    @GetMapping("/Achievement")
-    public String showAchievements(Model model) {
-        PageBuilder achievement = new PageBuilder(serviceManager, "Achivement", model, JwtRequestContext.getJwtToken());
-        /*
-         * Richiedo a T4 lo stato del giocatore
-         */
-        PlayerProgressDTO playerProgress = (PlayerProgressDTO) serviceManager.handleRequest("T23", "getPlayerProgressAgainstAllOpponent", achievement.getUserId());
-        List<GameProgressDTO> achievements = playerProgress.getGameProgressesDTO();
-        Set<String> globalAchievements = playerProgress.getGlobalAchievements();
-        model.addAttribute("gamemode_achievements", achievements);
-        model.addAttribute("general_achievements", globalAchievements);
-        model.addAttribute("userCurrentExperience", playerProgress.getExperiencePoints());
 
-        model.addAttribute("startingLevel", gameConfigData.getStartingLevel());
-        model.addAttribute("expPerLevel", gameConfigData.getExpPerLevel());
-        model.addAttribute("maxLevel", gameConfigData.getMaxLevel());
 
-        return achievement.handlePageRequest();
+    // ============================== Aggiunta funzione per recuperare i dati quando si carica la pagina achievement
+    @GetMapping("/Achievement/{userId}")
+    @ResponseBody
+    public Map<String, Object> getAchievementData(@PathVariable Long userId) {
+ 
+        PlayerProgressDTO p = (PlayerProgressDTO) serviceManager
+                .handleRequest("T23", "getPlayerProgressAgainstAllOpponent", userId);
+ 
+        Map<String, Object> map = new HashMap<>();
+ 
+        map.put("experiencePoints", p.getExperiencePoints());
+        map.put("gameProgressesDTO", p.getGameProgressesDTO());
+        map.put("globalAchievements", p.getGlobalAchievements());
+ 
+        // aggiungi anche i valori di configurazione (obbligatori)
+        map.put("startingLevel", gameConfigData.getStartingLevel());
+        map.put("expPerLevel", gameConfigData.getExpPerLevel());
+        map.put("maxLevel", gameConfigData.getMaxLevel());
+ 
+        return map;
     }
 
-//    Handler per la costruzione della pagina contenente la classifica
-//    La pagina è costruita utilizzando un ObjectComponent "riempito" da un LogicComponent
-    @GetMapping("/leaderboard")
-    public String showLeaderboard(Model model) {
-        PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
+
+
+
+    //=========================== AGGIUNTA: Nuova rotta aggiunta per il caricamento di dati json da passare al profilo
+    //che è ora responsabile di visualizzare la rotta.
+    @GetMapping("/leaderboard/{userId}")
+    @ResponseBody
+    public Map<String, Object> getLeaderboardData(@PathVariable Long userId) {
+
+        // 1. Component contenitore (identico alla rotta HTML)
         GenericObjectComponent leaderboardObjectComponent = new GenericObjectComponent(null, null);
-        LeaderboardComponent leaderboardComponent = new LeaderboardComponent(leaderboardObjectComponent, leaderboardPage.getUserId(), serviceManager);
-        leaderboardPage.setLogicComponents(leaderboardComponent);
-        leaderboardPage.setObjectComponents(leaderboardObjectComponent);
-        return leaderboardPage.handlePageRequest();
+
+        // 2. LogicComponent che costruisce la classifica
+        LeaderboardComponent leaderboardComponent =
+                new LeaderboardComponent(leaderboardObjectComponent, userId, serviceManager);
+
+        // 3. Esegui la logica
+        boolean ok = leaderboardComponent.executeLogic();
+        if (!ok) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Unable to load leaderboard");
+            return error;
+        }
+
+        // 4. Ritorna direttamente la map popolata
+        return leaderboardObjectComponent.getModel();
     }
+
+
+ 
 
     @GetMapping("/Notification")
     public String showProfileNotificationPage(Model model) {
@@ -144,11 +178,6 @@ public class UserProfileController {
         return notificationPage.handlePageRequest();
     }
 
-    @GetMapping("/Games")
-    public String showGameHistory(Model model) {
-        PageBuilder gameHistoryPage = new PageBuilder(serviceManager, "GameHistory", model, JwtRequestContext.getJwtToken());
-        return gameHistoryPage.handlePageRequest();
-    }
 
     /*
      *    TENERE QUESTA CHIAMATA SOLO PER DEBUG DA DISATTIVARE
@@ -182,21 +211,177 @@ public class UserProfileController {
         return images;
     }
 
+
+
+    // =================================================== ok
+    @GetMapping("/followers")
+    @ResponseBody
+    public ResponseEntity<?> getFollowers(@RequestParam String userId) {
+        try {
+            Object result = serviceManager.handleRequest(
+                    "T23",
+                    "getFollowers",
+                    userId
+            );
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(List.of()); // niente 500 verso front
+        }
+    }
+
+
+
+    // ================================================================== ok
+    @GetMapping("/following")
+    @ResponseBody
+    public ResponseEntity<?> getFollowing(@RequestParam String userId) {
+        try {
+            Object result = serviceManager.handleRequest(
+                    "T23",
+                    "getFollowing",
+                    userId
+            );
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(List.of()); // niente 500 verso front
+        }
+    }
+
+
+
+    // NEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEW ok
+    @GetMapping("/isFollowing")
+    @ResponseBody
+    public ResponseEntity<Boolean> isFollowing(
+            @RequestParam String followerId,
+            @RequestParam String followingId
+    ){
+        try {
+    
+            Object result = serviceManager.handleRequest(
+                    "T23",
+                    "isFollowing",
+                    followerId,
+                    followingId
+            );
+    
+            boolean value = result instanceof Boolean && (Boolean) result;
+    
+            return ResponseEntity.ok(value);
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(false); // NON ritornare 500 al frontend
+        }
+    }
+    
+
+
+    // NEEEEEEEEEEEEEEEEEEEEEEEEW ok
+    @PostMapping("/toggle_follow")
+    @ResponseBody
+    public ResponseEntity<Boolean> toggleFollow(
+            @RequestParam String followerId,
+            @RequestParam String followingId
+    ){
+    
+        try {
+    
+            Object result = serviceManager.handleRequest(
+                    "T23",
+                    "toggle_follow", 
+                    followerId,
+                    followingId
+            );
+    
+            // se null → errore logico → ritorna false
+            boolean followState = result instanceof Boolean && (Boolean) result;
+    
+            return ResponseEntity.ok(followState);
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+    
+            // in caso di errore NON mandare 500 al frontend
+            return ResponseEntity.ok(false);
+        }
+    }
+    
+    
+
+
+    
+
+
+    // ============================== MODIFICA ok
     @GetMapping("/edit_profile")
     public String showEditProfile(Model model) {
-        PageBuilder editProfilePage = new PageBuilder(serviceManager, "Edit_Profile", model, JwtRequestContext.getJwtToken());
-        User user = (User) serviceManager.handleRequest("T23", "GetUser", editProfilePage.getUserId());
-        if (user == null) {
-            //Qua gestisco utente sbagliato
+        try {
+            PageBuilder editProfilePage = new PageBuilder(serviceManager, "Edit_Profile", model, JwtRequestContext.getJwtToken());
+    
+            Long userId = editProfilePage.getUserId();
+            User user = (User) serviceManager.handleRequest("T23", "GetUser", userId);
+    
+            if (user == null) {
+                return "error";
+            }
+    
+            List<String> images = getProfilePictures();
+    
+            editProfilePage.setObjectComponents(
+                    new GenericObjectComponent("player", user),
+                    new GenericObjectComponent("images", images)
+            );
+    
+            return editProfilePage.handlePageRequest();
+    
+        } catch (Exception e) {
+            e.printStackTrace();
             return "error";
         }
-        // Prendiamo le risorse dal servizio UserProfileService
-        List<String> images = getProfilePictures();
-        editProfilePage.setObjectComponents(
-                new GenericObjectComponent("user", user),
-                new GenericObjectComponent("images", images)
-        );
-        return editProfilePage.handlePageRequest();
     }
+    
+
+
+    // ============================== ok
+    @PostMapping("/update_profile")
+    public ResponseEntity<Boolean> editProfile(
+
+            @RequestParam("email") String email,
+            @RequestParam("bio") String bio,
+            @RequestParam("profilePicturePath") String profilePicturePath,
+            @RequestParam("nickname") String nickname) {
+
+                System.out.println("[DEBUG] update_profile chiamato per email: " + email);
+
+        try {
+            Boolean updated = (Boolean) serviceManager.handleRequest(
+                    "T23",
+                    "UpdateProfile",
+                    email,
+                    bio,
+                    profilePicturePath,
+                    nickname
+            );
+
+            return ResponseEntity.ok(updated != null ? updated : false);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Basta ritornare ok(false) senza usare HttpStatus
+            return ResponseEntity.ok(false);
+        }
+
+
+
+}
+
+
 
 }

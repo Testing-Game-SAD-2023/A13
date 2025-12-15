@@ -112,6 +112,14 @@ public class T23Service extends BaseService {
                 Long.class
         ));
 
+
+        // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
+        registerAction("GetUserByProfile", new ServiceActionDefinition(
+            params -> getUserByProfile((Long) params[0]),
+            Long.class
+        ));
+    
+
         registerAction("GetUsersByList", new ServiceActionDefinition(
                 params -> getUserByList((List<String>) params[0]),
                 List.class
@@ -123,27 +131,55 @@ public class T23Service extends BaseService {
         ));
     }
 
-    private void registerUserProfileActions() {
+    private void registerUserProfileActions() { // ============================== MODIFICATO ok
         registerAction("UpdateProfile", new ServiceActionDefinition(
-                params -> updateProfile((String) params[0], (String) params[1], (String) params[2]),
-                String.class, String.class, String.class
+                params -> updateProfile((String) params[0], (String) params[1], (String) params[2], (String) params[3] ),
+                String.class, String.class, String.class, String.class  // ==============================
         ));
 
-        registerAction("followUser", new ServiceActionDefinition(
-                params -> followUser((Integer) params[0], (Integer) params[1]),
-                Integer.class, Integer.class
-        ));
 
+        // ============================================== ok
         registerAction("getFollowers", new ServiceActionDefinition(
-                params -> getFollowers((String) params[0]),
-                String.class
+            params -> getFollowers((String) params[0]),
+            String.class
         ));
+    
 
+        // ============================================== ok
         registerAction("getFollowing", new ServiceActionDefinition(
                 params -> getFollowing((String) params[0]),
                 String.class
         ));
+
+
+
+
+        // ============================================== AGGIUNTO ok
+        registerAction("toggle_follow", new ServiceActionDefinition(
+            params -> toggle_follow(
+                    (String) params[0],   // followerId
+                    (String) params[1]    // followingId
+            ),
+            String.class,
+            String.class
+        ));
+    
+        
+        // ============================================== AGGIUNTO
+        registerAction("isFollowing", new ServiceActionDefinition(
+            params -> isFollowing(
+                    (String) params[0],   // followerId
+                    (String) params[1]    // followingId
+            ),
+            String.class,
+            String.class
+        ));
+    
+    
+
+
     }
+    
 
     private void registerPlayerStatusActions() {
         registerAction("createPlayerProgressAgainstOpponent", new ServiceActionDefinition(
@@ -264,6 +300,14 @@ public class T23Service extends BaseService {
         return callRestGET(endpoint, null, User.class);
     }
 
+    // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
+    private User getUserByProfile(long profileId) {
+        final String endpoint = "/profile/player/by/profile/" + profileId;
+        return callRestGET(endpoint, null, User.class);
+    }
+
+
+
     //Do una lista di ID e mi ritorna una lista di User
     // Implementata a mano perchè un po' strana è una POST che ottiene dati come una GET
     private List<User> getUserByList(List<String> idsStudenti) {
@@ -289,13 +333,15 @@ public class T23Service extends BaseService {
         }
     }
 
-    // Metodo per modificare il profilo di un utente
-    private Boolean updateProfile(String userEmail, String bio, String imagePath) {
+    // Metodo per modificare il profilo di un utente ok
+    private Boolean updateProfile(String userEmail, String bio, String imagePath, String nickname) {  // ============================== aggiunto String nickname
         final String endpoint = "/profile/update_profile";
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add(EMAIL_FIELD, userEmail);
         map.add("bio", bio);
         map.add("profilePicturePath", imagePath);
+        map.add("nickname", nickname); // ============================== aggiunto
+
         return callRestPost(endpoint, map, null, Boolean.class);
     }
 
@@ -365,30 +411,55 @@ public class T23Service extends BaseService {
         return callRestDelete(endpoint, queryParams);
     }
 
-    /*
-     *   Metodo per follow/unfollow di un utente
-     *   il targetUserId + chi viene seguito
-     *   il authUserId è chi segue
-     */
-    public String followUser(Integer targetUserId, Integer authUserId) {
-        final String endpoint = "/profile/toggle_follow";
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("targetUserId", String.valueOf(targetUserId));
-        map.add("authUserId", String.valueOf(authUserId));
-        return callRestPost(endpoint, map, null, String.class);
-    }
 
+
+    // NEEEEEEEEEEEEEEEEEEEEEEEW ok
+    public Boolean isFollowing(String followerId, String followingId) {
+
+        String endpoint = "/profile/isFollowing";
+    
+        return callRestGET(
+                endpoint,
+                Map.of(
+                    "followerId", followerId,
+                    "followingId", followingId
+                ),
+                Boolean.class
+        );
+    }
+    
+    
+
+    // NEEEEEEEEEEEEEEEEEEEEEEEW ok
+    public Boolean toggle_follow(String followerId, String followingId) {
+
+        String endpoint = "/profile/toggle_follow";
+    
+        MultiValueMap<String,String> form = new LinkedMultiValueMap<>();
+        form.add("followerId", followerId);
+        form.add("followingId", followingId);
+    
+        return callRestPost(endpoint, form, null, Boolean.class);
+    }
+    
+
+    // ================================================================== ok
     public List<User> getFollowers(String userId) {
         final String endpoint = "/profile/followers";
         Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
-        });
+
+        return callRestGET(endpoint, queryParams, 
+                new ParameterizedTypeReference<List<User>>() {});
     }
 
+    
+    // ================================================================== ok
     public List<User> getFollowing(String userId) {
         final String endpoint = "/profile/following";
         Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
-        });
+
+        return callRestGET(endpoint, queryParams,
+                new ParameterizedTypeReference<List<User>>() {});
     }
+
 }

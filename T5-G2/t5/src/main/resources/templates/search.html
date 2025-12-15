@@ -75,6 +75,22 @@
 
 <script>
   $(document).ready(function() {
+
+
+    // ============================== AGGIUNTO: Funzione per leggere i cookie
+    function getCookie(name) {
+        let value = "; " + document.cookie;
+        let parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+        return null;
+    }
+
+    // ============================== AGGIUNTO: Leggi il JWT dal cookie
+    const token = getCookie("jwt");
+    console.log("JWT token:", token); // solo per debug
+
+
+
     let currentPage = 0;
     let pageSize = 10;
 
@@ -83,13 +99,22 @@
     // Funzione per eseguire la ricerca
     function searchUserProfiles(searchTerm, page, size) {
         $.ajax({
-            url: "/searchUserProfiles",
+            url: "/api/userService/profile/searchUserProfiles", //============================== MODIFICATO: /api/userService/profile
             type: "GET",
             data: {
                 searchTerm: searchTerm,
                 page: page,
                 size: size
             },
+
+            // ============================== AGGIUNTO
+            headers: {
+                "Authorization": "Bearer " + token, // qui token = JWT valido
+            },
+
+
+
+
             dataType: "json",
             success: function(response) {
                 console.log("Risultati della ricerca:", response);
@@ -129,13 +154,17 @@
                                 <h5 class="fw-semibold mb-0">${user.name + " " + user.surname}</h5>
                                 <span class="fs-5 d-flex align-items-center">${user.email}</span>
                             </div>
-                            <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${user.userId}">Link</a>                     
+                            <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${user.id}">Link</a>                     
                         </div>
                     </div>
                 </div>`
             );
         });
     }
+
+
+    //RIGA 157 <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${user.userId}">Link</a>                     
+
 
     // Funzione per aggiornare la paginazione
     function updatePagination(data) {

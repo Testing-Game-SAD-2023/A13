@@ -45,6 +45,19 @@ public class UserSocialController {
         return players; // 200 OK con i risultati
     }
 
+
+    // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
+    @GetMapping("/player/by/profile/{profileId}")
+    public Player getUserByProfile(@PathVariable("profileId") int profileId) {
+        Player player = playerService.getPlayerByProfile(profileId);
+
+        return player; // 200 OK con i risultati
+    }
+
+    
+
+
+
     //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
     @PostMapping("/getStudentiTeam")
     public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti) {

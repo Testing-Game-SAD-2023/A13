@@ -134,7 +134,7 @@ public class T1Service extends BaseService {
 
     private ResponseTeamComplete ottieniTeamCompleto(String studentId) {
         Map<String, String> queryParams = Map.of(
-                STUDENT_ID_FIELD, studentId
+                "StudentId", studentId  // =============== // Spring richiede che il nome del parametro nella query sia ESATTAMENTE "StudentId"
         );
         return callRestGET("/ottieniDettagliTeamCompleto", queryParams, ResponseTeamComplete.class);
     }
