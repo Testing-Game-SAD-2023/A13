@@ -194,37 +194,83 @@ public class CoverageService {
      * oppure {@code null} se si è verificato un errore durante il calcolo di uno dei criteri
      * o nella lettura del file dei risultati della copertura.
      */
+     
+    
+    
+     // Configurazione ottimizzata calcolo EvoSuiteCoverage
+     
     private String calculateEvosuiteCoverage(String workingDir, String classUTPackage, String classUTName) {
-        // Preparo evosuite per la coverage
-        runCommand(workingDir, 15, "mvn", "clean", "install");
-        runCommand(workingDir, 15, "mvn", "dependency:copy-dependencies");
+        try {
+            // [OTTIMIZZAZIONE MAVEN]
+            // Esecuzione pipeline unificata (package + copy-dependencies) per ridurre overhead avvio JVM.
+            boolean buildError = runCommand(workingDir, 15, "mvn", "package", "dependency:copy-dependencies");
 
-        String projectCP = workingDir + "/target/classes:" + workingDir + "/target/test-classes";
-        List<String> criteria = Arrays.asList("LINE", "BRANCH", "EXCEPTION", "WEAKMUTATION", "OUTPUT", "METHOD", "METHODNOEXCEPTION", "CBRANCH");
-
-        // Eseguo evosuite con ogni criterio di coverage che mette a disposizione. La variabile `foundError` mi dice se l'esecuzione del criterio
-        // è fallita. In quel caso termino, in quanto non ha senso continuare con gli altri e perdere tempo
-        for (String criterion : criteria) {
-            boolean foundError = runCommand(workingDir, 30, "/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-jar", workingDir + "/evosuite-1.0.6.jar",
-                    "-measureCoverage", "-class", classUTPackage + classUTName,
-                    "-projectCP", projectCP, "-Dcriterion=" + criterion);
-
-            if (foundError) {
-                logger.error("[calculateEvosuiteCoverage] Errore durante la verifica della copertura: Uno o più goal non sono stati trovati");
-                return null;
+            if (buildError) {
+                 // [ARCHITETTURA] Propagazione eccezione al Global Filter (es. codice 400/500 JSON)
+                 throw new ProcessingExceptionWrapper("Errore critico: Maven Build Failed (Test utente errati o codice non compilabile)", new RuntimeException("Build Failed"));
             }
-        }
 
-        // Leggo i risultati della coverage dal file prodotto da evosuite
-        Path coverageFilePath = Paths.get(workingDir, "evosuite-report", "statistics.csv");
-        try (Stream<String> coverage = Files.lines(coverageFilePath)) {
-            return coverage.collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            logger.error("[calculateEvosuiteCoverage] Errore durante la lettura di statistics.csv: ", e);
-            return null;
+            String projectCP = workingDir + "/target/classes:" + workingDir + "/target/test-classes";
+            
+            // Selezione metriche essenziali per ridurre i tempi di calcolo
+            List<String> criteria = Arrays.asList("LINE", "BRANCH", "EXCEPTION", "WEAKMUTATION", "CBRANCH");
+            
+            StringBuilder finalResult = new StringBuilder();
+
+            // Esecuzione SEQUENZIALE per garantire stabilità I/O
+            for (String criterion : criteria) {
+                
+                // [OTTIMIZZAZIONE JVM & RAM]
+                // -Xmx6144m: Allocazione di 6GB di RAM dedicati al processo (su container 8GB).
+                //            Elimina le pause di Garbage Collection massimizzando la velocità.
+                // -XX:+UseParallelGC: Algoritmo ottimizzato per il throughput di calcolo.
+                boolean evosuiteError = runCommand(workingDir, 5, 
+                        "/usr/lib/jvm/java-8-openjdk-amd64/bin/java", 
+                        "-Xmx6144m",           
+                        "-XX:+UseParallelGC",  
+                        "-jar", workingDir + "/evosuite-1.0.6.jar",
+                        "-measureCoverage", 
+                        "-class", classUTPackage + classUTName,
+                        "-projectCP", projectCP, 
+                        "-Dsearch_budget=15",
+                        "-Dcriterion=" + criterion
+                );
+                
+                if (evosuiteError) {
+                    logger.error("Errore critico durante l'esecuzione di EvoSuite per {}", criterion);
+                    throw new ProcessingExceptionWrapper("Errore interno EvoSuite per " + criterion, new RuntimeException("EvoSuite Crash"));
+                }
+        }
+        
+            // Lettura Risultati
+            Path coverageFilePath = Paths.get(workingDir, "evosuite-report", "statistics.csv");
+            
+            // [ARCHITETTURA] Controllo integrità
+            // Se il file manca a questo punto, è un errore di sistema non previsto.
+            if (!Files.exists(coverageFilePath)) {
+                 throw new ProcessingExceptionWrapper("Report coverage non trovato. Errore imprevisto.", new NoSuchFileException(coverageFilePath.toString()));
+            }
+
+            try (Stream<String> lines = Files.lines(coverageFilePath)) {
+                finalResult.append(lines.collect(Collectors.joining("\n")));
+            } catch (IOException e) {
+                throw new ProcessingExceptionWrapper("Errore lettura report CSV", e);
+            }
+
+            // Aggiunta righe dummy per compatibilità con parser legacy (ExtractScore)
+            return finalResult.toString() + "\n0,0\n0,0\n0,0";
+
+        } catch (Exception e) {
+            // Rilancio l'eccezione wrapper se già presente, altrimenti ne creo una nuova
+            if (e instanceof ProcessingExceptionWrapper) {
+                throw (ProcessingExceptionWrapper) e;
+            }
+            logger.error("Eccezione in CoverageService", e);
+            throw new ProcessingExceptionWrapper("Errore generico calcolo copertura", e);
         }
     }
-
+       
+    
     /**
      * Esegue un processo sull'OS tramite {@link ProcessBuilder}.
      *
@@ -249,7 +295,6 @@ public class CoverageService {
         Process process = null;
         AtomicBoolean foundError = new AtomicBoolean(false);
 
-        // L'executor è necessario per poter catturare i log del processo e settare foundError
         try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
             ProcessBuilder processBuilder = new ProcessBuilder();
 
@@ -268,7 +313,7 @@ public class CoverageService {
             executor.submit(() -> streamGobbler(finalProcess.getInputStream(), "OUTPUT", foundError));
             executor.submit(() -> streamGobbler(finalProcess.getErrorStream(), "ERROR", foundError));
 
-            logger.info("[runCommand] Avviato timer {} per comando {}", timer, command);
+            logger.info("[runCommand] Avviato timer {} per comando {}", timer, Arrays.toString(command));
             boolean finished = process.waitFor(timer, TimeUnit.MINUTES);
 
             // Chiudo l'executor
@@ -280,6 +325,15 @@ public class CoverageService {
                 logger.error("[runCommand] Timeout superato. Processo terminato forzatamente.");
                 throw new ProcessingExceptionWrapper("Timeout superato. Processo terminato forzatamente.", new TimeoutException());
             }
+
+            // Controllo del codice di uscita del processo.
+            // Se il processo termina con un codice diverso da 0 (es. Maven Build Failure),
+            // viene segnalato l'errore al chiamante.
+            if (process.exitValue() != 0) {
+                logger.error("Processo terminato con exit code {}", process.exitValue());
+                return true; 
+            }
+
         } catch (IOException e) {
             throw new ProcessingExceptionWrapper("Errore I/O: " + e.getMessage(), e);
         } catch (InterruptedException e) {

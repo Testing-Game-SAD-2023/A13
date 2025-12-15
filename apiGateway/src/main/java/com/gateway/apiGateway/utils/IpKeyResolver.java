@@ -25,7 +25,6 @@ import reactor.core.publisher.Mono;
 @Component
 public class IpKeyResolver implements KeyResolver {
 
-    @SuppressWarnings("null")
     @Override
     public Mono<String> resolve(ServerWebExchange exchange) {
         // Estrai l'IP dall'header X-Forwarded-For

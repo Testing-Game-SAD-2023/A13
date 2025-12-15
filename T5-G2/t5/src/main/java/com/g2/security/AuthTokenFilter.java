@@ -48,6 +48,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
      * @throws ServletException in caso di errore lato servlet
      * @throws IOException      in caso di errore di I/O
      */
+    
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        // Lascia passare tutto ciò che inizia con /actuator senza controllare il JWT
+        return path.startsWith("/actuator");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {

@@ -52,6 +52,20 @@ services:
       - ./tempo/tempo_config.yml:/etc/tempo/config.yaml
     networks:
       - global-network
+  
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/config.yml
+      - --web.enable-remote-write-receiver
+    volumes:
+      - ./prometheus/prometheus_config.yml:/etc/prometheus/config.yml    
+    ports:
+      - "9090:9090"
+    networks:
+      - global-network
+
 
 volumes:
   grafana-storage:

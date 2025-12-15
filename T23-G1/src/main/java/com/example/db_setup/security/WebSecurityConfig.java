@@ -141,6 +141,7 @@ public class WebSecurityConfig {
                                 // player views
                                 new AntPathRequestMatcher("/home"),
                                 new AntPathRequestMatcher("/changeLanguage"),
+                                new AntPathRequestMatcher("/actuator/**"), 
                                 new AntPathRequestMatcher("/login"),
                                 new AntPathRequestMatcher("/register"),
                                 new AntPathRequestMatcher("/register/success"),

@@ -47,6 +47,7 @@ public class BuildResponse {
         responseBody.setWeakMutationCoverageDTO(new CoverageDTO(
                 score[3][0], score[3][1]
         ));
+        /** 
         responseBody.setOutputCoverageDTO(new CoverageDTO(
                 score[4][0], score[4][1]
         ));
@@ -56,8 +57,9 @@ public class BuildResponse {
         responseBody.setMethodNoExceptionCoverageDTO(new CoverageDTO(
                 score[6][0], score[6][1]
         ));
+        */
         responseBody.setCBranchCoverageDTO(new CoverageDTO(
-                score[7][0], score[7][1]
+                score[4][0], score[4][1]
         ));
 
         return responseBody;

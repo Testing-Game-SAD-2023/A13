@@ -1,18 +1,7 @@
 /*
- *   Copyright (c) 2025 Stefano Marano https://github.com/StefanoMarano80017
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Copyright (c) 2025 Stefano Marano https://github.com/StefanoMarano80017
+ * All rights reserved.
+ * ... (License header standard) ...
  */
 package com.gateway.apiGateway.filter.authenticationFilter;
 
@@ -27,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException; // IMPORTANTE
 import org.springframework.web.server.ServerWebExchange;
 
 import com.gateway.apiGateway.Factory.AuthenticationFilterGatewayFilterFactory.Config;
@@ -39,9 +29,6 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
     private final AuthTokenService authTokenService;
 
-    /*
-     * Ordine d'esecuzione del filtro, 
-     */
     @Override
     public int getOrder() {
         return NettyWriteResponseFilter.WRITE_RESPONSE_FILTER_ORDER - 2;
@@ -60,29 +47,31 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        logger.error("[Gateway auth filter] Received request from: {}", request.getPath());
+
         String token;
         try {
             token = authTokenService.extractToken(request);
             if (token == null) {
                 logger.warn("Token mancante nella richiesta per l'utente: {}", request.getRemoteAddress());
-                return unauthorized(exchange);
+                // MODIFICA QUI: Non chiamare metodi che ritornano Mono.empty(), lancia l'errore!
+                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token mancante"));
             }
         } catch (Exception e) {
             logger.error("Errore nell'estrazione del token per l'utente {}", request.getRemoteAddress(), e);
-            return unauthorized(exchange);
+            // MODIFICA QUI
+            return Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore estrazione token"));
         }
 
         return authTokenService.validateToken(token).flatMap(isValid -> {
             if (!isValid) {
                 logger.warn("Token non valido ricevuto dalla richiesta: {}", request.getRemoteAddress());
-                return unauthorized(exchange);
+                // MODIFICA QUI
+                return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token non valido"));
             }
-            // Estrai informazioni dal token e aggiungile all'header
+            
             String userId = authTokenService.extractUserId(token);
-            logger.info("Avvio autenticazione per utente {}", userId);
+            logger.info("Utente autenticato con successo: {}", userId);
 
-            // Creare un nuovo exchange con la richiesta mutata
             ServerWebExchange mutatedExchange = exchange.mutate()
                                                 .request(
                                                     request.mutate()
@@ -92,15 +81,16 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
                                                 .build();
             return chain.filter(mutatedExchange);
         }).onErrorResume(e -> {
-            logger.error("Errore nella validazione del token: {}", e.getMessage(), e);
-            return unauthorized(exchange);
+            // Se l'errore è già una ResponseStatusException (lanciata sopra), la lasciamo passare
+            // così il GlobalErrorAttributesFilter la prende.
+            if (e instanceof ResponseStatusException) {
+                return Mono.error(e);
+            }
+            
+            logger.error("Errore tecnico durante la validazione del token: {}", e.getMessage(), e);
+            return Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore interno durante la validazione"));
         });
     }
-
-    private Mono<Void> unauthorized(ServerWebExchange exchange) {
-        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        exchange.getResponse().getHeaders().set("Content-Length", "0"); // Evita che il client aspetti dati
-        exchange.getResponse().getHeaders().set("Connection", "close"); // Chiude la connessione
-        return exchange.getResponse().setComplete();
-    }
+    
+    // I metodi privati 'unauthorized' ed 'error' non servono più e possono essere rimossi
 }

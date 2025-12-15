@@ -11,6 +11,14 @@ receivers:
 # Processors take the data collected by receivers and modify or transform it before sending it to the exporters
 processors:
   batch:
+#Filter that aims to cut out prometheus generated traces, in this way the attention is just upon user generated traffic 
+  filter/drop_actuator:
+    error_mode: ignore
+    traces:
+      span:
+        - 'IsMatch(attributes["http.target"], "/actuator.*")'
+        - 'IsMatch(attributes["url.path"], "/actuator.*")'
+        - 'IsMatch(attributes["http.route"], "/actuator.*")'
 
 # Exporters send data to one or more backends or destinations
 exporters:
@@ -30,7 +38,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
+      processors: [filter/drop_actuator,batch]
       exporters: [otlp/traces, debug]
     logs:
       receivers: [otlp]
