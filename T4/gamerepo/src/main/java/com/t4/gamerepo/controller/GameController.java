@@ -80,37 +80,6 @@ public class GameController {
         return ResponseEntity.ok(games);
     }
 
-
-    @Operation(
-            summary = "Get the last Scalata game in progress for a player",
-            description = "Returns the most recent Scalata game with status STARTED or IN_PROGRESS for the specified player, or 404 if none exists"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Scalata game found and returned",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = GameDTO.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "No Scalata game in progress found for this player"
-            )
-    })
-    @GetMapping("/player/{playerId}/scalata/last")
-    public ResponseEntity<GameDTO> getLastScalataInProgress(
-            @Parameter(name = "playerId", description = "Id of the player", required = true)
-            @PathVariable("playerId") Long playerId) {
-        GameDTO game = gameService.getLastScalataInProgress(playerId);
-        if (game == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(game);
-    }
-
-
     @Operation(
             summary = "Get all games",
             description = "Returns a list of all available games"
