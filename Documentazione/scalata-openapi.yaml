@@ -1,0 +1,331 @@
+openapi: 3.0.3
+info:
+  title: ManVsClass - Scalata API
+  description: API per la gestione delle "Scalate" (Ladders) nel sistema ManVsClass.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Server di Sviluppo Locale
+
+paths:
+  /scalata/create:
+    post:
+      summary: Create a new ladder
+      description: Checks for duplicates, minimum number of levels, maximum time, and different UT classes.
+      operationId: createScalata
+      parameters:
+        - name: jwt
+          in: cookie
+          description: JSON Web Token per l'autenticazione (opzionale)
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: Dati della nuova scalata
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScalataDTO'
+      responses:
+        '200':
+          description: Ladder created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Ladder created"
+        '400':
+          description: Invalid levels or negative maximum time
+          content:
+            text/plain:
+              schema:
+                type: string
+        '409':
+          description: Ladder already exists
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /scalata/getAll:
+    get:
+      summary: Retrieve all available ladders
+      operationId: getAllScalata
+      parameters:
+        - name: jwt
+          in: cookie
+          description: JSON Web Token per l'autenticazione (opzionale)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of ladders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScalataDTO'
+
+  /scalata/get/{name}:
+    get:
+      summary: Retrieve a ladder by name
+      description: Returns the ladder if it exists, otherwise throws ScalataNotFoundException.
+      operationId: getScalata
+      parameters:
+        - name: name
+          in: path
+          description: Il nome della scalata da cercare
+          required: true
+          schema:
+            type: string
+        - name: jwt
+          in: cookie
+          description: JSON Web Token per l'autenticazione (opzionale)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ladder retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScalataDTO'
+        '404':
+          description: Ladder not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /scalata/getLevel/{name}/{number}:
+    get:
+      summary: Retrieve a specific level of a ladder
+      description: Returns the level if both the ladder and the level exist.
+      operationId: getLevel
+      parameters:
+        - name: name
+          in: path
+          description: Il nome della scalata
+          required: true
+          schema:
+            type: string
+        - name: number
+          in: path
+          description: Il numero del livello
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: jwt
+          in: cookie
+          description: JSON Web Token per l'autenticazione (opzionale)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Level retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LevelDTO'
+        '404':
+          description: Ladder or Level not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /scalata/getLevels/{name}:
+    get:
+      summary: Retrieve the levels of a ladder
+      description: Returns the list of levels if the ladder exists.
+      operationId: getLevels
+      parameters:
+        - name: name
+          in: path
+          description: Il nome della scalata
+          required: true
+          schema:
+            type: string
+        - name: jwt
+          in: cookie
+          description: JSON Web Token per l'autenticazione (opzionale)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Levels retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LevelDTO'
+        '404':
+          description: Ladder not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /scalata/delete/{name}:
+    delete:
+      summary: Delete a ladder by name
+      description: Removes the ladder if it exists, otherwise throws ScalataNotFoundException.
+      operationId: deleteScalata
+      parameters:
+        - name: name
+          in: path
+          description: Il nome della scalata da eliminare
+          required: true
+          schema:
+            type: string
+        - name: jwt
+          in: cookie
+          description: JSON Web Token per l'autenticazione (opzionale)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ladder deleted successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Ladder deleted"
+        '404':
+          description: Ladder not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    # --- ScalataDTO ---
+    ScalataDTO:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Data di creazione
+          example: "2023-10-25"
+        username:
+          type: string
+          description: Username dell'autore
+          example: "user123"
+        name:
+          type: string
+          description: Nome della scalata
+          example: "Java Advanced"
+        description:
+          type: string
+          description: Descrizione della scalata
+          example: "Sfida avanzata di testing"
+        numberOfLevels:
+          type: integer
+          format: int32
+          example: 5
+        listOfLevels:
+          type: array
+          items:
+            $ref: '#/components/schemas/LevelDTO'
+
+    # --- LevelDTO ---
+    LevelDTO:
+      type: object
+      properties:
+        opponent:
+          $ref: '#/components/schemas/Opponent'
+        tempoMax:
+          type: integer
+          format: int32
+          description: Tempo massimo in secondi
+          example: 120
+
+    # --- Opponent ---
+    Opponent:
+      type: object
+      properties:
+        id:
+          type: string
+          description: MongoDB ID
+          example: "64f8a5c2e4b0d3a2f1c8e9d0"
+        createdAt:
+          type: string
+          format: date-time
+        classUT:
+          type: string
+          description: Class Under Test
+          example: "com.example.Calculator"
+        opponentDifficulty:
+          type: string
+          enum: [EASY, MEDIUM, HARD]
+          description: Difficoltà dell'avversario
+          example: "MEDIUM"
+        opponentType:
+          type: string
+          example: "EVOSUITE"
+        coverage:
+          type: string
+          description: Stringa descrittiva della coverage generale
+          example: "85%"
+        jacocoScore:
+          $ref: '#/components/schemas/JacocoScore'
+        evosuiteScore:
+          $ref: '#/components/schemas/EvosuiteScore'
+
+    # --- JacocoScore ---
+    JacocoScore:
+      type: object
+      properties:
+        lineCoverage:
+          $ref: '#/components/schemas/Coverage'
+        branchCoverage:
+          $ref: '#/components/schemas/Coverage'
+        instructionCoverage:
+          $ref: '#/components/schemas/Coverage'
+
+    # --- EvosuiteScore ---
+    EvosuiteScore:
+      type: object
+      properties:
+        lineCoverage:
+          $ref: '#/components/schemas/Coverage'
+        branchCoverage:
+          $ref: '#/components/schemas/Coverage'
+        exceptionCoverage:
+          $ref: '#/components/schemas/Coverage'
+        weakMutationCoverage:
+          $ref: '#/components/schemas/Coverage'
+        outputCoverage:
+          $ref: '#/components/schemas/Coverage'
+        methodCoverage:
+          $ref: '#/components/schemas/Coverage'
+        methodNoExceptionCoverage:
+          $ref: '#/components/schemas/Coverage'
+        cBranchCoverage:
+          $ref: '#/components/schemas/Coverage'
+
+    # --- Coverage (Base Metric) ---
+    Coverage:
+      type: object
+      description: Rappresenta metriche di copertura (covered/missed)
+      properties:
+        covered:
+          type: integer
+          format: int32
+          description: Numero di elementi coperti
+          example: 50
+        missed:
+          type: integer
+          format: int32
+          description: Numero di elementi non coperti
+          example: 5
