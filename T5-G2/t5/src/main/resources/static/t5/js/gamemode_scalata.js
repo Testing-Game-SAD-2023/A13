@@ -1,0 +1,284 @@
+/**
+ * gamemode_scalata.js
+ * Gestisce la selezione e l'avvio delle scalate disponibili
+ * 
+ * Le card delle scalate sono già renderizzate da Thymeleaf nel DOM.
+ * JavaScript si occupa solo dell'interattività (selezione e avvio).
+ * 
+ * Dipendenze:
+ * - UserUtil.js (caricato dal footer): getCookie(), parseJwt()
+ * - jQuery
+ * - SweetAlert
+ */
+
+console.log("🚀 gamemode_scalata.js CARICATO!");
+
+// Variabile globale per tenere traccia della scalata selezionata
+let selectedScalata = null;
+
+// ------------------------------
+// GESTIONE SESSIONE E SCHEDE
+// ------------------------------
+
+/**
+ * Aggiorna il DOM con i dati della sessione esistente
+ * Mostra scheda_continua_scalata se c'è una sessione, altrimenti scalate-container
+ */
+function updateDOMWithPreviousScalataData(sessionData) {
+    if (sessionData) {
+        console.log("[gamemode_scalata] Scalata in corso, mostro scheda continua");
+        console.log("[gamemode_scalata] ========== DEBUG SESSION DATA ==========");
+        console.log("[gamemode_scalata] Session Data completo:", JSON.stringify(sessionData, null, 2));
+        console.log("[gamemode_scalata] remainingTime:", sessionData.remainingTime);
+        console.log("[gamemode_scalata] timeMaxPerLevel:", sessionData.timeMaxPerLevel);
+        console.log("[gamemode_scalata] currentLevel:", sessionData.currentLevel);
+        console.log("[gamemode_scalata] class_ut:", sessionData.class_ut);
+        console.log("[gamemode_scalata] =========================================");
+        
+        // Nascondi container scalate
+        const scalateContainer = document.getElementById("scalate-container");
+        const submitButton = document.getElementById("submit-button");
+        
+        if (scalateContainer) scalateContainer.classList.add("d-none");
+        if (submitButton) submitButton.parentElement.classList.add("d-none");
+        
+        // Mostra scheda continua
+        document.getElementById("scheda_continua_scalata").classList.remove("d-none");
+        
+        // Popola i dati nella scheda continua
+        // ATTENZIONE: Usiamo i nomi dei campi JSON (@JsonProperty) non i nomi Java!
+        // class_ut (non classUTName), remainingTime resta uguale perché non ha @JsonProperty custom
+        document.getElementById("gamemode_scalata_nome").innerText = sessionData.scalataName || "";
+        document.getElementById("gamemode_livello_corrente").innerText = sessionData.currentLevel || 1;
+        document.getElementById("gamemode_livelli_totali").innerText = sessionData.totalLevels || "N/A";
+        document.getElementById("gamemode_modalita").innerText = "Scalata";
+        
+        // Formatta e mostra il tempo rimanente
+        const remainingTime = sessionData.remainingTime || 0;
+        console.log("[gamemode_scalata] Tempo da mostrare:", remainingTime, "→", formatTime(remainingTime));
+        document.getElementById("gamemode_time_limit").innerText = formatTime(remainingTime);
+        
+        // Configura il bottone "Riprendi partita"
+        // I dati del livello sono già nella sessione Redis (incluso class_ut del livello corrente)
+        const linkRiprendi = document.getElementById("Continua");
+        const classUT = sessionData.class_ut || "FTPFile"; // Fallback nel caso remoto in cui class_ut sia null
+        linkRiprendi.href = `/editor?ClassUT=${classUT}&mode=Scalata`;
+        
+        console.log("[gamemode_scalata] Bottone 'Riprendi' configurato per livello", sessionData.currentLevel, "classe:", classUT);
+        
+    } else {
+        console.log("[gamemode_scalata] Nessuna scalata in corso, mostro scheda nuovo");
+        
+        // Mostra container scalate
+        const scalateContainer = document.getElementById("scalate-container");
+        const submitButton = document.getElementById("submit-button");
+        
+        if (scalateContainer) scalateContainer.classList.remove("d-none");
+        if (submitButton) submitButton.parentElement.classList.remove("d-none");
+        
+        // Nascondi scheda continua
+        document.getElementById("scheda_continua_scalata").classList.add("d-none");
+    }
+}
+
+
+// Quando il documento è pronto
+$(document).ready(async function() {
+    console.log("[gamemode_scalata] ========== INIZIALIZZAZIONE PAGINA ==========");
+    
+    // 1. CONTROLLA SE ESISTE UNA SESSIONE ATTIVA
+    const jwtToken = getCookie("jwt");
+    console.log("[gamemode_scalata] JWT Token:", jwtToken ? "presente" : "assente");
+    
+    const playerId = parseJwt(jwtToken).userId;
+    console.log("[gamemode_scalata] Player ID:", playerId);
+
+    let previousGameObject = null;
+    try {
+        previousGameObject = await fetchPreviousGameData();
+        console.log("Oggetto partita precedente:", previousGameObject);
+    } catch (error) {
+        console.error("Errore durante il recupero dei dati del gioco:", error);
+    }
+    updateDOMWithPreviousScalataData(previousGameObject);
+    
+    // 2. INIZIALIZZA LE CARD DELLE SCALATE con event delegation
+    // Usa event delegation sul container invece che sulle card direttamente
+    // Questo funziona anche se le card sono nascoste o caricate dinamicamente
+    $('#scalate-container').on('click', '.scalata-card', function() {
+        console.log("=== CLICK RILEVATO SU CARD SCALATA ===");
+        console.log("[gamemode_scalata] Click rilevato su card tramite delegation");
+        selectScalata($(this));
+    });
+    
+    const scalateCards = $('.scalata-card');
+    console.log("[gamemode_scalata] Numero di card trovate:", scalateCards.length);
+    console.log("[gamemode_scalata] Card HTML:", scalateCards.html());
+    
+    // 3. EVENT LISTENER PER IL BOTTONE SUBMIT (nella scheda nuovo)
+    $('#submit-button').on('click', async function() {
+        if (!selectedScalata) {
+            swal({
+                title: "Attenzione!",
+                text: "Seleziona una scalata prima di procedere",
+                icon: "warning",
+                button: "OK"
+            });
+            return;
+        }
+        
+        // Avvia la scalata selezionata
+        console.log("[gamemode_scalata] Avvio scalata:", selectedScalata);
+        startScalata();
+    });
+    
+    // 4. EVENT LISTENER PER IL BOTTONE "NUOVA SCALATA" (nella scheda continua)
+    $('#new_game').on('click', async function() {
+        console.log("[gamemode_scalata] Click su 'Nuova partita'");
+        
+        // Chiedi conferma
+        swal({
+            title: "Sei sicuro?",
+            text: "Vuoi abbandonare la scalata corrente e iniziarne una nuova?",
+            icon: "warning",
+            buttons: {
+                cancel: {
+                    text: "Annulla",
+                    value: null,
+                    visible: true
+                },
+                confirm: {
+                    text: "Sì, abbandona",
+                    value: true,
+                    className: "btn-danger"
+                }
+            },
+            dangerMode: true
+        }).then(async (willDelete) => {
+            if (willDelete) {
+                console.log("[gamemode_scalata] Confermato abbandono, elimino sessione");
+                
+                // Elimina la sessione
+                await deleteModalita(GetMode());
+                console.log("[gamemode_scalata] Sessione eliminata, mostro scheda nuovo");
+
+                // Nascondi scheda continua
+                document.getElementById("scheda_continua_scalata").classList.add("d-none");
+
+                // Mostra container scalate
+                const scalateContainer = document.getElementById("scalate-container");
+                const submitButton = document.getElementById("submit-button");
+
+                if (scalateContainer) scalateContainer.classList.remove("d-none");
+                if (submitButton) submitButton.parentElement.classList.remove("d-none");
+
+                swal("Sessione eliminata!", "Puoi ora selezionare una nuova scalata", "success");
+            }
+        });
+    });
+});
+
+/**
+ * Gestisce la selezione di una scalata
+ * @param {jQuery} $card - La card jQuery cliccata
+ */
+function selectScalata($card) {
+    console.log("[gamemode_scalata] Card cliccata:", $card);
+    
+    // Rimuovi la classe selected da tutte le card
+    $('.scalata-card').removeClass('selected');
+    
+    // Aggiungi la classe selected alla card cliccata
+    $card.addClass('selected');
+    
+    // Leggi i dati dalla card tramite data attributes
+    const scalataName = $card.data('name');
+    const totalLevels = parseInt($card.data('levels'));
+    
+    // Salva la scalata selezionata
+    selectedScalata = {
+        name: scalataName,
+        totalLevels: totalLevels
+    };
+    
+    console.log("[gamemode_scalata] Scalata selezionata:", selectedScalata);
+}
+
+/**
+ * Avvia la scalata selezionata
+ * T5 si occupa di chiamare T1 internamente tramite ScalataGame.loadLevelData()
+ * Il frontend invia solo: playerId, mode, scalataName, totalLevels, currentLevel
+ */
+async function startScalata() {
+    if (!selectedScalata) {
+        console.error("[gamemode_scalata] Nessuna scalata selezionata");
+        return;
+    }
+    
+    const playerId = String(parseJwt(getCookie("jwt")).userId);
+    const mode = "Scalata"; 
+
+    console.log("[gamemode_scalata] Avvio scalata:", selectedScalata);
+
+    // PREPARA I DATI MINIMI PER StartGame
+    // T5 chiamerà T1 internamente per ottenere className, remainingTime, ecc.
+    let requestData = {
+        playerId: playerId,
+        mode: mode,
+        scalataName: selectedScalata.name,
+        currentLevel: 1,  // Inizia sempre dal livello 1
+        totalLevels: selectedScalata.totalLevels
+    };
+    
+    console.log("[gamemode_scalata] Richiesta StartGame:", JSON.stringify(requestData, null, 2));
+
+    // CHIAMATA A T5 (che chiamerà T1 internamente)
+    startGameRequest(requestData)
+        .then((response) => {
+            console.log("[gamemode_scalata] StartGame response:", response);
+            
+            // T5 ha caricato i dati del livello da T1
+            // Ora possiamo reindirizzare all'editor
+            if (mode === "Scalata") {
+                // Nota: questi dati verranno caricati dalla sessione nell'editor
+                scalata_name = selectedScalata.name;
+                scalata_currentLevel = 1;
+                scalata_totalLevels = selectedScalata.totalLevels;
+                //scalata_classUTName = response.classUTName; // Recupera className dalla response
+               // console.log("[gamemode_scalata] Dati scalata impostati per l'editor");
+            }
+                if (!response.classUTName) {
+                swal("Errore!", "Classe non disponibile, impossibile avviare la partita.", "error");
+                return;
+                }
+            // Redirect all'editor - la className verrà recuperata dalla sessione
+            window.location.href = `/editor?ClassUT=${response.classUTName}&mode=${mode}`;
+        })
+        .catch((error) => {
+            console.error("Errore nell'avvio della scalata:", error);
+            
+            // Estrai il messaggio di errore dettagliato
+            let errorMessage = "Impossibile avviare la scalata. Riprova più tardi.";
+            
+            if (error && error.errors && Array.isArray(error.errors)) {
+                // Se ci sono errori di validazione, mostrali tutti
+                errorMessage = "Errori di validazione:\n" + error.errors.map(err => `• ${err}`).join('\n');
+            } else if (error && error.message) {
+                errorMessage = error.message;
+            } else if (error && typeof error === 'string') {
+                errorMessage = error;
+            }
+            
+            console.error("[gamemode_scalata] Messaggio errore elaborato:", errorMessage);
+            
+            swal({
+                title: "Errore!",
+                text: errorMessage,
+                icon: "error",
+                button: "OK"
+            });
+        });
+}
+
+// Le funzioni getGameMode, fetchPreviousGameData e deleteModalita
+// sono ora disponibili in common_utils.js

@@ -545,11 +545,12 @@ function controlloScalata(
 			});
 	}
 }
-// === FUNZIONI PER LA GESTIONE DEL TIMER DELLA PARTITA SINGOLA ===
+// === FUNZIONI PER LA GESTIONE DEL TIMER (PARTITA SINGOLA E SCALATA) ===
 
 window.addEventListener("load", function () {
 	const mode = GetMode();
-	if (mode === "PartitaSingola")
+	// Il timer è visibile sia in PartitaSingola che in Scalata (ogni livello ha un tempo)
+	if (mode === "PartitaSingola" || mode === "Scalata")
 		startTimer();
 });
 
@@ -608,8 +609,24 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (previousGameObject && previousGameObject.testingClassCode) {
 		editor_utente.setValue(previousGameObject.testingClassCode);
 	}
-	if (previousGameObject && GetMode() === "PartitaSingola" && previousGameObject.remainingTime) {
+	// Recupera il remainingTime per PartitaSingola e Scalata
+	const mode = GetMode();
+	if (previousGameObject && (mode === "PartitaSingola" || mode === "Scalata") && previousGameObject.remainingTime) {
 		timer_remainingTime = previousGameObject.remainingTime;
+	}
+	
+	// Recupera i dati specifici della Scalata da previousGameObject
+	if (previousGameObject && mode === "Scalata") {
+		scalata_name = previousGameObject.scalataName;
+		scalata_currentLevel = previousGameObject.currentLevel;
+		scalata_totalLevels = previousGameObject.totalLevels;
+		
+		console.log("[Util_Editor] Variabili Scalata inizializzate da previousGameObject:", {
+			scalata_name,
+			scalata_currentLevel,
+			scalata_totalLevels,
+			timer_remainingTime
+		});
 	}
 });
 

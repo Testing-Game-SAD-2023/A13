@@ -239,6 +239,28 @@ public abstract class BaseService implements ServiceInterface {
         });
     }
 
+    // Metodo per chiamate PUT senza body (per operazioni come increment)
+    protected <R> R callRestPut(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
+        return executeRestCall("callRestPut " + endpoint, () -> {
+            String url = buildUri(endpoint, queryParams);
+            HttpHeaders headers = HttpHeadersFactory.createHeaders(buildAuth(), null);
+            HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
+            ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, responseType);
+            return response.getBody();
+        });
+    }
+
+    // Metodo per chiamate PATCH
+    protected <R> R callRestPatch(String endpoint, Map<String, String> queryParams, Class<R> responseType) {
+        return executeRestCall("callRestPatch " + endpoint, () -> {
+            String url = buildUri(endpoint, queryParams);
+            HttpHeaders headers = HttpHeadersFactory.createHeaders(buildAuth(), null);
+            HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
+            ResponseEntity<R> response = restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, responseType);
+            return response.getBody();
+        });
+    }
+
     // Metodo per chiamate DELETE
     protected String callRestDelete(String endpoint, Map<String, String> queryParams) {
         return executeRestCall("callRestDelete " + endpoint, () -> {

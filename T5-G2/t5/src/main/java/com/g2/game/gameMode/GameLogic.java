@@ -51,7 +51,7 @@ public abstract class GameLogic implements Serializable {
     private long gameID;
 
     @JsonProperty("current_round")
-    private int currentRound = 0;
+    private int currentRound = 1;
 
     @JsonProperty("current_turn")
     private int currentTurn = 0;
@@ -129,7 +129,7 @@ public abstract class GameLogic implements Serializable {
     }
 
     public void startRound() {
-        this.currentRound++;
+        //this.currentRound++;
         serviceManager.handleRequest("T4", "CreateRound", Integer.class, this.gameID, this.classUTName, this.typeRobot, this.difficulty, this.currentRound);
     }
 

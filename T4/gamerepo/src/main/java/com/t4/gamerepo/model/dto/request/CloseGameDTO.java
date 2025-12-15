@@ -25,5 +25,5 @@ public class CloseGameDTO {
     /**
      * Indica se il game si è concluso perché il giocatore la ha abbandonato
      */
-    private boolean isGameSurrendered;
+    private boolean gameSurrendered;
 }

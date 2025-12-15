@@ -18,6 +18,8 @@ package com.g2.interfaces;
 
 import com.g2.model.OpponentSummary;
 import com.g2.model.Team;
+import com.g2.model.dto.ScalataDTO;
+import com.g2.model.dto.LevelDataDTO;
 import com.g2.model.dto.ResponseTeamComplete;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -81,6 +83,15 @@ public class T1Service extends BaseService {
         registerAction("getOpponentEvosuiteScore", new ServiceActionDefinition(
                 params -> getOpponentEvosuiteScore((String) params[0], (String) params[1], (OpponentDifficulty) params[2]),
                 String.class, String.class, OpponentDifficulty.class));
+
+        registerAction("getScalateList", new ServiceActionDefinition(
+                params -> getScalateList() // Recupera lista scalate da T1
+        ));
+
+        registerAction("getLevelByScalataAndPosition", new ServiceActionDefinition(
+                params -> getLevelByScalataAndPosition((String) params[0], (Integer) params[1]),
+                String.class, Integer.class
+        ));
     }
 
 
@@ -133,11 +144,26 @@ public class T1Service extends BaseService {
     }
 
     private ResponseTeamComplete ottieniTeamCompleto(String studentId) {
-        Map<String, String> queryParams = Map.of(
-                STUDENT_ID_FIELD, studentId
-        );
-        return callRestGET("/ottieniDettagliTeamCompleto", queryParams, ResponseTeamComplete.class);
-    }
+    Map<String, String> queryParams = Map.of(
+            STUDENT_ID_FIELD, studentId
+    );
+    return callRestGET("/ottieniDettagliTeamCompleto", queryParams, ResponseTeamComplete.class);
+}
 
+// Restituisce la lista di tutte le scalate disponibili
+private List<ScalataDTO> getScalateList() {
+    return callRestGET("/scalata/getAll", null, new ParameterizedTypeReference<List<ScalataDTO>>() {});
+}
 
+/**
+ * Restituisce il livello i-esimo di una scalata specifica.
+ * 
+ * @param scalataName Nome della scalata
+ * @param currentLevel Posizione del livello (1-based: 1=primo, 2=secondo, etc.)
+ * @return {@link LevelDataDTO} con i dati del Level
+ */
+private LevelDataDTO getLevelByScalataAndPosition(String scalataName, Integer currentLevel) {
+    String path = "/scalata/getLevel/" + scalataName + "/" + (currentLevel-1);
+    return callRestGET(path, null, LevelDataDTO.class);
+}
 }

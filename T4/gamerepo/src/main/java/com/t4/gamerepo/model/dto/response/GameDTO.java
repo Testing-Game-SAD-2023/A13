@@ -16,6 +16,8 @@ public record GameDTO(
         Map<Long, PlayerResultDTO> playerResults,
         List<RoundDTO> rounds,
         Timestamp startedAt,
-        Timestamp closedAt
+        Timestamp closedAt,
+        Integer currentLevel,
+        String gameName
 ) {
 }

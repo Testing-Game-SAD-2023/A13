@@ -15,27 +15,7 @@
  *   limitations under the License.
  */
 
-// ------------------------------
-// FUNZIONI DI UTILITÀ
-// ------------------------------
-function getParameterByName(name) {
-	const url = window.location.href;
-	name = name.replace(/[\[\]]/g, "\\$&");
-	const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-	const results = regex.exec(url);
-	if (!results) return null;
-	if (!results[2]) return "";
-	return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-function GetMode() {
-	const mode = getParameterByName("mode");
-	if (mode) {
-		const trimmed = mode.replace(/[^a-zA-Z0-9\s]/g, " ").trim();
-		return trimmed;
-	}
-	return "Sfida"; // Default in forma capitalizzata
-}
+// Le funzioni getParameterByName e GetMode sono ora disponibili in common_utils.js
 
 function SetMode(setM) {
 	const currentMode = GetMode();
@@ -64,36 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	timeLimitField.style.display = (GetMode() === "PartitaSingola") ? "block" : "none";
 });
 
-// ------------------------------
-// FUNZIONI PER GESTIRE LA SESSIONE CON REDIS
-// ------------------------------
-
-// --- Funzione per ottenere il gamemode dalla sessione  ---
-// Funzione getGameMode riscritta usando `fetch`
-async function getGameMode(playerId, mode) {
-	const url = `/api/gameEngine/session/gamemode/${playerId}?mode=${mode}`;
-	try {
-		const response = await fetch(url, {
-			method: "GET", // tipo di richiesta GET
-			headers: {
-				"Content-Type": "application/json", // Impostazione per la richiesta
-			},
-		});
-
-		// Se la risposta non è ok, lanciamo un errore
-		if (!response.ok) {
-			throw new Error(`Errore nella richiesta: ${response.statusText}`);
-		}
-
-		// Parsa la risposta come JSON
-		const data = await response.json();
-		return data; // Restituisce i dati della risposta JSON
-	} catch (error) {
-		// Gestione dell'errore in caso di problema nella chiamata fetch
-		console.error("Errore nella chiamata a getGameMode:", error);
-		throw error; // Rilancia l'errore per poterlo gestire più avanti
-	}
-}
+// Le funzioni getGameMode, startGameRequest, fetchPreviousGameData e deleteModalita
+// sono ora disponibili in common_utils.js
 
 // -- Funzione per aggiornare il gamemode della sessione ---
 function putGameMode(
@@ -125,50 +77,6 @@ function putGameMode(
 	});
 }
 
-// -- Funzione per far partire un game ---
-function startGameRequest(requestData) {
-	return new Promise((resolve, reject) => {
-		$.ajax({
-			url: "/api/gameEngine/StartGame",
-			type: "POST",
-			contentType: "application/json",
-			data: requestData ? JSON.stringify(requestData) : null,
-			xhrFields: {
-				withCredentials: true, // Invia automaticamente i cookie (JWT)
-			},
-			success: function (response) {
-				resolve(response);
-			},
-			error: function (xhr) {
-				reject(xhr.responseJSON || xhr.responseText);
-			},
-		});
-	});
-}
-
-async function fetchPreviousGameData() {
-	const playerId = String(parseJwt(getCookie("jwt")).userId); // recupera il playerId dal JWT
-	const gamemode = GetMode(); // recupera la modalità di gioco
-	try {
-		// Uso di await per ottenere i dati in modo sincrono
-		const response = await getGameMode(playerId, gamemode);
-		// Verifica se la modalità corrisponde
-		if (response && response.mode == gamemode) {
-			console.log(
-				"[fetchPreviousGameData] Trovato gameobject per la modalità " + gamemode
-			);
-			return response;
-		} else {
-			console.log("[fetchPreviousGameData] Modalità non corrispondente.");
-			return null;
-		}
-	} catch (error) {
-		// Gestione dell'errore
-		console.error("Errore durante il recupero della sessione:", error);
-		return null;
-	}
-}
-
 async function putGameMode() {
 	const playerId = String(parseJwt(getCookie("jwt")).userId);
 	const currentMode = GetMode();
@@ -185,21 +93,6 @@ async function putGameMode() {
 		.catch((error) => {
 			console.error("Modalità non creata Errore:", error);
 		});
-}
-
-async function deleteModalita(mode) {
-	const playerId = String(parseJwt(getCookie("jwt")).userId);
-	// const url = `/session/gamemode/${playerId}?mode=${mode}`
-	const url = `/api/gameEngine/SurrenderGame/${playerId}?mode=${mode}`;
-	try {
-		const response = await fetch(url, {
-			method: "DELETE",
-		});
-		const result = await response.text();
-		console.log("Modalità eliminata:", result);
-	} catch (error) {
-		console.error("Errore durante l'eliminazione della modalità:", error);
-	}
 }
 
 // ------------------------------
@@ -288,6 +181,7 @@ function updateDOMWithPreviousGameData(previousGameObject) {
 		if (previousGameObject.mode === "PartitaSingola")
 			document.getElementById("gamemode_time_limit").innerText =
 				formatTime(previousGameObject.remainingTime) || formatTime(0);
+		
 		else
 			document.getElementById("gamemode_time_limit").innerText = "Nessun tempo limite"
 
@@ -364,14 +258,7 @@ document
 	.getElementById("select_diff")
 	.addEventListener("change", updateButtonState);
 
-function toggleVisibility(elementId) {
-	const element = document.getElementById(elementId);
-	if (element) {
-		element.classList.toggle("d-none");
-	} else {
-		console.error("Elemento non trovato con ID:", elementId);
-	}
-}
+// La funzione toggleVisibility è ora disponibile in common_utils.js
 
 // Filtro i robot disponibili in base alla classeUT scelta
 document.addEventListener("DOMContentLoaded", function () {

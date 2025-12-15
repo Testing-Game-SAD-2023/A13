@@ -13,6 +13,11 @@ public class Game {
     private String classe;
     private String username;
     private double score;
+    
+    // Campi aggiunti per compatibilità con T4 GameDTO
+    private String gameMode;  // Es: "Scalata", "PartitaSingola", "Sfida"
+    private Integer currentLevel;  // Livello corrente per modalità Scalata
+    private String scalataName;  // Nome della scalata (solo per gameMode='Scalata')
 
     public Game(int playerId, String description, String name, String difficulty, String username) {
         this.playerId = playerId;
@@ -105,6 +110,30 @@ public class Game {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(String gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public Integer getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public void setCurrentLevel(Integer currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
+    public String getScalataName() {
+        return scalataName;
+    }
+
+    public void setScalataName(String scalataName) {
+        this.scalataName = scalataName;
     }
 
     @Override

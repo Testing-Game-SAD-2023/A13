@@ -1,85 +1,167 @@
 <!DOCTYPE html>
 
 <!--Adding Thymeleaf-->
-<html lang ="en" 
+<html lang="it" 
     xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:th="http://www.thymeleaf.org">
+    xmlns:th="http://www.thymeleaf.org"
+    data-bs-theme="dark">
 
 <head>
-    <!--Enabling proper responsive behavior-->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <div th:replace="fragments/header :: header"></div>
+    
     <title id="title-scalata-gamemode" th:text="#{seleziona_scalata}"></title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <!-- Rimosso Bulma CSS che potrebbe creare conflitti -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css"> -->
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale-extreme.css">
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/translucent.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- CSS per bg-custom e stili base -->
     <link rel="stylesheet" href="/t5/css/gamemode_scalata.css">
+    <!-- CSS minimale SOLO per le card di selezione scalate -->
+    <link rel="stylesheet" href="/t5/css/gamemode_scalata_minimal.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
-    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-    <!-- <script type= "text/javascript" src="/t5/js/opponents_main.js"></script> -->
-    <script type="text/javascript" src="/t5/js_old/common.js"></script>
-    <script type="text/javascript" src="/t5/js_old/gamemode_scalata.js"></script>
-    
+    <!-- Le scalate sono già renderizzate nel DOM da Thymeleaf -->
+    <!-- Non serve più passare dati JSON a JavaScript -->
 
 </head>
 
-<body class=bg-custom>
+<body>
   
-  <!--Navbar-->
-  <nav class="navbar navbar-dark bg-dark" id="navbar">
-      <a class="navbar-brand" href="javascript:void(0);">
-        <i class="fas fa-stairs" th:text="#{seleziona_scalata}"></i> 
-      </a>
-      <button class="navbar-toggler" id="navbar-button" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" id="nav-go-back" href="/main" th:text="#{indietro}"> <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="nav-logout" href="/logout" th:text="#{logout}"> <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="nav-rules" href="#" data-toggle="modal" data-target="#rulesModal" th:text="#{regole}"></a>
-          </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" id="nav-tour" href=#>Inizia il tour</a>
-          </li> -->
-        </ul>
-      </div>
-  </nav>
+  <!-- NAVBAR -->
+  <div th:replace="fragments/navbar :: navbar"></div>
 
-  <!--Jumbotron-->
-  <div class="jumbotron">
-    <h1 class="title" th:text="#{titolo_scalata}"></h1>
-    <h2 class="subtitle" th:text="#{descrizione_scalata}"></h2>
+  <!-- SCHEDA CONTINUA - COPIATA ESATTAMENTE DA PARTITA SINGOLA -->
+  <div class="container-fluid mt-3 d-none" id="scheda_continua_scalata">
+    <div class="row justify-content-center row-cols-3">
+      <div class="col"></div>
+      <div class="col">
+        <!-- Scheda continua gioco-->
+        <div class="card">
+          <h5 class="card-header text-center" th:text="#{scalata}"></h5>
+          <div class="card-body">
+            <!-- Form di selezione -->
+            <div class="row">
+              <div class="col">
+                <h3 class="text-center mb-4" th:text="#{gamemode_alert}"></h3>
+                <div class="row">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <label th:text="#{nome_scalata}"> </label>
+                      <span id="gamemode_scalata_nome"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{livello_corrente}"> </label>
+                      <span id="gamemode_livello_corrente"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{totale_livelli}"></label>
+                      <span id="gamemode_livelli_totali"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{modalità}"></label>
+                      <span id="gamemode_modalita"> </span>
+                    </li>
+                    <li class="list-group-item">
+                      <label th:text="#{tempo_rimanente}"></label>
+                      <span id="gamemode_time_limit"> </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="d-flex gap-5 justify-content-between">
+                  <!-- Set new Game-->
+                  <div class="text-center pt-2">
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      id="new_game"
+                    >
+                      <i class="bi bi-plus-lg" th:text="#{nuova_partita}"></i>
+                    </button>
+                  </div>
+                  <!-- Link editor -->
+                  <div class="text-center pt-2">
+                    <a
+                      class="btn btn-primary"
+                      href="#"
+                      role="button"
+                      id="Continua"
+                    >
+                      <i class="bi bi-play-fill" th:text="#{riprendi_partita}"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col"></div>
+    </div>
   </div>
-  <br>
-  <div id="scalate-container" class="container">
-    <!-- List of all "Scalate" to choose-->
+  
+  <!-- Container delle scalate - Renderizzato lato server con Thymeleaf (schermata di default) -->
+  <div id="scalate-container" class="container-fluid mt-3">
+    <div class="row justify-content-center">
+      <!-- Itera su tutte le scalate disponibili - Una card per riga, tutto orizzontale -->
+      <div th:each="scalata : ${lista_scalate}" class="col-12 col-lg-10 col-xl-8 mb-3">
+        <div class="card scalata-card shadow-sm" 
+             th:attr="data-name=${scalata.name},
+                      data-levels=${scalata.totalLevels}"
+             style="cursor: pointer; transition: all 0.3s ease;">
+          <div class="card-body">
+            <!-- Nome Scalata -->
+            <h5 class="card-title font-weight-bold mb-0" 
+                style="display: inline-block; min-width: 200px;"
+                th:text="${scalata.name}">Nome Scalata</h5>
+            
+            <!-- Separatore -->
+            <span style="margin: 0 1.5rem; color: #6c757d;">|</span>
+            
+            <!-- Descrizione -->
+            <span class="card-text text-muted" 
+                  style="display: inline-block; min-width: 250px;"
+                  th:if="${scalata.description}"
+                  th:text="${scalata.description}">
+              Scalata di test
+            </span>
+            <small class="text-muted" 
+                   style="display: inline-block; min-width: 250px;"
+                   th:unless="${scalata.description}">Clicca per selezionare</small>
+            
+            <!-- Separatore -->
+            <span style="margin: 0 1.5rem; color: #6c757d;">|</span>
+            
+            <!-- Livelli totali -->
+            <span class="card-text" style="display: inline-block;">
+              <i class="fas fa-layer-group"></i>
+              <strong>Livelli totali:</strong> 
+              <span class="badge badge-primary" 
+                    th:text="${scalata.totalLevels}">0</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Messaggio se non ci sono scalate -->
+      <div th:if="${#lists.isEmpty(lista_scalate)}" class="col-12 text-center">
+        <div class="alert alert-warning" role="alert">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Nessuna scalata disponibile</strong>
+          <p>Al momento non ci sono scalate da giocare.</p>
+        </div>
+      </div>
+    </div>
   </div>
-  <br>
-  <br>
-  <div class="text-center">
+
+  <div class="text-center mt-4 mb-5">
     <button type="button" id="submit-button" class="btn btn-light btn-lg" th:text="#{submit}"></button>
   </div>
-  <br>
-  <br>
+
 <!--Regolamento modal dialog-->
 <div class="modal fade" id="rulesModal" tabindex="-1" role="dialog" aria-labelledby="rulesModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -97,6 +179,17 @@
     </div>
   </div>
 </div>
+
+<!-- Footer con UserUtil.js e altre utility (include jQuery, Bootstrap, UserUtil.js) -->
+<div th:replace="fragments/footer :: footer"></div>
+
+<!-- IMPORTANTE: Ordine di caricamento critico -->
+<!-- 1. common_utils.js (dipende da jQuery e UserUtil.js dal footer) -->
+<script th:src="@{/t5/js/common_utils.js}"></script>
+
+<!-- 2. gamemode_scalata.js (dipende da common_utils.js) -->
+<script th:src="@{/t5/js/gamemode_scalata.js}"></script>
+
 </body>
 
 </html>

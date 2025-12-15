@@ -17,9 +17,11 @@
 
 package com.g2.game.service;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.game.gameDTO.EndGameDTO.EndGameResponseDTO;
+import com.g2.game.gameDTO.EndGameDTO.EndScalataGameResponseDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameRequestDTO;
 import com.g2.game.gameDTO.RunGameDTO.RunGameResponseDTO;
 import com.g2.game.gameDTO.StartGameDTO.StartGameRequestDTO;
@@ -28,10 +30,13 @@ import com.g2.game.gameFactory.params.GameParams;
 import com.g2.game.gameFactory.params.GameParamsFactory;
 import com.g2.game.gameMode.Compile.CompileResult;
 import com.g2.game.gameMode.GameLogic;
+import com.g2.game.gameMode.ScalataGame;
 import com.g2.model.configuration.GameExecutionConfig;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.session.SessionService;
 import jakarta.annotation.PostConstruct;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +48,9 @@ import testrobotchallenge.commons.models.opponent.GameMode;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,7 +73,7 @@ public class GameManager {
     private String turnExecutionConfigFile;
     private GameExecutionConfig config;
 
-    public GameManager(GameService gameService, SessionService sessionService,
+    public GameManager( GameService gameService, SessionService sessionService,
                        PlayerStatService playerStatService, LogWriterService logWriterService) {
         this.gameService = gameService;
         this.sessionService = sessionService;
@@ -104,12 +111,19 @@ public class GameManager {
      * e lo stato della creazione ("created")
      */
     public StartGameResponseDTO handleStartNewGame(StartGameRequestDTO requestDTO) {
-        // Converto il dto
+
+        // Se è Scalata, carica i dati del livello da T1
+        // Se è Scalata, popola il DTO con i dati reali del primo livello
+        if (requestDTO instanceof com.g2.game.gameDTO.StartGameDTO.StartScalataRequestDTO scalataDTO) {
+            requestDTO = gameService.populateFirstLevelDataForScalata(scalataDTO);
+        }
+
+                // Converto il dto
         GameParams gameParams = GameParamsFactory.generateCreateParams(requestDTO);
 
         // Creo una nuova partita, modellata da GameLogic
         GameLogic gameLogic = gameService.createNewGame(gameParams);
-
+        
         // Registra la creazione in T4
         gameLogic.startGame();
         gameLogic.startRound();
@@ -126,11 +140,14 @@ public class GameManager {
          */
         GameProgressDTO progress = gameService.createNewGameProgress(gameParams);
         logger.info("createGame: creato/recuperato con successo progress {} per playerId={}.", progress, gameLogic.getPlayerID());
-
-        return new StartGameResponseDTO(gameLogic.getGameID(), "created");
+        
+        return new StartGameResponseDTO(gameLogic.getGameID(), "created", gameLogic.getClassUTName());
     }
-
-
+    
+    /**
+     * Popola il DTO di Scalata con i dati reali del primo livello da T1.
+     * Aggiorna i campi di requestDTO con classUTName, remainingTime, timeMaxPerLevel, ecc.
+     */
     /**
      * Gestisce l'esecuzione di un singolo turno di gioco per un giocatore.
      * <p>
@@ -350,28 +367,92 @@ public class GameManager {
         GameLogic currentGame = handleGetCurrentGame(updateParams.getPlayerId(), updateParams.getGameMode());
         logger.info("[EndGame] GameLogic recuperato: gameID={}", currentGame.getGameID());
 
-        handleCloseGame(currentGame, false);
+        // Per Scalata: creo subito il DTO con i valori corretti PRIMA di handleCloseLevel()
+        EndScalataGameResponseDTO scalataResponseDTO = null;
+        if (currentGame instanceof ScalataGame scalataGame) {
+            scalataResponseDTO = new EndScalataGameResponseDTO(
+                currentGame.getScore(currentGame.getRobotCompileResult()),
+                currentGame.getScore(currentGame.getUserCompileResult()),
+                currentGame.isWinner(),
+                0, // expGained verrà aggiornato dopo
+                achievementsUnlocked,
+                runGameResponse,
+                scalataGame.getCurrentLevel(),
+                scalataGame.getTotalLevels(),
+                scalataGame.getScalataName(),
+                scalataGame.isScalataWon()
+            );
+        }
+        
+        // Gestione della chiusura in base alla modalità di gioco
+        if (currentGame instanceof ScalataGame scalataGame) {
+            // Modalità Scalata: verifica se ha completato TUTTA la scalata
+            if (scalataGame.isWinner() 
+                    && scalataGame.getCurrentLevel() == scalataGame.getTotalLevels()) {
+                // Ha completato l'ULTIMO livello con vittoria → chiudi partita completamente
+                logger.info("[EndGame] Scalata completata! Livello {}/{} vinto → chiusura partita",
+                        scalataGame.getCurrentLevel(), scalataGame.getTotalLevels());
+                handleCloseGame(currentGame, false);
+            } else {
+                // O ha perso, o non è ancora all'ultimo livello → gestisci livello (passa al successivo o permetti retry)
+                logger.info("[EndGame] Scalata in corso: livello {}/{}, winner={} → gestione livello",
+                        scalataGame.getCurrentLevel(), scalataGame.getTotalLevels(), scalataGame.isWinner());
+                achievementsUnlocked.addAll(handleCloseLevel(scalataGame));
+            }
+        } else {
+            // Altre modalità di gioco → chiudi partita
+            handleCloseGame(currentGame, false);
+        }
 
         // Determino la forma della risposta in base allo stato di terminazione della partita ed eseguo le operazioni
         // aggiuntive in caso di vittoria
         if (currentGame.getUserCompileResult() == null ||
                 !currentGame.getUserCompileResult().hasSuccess()
         ) {
+            if (scalataResponseDTO != null) {
+                // Aggiorno gli achievement che potrebbero essere stati aggiunti da handleCloseLevel()
+                scalataResponseDTO.setAchievementsUnlocked(achievementsUnlocked);
+                return scalataResponseDTO;
+            }
             return new EndGameResponseDTO(0, 0, false, 0, runGameResponse);
         } else if (!currentGame.isWinner()) {
-
+            if (scalataResponseDTO != null) {
+                // Aggiorno gli achievement che potrebbero essere stati aggiunti da handleCloseLevel()
+                scalataResponseDTO.setAchievementsUnlocked(achievementsUnlocked);
+                return scalataResponseDTO;
+            }
             return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),
                     currentGame.getScore(currentGame.getUserCompileResult()),
                     currentGame.isWinner(), 0, achievementsUnlocked, runGameResponse);
         } else {
             // Gestisco il calcolo e l'aggiornamento dei punti esperienza e degli achievement sbloccati
-            int expGained = playerStatService.assignExperiencePoints(currentGame);
-            achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
-            return new EndGameResponseDTO(
+            // Per Scalata: gli XP e achievement sono già stati assegnati in handleCloseLevel
+            // Per altre modalità: li assegniamo qui
+            int expGained = 0;
+            
+            if (currentGame instanceof ScalataGame scalataGame 
+                    && scalataGame.getCurrentLevel() <= scalataGame.getTotalLevels()) {
+                // Scalata: livello completato, XP già assegnati in handleCloseLevel
+                logger.info("[EndGame] Scalata: livello completato, XP già assegnati, achievement: {}", achievementsUnlocked);
+            } else {
+                // Modalità normale: assegna XP e achievement qui
+                expGained = playerStatService.assignExperiencePoints(currentGame);
+                achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(currentGame.getPlayerID()));
+            }
+
+            if (scalataResponseDTO != null) {
+                // Aggiorno expGained che ora è stato calcolato
+                scalataResponseDTO.setExpGained(expGained);
+                return scalataResponseDTO;
+            } else {
+                return new EndGameResponseDTO(
                     currentGame.getScore(currentGame.getRobotCompileResult()),
                     currentGame.getScore(currentGame.getUserCompileResult()),
                     currentGame.isWinner(), expGained, achievementsUnlocked, runGameResponse);
+            }
+
+            
         }
     }
 
@@ -481,6 +562,68 @@ public class GameManager {
         // Chiudo la partita i T4 e rimuovo la sessione
         gameService.closeGame(currentGame, isGameSurrendered);
         sessionService.removeGameMode(currentGame.getPlayerID(), currentGame.getGameMode(), java.util.Optional.empty());
+    }
+
+    /**
+     * Gestisce la chiusura di un livello nella modalità Scalata.
+     * Delega tutta la logica a ScalataGame e aggiorna la sessione.
+     * @return lista degli achievement sbloccati durante questo livello
+     */
+    public List<String> handleCloseLevel(ScalataGame scalataGame) {
+        List<String> achievementsUnlocked = new ArrayList<>();
+
+        if (scalataGame.isWinner()) {
+            // Ha vinto il livello: assegna XP e achievement PRIMA di cambiare livello
+            logger.info("[CLOSE_LEVEL] Livello {} vinto, assegnazione XP e achievement", 
+                       scalataGame.getCurrentLevel());
+
+            try {
+                // Assegna XP e sblocca achievement per il livello COMPLETATO
+                int expGained = playerStatService.assignExperiencePoints(scalataGame);
+                achievementsUnlocked.addAll(playerStatService.unlockGlobalAchievements(scalataGame.getPlayerID()));
+                
+                logger.info("[CLOSE_LEVEL] XP assegnati: {}, Achievement: {}", expGained, achievementsUnlocked);
+
+                // Delega a ScalataGame la gestione del livello (carica dati da T1, chiama T4)
+                scalataGame.handleCloseLevel();
+                
+                // Aggiorna la sessione con i dati del livello successivo
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.info("[CLOSE_LEVEL] Sessione aggiornata con dati livello successivo");
+
+            } catch (Exception e) {
+                logger.error("[CLOSE_LEVEL] Errore gestione livello: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.warn("[CLOSE_LEVEL] Sessione salvata nonostante errore");
+            }
+
+        } else {
+            // Ha perso il livello: delega a ScalataGame il reset
+            logger.info("[CLOSE_LEVEL] Livello {} fallito, reset per retry (remainingTime PRIMA: {})", 
+                       scalataGame.getCurrentLevel(), scalataGame.getRemainingTime());
+
+            try {
+                // Delega a ScalataGame la gestione della sconfitta (reset tempo/turno, chiama T4)
+                scalataGame.handleCloseLevel();
+                
+                logger.info("[CLOSE_LEVEL] DOPO handleCloseLevel: remainingTime={}, timeMaxPerLevel={}, currentTurn={}",
+                           scalataGame.getRemainingTime(), scalataGame.getTimeMaxPerLevel(), scalataGame.getCurrentTurn());
+                
+                // Aggiorna la sessione con dati resettati
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.info("[CLOSE_LEVEL] Sessione aggiornata in Redis, giocatore può riprovare livello {}",
+                           scalataGame.getCurrentLevel());
+
+            } catch (Exception e) {
+                logger.error("[CLOSE_LEVEL] Errore reset livello: {}", e.getMessage(), e);
+                // In caso di errore, salva comunque la sessione
+                sessionService.updateGameMode(scalataGame.getPlayerID(), scalataGame);
+                logger.warn("[CLOSE_LEVEL] Sessione salvata nonostante errore");
+            }
+        }
+
+        return achievementsUnlocked;
     }
 
 }

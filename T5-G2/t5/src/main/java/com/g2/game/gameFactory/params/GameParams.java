@@ -36,6 +36,7 @@ public class GameParams {
         this.opponentDifficulty = null;
     }
 
+    // Costruttore completo che inizializza tutti i campi per la sessione
     public GameParams(Long playerId, String classUTName, String classUTCode, String opponentType, OpponentDifficulty opponentDifficulty, GameMode gameMode, String testClassCode) {
         this.playerId = playerId;
         this.classUTName = classUTName;

@@ -17,12 +17,15 @@
 
 package com.g2.game.service;
 
+import com.g2.game.gameDTO.StartGameDTO.StartScalataRequestDTO;
 import com.g2.game.gameFactory.GameRegistry;
 import com.g2.game.gameFactory.params.GameParams;
 import com.g2.game.gameMode.Compile.CompileResult;
 import com.g2.game.gameMode.GameLogic;
 import com.g2.interfaces.ServiceManager;
 import com.g2.model.dto.GameProgressDTO;
+import com.g2.model.dto.LevelDataDTO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import testrobotchallenge.commons.models.dto.score.EvosuiteCoverageDTO;
 import testrobotchallenge.commons.models.dto.score.JacocoCoverageDTO;
 import testrobotchallenge.commons.models.opponent.GameMode;
+import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
 /**
  * Service impiegato per la gestione della logica di gioco lato backend.
@@ -95,7 +99,8 @@ public class GameService {
      */
     public GameProgressDTO createNewGameProgress(GameParams gameParams) {
         return (GameProgressDTO) serviceManager.handleRequest("T23", "createPlayerProgressAgainstOpponent",
-                gameParams.getPlayerId(), gameParams.getGameMode(), gameParams.getClassUTName(), gameParams.getOpponentType(), gameParams.getOpponentDifficulty());
+                gameParams.getPlayerId(), gameParams.getGameMode(), gameParams.getClassUTName(),
+                gameParams.getOpponentType(), gameParams.getOpponentDifficulty());
     }
 
 
@@ -239,4 +244,35 @@ public class GameService {
         currentGame.endGame(isGameSurrendered);
         logger.info("EndGame: Partita rimossa con successo per playerId={}.", currentGame.getPlayerID());
     }
+
+        /**
+     * Popola i dati del primo livello della Scalata richiedendoli a T1.
+     * <p>
+     * Questo metodo viene utilizzato all'inizio di una nuova Scalata per caricare
+     * le informazioni del livello corrente (className, tempo massimo, ecc.).
+     *
+     * @param requestDTO il DTO della richiesta Scalata da popolare con i dati del livello.
+     * @return il DTO aggiornato con i dati del livello.
+     */
+    public StartScalataRequestDTO populateFirstLevelDataForScalata(StartScalataRequestDTO requestDTO) {
+        // Chiama T1 per ottenere i dati del primo livello
+        int livello = requestDTO.getCurrentLevel() > 0 ? requestDTO.getCurrentLevel() : 1;
+        LevelDataDTO levelData = (LevelDataDTO) this.serviceManager.handleRequest(
+                "T1", "getLevelByScalataAndPosition", requestDTO.getScalataName(), livello);
+            
+        // Popola i dati nel DTO usando i campi type-safe del LevelDataDTO
+        requestDTO.setClassUTName(levelData.getOpponentName().getClassUT());
+        requestDTO.setTypeRobot(levelData.getOpponentName().getType());
+        requestDTO.setDifficulty(levelData.getOpponentName().getDifficulty());
+        
+        // T1 ritorna tempoMax in secondi, ma il DB contiene minuti
+        // Quindi convertiamo minuti -> secondi (tempoMax * 60)
+        int timeInSeconds = levelData.getTempoMax() * 60;
+        requestDTO.setRemainingTime(timeInSeconds);
+        requestDTO.setTimeMaxPerLevel(timeInSeconds);
+        
+        return requestDTO;
+    }
+
+    
 }

@@ -59,10 +59,15 @@ public class T4Service extends BaseService {
                 Long.class
         ));
 
-
+        // Action CreateGame con 2 parametri (PartitaSingola, Allenamento)
         registerAction("CreateGame", new ServiceActionDefinition(
                 params -> CreateGame((GameMode) params[0], (long) params[1]),
                 GameMode.class, Long.class));
+
+        // Action CreateGame con 3 parametri (Scalata con nome)
+        registerAction("CreateGameWithName", new ServiceActionDefinition(
+                params -> CreateGame((GameMode) params[0], (long) params[1], (String) params[2]),
+                GameMode.class, Long.class, String.class));
 
         registerAction("CreateRound", new ServiceActionDefinition(
                 params -> CreateRound((long) params[0], (String) params[1], (String) params[2], (OpponentDifficulty) params[3], (int) params[4]),
@@ -84,12 +89,24 @@ public class T4Service extends BaseService {
                 params -> EndGame((long) params[0], (Map<Long, PlayerResult>) params[1], (boolean) params[2]),
                 Long.class, Map.class, Boolean.class));
 
+        registerAction("IncrementCurrentLevel", new ServiceActionDefinition(
+                params -> IncrementCurrentLevel((long) params[0]),
+                Long.class));
 
+        registerAction("IncrementRoundAttempt", new ServiceActionDefinition(
+                params -> IncrementRoundAttempt((long) params[0]),
+                Long.class));
+
+        registerAction("GetCurrentLevelForScalata", new ServiceActionDefinition(
+                params -> GetCurrentLevelForScalata((long) params[0], (String) params[1]),
+                Long.class, String.class));
+
+        /* Valutare se eliminare questa chiamata non utilizzata
         registerAction("CreateScalata", new ServiceActionDefinition(
                 params -> CreateScalata((String) params[0], (String) params[1], (String) params[2], (String) params[3]),
                 String.class, String.class, String.class, String.class));
 
-
+        */
     }
 
 
@@ -99,7 +116,6 @@ public class T4Service extends BaseService {
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {
         });
     }
-
 
     private long CreateGame(GameMode gameMode, long playerId) {
         final String endpoint = "/games";
@@ -118,7 +134,29 @@ public class T4Service extends BaseService {
         // Parsing della stringa JSON
         JSONObject jsonObject = new JSONObject(respose);
         // Estrazione del valore di id
-        return jsonObject.getInt("id");
+        return jsonObject.getLong("id");
+    }
+
+    // Overload per Scalata con scalataName
+    private long CreateGame(GameMode gameMode, long playerId, String scalataName) {
+        final String endpoint = "/games";
+
+        JSONObject obj = new JSONObject();
+
+        JSONArray playersArray = new JSONArray();
+        playersArray.put(String.valueOf(playerId));
+
+        obj.put("gameMode", gameMode);
+        obj.put("players", playersArray);
+        
+        // Aggiungi gameName solo se non è null (T4 usa gameName, ma riceviamo scalataName da T1)
+        if (scalataName != null && !scalataName.isEmpty()) {
+            obj.put("gameName", scalataName);
+        }
+
+        String respose = callRestPost(endpoint, obj, null, null, String.class);
+        JSONObject jsonObject = new JSONObject(respose);
+        return jsonObject.getLong("id");
     }
 
 
@@ -241,22 +279,57 @@ public class T4Service extends BaseService {
         }
 
         requestBody.put("results", results);
-        requestBody.put("isGameSurrendered", isGameSurrendered);
+        requestBody.put("gameSurrendered", isGameSurrendered);
 
         String respose = callRestPut(endpoint, requestBody, null, null, String.class);
         return respose;
     }
 
-    // Questa chiamata non è documentata nel materiale di caterina
-    private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date) {
-        final String endpoint = "/turns";
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("playerID", player_id);
-        formData.add("scalataName", scalata_name);
-        formData.add("creationTime", creation_Time);
-        formData.add("creationDate", creation_date);
-        String respose = callRestPost(endpoint, formData, null, String.class);
-        return respose;
+    private String IncrementCurrentLevel(long gameId) {
+        final String endpoint = "/games/%s/current-level-increment".formatted(gameId);
+        
+        try {
+            return callRestPut(endpoint, null, String.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[IncrementCurrentLevel]: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Incrementa il contatore di tentativi (round_number) dell'ultimo Round attivo.
+     * Usato in modalità Scalata quando il giocatore fallisce un livello e vuole riprovare.
+     * 
+     * @param gameId ID del game
+     * @return Risposta dal server (RoundDTO in JSON)
+     */
+    private String IncrementRoundAttempt(long gameId) {
+        final String endpoint = "/games/%s/rounds/last/increment-attempt".formatted(gameId);
+        
+        try {
+            return callRestPut(endpoint, null, String.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[IncrementRoundAttempt]: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Recupera il livello corrente per una Scalata in corso (Game con status STARTED).
+     * Ritorna 1 (default) se non esiste partita in corso.
+     * 
+     * @param playerId ID del giocatore
+     * @param scalataName Nome della scalata (viene passato a T4 come gameName)
+     * @return Livello corrente (1 se non esiste partita)
+     */
+    private Integer GetCurrentLevelForScalata(long playerId, String scalataName) {
+        final String endpoint = "/games/scalata/current-level?playerId=%d&gameName=%s"
+                .formatted(playerId, scalataName);
+        
+        try {
+            return callRestGET(endpoint, null, Integer.class);
+        } catch (Exception e) {
+            // Se c'è un errore (es: 404), ritorna default 1
+            return 1;
+        }
     }
 
 }

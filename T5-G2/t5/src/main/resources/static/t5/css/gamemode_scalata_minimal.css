@@ -1,0 +1,66 @@
+/* CSS minimale per gamemode_scalata - SOLO per le card di selezione scalate */
+
+/* Sovrascrivi #scalate-container per renderlo trasparente */
+#scalate-container {
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 24px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Stili per le card delle scalate - RETTANGOLARI ORIZZONTALI */
+.scalata-card {
+    background-color: transparent;
+    border: 2px solid #393953;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 80px;
+    max-height: 100px;
+}
+
+.scalata-card .card-body {
+    background-color: transparent !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1.25rem 2rem;
+}
+
+.scalata-card:hover {
+    border-color: #ff9b3a;
+    box-shadow: 0 4px 8px rgba(255, 155, 58, 0.3);
+    transform: translateY(-5px);
+}
+
+.scalata-card.selected {
+    border-color: #f018f0;
+    border-width: 3px;
+    background-color: rgba(240, 24, 240, 0.1);
+    box-shadow: 0 6px 16px rgba(240, 24, 240, 0.5);
+    transform: translateY(-5px);
+}
+
+.scalata-card .card-title {
+    color: #ff9b3a;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.scalata-card .card-text {
+    color: #C8C7D8;
+}
+
+.badge {
+    margin-right: 20px;
+    font-size: 0.65em;
+    padding: 5px 10px;
+}
+
+/* Nascondi scrollbar */
+::-webkit-scrollbar {
+    display: none;
+}

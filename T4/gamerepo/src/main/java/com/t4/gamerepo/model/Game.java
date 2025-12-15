@@ -74,7 +74,7 @@ public class Game {
     // genitore lo stesso avviene anche per i figli
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "game_id")
-    @OrderBy("roundNumber ASC")
+    @OrderBy("id DESC")
     private List<Round> rounds = new ArrayList<>();
 
     /**
@@ -89,6 +89,18 @@ public class Game {
      */
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp closedAt;
+
+    /**
+     * Livello corrente della partita (null per partite non-scalata)
+     */
+    @Column(name = "current_level")
+    private Integer currentLevel = 1;  // Default a 1
+
+    /**
+     * Nome della scalata (solo per game_mode = 'Scalata', altrimenti null)
+     */
+    @Column(name = "game_name")
+    private String gameName;
 
     public Game(GameMode gameMode, List<Long> players) {
         this.gameMode = gameMode;
@@ -118,7 +130,17 @@ public class Game {
         if (rounds == null || rounds.isEmpty()) {
             return null;
         }
-        return rounds.get(rounds.size() - 1);
+        // Con @OrderBy("id DESC"), l'ultimo round creato è il primo nella lista
+        return rounds.get(0);
+    }
+
+    // Getter/Setter
+    public Integer getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public void setCurrentLevel(Integer currentLevel) {
+        this.currentLevel = currentLevel;
     }
 
 }

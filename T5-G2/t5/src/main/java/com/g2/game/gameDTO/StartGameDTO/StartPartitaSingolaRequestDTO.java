@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class StartPartitaSingolaRequestDTO extends StartGameRequestDTO {
+
     @JsonProperty("remainingTime")
     @NotNull(message = "remainingTime is required")
     private int remainingTime;

@@ -80,7 +80,6 @@ public class GameController {
         return ResponseEntity.ok(games);
     }
 
-
     @Operation(
             summary = "Get all games",
             description = "Returns a list of all available games"
@@ -379,5 +378,79 @@ public class GameController {
             @Validated @RequestBody CloseGameDTO closeGameDTO) {
         GameDTO closedGame = gameService.endGame(gameId, closeGameDTO);
         return ResponseEntity.ok(closedGame);
+    }
+
+    @Operation(
+            summary = "Increment current level of a game",
+            description = "Increments the current level counter for games in Scalata mode"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Current level incremented successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GameDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Game not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorBackend.class))
+            )
+    })
+    @PutMapping("/{gameId}/current-level-increment")
+    public ResponseEntity<GameDTO> incrementCurrentLevel(
+            @Parameter(name = "gameId", description = "Id of the game", required = true)
+            @PathVariable Long gameId) {
+        GameDTO updated = gameService.incrementCurrentLevel(gameId);
+        return ResponseEntity.ok(updated);
+    }
+
+    @Operation(
+            summary = "Increment round attempt counter",
+            description = "Increments the round_number of the last active round for a game (used when player retries a failed level in Scalata)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Round attempt incremented successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoundDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Game or active round not found",
+                    content = @Content(schema = @Schema(implementation = ApiErrorBackend.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Game is not in progress",
+                    content = @Content(schema = @Schema(implementation = ApiErrorBackend.class))
+            )
+    })
+    @PutMapping("/{gameId}/rounds/last/increment-attempt")
+    public ResponseEntity<RoundDTO> incrementLastRoundAttempt(
+            @Parameter(name = "gameId", description = "Id of the game", required = true)
+            @PathVariable Long gameId) {
+        RoundDTO updated = gameService.incrementLastRoundAttempt(gameId);
+        return ResponseEntity.ok(updated);
+    }
+
+    @Operation(
+            summary = "Get current level for a player's Scalata in progress",
+            description = "Returns the current level of a STARTED Scalata game for the given player and scalata name. Returns 1 if no game is found."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Current level returned (1 if no game found)",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))
+            )
+    })
+    @GetMapping("/scalata/current-level")
+    public ResponseEntity<Integer> getCurrentLevelForScalata(
+            @Parameter(name = "playerId", description = "ID of the player", required = true)
+            @RequestParam Long playerId,
+            @Parameter(name = "gameName", description = "Name of the scalata", required = true)
+            @RequestParam String gameName) {
+        Integer currentLevel = gameService.getCurrentLevelForScalata(playerId, gameName);
+        return ResponseEntity.ok(currentLevel);
     }
 }
