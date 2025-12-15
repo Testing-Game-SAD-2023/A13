@@ -1,0 +1,50 @@
+name: t9-profile-service
+
+services:
+  t9-db:
+    image: mysql:latest
+    container_name: t9-mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - t9-net     # rete interna solo T9 <-> DB
+
+  t9-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mick0974/a13:t9-profile-service
+    container_name: t9-app
+    depends_on:
+      t9-db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://t9-db:3306/${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+      # 🔥 LLM
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      LLM_API_URL: ${LLM_API_URL}
+      LLM_MODEL: ${LLM_MODEL}
+
+    ports:
+      - "8089:8089"
+    networks:
+      - t9-net
+      - global-network  
+
+networks:
+  t9-net:
+    driver: bridge
+
+  global-network:
+    external: true

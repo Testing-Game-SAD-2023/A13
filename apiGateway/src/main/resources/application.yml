@@ -1,22 +1,6 @@
 server:
   port: 8090
 
-# Configurazione OpenTelemetry con OpenTelemetry Protocol e OpenTelemetry Collector
-otel:
-  resource:
-    attributes:
-      service:
-        name: API Gateway
-  traces:
-    exporter: otlp
-  metrics:
-    exporter: otlp
-  exporter:
-    otlp:
-      traces:
-        endpoint: "http://otel-collector:4317"
-        protocol: grpc
-
 spring:
   redis: 
     host: redis_rate_limiter
@@ -36,11 +20,16 @@ spring:
           type: fixed
           max-connections: 30  # Numero massimo di connessioni simultanee
           acquire-timeout: 5000  # Tempo massimo di attesa per una connessione libera
+
       routes:
+        # ============================
+        # FALLBACK & TEST
+        # ============================
         - id: fallback-route
           uri: http://localhost:8080/fallback # Dove si gestisce il fallback
           predicates:
             - Path=/fallback
+
         - id: test-route
           uri: http://httpbin.org
           predicates:
@@ -52,14 +41,20 @@ spring:
                 ttl: 60
                 cachePrefix: "test_cache:"
                 methods: "GET, POST, PUT"
+
         - id: aggregated-route
-          uri: no://op  //il gateway non inoltra direttamente la richiesta a un backend
+          uri: no://op  # il gateway non inoltra direttamente la richiesta a un backend
           predicates:
             - Path=/aggregated
           filters:
             - name: Aggregation
               args:
                 services: "http://httpbin.org/get, http://httpbin.org/bytes/10"
+
+        # ============================
+        # MICROSERVIZI ESISTENTI
+        # ============================
+
         - id: gamerepo-route
           uri: http://t4-controller:8084
           predicates:
@@ -72,6 +67,7 @@ spring:
                 ttl: 60
                 cachePrefix: "gamerepo_cache:"
                 methods: "GET"
+
         - id: T7-route
           uri: http://t7-controller:8087
           predicates:
@@ -84,6 +80,7 @@ spring:
                 redis-rate-limiter.replenishRate: 2
                 redis-rate-limiter.burstCapacity: 10
                 redis-rate-limiter.requestedTokens: 1
+
         - id: T8-route
           uri: http://t8-controller:8088
           predicates:
@@ -96,24 +93,44 @@ spring:
                 redis-rate-limiter.replenishRate: 2
                 redis-rate-limiter.burstCapacity: 15
                 redis-rate-limiter.requestedTokens: 1
+
         - id: T1-route
           uri: http://t1-controller:8081
           predicates:
             - Path=/adminService/**
           filters:
             - RewritePath=/adminService/(?<segment>.*), /${segment}
+
         - id: T23-route
           uri: http://t23-controller:8082
           predicates:
             - Path=/userService/**
           filters:
             - RewritePath=/userService/(?<segment>.*), /${segment}
+
         - id: T5-route
           uri: http://t5-controller:8085
           predicates:
             - Path=/gameEngine/**
           filters:
             - RewritePath=/gameEngine/(?<segment>.*), /${segment}
+
+        # ============================
+        # ✅ T9 - PROFILI UTENTE
+        # ============================
+
+        - id: T9-profile-route
+          uri: http://t9-app:8089
+          predicates:
+            - Path=/api/profiles/**
+          filters:
+            - name: AuthenticationFilter
+            # opzionale: cache solo per le GET sul profilo
+            - name: RedisCacheFilter
+              args:
+                ttl: 60
+                cachePrefix: "profiles_cache:"
+                methods: "GET"
 
 # Configurazioni aggiuntive per il logging e altre personalizzazioni
 logging:
@@ -136,3 +153,10 @@ management:
   metrics:
     tags:
       application: apiGateway
+
+t23:
+  base-url: http://t23-controller:8082
+
+t9:
+  profile-service:
+    base-url: http://t9-app:8089
