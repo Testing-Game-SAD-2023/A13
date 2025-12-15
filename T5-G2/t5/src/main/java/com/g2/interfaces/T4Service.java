@@ -59,11 +59,6 @@ public class T4Service extends BaseService {
                 Long.class
         ));
 
-        registerAction("getLastScalataInProgress", new ServiceActionDefinition(
-                params -> getLastScalataInProgress((long) params[0]),
-                Long.class
-        ));
-
         // Action CreateGame con 2 parametri (PartitaSingola, Allenamento)
         registerAction("CreateGame", new ServiceActionDefinition(
                 params -> CreateGame((GameMode) params[0], (long) params[1]),
@@ -121,22 +116,6 @@ public class T4Service extends BaseService {
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<Game>>() {
         });
     }
-
-    /**
-     * Recupera l'ultima partita Scalata in corso del giocatore (status STARTED o IN_PROGRESS)
-     * @param playerId ID del giocatore
-     * @return Game object dell'ultima scalata in corso, o null se non esiste
-     */
-    private Game getLastScalataInProgress(long playerId) {
-        final String endpoint = "/games/player/" + playerId + "/scalata/last";
-        try {
-            return callRestGET(endpoint, null, Game.class);
-        } catch (Exception e) {
-            // Se non trova partite (404), ritorna null invece di lanciare eccezione
-            return null;
-        }
-    }
-
 
     private long CreateGame(GameMode gameMode, long playerId) {
         final String endpoint = "/games";
@@ -353,17 +332,4 @@ public class T4Service extends BaseService {
         }
     }
 
-    /* Valutare se eliminare questa chiamata non utilizzata
-    // Questa chiamata non è documentata nel materiale di caterina
-    private String CreateScalata(String player_id, String scalata_name, String creation_Time, String creation_date) {
-        final String endpoint = "/turns";
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("playerID", player_id);
-        formData.add("scalataName", scalata_name);
-        formData.add("creationTime", creation_Time);
-        formData.add("creationDate", creation_date);
-        String respose = callRestPost(endpoint, formData, null, String.class);
-        return respose;
-    }
-    */
 }

@@ -88,11 +88,6 @@ public class T1Service extends BaseService {
                 params -> getScalateList() // Recupera lista scalate da T1
         ));
 
-        registerAction("retrieveScalataByName", new ServiceActionDefinition(
-                params -> retrieveScalataByName((String) params[0]), // Recupera scalata per nome
-                String.class
-        ));
-
         registerAction("getLevelByScalataAndPosition", new ServiceActionDefinition(
                 params -> getLevelByScalataAndPosition((String) params[0], (Integer) params[1]),
                 String.class, Integer.class
@@ -158,11 +153,6 @@ public class T1Service extends BaseService {
 // Restituisce la lista di tutte le scalate disponibili
 private List<ScalataDTO> getScalateList() {
     return callRestGET("/scalata/getAll", null, new ParameterizedTypeReference<List<ScalataDTO>>() {});
-}
-
-// Restituisce i dettagli di una scalata specifica per nome
-private ScalataDTO retrieveScalataByName(String scalataName) {
-    return callRestGET("/scalata/get/" + scalataName, null, ScalataDTO.class);
 }
 
 /**
