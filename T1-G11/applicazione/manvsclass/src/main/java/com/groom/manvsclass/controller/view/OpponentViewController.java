@@ -58,7 +58,7 @@ public class OpponentViewController {
 
         logger.info("[opponents/opponents_main] classUTs found: {}", classUTList);
         ModelAndView view = new ModelAndView("opponents/opponents_main");
-        view.addObject("classUTs", classUTList);
+        view.addObject("classes", classUTList);
         return view;
     }
 

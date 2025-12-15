@@ -13,6 +13,10 @@ import org.springframework.web.util.WebUtils;
 import testrobotchallenge.commons.models.dto.auth.JwtValidationResponseDTO;
 import testrobotchallenge.commons.models.user.Role;
 
+import com.groom.manvsclass.model.Admin;
+import com.groom.manvsclass.repository.AdminRepository;
+import com.groom.manvsclass.service.JwtService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -26,12 +30,6 @@ import java.util.Map;
 import static testrobotchallenge.commons.models.user.Role.ADMIN;
 import static testrobotchallenge.commons.models.user.Role.PLAYER;
 
-/**
- * MODIFICA (13/11/2025):
- * - Rimossa ogni validazione locale del JWT (la validazione viene delegata interamente al userService)
- * - Gestione unificata di refresh e redirect
- * - Pulizia e logging più chiaro
- */
 @Component
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
@@ -45,6 +43,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     );
 
     private final ApiGatewayClient apiGatewayClient;
+    private final AdminRepository adminRepository;
+    private final JwtService jwtService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -86,6 +86,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             if (ADMIN.equals(resolvedRole)) {
                 JwtRequestContext.setJwtToken(jwt);
                 log.debug("[AuthTokenFilter] JWT salvato nel thread context (ADMIN)");
+
+                // SALVATAGGIO LOCALE
+                try {
+                    Admin adminFromToken = jwtService.getAdminFromJwt(jwt);
+                    if (adminFromToken != null && !adminRepository.existsById(adminFromToken.getEmail())) {
+                        adminRepository.save(adminFromToken);
+                        log.debug("Admin {} sincronizzato nel DB locale.", adminFromToken.getEmail());
+                    }
+                } catch (Exception e) {
+                    log.error("Impossibile salvare l'admin nel DB locale: {}", e.getMessage());
+                }
             }
 
             chain.doFilter(request, response);

@@ -170,12 +170,13 @@ public class ApiGatewayClient {
         return response.getBody();
     }
 
-    public HttpResponse callOttieniStudentiDettagli(List<String> studentiIds, String jwt) throws IOException {
+    public HttpResponse callOttieniStudentiDettagli(List<String> studentiIds) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
             JSONArray studentiArray = new JSONArray(studentiIds);
             StringEntity entity = new StringEntity(studentiArray.toString(), StandardCharsets.UTF_8);
 
+            String jwt = JwtRequestContext.getJwtToken();
             HttpPost post = new HttpPost(userServiceUrl + "/student/studentsByIds");
             post.setHeader("Cookie", "jwt=" + jwt);
             post.setHeader("Content-Type", "application/json");

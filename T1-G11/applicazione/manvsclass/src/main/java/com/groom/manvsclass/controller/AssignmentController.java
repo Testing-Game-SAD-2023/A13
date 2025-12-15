@@ -1,38 +1,67 @@
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.model.Assignment;
+import com.groom.manvsclass.dto.AssignmentDTO;
 import com.groom.manvsclass.service.AssignmentService;
+import com.groom.manvsclass.service.SecurityService;
+import com.groom.manvsclass.service.JwtService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.groom.manvsclass.exception.UnauthorizedException;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
 public class AssignmentController {
 
-    private final AssignmentService assignmentService;
+    @Autowired
+    private AssignmentService assignmentService;
 
-    public AssignmentController(AssignmentService assignmentService) {
-        this.assignmentService = assignmentService;
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private SecurityService securityService;
+
+    @PostMapping("/creaAssignment/{teamName}")
+    public ResponseEntity<?> creaAssignment(@PathVariable String teamName, @RequestBody AssignmentDTO assignmentDTO) {
+
+        String jwt = securityService.getJwtToken();
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        assignmentService.createAssignment(teamName, assignmentDTO, adminEmail);
+        return ResponseEntity.status(HttpStatus.OK).body("Assignment creato con successo.");
     }
 
-    @PostMapping("/creaAssignment/{idTeam}")
-    public ResponseEntity<?> creaAssignment(@PathVariable("idTeam") String idTeam, @RequestBody Assignment assignment, @CookieValue(name = "jwt", required = false) String jwt) {
-        return assignmentService.creaAssignment(assignment, idTeam, jwt);
-    }
+    @GetMapping("/visualizzaTeamAssignments/{teamName}")
+    public ResponseEntity<?> viewAdminSingleTeamAssignments(@PathVariable String teamName) {
 
-    @GetMapping("/visualizzaTeamAssignments/{idTeam}")
-    public ResponseEntity<?> visualizzaTeamAssignments(@PathVariable("idTeam") String idTeam, @CookieValue(name = "jwt", required = false) String jwt) {
-        return assignmentService.visualizzaTeamAssignment(idTeam, jwt);
+        String jwt = securityService.getJwtToken();
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        List<AssignmentDTO> assignmentDTOs = assignmentService.findAdminSingleTeamAssignments(teamName, adminEmail);
+        return ResponseEntity.ok(assignmentDTOs);
     }
 
     @GetMapping("/visualizzaAssignments")
-    public ResponseEntity<?> visualizzaAssignments(@CookieValue(name = "jwt", required = false) String jwt) {
-        return assignmentService.visualizzaAssignments(jwt);
+    public ResponseEntity<?> viewAdminTeamsAssignments() {
+
+        String jwt = securityService.getJwtToken();
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        List<AssignmentDTO> assignmentDTOs = assignmentService.findAdminTeamsAssignments(adminEmail);
+        return ResponseEntity.ok(assignmentDTOs);
     }
 
-    @DeleteMapping("/deleteAssignment/{idAssignment}")
-    ResponseEntity<?> deleteAssignment(@PathVariable("idAssignment") String idAssignment, @CookieValue(name = "jwt", required = false) String jwt) {
-        return assignmentService.deleteAssignment(idAssignment, jwt);
-    }
+    @DeleteMapping("/deleteAssignment/{assignmentTitle}")
+    ResponseEntity<?> deleteAssignment(@PathVariable("assignmentTitle") String assignmentTitle) {
 
+        String jwt = securityService.getJwtToken();
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        assignmentService.deleteAssignment(assignmentTitle, adminEmail);
+        return ResponseEntity.ok("Assignment eliminato con successo.");
+    }
 }

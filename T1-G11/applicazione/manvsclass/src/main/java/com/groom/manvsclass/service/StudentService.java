@@ -22,14 +22,7 @@ public class StudentService {
         this.apiGatewayClient = apiGatewayClient;
     }
 
-    public ResponseEntity<?> ottieniStudentiDettagli(List<String> studentiIds, String jwt) {
-        System.out.println("Inizio metodo ottieniStudentiDettagli");
-
-        // 1. Verifica validità del token JWT
-        if (jwt == null || jwt.isEmpty()) {
-            System.out.println("Token JWT non valido o mancante.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
+    public ResponseEntity<?> ottieniStudentiDettagli(List<String> studentiIds) {
 
         if (studentiIds == null || studentiIds.isEmpty()) {
             System.out.println("La lista degli studenti è vuota.");
@@ -37,7 +30,7 @@ public class StudentService {
         }
 
         try {
-            HttpResponse httpResponse = apiGatewayClient.callOttieniStudentiDettagli(studentiIds, jwt);
+            HttpResponse httpResponse = apiGatewayClient.callOttieniStudentiDettagli(studentiIds);
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             System.out.println("Risposta HTTP ricevuta. Status code: " + statusCode);
 

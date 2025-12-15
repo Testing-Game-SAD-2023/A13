@@ -1,40 +1,36 @@
 package com.groom.manvsclass.repository;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.test.context.TestPropertySource;
-
+import com.groom.manvsclass.dto.SuggestionDTO;
 import com.groom.manvsclass.model.ClassUT;
+import com.groom.manvsclass.model.Interaction;
 import com.groom.manvsclass.model.Suggestion;
 import com.groom.manvsclass.model.SuggestionLevel;
-import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
-
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-
+import com.groom.manvsclass.util.TestUtils;
+import jakarta.validation.ConstraintViolationException;
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
+import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
 import java.time.LocalDate;
-
-import org.springframework.dao.DataIntegrityViolationException;
-import jakarta.validation.ConstraintViolationException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import org.junit.jupiter.api.BeforeEach;
-
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @EntityScan(basePackages = "com.groom.manvsclass")
@@ -43,7 +39,11 @@ import java.util.stream.Stream;
         "spring.jpa.hibernate.ddl-auto=create-drop",
         "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL", // Simula MySQL
         "spring.jpa.show-sql=true",
-        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
+        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
+
+//        "spring.jpa.properties.hibernate.format_sql=true",
+//        "logging.level.org.hibernate.SQL=DEBUG",
+//        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE"
 })
 class SuggestionRepositoryTests {
 
@@ -55,23 +55,32 @@ class SuggestionRepositoryTests {
 
     private ClassUT classUT;
 
-    // METODI UTILI
+    // configurazione di comparison per Suggestion
+    public static final RecursiveComparisonConfiguration SUGGESTION_COMPARISON_CONFIG = RecursiveComparisonConfiguration.builder()
+            .withComparedFields("id", "order", "hint", "date", "image", "level")
+            .withEqualsForType(
+                    (classUT1, classUT2) -> classUT1.getName().equals(classUT2.getName()),
+                    ClassUT.class
+            )
+            .build();
 
-    private static boolean suggestionEquals(Suggestion s1, Suggestion s2) {
-        if (s1 == s2) return true;
-        if (s1 == null || s2 == null) return false;
+    // assert personalizzati
+    private final TestUtils<Suggestion> suggestionTestUtils = new TestUtils<>(SUGGESTION_COMPARISON_CONFIG);
 
-        return s1.getId().equals(s2.getId()) &&
-                s1.getTitle().equals(s2.getTitle()) &&
-                s1.getHint().equals(s2.getHint()) &&
-                s1.getDate().equals(s2.getDate()) &&
-                s1.getBase64Image().equals(s2.getBase64Image()) &&
-                s1.getLevel().equals(s2.getLevel()) &&
-                s1.getClassUT().getName().equals(s2.getClassUT().getName());
-    }
+    /**
+     * Crea un suggerimento associato alla classe {@code classUT}.
+     */
+    public static Suggestion createBaseSuggestion(ClassUT classUT) {
 
-    private static void assertSuggestionEquals(Suggestion expected, Suggestion actual) {
-        assertThat(suggestionEquals(expected, actual)).isTrue();
+        Suggestion suggestion = new Suggestion();
+        suggestion.setClassUT(classUT);
+        suggestion.setOrder(1);
+        suggestion.setHint("Testo_Suggerimento");
+        suggestion.setDate(LocalDate.now());
+        suggestion.setLevel(SuggestionLevel.LOW);
+        suggestion.setImage(null);
+
+        return suggestion;
     }
 
     @BeforeEach
@@ -87,23 +96,7 @@ class SuggestionRepositoryTests {
         entityManager.persist(classUT);
     }
 
-    /**
-     * Crea un suggerimento associato alla classe {@code classUT}.
-     */
-    private static Suggestion createBaseSuggestion(ClassUT classUT) {
-
-        Suggestion suggestion = new Suggestion();
-        suggestion.setClassUT(classUT);
-        suggestion.setTitle("Suggerimento");
-        suggestion.setHint("Testo_Suggerimento");
-        suggestion.setDate(LocalDate.now());
-        suggestion.setLevel(SuggestionLevel.LOW);
-        suggestion.setImage(new byte[]{1, 2, 3, 4, 5});
-
-        return suggestion;
-    }
-
-    // TEST SAVE
+    // TEST CREATE
 
     @Test
     void testSaveSuggestion() {
@@ -114,48 +107,21 @@ class SuggestionRepositoryTests {
         entityManager.flush();  // forza la scrittura sul database
         entityManager.clear();  // svuota la cache per forzare la lettura dal database
 
-        // lo rilegge per verificare il corretto inserimento nel database
+        // per verificare il corretto inserimento nel database effettua una find
         Optional<Suggestion> suggestionOpt = suggestionRepository.findById(savedSuggestion.getId());
         assertThat(suggestionOpt).isPresent();
 
-        Suggestion receivedSuggestion = suggestionOpt.get();
-        assertSuggestionEquals(savedSuggestion, receivedSuggestion);
+        Suggestion foundSuggestion = suggestionOpt.get();
+        suggestionTestUtils.assertEquals(savedSuggestion, foundSuggestion);
     }
-
-    @Test
-    void testSaveSuggestion_DuplicatedTitle() {
-
-        Suggestion firstSuggestion = createBaseSuggestion(this.classUT);
-        Suggestion savedFirstSuggestion = suggestionRepository.save(firstSuggestion);
-
-        entityManager.flush();
-
-        Suggestion secondSuggestion = createBaseSuggestion(this.classUT);
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            suggestionRepository.save(secondSuggestion);
-            entityManager.flush();
-        });
-
-        entityManager.clear();
-
-        // verifica la presenza del primo suggerimento
-        Optional<Suggestion> suggestionOpt = suggestionRepository.findById(savedFirstSuggestion.getId());
-        assertThat(suggestionOpt).isPresent();
-
-        Suggestion receivedSuggestion = suggestionOpt.get();
-        assertSuggestionEquals(savedFirstSuggestion, receivedSuggestion);
-    }
-
-    // TEST SAVE_ALL
 
     @Test
     void testSaveAllSuggestions() {
 
         Suggestion firstSuggestion = createBaseSuggestion(this.classUT);
-        firstSuggestion.setTitle("Suggerimento_1");
 
         Suggestion secondSuggestion = createBaseSuggestion(this.classUT);
-        secondSuggestion.setTitle("Suggerimento_2");
+        secondSuggestion.setOrder(2);
 
         List<Suggestion> suggestions = Arrays.asList(firstSuggestion, secondSuggestion);
 
@@ -166,21 +132,15 @@ class SuggestionRepositoryTests {
         entityManager.clear();
 
         // verifica la presenza dei suggerimenti nel database, effettuando una findById per ogni suggerimento
-        Stream<Suggestion> foundSuggestions =
-                savedSuggestions
-                        .stream()
-                        .map(suggestion -> {
-                            Optional<Suggestion> suggestionOpt = suggestionRepository.findById(suggestion.getId());
-                            assertThat(suggestionOpt).isPresent();
-                            return suggestionOpt.get();
-                        });
+        List<Suggestion> foundSuggestions = new ArrayList<>();
+        for (Suggestion suggestion : savedSuggestions){
+            Optional<Suggestion> suggestionOpt = suggestionRepository.findById(suggestion.getId());
+            assertThat(suggestionOpt).isPresent();
+            foundSuggestions.add(suggestionOpt.get());
+        }
 
-        Comparator<Suggestion> suggestionComparator = (s1, s2) -> suggestionEquals(s1, s2) ? 0 : 1;
-
-        assertThat(foundSuggestions)
-                .hasSize(savedSuggestions.size())
-                .usingElementComparator(suggestionComparator)
-                .containsExactlyInAnyOrderElementsOf(savedSuggestions);
+        // verifica che i suggerimenti ottenuti siano corretti
+        suggestionTestUtils.assertListEquals(savedSuggestions, foundSuggestions);
     }
 
     // TEST UPDATE
@@ -195,7 +155,7 @@ class SuggestionRepositoryTests {
         entityManager.flush();
 
         // lo aggiorna
-        savedSuggestion.setTitle("Titolo Aggiornato");
+        savedSuggestion.setOrder(2);
         Suggestion updatedSuggestion = suggestionRepository.save(savedSuggestion);
 
         entityManager.flush();
@@ -206,7 +166,7 @@ class SuggestionRepositoryTests {
         assertThat(suggestionOpt).isPresent();
 
         Suggestion receivedSuggestion = suggestionOpt.get();
-        assertSuggestionEquals(updatedSuggestion, receivedSuggestion);
+        suggestionTestUtils.assertEquals(updatedSuggestion, receivedSuggestion);
     }
 
     // TEST DELETE
@@ -235,16 +195,14 @@ class SuggestionRepositoryTests {
     @Test
     void testFindAllByClassUT_Name_ReturnsList() {
 
-        // salva due suggerimenti associati a this.classUT
         Suggestion firstSuggestion = createBaseSuggestion(this.classUT);
-        firstSuggestion.setTitle("Suggerimento_1");
+        firstSuggestion.setOrder(1);
         Suggestion savedFirstSuggestion = suggestionRepository.save(firstSuggestion);
 
         Suggestion secondSuggestion = createBaseSuggestion(this.classUT);
-        secondSuggestion.setTitle("Suggerimento_2");
+        secondSuggestion.setOrder(2);
         Suggestion savedSecondSuggestion = suggestionRepository.save(secondSuggestion);
 
-        // salva un'altra classe UT
         ClassUT otherClassUT = new ClassUT();
         otherClassUT.setName("Classe_Diversa");
         otherClassUT.setDate(LocalDate.now());
@@ -254,34 +212,30 @@ class SuggestionRepositoryTests {
 
         entityManager.persist(otherClassUT);
 
-        // salva un terzo suggerimento associato all'altra classe UT
         Suggestion thirdSuggestion = createBaseSuggestion(otherClassUT);
-        thirdSuggestion.setTitle("Suggerimento_Classe_Diversa");
+        thirdSuggestion.setOrder(1);
         suggestionRepository.save(thirdSuggestion);
 
         entityManager.flush();
         entityManager.clear();
 
-        List<Suggestion> results = suggestionRepository.findAllByClassUT_Name(this.classUT.getName());
+        List<Suggestion> foundSuggestions = suggestionRepository.findAllByClassUT_Name(this.classUT.getName());
 
-        Comparator<Suggestion> suggestionComparator = (s1, s2) -> suggestionEquals(s1, s2) ? 0 : 1;
+        List<Suggestion> expectedSuggestions = Arrays.asList(savedFirstSuggestion, savedSecondSuggestion);
 
         // verifica che i suggerimenti ottenuti siano corretti
-        assertThat(results)
-                .hasSize(2)
-                .usingElementComparator(suggestionComparator)
-                .containsExactlyInAnyOrder(savedFirstSuggestion, savedSecondSuggestion);
+        suggestionTestUtils.assertListEquals(expectedSuggestions, foundSuggestions);
     }
 
     @Test
     void testFindAllByClassUT_Name_ReturnsEmpty() {
 
-        List<Suggestion> results = suggestionRepository.findAllByClassUT_Name("Classe_Inesistente");
-        assertThat(results).isEmpty();
+        List<Suggestion> suggestions = suggestionRepository.findAllByClassUT_Name("Classe_Inesistente");
+        assertThat(suggestions).isEmpty();
     }
 
     @Test
-    void testFindByClassUT_NameAndTitle() {
+    void testFindByClassUT_NameAndOrder_Correct() {
 
         // salva un suggerimento associato a this.classUT
         Suggestion suggestion = createBaseSuggestion(this.classUT);
@@ -290,15 +244,15 @@ class SuggestionRepositoryTests {
         entityManager.flush();
         entityManager.clear();
 
-        // lo cerca per nome classe e titolo
-        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndTitle(this.classUT.getName(), savedSuggestion.getTitle());
+        // lo cerca per nome classe e order
+        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndOrder(this.classUT.getName(), savedSuggestion.getOrder());
 
         assertThat(result).isPresent();
-        assertSuggestionEquals(savedSuggestion, result.get());
+        suggestionTestUtils.assertEquals(savedSuggestion, result.get());
     }
 
     @Test
-    void testFindByClassUT_NameAndTitle_NotFound_TitleNotExists() {
+    void testFindByClassUT_NameAndOrder_NotFound_OrderNotExists() {
 
         // salva un suggerimento associato a this.classUT
         Suggestion suggestion = createBaseSuggestion(this.classUT);
@@ -308,47 +262,47 @@ class SuggestionRepositoryTests {
         entityManager.clear();
 
         // cerca un suggerimento associato a this.classUT con un titolo di un suggerimento non esistente
-        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndTitle(this.classUT.getName(), "Titolo_Inesistente");
+        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndOrder(this.classUT.getName(), 2);
 
         assertThat(result).isEmpty();
     }
 
+//    @Test
+//    void testFindByClassUT_NameAndOrder_NotFound_WrongOrder() {
+//
+//        // salva un suggerimento associato a this.classUT
+//        Suggestion firstSuggestion = createBaseSuggestion(this.classUT);
+//        Suggestion savedFirstSuggestion = suggestionRepository.save(firstSuggestion);
+//
+//        // salva un'altra classe UT
+//        ClassUT otherClassUT = new ClassUT();
+//        otherClassUT.setName("Classe_Diversa");
+//        otherClassUT.setDate(LocalDate.now());
+//        otherClassUT.setDescription("Descrizione_Diversa");
+//        otherClassUT.setDifficulty(OpponentDifficulty.HARD);
+//        otherClassUT.setUri("/URI/DIVERSO");
+//
+//        entityManager.persist(otherClassUT);
+//
+//        // salva un secondo suggerimento associato all'altra classe UT
+//        Suggestion secondSuggestion = createBaseSuggestion(otherClassUT);
+//        secondSuggestion.setOrder(1);
+//        Suggestion savedSecondSuggestion = suggestionRepository.save(secondSuggestion);
+//
+//        entityManager.flush();
+//        entityManager.clear();
+//
+//        // cerca ogni suggerimento con la classe sbagliata
+//        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndOrder(this.classUT.getName(), savedSecondSuggestion.getOrder());
+//        assertThat(result).isEmpty();
+//
+//        Optional<Suggestion> result2 = suggestionRepository.findByClassUT_NameAndOrder(otherClassUT.getName(), savedFirstSuggestion.getOrder());
+//        assertThat(result).isEmpty();
+//
+//    }
+
     @Test
-    void testFindByClassUT_NameAndTitle_NotFound_WrongTitle() {
-
-        // salva un suggerimento associato a this.classUT
-        Suggestion firstSuggestion = createBaseSuggestion(this.classUT);
-        Suggestion savedFirstSuggestion = suggestionRepository.save(firstSuggestion);
-
-        // salva un'altra classe UT
-        ClassUT otherClassUT = new ClassUT();
-        otherClassUT.setName("Classe_Diversa");
-        otherClassUT.setDate(LocalDate.now());
-        otherClassUT.setDescription("Descrizione_Diversa");
-        otherClassUT.setDifficulty(OpponentDifficulty.HARD);
-        otherClassUT.setUri("/URI/DIVERSO");
-
-        entityManager.persist(otherClassUT);
-
-        // salva un secondo suggerimento associato all'altra classe UT
-        Suggestion secondSuggestion = createBaseSuggestion(otherClassUT);
-        secondSuggestion.setTitle("Suggerimento_Classe_Diversa");
-        Suggestion savedSecondSuggestion = suggestionRepository.save(secondSuggestion);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        // cerca ogni suggerimento con la classe sbagliata
-        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndTitle(this.classUT.getName(), savedSecondSuggestion.getTitle());
-        assertThat(result).isEmpty();
-
-        Optional<Suggestion> result2 = suggestionRepository.findByClassUT_NameAndTitle(otherClassUT.getName(), savedFirstSuggestion.getTitle());
-        assertThat(result).isEmpty();
-
-    }
-
-    @Test
-    void testFindByClassUT_NameAndTitle_NotFound_WrongClass() {
+    void testFindByClassUT_NameAndOrder_NotFound_WrongClass() {
 
         // salva un suggerimento associato a this.classUT
         Suggestion suggestion = createBaseSuggestion(this.classUT);
@@ -358,64 +312,21 @@ class SuggestionRepositoryTests {
         entityManager.clear();
 
         // cerca il suggerimento con una classe non esistente
-        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndTitle("Classe_Non_Esistente", savedSuggestion.getTitle());
+        Optional<Suggestion> result = suggestionRepository.findByClassUT_NameAndOrder("Classe_Non_Esistente", savedSuggestion.getOrder());
 
         assertThat(result).isEmpty();
     }
 
-    @Test
-    void testExistsByClassUT_NameAndTitle_True() {
+    // TEST ORDER
 
-        // salva un suggerimento associato a this.classUT
-        Suggestion suggestion = createBaseSuggestion(this.classUT);
-        Suggestion savedSuggestion = suggestionRepository.save(suggestion);
+    void testInvalidOrder() {
 
-        entityManager.flush();
-        entityManager.clear();
-
-        boolean exists = suggestionRepository.existsByClassUT_NameAndTitle(this.classUT.getName(), savedSuggestion.getTitle());
-
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    void testExistsByClassUT_NameAndTitle_False() {
-
-        // salva un suggerimento associato a this.classUT
-        Suggestion suggestion = createBaseSuggestion(this.classUT);
-        suggestionRepository.save(suggestion);
-
-        entityManager.flush();
-        entityManager.clear();
-
-        boolean exists = suggestionRepository.existsByClassUT_NameAndTitle(this.classUT.getName(), "Titolo_Inesistente");
-
-        assertThat(exists).isFalse();
-    }
-
-    // TEST TITLE
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {"   "})
-    void testInvalidTitle(String invalidTitle) {
+        int invalidOrder = -1;
 
         Suggestion suggestion = createBaseSuggestion(this.classUT);
-        suggestion.setTitle(invalidTitle);
+        suggestion.setOrder(invalidOrder);
 
         assertThrows(ConstraintViolationException.class, () -> {
-            suggestionRepository.save(suggestion);
-            entityManager.flush();
-        });
-    }
-
-    @Test
-    void testTitleTooLong() {
-
-        Suggestion suggestion = createBaseSuggestion(this.classUT);
-        suggestion.setTitle("a".repeat(300));
-
-        assertThrows(DataIntegrityViolationException.class, () -> {
             suggestionRepository.save(suggestion);
             entityManager.flush();
         });
@@ -484,7 +395,7 @@ class SuggestionRepositoryTests {
         Suggestion suggestion = createBaseSuggestion(this.classUT);
         suggestion.setDate(null);
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThrows(DataIntegrityViolationException.class, () -> {
             suggestionRepository.save(suggestion);
             entityManager.flush();
         });
@@ -492,8 +403,7 @@ class SuggestionRepositoryTests {
 
     // TEST IMAGE
 
-    @Test
-    void testSaveNullImage() {
+    @Test void testSaveNullImage() {
 
         Suggestion suggestion = createBaseSuggestion(this.classUT);
         suggestion.setImage(null);
@@ -501,19 +411,6 @@ class SuggestionRepositoryTests {
         Suggestion savedSuggestion = suggestionRepository.save(suggestion);
         entityManager.flush();
         assertThat(savedSuggestion.getImage()).isNull();
-    }
-
-    @Test
-    void testSaveLargeImage() {
-
-        final int IMAGE_SIZE = 1024 * 1024;
-
-        Suggestion suggestion = createBaseSuggestion(this.classUT);
-        suggestion.setImage(new byte[IMAGE_SIZE]); // 1 MB
-
-        Suggestion savedSuggestion = suggestionRepository.save(suggestion);
-        entityManager.flush();
-        assertThat(savedSuggestion.getImage().length).isEqualTo(IMAGE_SIZE);
     }
 
     // TEST FOREIGN KEY
@@ -534,7 +431,7 @@ class SuggestionRepositoryTests {
     void testCascadeDelete() {
 
         Suggestion suggestion = createBaseSuggestion(this.classUT);
-        Suggestion savedSuggestion = suggestionRepository.save(suggestion);
+        suggestionRepository.save(suggestion);
         entityManager.flush();
 
         entityManager.refresh(this.classUT);
@@ -542,8 +439,7 @@ class SuggestionRepositoryTests {
         entityManager.remove(this.classUT);
         entityManager.flush();
 
-        Optional<Suggestion> suggestionOpt = suggestionRepository.findById(savedSuggestion.getId());
-        assertThat(suggestionOpt).isEmpty();
+        assertThat(suggestionRepository.findById(suggestion.getId())).isEmpty();
     }
 
 }

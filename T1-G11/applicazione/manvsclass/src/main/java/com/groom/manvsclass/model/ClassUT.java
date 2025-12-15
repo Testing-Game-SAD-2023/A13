@@ -22,6 +22,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Column;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.NoArgsConstructor;
@@ -34,13 +35,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "classes")
+@Table(name = "classes_ut")
 public class ClassUT {
 
     @Id
+    @Column(name = "name")
     private String name;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "date")
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)

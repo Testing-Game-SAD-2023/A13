@@ -35,7 +35,7 @@ const VIEWS = {
     OPPONENTS_UPLOAD: "/opponents/upload",
     OPPONENTS_EDIT: "/opponents/edit",
 
-    ADD_GUIDELINES: "#",
+    GUIDELINES_UPLOAD: "/opponents/guidelines/main",
 
     TEAMS_MAIN: "/team/main",
     TEAMS_DETAILS: "/team/details",
@@ -56,11 +56,20 @@ const APIS = {
     DOWNLOAD_CLASSUT: (name) => `/opponents/download/${encodeURIComponent(name)}`,
     DELETE_OPPONENT: (classUT) => `/opponents/${encodeURIComponent(classUT)}`,
     UPLOAD_OPPONENT: `/opponents`,
+
     UPLOAD_GUIDELINES: '/opponents/guidelines/upload',
+    UPLOAD_GUIDELINE_IMAGE: (order) => `/opponents/guidelines/upload/${encodeURIComponent(order)}`,
+    DOWNLOAD_GUIDELINES: '/opponents/guidelines',
     GET_GUIDELINES: '/opponents/guidelines',
-    DELETE_GUIDELINE: (guidelineTitle) =>`/opponents/guidelines/${encodeURIComponent(guidelineTitle)}`,
-    UPLOAD_SUGGESTIONS: (className) => `/opponents/suggestions/upload/${encodeURIComponent(className)}`,
+    DELETE_GUIDELINE: (order) =>`/opponents/guidelines/${encodeURIComponent(order)}`,
+    DELETE_GUIDELINE_IMAGE: (order) => `/opponents/guidelines/image/${encodeURIComponent(order)}`,
+
+    UPLOAD_SUGGESTIONS: '/opponents/suggestions/upload',
+    UPLOAD_SUGGESTION_IMAGE: (className, order) => `/opponents/suggestions/upload/${encodeURIComponent(className)}/${encodeURIComponent(order)}`,
+    DOWNLOAD_SUGGESTIONS: (className) => `/opponents/suggestions/${encodeURIComponent(className)}`,
     GET_SUGGESTIONS: (name) => `/opponents/suggestions/${encodeURIComponent(name)}`,
-    DELETE_SUGGESTION: (className, suggestionTitle) =>
-        `/opponents/suggestions/${encodeURIComponent(className)}/suggestion?suggestionTitle=${encodeURIComponent(suggestionTitle)}`
+    DELETE_SUGGESTION: (className, order) => `/opponents/suggestions/${encodeURIComponent(className)}/${encodeURIComponent(order)}`,
+    DELETE_SUGGESTION_IMAGE: (className, order) => `/opponents/suggestions/image/${encodeURIComponent(className)}/${encodeURIComponent(order)}`
 };
+
+const IMAGE_BASE_URL = '/t1/images/';

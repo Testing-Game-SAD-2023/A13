@@ -2,25 +2,26 @@ package com.groom.manvsclass.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Positive;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
 public class GuidelineDTO {
 
-    @NotBlank(message = "Il titolo è obbligatorio")
-    @Size(max = 100, message = "Il titolo è troppo lungo")
-    private String title;
+    @Positive(message = "{validation.guideline.order.positive}")
+    private int order;
 
-    @NotBlank(message = "L'hint è obbligatorio")
-    @Size(max = 255, message = "L'hint è troppo lungo")
+    @NotBlank(message = "{validation.guideline.hint.mandatory}")
+    @Size(max = 255, message = "{validation.guideline.hint.tooLong}")
     private String hint;
 
+    private LocalDate date;
     private String image;
 }

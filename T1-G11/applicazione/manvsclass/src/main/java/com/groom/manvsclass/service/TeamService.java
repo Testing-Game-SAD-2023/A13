@@ -1,24 +1,26 @@
-/*
- * Crea - Elimina - 30/11/2024
- */
-
 package com.groom.manvsclass.service;
 
 import com.groom.manvsclass.model.Assignment;
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.Team;
+import com.groom.manvsclass.dto.TeamModificationRequest;
+import com.groom.manvsclass.dto.TeamDTO;
+import com.groom.manvsclass.mapper.TeamMapper;
+import com.groom.manvsclass.service.JwtService;
 
 import com.groom.manvsclass.repository.AssignmentRepository;
 import com.groom.manvsclass.repository.AdminRepository;
 import com.groom.manvsclass.repository.TeamRepository;
 
 import com.groom.manvsclass.exception.NotFoundException;
+import com.groom.manvsclass.exception.DuplicatedEntryException;
+import com.groom.manvsclass.exception.ForbiddenException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.mail.MessagingException;
 import java.time.LocalDate;
@@ -31,13 +33,13 @@ import java.util.stream.Collectors;
 public class TeamService {
 
     @Autowired
+    private JwtService jwtService;
+
+    @Autowired
     private TeamRepository teamRepository;
 
     @Autowired
     private AdminRepository adminRepository;
-
-    @Autowired
-    private JwtService jwtService;  // Servizio per la validazione del JWT
 
     @Autowired
     private StudentService studentService; //Servizio per mandare query al T23
@@ -51,175 +53,103 @@ public class TeamService {
     @Autowired
     private NotificationService notificationService;
 
-    public ResponseEntity<?> createTeam(Team team, String adminEmail) {
+    @Autowired
+    private TeamMapper teamMapper;
 
-        if (team.getName() == null || team.getName().isEmpty() || team.getName().length() < 3 || team.getName().length() > 20) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome del team non valido. Deve essere tra 3 e 20 caratteri.");
+    @Transactional
+    public void createTeam(TeamDTO teamDTO, String adminEmail) {
+
+        if (teamRepository.existsByName(teamDTO.getName())) {
+            throw new DuplicatedEntryException("Team " + teamDTO.getName() + " già esistente.");
         }
 
-        if (teamRepository.existsByName(team.getName())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Un team con questo nome esiste già.");
-        }
+        Team teamToSave = teamMapper.toEntity(teamDTO);
 
         Optional<Admin> adminOpt = adminRepository.findById(adminEmail);
         if (adminOpt.isEmpty()) {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin non trovato.");
+            throw new NotFoundException("Admin " + adminEmail + " non trovato.");
         }
 
-        team.setAdmin(adminOpt.get());
+        teamToSave.setAdmin(adminOpt.get());
 
-        Team savedTeam = teamRepository.save(team);
-
-        return ResponseEntity.ok().body(savedTeam);
+        teamRepository.save(teamToSave);
     }
 
-    public ResponseEntity<?> deleteTeam(String teamName, String jwt) {
+    public void deleteTeam(String teamName, String adminEmail) {
 
-        // 2. Estrai l'ID dell'admin dal JWT
-        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
-	if (adminEmail == null || adminEmail.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'admin dal token JWT");
+        Optional<Team> teamOpt = teamRepository.findByName(teamName);
+        if (teamOpt.isEmpty()) {
+            throw new NotFoundException("Team " + teamName + " non trovato.");
         }
 
-        Optional<Team> teamToDeleteOpt = teamRepository.findByName(teamName);
-        if (teamToDeleteOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team " + teamName + " non trovato.");
-        }
+        Team teamToDelete = teamOpt.get();
 
-        Team teamToDelete = teamToDeleteOpt.get();
-
-        if (teamToDelete.getAdmin() == null || !teamToDelete.getAdmin().getEmail().equals(adminEmail)) {
-
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per eliminare questo team.");
+        if (!teamToDelete.getAdmin().getEmail().equals(adminEmail)) {
+            throw new ForbiddenException("L'admin " + adminEmail + " non ha i permessi per eliminare il team.");
         }
 
         teamRepository.delete(teamToDelete);
-
-        return ResponseEntity.status(HttpStatus.OK).body("Team " + teamName + " eliminato con successo.");
     }
 
-    public ResponseEntity<?> modificaNomeTeam(TeamModificationRequest request, String jwt) {
+    public void modificaNomeTeam(TeamModificationRequest request, String adminEmail) {
 
-        String oldName = request.getTeamOldName();
-        String newName = request.getTeamNewName();
-
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
-
-        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+        String newName = request.getNewName();
+        String oldName = request.getOldName();
 
         Optional<Team> teamOpt = teamRepository.findByName(oldName);
         if (teamOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team " + oldName + "' non trovato.");
+            throw new NotFoundException("Team " + oldName + "' non trovato.");
         }
 
         Team existingTeam = teamOpt.get();
 
-        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
-        if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+        if (!existingTeam.getAdmin().getEmail().equals(adminEmail)) {
+            throw new ForbiddenException("Non hai i permessi per modificare questo team.");
         }
 
-        // 5. Verifica il nuovo nome del team
-
-        //Modifica con nome nullo
-        if (newName == null || newName.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome team obbligatorio");
-        }
-
-        //Modifica con nome troppo lungo (massimo 20 caratteri)
-        if (newName.length() > 20) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nome team troppo lungo");
-        }
-
-
-        // 6. Verifica se il nuovo nome è già utilizzato da un altro team
         if (teamRepository.existsByName(newName)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esiste già un team con il nome '" + newName + "'");
+            throw new DuplicatedEntryException("Esiste già un team con il nome '" + newName + "'");
         }
 
-        // 7. Modifica il nome del team
         existingTeam.setName(newName);
 
-        // 8. Salva il team aggiornato
         teamRepository.save(existingTeam);
 
-        // 9. Restituisci il team aggiornato
-        return ResponseEntity.ok().body(existingTeam);
     }
 
-    // Metodo per visualizzare i team associati a un admin specifico
-    public ResponseEntity<?> visualizzaTeams(@CookieValue(name = "jwt", required = false) String jwt) {
-        System.out.println("Recupero dei team associati all'Admin in corso...");
+    public List<TeamDTO> findAdminTeams(String adminEmail) {
 
-        try {
-            // 1. Verifica se il token JWT è valido
-            if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-            }
-
-            // 2. Estrai l'ID dell'Admin dal JWT
-            String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
-            if (adminEmail == null || adminEmail.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'Admin dal token JWT.");
-            }
-
-            // 3
-            List<Team> teams = teamRepository.findByAdmin_Email(adminEmail);
-            if (teams == null || teams.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Nessun team trovato per l'Admin specificato.");
-            }
-
-            // 4. Restituisce i team trovati
-            return ResponseEntity.ok(teams);
-
-        } catch (Exception e) {
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore durante il recupero dei team.");
+        List<Team> teams = teamRepository.findByAdmin_Email(adminEmail);
+        if (teams.isEmpty()) {
+            throw new NotFoundException("Nessun team trovato per l'Admin " + adminEmail);
         }
+
+        return teamMapper.toDtoList(teams);
     }
 
-    //Modifica 03/12/2024: Aggiunta della visualizzazione del singolo team
-    public ResponseEntity<?> cercaTeam(String teamName, String jwt) {
+    public TeamDTO findAdminTeam(String teamName, String adminEmail) {
 
-        // Verifica se il token JWT è presente
-        // 1. Verifica se il token JWT è valido
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
+        Optional<Team> teamOpt = teamRepository.findByAdmin_EmailAndName(adminEmail, teamName);
+        if (teamOpt.isEmpty()) {
+            throw new NotFoundException("Team " + teamName + " non trovato per l'admin " + adminEmail);
         }
 
-        // 3. Verifica se il team esiste
+        TeamDTO teamDTO = teamMapper.toDto(teamOpt.get());
+
+        return teamDTO;
+    }
+
+    public ResponseEntity<?> addStudents(String teamName, List<String> studentIds, String adminEmail) {
+
         Optional<Team> teamOpt = teamRepository.findByName(teamName);
-        if (teamOpt == null || teamOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team " + teamName + " non trovato.");
+        if (teamOpt.isEmpty()) {
+            throw new NotFoundException("Team " + teamName + " non trovato.");
         }
 
         Team team = teamOpt.get();
-        // Restituisce il team
-        return ResponseEntity.ok().body(team);
-    }
 
-    //Modifica 03/12/2024: Aggiunta dell'aggiungiStudenti
-    public ResponseEntity<?> aggiungiStudenti(String teamName, List<String> studentIds, String jwt) {
-        // 1. Verifica se il token JWT è valido
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
-        // 2. Estrai l'ID dell'admin dal JWT
-        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
-        // 3. Verifica se il team esiste
-        Optional<Team> teamOpt = teamRepository.findByName(teamName);
-        if (teamOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Team " + teamName + " non trovato.");
-        }
-
-        Team existingTeam = teamOpt.get();
-
-        // 4. Verifica che l'admin sia effettivamente associato a questo team come "Owner"
-        if (existingTeam.getAdmin() == null || !existingTeam.getAdmin().getEmail().equals(adminEmail)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non hai i permessi per modificare questo team.");
+        if (team.getAdmin().getEmail().equals(adminEmail)) {
+            throw new ForbiddenException("Non hai i permessi per modificare questo team.");
         }
         //4.1 Verifica che non ho un array di id vuoto!
         if (studentIds.isEmpty()) {
@@ -227,21 +157,21 @@ public class TeamService {
         }
         // 5. Filtra gli studenti già presenti nel team
         List<String> newStudents = studentIds.stream()
-                .filter(studentId -> !existingTeam.getStudentIds().contains(studentIds))
+                .filter(studentId -> !team.getStudentIds().contains(studentIds))
                 .collect(Collectors.toList());
 
         if (newStudents.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tutti gli studenti forniti sono già associati al team.");
+            throw new DuplicatedEntryException("Tutti gli studenti forniti sono già associati al team.");
         }
 
         // 6. Aggiungi gli studenti validi al team
-        existingTeam.getStudentIds().addAll(newStudents);
+        team.getStudentIds().addAll(newStudents);
         // 7. Aggiorna il numero di studenti
-        existingTeam.setNumStudents(existingTeam.getStudentIds().size());
+        team.setNumStudents(team.getStudentIds().size());
         // 8. Salva il team aggiornato
-        Team updatedTeam = teamRepository.save(existingTeam);
+        Team updatedTeam = teamRepository.save(team);
         // 9. Recupero dettagli degli studenti per inviare le email.
-        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(newStudents, jwt);
+        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(newStudents);
         if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
             return ResponseEntity.status(dettagliStudentiResponse.getStatusCode())
                     .body("Errore nel recupero delle informazioni sugli studenti: " + dettagliStudentiResponse.getBody());
@@ -256,14 +186,14 @@ public class TeamService {
         // 11. Invia email di notifica agli studenti aggiunti
 
         try {
-            emailService.sendTeamAdditionNotificationToStudents(emails, existingTeam.getName());
+            emailService.sendTeamAdditionNotificationToStudents(emails, updatedTeam.getName());
         } catch (MessagingException e) {
             System.out.println("Errore durante l'invio della email.");
         }
 
         // 12. notifica l'utente nella pagina web
         String Title = "Aggiunto al Team ";
-        String message = "Ora fai parte di " + existingTeam.getName();
+        String message = "Ora fai parte di " + updatedTeam.getName();
         for (String email : emails) {
             try {
                 notificationService.sendNotification(email, null, Title, message, "Team");
@@ -307,7 +237,7 @@ public class TeamService {
         }
 
         // 6. Invoca il servizio T23 per ottenere i dettagli degli utenti
-        return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentIds, jwt));
+        return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentIds));
     }
 
     // Modifica 04/12/2024: Aggiunta rimuoviStudenteTeam
@@ -383,7 +313,7 @@ public class TeamService {
             throw new NotFoundException("Non ci sono studenti associati a questo team.");
         }
         // 3. Invoca il servizio T23 per ottenere i dettagli degli utenti
-        return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentIds, jwt));
+        return ResponseEntity.ok(studentService.ottieniStudentiDettagli(studentIds));
     }
 
 }

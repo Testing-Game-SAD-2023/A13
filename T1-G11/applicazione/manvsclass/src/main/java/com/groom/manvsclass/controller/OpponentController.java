@@ -48,32 +48,29 @@ public class OpponentController {
     private AdminService adminService;
 
     @GetMapping("/opponents/elencoNomiClassiUT")
-    public ResponseEntity<?> getNomiClassiUT(@CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> getNomiClassiUT() {
+
         return ResponseEntity.ok(classUTService.getClassUTNames());
     }
 
     @PostMapping("/opponents/update/{name}")
-    public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+    public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent, HttpServletRequest request) {
 
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
-
+        String jwt = JwtRequestContext.getJwtToken();
         String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
-        if (adminEmail == null || adminEmail.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'admin dal token JWT");
-        }
 
         return opponentService.modificaClasse(name, newContent, adminEmail, request);
     }
 
     @GetMapping("/opponents")
     public ResponseEntity<List<Opponent>> getAllOpponents() {
+
         return ResponseEntity.ok(opponentService.getAllOpponents());
     }
 
     @GetMapping("/opponents/classes/summary")
     public ResponseEntity<List<String>> getAllClassesAsSummary() {
+
         logger.info("[GET /classes/summary] Request received");
         List<ClassUT> classes = classUTService.getClassUTs();
         logger.info("[GET /classes/summary] Classes found: {}", classes);
@@ -87,6 +84,7 @@ public class OpponentController {
 
     @GetMapping("/opponents/summary")
     public ResponseEntity<List<OpponentSummaryDTO>> getAllOpponentsAsSummary() {
+
         logger.info("[GET /summary] Request received");
         List<Opponent> opponents = opponentService.getAllOpponents();
         logger.info("[GET /summary] Opponents found: {}", opponents);
@@ -138,52 +136,27 @@ public class OpponentController {
     ) throws IOException {
 
         String jwt = JwtRequestContext.getJwtToken();
-        if (jwt == null) {
-            throw new RuntimeException("Auth token is missing from context");
-        }
-
         String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
-
-        if(!adminService.existsAdminById(adminEmail)) {
-
-            adminService.saveAdmin(jwtService.getAdminFromJwt(jwt));
-        }
 
         return opponentService.uploadOpponent(classUTFile, classUTDetails, robotTestsZip, adminEmail);
     }
 
 
-    @GetMapping("/opponents/download/{name}")
-    public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) {
-        try {
-            return opponentService.downloadClasse(name);
-        } catch (Exception e) {
-            // Gestisci l'eccezione e ritorna una risposta appropriata
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore nel download della classe: " + e.getMessage());
-        }
+    @GetMapping("/opponents/download/{className}")
+    public ResponseEntity<?> downloadClasse(@PathVariable String className) {
+
+        return opponentService.downloadClasse(className);
     }
 
     @DeleteMapping("/opponents/{classUT}")
     public ResponseEntity<?> deleteClassUT(@PathVariable("classUT") String classUT) {
 
         String jwt = JwtRequestContext.getJwtToken();
-        if (jwt == null) {
-            throw new RuntimeException("Auth token is missing from context");
-        }
-
         String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
-        if (adminEmail == null || adminEmail.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossibile identificare l'admin dal token JWT");
-        }
 
-        try {
-            opponentService.eliminaClasse(classUT, adminEmail);
-            return ResponseEntity.status(HttpStatus.OK).body("Classe eliminata con successo.");
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore" );
-        }
+        opponentService.eliminaClasse(classUT, adminEmail);
+        return ResponseEntity.ok("Classe eliminata con successo.");
     }
+
 }
+

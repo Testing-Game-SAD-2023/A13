@@ -7,7 +7,9 @@ import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 @Data
 @AllArgsConstructor
 public class OpponentSummaryDTO {
+
     private String classUT;
     private String opponentType;
     private OpponentDifficulty opponentDifficulty;
+
 }

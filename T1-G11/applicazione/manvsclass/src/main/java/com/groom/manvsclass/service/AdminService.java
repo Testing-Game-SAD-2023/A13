@@ -39,16 +39,15 @@ public class AdminService {
     @Autowired
     private PasswordEncoder myPasswordEncoder;
 
-    public boolean existsAdminById(String adminEmail) {
+    public Admin getAdminByUsername(String username) {
 
-        return adminRepository.existsById(adminEmail);
+        Optional<Admin> adminOpt = adminRepository.findByUsername(username);
+        if (adminOpt.isEmpty()) {
+            throw new NotFoundException("Impossibile trovare Admin con username: " + username);
+        }
+        return adminOpt.get();
+
     }
-
-    public Admin saveAdmin(Admin newAdmin) {
-
-        return adminRepository.save(newAdmin);
-    }
-
 
     public List<ClassUT> filtraClassi(String category) {
 
@@ -73,8 +72,9 @@ public class AdminService {
     }
 
 
-    // METODO NON UTILIZZATO
-    public ResponseEntity<?> inviteAdmins(Admin admin1, String jwt) {
+    // METODO NON UTILIZZATO (LEGACY?)
+
+    /* public ResponseEntity<?> inviteAdmins(Admin admin1, String jwt) {
         if (!jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Attenzione, non sei loggato");
         }
@@ -104,11 +104,12 @@ public class AdminService {
         } catch (MessagingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nell'invio del messaggio di posta");
         }
-    }
+    } */
 
 
-    // METODO NON UTILIZZATO
-    public ResponseEntity<?> loginWithInvitation(Admin admin1, String jwt) {
+    // METODO NON UTILIZZATO (LEGACY?)
+
+    /* public ResponseEntity<?> loginWithInvitation(Admin admin1, String jwt) {
 
         if (jwtService.isJwtValid(jwt)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Attenzione, hai già un token valido!");
@@ -164,15 +165,6 @@ public class AdminService {
 
         Admin savedAdmin = adminRepository.save(admin);
         return ResponseEntity.ok().body(savedAdmin);
-    }
+    } */
 
-    public Admin getAdminByUsername(String username) {
-
-        Optional<Admin> adminOpt = adminRepository.findByUsername(username);
-        if (adminOpt.isEmpty()) {
-            throw new NotFoundException("Impossibile trovare Admin con username: " + username);
-        }
-        return adminOpt.get();
-
-    }
 }

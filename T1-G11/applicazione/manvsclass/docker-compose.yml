@@ -12,7 +12,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-    # CORREZIONE: Rimuovi il trattino e usa la sintassi a mappa (chiave-valore)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     depends_on:
       mysql_db:
         condition: service_healthy
@@ -21,6 +22,11 @@ services:
       - VolumeT0:/VolumeT0
     networks:
       - global-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   mysql_db:
     image: mysql:8.0
@@ -34,11 +40,9 @@ services:
     expose:
       - "3306"
     volumes:
-      - mysql_data_volume:/var/lib/mysql # Volume per la persistenza dei dati
+      - mysql_data_volume:/var/lib/mysql
     networks:
       - global-network
-
-    # CORREZIONE: Sposta l'healthcheck qui, dentro il servizio 'mysql_db'
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "${MYSQL_USER}", "--password=${MYSQL_PASSWORD}"]
       interval: 10s
@@ -53,3 +57,4 @@ volumes:
   VolumeT0:
     external: true
   mysql_data_volume:
+  t1_images_volume:

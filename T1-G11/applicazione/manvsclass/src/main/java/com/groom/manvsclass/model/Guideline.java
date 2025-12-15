@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Column;
 import jakarta.persistence.Basic;
@@ -14,11 +15,14 @@ import jakarta.persistence.FetchType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-import lombok.*;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Base64;
 
 @Entity
 @Table(name = "guidelines")
@@ -33,30 +37,18 @@ public class Guideline {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    @NotBlank
-    private String title;
+    @Positive
+    @Column(name = "sort_order", nullable = false)
+    private int order;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     @NotBlank
     private String hint;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "image", columnDefinition = "LONGBLOB")
-    private byte[] image;
+    @Column(length = 255)
+    private String image;
 
-    @NotNull
     @Column(nullable = false)
     private LocalDate date;
-
-    public String getBase64Image() {
-
-        if (this.image == null || this.image.length == 0) {
-            return null;
-        }
-
-        return Base64.getEncoder().encodeToString(this.image);
-    }
 
 }

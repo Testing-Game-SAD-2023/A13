@@ -96,7 +96,7 @@ public class EmailService {
     @Async
     public ResponseEntity<String> sendTeamNewAssignment(List<String> idsStudents, Team team, Assignment assignment, String jwt) {
 
-        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(idsStudents, jwt);
+        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(idsStudents);
         if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
             return ResponseEntity.status(dettagliStudentiResponse.getStatusCode())
                     .body("Errore nel recupero delle informazioni sugli studenti: " + dettagliStudentiResponse.getBody());

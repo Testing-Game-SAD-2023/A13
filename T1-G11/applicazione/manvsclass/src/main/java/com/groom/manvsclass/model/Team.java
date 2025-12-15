@@ -42,7 +42,7 @@ public class Team {
     private String name;
 
     private int numStudents;
-    private LocalDate date;
+    private LocalDate creationDate;
 
     @ManyToOne
     @JoinColumn(name = "admin_email", referencedColumnName = "email")

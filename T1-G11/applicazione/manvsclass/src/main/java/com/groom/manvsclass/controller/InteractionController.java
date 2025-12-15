@@ -20,17 +20,15 @@ package com.groom.manvsclass.controller;
 import com.groom.manvsclass.dto.InteractionDTO;
 import com.groom.manvsclass.service.AdminService;
 import com.groom.manvsclass.service.JwtService;
-
-import com.groom.manvsclass.util.Util;
+import com.groom.manvsclass.mapper.InteractionMapper;
+import com.groom.manvsclass.service.InteractionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
-import com.groom.manvsclass.exception.NotFoundException;
-import com.groom.manvsclass.exception.ForbiddenException;
 
 import java.util.List;
 
@@ -43,45 +41,38 @@ public class InteractionController {
     @Autowired
     private AdminService adminService;
     @Autowired
-    private Util utilsService;
+    private InteractionService interactionService;
+
+    @PostMapping("/interaction/upload")
+    public ResponseEntity<?> uploadInteraction(@Valid @RequestBody InteractionDTO interactionDTO) {
+
+        interactionService.uploadInteraction(interactionDTO.getClassName(), interactionDTO);
+        return ResponseEntity.ok().body("Interazione caricata con successo.");
+
+    }
 
     @GetMapping("/getLikes/{className}")
-    public ResponseEntity<?> likes(@PathVariable String className) {
+    public ResponseEntity<?> countLikes(@PathVariable String className) {
 
-        try {
-            long likesCount = utilsService.getClassLikes(className);
-            return ResponseEntity.ok(likesCount);
-        } catch(NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        long likesCount = interactionService.countLikes(className);
+        return ResponseEntity.ok(likesCount);
     }
 
     @GetMapping("/interaction")
     public List<InteractionDTO> elencaInt() {
 
-        return utilsService.elencaInt();
+        return interactionService.findInteractions();
     }
 
     @GetMapping("/findReport")
     public List<InteractionDTO> elencaReport() {
 
-        return utilsService.elencaReport();
+        return interactionService.findReports();
     }
 
-    @PostMapping("/interaction/upload")
-    public ResponseEntity<?> uploadInteraction(@RequestBody InteractionDTO interactionDTO) {
-
-        try {
-            utilsService.uploadInteraction(interactionDTO);
-            return ResponseEntity.ok().body("");
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/deleteint/{interactionId}")
+    @DeleteMapping("/deleteint/{interactionId}")
     public void eliminaInteraction(@PathVariable String interactionId) {
 
-        utilsService.eliminaInteraction(Long.parseLong(interactionId));
+        interactionService.eliminaInteraction(Long.parseLong(interactionId));
     }
 }

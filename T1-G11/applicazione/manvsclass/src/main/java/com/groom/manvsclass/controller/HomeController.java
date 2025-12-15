@@ -24,17 +24,12 @@ package com.groom.manvsclass.controller;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Interaction;
 import com.groom.manvsclass.service.AdminService;
-import com.groom.manvsclass.service.JwtService;
-import com.groom.manvsclass.util.Util;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-
-import com.groom.manvsclass.exception.NotFoundException;
-import com.groom.manvsclass.exception.ForbiddenException;
 
 import java.util.List;
 
@@ -43,51 +38,22 @@ import java.util.List;
 public class HomeController {
 
     @Autowired
-    private JwtService jwtService;
-    @Autowired
     private AdminService adminService;
-    @Autowired
-    private Util utilsService;
 
     @GetMapping("/Cfilterby/{category}")
-    public ResponseEntity<?> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> filtraClassi(@PathVariable String category) {
 
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
-
-        try {
-            List<ClassUT> filteredClasses = adminService.filtraClassi(category);
-            return ResponseEntity.ok(filteredClasses);
-
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il recupero delle classi: " + e.getMessage());
-        }
-
+        List<ClassUT> filteredClasses = adminService.filtraClassi(category);
+        return ResponseEntity.ok(filteredClasses);
     }
 
     @GetMapping("/Cfilterby/{text}/{category}")
-    public ResponseEntity<?> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> filtraClassi(@PathVariable String text, @PathVariable String category) {
 
-        if (jwt == null || jwt.isEmpty() || !jwtService.isJwtValid(jwt)) {
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
-
-        try {
-            List<ClassUT> filteredClasses = adminService.filtraClassi(text, category);
-            return ResponseEntity.ok(filteredClasses);
-
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante il recupero delle classi: " + e.getMessage());
-        }
-
+        List<ClassUT> filteredClasses = adminService.filtraClassi(text, category);
+        return ResponseEntity.ok(filteredClasses);
     }
+
 }
 
 

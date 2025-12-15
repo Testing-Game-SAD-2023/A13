@@ -114,8 +114,4 @@ if %ERRORLEVEL% neq 0 (
 )
 cd /d "%ROOT_DIR%"
 
-REM RunScript.bat
-echo "Executing RunCommands.ps1"
-powershell -ExecutionPolicy Bypass -File RunCommands.ps1
-
 echo Deployment completed

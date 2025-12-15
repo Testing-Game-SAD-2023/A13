@@ -15,6 +15,7 @@ import com.groom.manvsclass.model.Category;
 import com.groom.manvsclass.model.Operation;
 import com.groom.manvsclass.model.OperationType;
 import com.groom.manvsclass.model.Opponent;
+import com.groom.manvsclass.service.ImageService;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
 import com.groom.manvsclass.repository.AdminRepository;
@@ -77,6 +78,8 @@ public class OpponentService {
     private AdminRepository adminRepository;
     @Autowired
     private ApiGatewayClient apiGatewayClient;
+    @Autowired
+    private ImageService imageService;
 
 
 
@@ -257,6 +260,18 @@ public class OpponentService {
 
         // elimino gli opponent mantenuti da T23
         apiGatewayClient.callDeleteAllClassUTOpponents(className);
+
+        // ELIMINAZIONI FILE IMG SUGGERIMENTI
+        classToDelete.getSuggestions()
+                .forEach(suggestion -> {
+                    if(suggestion.getImage() != null) {
+                        try {
+                            imageService.deleteImage(suggestion.getImage());
+                        } catch (IOException e) {
+                            throw new RuntimeException("Errore nella cancellazione del file", e);
+                        }
+                    }
+                });
 
         classUTRepository.delete(classToDelete);
         eliminaFile(className);

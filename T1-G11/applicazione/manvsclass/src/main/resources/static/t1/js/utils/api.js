@@ -1,4 +1,4 @@
-/*      Utility functions        */
+/* Utility functions        */
 
 function executeFetch(url, init) {
     return fetch(url, {
@@ -85,7 +85,7 @@ async function redirectOnSuccessTemplate({ url, method, headers, body }, { redir
     }
 }
 
-/*      API calls        */
+/* API calls        */
 
 async function callLogoutAdmin() {
     await redirectOnSuccessTemplate(
@@ -149,9 +149,10 @@ async function callDeleteClassUT(className) {
         });
 }
 
-async function callDeleteSuggestion(className, suggestionTitle) {
+async function callDeleteSuggestion(className, order) {
 
-    const response = await fetch(APIS.DELETE_SUGGESTION(className, suggestionTitle), {
+    const url = APIS.DELETE_SUGGESTION(className, order);
+    const response = await fetch(url, {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json'}
     });
@@ -160,6 +161,22 @@ async function callDeleteSuggestion(className, suggestionTitle) {
         throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
     }
 
+    return true;
+}
+
+async function callDeleteSuggestionImage(className, order) {
+
+    const url = APIS.DELETE_SUGGESTION_IMAGE(className, order);
+    const response = await fetch(url, { method: 'DELETE' });
+    if (!response.ok) throw new Error("Errore rimozione immagine suggerimento");
+    return true;
+}
+
+async function callDeleteGuidelineImage(order) {
+
+    const url = APIS.DELETE_GUIDELINE_IMAGE(order);
+    const response = await fetch(url, { method: 'DELETE' });
+    if (!response.ok) throw new Error("Errore rimozione immagine linea guida");
     return true;
 }
 
@@ -179,7 +196,6 @@ async function callUploadGuidelines(guideLines) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            // MODIFICA QUI: Invia direttamente la lista, senza { guidelines: ... }
             body: JSON.stringify(guideLines)
         });
 
@@ -195,8 +211,6 @@ async function callUploadGuidelines(guideLines) {
         throw error;
     }
 }
-
-// in api.js
 
 async function callGetGuidelines() {
     try {
@@ -218,9 +232,9 @@ async function callGetGuidelines() {
     }
 }
 
-async function callDeleteGuideline(title) {
+async function callDeleteGuideline(order) {
     try {
-        const url = APIS.DELETE_GUIDELINE(title);
+        const url = APIS.DELETE_GUIDELINE(order);
 
         const response = await fetch(url, {
             method: 'DELETE',
@@ -238,13 +252,14 @@ async function callDeleteGuideline(title) {
 }
 
 
-async function callUploadSuggestions(className, suggestionsData) {
+async function callUploadSuggestions(suggestionsData) {
 
     try {
 
-        const url = APIS.UPLOAD_SUGGESTIONS(className);
+        const url = APIS.UPLOAD_SUGGESTIONS;
 
         const response = await fetch(url, {
+            cache: 'no-store',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -266,12 +281,25 @@ async function callUploadSuggestions(className, suggestionsData) {
     }
 }
 
+async function callDownloadSuggestions(className) {
+    return await returnDataOnSuccessTemplate({
+        url: APIS.DOWNLOAD_SUGGESTIONS(className),
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' }
+    }, async response => await response.json());
+}
+
 async function callGetSuggestions(className) {
     try {
-
         const url = APIS.GET_SUGGESTIONS(className);
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            cache: 'no-store'
+        });
 
         if (!response.ok) {
             throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
@@ -280,8 +308,59 @@ async function callGetSuggestions(className) {
         return await response.json();
 
     } catch (error) {
-
         console.error(`Errore durante il recupero dei suggerimenti per ${className}:`, error);
         throw error;
     }
+}
+
+async function callUploadSuggestionImage(formData, className, order) {
+
+    const url = APIS.UPLOAD_SUGGESTION_IMAGE(className, order);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.text();
+
+    } catch (error) {
+        console.error("Errore in callUploadSuggestionImage:", error);
+        throw error;
+    }
+}
+
+async function callUploadGuidelineImage(formData, order) {
+
+    const url = APIS.UPLOAD_GUIDELINE_IMAGE(order);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Errore HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.text();
+
+    } catch (error) {
+        console.error("Errore in callUploadGuidelineImage:", error);
+        throw error;
+    }
+}
+
+async function callDownloadGuidelines() {
+    return await returnDataOnSuccessTemplate({
+        url: APIS.DOWNLOAD_GUIDELINES,
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' }
+    }, async response => await response.json());
 }

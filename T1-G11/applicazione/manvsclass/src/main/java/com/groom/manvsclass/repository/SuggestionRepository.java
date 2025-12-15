@@ -10,8 +10,6 @@ public interface SuggestionRepository extends JpaRepository<Suggestion, Long> {
 
     List<Suggestion> findAllByClassUT_Name(String className);
 
-    Optional<Suggestion> findByClassUT_NameAndTitle(String className, String suggestionTitle);
-
-    boolean existsByClassUT_NameAndTitle(String className, String suggestionTitle);
+    Optional<Suggestion> findByClassUT_NameAndOrder(String className, int order);
 
 }

@@ -1,16 +1,16 @@
 package com.groom.manvsclass.controller;
 
 import com.groom.manvsclass.dto.SuggestionDTO;
-
-import com.groom.manvsclass.service.SecurityService;
+import com.groom.manvsclass.dto.ClassUTSuggestionDTO;
 import com.groom.manvsclass.service.SuggestionService;
 
-import com.groom.manvsclass.exception.NotFoundException;
-import com.groom.manvsclass.exception.DuplicatedTitlesException;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,82 +19,75 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
 import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+@Validated
 @CrossOrigin
 @RestController
 public class SuggestionController {
 
     @Autowired
-    private SecurityService securityService;
-
-    @Autowired
     private SuggestionService suggestionService;
 
-    @PostMapping("/opponents/suggestions/upload/{className}")
-    public ResponseEntity<?> uploadSuggestions(
-            @PathVariable String className,
-            @Valid @RequestBody List<SuggestionDTO> suggestionDTOs) {
+    @PostMapping("/opponents/suggestions/upload")
+    public ResponseEntity<?> uploadSuggestions(@Valid @RequestBody ClassUTSuggestionDTO classUTSuggestionDTO) {
 
-        String jwt = securityService.getJwtToken();
-        if (jwt == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
+        String className = classUTSuggestionDTO.getClassName();
+        List<SuggestionDTO> suggestionDTOs = classUTSuggestionDTO.getSuggestions();
 
-        try {
-            suggestionService.uploadSuggestions(className, suggestionDTOs);
-            return ResponseEntity.status(HttpStatus.OK).body("Suggerimenti caricati con successo.");
+        suggestionService.uploadSuggestions(className, suggestionDTOs);
 
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.ok("Suggerimenti caricati con successo.");
 
-        catch (Exception e) {
+    }
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore.");
-        }
+    @PostMapping("/opponents/suggestions/upload/{className}/{order}")
+    public ResponseEntity<?> uploadSuggestionImage(
+            @PathVariable("className") @NotBlank String className,
+            @PathVariable("order") @Positive int order,
+            @RequestParam("image") @NotNull MultipartFile image) {
+
+        suggestionService.uploadSuggestionImage(className, order, image);
+
+        return ResponseEntity.ok("Immagine caricata con successo.");
+
     }
 
     @GetMapping("/opponents/suggestions/{className}")
-    public ResponseEntity<?> viewSuggestions(@PathVariable("className") String className) {
+    public ResponseEntity<?> viewSuggestions(@PathVariable("className") @NotBlank String className) {
 
-        String jwt = securityService.getJwtToken();
-        if (jwt == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
+        List<SuggestionDTO> suggestionDTOs = suggestionService.findSuggestions(className);
 
-        try {
-            List<SuggestionDTO> suggestions = suggestionService.findSuggestions(className);
-            return ResponseEntity.ok(suggestions);
+        ClassUTSuggestionDTO classUTSuggestionDTO = new ClassUTSuggestionDTO();
+        classUTSuggestionDTO.setClassName(className);
+        classUTSuggestionDTO.setSuggestions(suggestionDTOs);
 
-        } catch (Exception e) {
+        return ResponseEntity.ok(classUTSuggestionDTO);
 
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Errore nel download della classe: " + e.getMessage());
-        }
     }
 
-    @DeleteMapping("/opponents/suggestions/{className}/suggestion")
+    @DeleteMapping("/opponents/suggestions/{className}/{order}")
     public ResponseEntity<?> deleteSuggestion(
-            @PathVariable("className") String className,
-            @RequestParam("suggestionTitle") String suggestionTitle)
-    {
+            @PathVariable("className") @NotBlank String className,
+            @PathVariable("order") @Positive int order) {
 
-        String jwt = securityService.getJwtToken();
-        if (jwt == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token JWT non valido o mancante.");
-        }
+        suggestionService.deleteSuggestion(className, order);
 
-        try {
-            suggestionService.deleteSuggestion(className, suggestionTitle);
-            return ResponseEntity.status(HttpStatus.OK).body("Suggerimento eliminato con successo.");
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore" );
-        }
+        return ResponseEntity.ok("Suggerimento eliminato con successo.");
+    }
+
+    @DeleteMapping("/opponents/suggestions/image/{className}/{order}")
+    public ResponseEntity<?> deleteSuggestionImage(
+            @PathVariable("className") @NotBlank String className,
+            @PathVariable("order") @Positive int order) {
+
+        suggestionService.deleteSuggestionImage(className, order);
+
+        return ResponseEntity.ok("Immagine eliminata con successo.");
     }
 
 }

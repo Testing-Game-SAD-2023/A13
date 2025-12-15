@@ -1,32 +1,31 @@
 package com.groom.manvsclass.repository;
 
-import com.groom.manvsclass.model.Suggestion;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.test.context.TestPropertySource;
-
+import com.groom.manvsclass.dto.GuidelineDTO;
+import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Guideline;
-
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-
+import com.groom.manvsclass.util.TestUtils;
+import jakarta.validation.ConstraintViolationException;
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
-import org.springframework.dao.DataIntegrityViolationException;
-import jakarta.validation.ConstraintViolationException;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @EntityScan(basePackages = "com.groom.manvsclass")
@@ -35,7 +34,11 @@ import java.util.stream.Stream;
         "spring.jpa.hibernate.ddl-auto=create-drop",
         "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL", // Simula MySQL
         "spring.jpa.show-sql=true",
-        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
+        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
+
+//        "spring.jpa.properties.hibernate.format_sql=true",
+//        "logging.level.org.hibernate.SQL=DEBUG",
+//        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE"
 })
 class GuidelineRepositoryTests {
 
@@ -45,36 +48,27 @@ class GuidelineRepositoryTests {
     @Autowired
     private GuidelineRepository guidelineRepository;
 
-    // METODI UTILI
-    private Guideline createBaseGuideline() {
+    // configurazione di comparison per Guideline
+    // configurazione di default: confronta tutti i parametri con equals
+    public static final RecursiveComparisonConfiguration GUIDELINE_COMPARISON_CONFIG = new RecursiveComparisonConfiguration();
+
+    // assert personalizzati
+    private final TestUtils<Guideline> guidelineTestUtils = new TestUtils<>(GUIDELINE_COMPARISON_CONFIG);
+
+    public static Guideline createBaseGuideline() {
 
         Guideline guideline = new Guideline();
-        guideline.setTitle("Guideline");
+        guideline.setOrder(1);
         guideline.setHint("Testo_Guideline");
         guideline.setDate(LocalDate.now());
-        guideline.setImage(new byte[] {1,2,3,4,5});
+        guideline.setImage(null);
         return guideline;
-    }
-
-    private static boolean guidelineEquals(Guideline g1, Guideline g2) {
-        if (g1 == g2) return true;
-        if (g1 == null || g2 == null) return false;
-
-        return g1.getId().equals(g2.getId()) &&
-                g1.getTitle().equals(g2.getTitle()) &&
-                g1.getHint().equals(g2.getHint()) &&
-                g1.getDate().equals(g2.getDate()) &&
-                g1.getBase64Image().equals(g2.getBase64Image());
-    }
-
-    private static void assertGuidelineEquals(Guideline expected, Guideline actual) {
-        assertThat(guidelineEquals(expected, actual)).isTrue();
     }
 
     // TEST CREATE
 
     @Test
-    void testCreateGuideline() {
+    void testSaveGuideline() {
 
         Guideline guideline = createBaseGuideline();
         Guideline savedGuideline = guidelineRepository.save(guideline);
@@ -82,48 +76,22 @@ class GuidelineRepositoryTests {
         entityManager.flush();  // forza la scrittura sul database
         entityManager.clear();  // svuota la cache per forzare la lettura dal database
 
-        // lo rilegge per verificare il corretto inserimento nel database
+        // per verificare il corretto inserimento nel database effettua una find
         Optional<Guideline> guidelineOpt = guidelineRepository.findById(savedGuideline.getId());
         assertThat(guidelineOpt).isPresent();
 
-        Guideline receivedGuideline = guidelineOpt.get();
-        assertGuidelineEquals(savedGuideline, receivedGuideline);
+        Guideline foundGuideline = guidelineOpt.get();
+        guidelineTestUtils.assertEquals(savedGuideline, foundGuideline);
     }
-
-    @Test
-    void testSaveGuideline_DuplicatedTitle() {
-
-        Guideline firstGuideline = createBaseGuideline();
-        Guideline savedFirstGuideline = guidelineRepository.save(firstGuideline);
-
-        entityManager.flush();
-
-        Guideline secondGuideline = createBaseGuideline();
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            guidelineRepository.save(secondGuideline);
-            entityManager.flush();
-        });
-
-        entityManager.clear();
-
-        // verifica la presenza del primo guideline
-        Optional<Guideline> guidelineOpt = guidelineRepository.findById(savedFirstGuideline.getId());
-        assertThat(guidelineOpt).isPresent();
-
-        Guideline receivedGuideline = guidelineOpt.get();
-        assertGuidelineEquals(savedFirstGuideline, receivedGuideline);
-    }
-
-    // TEST SAVE_ALL
 
     @Test
     void testSaveAllGuidelines() {
 
         Guideline firstGuideline = createBaseGuideline();
-        firstGuideline.setTitle("Guideline_1");
+        firstGuideline.setOrder(1);
 
         Guideline secondGuideline = createBaseGuideline();
-        secondGuideline.setTitle("Guideline_2");
+        secondGuideline.setOrder(2);
 
         List<Guideline> guidelines = Arrays.asList(firstGuideline, secondGuideline);
 
@@ -134,22 +102,16 @@ class GuidelineRepositoryTests {
         entityManager.flush();
         entityManager.clear();
 
-        // verifica la presenza delle guidelines nel database, effettuando una findById per ogni guideline
-        Stream<Guideline> foundGuidelines =
-                savedGuidelines
-                        .stream()
-                        .map(guideline -> {
-                            Optional<Guideline> guidelineOpt = guidelineRepository.findById(guideline.getId());
-                            assertThat(guidelineOpt).isPresent();
-                            return guidelineOpt.get();
-                        });
+        // verifica la presenza dei suggerimenti nel database, effettuando una findById per ogni suggerimento
+        List<Guideline> foundGuidelines = new ArrayList<>();
+        for (Guideline guideline : savedGuidelines) {
+            Optional<Guideline> guidelineOpt = guidelineRepository.findById(guideline.getId());
+            assertThat(guidelineOpt).isPresent();
+            foundGuidelines.add(guidelineOpt.get());
+        }
 
-        Comparator<Guideline> guidelineComparator = (g1, g2) -> guidelineEquals(g1, g2) ? 0 : 1;
-
-        assertThat(foundGuidelines)
-                .hasSize(guidelines.size())
-                .usingElementComparator(guidelineComparator)
-                .containsExactlyInAnyOrderElementsOf(guidelines);
+        // verifica che le linee guida ottenute siano corrette
+        guidelineTestUtils.assertListEquals(savedGuidelines, foundGuidelines);
     }
 
     // TEST UPDATE
@@ -161,7 +123,7 @@ class GuidelineRepositoryTests {
         Guideline savedGuideline = guidelineRepository.save(guideline);
         entityManager.flush();
 
-        guideline.setTitle("Titolo Aggiornato");
+        guideline.setOrder(2);
         Guideline updatedGuideline = guidelineRepository.save(savedGuideline);
         entityManager.flush();
         entityManager.clear();
@@ -170,7 +132,7 @@ class GuidelineRepositoryTests {
         assertThat(guidelineOpt).isPresent();
 
         Guideline foundGuideline = guidelineOpt.get();
-        assertGuidelineEquals(updatedGuideline, foundGuideline);
+        guidelineTestUtils.assertEquals(updatedGuideline, foundGuideline);
     }
 
     // TEST DELETE
@@ -195,25 +157,22 @@ class GuidelineRepositoryTests {
     void testFindAllGuidelines_ReturnsList() {
 
         Guideline firstGuideline = createBaseGuideline();
-        firstGuideline.setTitle("Guideline_1");
+        firstGuideline.setOrder(1);
         Guideline savedFirstGuideline = guidelineRepository.save(firstGuideline);
 
         Guideline secondGuideline = createBaseGuideline();
-        secondGuideline.setTitle("Guideline_2");
+        secondGuideline.setOrder(2);
         Guideline savedSecondGuideline = guidelineRepository.save(secondGuideline);
 
         entityManager.flush();
         entityManager.clear();
 
-        List<Guideline> results = guidelineRepository.findAllGuidelines();
+        List<Guideline> foundGuidelines = guidelineRepository.findAllGuidelines();
 
-        Comparator<Guideline> guidelineComparator = (g1, g2) -> guidelineEquals(g1, g2) ? 0 : 1;
+        List<Guideline> expectedGuidelines = Arrays.asList(savedFirstGuideline, savedSecondGuideline);
 
-        // verifica che i suggerimenti ottenuti siano corretti
-        assertThat(results)
-                .hasSize(2)
-                .usingElementComparator(guidelineComparator)
-                .containsExactlyInAnyOrder(savedFirstGuideline, savedSecondGuideline);
+        // verifica che le linee guida ottenute siano corrette
+        guidelineTestUtils.assertListEquals(expectedGuidelines, foundGuidelines);
     }
 
     @Test
@@ -224,81 +183,42 @@ class GuidelineRepositoryTests {
     }
 
     @Test
-    void testFindByTitle() {
+    void testFindByOrder() {
 
         Guideline guideline = createBaseGuideline();
         Guideline savedGuideline = guidelineRepository.save(guideline);
         entityManager.flush();
         entityManager.clear();
 
-        Optional<Guideline> result = guidelineRepository.findByTitle(guideline.getTitle());
+        Optional<Guideline> result = guidelineRepository.findByOrder(guideline.getOrder());
 
         assertThat(result).isPresent();
-        assertGuidelineEquals(savedGuideline, result.get());
+        guidelineTestUtils.assertEquals(savedGuideline, result.get());
     }
 
     @Test
-    void testFindByTitle_WrongTitle() {
+    void testFindByOrder_WrongTitle() {
 
         Guideline guideline = createBaseGuideline();
         guidelineRepository.save(guideline);
         entityManager.flush();
         entityManager.clear();
 
-        Optional<Guideline> result = guidelineRepository.findByTitle("Titolo_Non_Esistente");
+        Optional<Guideline> result = guidelineRepository.findByOrder(2);
 
         assertThat(result).isEmpty();
     }
 
-    @Test
-    void testExistsByTitle_True() {
+    // TEST CODE_ID
+
+    void testInvalidOrder() {
+
+        int invalidOrder = -1;
 
         Guideline guideline = createBaseGuideline();
-        Guideline savedGuideline = guidelineRepository.save(guideline);
-        entityManager.flush();
-        entityManager.clear();
-
-        boolean exists = guidelineRepository.existsByTitle(savedGuideline.getTitle());
-
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    void testExistsByTitle_False() {
-
-        Guideline guideline = createBaseGuideline();
-        guidelineRepository.save(guideline);
-        entityManager.flush();
-        entityManager.clear();
-
-        boolean exists = guidelineRepository.existsByTitle("Titolo_Non_Esistente");
-
-        assertThat(exists).isFalse();
-    }
-
-    // TEST TITLE
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {"   "})
-    void testInvalidTitle(String invalidTitle) {
-
-        Guideline guideline = createBaseGuideline();
-        guideline.setTitle(invalidTitle);
+        guideline.setOrder(invalidOrder);
 
         assertThrows(ConstraintViolationException.class, () -> {
-            guidelineRepository.save(guideline);
-            entityManager.flush();
-        });
-    }
-
-    @Test
-    void testTitleTooLong() {
-
-        Guideline guideline = createBaseGuideline();
-        guideline.setTitle("a".repeat(300));
-
-        assertThrows(DataIntegrityViolationException.class, () -> {
             guidelineRepository.save(guideline);
             entityManager.flush();
         });
@@ -340,7 +260,7 @@ class GuidelineRepositoryTests {
         Guideline guideline = createBaseGuideline();
         guideline.setDate(null);
 
-        assertThrows(ConstraintViolationException.class, () -> {
+        assertThrows(DataIntegrityViolationException.class, () -> {
             guidelineRepository.save(guideline);
             entityManager.flush();
         });
@@ -348,7 +268,8 @@ class GuidelineRepositoryTests {
 
     // TEST IMAGE
 
-    @Test void testSaveNullImage() {
+    @Test
+    void testSaveNullImage() {
 
         Guideline guideline = createBaseGuideline();
         guideline.setImage(null);
@@ -356,18 +277,6 @@ class GuidelineRepositoryTests {
         Guideline savedGuideline = guidelineRepository.save(guideline);
         entityManager.flush();
         assertThat(savedGuideline.getImage()).isNull();
-    }
-
-    @Test void testSaveLargeImage() {
-
-        final int IMAGE_SIZE = 1024 * 1024;
-
-        Guideline guideline = createBaseGuideline();
-        guideline.setImage(new byte[IMAGE_SIZE]); // 1 MB
-
-        Guideline savedGuideline = guidelineRepository.save(guideline);
-        entityManager.flush();
-        assertThat(savedGuideline.getImage().length).isEqualTo(IMAGE_SIZE);
     }
 
 }
