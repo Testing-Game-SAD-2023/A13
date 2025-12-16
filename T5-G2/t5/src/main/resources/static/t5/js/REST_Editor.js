@@ -105,16 +105,6 @@ async function handleGameAction(isGameEnd, compileUponEndTime=false) {
     if (isGameEnd) {
         try {
             //Esegue la terminazione del gioco
-            
-            // Se non è stato fatto nemmeno un turno, devo prima inizializzare il gioco
-            if (orderTurno === 0) {
-                console.log("[handleGameAction] Primo submit senza turni: inizializzo il gioco prima di EndGame");
-                const initResponse = await runGameAction("/api/gameEngine/run", requestBody);
-                setStatus("compiling");
-                handleGameRun(initResponse, loadingKey, buttonKey, false);
-                // Dopo l'inizializzazione, il requestBody potrebbe essere aggiornato
-                requestBody = await getGameActionRequestBody();
-            }
 
             if (!compileUponEndTime) {
                 requestBody["testingClassCode"] = "";
