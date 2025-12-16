@@ -1,130 +1,194 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title th:text="#{class_title}">Classi</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{class_title}">Classi</title>
 
-  <!-- Bootstrap & Font Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/t1/css/class.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="/t1/css/class.css" rel="stylesheet">
 </head>
 
 <body>
 <div id="main-content" class="file_manager">
-  <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
-        <a id="navDashboardAdmin" class="navbar-brand" href="/#">
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
-            <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Zm9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382l.045-.148ZM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/>
-          </svg>
-        </a>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <div class="container-fluid">
+                <a id="navDashboardAdmin" class="navbar-brand" href="#">
+                    <i class="fa fa-cogs"></i>
+                </a>
+                <a id="navOpponentsMain" class="navbar-brand" href="#" th:text="#{class_title}">Classi</a>
 
-        <a id="navOpponentsMain" class="navbar-brand" href="/#" th:text="#{class_title}">Classi</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a id="navDashboardAdmin2" class="nav-link" href="/#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a id="navOpponentsUpload" class="nav-link" href="/#" th:text="#{class_navbar_add}">Aggiungi Classe e Robot</a>
-            </li>
+                        <li class="nav-item">
+                            <a id="navOpponentsUpload" class="nav-link" href="#" th:text="#{class_navbar_add}">Aggiungi</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="sortByDropdown" data-toggle="dropdown" th:text="#{class_navbar_sort}">Ordina per</a>
+                            <div class="dropdown-menu">
+                                <a id="linkSortByDate" class="dropdown-item" href="#" th:text="#{class_navbar_sort_date}">Data</a>
+                                <a id="linkSortByName" class="dropdown-item" href="#" th:text="#{class_navbar_sort_name}">Nome</a>
+                            </div>
+                        </li>
 
-            <!-- Ordina per -->
-            <ul class="navbar-nav">
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="sortByDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">Ordina per</a>
-                <div class="dropdown-menu" aria-labelledby="sortByDropdown">
-                  <a id="linkSortByDate" class="dropdown-item" href="#" th:text="#{class_navbar_sort_date}">Data</a>
-                  <a id="linkSortByName" class="dropdown-item" href="#" th:text="#{class_navbar_sort_name}">Nome</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="filterDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="#{class_navbar_filter}">Filtra per difficoltà</a>
+                            <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                                <a id="linkFilterDifficultyEasy" class="dropdown-item" href="#" th:text="#{difficulty_easy}">Facile</a>
+                                <a id="linkFilterDifficultyMedium" class="dropdown-item" href="#" th:text="#{difficulty_medium}">Medio</a>
+                                <a id="linkFilterDifficultyHard" class="dropdown-item" href="#" th:text="#{difficulty_hard}">Difficile</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a id="navGuidelinesUpload" class="nav-link" href="#" th:text="#{guidelines_navbar_add}">Aggiungi</a>
+                        </li>
+                    </ul>
+                    <form id="searchForm" class="form-inline my-2 my-lg-0">
+                        <input id="searchInput" autocomplete="off" class="form-control mr-sm-2" type="search" th:placeholder="#{search_placeholder}">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" th:text="#{search}">Cerca</button>
+                    </form>
                 </div>
-              </li>
+            </div>
+        </nav>
 
-              <!-- Filtra per -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="filterDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">Filtra per difficoltà</a>
-                <div class="dropdown-menu" aria-labelledby="filterDropdown">
-                  <a id="linkFilterDifficultyEasy" class="dropdown-item" href="#" th:text="#{difficulty_beginner}">Facile</a>
-                  <a id="linkFilterDifficultyMedium" class="dropdown-item" href="#" th:text="#{difficulty_intermediate}">Medio</a>
-                  <a id="linkFilterDifficultyHard" class="dropdown-item" href="#" th:text="#{difficulty_advanced}">Difficile</a>
+        <details th:each="classUT : ${classes}" class="mb-3 shadow-sm bg-light p-2 rounded">
+            <summary class="bg-success text-white font-weight-bold p-3 rounded" style="cursor: pointer; outline: none;">
+                <span th:text="${classUT.name}">Nome Classe</span>
+            </summary>
+            <div class="mt-2">
+                <p>
+                    <span th:each="cat : ${classUT.categories}" class="badge badge-success mr-1" th:text="${cat.name}"></span>
+                    &emsp;&emsp;
+                    <small class="date text-success" th:if="${classUT.difficulty != null}" th:text="${#messages.msg('difficulty_' + classUT.difficulty.name().toLowerCase())}"></small>
+                    <span class="date text-muted ml-2" th:text="${classUT.date}"></span>
+                </p>
+                <p><small class="date text-muted" th:text="${classUT.description}"></small></p>
+                <p>
+                    <button type="button" th:data-name="${classUT.name}" onclick="deleteClassUT(this.getAttribute('data-name'))" class="btn btn-icon btn-danger" title="Elimina Classe">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                    <button type="button" th:data-name="${classUT.name}" onclick="downloadClassUT(this.getAttribute('data-name'))" class="btn btn-success btn-sm">
+                        <i class="fa fa-download"></i>
+                        <span th:text="#{class_download}">Download Classe</span>
+                    </button>
+                    <input type="file" th:id="|uploadInput_${classUT.name}|" style="display: none;" accept=".json" th:data-name="${classUT.name}" onchange="handleSuggestionUpload(this, this.getAttribute('data-name'))"/>
+                    <label th:for="|uploadInput_${classUT.name}|" class="btn btn-primary btn-sm mb-0">
+                        <i class="fa fa-upload"></i>
+                        <span th:text="#{suggestionsUpload}">Upload</span>
+                    </label>
+
+                    <button type="button"
+                            th:id="|btnDownload_${classUT.name}|"
+                            th:data-name="${classUT.name}"
+                            onclick="downloadSuggestions(this.getAttribute('data-name'))"
+                            class="btn btn-success btn-sm mb-0"
+                            title="Scarica Suggerimenti"
+                            th:style="${classUT.suggestions == null || classUT.suggestions.isEmpty()} ? 'display: none;' : 'display: inline-block;'">
+                        <i class="fa fa-download"></i>
+                        <span th:text="#{suggestionsDownload}">Download</span>
+                    </button>
+                </p>
+
+                <details th:id="|suggestions-container_${classUT.name}|" class="mt-3"
+                         th:style="${classUT.suggestions == null || classUT.suggestions.isEmpty()} ? 'display: none;' : 'display: block;'">
+
+                    <summary class="bg-success text-white font-weight-bold p-2 rounded" style="cursor: pointer; outline: none" th:text="#{suggestionsTitle}">Suggerimenti</summary>
+                    <ul th:id="|suggestions-list_${classUT.name}|" class="list-group list-group-flush mt-2">
+                        <li th:each="suggestion : ${classUT.suggestions}" class="list-group-item d-flex justify-content-between align-items-start bg-transparent border-bottom">
+                            <div class="w-100">
+                                <div class="d-flex align-items-center mb-1">
+                                    <span th:text="${suggestion.order}" class="font-weight-bold mr-2"></span>
+                                    <span th:if="${suggestion.level != null}" th:text="${suggestion.level}" th:classappend="${suggestion.level.name() == 'LOW' ? 'badge-success' : (suggestion.level.name() == 'MEDIUM' ? 'badge-warning' : 'badge-danger')}" class="badge mr-2"></span>
+                                    <small class="text-muted" th:text="${#temporals.format(suggestion.date, 'yyyy-MM-dd')}"></small>
+                                </div>
+                                <div th:text="${suggestion.hint}" class="text-dark mb-1"></div>
+                                <div th:if="${suggestion.image != null}" class="mt-2 position-relative" style="display: inline-block;">
+
+                                    <img th:src="@{'/t1/images/' + ${suggestion.image}}"
+                                         class="img-fluid rounded border"
+                                         style="max-height: 200px; max-width: 100%;"
+                                         alt="Immagine suggerimento" />
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger position-absolute"
+                                            style="top: 0; right: 0;"
+                                            th:data-classname="${classUT.name}"
+                                            th:data-order="${suggestion.order}"
+                                            onclick="deleteSuggestionImage(this.getAttribute('data-classname'), this.getAttribute('data-order'))">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column ml-3">
+                                <label class="btn btn-sm btn-outline-primary mb-1" title="Carica Immagine" style="cursor:pointer;">
+                                    <i class="fa fa-camera"></i>
+                                    <input type="file" style="display: none;" accept="image/*" th:data-classname="${classUT.name}" th:data-order="${suggestion.order}" onchange="uploadSuggestionImage(this, this.getAttribute('data-classname'), this.getAttribute('data-order'))" />
+                                </label>
+                                <button type="button" class="btn btn-sm btn-outline-danger" th:data-classname="${classUT.name}" th:data-order="${suggestion.order}" onclick="deleteSuggestion(this.getAttribute('data-classname'), this.getAttribute('data-order'))">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </details>
+            </div>
+        </details>
+
+        <div class="modal fade" id="genericMessageModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="genericModalTitle">Avviso</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="genericModalBody">...</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                    </div>
                 </div>
-              </li>
-            </ul>
-          </ul>
-
-          <!-- Form di ricerca -->
-          <form id="searchForm" class="form-inline my-2 my-lg-0">
-            <input id="searchInput" class="form-control mr-sm-2" type="search" name="search" placeholder="Search"
-                   aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" th:text="#{search}">Cerca</button>
-          </form>
+            </div>
         </div>
-      </div>
-    </nav>
-
-    <br>
-
-    <!-- Container classi -->
-    <details th:each="class : ${classUTs}">
-      <summary th:text="${class.name}"></summary>
-      <p>
-        <span class="badge badge-info" th:text="${class.category[0]}"></span>
-        <span class="badge badge-info" th:text="${class.category[1]}"></span>
-        <span class="badge badge-info" th:text="${class.category[2]}"></span>
-        &emsp;&emsp;&emsp;&emsp;
-        <small class="date text-success" th:text="#{${'difficulty_' + class.difficulty.toLowerCase()}}"></small>
-        <span class="date text-muted" th:text="${class.date}"></span>
-      </p>
-      <p><small class="date text-muted" th:text="${class.description}"></small></p>
-      <p>
-        <button type="button"
-                th:attr="onclick=|deleteClassUT('${class.name}')|"
-                class="btn btn-icon btn-danger">
-          <i class="fa fa-trash"></i>
-        </button>
-        <button type="button"
-                th:attr="onclick=|downloadClassUT('${class.name}')|"
-                class="btn btn-success btn-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-               class="bi bi-arrow-down-circle" viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-                  d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
-          </svg>
-          Download
-        </button>
-      </p>
-    </details>
-
-
-    <!-- Script -->
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script th:src="@{/t1/js/utils/endpoints.js}"></script>
-    <script th:src="@{/t1/js/utils/api.js}"></script>
-    <script th:src="@{/t1/js/utils/cookie_util.js}"></script>
-    <script th:src="@{/t1/js/utils/renderErrors.js}"></script>
-
-    <script th:src="@{/t1/js/opponents/opponents_main.js}"></script>
-
-    <script th:inline="javascript">
-        const errors = {
-            notHandled: /*[[#{error.nothandled}]]*/ "Si è verificato un errore, riprova più tardi"
-        };
-    </script>
-  </div>
+    </div>
 </div>
-</body>
 
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/t1/js/utils/endpoints.js}"></script>
+<script th:src="@{/t1/js/utils/api.js}"></script>
+<script th:src="@{/t1/js/opponents/opponents_main.js}"></script>
+<script th:src="@{/t1/js/opponents/suggestions.js}"></script>
+
+<script th:inline="javascript">
+    const translations = {
+        titles: {
+            alert: /*[[#{titles.alert}]]*/ "Avviso",
+            error: /*[[#{titles.error}]]*/ "Errore",
+            success: /*[[#{titles.success}]]*/ "Successo"
+        },
+        errors: {
+            notHandled: /*[[#{error.nothandled}]]*/ "Errore generico",
+            fetchSuggestions: /*[[#{error.fetch_suggestions}]]*/ "Impossibile recuperare i suggerimenti.",
+            deleteSuggestion: /*[[#{error.delete_suggestion}]]*/ "Impossibile eliminare il suggerimento.",
+            readFile: /*[[#{error.read_file}]]*/ "Impossibile leggere il file."
+        },
+        suggestions: {
+            suggestionsUpload: /*[[#{suggestionsUpload}]]*/ "Upload Suggerimenti",
+            suggestionsTitle: /*[[#{suggestionsTitle}]]*/ "Suggerimenti",
+            suggestionsDelete: /*[[#{suggestionsDelete}]]*/ "Elimina Suggerimenti",
+            suggestionsUploadSuccess: /*[[#{suggestionsUploadSuccess}]]*/ "Suggerimenti per {0} caricati con successo"
+        },
+    };
+
+</script>
+</body>
 </html>

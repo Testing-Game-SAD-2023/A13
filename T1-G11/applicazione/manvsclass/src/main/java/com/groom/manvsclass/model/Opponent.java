@@ -1,44 +1,57 @@
 package com.groom.manvsclass.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.groom.manvsclass.model.ClassUT;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import javax.persistence.Id;
-import java.time.Instant;
+import java.time.LocalDate;
 
-@Document(collection = "opponents")
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Column;
+
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
+@Table(name = "opponents")
 public class Opponent {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @CreatedDate
-    private Instant createdAt;
+    private LocalDate date;
+    private String type;
 
-    @Indexed
-    private String classUT;
-
-    @Indexed
-    private OpponentDifficulty opponentDifficulty;
-
-    @Indexed
-    private String opponentType;
-
+    @Column(columnDefinition="TEXT")
     private String coverage;
 
-    private JacocoScore jacocoScore;
-    private EvosuiteScore evosuiteScore;
+    // @Enumerated(EnumType.STRING)
+    // private OpponentDifficulty opponentDifficulty;
 
+    @ManyToOne
+    @JoinColumn(name = "class_name", referencedColumnName = "name")
+    private ClassUT classUT;
+
+    @Embedded
+    private JacocoScore jacocoScore;
+
+    @Embedded
+    private EvosuiteScore evosuiteScore;
 }

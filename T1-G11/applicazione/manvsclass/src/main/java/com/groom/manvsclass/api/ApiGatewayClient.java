@@ -1,7 +1,7 @@
 package com.groom.manvsclass.api;
 
-import com.groom.manvsclass.model.dto.OpponentDTO;
-import com.groom.manvsclass.model.dto.RequestEvosuiteCoverageDTO;
+import com.groom.manvsclass.dto.OpponentDTO;
+import com.groom.manvsclass.dto.RequestEvosuiteCoverageDTO;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -24,24 +24,25 @@ import testrobotchallenge.commons.models.dto.score.JacocoCoverageDTO;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 
-import javax.annotation.PostConstruct;
+import com.groom.manvsclass.security.JwtRequestContext;
+
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-/**
- * ApiGatewayClient contiene tutte le chiamate API di T1 verso gli altri microservizi del sistema.
- */
 @Component
 public class ApiGatewayClient {
 
     private final RestExchangeTemplateHelper exchangeHelper;
     private final Logger logger = LoggerFactory.getLogger(ApiGatewayClient.class);
+
     @Value("${API_GATEWAY_ENDPOINT:api-gateway_controller}")
     private String apiGatewayHost;
     @Value("${API_GATEWAY_PORT:8090}")
     private int apiGatewayPort;
+
     private String userServiceUrl;
     private String jacocoCoverageServiceUrl;
     private String evosuiteCoverageServiceUrl;
@@ -59,31 +60,24 @@ public class ApiGatewayClient {
         logger.info("API Gateway Base URL: {}", baseUrl);
     }
 
-    /**
-     * Valida il token JWT ricevuto nell'header della richiesta utente contattando T23
-     */
     public JwtValidationResponseDTO callValidateJwtToken(String jwtToken) {
-        ResponseEntity<JwtValidationResponseDTO> response = exchangeHelper.exchange(userServiceUrl + "/auth/validateToken?jwt=" + jwtToken,
+        ResponseEntity<JwtValidationResponseDTO> response = exchangeHelper.exchange(
+                userServiceUrl + "/auth/validateToken?jwt=" + jwtToken,
                 null, HttpMethod.POST, null, null, JwtValidationResponseDTO.class);
-        if (response == null || response.getBody() == null)
-            return null;
 
-        return response.getBody();
+        return (response == null) ? null : response.getBody();
     }
 
-    /**
-     * Richiede un nuovo jwt token usando il refresh token presente nell'header della richiesta utente contattando T23.
-     */
     public String callRefreshJwtToken(String refreshToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.COOKIE, "jwt-refresh=" + refreshToken);
 
-        ResponseEntity<String> response = exchangeHelper.exchange(userServiceUrl + "/auth/refreshToken",
+        ResponseEntity<String> response = exchangeHelper.exchange(
+                userServiceUrl + "/auth/refreshToken",
                 null, HttpMethod.POST, headers, null, String.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
             List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-
             if (cookies != null) {
                 for (String cookie : cookies) {
                     if (cookie.startsWith("jwt=")) {
@@ -92,110 +86,114 @@ public class ApiGatewayClient {
                 }
             }
         }
-
         throw new RuntimeException("Invalid refresh token");
     }
 
-    public void callAddNewOpponent(String classUT, GameMode gameMode, String type, OpponentDifficulty difficulty) {
+    public void callAddNewOpponent(String className, GameMode gameMode, String opponentType, OpponentDifficulty opponentDifficulty) {
         OpponentDTO requestBody = new OpponentDTO();
-        requestBody.setClassUT(classUT);
+        requestBody.setClassUT(className);
         requestBody.setGameMode(gameMode);
-        requestBody.setType(type);
-        requestBody.setDifficulty(difficulty);
+        requestBody.setType(opponentType);
+        requestBody.setDifficulty(opponentDifficulty);
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) throw new RuntimeException("Auth token is missing from context");
 
         HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.COOKIE, "jwt=" + jwt);
 
-        ResponseEntity<String> response = exchangeHelper.exchange(userServiceUrl + "/opponents",
+        ResponseEntity<String> response = exchangeHelper.exchange(
+                userServiceUrl + "/opponents",
                 null, HttpMethod.POST, headers, requestBody, String.class);
 
         if (response.getStatusCode().isError())
             throw new RuntimeException("Error adding new opponent");
-
     }
 
-    public void callDeleteAllClassUTOpponents(String classUT) {
-        ResponseEntity<String> response = exchangeHelper.exchange(userServiceUrl + "/opponents/" + classUT,
-                null, HttpMethod.DELETE, null, null, String.class);
+    public void callDeleteAllClassUTOpponents(String className) {
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) throw new RuntimeException("Auth token is missing from context");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.COOKIE, "jwt=" + jwt);
+
+        ResponseEntity<String> response = exchangeHelper.exchange(
+                userServiceUrl + "/opponents/" + className,
+                null, HttpMethod.DELETE, headers, null, String.class);
 
         if (response.getStatusCode().isError())
             throw new RuntimeException("Error deleting opponents");
-
     }
 
-    public EvosuiteCoverageDTO callGenerateMissingEvoSuiteCoverage(String classUTName, String classUTPackageName, File zip) {
+    public EvosuiteCoverageDTO callGenerateMissingEvoSuiteCoverage(String classUTName, String classUTPackage, File zip) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) throw new RuntimeException("Auth token is missing from context");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.COOKIE, "jwt=" + jwt);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("request", new RequestEvosuiteCoverageDTO(classUTName, classUTPackageName));
+        builder.part("request", new RequestEvosuiteCoverageDTO(classUTName, classUTPackage));
         builder.part("project", new FileSystemResource(zip));
 
-        MultiValueMap<String, HttpEntity<?>> requestBody = builder.build();
-
-        ResponseEntity<EvosuiteCoverageDTO> response = exchangeHelper.exchange(evosuiteCoverageServiceUrl + "/coverage/opponent",
-                null, HttpMethod.POST, null, requestBody, EvosuiteCoverageDTO.class);
+        ResponseEntity<EvosuiteCoverageDTO> response = exchangeHelper.exchange(
+                evosuiteCoverageServiceUrl + "/coverage/opponent",
+                null, HttpMethod.POST, headers, builder.build(), EvosuiteCoverageDTO.class);
 
         if (response.getStatusCode().isError())
             throw new RuntimeException("Error generating evosuite coverage");
 
-        EvosuiteCoverageDTO responseBody = response.getBody();
-        logger.info("responseBody: {}", responseBody);
-
-        return responseBody;
+        return response.getBody();
     }
 
     public JacocoCoverageDTO callGenerateMissingJacocoCoverage(File zip) {
-        FileSystemResource fileResource = new FileSystemResource(zip);
 
-        MultiValueMap<String, Object> reqBody = new LinkedMultiValueMap<>();
-        reqBody.add("project", fileResource);
+        String jwt = JwtRequestContext.getJwtToken();
+        if (jwt == null) throw new RuntimeException("Auth token is missing from context");
 
         HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.COOKIE, "jwt=" + jwt);
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        ResponseEntity<JacocoCoverageDTO> response = exchangeHelper.exchange(jacocoCoverageServiceUrl + "/coverage/opponent",
+        MultiValueMap<String, Object> reqBody = new LinkedMultiValueMap<>();
+        reqBody.add("project", new FileSystemResource(zip));
+
+        ResponseEntity<JacocoCoverageDTO> response = exchangeHelper.exchange(
+                jacocoCoverageServiceUrl + "/coverage/opponent",
                 null, HttpMethod.POST, headers, reqBody, JacocoCoverageDTO.class);
 
         if (response.getStatusCode().isError())
             throw new RuntimeException("Error generating jacoco coverage");
 
-        JacocoCoverageDTO responseBody = response.getBody();
-        logger.info("responseBody: {}", responseBody);
-        return responseBody;
+        return response.getBody();
     }
 
-    public HttpResponse callOttieniStudentiDettagli(List<String> studentiIds, String jwt) throws IOException {
+    public HttpResponse callOttieniStudentiDettagli(List<String> studentiIds) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-            // 2. Prepara il corpo JSON
-            logger.info("Preparazione del corpo JSON...");
-            JSONArray studentiArray = new JSONArray(studentiIds); // Crea un array JSON direttamente
-            StringEntity entity = new StringEntity(studentiArray.toString(), StandardCharsets.UTF_8); // Corpo JSON come array
-            logger.info("Corpo JSON preparato: {}", studentiArray);
+            JSONArray studentiArray = new JSONArray(studentiIds);
+            StringEntity entity = new StringEntity(studentiArray.toString(), StandardCharsets.UTF_8);
 
-            // 3. Configura la richiesta HTTP POST
-            logger.info("Configurazione della richiesta HTTP POST...");
+            String jwt = JwtRequestContext.getJwtToken();
+            HttpPost post = new HttpPost(userServiceUrl + "/student/studentsByIds");
+            post.setHeader("Cookie", "jwt=" + jwt);
+            post.setHeader("Content-Type", "application/json");
+            post.setEntity(entity);
 
-            HttpPost httpPost = new HttpPost(userServiceUrl + "/student/studentsByIds");
-
-            httpPost.setHeader("Authorization", "Bearer " + jwt);
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(entity);
-
-            // 4. Esegui la richiesta
-            logger.info("Esecuzione della richiesta...");
-
-            return httpClient.execute(httpPost);
+            return httpClient.execute(post);
         }
     }
 
     public ResponseEntity<String> callSendNotification(MultiValueMap<String, String> params) {
-        // Headers della richiesta
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        // Crea la richiesta HTTP
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.exchange(userServiceUrl + "/new_notification", HttpMethod.POST, entity, String.class);
+        RestTemplate rest = new RestTemplate();
+        return rest.exchange(userServiceUrl + "/new_notification", HttpMethod.POST, entity, String.class);
     }
-
 }
+

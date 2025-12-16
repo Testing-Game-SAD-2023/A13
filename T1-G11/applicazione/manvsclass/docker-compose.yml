@@ -8,13 +8,15 @@ services:
     expose:
       - 8081
     environment:
-      MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
-      MONGODB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     depends_on:
-      - mongo_db
+      mysql_db:
+        condition: service_healthy
     volumes:
       - ./FilesUpload:/Files-Upload
       - VolumeT0:/VolumeT0
@@ -26,17 +28,26 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  mongo_db:
-    image: "mongo:6.0.6"
-    container_name: t1-mongo_db
+  mysql_db:
+    image: mysql:8.0
+    container_name: t1-mysql_db
     restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     expose:
-      - "27017:27017"
+      - "3306"
     volumes:
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-      - mongodb_data_volume:/data/db
+      - mysql_data_volume:/var/lib/mysql
     networks:
       - global-network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "${MYSQL_USER}", "--password=${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   global-network:
@@ -45,4 +56,5 @@ networks:
 volumes:
   VolumeT0:
     external: true
-  mongodb_data_volume:
+  mysql_data_volume:
+  t1_images_volume:

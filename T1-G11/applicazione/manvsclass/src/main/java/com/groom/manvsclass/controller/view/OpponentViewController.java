@@ -1,8 +1,8 @@
 package com.groom.manvsclass.controller.view;
 
 import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.repository.ClassRepository;
 import com.groom.manvsclass.service.OpponentService;
+import com.groom.manvsclass.service.ClassUTService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,14 +18,14 @@ import java.util.List;
 @Controller
 @RequestMapping("/opponents")
 public class OpponentViewController {
-    private final ClassRepository classRepository;
     private final OpponentService opponentService;
+    private final ClassUTService classUTService;
     private final Logger logger = LoggerFactory.getLogger(OpponentViewController.class);
 
 
-    public OpponentViewController(ClassRepository classRepository, OpponentService opponentService) {
-        this.classRepository = classRepository;
+    public OpponentViewController(OpponentService opponentService, ClassUTService classUTService) {
         this.opponentService = opponentService;
+        this.classUTService = classUTService;
     }
 
     @GetMapping("/main")
@@ -37,15 +37,15 @@ public class OpponentViewController {
         List<ClassUT> classUTList;
 
         if (filterByDifficulty != null && !filterByDifficulty.isBlank()) {
-            classUTList = opponentService.filterByDifficulty(filterByDifficulty);
+            classUTList = classUTService.filterByDifficulty(filterByDifficulty);
         } else if (sortBy != null && !sortBy.isBlank()) {
             classUTList = switch (sortBy) {
-                case "Date" -> opponentService.orderByDate();
-                case "Name" -> opponentService.orderByName();
-                default -> classRepository.findAll();
+                case "Date" -> classUTService.orderByDate();
+                case "Name" -> classUTService.orderByName();
+                default -> classUTService.getClassUTs();
             };
         } else {
-            classUTList = classRepository.findAll();
+            classUTList = classUTService.getClassUTs();
         }
 
         // Applichiamo la ricerca testuale
@@ -58,7 +58,7 @@ public class OpponentViewController {
 
         logger.info("[opponents/opponents_main] classUTs found: {}", classUTList);
         ModelAndView view = new ModelAndView("opponents/opponents_main");
-        view.addObject("classUTs", classUTList);
+        view.addObject("classes", classUTList);
         return view;
     }
 

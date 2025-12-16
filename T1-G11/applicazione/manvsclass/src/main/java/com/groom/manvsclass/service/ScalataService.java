@@ -1,69 +1,138 @@
-/*MODIFICA (5/11/2024) - Refactoring task T1
- * ScalataService ora si occupa di implementare i servizi relativi alla modalità scalata
- */
 package com.groom.manvsclass.service;
 
+import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.Scalata;
-import com.groom.manvsclass.model.repository.ScalataRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.groom.manvsclass.model.ClassUT;
+import com.groom.manvsclass.model.ClassUTScalata;
+import com.groom.manvsclass.model.ClassUTScalataId;
+import com.groom.manvsclass.dto.ClassUTScalataDTO;
+import com.groom.manvsclass.dto.ScalataDTO;
+import com.groom.manvsclass.repository.ScalataRepository;
+import com.groom.manvsclass.repository.AdminRepository;
+import com.groom.manvsclass.repository.ClassUTRepository;
+import com.groom.manvsclass.mapper.ScalataMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.groom.manvsclass.exception.NotFoundException;
+import com.groom.manvsclass.exception.ForbiddenException;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.time.LocalDate;
 
 @Service
 public class ScalataService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ScalataService.class);
     @Autowired
-    private ScalataRepository scalata_repo;
+    private ScalataRepository scalataRepository;
     @Autowired
-    private JwtService jwtService;
+    private AdminRepository adminRepository;
+    @Autowired
+    private ClassUTRepository classUTRepository;
+    @Autowired
+    private ScalataMapper scalataMapper;
 
-    public ResponseEntity<?> uploadScalata(Scalata scalata, String jwt) {
-        if (!jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /configureScalata) Attenzione, non sei loggato!");
+    @Transactional
+    public void uploadScalata(ScalataDTO scalataDTO, String adminEmail) {
+
+        Scalata newScalata = scalataMapper.toEntity(scalataDTO);
+
+        Optional<Admin> adminOpt = adminRepository.findById(adminEmail);
+        if (adminOpt.isEmpty()) {
+            throw new NotFoundException("Admin " + adminEmail + " non trovato.");
+        }
+        newScalata.setAdmin(adminOpt.get());
+
+        List<ClassUTScalataDTO> classUTScalataDTOs = scalataDTO.getClassUTScalataDTOs();
+
+        List<ClassUTScalata> associations = new ArrayList<>();
+
+        for (ClassUTScalataDTO classUTScalataDTO : classUTScalataDTOs) {
+
+            Optional<ClassUT> classUTOpt = classUTRepository.findById(classUTScalataDTO.getClassName());
+            if (classUTOpt.isEmpty()) {
+                throw new NotFoundException("Classe " +  classUTScalataDTO.getClassName() + " non trovata.");
+            }
+
+            ClassUTScalata association = scalataMapper.toAssociation(classUTScalataDTO, newScalata, classUTOpt.get());
+
+            associations.add(association);
         }
 
-        Scalata new_scalata = new Scalata();
-        new_scalata.setUsername(scalata.getUsername());
-        new_scalata.setScalataName(scalata.getScalataName());
-        new_scalata.setScalataDescription(scalata.getScalataDescription());
-        new_scalata.setNumberOfRounds(scalata.getNumberOfRounds());
-        new_scalata.setSelectedClasses(scalata.getSelectedClasses());
+        newScalata.setAssociations(associations);
+        newScalata.setNumLevels(associations.size());
 
-        scalata_repo.save(new_scalata);
-        return ResponseEntity.ok().body(new_scalata);
+        scalataRepository.save(newScalata);
     }
 
-    public ResponseEntity<?> listScalate() {
-        List<Scalata> scalate = scalata_repo.findAll();
-        return new ResponseEntity<>(scalate, HttpStatus.OK);
-    }
+    public void deleteScalataByName(String scalataName, String adminEmail) {
 
-    public ResponseEntity<?> deleteScalataByName(String scalataName, String jwt) {
-        if (!jwtService.isJwtValid(jwt)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(DELETE /delete_scalata/{scalataName}) Attenzione, non sei loggato!");
+        Optional<Scalata> scalataOpt = scalataRepository.findById(scalataName);
+        if(scalataOpt.isEmpty()) {
+            throw new NotFoundException("Scalata con nome: " + scalataName + " non trovata");
         }
 
-        List<Scalata> scalata = scalata_repo.findByScalataNameContaining(scalataName);
-        if (scalata.isEmpty()) {
-            return new ResponseEntity<>("Scalata con nome: " + scalataName + " non trovata", HttpStatus.NOT_FOUND);
-        } else {
-            scalata_repo.delete(scalata.get(0));
-            return new ResponseEntity<>("Scalata con nome: " + scalataName + " rimossa", HttpStatus.OK);
+        Scalata scalataToDelete = scalataOpt.get();
+
+        if(!scalataToDelete.getAdmin().getEmail().equals(adminEmail)) {
+            throw new ForbiddenException("L'admin " + adminEmail + " non ha i permessi per eliminare la scalata.");
         }
+
+        scalataRepository.delete(scalataToDelete);
     }
 
-    public ResponseEntity<?> retrieveScalataByName(String scalataName) {
-        List<Scalata> scalata = scalata_repo.findByScalataNameContaining(scalataName);
-        if (scalata.isEmpty()) {
-            return new ResponseEntity<>("Scalata with name: " + scalataName + " not found", HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(scalata, HttpStatus.OK);
+    @Transactional
+    public ScalataDTO findScalataByName(String scalataName) {
+
+        Optional<Scalata> scalataOpt = scalataRepository.findById(scalataName);
+        if (scalataOpt.isEmpty()) {
+            throw new NotFoundException("Scalata con nome: " + scalataName + " non trovata.");
         }
+
+        Scalata scalataToFind = scalataOpt.get();
+        List<ClassUTScalata> associations = scalataToFind.getAssociations();
+
+        List<ClassUTScalataDTO> classUTScalataDTOList = new ArrayList<>();
+        for (ClassUTScalata association : associations) {
+
+            ClassUTScalataDTO classUTScalataDTO = new ClassUTScalataDTO();
+            classUTScalataDTO.setClassName(association.getClassUT().getName());
+            classUTScalataDTO.setLevel(association.getLevel());
+            classUTScalataDTO.setTimeLimit(association.getTimeLimit());
+
+            classUTScalataDTOList.add(classUTScalataDTO);
+        }
+
+        ScalataDTO scalataDTO = new ScalataDTO();
+        scalataDTO.setScalataName(scalataName);
+        scalataDTO.setDescription(scalataToFind.getDescription());
+        scalataDTO.setClassUTScalataDTOs(classUTScalataDTOList);
+
+        return scalataDTO;
     }
+
+    public List<ScalataDTO> listScalate() {
+
+        List<ScalataDTO> scalataDTOList = new ArrayList<>();
+
+        List<Scalata> scalataList = scalataRepository.findAll();
+        for (Scalata scalata : scalataList) {
+
+            try {
+
+                ScalataDTO scalataDTO = findScalataByName(scalata.getName());
+                scalataDTOList.add(scalataDTO);
+
+            } catch (NotFoundException e) {
+
+            }
+        }
+
+        return scalataDTOList;
+    }
+
 }

@@ -13,11 +13,15 @@ import org.springframework.web.util.WebUtils;
 import testrobotchallenge.commons.models.dto.auth.JwtValidationResponseDTO;
 import testrobotchallenge.commons.models.user.Role;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.groom.manvsclass.model.Admin;
+import com.groom.manvsclass.repository.AdminRepository;
+import com.groom.manvsclass.service.JwtService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -30,19 +34,23 @@ import static testrobotchallenge.commons.models.user.Role.PLAYER;
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    private static final Logger customLogger = LoggerFactory.getLogger(AuthTokenFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthTokenFilter.class);
+
     private static final List<String> PLAYER_ALLOWED_URIS = List.of(
             "/opponents/**",
             "/ottieniTeamByStudentId",
             "/ottieniDettagliTeamCompleto"
     );
+
     private final ApiGatewayClient apiGatewayClient;
+    private final AdminRepository adminRepository;
+    private final JwtService jwtService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        customLogger.info("[AuthTokenFilter] Authenticating request {} {}", request.getMethod(), request.getRequestURI());
+        log.info("[AuthTokenFilter] {} {}", request.getMethod(), request.getRequestURI());
 
         Cookie jwtCookie = WebUtils.getCookie(request, "jwt");
         Cookie refreshCookie = WebUtils.getCookie(request, "jwt-refresh");
@@ -51,33 +59,44 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         String refreshToken = refreshCookie != null ? refreshCookie.getValue() : null;
 
         try {
+            // 1️⃣ Nessun JWT presente → tenta refresh o reindirizza al login
             if (jwt == null) {
-                if (refreshCookie != null) {
-                    customLogger.info("JWT missing. Attempting to refresh using refresh token...");
+                if (refreshToken != null) {
+                    log.info("[AuthTokenFilter] JWT mancante, provo refresh...");
                     jwt = tryRefreshAndContinue(refreshToken, response);
-
-                    if (jwt == null)
-                        return;
+                    if (jwt == null) return;
                 } else {
-                    customLogger.info("JWT and refresh token missing. Redirecting to login.");
+                    log.warn("[AuthTokenFilter] Nessun JWT e nessun refresh token → redirect al login");
                     redirectToLogin(response, "unauthorized");
                     return;
                 }
             }
 
+            // 2️⃣ Chiamata remota al servizio di validazione centralizzato
             JwtValidationResponseDTO validation = apiGatewayClient.callValidateJwtToken(jwt);
-            Role role = resolveRole(request, validation);
 
-            if (role == null) {
-                customLogger.info("[AuthTokenFilter] Invalid token or insufficient permissions.");
+            Role resolvedRole = resolveRole(request, validation);
+            if (resolvedRole == null) {
+                log.warn("[AuthTokenFilter] Token non valido o permessi insufficienti");
                 redirectToLogin(response, "unauthorized");
                 return;
             }
 
-            customLogger.info("[AuthTokenFilter] Validated token for role {}", role);
-            if (ADMIN.equals(role)) {
-                JwtRequestContext.setJwtToken("%s=%s".formatted(jwtCookie.getName(), jwt));
-                customLogger.debug("[AuthTokenFilter] JWT saved in thread context");
+            // 3️⃣ Solo se ADMIN → salva token nel contesto per uso nei service successivi
+            if (ADMIN.equals(resolvedRole)) {
+                JwtRequestContext.setJwtToken(jwt);
+                log.debug("[AuthTokenFilter] JWT salvato nel thread context (ADMIN)");
+
+                // SALVATAGGIO LOCALE
+                try {
+                    Admin adminFromToken = jwtService.getAdminFromJwt(jwt);
+                    if (adminFromToken != null && !adminRepository.existsById(adminFromToken.getEmail())) {
+                        adminRepository.save(adminFromToken);
+                        log.debug("Admin {} sincronizzato nel DB locale.", adminFromToken.getEmail());
+                    }
+                } catch (Exception e) {
+                    log.error("Impossibile salvare l'admin nel DB locale: {}", e.getMessage());
+                }
             }
 
             chain.doFilter(request, response);
@@ -87,11 +106,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Prova a rinnovare il JWT usando il refresh token.
+     */
     private String tryRefreshAndContinue(String refreshToken, HttpServletResponse response)
             throws IOException {
-
         try {
             Map<String, String> cookieAttrs = parseCookieAttributes(apiGatewayClient.callRefreshJwtToken(refreshToken));
+
             String newJwt = cookieAttrs.get("jwt");
             int maxAge = Integer.parseInt(cookieAttrs.getOrDefault("max-age", "3600"));
             String path = cookieAttrs.getOrDefault("path", "/");
@@ -100,28 +122,35 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     .path(path)
                     .maxAge(maxAge)
                     .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Strict")
                     .build();
 
             response.setHeader(HttpHeaders.SET_COOKIE, newJwtCookie.toString());
-            JwtRequestContext.setJwtToken(newJwtCookie.toString());
+            JwtRequestContext.setJwtToken(newJwt);
 
-            customLogger.info("JWT refreshed and saved in context. Proceeding with filter chain.");
+            log.info("[AuthTokenFilter] JWT rinnovato con successo, proseguo la catena");
             return newJwt;
 
         } catch (Exception ex) {
-            customLogger.warn("Refresh token failed: {}", ex.getMessage());
+            log.warn("[AuthTokenFilter] Refresh token fallito: {}", ex.getMessage());
             redirectToLogin(response, "expired");
             return null;
         }
     }
 
+    /**
+     * Reindirizza l'utente alla pagina di login con motivo specifico.
+     */
     private void redirectToLogin(HttpServletResponse response, String reason) throws IOException {
         response.sendRedirect("/admin/login?" + reason + "=true");
     }
 
+    /**
+     * Determina se l'utente ha accesso in base al ruolo e all'endpoint richiesto.
+     */
     private Role resolveRole(HttpServletRequest request, JwtValidationResponseDTO validation) {
-        if (validation == null || !validation.isValid())
-            return null;
+        if (validation == null || !validation.isValid()) return null;
 
         return switch (validation.getRole()) {
             case ADMIN -> ADMIN;
@@ -130,12 +159,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean isPlayerAccessAllowed(HttpServletRequest request) {
-        AntPathMatcher uriMatcher = new AntPathMatcher();
+        if (!"GET".equals(request.getMethod())) return false;
 
-        if (!request.getMethod().equals("GET"))
-            return false;
-
-        return PLAYER_ALLOWED_URIS.stream().anyMatch(allowedURI -> uriMatcher.match(allowedURI, request.getRequestURI()));
+        AntPathMatcher matcher = new AntPathMatcher();
+        return PLAYER_ALLOWED_URIS.stream()
+                .anyMatch(allowed -> matcher.match(allowed, request.getRequestURI()));
     }
 
     private Map<String, String> parseCookieAttributes(String setCookieHeader) {

@@ -27,12 +27,15 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class EmailService {
@@ -93,7 +96,7 @@ public class EmailService {
     @Async
     public ResponseEntity<String> sendTeamNewAssignment(List<String> idsStudents, Team team, Assignment assignment, String jwt) {
 
-        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(idsStudents, jwt);
+        ResponseEntity<?> dettagliStudentiResponse = studentService.ottieniStudentiDettagli(idsStudents);
         if (!HttpStatus.OK.equals(dettagliStudentiResponse.getStatusCode())) {
             return ResponseEntity.status(dettagliStudentiResponse.getStatusCode())
                     .body("Errore nel recupero delle informazioni sugli studenti: " + dettagliStudentiResponse.getBody());
@@ -108,7 +111,7 @@ public class EmailService {
         // 12. Invia email di notifica agli studenti aggiunti
 
         try {
-            sendTeamNewAssignment(emails, team.getName(), assignment.getDataScadenza(), assignment.getTitolo(), assignment.getDescrizione());
+            sendTeamNewAssignment(emails, team.getName(), assignment.getExpirationDate(), assignment.getTitle(), assignment.getDescription());
         } catch (MessagingException e) {
             System.out.println("Errore durante l'invio della email.");
         }
@@ -116,7 +119,7 @@ public class EmailService {
     }
 
     //Mail nuovo assignment agli studenti.
-    public void sendTeamNewAssignment(List<String> emails, String teamName, java.util.Date dataScadenza, String titoloAssignment, String descrizione) throws MessagingException {
+    public void sendTeamNewAssignment(List<String> emails, String teamName, LocalDate dataScadenza, String titoloAssignment, String descrizione) throws MessagingException {
         for (String email : emails) {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -128,7 +131,7 @@ public class EmailService {
             helper.setSubject("Nuovo assignment per il team: " + teamName);
 
             // Contenuto dell'email
-            String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(dataScadenza);
+            String formattedDate = dataScadenza.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             String body = "Ciao,\n\n" +
                     "Hai un nuovo assignment nel team: \"" + teamName + "\".\n\n" +
                     "Titolo Assignment: " + titoloAssignment + "\n" +

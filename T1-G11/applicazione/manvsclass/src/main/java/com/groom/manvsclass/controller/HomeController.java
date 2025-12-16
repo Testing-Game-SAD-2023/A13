@@ -22,75 +22,38 @@
 package com.groom.manvsclass.controller;
 
 import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.interaction;
+import com.groom.manvsclass.model.Interaction;
 import com.groom.manvsclass.service.AdminService;
-import com.groom.manvsclass.util.Util;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
 @CrossOrigin
-@Controller
+@RestController
 public class HomeController {
 
-    private final AdminService adminService;
-    private final Util utilsService;
-
-    public HomeController(AdminService adminService, Util utilsService) {
-        this.adminService = adminService;
-        this.utilsService = utilsService;
-    }
-
-    //Solo x testing
-    @GetMapping("/getLikes/{name}")
-
-    public ResponseEntity<Long> likes(@PathVariable String name) {
-        long likesCount = utilsService.likes(name);
-        return ResponseEntity.ok(likesCount);
-    }
-
-    @PostMapping("/newinteraction")
-    public ResponseEntity<interaction> uploadInteraction(@RequestBody interaction interazione) {
-        interaction savedInteraction = utilsService.uploadInteraction(interazione);
-        return ResponseEntity.ok(savedInteraction);
-    }
+    @Autowired
+    private AdminService adminService;
 
     @GetMapping("/Cfilterby/{category}")
-    public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
-        return adminService.filtraClassi(category, jwt);
+    public ResponseEntity<?> filtraClassi(@PathVariable String category) {
+
+        List<ClassUT> filteredClasses = adminService.filtraClassi(category);
+        return ResponseEntity.ok(filteredClasses);
     }
 
     @GetMapping("/Cfilterby/{text}/{category}")
-    public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
-        return adminService.filtraClassi(text, category, jwt);
+    public ResponseEntity<?> filtraClassi(@PathVariable String text, @PathVariable String category) {
+
+        List<ClassUT> filteredClasses = adminService.filtraClassi(text, category);
+        return ResponseEntity.ok(filteredClasses);
     }
 
-    @GetMapping("/interaction")
-    public List<interaction> elencaInt() {
-        return utilsService.elencaInt();
-    }
-
-    @GetMapping("/findReport")
-    public List<interaction> elencaReport() {
-        return utilsService.elencaReport();
-    }
-
-    @PostMapping("/newLike/{name}")
-    public String newLike(@PathVariable String name) {
-        return utilsService.newLike(name);
-    }
-
-    @PostMapping("/newReport/{name}")
-    public String newReport(@PathVariable String name, @RequestBody String commento) {
-        return utilsService.newReport(name, commento);
-    }
-
-    @PostMapping("/deleteint/{id}")
-    public interaction eliminaInteraction(@PathVariable int id) {
-        return utilsService.eliminaInteraction(id);
-    }
 }
 
 

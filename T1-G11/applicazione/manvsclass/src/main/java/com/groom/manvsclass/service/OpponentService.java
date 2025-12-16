@@ -1,43 +1,58 @@
 package com.groom.manvsclass.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import com.groom.manvsclass.api.ApiGatewayClient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
+import com.groom.manvsclass.dto.ClassUTDTO;
+import com.groom.manvsclass.model.Category;
 import com.groom.manvsclass.model.Operation;
+import com.groom.manvsclass.model.OperationType;
 import com.groom.manvsclass.model.Opponent;
-import com.groom.manvsclass.model.repository.ClassRepository;
-import com.groom.manvsclass.model.repository.OperationRepository;
-import com.groom.manvsclass.model.repository.OpponentRepository;
-import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
-import com.groom.manvsclass.service.exception.CoverageNotFoundException;
-import com.groom.manvsclass.service.exception.OpponentNotFoundException;
-import com.groom.manvsclass.service.exception.ScoreNotFoundException;
+import com.groom.manvsclass.service.ImageService;
+import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
+
+import com.groom.manvsclass.repository.AdminRepository;
+import com.groom.manvsclass.repository.ClassUTRepository;
+import com.groom.manvsclass.repository.OperationRepository;
+import com.groom.manvsclass.repository.OpponentRepository;
+
+import com.groom.manvsclass.exception.CoverageNotFoundException;
+import com.groom.manvsclass.exception.OpponentNotFoundException;
+import com.groom.manvsclass.exception.ScoreNotFoundException;
+
 import com.groom.manvsclass.util.filesystem.FileOperationUtil;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import javax.servlet.http.HttpServletRequest;
+import com.groom.manvsclass.exception.NotFoundException;
+import com.groom.manvsclass.exception.ForbiddenException;
+
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,174 +60,225 @@ import java.util.stream.Collectors;
 @Service
 public class OpponentService {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(String.valueOf(OpponentService.class));
-    private final OperationRepository operationRepository;
+    private static final Logger logger = LoggerFactory.getLogger(OpponentService.class);
+
     @Autowired
-    private final ClassRepository classRepository;
-    private final MongoTemplate mongoTemplate;
-    private final SearchRepositoryImpl searchRepository;
-    private final UploadOpponentService uploadOpponentService;
+    private OperationRepository operationRepository;
     @Autowired
-    private final OpponentRepository opponentRepository;
-    private final Admin userAdmin = new Admin("default", "default", "default", "default", "default");
-    private final ApiGatewayClient apiGatewayClient;
+    private ClassUTRepository classUTRepository;
+    @Autowired
+    private UploadOpponentService uploadOpponentService;
+    @Autowired
+    private OpponentRepository opponentRepository;
+    @Autowired
+    private AdminService adminService;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private AdminRepository adminRepository;
+    @Autowired
+    private ApiGatewayClient apiGatewayClient;
+    @Autowired
+    private ImageService imageService;
 
-    public OpponentService(OperationRepository operationRepository,
-                           ClassRepository classRepository,
-                           MongoTemplate mongoTemplate,
-                           SearchRepositoryImpl searchRepository,
-                           UploadOpponentService uploadOpponentService, OpponentRepository opponentRepository, ApiGatewayClient apiGatewayClient) {
-        this.operationRepository = operationRepository;
-        this.classRepository = classRepository;
-        this.mongoTemplate = mongoTemplate;
-        this.searchRepository = searchRepository;
-        this.uploadOpponentService = uploadOpponentService;
-        this.opponentRepository = opponentRepository;
-        this.apiGatewayClient = apiGatewayClient;
-    }
 
-    /*
-     * Restituisce la lista di classi UT disponibili nel sistema
-     */
-    public ResponseEntity<?> getNomiClassiUT(String jwt) {
-        // 2. Recupera tutte le ClassUT dal repository e restituisce solo i nomi
-        List<String> classNames = classRepository.findAll()
-                .stream()
-                .map(ClassUT::getName) // Estrae solo i nomi
-                .collect(Collectors.toList());
 
-        // 3. Ritorna i nomi delle classi con lo status HTTP 200 (OK)
-        return ResponseEntity.ok(classNames);
-    }
-
+    @Transactional
     public ResponseEntity<FileUploadResponse> uploadOpponent(
             MultipartFile classUTFile,
             String classUTDetails,
-            MultipartFile robotTestsZip) throws IOException {
+            MultipartFile robotTestsZip,
+            String adminEmail) throws IOException {
 
         FileUploadResponse response = new FileUploadResponse();
 
-        // Verifica che il file della classe sia stato ricevuto
         if (classUTFile == null || classUTFile.isEmpty()) {
             response.setErrorMessage("Errore: file della classe non ricevuto o vuoto.");
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Parsing dei dettagli della classe
-        ObjectMapper mapper = new ObjectMapper();
-        ClassUT classe = mapper.readValue(classUTDetails, ClassUT.class);
+        if (classUTDetails == null || classUTDetails.isBlank()) {
+            response.setErrorMessage("Errore: dettagli della classe mancanti.");
+            return ResponseEntity.badRequest().body(response);
+        }
 
-        // Nome del file e dimensione
-        String classUTFileName = StringUtils.cleanPath(Objects.requireNonNull(classUTFile.getOriginalFilename()));
-        long size = classUTFile.getSize();
+        ClassUTDTO classDTO;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            classDTO = mapper.readValue(classUTDetails, ClassUTDTO.class);
+        } catch (Exception e) {
+            response.setErrorMessage("Errore nel parsing dei dettagli della classe: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
 
-        System.out.println("Salvataggio di " + classUTFileName + " nel filesystem condiviso");
 
-        // Salvataggio del file della classe e robot associati
-        FileUploadUtil.saveCLassFile(classUTFileName, classe.getName(), classUTFile);
-        uploadOpponentService.saveOpponentsFromZip(classUTFileName, classe.getName(), classUTFile, robotTestsZip);
+        ClassUT classUT = new ClassUT();
+        classUT.setName(classDTO.getName());
+        classUT.setDifficulty(
+                OpponentDifficulty.valueOf(classDTO.getDifficulty().toUpperCase())
+        );
+        classUT.setDescription(classDTO.getDescription());
+        classUT.setDate(classDTO.getDate());
 
-        // Popola la risposta
-        response.setFileName(classUTFileName);
-        response.setSize(size);
-        response.setDownloadUri("/downloadFile");
+        List<Category> categoryEntities = new ArrayList<>();
 
-        // Imposta i metadati della classe
-        classe.setUri(String.format("%s/%s/%s/%s",
+        if (classDTO.getCategory() != null) {
+            for (String catName : classDTO.getCategory()) {
+                if (catName != null && !catName.trim().isEmpty()) {
+                    Category c = new Category();
+                    c.setName(catName.trim());
+                    categoryEntities.add(c);
+                }
+            }
+        }
+
+        classUT.setCategories(categoryEntities);
+
+        String classUTFileName = StringUtils.cleanPath(
+                Objects.requireNonNull(classUTFile.getOriginalFilename())
+        );
+
+        classUT.setUri(String.format("%s/%s/%s/%s",
                 UploadOpponentService.VOLUME_T0_BASE_PATH,
                 UploadOpponentService.UNMODIFIED_SRC,
-                classe.getName(),
+                classUT.getName(),
                 classUTFileName));
 
-        classe.setDate(LocalDate.now().toString());
+        classUTRepository.save(classUT);
 
-        classRepository.save(classe);
+        try {
+            uploadOpponentService.saveOpponentsFromZip(
+                    classUTFileName,
+                    classUT.getName(),
+                    classUTFile,
+                    robotTestsZip
+            );
+        } catch (Exception e) {
+            response.setErrorMessage("Errore durante l'elaborazione degli Opponents: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
 
-        System.out.println("Operazione completata con successo (uploadTest)");
+
+        try {
+            FileUploadUtil.saveCLassFile(classUTFileName, classUT.getName(), classUTFile);
+        } catch (Exception e) {
+            response.setErrorMessage("Errore nel salvataggio del file della classe: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+
+        response.setFileName(classUTFileName);
+        response.setSize(classUTFile.getSize());
+        response.setDownloadUri("/downloadFile/" + classUT.getName());
 
         return ResponseEntity.ok(response);
     }
 
 
-    public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
+    public ResponseEntity<?> downloadClasse(String className) {
 
-        System.out.println("/downloadFile/{name} (HomeController) - name: " + name);
-        System.out.println("test");
+        logger.info("Request /downloadFile/{{}}", className);
+        logger.debug("Inizio elaborazione downloadClasse per nome: {}", className);
+
+        Optional<ClassUT> classUTOpt = classUTRepository.findById(className);
+        if (!classUTOpt.isPresent()) {
+            logger.warn("Nessuna classe con nome {} trovata", className);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Nessuna classe con nome " + className + " trovata");
+        }
+
+        ClassUT classUT = classUTOpt.get();
+        logger.debug("Classe trovata: {}", classUT);
+        logger.debug("URI del file da scaricare: {}", classUT.getUri());
+
         try {
-            List<ClassUT> classe = searchRepository.findByText(name);
-            System.out.println("File download:");
-            System.out.println(classe.get(0).getUri());
-            ResponseEntity file = FileDownloadUtil.downloadClassFile(classe.get(0).getUri());
-            return file;
+            logger.debug("Chiamata a FileDownloadUtil.downloadClassFile con URI: {}", classUT.getUri());
+            ResponseEntity<?> fileResponse = FileDownloadUtil.downloadClassFile(classUT.getUri());
+            logger.info("Download completato con successo per il file: {}", classUT.getUri());
+            return fileResponse;
         } catch (Exception e) {
-            System.out.println("Classe UT non trovata");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ClasseUT " + name + " non trovata");
+            logger.error("Errore durante il download del file: {}", classUT.getUri(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Impossibile scaricare la classe " + className);
         }
     }
 
-    public List<ClassUT> getAllClassUTs() {
-        return classRepository.findAll();
-    }
 
-    public List<ClassUT> filterByDifficulty(String difficulty) {
-        return searchRepository.filterByDifficulty(difficulty);
-    }
 
-    public List<ClassUT> orderByDate() {
-        return searchRepository.orderByDate();
-    }
+    @Transactional
+    public ResponseEntity<String> modificaClasse(String className, ClassUT newContent, String adminEmail, HttpServletRequest request) {
 
-    public List<ClassUT> orderByName() {
-        return searchRepository.orderByName();
-    }
-
-    public ResponseEntity<String> modificaClasse(String name, ClassUT newContent, String jwt, HttpServletRequest request) {
-        System.out.println("Token valido, può aggiornare informazioni inerenti le classi (update/{name})");
-        Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(name));
-        Update update = new Update().set("name", newContent.getName())
-                .set("date", newContent.getDate())
-                .set("difficulty", newContent.getDifficulty())
-                .set("description", newContent.getDescription())
-                .set("category", newContent.getCategory());
-        long modifiedCount = mongoTemplate.updateFirst(query, update, ClassUT.class).getModifiedCount();
-
-        if (modifiedCount > 0) {
-            LocalDate currentDate = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String data = currentDate.format(formatter);
-            Operation operation1 = new Operation((int) operationRepository.count(), userAdmin.getUsername(), newContent.getName(), 1, data);
-            operationRepository.save(operation1);
-            return new ResponseEntity<>("Aggiornamento eseguito correttamente.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Nessuna classe trovata o nessuna modifica effettuata.", HttpStatus.NOT_FOUND);
+        Optional<ClassUT> classUTOpt = classUTRepository.findById(className);
+        if (!classUTOpt.isPresent()) {
+            return new ResponseEntity<>("Nessuna classe con nome " + className + " trovata", HttpStatus.NOT_FOUND);
         }
-    }
 
-    public ResponseEntity<?> eliminaClasse(String name) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(name));
-        eliminaFile(name);
-        LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String data = currentDate.format(formatter);
-        Operation operation1 = new Operation((int) operationRepository.count(), "userAdmin", name, 2, data);
-        operationRepository.save(operation1);
-        ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
-
-        Query query2 = new Query();
-        query2.addCriteria(Criteria.where("classUT").is(name));
-        mongoTemplate.findAndRemove(query, Opponent.class);
-
-        apiGatewayClient.callDeleteAllClassUTOpponents(name);
-        if (deletedClass != null) {
-            return ResponseEntity.ok().body(deletedClass);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
+        Optional<Admin> adminOpt = adminRepository.findById(adminEmail);
+        if (adminOpt.isEmpty()) {
+            return new ResponseEntity<>("Admin non trovato", HttpStatus.NOT_FOUND);
         }
+
+        ClassUT classUT = classUTOpt.get();
+        classUT.setDate(newContent.getDate());
+        classUT.setDifficulty(newContent.getDifficulty());
+        classUT.setDescription(newContent.getDescription());
+        classUT.setCategories(newContent.getCategories());
+
+        classUTRepository.save(classUT);
+
+        Operation updateOperation = new Operation();
+        updateOperation.setAdmin(adminOpt.get());
+        updateOperation.setClassUT(classUT);
+        updateOperation.setType(OperationType.UPDATE);
+        updateOperation.setDate(LocalDate.now());
+        operationRepository.save(updateOperation);
+
+        return new ResponseEntity<>("Aggiornamento eseguito correttamente.", HttpStatus.OK);
     }
 
-    public void eliminaFile(String fileName) {
+        public void eliminaClasse(String className, String adminEmail) {
+
+        Optional<ClassUT> classUTOpt = classUTRepository.findById(className);
+        if(classUTOpt.isEmpty()) {
+            throw new NotFoundException("Classe " + className + " non trovata");
+        }
+
+        ClassUT classToDelete = classUTOpt.get();
+
+        Optional<Admin> adminOpt = adminRepository.findById(adminEmail);
+        if(adminOpt.isEmpty()) {
+            throw new NotFoundException("Admin " + adminEmail + " non trovato");
+        }
+
+        Operation deletionOperation = new Operation();
+        deletionOperation.setAdmin(adminOpt.get());
+        deletionOperation.setClassUT(classToDelete);
+        deletionOperation.setType(OperationType.DELETE);
+        deletionOperation.setDate(LocalDate.now());
+
+        operationRepository.save(deletionOperation);
+
+        // elimino gli opponent mantenuti da T23
+        apiGatewayClient.callDeleteAllClassUTOpponents(className);
+
+        // ELIMINAZIONI FILE IMG SUGGERIMENTI
+        classToDelete.getSuggestions()
+                .forEach(suggestion -> {
+                    if(suggestion.getImage() != null) {
+                        try {
+                            imageService.deleteImage(suggestion.getImage());
+                        } catch (IOException e) {
+                            throw new RuntimeException("Errore nella cancellazione del file", e);
+                        }
+                    }
+                });
+
+        classUTRepository.delete(classToDelete);
+        eliminaFile(className);
+
+    }
+
+    private void eliminaFile(String fileName) {
         File directory = new File(String.format("%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, fileName));
         File directoryUnmodifiedSrc = new File(String.format("%s/%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, UploadOpponentService.UNMODIFIED_SRC, fileName));
 
@@ -236,40 +302,40 @@ public class OpponentService {
     }
 
     public Opponent getOpponentData(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
-        Optional<Opponent> opponent = opponentRepository.findOpponent(classUT, opponentType, opponentDifficulty);
-        if (opponent.isEmpty())
+        Optional<Opponent> opponentOpt = opponentRepository.findOpponent(classUT, opponentType, opponentDifficulty);
+        if (opponentOpt.isEmpty())
             throw new OpponentNotFoundException();
 
-        return opponent.get();
+        return opponentOpt.get();
     }
 
     public EvosuiteScore getOpponentEvosuiteScore(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
-        Optional<EvosuiteScore> score = opponentRepository.findEvosuiteScore(classUT,
+        Optional<EvosuiteScore> scoreOpt = opponentRepository.findEvosuiteScore(classUT,
                 opponentType, opponentDifficulty);
 
-        if (score.isEmpty())
+        if (scoreOpt.isEmpty())
             throw new ScoreNotFoundException();
 
-        return score.get();
+        return scoreOpt.get();
     }
 
     public JacocoScore getOpponentJacocoScore(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
-        Optional<JacocoScore> score = opponentRepository.findJacocoScore(classUT,
+        Optional<JacocoScore> scoreOpt = opponentRepository.findJacocoScore(classUT,
                 opponentType, opponentDifficulty);
 
-        if (score.isEmpty())
+        if (scoreOpt.isEmpty())
             throw new ScoreNotFoundException();
 
-        return score.get();
+        return scoreOpt.get();
     }
 
     public String getOpponentCoverage(String classUT, String opponentType, OpponentDifficulty opponentDifficulty) {
-        Optional<String> coverage = opponentRepository.findCoverage(classUT,
+        Optional<String> coverageOpt = opponentRepository.findCoverage(classUT,
                 opponentType, opponentDifficulty);
 
-        if (coverage.isEmpty())
+        if(coverageOpt.isEmpty())
             throw new CoverageNotFoundException();
 
-        return coverage.get();
+        return coverageOpt.get();
     }
 }

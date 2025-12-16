@@ -1,5 +1,3 @@
-
-// Mappa id pulsanti a view
 const links = {
     navDashboardAdmin: VIEWS.DASHBOARD_ADMIN,
     navOpponentsMain: VIEWS.OPPONENTS_MAIN,
@@ -10,39 +8,44 @@ const links = {
     linkFilterDifficultyEasy: VIEWS.OPPONENTS_FILTER_DIFFICULTY_EASY,
     linkFilterDifficultyMedium: VIEWS.OPPONENTS_FILTER_DIFFICULTY_MEDIUM,
     linkFilterDifficultyHard: VIEWS.OPPONENTS_FILTER_DIFFICULTY_HARD,
+    navGuidelinesUpload: VIEWS.GUIDELINES_UPLOAD,
 };
 
 assignUrls(links);
 
-document.getElementById("searchForm").addEventListener("search", event => {
-    event.preventDefault(); // Previene il comportamento di submit standard
+function showStyledMessage(message, title) {
 
-    const searchValue = document.getElementById('searchInput').value.trim();
-    const url = new URL(VIEWS.OPPONENTS_MAIN, window.location.origin);
+    const finalTitle = title ? title : translations.titles.alert || "Avviso";
 
-    if (searchValue) {
-        url.searchParams.set("search", searchValue);
-    }
+    $('#genericModalTitle').text(finalTitle);
+    $('#genericModalBody').text(message);
 
-    // Mantengo gli eventuali parametri già presenti
-    const currentParams = new URLSearchParams(window.location.search);
-    if (currentParams.has("sortBy")) {
-        url.searchParams.set("sortBy", currentParams.get("sortBy"));
-    }
-    if (currentParams.has("filterByDifficulty")) {
-        url.searchParams.set("filterByDifficulty", currentParams.get("filterByDifficulty"));
-    }
+    $('#genericMessageModal').modal('show');
+}
 
-    window.location.href = url.toString();
-});
+const searchForm = document.getElementById("searchForm");
+
+if (searchForm) {
+    searchForm.addEventListener("search", event => {
+        event.preventDefault();
+
+        const searchValue = document.getElementById('searchInput').value.trim();
+        const url = new URL(VIEWS.OPPONENTS_MAIN, window.location.origin);
+
+        if (searchValue) url.searchParams.set("search", searchValue);
+
+        const currentParams = new URLSearchParams(window.location.search);
+        if (currentParams.has("sortBy")) url.searchParams.set("sortBy", currentParams.get("sortBy"));
+        if (currentParams.has("filterByDifficulty")) url.searchParams.set("filterByDifficulty", currentParams.get("filterByDifficulty"));
+
+        window.location.href = url.toString();
+    });
+}
 
 async function downloadClassUT(classUTName) {
     try {
         const blob = await callDownloadClassUT(classUTName);
-
-        if (!blob) {
-            throw new Error("Blob non valido o download fallito");
-        }
+        if (!blob) throw new Error("Blob non valido o download fallito");
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -53,7 +56,8 @@ async function downloadClassUT(classUTName) {
         URL.revokeObjectURL(link.href);
     } catch (err) {
         console.error("Errore nel download:", err);
-        alert("Si è verificato un errore durante il download.");
+
+        showStyledMessage(translations.errors.download || "Si è verificato un errore durante il download.");
     }
 }
 

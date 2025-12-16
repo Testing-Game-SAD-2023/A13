@@ -158,103 +158,88 @@ a:hover {
 
 
 
-<script type="text/javascript">
-var parametro = location.search.split('parametro=')[1];
-    fetch('/home/' + parametro)
-        .then(response => response.json())
-        .then(data => {
-            let classutList = document.getElementById('classut-list');
-            let rows = '';
-            data.forEach(home => {
-                rows += `
-                   		
-					
-					
-		<div class="file">
+    <script type="text/javascript">
+        var parametro = location.search.split('parametro=')[1];
 
-<br>
-<center><p class="h3">Modifica Classe: ${home.name}</p></center>
-<div class="icon">
-<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-arrow-clockwise text-success" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-</svg>
-<br><br>
-</div>
+        fetch('/home/' + parametro) // Assicurati che questo endpoint esista e ritorni una ClassUT
+            .then(response => response.json())
+            .then(data => {
+                let classutList = document.getElementById('classut-list');
+                let rows = '';
 
-</a>
-</div>			
-					
-					<div class="card-body">
- <form id="uploadForm">
-  <div class="mb-3">
-    <label for="className" class="form-label">Class name</label>
-    <input type="text" class="form-control" value="${home.name}" id="className" aria-describedby="classNameHelp">
-  </div>
-  
-<div class="mb-3">
-  <label for="date" class="form-label">Date</label>
-  <input type="date" class="form-control" id="date" aria-describedby="dateHelp" value="${new Date().toISOString().slice(0, 10)}">
-</div>
+                // Se 'data' è un singolo oggetto e non un array, rimuovi il forEach.
+                // Assumo che 'data' sia un array come nel tuo codice originale.
+                data.forEach(home => {
 
-  <div class="mb-3">
-  <label for="difficulty" class="form-label">Difficulty</label>
-  <select class="form-select" id="difficulty" value="${home.difficulty}" aria-describedby="difficultyHelp">
-    <option value="Beginner">Beginner</option>
-    <option value="Intermediate">Intermediate</option>
-    <option value="Advanced">Advanced</option>
-  </select>
-  <div id="difficultyHelp" class="form-text">Select the difficulty level of this item</div>
-</div>
-  
-  
-  <div class="mb-3">
-    <label for="description" class="form-label" >Description</label>
-    <textarea class="form-control" id="description" rows="3"    value="${home.description}" >${home.description}</textarea>
-  </div>
-  
+                    // Logica per estrarre le categorie in modo sicuro
+                    let cat1 = (home.categories && home.categories[0]) ? home.categories[0].name : '';
+                    let cat2 = (home.categories && home.categories[1]) ? home.categories[1].name : '';
+                    let cat3 = (home.categories && home.categories[2]) ? home.categories[2].name : '';
 
-  
-  
-  
-  
-  <div class="mb-3">
-    <label for="category1" class="form-label"  >Category 1</label>
-    <input type="text" class="form-control" id="category1" value="${home.statistic[0]}" aria-describedby="categoryHelp">
-  </div>
+                    rows += `
+       <div class="file">
+            <br>
+            <center><p class="h3">Modifica Classe: ${home.name}</p></center>
+            <div class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-arrow-clockwise text-success" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+                <br><br>
+            </div>
+        </div>
 
-  <div class="mb-3">
-    <label for="category2" class="form-label" >Category 2</label>
-    <input type="text" class="form-control" value="${home.statistic[1]}" id="category2" aria-describedby="categoryHelp">
-  </div>
+        <div class="card-body">
+             <form id="uploadForm">
+              <div class="mb-3">
+                <label for="className" class="form-label">Class name</label>
+                <input type="text" class="form-control" value="${home.name}" id="className" readonly> </div>
 
-  <div class="mb-3">
-    <label for="category3" class="form-label" value="${home.statistic[2]}">Category 3</label>
-    <input type="text" class="form-control" id="category3" value="${home.statistic[2]}" aria-describedby="categoryHelp">
-  </div>
+            <div class="mb-3">
+              <label for="date" class="form-label">Date</label>
+              <input type="date" class="form-control" id="date" value="${home.date}">
+            </div>
 
-  
+              <div class="mb-3">
+              <label for="difficulty" class="form-label">Difficulty</label>
+              <select class="form-control" id="difficulty">
+                <option value="Beginner" ${home.difficulty === 'Beginner' ? 'selected' : ''}>Beginner</option>
+                <option value="Intermediate" ${home.difficulty === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+                <option value="Advanced" ${home.difficulty === 'Advanced' ? 'selected' : ''}>Advanced</option>
+              </select>
+            </div>
 
-  <div class="col-12">
-    <button type="button" onclick="uploadFile()" class="btn btn-success">Upload</button>
-  </div>
-</form>
+              <div class="mb-3">
+                <label for="description" class="form-label" >Description</label>
+                <textarea class="form-control" id="description" rows="3">${home.description}</textarea>
+              </div>
 
-  </div>
+              <div class="mb-3">
+                <label for="category1" class="form-label">Category 1</label>
+                <input type="text" class="form-control" id="category1" value="${cat1}">
+              </div>
 
-</div>
-					
-					
-					
-					
-					
-					
+              <div class="mb-3">
+                <label for="category2" class="form-label">Category 2</label>
+                <input type="text" class="form-control" id="category2" value="${cat2}">
+              </div>
+
+              <div class="mb-3">
+                <label for="category3" class="form-label">Category 3</label>
+                <input type="text" class="form-control" id="category3" value="${cat3}">
+              </div>
+
+              <div class="col-12">
+                <button type="button" onclick="uploadFile()" class="btn btn-success">Salva Modifiche</button>
+              </div>
+            </form>
+        </div>
                 `;
-            });
-            classutList.innerHTML = rows;
-        })
-        .catch(error => console.error(error));
-</script>
+                });
+                classutList.innerHTML = rows;
+            })
+            .catch(error => console.error(error));
+    </script>
 
 
 

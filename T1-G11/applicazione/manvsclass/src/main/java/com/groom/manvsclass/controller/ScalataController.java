@@ -1,43 +1,59 @@
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.model.Scalata;
+import com.groom.manvsclass.dto.ScalataDTO;
 import com.groom.manvsclass.service.ScalataService;
+import com.groom.manvsclass.service.JwtService;
+import com.groom.manvsclass.service.SecurityService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @CrossOrigin
-@Controller
+@RestController
 public class ScalataController {
 
-    private final ScalataService scalataService;
+    @Autowired
+    private ScalataService scalataService;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private SecurityService securityService;
 
-    public ScalataController(ScalataService scalataService) {
-        this.scalataService = scalataService;
+    @PostMapping("/scalata/upload")
+    public ResponseEntity<?> uploadScalata(@Valid @RequestBody ScalataDTO scalataDTO) {
+
+        String jwt = securityService.getJwtToken();
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        scalataService.uploadScalata(scalataDTO, adminEmail);
+        return ResponseEntity.ok("Scalata caricata con successo.");
     }
 
-    @PostMapping("/configureScalata")
-    public ResponseEntity<?> uploadScalata(@RequestBody Scalata scalata, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
-        return scalataService.uploadScalata(scalata, jwt);
-    }
-
-    @GetMapping("/scalate_list")
-    @ResponseBody
+    @GetMapping("/scalata")
     public ResponseEntity<?> listScalate() {
-        return scalataService.listScalate();
+
+        List<ScalataDTO> scalataDTOList = scalataService.listScalate();
+        return ResponseEntity.ok(scalataDTOList);
     }
 
-    @DeleteMapping("delete_scalata/{scalataName}")
-    @ResponseBody
-    public ResponseEntity<?> deleteScalataByName(@PathVariable String scalataName, @CookieValue(name = "jwt", required = false) String jwt) {
-        return scalataService.deleteScalataByName(scalataName, jwt);
+    @GetMapping("/scalata/{scalataName}")
+    public ResponseEntity<?> findScalataByName(@PathVariable String scalataName) {
+
+        ScalataDTO scalataDTO = scalataService.findScalataByName(scalataName);
+        return ResponseEntity.ok(scalataDTO);
     }
 
-    @GetMapping("/retrieve_scalata/{scalataName}")
-    @ResponseBody
-    public ResponseEntity<?> retrieveScalataByName(@PathVariable String scalataName) {
-        return scalataService.retrieveScalataByName(scalataName);
+    @DeleteMapping("/scalata/{scalataName}")
+    public ResponseEntity<?> deleteScalataByName(@PathVariable String scalataName) {
+
+        String jwt = securityService.getJwtToken();
+        String adminEmail = jwtService.getAdminEmailFromJwt(jwt);
+
+        scalataService.deleteScalataByName(scalataName, adminEmail);
+        return ResponseEntity.ok("Scalata eliminata con successo.");
     }
+
 }
