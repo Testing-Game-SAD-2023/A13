@@ -105,6 +105,16 @@ async function handleGameAction(isGameEnd, compileUponEndTime=false) {
     if (isGameEnd) {
         try {
             //Esegue la terminazione del gioco
+            
+            // Se non è stato fatto nemmeno un turno, devo prima inizializzare il gioco
+            if (orderTurno === 0) {
+                console.log("[handleGameAction] Primo submit senza turni: inizializzo il gioco prima di EndGame");
+                const initResponse = await runGameAction("/api/gameEngine/run", requestBody);
+                setStatus("compiling");
+                handleGameRun(initResponse, loadingKey, buttonKey, false);
+                // Dopo l'inizializzazione, il requestBody potrebbe essere aggiornato
+                requestBody = await getGameActionRequestBody();
+            }
 
             if (!compileUponEndTime) {
                 requestBody["testingClassCode"] = "";
@@ -219,7 +229,7 @@ function handleGameEnd(response) {
             console.log(`[handleGameEnd] Livello ${currentLevel} superato! Prossimo: ${currentLevel + 1}/${totalLevels}`);
             
             // Nascondo il pulsante Submit e mostro il pulsante Prossimo Livello
-            hideSubmitShowNextLevel();
+            toggleScalataButtons(true);
             
             let detailMessage = gameEndData.level_won_detail
                 .replace('{0}', currentLevel)
@@ -235,6 +245,9 @@ function handleGameEnd(response) {
         } else {
             // ❌ Livello fallito
             console.log(`[handleGameEnd] Scalata fallita al livello ${currentLevel}/${totalLevels}`);
+            
+            // Nascondo i pulsanti Submit/Coverage e mostro il pulsante Ripeti Livello
+            toggleScalataButtons(false);
             
             let detailMessage = gameEndData.level_lost_detail
                 .replace('{0}', currentLevel)
@@ -383,20 +396,35 @@ function resetButtons() {
     coverage_button.disabled = false; // Abilita il pulsante di coverage
 }
 
-// Nasconde il pulsante Submit e mostra il pulsante Prossimo Livello (solo per Scalata)
-function hideSubmitShowNextLevel() {
+// Nasconde i pulsanti Submit/Coverage e mostra il pulsante appropriato per Scalata
+// @param showNextLevel: true per mostrare "Prossimo Livello", false per mostrare "Ripeti Livello"
+function toggleScalataButtons(showNextLevel) {
     const runButton = document.getElementById('runButton');
-    const nextLevelButton = document.getElementById('nextLevelButton');
     const coverageButton = document.getElementById('coverageButton');
+    const nextLevelButton = document.getElementById('nextLevelButton');
+    const retryLevelButton = document.getElementById('retryLevelButton');
     
+    // Nascondo i pulsanti standard
     if (runButton) runButton.style.display = 'none';
     if (coverageButton) coverageButton.style.display = 'none';
-    if (nextLevelButton) {
-        nextLevelButton.style.display = 'inline-block';
-        // Aggiungo l'event listener per il redirect
-        nextLevelButton.onclick = () => {
-            window.location.href = '/gamemode?mode=Scalata';
-        };
+    
+    // Mostro il pulsante appropriato in base al parametro
+    if (showNextLevel) {
+        if (retryLevelButton) retryLevelButton.style.display = 'none';
+        if (nextLevelButton) {
+            nextLevelButton.style.display = 'inline-block';
+            nextLevelButton.onclick = () => {
+                window.location.href = '/gamemode?mode=Scalata';
+            };
+        }
+    } else {
+        if (nextLevelButton) nextLevelButton.style.display = 'none';
+        if (retryLevelButton) {
+            retryLevelButton.style.display = 'inline-block';
+            retryLevelButton.onclick = () => {
+                window.location.href = '/gamemode?mode=Scalata';
+            };
+        }
     }
 }
 
