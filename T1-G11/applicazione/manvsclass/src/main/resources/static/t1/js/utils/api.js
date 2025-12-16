@@ -12,21 +12,56 @@ async function handleApiErrors(response) {
         const errorBody = await response.json();
         console.error('Errore dalla risposta:', errorBody);
 
+        // Handle new uniform error structure (ErrorResponseDTO)
+        if (errorBody?.message) {
+            // Show a more informative error message
+            const errorTitle = errorBody?.error || 'Errore';
+            const errorStatus = errorBody?.status ? ` (Codice: ${errorBody.status})` : '';
+            
+            // Format the message nicely, preserving line breaks
+            const message = errorBody.message.replace(/\\n/g, '\n');
+            
+            // Create a more structured error display
+            const fullMessage = `${errorTitle}${errorStatus}\n\n${message}`;
+            
+            $('#errorModalBody').text(message);
+			$('#errorModal').modal('show');
+            return;
+        }
+
+        // Handle validation errors with field-specific errors (ValidationErrorDTO)
         if (errorBody?.errors?.length > 0) {
+            let errorMessages = [];
             errorBody.errors.forEach(err => {
                 const container = document.getElementById(`${err.field}_label_container`);
                 if (container) {
                     addErrorDiv(container, err.message);
                 } else {
-                    alert(err.message);
+                    errorMessages.push(`• ${err.message}`);
                 }
             });
-        } else {
-            alert(errors.notHandled);
+            
+            if (errorMessages.length > 0) {
+                const errorTitle = errorBody?.message || 'Errori di validazione';
+                $('#errorModalBody').text(`${errorMessages.join('\n')}`);
+				$('#errorModal').modal('show');
+            }
+            return;
         }
+
+        // Fallback for other error formats
+        if (errorBody?.errorMessage) {
+            $('#errorModalBody').text(errorMessage);
+			$('#errorModal').modal('show');
+            return;
+        }
+
+        // Generic fallback
+        $('#errorModalBody').text(errors.notHandled);
+		$('#errorModal').modal('show');
     } catch (e) {
-        console.error('Errore durante la lettura del corpo JSON:', e);
-        alert(errors.notHandled);
+        $('#errorModalBody').text('Errore durante la lettura del JSON.');
+		$('#errorModal').modal('show');
     }
 }
 
@@ -61,8 +96,8 @@ async function returnDataOnSuccessTemplate({ url, method, headers, body }, parse
         await handleApiErrors(response);
         return null;
     } catch (err) {
-        console.error(`Errore nella chiamata ${method} ${url}:`, err);
-        alert(errors.notHandled);
+        $('#errorModalBody').text(`Errore nella chiamata ${method} ${url}:`);
+		$('#errorModal').modal('show');
         return null;
     }
 }
@@ -94,8 +129,8 @@ async function redirectOnSuccessTemplate({ url, method, headers, body }, { redir
 
         await handleApiErrors(response);
     } catch (err) {
-        console.error(`Errore nella chiamata ${method} ${url}:`, err);
-        alert(errors.notHandled);
+        $('#errorModalBody').text(`Errore nella chiamata ${method} ${url}:`);
+		$('#errorModal').modal('show');
     }
 }
 
@@ -172,7 +207,6 @@ async function callUploadOpponent(body) {
         body: body
     }, async response => await response.json());
 }
-
 
 
 

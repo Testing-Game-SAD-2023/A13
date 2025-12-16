@@ -4,5 +4,9 @@ import com.groom.manvsclass.model.ClassUT;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ClassRepository extends MongoRepository<ClassUT, String> {
-
+    
+    /**
+     * Delete ClassUT entry by name
+     */
+    void deleteByName(String name);
 }

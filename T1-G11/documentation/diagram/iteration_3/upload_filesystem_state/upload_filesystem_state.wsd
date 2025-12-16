@@ -1,0 +1,157 @@
+@startuml Upload_FileSystem_State_Diagram
+
+title File System State Transformation During Upload
+
+skinparam state {
+  BackgroundColor<<initial>> LightBlue
+  BackgroundColor<<temp>> LightYellow
+  BackgroundColor<<final>> LightGreen
+  BackgroundColor<<cleanup>> LightCoral
+}
+
+state "Initial Upload" as Initial <<initial>> {
+  state "Browser FormData" as FormData {
+    FormData : - classUTFile (.java)
+    FormData : - classUTDetails (JSON)
+    FormData : - robotTestsZip (.zip)
+  }
+}
+
+state "Temporary Extraction" as TempExtract <<temp>> {
+  state "VolumeT0/FolderTree/ClassUT/{className}/tmp/" as TmpFolder {
+    TmpFolder : robot.zip
+    TmpFolder : [extracted]/
+    TmpFolder :   ├─ EvosuiteTest/
+    TmpFolder :   │  ├─ 01Level/
+    TmpFolder :   │  │  ├─ TestSourceCode/
+    TmpFolder :   │  │  │  └─ evosuite-tests/*.java
+    TmpFolder :   │  │  └─ TestReport/
+    TmpFolder :   │  │     ├─ statistics.csv
+    TmpFolder :   │  │     └─ coveragetot.xml
+    TmpFolder :   │  └─ 02Level/
+    TmpFolder :   └─ RandoopTest/
+    TmpFolder :      ├─ 01Level/
+    TmpFolder :      │  ├─ *.java
+    TmpFolder :      │  └─ coveragetot.xml
+    TmpFolder :      └─ 02Level/
+  }
+}
+
+state "Unmodified Source Storage" as UnmodifiedSrc <<final>> {
+  state "VolumeT0/FolderTree/ClassUT/unmodified_src/{className}/" as UnmodSrc {
+    UnmodSrc : {className}.java
+    UnmodSrc : (original uploaded file)
+  }
+}
+
+state "Organized Opponent Structure" as OrganizedStructure <<final>> {
+  state "Per Robot Type & Level" as PerRobotLevel {
+    state "VolumeT0/FolderTree/ClassUT/{className}/Evosuite/" as EvosuiteStructure {
+      EvosuiteStructure : project/
+      EvosuiteStructure :   ├─ 01Level/
+      EvosuiteStructure :   │  ├─ src/main/java/{package}/
+      EvosuiteStructure :   │  │  └─ {className}.java (with package)
+      EvosuiteStructure :   │  └─ src/test/java/{package}/
+      EvosuiteStructure :   │     └─ *Test.java
+      EvosuiteStructure :   └─ 02Level/
+      EvosuiteStructure :      ├─ src/main/java/{package}/
+      EvosuiteStructure :      └─ src/test/java/{package}/
+      EvosuiteStructure : 
+      EvosuiteStructure : coverage/
+      EvosuiteStructure :   ├─ 01Level/
+      EvosuiteStructure :   │  ├─ statistics.csv
+      EvosuiteStructure :   │  └─ coveragetot.xml
+      EvosuiteStructure :   └─ 02Level/
+      EvosuiteStructure :      ├─ statistics.csv (generated if missing)
+      EvosuiteStructure :      └─ coveragetot.xml
+    }
+    
+    state "VolumeT0/FolderTree/ClassUT/{className}/Randoop/" as RandoopStructure {
+      RandoopStructure : project/
+      RandoopStructure :   ├─ 01Level/
+      RandoopStructure :   │  ├─ src/main/java/{package}/
+      RandoopStructure :   │  │  └─ {className}.java (with package)
+      RandoopStructure :   │  └─ src/test/java/{package}/
+      RandoopStructure :   │     └─ *Test.java
+      RandoopStructure :   └─ 02Level/
+      RandoopStructure : 
+      RandoopStructure : coverage/
+      RandoopStructure :   ├─ 01Level/
+      RandoopStructure :   │  └─ coveragetot.xml
+      RandoopStructure :   └─ 02Level/
+      RandoopStructure :      └─ coveragetot.xml (generated if missing)
+    }
+  }
+}
+
+state "Temporary ZIP for Coverage Generation" as TempZip <<temp>> {
+  state "VolumeT0/FolderTree/ClassUT/{className}/tmp_zip/" as TmpZipFolder {
+    TmpZipFolder : src/
+    TmpZipFolder :   ├─ main/java/{package}/{className}.java
+    TmpZipFolder :   └─ test/java/{package}/*Test.java
+    TmpZipFolder : src.zip (created for API call)
+  }
+  
+  note right of TmpZipFolder
+    Created only when coverage 
+    files are missing and need
+    to be generated via external
+    API services
+  end note
+}
+
+state "Cleanup Phase" as Cleanup <<cleanup>> {
+  Cleanup : Delete tmp/ folder
+  Cleanup : Delete tmp_zip/ folder
+  Cleanup : Delete src.zip
+}
+
+state "MongoDB Persistence" as MongoDB {
+  MongoDB : opponents collection
+  MongoDB :   - classUT: "{className}"
+  MongoDB :   - opponentType: "Evosuite|Randoop"
+  MongoDB :   - opponentDifficulty: BEGINNER|INTERMEDIATE|ADVANCED
+  MongoDB :   - evosuiteScore: {...}
+  MongoDB :   - jacocoScore: {...}
+  MongoDB :   - coverage: "<xml>...</xml>"
+  MongoDB : 
+  MongoDB : classes collection
+  MongoDB :   - name: "{className}"
+  MongoDB :   - date, difficulty, description
+  MongoDB :   - uri: path to file
+}
+
+[*] --> Initial
+
+Initial --> TempExtract : Extract robot.zip
+Initial --> UnmodifiedSrc : Save original .java
+
+TempExtract --> OrganizedStructure : For each Robot Type\nFor each Level:\n- Save test files\n- Save src with package\n- Copy coverage files
+
+OrganizedStructure --> TempZip : If coverage missing:\nPrepare ZIP
+
+TempZip --> OrganizedStructure : Generate coverage\nvia API call\nSave statistics.csv\nor coveragetot.xml
+
+OrganizedStructure --> MongoDB : Read coverage files\nBuild scores\nPersist Opponent
+
+OrganizedStructure --> Cleanup : After all levels\nprocessed
+
+Cleanup --> [*]
+
+note right of OrganizedStructure
+  Final structure allows:
+  - Direct access to source files
+  - Organized test files by package
+  - Coverage metrics per level
+  - Support for multiple robot types
+  - Easy retrieval for downloads
+end note
+
+note bottom of MongoDB
+  Each opponent entry references
+  the file system location through
+  classUT name and can retrieve
+  files from the organized structure
+end note
+
+@enduml

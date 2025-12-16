@@ -1,0 +1,160 @@
+@startuml Opponents Query Sequence
+
+!define CONTROLLER_COLOR #E1F5FE
+!define SERVICE_COLOR #FFF3E0
+!define REPOSITORY_COLOR #F3E5F5
+
+skinparam sequence {
+    ParticipantBackgroundColor CONTROLLER_COLOR
+    ActorBackgroundColor #C5E1A5
+    LifeLineBackgroundColor white
+    LifeLineBorderColor #424242
+    ArrowColor #424242
+}
+
+actor "User/System" as User
+participant "OpponentController" as Controller <<Controller>> CONTROLLER_COLOR
+participant "OpponentService" as Service <<Service>> SERVICE_COLOR
+database "OpponentRepository" as OpponentRepo <<Repository>> REPOSITORY_COLOR
+database "ClassRepository" as ClassRepo <<Repository>> REPOSITORY_COLOR
+
+' === Get All Opponents ===
+group Get All Opponents
+    User -> Controller: GET /opponents
+    activate Controller
+    
+    Controller -> Service: getAllOpponents()
+    activate Service
+    
+    Service -> OpponentRepo: findAllOpponents()
+    activate OpponentRepo
+    OpponentRepo --> Service: List<Opponent>
+    deactivate OpponentRepo
+    
+    Service --> Controller: List<Opponent>
+    deactivate Service
+    
+    Controller --> User: 200 OK (List<Opponent>)
+    deactivate Controller
+end
+
+' === Get Opponent Data ===
+group Get Specific Opponent Data
+    User -> Controller: GET /opponents/{classUT}/{type}/{difficulty}/score
+    activate Controller
+    
+    Controller -> Service: getOpponentData(classUT, type, difficulty)
+    activate Service
+    
+    Service -> OpponentRepo: findOpponent(classUT, type, difficulty)
+    activate OpponentRepo
+    OpponentRepo --> Service: Optional<Opponent>
+    deactivate OpponentRepo
+    
+    alt Opponent Found
+        Service --> Controller: Opponent
+        Controller --> User: 200 OK (Opponent)
+    else Opponent Not Found
+        Service --> Controller: throw OpponentNotFoundException
+        Controller --> User: 404 Not Found
+    end
+    
+    deactivate Service
+    deactivate Controller
+end
+
+' === Get Scores ===
+group Get Opponent Scores
+    User -> Controller: GET /opponents/{classUT}/{type}/{difficulty}/score/evosuite
+    activate Controller
+    
+    Controller -> Service: getOpponentEvosuiteScore(classUT, type, difficulty)
+    activate Service
+    
+    Service -> OpponentRepo: findEvosuiteScore(classUT, type, difficulty)
+    activate OpponentRepo
+    OpponentRepo --> Service: Optional<EvosuiteScore>
+    deactivate OpponentRepo
+    
+    alt Score Found
+        Service --> Controller: EvosuiteScore
+        Controller --> User: 200 OK (EvosuiteScoreDTO)
+    else Score Not Found
+        Service --> Controller: throw ScoreNotFoundException
+        Controller --> User: 404 Not Found
+    end
+    
+    deactivate Service
+    deactivate Controller
+    
+    ' === Similar flow for Jacoco Score ===
+    User -> Controller: GET /opponents/{classUT}/{type}/{difficulty}/score/jacoco
+    activate Controller
+    
+    Controller -> Service: getOpponentJacocoScore(classUT, type, difficulty)
+    activate Service
+    
+    Service -> OpponentRepo: findJacocoScore(classUT, type, difficulty)
+    activate OpponentRepo
+    OpponentRepo --> Service: Optional<JacocoScore>
+    deactivate OpponentRepo
+    
+    alt Score Found
+        Service --> Controller: JacocoScore
+        Controller --> User: 200 OK (JacocoScoreDTO)
+    else Score Not Found
+        Service --> Controller: throw ScoreNotFoundException
+        Controller --> User: 404 Not Found
+    end
+    
+    deactivate Service
+    deactivate Controller
+end
+
+' === Get Coverage ===
+group Get Opponent Coverage
+    User -> Controller: GET /opponents/{classUT}/{type}/{difficulty}/coverage
+    activate Controller
+    
+    Controller -> Service: getOpponentCoverage(classUT, type, difficulty)
+    activate Service
+    
+    Service -> OpponentRepo: findCoverage(classUT, type, difficulty)
+    activate OpponentRepo
+    OpponentRepo --> Service: Optional<String>
+    deactivate OpponentRepo
+    
+    alt Coverage Found
+        Service --> Controller: coverage XML
+        Controller --> User: 200 OK (coverage XML)
+    else Coverage Not Found
+        Service --> Controller: throw CoverageNotFoundException
+        Controller --> User: 404 Not Found
+    end
+    
+    deactivate Service
+    deactivate Controller
+end
+
+' === Get Summary ===
+group Get Opponents Summary
+    User -> Controller: GET /opponents/summary
+    activate Controller
+    
+    Controller -> Service: getAllOpponents()
+    activate Service
+    
+    Service -> OpponentRepo: findAllOpponents()
+    activate OpponentRepo
+    OpponentRepo --> Service: List<Opponent>
+    deactivate OpponentRepo
+    
+    Service --> Controller: List<Opponent>
+    deactivate Service
+    
+    Controller -> Controller: Transform to List<OpponentSummaryDTO>
+    Controller --> User: 200 OK (List<OpponentSummaryDTO>)
+    deactivate Controller
+end
+
+@enduml

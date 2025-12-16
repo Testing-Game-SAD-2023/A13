@@ -1,0 +1,176 @@
+@startuml Upload_Sequence_Diagram_v2
+actor AdminBrowser as Browser
+participant "opponents_upload.js\n(formData)" as FrontendJS
+participant "api.js\ncallUploadOpponent" as ApiJS
+participant "API Gateway\n(/api/adminService)" as ApiGateway
+participant "OpponentController\n(/opponents)" as Controller
+participant "OpponentService\n.uploadClassAndOpponents(...)" as Service
+participant "JavaMetadataExtractor" as MetadataExtractor
+participant "FormValidation" as FormValidator
+participant "ClassUTUploadService\n.saveClassUTFile\n.persistClassUTMetadata" as ClassUTService
+participant "UploadOpponentService\n.saveOpponentsFromZip" as UploadService
+participant "FileStorageService" as FileStorage
+participant "JavaSourceFileService" as JavaFileService
+participant "CoverageService" as CovService
+participant "OpponentTransformationService\n.createAndPersistOpponent" as TransformService
+participant "CoverageReader" as CovReader
+participant "ScoreBuilder" as ScoreBuilder
+participant "ApiGatewayClient" as Gateway
+participant "OpponentPersistenceService" as PersistenceService
+participant "OpponentRepository" as OppRepo
+participant "ClassRepository" as ClassRepo
+
+== Upload request ==
+Browser -> FrontendJS : user clicks Upload (builds FormData\nclassUTFile, classUTDetails, robotTestsZip)
+FrontendJS -> ApiJS : callUploadOpponent(formData)
+ApiJS -> ApiGateway : POST /api/adminService/opponents (FormData, cookies)
+ApiGateway -> Controller : route POST /opponents (FormData)
+Controller -> Service : uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip)
+
+== Validation Phase ==
+Service -> Service : validate classUTFile not empty
+note right: Throws FileUploadException if empty
+
+Service -> Service : validate robotTestsZip not empty  
+note right: Throws FileUploadException if empty
+
+Service -> Service : parse classUTDetails JSON
+note right: Throws ClassValidationException on parse error
+
+Service -> MetadataExtractor : getClassNameFromJavaSourceFile(classFileBytes)
+MetadataExtractor --> Service : classNameFromSourceFile
+note right: Throws ClassValidationException if no class declaration found
+
+Service -> Service : verify className matches
+note right: Compare form input vs. actual class name in file\nThrows ClassValidationException if mismatch
+
+Service -> FormValidator : validateClassUT(classe)
+FormValidator --> Service : boolean (validation result)
+note right: Validates name, difficulty, categories\nThrows ClassValidationException if validation fails
+
+== Upload Phase (try-catch block) ==
+Service -> ClassUTService : saveClassUTFile(classUTFileName, className, classUTFile)
+ClassUTService -> FileStorage : saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile)
+note right: saves original .java into\n/VolumeT0/FolderTree/ClassUT/unmodified_src/<class>
+
+Service -> UploadService : saveOpponentsFromZip(classUTFileName, className, classUTFile, robotTestsZip)
+
+== SaveOpponentsFromZip - Extract and organize files ==
+UploadService -> FileStorage : saveFileInFileSystem("robot.zip", operationTmpFolder, robotTestsZip)
+UploadService -> FileStorage : extractZipIn(operationTmpFolder)
+UploadService -> FileStorage : saveFileInFileSystem(classUTFileName, unmodifiedSrcCodePath, classUTFile)
+
+loop for each robotType (Evosuite/Randoop)
+  UploadService -> UploadService : processRobotFolders(classUTFileName, className, classUTFile, robotGroupFolder)
+  
+  loop for each level folder (01Level, 02Level, etc.)
+    UploadService -> UploadService : processLevelFolder(...)
+    
+    note right: Build paths for src, test, coverage using OpponentPathResolver
+    
+    UploadService -> JavaFileService : saveTestFilesInVolume(fromTestPath, toTestPath, classUTName, robotType)
+    note right: Uses JavaMetadataExtractor internally
+    JavaFileService --> UploadService : splitPackageNames[][]
+    
+    UploadService -> JavaFileService : saveSrcFileInVolume(classUTFile, toSrcPath, splitPackageNames, classUTFileName)
+    
+    UploadService -> JavaFileService : saveCoverageFilesInVolume(fromCoveragePath, toCoveragePath)
+    JavaFileService --> UploadService : coverageFound[jacoco, evosuite]
+    
+    alt coverage missing
+      alt robotType == "evosuite" && !evosuiteFound
+        UploadService -> UploadService : ensureEvoCoverageIfMissing(...)
+        UploadService -> FileStorage : copyDirectoryRecursively / zipDirectory
+        UploadService -> CovService : generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
+        CovService -> Gateway : callGenerateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
+        Gateway --> CovService : EvosuiteCoverageDTO
+        CovService --> UploadService : EvosuiteCoverageDTO
+        UploadService -> FileStorage : writeStringToFile(statistics.csv)
+      end
+      
+      alt robotType == "randoop" && !jacocoFound
+        UploadService -> UploadService : ensureJacocoCoverageIfMissing(...)
+        UploadService -> FileStorage : copyDirectoryRecursively / zipDirectory
+        UploadService -> CovService : generateMissingJacocoCoverage(classUTName, zip)
+        CovService -> Gateway : callGenerateMissingJacocoCoverage(classUTName, zip)
+        Gateway --> CovService : JacocoCoverageDTO
+        CovService --> UploadService : JacocoCoverageDTO
+        UploadService -> FileStorage : writeStringToFile(coveragetot.xml)
+      end
+      
+      UploadService -> FileStorage : deleteDirectoryRecursively(tmpFolderToZip)
+    end
+    
+    UploadService -> UploadService : computeScoresAndPersist(classUTName, robotType, levelFolder, toCoveragePath)
+    UploadService -> TransformService : createAndPersistOpponent(classUTName, robotType, levelFolder, evosuitePath, jacocoPath)
+    
+    TransformService -> CovReader : readCoverageFiles(evosuitePath, jacocoPath)
+    note right: Reads both Evosuite statistics.csv\nand Jacoco coveragetot.xml
+    CovReader --> TransformService : CoverageData(evosuiteStatistics[][], jacocoStatistics[][], coverageXml)
+    
+    TransformService -> ScoreBuilder : buildJacocoScore(jacocoStatistics)
+    ScoreBuilder --> TransformService : JacocoScore
+    
+    TransformService -> ScoreBuilder : buildEvosuiteScore(evosuiteStatistics)
+    ScoreBuilder --> TransformService : EvosuiteScore
+    
+    note right: Create Opponent object with:\n- classUT, robotType, difficulty (from LevelExtractor)\n- coverage XML, scores
+    
+    TransformService -> PersistenceService : saveOpponentAndNotify(opponent)
+    PersistenceService -> OppRepo : save(opponent)
+    
+    loop for each GameMode
+      PersistenceService -> Gateway : callAddNewOpponent(classUT, gameMode, type, difficulty)
+      note right: Notify other services about new opponent
+    end
+  end
+end
+
+== Cleanup and finalization ==
+UploadService -> FileStorage : deleteDirectoryRecursively(operationTmpFolder)
+Service -> ClassUTService : persistClassUTMetadata(classe, classUTFileName)
+ClassUTService -> ClassRepo : save(classUT)
+note right: Save ClassUT metadata with URI
+
+Service --> Controller : return FileUploadResponse (200)
+Controller --> ApiGateway : HTTP 200 + JSON
+ApiGateway --> ApiJS : HTTP 200 + JSON
+ApiJS --> FrontendJS : parsed JSON (success)
+FrontendJS --> Browser : show success modal
+
+== Failure path (exception handling with rollback) ==
+alt Any exception during upload
+  UploadService --> Service : throws Exception (FileUploadException/RobotProcessingException/ClassValidationException/IOException)
+  note right: Exception caught in try-catch block
+  
+  Service -> Service : performRollback(classUTName)
+  note right: Attempt to clean up all created resources
+  
+  Service -> ClassUTService : rollbackClassUTMetadata(classUTName)
+  ClassUTService -> ClassRepo : deleteByName(classUTName)
+  note right: Delete ClassUT from database (silent failure)
+  
+  Service -> OppRepo : deleteByClassUT(classUTName)
+  note right: Delete all opponents for this class (silent failure)
+  
+  Service -> Gateway : callDeleteAllClassUTOpponents(classUTName)
+  note right: Notify external services to delete (silent failure)
+  
+  Service -> UploadService : rollbackOpponentFiles(classUTName)
+  UploadService -> FileStorage : deleteDirectoryRecursively(classUTDirectory)
+  note right: Delete opponent files from volume (silent failure)
+  
+  Service -> ClassUTService : rollbackClassUTFile(classUTName)
+  ClassUTService -> FileStorage : deleteDirectoryRecursively(unmodifiedSrcPath)
+  note right: Delete original class file (silent failure)
+  
+  Service --> Service : re-throw original exception
+  note right: Let GlobalExceptionHandler handle the response
+  
+  Service --> Controller : throws Exception
+Controller --> ApiGateway : HTTP 500 + JSON
+ApiGateway --> ApiJS : HTTP 500 + JSON
+ApiJS --> FrontendJS : handleApiErrors(response) -> show modal/alert with uploadId
+FrontendJS --> Browser : show error to admin
+
+@enduml

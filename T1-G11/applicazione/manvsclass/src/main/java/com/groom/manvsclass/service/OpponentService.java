@@ -1,23 +1,26 @@
 package com.groom.manvsclass.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.groom.manvsclass.api.ApiGatewayClient;
 import com.groom.manvsclass.model.Admin;
 import com.groom.manvsclass.model.ClassUT;
 import com.groom.manvsclass.model.Operation;
 import com.groom.manvsclass.model.Opponent;
+import com.groom.manvsclass.model.dto.ClassUTDetailsDTO;
 import com.groom.manvsclass.model.repository.ClassRepository;
 import com.groom.manvsclass.model.repository.OperationRepository;
 import com.groom.manvsclass.model.repository.OpponentRepository;
 import com.groom.manvsclass.model.repository.SearchRepositoryImpl;
-import com.groom.manvsclass.service.exception.CoverageNotFoundException;
-import com.groom.manvsclass.service.exception.OpponentNotFoundException;
-import com.groom.manvsclass.service.exception.ScoreNotFoundException;
-import com.groom.manvsclass.util.filesystem.FileOperationUtil;
+import com.groom.manvsclass.service.exception.*;
+import com.groom.manvsclass.service.upload.ClassUTUploadService;
+import com.groom.manvsclass.service.upload.FileStorageService;
+import com.groom.manvsclass.service.upload.UploadOpponentService;
 import com.groom.manvsclass.util.filesystem.download.FileDownloadUtil;
-import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
-import com.groom.manvsclass.util.filesystem.upload.FileUploadUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.groom.manvsclass.util.upload.FileUploadResponse;
+import com.groom.manvsclass.util.upload.JavaMetadataExtractor;
+import com.groom.manvsclass.config.FormValidation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,42 +29,44 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import testrobotchallenge.commons.models.score.EvosuiteScore;
 import testrobotchallenge.commons.models.score.JacocoScore;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static com.groom.manvsclass.util.upload.OpponentPathResolver.*;
 
 @Service
 public class OpponentService {
-
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(String.valueOf(OpponentService.class));
+    private static final Logger logger = LoggerFactory.getLogger(OpponentService.class);
     private final OperationRepository operationRepository;
-    @Autowired
     private final ClassRepository classRepository;
     private final MongoTemplate mongoTemplate;
     private final SearchRepositoryImpl searchRepository;
     private final UploadOpponentService uploadOpponentService;
-    @Autowired
     private final OpponentRepository opponentRepository;
+    private final ClassUTUploadService classUTUploadService;
     private final Admin userAdmin = new Admin("default", "default", "default", "default", "default");
     private final ApiGatewayClient apiGatewayClient;
+    private final FileStorageService fileStorageService;
 
     public OpponentService(OperationRepository operationRepository,
                            ClassRepository classRepository,
                            MongoTemplate mongoTemplate,
                            SearchRepositoryImpl searchRepository,
-                           UploadOpponentService uploadOpponentService, OpponentRepository opponentRepository, ApiGatewayClient apiGatewayClient) {
+                           UploadOpponentService uploadOpponentService,
+                           OpponentRepository opponentRepository,
+                           ApiGatewayClient apiGatewayClient,
+                           FileStorageService fileStorageService,
+                           ClassUTUploadService classUTUploadService) {
         this.operationRepository = operationRepository;
         this.classRepository = classRepository;
         this.mongoTemplate = mongoTemplate;
@@ -69,83 +74,195 @@ public class OpponentService {
         this.uploadOpponentService = uploadOpponentService;
         this.opponentRepository = opponentRepository;
         this.apiGatewayClient = apiGatewayClient;
+        this.fileStorageService = fileStorageService;
+        this.classUTUploadService = classUTUploadService;
     }
 
     /*
      * Restituisce la lista di classi UT disponibili nel sistema
      */
-    public ResponseEntity<?> getNomiClassiUT(String jwt) {
+    public ResponseEntity<List<String>> getNomiClassiUT() {
         // 2. Recupera tutte le ClassUT dal repository e restituisce solo i nomi
         List<String> classNames = classRepository.findAll()
                 .stream()
                 .map(ClassUT::getName) // Estrae solo i nomi
-                .collect(Collectors.toList());
+                .toList();
 
         // 3. Ritorna i nomi delle classi con lo status HTTP 200 (OK)
         return ResponseEntity.ok(classNames);
     }
 
-    public ResponseEntity<FileUploadResponse> uploadOpponent(
+    public ResponseEntity<FileUploadResponse> uploadClassAndOpponents(
             MultipartFile classUTFile,
             String classUTDetails,
             MultipartFile robotTestsZip) throws IOException {
 
-        FileUploadResponse response = new FileUploadResponse();
-
-        // Verifica che il file della classe sia stato ricevuto
+        // Validate class file
         if (classUTFile == null || classUTFile.isEmpty()) {
-            response.setErrorMessage("Errore: file della classe non ricevuto o vuoto.");
-            return ResponseEntity.badRequest().body(response);
+            throw new FileUploadException(
+                "error.upload.file.empty"
+            );
         }
 
-        // Parsing dei dettagli della classe
-        ObjectMapper mapper = new ObjectMapper();
-        ClassUT classe = mapper.readValue(classUTDetails, ClassUT.class);
+        // Validate robot tests zip file
+        if (robotTestsZip == null || robotTestsZip.isEmpty()) {
+            throw new FileUploadException(
+                "error.upload.zip.empty"
+            );
+        }
 
-        // Nome del file e dimensione
+        ClassUT classe;
+        try {
+            classe = ClassUTDetailsDTO.parseFromJson(classUTDetails);
+        } catch (IOException e) {
+            throw new ClassValidationException(
+                "error.upload.json.parse",
+                e.getMessage()
+            );
+        }
+        
         String classUTFileName = StringUtils.cleanPath(Objects.requireNonNull(classUTFile.getOriginalFilename()));
-        long size = classUTFile.getSize();
+        String classUTName = classe.getName();
 
-        System.out.println("Salvataggio di " + classUTFileName + " nel filesystem condiviso");
+        //-------------------------------------------------------------------------------------------
+        // Verifica che il nome della classe inserito dall'admin nel campo "Class Name" del form HTML
+        // sia effettivamente il nome della classe così come dichiarato nel file .java.
+        byte[] classFileBytes;
+        try {
+            classFileBytes = classUTFile.getBytes();
+        } catch (IOException e) {
+            throw new FileUploadException(
+                "error.upload.file.read",
+                e.getMessage()
+            );
+        }
+        
+        String classNameFromSourceFile = JavaMetadataExtractor.getClassNameFromJavaSourceFile(classFileBytes);
 
-        // Salvataggio del file della classe e robot associati
-        FileUploadUtil.saveCLassFile(classUTFileName, classe.getName(), classUTFile);
-        uploadOpponentService.saveOpponentsFromZip(classUTFileName, classe.getName(), classUTFile, robotTestsZip);
+        if(classNameFromSourceFile == null) {
+            throw new ClassValidationException(
+                "error.validation.class.noDeclaration"
+            );
+        }
 
-        // Popola la risposta
-        response.setFileName(classUTFileName);
-        response.setSize(size);
-        response.setDownloadUri("/downloadFile");
+        if(!classNameFromSourceFile.equalsIgnoreCase(classUTName)) {
+            throw new ClassValidationException(
+                "error.validation.class.nameMismatch",
+                classNameFromSourceFile, classUTName
+            );
+        }
 
-        // Imposta i metadati della classe
-        classe.setUri(String.format("%s/%s/%s/%s",
-                UploadOpponentService.VOLUME_T0_BASE_PATH,
-                UploadOpponentService.UNMODIFIED_SRC,
-                classe.getName(),
-                classUTFileName));
+		if(FormValidation.validateClassUT(classe) == false)
+		{
+			throw new ClassValidationException(
+                "error.validation.class.failed"
+            );
+		}
 
-        classe.setDate(LocalDate.now().toString());
+        //-------------------------------------------------------------------------------------------
 
-        classRepository.save(classe);
+        try {
+            // Save class file to filesystem
+            classUTUploadService.saveClassUTFile(classUTFileName, classUTName, classUTFile);
 
-        System.out.println("Operazione completata con successo (uploadTest)");
+            // Process and save opponents from ZIP
+            uploadOpponentService.saveOpponentsFromZip(classUTFileName, classUTName, classUTFile, robotTestsZip);
 
-        return ResponseEntity.ok(response);
+            // Persist class metadata to database
+            classUTUploadService.persistClassUTMetadata(classe, classUTFileName);
+
+            // Success - build response
+            FileUploadResponse response = new FileUploadResponse();
+            response.setFileName(classUTFileName);
+            response.setSize(classUTFile.getSize());
+            response.setDownloadUri("/downloadFile");
+
+            logger.info("Operazione completata con successo (uploadClassAndOpponents) - class: {}", classUTName);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Rollback everything - just try to delete everything that might exist
+            logger.error("Error during upload of {}, initiating rollback. Error: {}", classUTName, e.getMessage(), e);
+            performRollback(classUTName);
+
+            // Re-throw the exception to be handled by GlobalExceptionHandler
+            if (e instanceof FileUploadException ||
+                e instanceof ClassValidationException ||
+                e instanceof RobotProcessingException ||
+                e instanceof ExternalServiceException) {
+                throw e;
+            } else if (e instanceof IOException ioException) {
+                throw new FileUploadException(
+                    "error.upload.io",
+                    ioException.getMessage()
+                );
+            } else {
+                throw new FileUploadException(
+                    "error.upload.unexpected",
+                    e.getMessage()
+                );
+            }
+        }
+    }
+
+    /**
+     * Performs rollback by attempting to delete everything that might have been created in case the upload fail.
+     */
+    private void performRollback(String classUTName) {
+        logger.warn("Starting rollback for class: {}", classUTName);
+
+        // Try to delete metadata from database
+        try {
+            classUTUploadService.rollbackClassUTMetadata(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: metadata cleanup - {}", e.getMessage());
+        }
+
+        // Try to delete opponent data from database
+        try {
+            opponentRepository.deleteByClassUT(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: opponent DB cleanup - {}", e.getMessage());
+        }
+
+        // Try to notify external service to delete opponents
+        try {
+            apiGatewayClient.callDeleteAllClassUTOpponents(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: external service cleanup - {}", e.getMessage());
+        }
+
+        // Try to delete all opponent files
+        try {
+            uploadOpponentService.rollbackOpponentFiles(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: opponent files cleanup - {}", e.getMessage());
+        }
+
+        // Try to delete class file
+        try {
+            classUTUploadService.rollbackClassUTFile(classUTName);
+        } catch (Exception e) {
+            logger.debug("Rollback: class file cleanup - {}", e.getMessage());
+        }
+
+        logger.info("Rollback completed for class: {}", classUTName);
     }
 
 
-    public ResponseEntity<?> downloadClasse(@PathVariable("name") String name) throws Exception {
+    public ResponseEntity<Object> downloadClasse(String name) {
 
-        System.out.println("/downloadFile/{name} (HomeController) - name: " + name);
-        System.out.println("test");
+        logger.info("/downloadFile (OpponentService) - name: {}", name);
+        logger.debug("DownloadClasse invoked");
         try {
             List<ClassUT> classe = searchRepository.findByText(name);
-            System.out.println("File download:");
-            System.out.println(classe.get(0).getUri());
-            ResponseEntity file = FileDownloadUtil.downloadClassFile(classe.get(0).getUri());
-            return file;
+            logger.info("File download: uri={}", classe.get(0).getUri());
+            ResponseEntity<Resource> resourceResponse = FileDownloadUtil.downloadClassFile(classe.get(0).getUri());
+            return ResponseEntity.status(resourceResponse.getStatusCode())
+                    .headers(resourceResponse.getHeaders())
+                    .body(resourceResponse.getBody());
         } catch (Exception e) {
-            System.out.println("Classe UT non trovata");
+            logger.error("Classe UT non trovata: name={}", name, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ClasseUT " + name + " non trovata");
         }
     }
@@ -166,8 +283,8 @@ public class OpponentService {
         return searchRepository.orderByName();
     }
 
-    public ResponseEntity<String> modificaClasse(String name, ClassUT newContent, String jwt, HttpServletRequest request) {
-        System.out.println("Token valido, può aggiornare informazioni inerenti le classi (update/{name})");
+    public ResponseEntity<String> modificaClasse(String name, ClassUT newContent) {
+        logger.debug("Token valido, aggiornamento informazioni classi (update/{})", name);
         Query query = new Query();
         query.addCriteria(Criteria.where("name").is(name));
         Update update = new Update().set("name", newContent.getName())
@@ -189,43 +306,51 @@ public class OpponentService {
         }
     }
 
-    public ResponseEntity<?> eliminaClasse(String name) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(name));
-        eliminaFile(name);
-        LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String data = currentDate.format(formatter);
-        Operation operation1 = new Operation((int) operationRepository.count(), "userAdmin", name, 2, data);
-        operationRepository.save(operation1);
-        ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
+    public ResponseEntity<Object> eliminaClasse(String name) {
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("name").is(name));
+            eliminaFile(name);
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String data = currentDate.format(formatter);
+            Operation operation1 = new Operation((int) operationRepository.count(), "userAdmin", name, 2, data);
+            operationRepository.save(operation1);
+            ClassUT deletedClass = mongoTemplate.findAndRemove(query, ClassUT.class);
 
-        Query query2 = new Query();
-        query2.addCriteria(Criteria.where("classUT").is(name));
-        mongoTemplate.findAndRemove(query, Opponent.class);
+            Query query2 = new Query();
+            query2.addCriteria(Criteria.where("classUT").is(name));
+            mongoTemplate.findAndRemove(query, Opponent.class);
 
-        apiGatewayClient.callDeleteAllClassUTOpponents(name);
-        if (deletedClass != null) {
-            return ResponseEntity.ok().body(deletedClass);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
+            apiGatewayClient.callDeleteAllClassUTOpponents(name);
+            if (deletedClass != null) {
+                return ResponseEntity.ok().body(deletedClass);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Classe non trovata");
+            }
+        } catch (RuntimeException e) {
+            logger.error("Errore durante l'eliminazione della classe {}: {}", name, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Errore durante l'eliminazione: " + e.getMessage());
         }
     }
 
     public void eliminaFile(String fileName) {
-        File directory = new File(String.format("%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, fileName));
-        File directoryUnmodifiedSrc = new File(String.format("%s/%s/%s", UploadOpponentService.VOLUME_T0_BASE_PATH, UploadOpponentService.UNMODIFIED_SRC, fileName));
+        Path classUTDirectory = Path.of(VOLUME_T0_BASE_PATH, fileName);
+        Path unmodifiedSrcDirectory = getUnmodifiedSrcPath(fileName);
 
-        System.out.println("name: " + fileName);
-        if (directory.exists() && directory.isDirectory()) {
+        logger.debug("name: {}", fileName);
+        if (classUTDirectory.toFile().exists() && classUTDirectory.toFile().isDirectory()) {
             try {
-                FileOperationUtil.deleteDirectoryRecursively(directory.toPath());
-                FileOperationUtil.deleteDirectoryRecursively(directoryUnmodifiedSrc.toPath());
-                logger.info("Cartella eliminata con successo (/deleteFile/{fileName})");
+                fileStorageService.deleteDirectoryRecursively(classUTDirectory);
+                fileStorageService.deleteDirectoryRecursively(unmodifiedSrcDirectory);
+                logger.info("Cartella eliminata con successo (/deleteFile/{})", fileName);
             } catch (IOException e) {
+                logger.error("Impossibile eliminare la cartella: {}", fileName, e);
                 throw new RuntimeException("Impossibile eliminare la cartella.");
             }
         } else {
+            logger.warn("Cartella non trovata: {}", fileName);
             throw new RuntimeException("Cartella non trovata.");
         }
     }

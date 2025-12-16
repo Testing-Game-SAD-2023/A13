@@ -17,6 +17,25 @@ async function uploadOpponent() {
     const testInput = document.getElementById('zipRobotInput');
     const tests = testInput.files[0];
 
+    // Validazione lato client
+    if (!name || name.trim() === '') {
+		$('#errorModalBody').text('Inserire il nome della classe.');
+		$('#errorModal').modal('show');
+        return;
+    }
+
+    if (!file) {
+        $('#errorModalBody').text('Selezionare il file della classe .java da caricare.');
+		$('#errorModal').modal('show');
+        return;
+    }
+
+    if (!tests) {
+        $('#errorModalBody').text('Selezionare il file ZIP dei test robot da caricare.');
+		$('#errorModal').modal('show');
+        return;
+    }
+
     const formData = new FormData();
     formData.append('classUTFile', file);
     formData.append('classUTDetails', JSON.stringify({
@@ -38,5 +57,11 @@ async function uploadOpponent() {
     if (data !== null) {
         console.log('Success:', data);
         $('#successModal').modal('show');
+        //-------------------------------------
+        // Se la classe è stata caricata correttamente, allora resetta il form.
+        const form = classInput?.form;
+        if (form) {
+            form.reset();
+        }
     }
 }

@@ -67,7 +67,7 @@ public class CompilationService {
         this.config = new Config();
         this.underTestClassName = null;
         this.underTestClassCode = null;
-        this.outputMaven = null;
+        this.outputMaven = "";
         this.testingClassName = null;
         this.testingClassCode = null;
         this.mvnPath = mvnPath;
@@ -84,11 +84,28 @@ public class CompilationService {
 
             copyPomFileForEvoSuiteTest();
             logger.info("[CompilationService] Avvio Maven");
-            if (compileExecuteCoverageWithMaven(true, "clean", "test", "jacoco:restore-instrumented-classes", "jacoco:report")) {
-                this.coverage = readFileToString(config.getCoverageFolderPath());
+            boolean success = compileExecuteCoverageWithMaven(true, "clean", "test", "jacoco:restore-instrumented-classes", "jacoco:report");
+            logger.info("[Compilation Service] Compiler working dir: {}", config.getPathCompiler());
+            logger.info("[Compilation Service] Maven output (truncated): {}", outputMaven == null ? "<null>" : (outputMaven.length() > 4000 ? outputMaven.substring(0,4000) + "...[truncated]" : outputMaven));
+            String covPath = config.getCoverageFolderPath();
+            File covFile = new File(covPath);
+            if (success) {
+                if (covFile.exists()) {
+                    this.coverage = readFileToString(covPath);
+                    logger.info("[Compilation Service] Coverage file found at {} ({} bytes)", covPath, covFile.length());
+                } else {
+                    // Fallback: search under the compiler working directory for any jacoco.xml
+                    String fallback = findJacocoUnder(config.getPathCompiler());
+                    if (fallback != null) {
+                        this.coverage = readFileToString(fallback);
+                        File fb = new File(fallback);
+                        logger.info("[Compilation Service] Coverage file found by fallback at {} ({} bytes)", fallback, fb.length());
+                    } else {
+                        this.coverage = null;
+                        logger.warn("[Compilation Service] Coverage file NOT found at {} and no fallback located under {}", covPath, config.getPathCompiler());
+                    }
+                }
                 this.errors = false;
-                logger.info("Coverage: ");
-                logger.info(this.coverage);
                 logger.info("[Compilation Service] Compilazione Terminata senza errori.");
             } else {
                 this.coverage = null;
@@ -97,7 +114,12 @@ public class CompilationService {
                 logger.info("[Compilation Service] Errori: {}", outputMaven);
             }
 
-            FileUtil.deleteDirectoryRecursively(Paths.get(config.getPathCompiler()));
+            boolean preserveTmp = "true".equalsIgnoreCase(System.getenv("DEBUG_PRESERVE_TMP"));
+            if (preserveTmp) {
+                logger.warn("[Compilation Service] DEBUG_PRESERVE_TMP=true, preserving compiler working dir: {}", config.getPathCompiler());
+            } else {
+                FileUtil.deleteDirectoryRecursively(Paths.get(config.getPathCompiler()));
+            }
         } catch (FileConcurrencyException e) {
             logger.error("[Compilation Service] [LOCK ERROR] ", e);
         } catch (IOException e) {
@@ -117,8 +139,26 @@ public class CompilationService {
             saveCodeToFile(this.testingClassName, this.testingClassCode, config.getTestingClassPath());
             saveCodeToFile(this.underTestClassName, this.underTestClassCode, config.getUnderTestClassPath());
             logger.info("[CompilationService] Avvio Maven");
-            if (compileExecuteCoverageWithMaven(false, "clean", "compile", "test")) {
-                this.coverage = readFileToString(config.getCoverageFolderPath());
+            boolean success = compileExecuteCoverageWithMaven(false, "clean", "compile", "test");
+            logger.info("[Compilation Service] Compiler working dir: {}", config.getPathCompiler());
+            logger.info("[Compilation Service] Maven output (truncated): {}", outputMaven == null ? "<null>" : (outputMaven.length() > 4000 ? outputMaven.substring(0,4000) + "...[truncated]" : outputMaven));
+            String covPath = config.getCoverageFolderPath();
+            File covFile = new File(covPath);
+            if (success) {
+                if (covFile.exists()) {
+                    this.coverage = readFileToString(covPath);
+                    logger.info("[CompilationService] Coverage file found at {} ({} bytes)", covPath, covFile.length());
+                } else {
+                    String fallback = findJacocoUnder(config.getPathCompiler());
+                    if (fallback != null) {
+                        this.coverage = readFileToString(fallback);
+                        File fb = new File(fallback);
+                        logger.info("[CompilationService] Coverage file found by fallback at {} ({} bytes)", fallback, fb.length());
+                    } else {
+                        this.coverage = null;
+                        logger.warn("[CompilationService] Coverage file NOT found at {} and no fallback located under {}", covPath, config.getPathCompiler());
+                    }
+                }
                 this.errors = false;
                 logger.info("[CompilationService] Compilazione terminata senza errori.");
             } else {
@@ -128,8 +168,13 @@ public class CompilationService {
             }
             deleteFile(config.getUnderTestClassPath() + underTestClassName);
             deleteFile(config.getTestingClassPath() + testingClassName);
-            deleteTemporaryDirectories(config.getPathCompiler());
-            logger.info("[CompilationService] File temporanei eliminati");
+            boolean preserveTmp = "true".equalsIgnoreCase(System.getenv("DEBUG_PRESERVE_TMP"));
+            if (preserveTmp) {
+                logger.warn("[CompilationService] DEBUG_PRESERVE_TMP=true, NOT deleting compiler working dir: {}", config.getPathCompiler());
+            } else {
+                deleteTemporaryDirectories(config.getPathCompiler());
+                logger.info("[CompilationService] File temporanei eliminati");
+            }
         } catch (FileConcurrencyException e) {
             logger.error("[CompilationService] [LOCK ERROR] ", e);
         } catch (IOException e) {
@@ -364,6 +409,20 @@ public class CompilationService {
     private String readFileToString(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    private String findJacocoUnder(String root) {
+        try {
+            return Files.walk(Paths.get(root))
+                    .filter(p -> p.getFileName().toString().equalsIgnoreCase("jacoco.xml")
+                            || p.getFileName().toString().equalsIgnoreCase("coveragetot.xml"))
+                    .map(p -> p.toAbsolutePath().toString())
+                    .findFirst()
+                    .orElse(null);
+        } catch (IOException | RuntimeException e) {
+            logger.warn("[findJacocoUnder] Error while searching for jacoco file under {}: {}", root, e.getMessage());
+            return null;
+        }
     }
 
     //mi serve per distinguere le eccezioni sulla concorrenza
