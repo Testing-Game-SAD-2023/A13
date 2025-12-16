@@ -218,6 +218,9 @@ function handleGameEnd(response) {
             // ✅ Livello superato, ma scalata non completata
             console.log(`[handleGameEnd] Livello ${currentLevel} superato! Prossimo: ${currentLevel + 1}/${totalLevels}`);
             
+            // Nascondo il pulsante Submit e mostro il pulsante Prossimo Livello
+            toggleScalataButtons(true);
+            
             let detailMessage = gameEndData.level_won_detail
                 .replace('{0}', currentLevel)
                 .replace('{1}', totalLevels);
@@ -232,6 +235,9 @@ function handleGameEnd(response) {
         } else {
             // ❌ Livello fallito
             console.log(`[handleGameEnd] Scalata fallita al livello ${currentLevel}/${totalLevels}`);
+            
+            // Nascondo i pulsanti Submit/Coverage e mostro il pulsante Ripeti Livello
+            toggleScalataButtons(false);
             
             let detailMessage = gameEndData.level_lost_detail
                 .replace('{0}', currentLevel)
@@ -378,6 +384,38 @@ function handleUnlockedAchievements(unlockedAchievements) {
 function resetButtons() {
     run_button.disabled = (mode === "Allenamento"); // Abilita/disabilita in base alla modalità
     coverage_button.disabled = false; // Abilita il pulsante di coverage
+}
+
+// Nasconde i pulsanti Submit/Coverage e mostra il pulsante appropriato per Scalata
+// @param showNextLevel: true per mostrare "Prossimo Livello", false per mostrare "Ripeti Livello"
+function toggleScalataButtons(showNextLevel) {
+    const runButton = document.getElementById('runButton');
+    const coverageButton = document.getElementById('coverageButton');
+    const nextLevelButton = document.getElementById('nextLevelButton');
+    const retryLevelButton = document.getElementById('retryLevelButton');
+    
+    // Nascondo i pulsanti standard
+    if (runButton) runButton.style.display = 'none';
+    if (coverageButton) coverageButton.style.display = 'none';
+    
+    // Mostro il pulsante appropriato in base al parametro
+    if (showNextLevel) {
+        if (retryLevelButton) retryLevelButton.style.display = 'none';
+        if (nextLevelButton) {
+            nextLevelButton.style.display = 'inline-block';
+            nextLevelButton.onclick = () => {
+                window.location.href = '/gamemode?mode=Scalata';
+            };
+        }
+    } else {
+        if (nextLevelButton) nextLevelButton.style.display = 'none';
+        if (retryLevelButton) {
+            retryLevelButton.style.display = 'inline-block';
+            retryLevelButton.onclick = () => {
+                window.location.href = '/gamemode?mode=Scalata';
+            };
+        }
+    }
 }
 
 /*

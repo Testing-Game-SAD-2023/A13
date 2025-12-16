@@ -600,6 +600,16 @@ public class TestClasse {
 										<!-- Icona nascosta -->
 									</div>
 								</button>
+								<!-- PROSSIMO LIVELLO (Scalata - Vittoria) -->
+								<button class="btn btn-primary" type="button" id="nextLevelButton" style="display: none;">
+									<i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+									<span th:text="#{next_level_button}"></span>
+								</button>
+								<!-- RIPETI LIVELLO (Scalata - Sconfitta) -->
+								<button class="btn btn-warning" type="button" id="retryLevelButton" style="display: none;">
+									<i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+									<span th:text="#{retry_level_button}"></span>
+								</button>
 							</div>
 						</nav>
 					</div>
