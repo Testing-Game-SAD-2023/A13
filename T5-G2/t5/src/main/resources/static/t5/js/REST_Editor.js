@@ -218,6 +218,9 @@ function handleGameEnd(response) {
             // ✅ Livello superato, ma scalata non completata
             console.log(`[handleGameEnd] Livello ${currentLevel} superato! Prossimo: ${currentLevel + 1}/${totalLevels}`);
             
+            // Nascondo il pulsante Submit e mostro il pulsante Prossimo Livello
+            hideSubmitShowNextLevel();
+            
             let detailMessage = gameEndData.level_won_detail
                 .replace('{0}', currentLevel)
                 .replace('{1}', totalLevels);
@@ -378,6 +381,23 @@ function handleUnlockedAchievements(unlockedAchievements) {
 function resetButtons() {
     run_button.disabled = (mode === "Allenamento"); // Abilita/disabilita in base alla modalità
     coverage_button.disabled = false; // Abilita il pulsante di coverage
+}
+
+// Nasconde il pulsante Submit e mostra il pulsante Prossimo Livello (solo per Scalata)
+function hideSubmitShowNextLevel() {
+    const runButton = document.getElementById('runButton');
+    const nextLevelButton = document.getElementById('nextLevelButton');
+    const coverageButton = document.getElementById('coverageButton');
+    
+    if (runButton) runButton.style.display = 'none';
+    if (coverageButton) coverageButton.style.display = 'none';
+    if (nextLevelButton) {
+        nextLevelButton.style.display = 'inline-block';
+        // Aggiungo l'event listener per il redirect
+        nextLevelButton.onclick = () => {
+            window.location.href = '/gamemode?mode=Scalata';
+        };
+    }
 }
 
 /*
