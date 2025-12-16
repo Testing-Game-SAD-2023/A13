@@ -36,10 +36,11 @@ Il task assegnato prevedeva l'ottimizzazione dell'API Gateway attraverso l'imple
  
 ### 2) Integrazioni effettuate con altri gruppi
 Per garantire il corretto funzionamento dell'infrastruttura di osservabilità distribuita, sono stati integrati e modificati i microservizi gestiti originariamente da altri gruppi (T1, T4, T5, T23).
-Nello specifico, sono state aggiornate le classi `AuthTokenFilter` e `WebSecurityConfig` nei servizi T1, T5 e T23 per permettere a Prometheus di effettuare lo scraping delle metriche senza essere bloccato dai filtri di sicurezza, uniformando la gestione della sicurezza per il monitoraggio.
+Nello specifico, sono state aggiornate le classi `AuthTokenFilter` e `WebSecurityConfig` nei servizi T1, T5 e T23 per permettere a Prometheus di effettuare lo scraping delle metriche senza essere bloccato dai filtri di sicurezza.
  
 ### 3) Errori/problematiche non risolte nel progetto consegnato
 * **Vulnerabilità Endpoint Actuator:** Gli endpoint di gestione `/actuator` (utilizzati per health check e metriche) non richiedono attualmente la validazione tramite token JWT. Questo espone potenzialmente metriche sensibili e lo stato del sistema ad accessi non autorizzati. Non è stato risolto in questa iterazione per priorità data alla stabilità funzionale, ma si raccomanda di estendere la configurazione di sicurezza.
 * **Visualizzazione Grafana:** Sono state riscontrate alcune imprecisioni nella visualizzazione degli errori nelle dashboard di Grafana. Alcune eccezioni sollevate dai microservizi potrebbero non essere intercettate correttamente dalle query attuali, causando potenziali falsi negativi nella rappresentazione grafica.
 * **Scalabilità Orizzontale (T7/T8):** Nonostante l'ottimizzazione del codice, per gestire carichi molto elevati sarebbe necessaria la scalabilità orizzontale dei servizi T7 e T8. Attualmente non è implementata poiché richiederebbe la disponibilità di più macchine server o di verificare l'effettiva capacità dell'attuale computer utilizzato.
+
 
