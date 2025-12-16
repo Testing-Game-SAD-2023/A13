@@ -118,6 +118,12 @@ public class NotificationService {
         }
     }
 
+    // Nuovo metodo per la cancellazione sicura
+    @Transactional
+    public void deleteNotificationByIdAndPlayerId(Long notificationID, long playerID) {
+        notificationRepository.deleteByIdAndPlayerID(notificationID, playerID);
+    }
+
     // Eliminare tutte le notifiche di un utente in un'unica query
     @Transactional
     public void clearNotificationsByPlayer(long playerID) {

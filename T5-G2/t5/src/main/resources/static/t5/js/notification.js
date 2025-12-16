@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateUI() {
         notificationMenu.innerHTML = "";
-        
+
         notificationsArray.forEach(notification => {
             const notificationItem = document.createElement("li");
             notificationItem.classList.add("dropdown-item", "d-flex", "justify-content-between", "align-items-start");

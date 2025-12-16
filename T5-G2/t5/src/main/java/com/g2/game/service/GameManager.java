@@ -81,7 +81,7 @@ public class GameManager {
             File file = new File("%s/%s".formatted(System.getProperty("user.dir"), turnExecutionConfigFile.replace("/", File.separator)));
             this.config = objectMapper.readValue(file, GameExecutionConfig.class);
         } catch (IOException e) {
-            logger.info("[PostConstruct init] Error in loading gamification_config.json, using default values: {}", e.getMessage());
+            logger.info("[PostConstruct init] Error in loading game_config.json, using default values: {}", e.getMessage());
             this.config = new GameExecutionConfig(true);
         }
     }

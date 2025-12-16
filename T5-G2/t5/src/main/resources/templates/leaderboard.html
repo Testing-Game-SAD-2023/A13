@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark" id="html-root" xmlns:th="http://thymeleaf.org">
+    <head th:replace="fragments/header :: header">
+<body>
+    <!-- NAV -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+    <!-- LEADERBOARD-->
+    <div class="container">
+
+        <h1 class="display-2 mt-2" th:text="#{classifica}"></h1>
+
+        <div class="container-fluid">
+            <!-- content -->
+            <div class="row mt-5 my-3">
+                <div class="card col border-primary mr-3">
+                    <div class="card-body row p-0">
+                        <div class="col text-center py-4">
+                            <i class="bi bi-brightness-high-fill display-5 text-primary"></i>
+                        </div>
+                        <div class="col text-start">
+                            <p>
+                                <h5> 1012 </h5> 
+                                <h5> Masters </h5>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card col border-danger mx-3">
+                    <div class="card-body row p-0">
+                        <div class="col text-center py-3">
+                            <i class="bi bi-brightness-low-fill display-5 text-danger"></i>
+                        </div>
+                        <div class="col text-start">
+                            <p>
+                                <h5> 1012 </h5> 
+                                <h5> Experts </h5>
+                            </p>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card col border-warning ml-3">
+                    <div class="card-body row p-0">
+                        <div class="col text-center py-4">
+                            <i class="bi bi-brightness-alt-low-fill display-5 text-warning"></i>
+                        </div>
+                        <div class="col text-start">
+                            <p>
+                                <h5> 105 </h5> 
+                                <h5> Novices </h5>
+                            </p>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div>
+            <table class="table table-striped" 
+                   data-toggle="table" 
+                   data-search="true"
+                   data-id-field="rank" 
+                   data-pagination="true"
+                   data-side-pagination="server"
+                   data-page-list="[10, 25, 50, 100, 200, All]" >
+                <thead>
+                <tr>
+                    <th scope="col" data-sortable="true" th:text="#{posizione}"></th> 
+                    <th scope="col" data-sortable="true" th:text="#{primo}"></th>
+                    <th scope="col" data-sortable="true" th:text="#{ultimpo}"></th>
+                    <th scope="col" data-sortable="true" data-searchable="false" th:text="#{punti}"></th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider  overflow-y-scroll">
+                    <!-- <tr th:each="player : ${listaPlayers}">
+                        <td th:text="${player.name}"></td>
+                        <td th:text="${player.surname}"></td>
+                    </tr>-->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- FOOTER -->
+    <div th:include="fragments/footer :: footer"></div>
+    <!-- SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.23.2/dist/bootstrap-table.min.js"></script>
+</body>
+</html>

@@ -8,8 +8,6 @@ servers:
     description: "Server for local development without dockerization"
   - url: "http://t23-controller:8082"
     description: "Server address inside the docker network"
-  - url: "http://localhost/api/userService/"
-    description: "Server address outside the docker network"
 paths:
   /players/{playerId}/progression:
     get:
@@ -284,9 +282,8 @@ paths:
                 type: "string"
   /players:
     get:
-      summary: "Get all players"
-      description: "Returns a list of all registered players"
-      operationId: ""
+      summary: "GET players"
+      operationId: "getAllPlayers"
       responses:
         "200":
           description: "OK"
@@ -295,7 +292,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/PlayerDTO"
+                  $ref: "#/components/schemas/Player"
   /players/searchStudents:
     post:
       summary: "POST players/searchStudents"
@@ -1237,24 +1234,6 @@ components:
             - "ALTRO"
         userProfile:
           $ref: "#/components/schemas/UserProfile"
-    PlayerDTO:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        name:
-          type: "string"
-        surname:
-          type: "string"
-        nickname:
-          type: "string"
-        email:
-          type: "string"
-        studies:
-          type: "string"
-        playerProgress:
-          $ref: "#/components/schemas/PlayerProgressDTO"
     Map:
       type: "object"
       properties: { }

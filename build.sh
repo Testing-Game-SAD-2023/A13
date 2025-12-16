@@ -27,6 +27,13 @@ mvn clean package || { echo "Error in T23-G1 build during mvn clean package" ; e
 docker build -t mick0974/a13:t23-g1 .
 cd "$ROOT_DIR"
 
+# Build NotificationBroker
+echo "Building NotificationBroker"
+cd "$ROOT_DIR/NotificationBroker"
+mvn clean package -U -DskipTests=true || { echo "Error in NotificationBroker build during mvn clean package" ; exit 1; }
+docker build -t mick0974/a13:notification-broker .
+cd "$ROOT_DIR"
+
 # Build T4-G18
 echo "Building T4"
 cd "$ROOT_DIR/T4/gamerepo"

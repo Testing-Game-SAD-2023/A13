@@ -11,4 +11,4 @@ COPY configuration/* /app/configuration/
 WORKDIR /app
 
 # Comando di avvio dell'applicazione
-CMD ["java", "-Dspring.profiles.active=prod", "-jar", "t5-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=prod", "t5-0.0.1-SNAPSHOT.jar"]

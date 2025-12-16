@@ -15,6 +15,17 @@ docker network ls | findstr /C:"global-network" >nul || docker network create gl
 set ROOT_DIR=%CD%
 
 rem Deploy dei componenti
+
+rem Deploy NotificationBroker (deve essere avviato prima di T5 e T23)
+echo Deploying NotificationBroker
+cd /d "%ROOT_DIR%\NotificationBroker"
+docker compose up -d
+if %ERRORLEVEL% neq 0 (
+    echo Error deploying NotificationBroker
+    exit /b 1
+)
+cd /d "%ROOT_DIR%"
+
 echo Deploying T1-G11
 cd /d "%ROOT_DIR%\T1-G11\applicazione\manvsclass"
 docker compose up -d
@@ -101,15 +112,6 @@ cd /d "%ROOT_DIR%\db-backup"
 docker compose up -d
 if %ERRORLEVEL% neq 0 (
     echo Error deploying db-backup
-    exit /b 1
-)
-cd /d "%ROOT_DIR%"
-
-echo Deploying observability stack
-cd /d "%ROOT_DIR%\observability"
-docker compose up -d
-if %ERRORLEVEL% neq 0 (
-    echo Error deploying observability stack
     exit /b 1
 )
 cd /d "%ROOT_DIR%"

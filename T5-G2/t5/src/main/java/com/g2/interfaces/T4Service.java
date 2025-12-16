@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class T4Service extends BaseService {
+public class T4Service extends BaseServiceREST {
 
     // Costante che definisce l'URL di base per le richieste REST
     private static final String BASE_URL = "http://api_gateway-controller:8090";

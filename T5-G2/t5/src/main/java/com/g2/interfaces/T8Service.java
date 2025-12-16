@@ -6,7 +6,7 @@ import org.springframework.web.client.RestTemplate;
 import testrobotchallenge.commons.models.dto.score.EvosuiteCoverageDTO;
 
 @Service
-public class T8Service extends BaseService {
+public class T8Service extends BaseServiceREST {
 
     /*
      * Per il test locale senza container docker usare:

@@ -45,14 +45,20 @@ if ERRORLEVEL 1 (
 docker build -t mick0974/a13:t23-g1 .
 cd /d "%ROOT_DIR%"
 
-rem Build T4-G18
-echo Building T4
-cd /d "%ROOT_DIR%\T4\gamerepo"
-call mvn clean package -DskipTests=true
+rem Build NotificationBroker
+echo Building NotificationBroker
+cd /d "%ROOT_DIR%\NotificationBroker"
+call mvn clean package -U -DskipTests=true
 if ERRORLEVEL 1 (
-    echo Error in T4 build during call mvn clean package
+    echo Error in NotificationBroker build during call mvn clean package
     exit /b 1
 )
+docker build -t mick0974/a13:notification-broker .
+cd /d "%ROOT_DIR%"
+
+rem Build T4-G18
+echo Building T4
+cd /d "%ROOT_DIR%\T4"
 docker build -t mick0974/a13:t4-g18 .
 cd /d "%ROOT_DIR%"
 

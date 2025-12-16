@@ -18,13 +18,13 @@ otel:
         protocol: grpc
 
 spring:
-  redis: 
+  redis:
     host: redis_rate_limiter
     port: 6380
-    timeout: 20000  
-  
+    timeout: 20000
+
   cache:
-    type: redis 
+    type: redis
 
   cloud:
     gateway:

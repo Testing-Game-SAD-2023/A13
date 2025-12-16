@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class T1Service extends BaseService {
+public class T1Service extends BaseServiceREST {
 
     /*
      * Per il test locale senza container docker usare:

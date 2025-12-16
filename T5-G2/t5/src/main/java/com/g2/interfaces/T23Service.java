@@ -4,7 +4,7 @@
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-20.0
  *   Unless required by applicable law or agreed to in writing, software
  *   distributed under the License is distributed on an "AS IS" BASIS,
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +14,8 @@
 package com.g2.interfaces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.g2.model.NotificationResponse;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.g2.model.User;
-import com.g2.model.dto.PlayerDTO;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.model.dto.PlayerProgressDTO;
 import com.g2.model.dto.UpdateGameProgressDTO;
@@ -40,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class T23Service extends BaseService {
+public class T23Service extends BaseServiceREST {
 
     private static final Logger logger = LoggerFactory.getLogger(T23Service.class);
     private static final String EMAIL_FIELD = "email"; // Dichiarato come variabile per rimuovere l'issue di SonarQube per le troppe ripetizioni di "email"
@@ -50,7 +49,7 @@ public class T23Service extends BaseService {
      */
     private static final String BASE_URL = "http://api_gateway-controller:8090";
     private static final String SERVICE_PREFIX = "userService";
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
     /*
      * La dimensione del costruttore è stata ridotta dividendolo in sotto-metodi per essere compliant con SonarQube
@@ -59,57 +58,32 @@ public class T23Service extends BaseService {
     public T23Service(RestTemplate restTemplate) {
         super(restTemplate, BASE_URL + "/" + SERVICE_PREFIX);
 
-        // Registrazione delle azioni
+        // Inizializza l'ObjectMapper e registra il modulo per gestire i tipi Java 8 Date/Time (es. LocalDateTime)
+        this.mapper = new ObjectMapper();
+        this.mapper.registerModule(new JavaTimeModule());
+
+        // Registrazione delle azioni che questo servizio può compiere
         registerAction("GetAuthenticated", new ServiceActionDefinition(
                 params -> getAuthenticated((String) params[0]),
                 String.class
         ));
 
-        registerNotificationActions();
         registerGetUserActions();
         registerUserProfileActions();
         registerPlayerStatusActions();
-        registerPlayerActions();
     }
 
     /*
      * Di seguito sono riportati i metodi in cui è stato scomposto il costruttore per ridurne la dimensione e risolvere l'issue di SonarQube
      */
-    private void registerNotificationActions() {
-        registerAction("NewNotification", new ServiceActionDefinition(
-                params -> newNotification((String) params[0], (String) params[1], (String) params[2]),
-                String.class, String.class, String.class
-        ));
-
-        registerAction("getNotifications", new ServiceActionDefinition(
-                params -> getNotifications((String) params[0], (Integer) params[1], (Integer) params[2]),
-                String.class, Integer.class, Integer.class
-        ));
-
-        registerAction("updateNotification", new ServiceActionDefinition(
-                params -> updateNotification((String) params[0], (String) params[1]),
-                String.class, String.class
-        ));
-
-        registerAction("deleteNotification", new ServiceActionDefinition(
-                params -> deleteNotification((String) params[0], (String) params[1]),
-                String.class, String.class
-        ));
-
-        registerAction("clearNotifications", new ServiceActionDefinition(
-                params -> clearNotifications((String) params[0]),
-                String.class
-        ));
-    }
-
     private void registerGetUserActions() {
         registerAction("GetUsers", new ServiceActionDefinition(
                 params -> getUsers() //metodo senza parametri
         ));
 
         registerAction("GetUser", new ServiceActionDefinition(
-                params -> getUser((Long) params[0]),
-                Long.class
+                params -> getUser((String) params[0]),
+                String.class
         ));
 
         registerAction("GetUsersByList", new ServiceActionDefinition(
@@ -175,17 +149,6 @@ public class T23Service extends BaseService {
         registerAction("updateGlobalAchievements", new ServiceActionDefinition(
                 params -> updateGlobalAchievements((long) params[0], (Set<String>) params[1]), Long.class, Set.class
         ));
-    }
-
-    private void registerPlayerActions(){
-        registerAction("getAllPlayers", new ServiceActionDefinition(
-            params -> getAllPlayers()
-        ));
-    }
-
-    private List<PlayerDTO> getAllPlayers() {
-        final String endpoint = "/players";
-        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>(){});
     }
 
     private GameProgressDTO createPlayerProgressAgainstOpponent(long playerId, GameMode gameMode, String classUT, String type, OpponentDifficulty difficulty) {
@@ -254,12 +217,12 @@ public class T23Service extends BaseService {
 
     // Metodo per ottenere la lista degli utenti
     private List<User> getUsers() {
-        final String endpoint = "/players/students_list";
+        final String endpoint = "/student/students_list";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {
         });
     }
 
-    private User getUser(long userId) {
+    private User getUser(String userId) {
         final String endpoint = "/players/students_list/" + userId;
         return callRestGET(endpoint, null, User.class);
     }
@@ -267,7 +230,7 @@ public class T23Service extends BaseService {
     //Do una lista di ID e mi ritorna una lista di User
     // Implementata a mano perchè un po' strana è una POST che ottiene dati come una GET
     private List<User> getUserByList(List<String> idsStudenti) {
-        final String endpoint = "/players/getStudentiTeam";
+        final String endpoint = "/student/getStudentiTeam";
         // Crea un oggetto HttpEntity con i dati che vogliamo inviare (la lista degli ID)
         HttpEntity<List<String>> requestEntity = new HttpEntity<>(idsStudenti);
         // Esegui la chiamata POST all'endpoint
@@ -303,66 +266,6 @@ public class T23Service extends BaseService {
         final String endpoint = "/profile/user_by_email";
         Map<String, String> queryParams = Map.of(EMAIL_FIELD, userEmail);
         return callRestGET(endpoint, queryParams, User.class);
-    }
-
-    // Metodo per la creazione di una notifica
-    private String newNotification(String userEmail, String title, String message) {
-        final String endpoint = "/notification/new_notification";
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add(EMAIL_FIELD, userEmail);
-        map.add("title", title);
-        map.add("message", message);
-        return callRestPost(endpoint, map, null, String.class);
-    }
-
-    public NotificationResponse getNotifications(String userEmail, int page, int size) {
-        final String endpoint = "/notification/notifications";
-        // Creazione dei parametri di query, inclusi email, pagina e dimensione
-        Map<String, String> queryParams = Map.of(
-                EMAIL_FIELD, userEmail,
-                "page", String.valueOf(page),
-                "size", String.valueOf(size)
-        );
-
-        ResponseEntity<NotificationResponse> response = restTemplate.exchange(
-                buildUri(endpoint, queryParams),
-                HttpMethod.GET,
-                null, // Puoi aggiungere intestazioni, se necessario
-                NotificationResponse.class
-        );
-
-        if (response == null) {
-            return new NotificationResponse();
-        } else {
-            return response.getBody();
-        }
-    }
-
-    public String updateNotification(String userEmail, String notificationID) {
-        final String endpoint = "/notification/update_notification";
-        // Imposta i dati del form
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add(EMAIL_FIELD, userEmail);
-        formData.add("id notifica", notificationID);
-        // Effettua una chiamata POST per aggiornare lo stato della notifica
-        return callRestPost(endpoint, formData, null, String.class);
-    }
-
-    // Metodo per eliminare una singola notifica
-    public String deleteNotification(String userEmail, String notificationID) {
-        final String endpoint = "/notification/delete_notification";
-        Map<String, String> queryParams = Map.of(
-                EMAIL_FIELD, userEmail,
-                "idnotifica", notificationID
-        );
-        return callRestDelete(endpoint, queryParams);
-    }
-
-    // Metodo per eliminare tutte le notifiche
-    public String clearNotifications(String userEmail) {
-        final String endpoint = "/notification/clear_notifications";
-        Map<String, String> queryParams = Map.of(EMAIL_FIELD, userEmail);
-        return callRestDelete(endpoint, queryParams);
     }
 
     /*

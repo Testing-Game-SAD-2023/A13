@@ -93,5 +93,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     // Trova le notifiche per un utente che corrispondono a più tipi
     Page<Notification> findByPlayerIDAndTypeIn(long playerID, List<String> types, Pageable pageable);
 
-
+    // Metodo aggiunto per la cancellazione sicura
+    @Transactional
+    @Modifying
+    void deleteByIdAndPlayerID(Long id, long playerID);
 }
