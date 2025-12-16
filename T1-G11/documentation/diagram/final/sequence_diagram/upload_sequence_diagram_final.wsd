@@ -1,4 +1,4 @@
-@startuml Upload Class and Opponents Sequence
+@startuml Upload_Sequence_Diagram_Final
 
 !define CONTROLLER_COLOR #E1F5FE
 !define SERVICE_COLOR #FFF3E0
@@ -30,6 +30,40 @@ activate Controller
 
 Controller -> OpponentSvc: uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip)
 activate OpponentSvc
+
+' Validate and Parse ClassUT Details
+OpponentSvc -> OpponentSvc: validate file presence
+note right
+  Check:
+  - classUTFile not null/empty
+  - robotTestsZip not null/empty
+  Throws FileUploadException if invalid
+end note
+
+OpponentSvc -> OpponentSvc: parse JSON to ClassUT
+note right
+  ClassUTDetailsDTO.parseFromJson(classUTDetails)
+  Throws ClassValidationException if JSON invalid
+end note
+
+OpponentSvc -> OpponentSvc: JavaMetadataExtractor.getClassNameFromJavaSourceFile()
+note right
+  Extract class name from .java file
+  Verify:
+  - Class declaration exists
+  - Class name matches form input
+  Throws ClassValidationException if mismatch
+end note
+
+OpponentSvc -> OpponentSvc: FormValidation.validateClassUT(classe)
+note right
+  Validates ClassUT object:
+  - Class name length (1-30 chars)
+  - Description length (≤150 chars)
+  - Category count (≤3) and length (≤30 each)
+  - Difficulty: Beginner/Intermediate/Advanced
+  Returns false if invalid → ClassValidationException
+end note
 
 ' Save ClassUT File
 OpponentSvc -> ClassUploadSvc: saveClassUTFile(fileName, name, file)
@@ -155,5 +189,14 @@ deactivate OpponentSvc
 
 Controller --> Admin: 200 OK (FileUploadResponse)
 deactivate Controller
+
+note over Controller
+  GlobalExceptionHandler catches:
+  - FileUploadException
+  - ClassValidationException
+  - RobotProcessingException
+  Returns localized error messages
+  with appropriate HTTP status codes
+end note
 
 @enduml

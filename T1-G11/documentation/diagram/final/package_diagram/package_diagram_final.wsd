@@ -1,4 +1,4 @@
-@startuml Package_Diagram_v2
+@startuml Package_Diagram_final
 
 !define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
 !include ICONURL/common.puml
@@ -34,6 +34,7 @@ package "Frontend Layer" <<Rectangle>> #LightBlue {
 package "Controller Layer" <<Rectangle>> #LightGreen {
   package "com.groom.manvsclass.controller" {
     [OpponentController]
+    [GlobalExceptionHandler]
   }
 }
 
@@ -69,12 +70,7 @@ package "Service Layer" <<Rectangle>> #LightYellow {
   }
 }
 
-' Config Layer
-package "Config Layer" <<Rectangle>> #LightGoldenRodYellow {
-  package "com.groom.manvsclass.config" {
-    [FormValidation]
-  }
-}
+
 
 ' Utility Layer
 package "Utility Layer" <<Rectangle>> #LightCoral {
@@ -87,6 +83,13 @@ package "Utility Layer" <<Rectangle>> #LightCoral {
   
   package "com.groom.manvsclass.util.filesystem" {
     [FileDownloadUtil]
+  }
+}
+
+' Config Layer
+package "Config Layer" <<Rectangle>> #LightGoldenRodYellow {
+  package "com.groom.manvsclass.config" {
+    [FormValidation]
   }
 }
 
@@ -169,6 +172,15 @@ database "MongoDB" {
 [UploadOpponentService] ..> [FileUploadException] : throws
 [UploadOpponentService] ..> [RobotProcessingException] : throws
 [OpponentTransformationService] ..> [RobotProcessingException] : throws
+
+' GlobalExceptionHandler catches exceptions
+[GlobalExceptionHandler] ..> [FileUploadException] : handles
+[GlobalExceptionHandler] ..> [ClassValidationException] : handles
+[GlobalExceptionHandler] ..> [RobotProcessingException] : handles
+[GlobalExceptionHandler] ..> [ExternalServiceException] : handles
+[GlobalExceptionHandler] ..> [OpponentNotFoundException] : handles
+[GlobalExceptionHandler] ..> [CoverageNotFoundException] : handles
+[GlobalExceptionHandler] ..> [ScoreNotFoundException] : handles
 
 ' Service -> Persistence
 [OpponentService] --> [OpponentRepository] : queries

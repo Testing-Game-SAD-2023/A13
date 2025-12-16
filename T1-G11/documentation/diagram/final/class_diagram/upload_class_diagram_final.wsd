@@ -1,15 +1,18 @@
-@startuml Upload Class Diagram
+@startuml Upload_Class_Diagram_Final
 
 !define COMPONENT_COLOR #E1F5FE
 !define SERVICE_COLOR #FFF3E0
 !define REPOSITORY_COLOR #F3E5F5
 !define MODEL_COLOR #E8F5E9
+!define CONFIG_COLOR #FFF9C4
 
 skinparam class {
     BackgroundColor<<Component>> COMPONENT_COLOR
     BackgroundColor<<Service>> SERVICE_COLOR
     BackgroundColor<<Repository>> REPOSITORY_COLOR
     BackgroundColor<<Model>> MODEL_COLOR
+    BackgroundColor<<Config>> CONFIG_COLOR
+    BackgroundColor<<Utility>> #FFCCBC
     BorderColor #424242
     ArrowColor #424242
 }
@@ -21,6 +24,25 @@ class OpponentController <<Component>> {
     + uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip): ResponseEntity
     + getAllOpponents(): ResponseEntity
     + getOpponentData(classUT, type, difficulty): ResponseEntity
+}
+
+class GlobalExceptionHandler <<Component>> {
+    - messageSource: MessageSource
+    --
+    + handleFileUploadException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleClassValidationException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleRobotProcessingException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleExternalServiceException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleOpponentNotFoundException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleScoreNotFoundException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleCoverageNotFoundException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleMaxUploadSizeExceededException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleIllegalArgumentException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleNullPointerException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleIOException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleRuntimeException(ex): ResponseEntity<ErrorResponseDTO>
+    + handleGlobalException(ex): ResponseEntity<ErrorResponseDTO>
+    - getLocalizedMessage(ex, locale): String
 }
 
 class OpponentService <<Service>> {
@@ -135,6 +157,32 @@ class OpponentPathResolver <<Utility>> {
     + {static} getTempOperationFolder(classUTName): Path
 }
 
+class FormValidation <<Config>> {
+    + {static} CLASS_NAME_MAX_LENGTH: int = 30
+    + {static} CLASS_DESCRIPTION_MAX_LENGTH: int = 150
+    + {static} CLASS_CATEGORY_MAX_LENGTH: int = 30
+    + {static} DIFFICULTY_LEVELS: String[]
+    --
+    + {static} validateClassUT(classUT): boolean
+}
+
+class JavaMetadataExtractor <<Utility>> {
+    --
+    + {static} extractPackageFromDeclaration(code): String[]
+    + {static} extractSourcePackageFromTestCode(code, className, robotType): String[]
+    + {static} getClassNameFromJavaSourceFile(fileContent): String
+}
+
+note right of FormValidation
+  Package: com.groom.manvsclass.config
+  
+  Validation rules:
+  - Class name: 1-30 chars
+  - Description: 0-150 chars
+  - Category: max 3, each ≤30 chars
+  - Difficulty: "Beginner", "Intermediate", "Advanced"
+end note
+
 ' Models
 class ClassUT <<Model>> {
     - name: String
@@ -173,6 +221,7 @@ interface OpponentRepository <<Repository>> {
 
 ' Relationships - Controller to Services
 OpponentController --> OpponentService : uses
+GlobalExceptionHandler ..> OpponentController : handles exceptions
 
 ' OpponentService relationships
 OpponentService --> UploadOpponentService : uses
@@ -204,6 +253,9 @@ CoverageService --> ApiGatewayClient : uses
 JavaSourceFileService --> FileStorageService : uses
 
 UploadOpponentService --> OpponentPathResolver : uses
+OpponentService ..> FormValidation : validates input
+OpponentService ..> JavaMetadataExtractor : extracts class name
+JavaSourceFileService ..> JavaMetadataExtractor : extracts packages
 
 ' Relationships - Models
 ClassUTUploadService ..> ClassUT : creates
