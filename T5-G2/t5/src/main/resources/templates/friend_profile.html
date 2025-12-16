@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profilo</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    :root{
+      --profile-bg: #0b1b2b;
+      --profile-accent: #198754;
+    }
+    body{ background: var(--profile-bg); }
+    .card-accent{ border-top: 4px solid var(--profile-accent); }
+  </style>
+</head>
+
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<div class="container py-4">
+  <div class="row g-4">
+
+    <div class="col-12 col-lg-5">
+      <div class="card card-accent shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            <img id="avatarImg" src="/t5/images/profileImages/default.png" alt="Avatar"
+                 style="width:92px;height:92px;border-radius:18px;object-fit:cover;">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2">
+                <h4 class="mb-0" id="nicknameText">-</h4>
+                <span id="visibilityBadge" class="badge text-bg-success">Public</span>
+              </div>
+              <div class="text-muted" id="nameText"></div>
+              <div class="mt-3 d-flex gap-2 align-items-center flex-wrap">
+                <button id="followBtn" class="btn btn-success">
+                  <i class="bi bi-person-plus"></i> Segui
+                </button>
+                <a class="btn btn-outline-secondary" href="/SearchFriend">
+                  <i class="bi bi-search"></i> Cerca altri utenti
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <hr>
+
+          <h6 class="mb-2">Statistiche</h6>
+          <div class="row text-center">
+            <div class="col">
+              <div class="fw-semibold" id="matchesPlayed">0</div>
+              <div class="text-muted small">Matches played</div>
+            </div>
+            <div class="col">
+              <div class="fw-semibold" id="matchesWon">0</div>
+              <div class="text-muted small">Matches won</div>
+            </div>
+            <div class="col">
+              <div class="fw-semibold" id="lastMatch">-</div>
+              <div class="text-muted small">Last match</div>
+            </div>
+          </div>
+
+          <hr>
+
+          <h6 class="mb-2">Bio</h6>
+          <div id="bioText" class="text-muted" style="white-space:pre-wrap">-</div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+      <div class="card card-accent shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-3">Social</h5>
+
+          <div class="row text-center">
+            <div class="col">
+              <div class="fw-semibold" id="followersCount">0</div>
+              <div class="text-muted small">Followers</div>
+            </div>
+            <div class="col">
+              <div class="fw-semibold" id="followingCount">0</div>
+              <div class="text-muted small">Following</div>
+            </div>
+          </div>
+
+          <!-- hint rimosso: era un testo tecnico che non deve comparire in UI -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Friend ID dal server (serve al JS)
+     NOTA: serve th:inline="javascript" altrimenti Thymeleaf non sostituisce [[...]] e rimane null. -->
+<script th:inline="javascript">
+  window.__FRIEND_ID__ = /*[[${friendId}]]*/ null;
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JS -->
+<script th:src="@{/t5/js/UserUtil.js}"></script>
+<script th:src="@{/t5/js/friend_profile.js}"></script>
+
+</body>
+</html>
