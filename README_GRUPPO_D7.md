@@ -32,7 +32,7 @@ Il task assegnato prevedeva l'ottimizzazione dell'API Gateway attraverso l'imple
 | **Infrastruttura (Docker/Config)** | Creazione pipeline OpenTelemetry (Collector, Prometheus, Tempo, Loki, Grafana). Configurazione dashboard e orchestrazione container. | OpenTelemetry, Prometheus, Tempo, Loki, Grafana |
 | **T8 (EvoSuite)** | Refactoring logica di business (`CoverageService`, `BuildResponse`) per ottimizzazione memoria e tempi di risposta. Strumentazione per tracciamento. | Micrometer |
 | **T1, T4, T5** | Strumentazione per tracciamento distribuito (aggiunta dipendenze `pom.xml`) e configurazione sicurezza per scraping metriche. | Micrometer |
-| **T23** | Aggiornamento script inizializzazione DB (`init.sql`) e configurazione sicurezza per scraping metriche. | PostgreSQL (init script) |
+| **T23** | Aggiornamento script inizializzazione DB (`init.sql`) e configurazione sicurezza per scraping metriche. | MySQL (init script) |
  
 ### 2) Integrazioni effettuate con altri gruppi
 Per garantire il corretto funzionamento dell'infrastruttura di osservabilità distribuita, sono stati integrati e modificati i microservizi gestiti originariamente da altri gruppi (T1, T4, T5, T23).
@@ -42,3 +42,4 @@ Nello specifico, sono state aggiornate le classi `AuthTokenFilter` e `WebSecurit
 * **Vulnerabilità Endpoint Actuator:** Gli endpoint di gestione `/actuator` (utilizzati per health check e metriche) non richiedono attualmente la validazione tramite token JWT. Questo espone potenzialmente metriche sensibili e lo stato del sistema ad accessi non autorizzati. Non è stato risolto in questa iterazione per priorità data alla stabilità funzionale, ma si raccomanda di estendere la configurazione di sicurezza.
 * **Visualizzazione Grafana:** Sono state riscontrate alcune imprecisioni nella visualizzazione degli errori nelle dashboard di Grafana. Alcune eccezioni sollevate dai microservizi potrebbero non essere intercettate correttamente dalle query attuali, causando potenziali falsi negativi nella rappresentazione grafica.
 * **Scalabilità Orizzontale (T7/T8):** Nonostante l'ottimizzazione del codice, per gestire carichi molto elevati sarebbe necessaria la scalabilità orizzontale dei servizi T7 e T8. Attualmente non è implementata poiché richiederebbe la disponibilità di più macchine server o di verificare l'effettiva capacità dell'attuale computer utilizzato.
+
