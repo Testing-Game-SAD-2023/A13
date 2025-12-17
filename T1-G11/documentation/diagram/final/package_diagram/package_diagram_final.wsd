@@ -5,246 +5,129 @@
 !include ICONURL/font-awesome-5/layer_group.puml
 
 skinparam packageStyle rectangle
-skinparam linetype ortho
+skinparam linetype polyline
+skinparam nodesep 20
+skinparam ranksep 40
 
-' Frontend Layer
+' Top Row - Frontend and Controller
 package "Frontend Layer" <<Rectangle>> #LightBlue {
   package "templates" {
     [opponents_upload.html]
     [dashboard.html]
-    [admins_info.html]
-    [players_info.html]
   }
   
   package "static/t1/js" {
-    package "opponents" {
-      [opponents_upload.js]
-      [opponents_main.js]
-    }
-    
-    package "utils" {
-      [api.js]
-      [endpoints.js]
-      [renderErrors.js]
-    }
+    [opponents_upload.js]
+    [api.js]
+    [endpoints.js]
   }
 }
 
-' Controller Layer
 package "Controller Layer" <<Rectangle>> #LightGreen {
-  package "com.groom.manvsclass.controller" {
-    [OpponentController]
-    [GlobalExceptionHandler]
-  }
+  [OpponentController]
+  [GlobalExceptionHandler]
 }
 
-' Service Layer
-package "Service Layer" <<Rectangle>> #LightYellow {
-  package "com.groom.manvsclass.service" {
-    [OpponentService]
-    [CoverageService]
-  }
-  
-  package "com.groom.manvsclass.service.upload" {
-    [UploadOpponentService]
-    [ClassUTUploadService]
-    [FileStorageService]
-    [JavaSourceFileService]
-    [OpponentTransformationService]
-    [OpponentPersistenceService]
-  }
-  
-  package "com.groom.manvsclass.service.upload.score" {
-    [CoverageReader]
-    [ScoreBuilder]
-  }
-  
-  package "com.groom.manvsclass.service.exception" {
-    [FileUploadException]
-    [ClassValidationException]
-    [RobotProcessingException]
-    [ExternalServiceException]
-    [OpponentNotFoundException]
-    [CoverageNotFoundException]
-    [ScoreNotFoundException]
-  }
+' Second Row - Service Layer Split
+package "Service Layer - Core" <<Rectangle>> #LightYellow {
+  [OpponentService]
+  [CoverageService]
 }
 
+package "Service Layer - Upload" <<Rectangle>> #FFF9C4 {
+  [UploadOpponentService]
+  [ClassUTUploadService]
+  [FileStorageService]
+  [JavaSourceFileService]
+  [OpponentTransformationService]
+  [OpponentPersistenceService]
+}
 
+' Third Row - Supporting Services
+package "Service Layer - Support" <<Rectangle>> #FFFACD {
+  [CoverageReader]
+  [ScoreBuilder]
+}
 
-' Utility Layer
+package "Exception Layer" <<Rectangle>> #FFE4E1 {
+  [FileUploadException]
+  [ClassValidationException]
+  [RobotProcessingException]
+  [ExternalServiceException]
+}
+
+' Fourth Row - Utilities and Config
 package "Utility Layer" <<Rectangle>> #LightCoral {
-  package "com.groom.manvsclass.util.upload" {
-    [JavaMetadataExtractor]
-    [LevelExtractor]
-    [OpponentPathResolver]
-    [FileUploadResponse]
-  }
-  
-  package "com.groom.manvsclass.util.filesystem" {
-    [FileDownloadUtil]
-  }
+  [JavaMetadataExtractor]
+  [LevelExtractor]
+  [OpponentPathResolver]
+  [FileUploadResponse]
+  [FileDownloadUtil]
 }
 
-' Config Layer
 package "Config Layer" <<Rectangle>> #LightGoldenRodYellow {
-  package "com.groom.manvsclass.config" {
-    [FormValidation]
-  }
+  [FormValidation]
 }
 
-' API Layer
 package "API Layer" <<Rectangle>> #Lavender {
-  package "com.groom.manvsclass.api" {
-    [ApiGatewayClient]
-    [RestExchangeTemplateHelper]
-  }
+  [ApiGatewayClient]
+  [RestExchangeTemplateHelper]
 }
 
-' Persistence Layer
+' Fifth Row - Persistence
 package "Persistence Layer" <<Rectangle>> #LightGray {
-  package "com.groom.manvsclass.model.repository" {
+  package "Repositories" {
     [OpponentRepository]
     [ClassRepository]
-    [OperationRepository]
-    [SearchRepositoryImpl]
   }
   
-  package "com.groom.manvsclass.model" {
+  package "Models" {
     [Opponent]
     [ClassUT]
-    [Operation]
-    [Admin]
   }
 }
 
-' External Services
-cloud "External Services" {
+' External Services - Compact
+cloud "External" {
   [API Gateway]
-  [User Service]
-  [Jacoco Coverage Service]
-  [Evosuite Coverage Service]
+  [Coverage Services]
 }
 
 database "MongoDB" {
-  [opponents collection]
-  [classes collection]
-  [operations collection]
+  [opponents]
+  [classes]
 }
 
-' Frontend -> Controller
-[opponents_upload.js] --> [api.js] : calls
-[api.js] --> [endpoints.js] : uses
-[api.js] ..> [OpponentController] : HTTP POST
+' Key Relationships Only
+[opponents_upload.js] --> [api.js]
+[api.js] --> [OpponentController]
+[OpponentController] --> [OpponentService]
 
-' Controller -> Service
-[OpponentController] --> [OpponentService] : delegates
+[OpponentService] --> [UploadOpponentService]
+[OpponentService] --> [ClassUTUploadService]
+[OpponentService] ..> [FormValidation]
+[OpponentService] ..> [JavaMetadataExtractor]
 
-' Service -> Service.Upload
-[OpponentService] --> [UploadOpponentService] : orchestrates upload
-[OpponentService] --> [ClassUTUploadService] : saves ClassUT file
-[OpponentService] --> [FileStorageService] : file operations
+[UploadOpponentService] --> [FileStorageService]
+[UploadOpponentService] --> [JavaSourceFileService]
+[UploadOpponentService] --> [OpponentTransformationService]
 
-' Service.Upload internal dependencies
-[UploadOpponentService] --> [FileStorageService] : file ops
-[UploadOpponentService] --> [JavaSourceFileService] : Java file handling
-[UploadOpponentService] --> [CoverageService] : coverage generation
-[UploadOpponentService] --> [OpponentTransformationService] : creates opponents
+[OpponentTransformationService] --> [OpponentPersistenceService]
+[OpponentTransformationService] --> [CoverageReader]
+[OpponentTransformationService] --> [ScoreBuilder]
 
-[ClassUTUploadService] --> [FileStorageService] : saves files
-[JavaSourceFileService] --> [FileStorageService] : delegates ops
+[OpponentService] --> [OpponentRepository]
+[OpponentService] --> [ClassRepository]
+[OpponentPersistenceService] --> [OpponentRepository]
 
-[OpponentTransformationService] --> [OpponentPersistenceService] : persists
-[OpponentTransformationService] ..> [CoverageReader] : reads coverage
-[OpponentTransformationService] ..> [ScoreBuilder] : builds scores
+[CoverageService] --> [ApiGatewayClient]
+[ApiGatewayClient] --> [API Gateway]
 
-' Service.Upload -> Utilities
-[UploadOpponentService] ..> [OpponentPathResolver] : path resolution
-[OpponentTransformationService] ..> [LevelExtractor] : extracts difficulty
-[JavaSourceFileService] ..> [JavaMetadataExtractor] : extracts packages/metadata
-[OpponentService] ..> [JavaMetadataExtractor] : validates class name
-[OpponentService] ..> [FormValidation] : validates form data
+[GlobalExceptionHandler] ..> [FileUploadException]
+[GlobalExceptionHandler] ..> [ClassValidationException]
+[GlobalExceptionHandler] ..> [RobotProcessingException]
 
-' Service -> Exception handling
-[OpponentService] ..> [FileUploadException] : throws
-[OpponentService] ..> [ClassValidationException] : throws
-[OpponentService] ..> [RobotProcessingException] : throws
-[UploadOpponentService] ..> [FileUploadException] : throws
-[UploadOpponentService] ..> [RobotProcessingException] : throws
-[OpponentTransformationService] ..> [RobotProcessingException] : throws
-
-' GlobalExceptionHandler catches exceptions
-[GlobalExceptionHandler] ..> [FileUploadException] : handles
-[GlobalExceptionHandler] ..> [ClassValidationException] : handles
-[GlobalExceptionHandler] ..> [RobotProcessingException] : handles
-[GlobalExceptionHandler] ..> [ExternalServiceException] : handles
-[GlobalExceptionHandler] ..> [OpponentNotFoundException] : handles
-[GlobalExceptionHandler] ..> [CoverageNotFoundException] : handles
-[GlobalExceptionHandler] ..> [ScoreNotFoundException] : handles
-
-' Service -> Persistence
-[OpponentService] --> [OpponentRepository] : queries
-[OpponentService] --> [ClassRepository] : CRUD
-[OpponentService] --> [OperationRepository] : logs operations
-[OpponentService] --> [SearchRepositoryImpl] : searches
-
-[ClassUTUploadService] --> [ClassRepository] : saves metadata
-[OpponentPersistenceService] --> [OpponentRepository] : saves opponents
-
-' Service -> API Layer
-[CoverageService] --> [ApiGatewayClient] : external calls
-[OpponentPersistenceService] --> [ApiGatewayClient] : notifications
-[ApiGatewayClient] --> [RestExchangeTemplateHelper] : HTTP operations
-
-' API Layer -> External Services
-[ApiGatewayClient] ..> [API Gateway] : REST calls
-[API Gateway] ..> [User Service] : auth/user ops
-[API Gateway] ..> [Jacoco Coverage Service] : generates coverage
-[API Gateway] ..> [Evosuite Coverage Service] : generates coverage
-
-' Repositories -> Database
-[OpponentRepository] --> [opponents collection]
-[ClassRepository] --> [classes collection]
-[OperationRepository] --> [operations collection]
-
-' Service -> Utilities (Download)
-[OpponentService] ..> [FileDownloadUtil] : downloads files
-
-' Notes
-note right of [UploadOpponentService]
-  Main orchestrator for upload flow
-  Delegates to specialized services
-  Reduced from 81 to 5 lines
-end note
-
-note right of [OpponentPathResolver]
-  Centralized path management
-  Static utility methods
-  Used across upload services
-end note
-
-note bottom of [OpponentPersistenceService]
-  Moved to service.upload package
-  Handles persistence + notifications
-  Notifies all game modes
-end note
-
-note left of [CoverageReader]
-  Reads Evosuite CSV + Jacoco XML
-  Returns CoverageData DTO
-  Used by OpponentTransformationService
-end note
-
-note bottom of [FormValidation]
-  Validates class name length, difficulty,
-  categories, and description length
-  Used before upload processing
-end note
-
-note right of [JavaMetadataExtractor]
-  Extracts class name from source files
-  Used for validation and package extraction
-  Renamed from JavaPackageExtractor
-end note
+[OpponentRepository] --> [opponents]
+[ClassRepository] --> [classes]
 
 @enduml
