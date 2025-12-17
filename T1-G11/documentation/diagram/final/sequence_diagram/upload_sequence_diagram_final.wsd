@@ -126,13 +126,25 @@ loop for each Robot Folder
         deactivate JavaSvc
         
         ' Generate missing coverage if needed
-        alt Coverage Missing
+        alt Evosuite Coverage Missing
             OpponentUploadSvc -> CoverageSvc: generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
             activate CoverageSvc
             CoverageSvc --> OpponentUploadSvc: EvosuiteCoverageDTO
             deactivate CoverageSvc
             
-            OpponentUploadSvc -> FileSvc: writeStringToFile(coverage, file)
+            OpponentUploadSvc -> FileSvc: writeStringToFile(statistics.csv, file)
+            activate FileSvc
+            FileSvc --> OpponentUploadSvc: written
+            deactivate FileSvc
+        end
+        
+        alt Jacoco Coverage Missing
+            OpponentUploadSvc -> CoverageSvc: generateMissingJacocoCoverage(classUTName, zip)
+            activate CoverageSvc
+            CoverageSvc --> OpponentUploadSvc: JacocoCoverageDTO
+            deactivate CoverageSvc
+            
+            OpponentUploadSvc -> FileSvc: writeStringToFile(coveragetot.xml, file)
             activate FileSvc
             FileSvc --> OpponentUploadSvc: written
             deactivate FileSvc
@@ -190,13 +202,60 @@ deactivate OpponentSvc
 Controller --> Admin: 200 OK (FileUploadResponse)
 deactivate Controller
 
-note over Controller
-  GlobalExceptionHandler catches:
-  - FileUploadException
-  - ClassValidationException
-  - RobotProcessingException
-  Returns localized error messages
-  with appropriate HTTP status codes
-end note
+== Error Handling and Rollback ==
+
+group Exception Occurs During Upload
+    note over OpponentSvc
+        On any exception during upload process:
+        - FileUploadException
+        - ClassValidationException
+        - RobotProcessingException
+        - IOException
+    end note
+    
+    OpponentSvc -> OpponentSvc: performRollback(classUTName)
+    activate OpponentSvc
+    
+    OpponentSvc -> ClassUploadSvc: rollbackClassUTMetadata(classUTName)
+    activate ClassUploadSvc
+    ClassUploadSvc -> ClassRepo: deleteByName(classUTName)
+    activate ClassRepo
+    ClassRepo --> ClassUploadSvc: deleted
+    deactivate ClassRepo
+    deactivate ClassUploadSvc
+    
+    OpponentSvc -> OpponentRepo: deleteByClassUT(classUTName)
+    activate OpponentRepo
+    OpponentRepo --> OpponentSvc: deleted
+    deactivate OpponentRepo
+    
+    OpponentSvc -> OpponentSvc: apiGatewayClient.callDeleteAllClassUTOpponents()
+    note right: Notify external services to delete opponents
+    
+    OpponentSvc -> OpponentUploadSvc: rollbackOpponentFiles(classUTName)
+    activate OpponentUploadSvc
+    OpponentUploadSvc -> FileSvc: deleteDirectoryRecursively(opponentPath)
+    activate FileSvc
+    FileSvc --> OpponentUploadSvc: deleted
+    deactivate FileSvc
+    deactivate OpponentUploadSvc
+    
+    OpponentSvc -> ClassUploadSvc: rollbackClassUTFile(classUTName)
+    activate ClassUploadSvc
+    ClassUploadSvc -> FileSvc: deleteDirectoryRecursively(classUTPath)
+    activate FileSvc
+    FileSvc --> ClassUploadSvc: deleted
+    deactivate FileSvc
+    deactivate ClassUploadSvc
+    
+    deactivate OpponentSvc
+    
+    OpponentSvc --> Controller: throw exception
+    Controller --> Admin: Error Response (GlobalExceptionHandler)
+    note right
+        Returns localized error message
+        with appropriate HTTP status
+    end note
+end
 
 @enduml
