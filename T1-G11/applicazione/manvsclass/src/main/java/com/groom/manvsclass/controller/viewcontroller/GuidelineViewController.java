@@ -1,4 +1,4 @@
-package com.groom.manvsclass.controller.view;
+package com.groom.manvsclass.controller.viewcontroller;
 
 import com.groom.manvsclass.service.GuidelineService;
 import org.slf4j.Logger;

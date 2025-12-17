@@ -1,4 +1,4 @@
-package com.groom.manvsclass.controller.view;
+package com.groom.manvsclass.controller.viewcontroller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;

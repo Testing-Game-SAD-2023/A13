@@ -474,7 +474,7 @@ public class GuidelineServiceTests {
 
         // VERIFICA CHE L'IMMAGINE SIA STATA SALVATA CON IL NOME CORRETTO
 
-        verify(imageService).storeImage(multipartFile, "Generic_1.png");
+        verify(imageService).storeImage(multipartFile, "1.png");
 
         // CAPTURE DEGLI ARGOMENTI PASSATI A save (chiamato per fare l'upload del campo image)
         verify(guidelineRepository, times(1)).save(guidelineCaptor.capture());
@@ -485,7 +485,7 @@ public class GuidelineServiceTests {
         // non utilizza "guideline" perché corrisponde allo STESSO oggetto updatedGuideline
         Guideline expectedGuideline = createBaseGuideline();
         expectedGuideline.setOrder(1);
-        expectedGuideline.setImage("Generic_1.png");  // modifica immagine per effettuare il confronto
+        expectedGuideline.setImage("1.png");  // modifica immagine per effettuare il confronto
 
         guidelineTestUtils.assertEquals(expectedGuideline, updatedGuideline);
     }
@@ -499,7 +499,7 @@ public class GuidelineServiceTests {
 
         // INPUT
 
-        String oldFileName = "Generic_1.jpg";
+        String oldFileName = "1.jpg";
         String newFileName = "immagine.png";
 
         // OUTPUT GUIDELINE REPOSITORY
@@ -527,7 +527,7 @@ public class GuidelineServiceTests {
 
         // VERIFICA CHE L'IMMAGINE SIA STATA SALVATA CON IL NOME CORRETTO
 
-        verify(imageService).storeImage(multipartFile, "Generic_1.png");
+        verify(imageService).storeImage(multipartFile, "1.png");
 
         // CAPTURE DEGLI ARGOMENTI PASSATI A save (chiamato per fare l'upload del campo image)
         verify(guidelineRepository, times(1)).save(guidelineCaptor.capture());
@@ -538,7 +538,7 @@ public class GuidelineServiceTests {
         // non utilizza "guideline" perché corrisponde allo STESSO oggetto updatedGuideline
         Guideline expectedGuideline = createBaseGuideline();
         expectedGuideline.setOrder(1);
-        expectedGuideline.setImage("Generic_1.png");  // modifica immagine per effettuare il confronto
+        expectedGuideline.setImage("1.png");  // modifica immagine per effettuare il confronto
 
         guidelineTestUtils.assertEquals(expectedGuideline, updatedGuideline);
     }
@@ -628,7 +628,7 @@ public class GuidelineServiceTests {
 
         // simula un errore nel salvataggio
         doThrow(new IOException("Storage failed"))
-                .when(imageService).storeImage(multipartFile, "Generic_1.png");
+                .when(imageService).storeImage(multipartFile, "1.png");
 
         assertThrows(RuntimeException.class, () -> {
             guidelineService.uploadGuidelineImage(order, multipartFile);
@@ -677,34 +677,6 @@ public class GuidelineServiceTests {
         guideline.setImage(null);
         guidelineTestUtils.assertEquals(guideline, guidelineCaptor.getValue());
     }
-
-//    /**
-//     * Effettua un test del metodo {@link GuidelineService#deleteGuidelineImage} con
-//     * suggerimento presente nel database, con nessuna immagine associata.
-//     */
-//    @Test
-//    void testDeleteGuidelineImage_Success_NoImage() throws IOException {
-//        String className = "Calcolatrice";
-//        int order = 1;
-//
-//        Guideline guideline = createBaseGuideline();
-//        guideline.setImage(null);  // non ha immagine
-//
-//        when(guidelineRepository.findByOrder(order))
-//                .thenReturn(Optional.of(guideline));
-//
-//        guidelineService.deleteGuidelineImage(order);
-//
-//        // VERIFICA CHIAMATE GUIDELINE REPOSITORY
-//
-//        verify(guidelineRepository, times(1)).findByOrder(order);
-//
-//        // verifica che deleteImage NON sia stato chiamato (non c'era immagine)
-//        verify(imageService, never()).deleteImage(any());
-//
-//        // verifica che save NON sia stato chiamato (non c'era niente da fare)
-//        verify(guidelineRepository, never()).save(any());
-//    }
 
     /**
      * Effettua un test del metodo {@link GuidelineService#deleteGuidelineImage} con
