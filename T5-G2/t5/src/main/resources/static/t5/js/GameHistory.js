@@ -4,9 +4,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const GAMES_PER_PAGE = 3;
     let currentPage = 1;
     let allGames = [];
-
+ 
+    const i18n = window.GAMES_i18n || {
+        win_label: "VITTORIA",
+        loss_label: "SCONFITTA",
+        no_games_message: "Nessuna partita trovata",
+        error_loading_games: "Errore nel caricamento delle partite"
+    };
+ 
     if (!container || !pagination) return;
-
+ 
     function fetchGameHistory(playerId) {
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -21,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
-
+ 
     function formatDate(isoDate) {
         const date = new Date(isoDate);
         const day = ("0" + date.getDate()).slice(-2);
@@ -31,36 +38,36 @@ document.addEventListener("DOMContentLoaded", () => {
         const minutes = ("0" + date.getMinutes()).slice(-2);
         return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
-
+ 
     function renderGamesPage(page = 1) {
         container.innerHTML = "";
         currentPage = page;
-
+ 
         const start = (page - 1) * GAMES_PER_PAGE;
         const end = start + GAMES_PER_PAGE;
         const gamesToShow = allGames.slice(start, end);
-
+ 
         if (gamesToShow.length === 0) {
-            container.innerHTML = '<p class="text-center text-secondary">Nessuna partita trovata</p>';
+            container.innerHTML = `<p class="text-center text-secondary">${i18n.no_games_message}</p>`;
             return;
         }
-
+ 
         gamesToShow.forEach(game => {
             let resultText = '<span class="badge text-bg-secondary">N/A</span>';
             let scoreText = '';
-
+ 
             if (game.playerResults && Object.keys(game.playerResults).length > 0) {
                 const firstUserId = Object.keys(game.playerResults)[0];
                 const result = game.playerResults[firstUserId];
-
+ 
                 if (result) {
                     resultText = result.winner
-                        ? `<span class="badge text-bg-success">VITTORIA</span>`
-                        : `<span class="badge text-bg-danger">SCONFITTA</span>`;
-                    scoreText = `Copertura ${result.score || 0}%`;
-                }
+                        ? `<span class="badge text-bg-success">${i18n.win_label}</span>`
+                        : `<span class="badge text-bg-danger">${i18n.loss_label}</span>`;
+                        scoreText = `${i18n.coverage_label} ${result.score || 0}%`;
+                    }
             }
-
+ 
             const html = `
                 <a class="list-group-item list-group-item-action">
                     <div class="d-flex justify-content-between">
@@ -78,34 +85,34 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
             container.insertAdjacentHTML("beforeend", html);
         });
-
+ 
         renderPaginationControls();
     }
-
+ 
     function renderPaginationControls() {
         pagination.innerHTML = "";
         const pageCount = Math.ceil(allGames.length / GAMES_PER_PAGE);
-
+ 
         for (let i = 1; i <= pageCount; i++) {
             const li = document.createElement("li");
             li.classList.add("page-item");
             if (i === currentPage) li.classList.add("active");
-
+ 
             const link = document.createElement("a");
             link.classList.add("page-link");
             link.href = "#";
             link.innerText = i;
-
+ 
             link.addEventListener("click", e => {
                 e.preventDefault();
                 renderGamesPage(i);
             });
-
+ 
             li.appendChild(link);
             pagination.appendChild(li);
         }
     }
-
+ 
     // --- CARICAMENTO IMMEDIATO DEL PRIMO TAB ---
     const userId = document.body.dataset.userid;
     if (userId) {
@@ -115,9 +122,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderGamesPage(1);
             })
             .catch(err => {
-                container.innerHTML = `<div class="text-center p-3 text-danger">Errore nel caricamento delle partite</div>`;
+                container.innerHTML = `<div class="text-center p-3 text-danger">${i18n.error_loading_games}</div>`;
                 console.error(err);
             });
     }
 });
- 

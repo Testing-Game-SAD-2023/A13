@@ -14,16 +14,32 @@
  
  
 <link rel="stylesheet" href="/t5/css/profile.css">
-
+ 
 </head>
  
 <body th:data-userid="${user.id}">
-
-
+ 
+ 
  
 <!-- NAVBAR -->
  
 <div th:replace="fragments/navbar :: navbar"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const navbarCheck = setInterval(() => {
+            const dropdownIcon = document.getElementById("dropdownIcon");
+            if (dropdownIcon) {
+                // Navbar presente, carica language.js
+                const script = document.createElement("script");
+                script.src = "/t5/js/language.js";
+                document.body.appendChild(script);
+                clearInterval(navbarCheck);
+            }
+        }, 50);
+    });
+    </script>
+    
  
 <div class="container mt-4">
  
@@ -76,36 +92,38 @@
     </ul>
  
     <div class="tab-content mt-3">
-
-
+ 
+ 
         <!-- GAMES TAB ============================= MOFIDICATO -->
         <div class="tab-pane fade show active" id="pills-games" role="tabpanel">
             
-
+ 
             <!-- Contenitore della storia partite (identico a GameHistory.html) -->
             <div id="game-history-container" class="list-group"></div>
-
+ 
             <ul id="game-history-pagination" class="pagination justify-content-center mt-3"></ul>
-
+ 
         </div>
         
  
-
  
-            <!-- SOCIAL TAB -->
-            <div class="tab-pane fade" id="pills-followers" role="tabpanel">
-            <div class="d-flex align-items-center mb-3">
-                <input type="radio" class="btn-check" name="options-follow" id="option_Followers" checked>
-                <label class="btn me-2" for="option_Followers">Followers</label>
-                <input type="radio" class="btn-check" name="options-follow" id="option_Following">
-                <label class="btn" for="option_Following">Following</label>
-                <a class="btn btn-primary ms-auto" href="/SearchFriend"><i class="bi bi-person-add"></i></a>
-            </div>
-            <input type="text" class="form-control search-chat mb-3" id="text-srh_follow" placeholder="Search Followers">
  
-            <div class="row row-cols-2" id="followers_block"></div>
-            <div class="row row-cols-2" id="following_block"></div>
-        </div>
+<!-- SOCIAL TAB -->
+<div class="tab-pane fade" id="pills-followers" role="tabpanel">
+    <div class="d-flex align-items-center mb-3">
+        <input type="radio" class="btn-check" name="options-follow" id="option_Followers" checked>
+        <label class="btn me-2" for="option_Followers">Followers</label>
+        <input type="radio" class="btn-check" name="options-follow" id="option_Following">
+        <label class="btn" for="option_Following">Following</label>
+        <a class="btn btn-primary ms-auto" href="/SearchFriend"><i class="bi bi-person-add"></i></a>
+    </div>
+    <input type="text" class="form-control search-chat mb-3" id="text-srh_follow" placeholder="Search Followers">
+ 
+    <div class="row row-cols-2" id="followers_block"></div>
+    <div class="row row-cols-2" id="following_block"></div>
+</div>
+ 
+ 
  
     <!-- ACHIEVEMENT TAB -->
     <div class="tab-pane fade" id="pills-achievements" role="tabpanel">
@@ -156,19 +174,20 @@
         </div>
     
     </div>
-
+ 
     
     <!-- LEADERBOARD TAB =========================== AGGIUNTO -->
         <div class="tab-pane fade" id="pills-leaderboard" role="tabpanel">
-
+ 
         <div class="mb-3">
-            <label for="scoreTypeSelector">Ordina per:</label>
+            <label id="scoreTypeLabel" for="scoreTypeSelector"></label>
             <select id="scoreTypeSelector" class="form-select w-auto">
-                <option value="exp" selected>Esperienza</option>
-                <option value="wins">Vittorie</option>
-            </select>
+                <option value="exp" selected></option>
+                <option value="wins"></option>
+            </select>            
+ 
         </div>
-
+ 
         <div class="table-responsive leaderboard-table">
             <table id="leaderboardTable" class="table table-dark table-striped text-white">
                 <thead>
@@ -185,10 +204,10 @@
                 </tbody>
             </table>
         </div>
-
+ 
         <!-- Paginazione -->
         <ul id="pagination" class="pagination justify-content-center mt-2"></ul>
-
+ 
         </div>
     
         
@@ -199,17 +218,17 @@
  
  
 </div>
-
+ 
 <!-- ID PROFILO E VIEW -->
 <span class="d-none" id="userProfileID" th:text="${user.userProfile.id}"></span>
 <span class="d-none" id="viewID" th:text="${viewID}"></span>
-
+ 
 <!-- ================ AGGIUNTA: Separazione ID utente e ID profilo per evitare che Games e Social usino lo stesso valore -->
 <!-- ID UTENTE (account) — per Game History -->
 <span class="d-none" id="userID" th:text="${user.id}"></span>
-
-
-
+ 
+ 
+ 
 <!-- jQuery e Bootstrap JS -->
  
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -275,33 +294,59 @@
 </script>
  
  
-
+ 
+<!-- Inclusione del JS di Achievement -->
+<script src="/t5/js/Achievement.js"></script>    
+ 
+<script th:inline="javascript">
+    window.LEADERBOARD_i18n = {
+        experience: /*[[#{leaderboard.experience}]]*/ "Esperienza",
+        wins: /*[[#{leaderboard.wins}]]*/ "Vittorie",
+        rank_label: /*[[#{leaderboard.rank}]]*/ "Posizione",
+        name_label: /*[[#{leaderboard.name}]]*/ "Nome",
+        surname_label: /*[[#{leaderboard.surname}]]*/ "Cognome",
+        email_label: /*[[#{leaderboard.email}]]*/ "Email",
+        sort_label: /*[[#{leaderboard.sort_label}]]*/ "Ordina per:"
+    };
+</script>
+ 
+ 
+<!-- Inclusione del JS della leaderboard -->
+<script src="/t5/js/leaderboard.js"></script>
+ 
+<script th:inline="javascript">
+    // Testi per la sezione Social
+    window.SOCIAL_i18n = {
+        followers_label: /*[[#{social.followers}]]*/ "Followers",
+        following_label: /*[[#{social.following}]]*/ "Following",
+        search_followers: /*[[#{social.search_followers}]]*/ "Search Followers",
+        search_following: /*[[#{social.search_following}]]*/ "Search Following",
+        go_to_profile: /*[[#{social.go_to_profile}]]*/ "Vai al profilo"
+    };
+</script>
+ 
     
-    <!-- Inclusione del JS di Achievement -->
-    <script src="/t5/js/Achievement.js"></script>    
-
-    <!-- Inclusione del JS della leaderboard -->
-    <script src="/t5/js/leaderboard.js"></script>
-
-
     
-    
-<!-- ============================== questa parte era commentata: va decommentata --> 
+<!-- ============================== questa parte era commentata: va decommentata -->
 <!-- FOLLOWERS/FOLLOWING AJAX -->
-
+ 
 <script th:inline="javascript">
     let userExperience = /*[[${user_experience}]]*/ {};
 </script>
-
+ 
  
 <script>
 $(document).ready(function () {
+    $("#option_Followers").next("label").text(window.SOCIAL_i18n.followers_label);
+    $("#option_Following").next("label").text(window.SOCIAL_i18n.following_label);
+    $("#text-srh_follow").attr("placeholder", window.SOCIAL_i18n.search_followers);
     function setupVisibilityAndSearch(config) {
         let $radio1 = $("#" + config.radio1);
         let $radio2 = $("#" + config.radio2);
         let $block1 = $("#" + config.block1);
         let $block2 = $("#" + config.block2);
         let $searchInput = $("#" + config.searchInput);
+ 
  
         function aggiornaVisibilita() {
             if ($radio1.is(":checked")) { $block1.show(); $block2.hide(); $searchInput.attr("placeholder", config.placeholder1); }
@@ -335,7 +380,7 @@ $(document).ready(function () {
  
     var userId = $("#userProfileID").text();
     console.log("[DEBUG] userProfileID letto dalla pagina:", userId);
-
+ 
  
     function fetchAndUpdateUserBlock(endpoint, blockId, countId) {
         $.ajax({
@@ -343,10 +388,10 @@ $(document).ready(function () {
             type: "GET",
             data: { userId: userId },
             dataType: "json",
-            success: function (response) { 
-
+            success: function (response) {
+ 
                 console.log("[DEBUG] Risposta da", endpoint, "=>", response); // <---- DEBUG    
-                updateUserBlock(blockId, response, countId); 
+                updateUserBlock(blockId, response, countId);
             },
             
             error: function () { $(blockId).html("<p style='color:red;'>Errore durante il caricamento.</p>"); }
@@ -358,17 +403,17 @@ $(document).ready(function () {
         container.empty();
         $(countId).text(users.length);
         users.forEach(user => {
-
+ 
             container.append(`
                 <div class="col mb-4">
                     <div class="card user-card p-3">
                         <div class="d-flex align-items-center w-100">
-
+ 
                             <!-- SEZIONE 1: NICKNAME -->
                             <div class="nickname-box me-4">
                                 ${user.nickname}
                             </div>
-
+ 
                             <!-- SEZIONE 2: INFO UTENTE -->
                             <div class="user-info flex-grow-1">
                                 <div class="user-name">
@@ -378,35 +423,30 @@ $(document).ready(function () {
                                     ${user.email}
                                 </div>
                             </div>
-
+ 
                             <!-- SEZIONE 3: PULSANTE -->
                             <div class="ms-3">
                                 <a class="btn btn-primary" href="/friend/${user.id}">
-                                    Vai al profilo
+                                    ${window.SOCIAL_i18n.go_to_profile}
                                 </a>
                             </div>
-
+ 
+ 
                         </div>
                     </div>
                 </div>
                 `);
-
+ 
         });
     }
-
-
-    //<a class="btn btn-primary ms-3" href="/friend/${user.userId}">Vai al profilo</a> QUESTA è LA TUA VECCHIA RIGA 483
-
  
-    //fetchAndUpdateUserBlock("/api/userService/profile/followers", "#followers_block", "#followersCount"); //============================== MODIFICATO: /api/userService/profile
-    //fetchAndUpdateUserBlock("/api/userService/profile/following", "#following_block", "#followingCount"); //============================== MODIFICATO: /api/userService/profile
 
-    fetchAndUpdateUserBlock("/api/gameEngine/followers", "#followers_block", "#followersCount"); 
+    fetchAndUpdateUserBlock("/api/gameEngine/followers", "#followers_block", "#followersCount");
     fetchAndUpdateUserBlock("/api/gameEngine/following", "#following_block", "#followingCount");
-
+ 
 });
 </script>
-
+ 
  
  
  
@@ -498,12 +538,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="col mb-4">
                     <div class="card user-card p-3">
                         <div class="d-flex align-items-center w-100">
-
+ 
                             <!-- SEZIONE 1: NICKNAME -->
                             <div class="nickname-box me-4">
                                 ${user.nickname}
                             </div>
-
+ 
                             <!-- SEZIONE 2: INFO UTENTE -->
                             <div class="user-info flex-grow-1">
                                 <div class="user-name">
@@ -513,62 +553,66 @@ document.addEventListener("DOMContentLoaded", function () {
                                     ${user.email}
                                 </div>
                             </div>
-
+ 
                             <!-- SEZIONE 3: PULSANTE -->
                             <div class="ms-3">
                                 <a class="btn btn-primary" href="/friend/${user.id}">
-                                    Vai al profilo
+                                    ${window.SOCIAL_i18n.go_to_profile}
                                 </a>
                             </div>
-
+ 
                         </div>
                     </div>
                 </div>
                 `);
-
+ 
                 });
             }
-
-// <a class="btn btn-primary ms-3" href="/friend/${user.userId}">Vai al profilo</a>  QUESTA è LA TUA VECCHIA RIGA 606
-//<img src="/t5/images/profileImages/${user.profilePicturePath || 'default.png'}" class="rounded-circle me-3" width="64" height="64"> QUESTA è LA TUA VECCHIA RIGA 593
-
+ 
 
  
-            //  Carica SOLO ora, quando apro il tab
-            //fetchAndUpdateUserBlock("/api/userService/profile/followers", "#followers_block", "#followersCount");  //============================== MODIFICATO: /api/userService/profile
-            //fetchAndUpdateUserBlock("/api/userService/profile/following", "#following_block", "#followingCount");  //============================== MODIFICATO: /api/userService/profile
-
             fetchAndUpdateUserBlock("/api/gameEngine/social/followers", "#followers_block", "#followersCount");  
             fetchAndUpdateUserBlock("/api/gameEngine/social/following", "#following_block", "#followingCount");  
-
-
+ 
+ 
         });
     }
 });
 </script>
  
-
-
-
+ 
+ 
+ 
 <script th:inline="javascript">
     window.userGames = /*[[${userGames}]]*/ [];
 </script>
-
+ 
+<script th:inline="javascript">
+    // --- TESTI PER LA CRONOLOGIA PARTITE ---
+    window.GAMES_i18n = {
+        win_label: /*[[#{win_label}]]*/ "VITTORIA",
+        loss_label: /*[[#{loss_label}]]*/ "SCONFITTA",
+        no_games_message: /*[[#{no_games_message}]]*/ "Nessuna partita trovata",
+        error_loading_games: /*[[#{error_loading_games}]]*/ "Errore nel caricamento delle partite",
+        coverage_label: /*[[#{coverage_label}]]*/ "Copertura"
+    };
+</script>
+ 
+ 
 <script src="/t5/js/GameHistory.js"></script>
-
-
+ 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const userIdEl = document.getElementById("userProfileID");
     if (!userIdEl) return;
-
+ 
     // Carica subito la cronologia partite
     loadGameHistory("#game-history-container");
 });
 </script>
-
-
-
+ 
+ 
+ 
  
 <!-- FOLLOW BUTTON SCRIPT -->
  

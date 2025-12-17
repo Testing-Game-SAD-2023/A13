@@ -85,18 +85,17 @@ public class PlayerService {
 
 
     // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
-    public Player getPlayerByProfile (int profileId) {
-        
+    public Player getPlayerByProfile(int profileId) {
+
         UserProfile profile = userProfileRepository.findByID(profileId);
-        
-        if(profile == null) {
-            return null;
+        if (profile == null) {
+            throw new UserNotFoundException("Profilo non trovato");
         }
-
-        Optional<Player> player = playerRepository.findById(profile.getUserId());
-        return player.orElse(null);
-
+    
+        return playerRepository.findById(profile.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("Player non trovato"));
     }
+    
     
 
 

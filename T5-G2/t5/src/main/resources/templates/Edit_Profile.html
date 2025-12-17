@@ -32,7 +32,8 @@
     <main class="content">
 
         <!-- ============================== AGGIUNTO: label per la scelta dell’immagine profilo ===== -->
-        <label for="profile-pictures">Immagine profilo</label>
+        <!-- <label for="profile-pictures">Immagine profilo</label> -->
+        <label for="profile-pictures" th:text="#{editProfile.profileImage}"></label>
 
         <!-- Sezione immagini profilo -->
         <div id="profile-pictures">
@@ -43,7 +44,8 @@
         </div>
 
         <!-- ============================== AGGIUNTO: label per la biografia ===== --> 
-        <label for="bio-input">Biografia</label>
+        <!-- <label for="bio-input">Biografia</label> -->
+        <label for="bio-input" th:text="#{editProfile.bio}"></label>
 
         <!-- Campo per la bio -->
         <textarea id="bio-input" th:text="${bio}"></textarea>
@@ -51,7 +53,8 @@
 
 
         <!-- ============================== AGGIUNTO: label per il nickname ===== -->
-        <label for="nickname-input">Nickname</label>
+        <!-- <label for="nickname-input">Nickname</label> -->
+        <label for="nickname-input" th:text="#{editProfile.nickname}"></label>
 
         <!-- ============================== AGGIUNTO: Campo per modificare il nickname -->
         <input type="text" id="nickname-input" th:value="${player.userProfile.nickname}" placeholder="Nickname">

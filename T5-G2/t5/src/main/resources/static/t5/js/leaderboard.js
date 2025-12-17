@@ -2,19 +2,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.querySelector("#leaderboardTable tbody");
     const pagination = document.getElementById("pagination");
     const selector = document.getElementById("scoreTypeSelector");
+    const sortLabel = document.getElementById("scoreTypeLabel"); // Assicurati di aggiungere questo span accanto al select
     const rowsPerPage = window.rowsPerPage || 3;
     const playerEmail = window.playerEmail || "";
  
     if (!tableBody || !pagination) return;
  
-    const SCORE_CONFIG = {
-        exp: window.i18nExperience || "Esperienza",
-        wins: window.i18nWins || "Vittorie"
+    const i18n = window.LEADERBOARD_i18n || {
+        experience: "Esperienza",
+        wins: "Vittorie",
+        rank_label: "Posizione",
+        name_label: "Nome",
+        surname_label: "Cognome",
+        email_label: "Email",
+        sort_label: "Ordina per:"
     };
+ 
+    const SCORE_CONFIG = {
+        exp: i18n.experience,
+        wins: i18n.wins
+    };
+ 
+    // Aggiorna label e opzioni select con i18n
+    const scoreTypeLabel = document.getElementById("scoreTypeLabel");
+    if (scoreTypeLabel) scoreTypeLabel.textContent = i18n.sort_label;
+ 
+    if (selector) {
+        selector.querySelector('option[value="exp"]').textContent = i18n.experience;
+        selector.querySelector('option[value="wins"]').textContent = i18n.wins;
+    }
+ 
+ 
+    // Aggiorna header tabella
+    const headerRow = document.querySelector("#leaderboardTable thead tr");
+    if (headerRow) {
+        headerRow.innerHTML = `
+            <th>${i18n.rank_label}</th>
+            <th>${i18n.name_label}</th>
+            <th>${i18n.surname_label}</th>
+            <th>${i18n.email_label}</th>
+            <th>${SCORE_CONFIG[window.defaultScoreType || "exp"]}</th>
+        `;
+    }
+ 
+    // Aggiorna label Ordina per:
+    if (sortLabel) {
+        sortLabel.textContent = i18n.sort_label;
+    }
  
     let leaderboardLoaded = false;
  
-    // Funzione principale di fetch dati e popolamento
     async function loadLeaderboard(userId) {
         try {
             const response = await fetch(`/leaderboard/${userId}`);
@@ -50,11 +87,14 @@ document.addEventListener("DOMContentLoaded", () => {
  
     function updateLeaderboard(scoreType) {
         const rows = Array.from(tableBody.querySelectorAll("tr"));
+ 
+        // Aggiorna contenuto punteggi
         rows.forEach(row => {
             const scoreCell = row.querySelector(".player-score");
             if (scoreCell) scoreCell.textContent = scoreCell.dataset[scoreType];
         });
  
+        // Ordina righe
         rows.sort((a, b) => {
             const scoreA = parseInt(a.querySelector(".player-score").dataset[scoreType] || 0);
             const scoreB = parseInt(b.querySelector(".player-score").dataset[scoreType] || 0);
@@ -81,6 +121,12 @@ document.addEventListener("DOMContentLoaded", () => {
  
             tableBody.appendChild(row);
         });
+ 
+        // Aggiorna header colonna punteggio
+        const headerRow = document.querySelector("#leaderboardTable thead tr");
+        if (headerRow) {
+            headerRow.cells[4].textContent = SCORE_CONFIG[scoreType] || scoreType;
+        }
  
         setupPagination();
         showPage(1);
@@ -120,10 +166,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
  
-    // Event listener per cambio tipo punteggio
+    // Gestione cambio tipo punteggio
     if (selector) {
         selector.addEventListener("change", function () {
-            updateLeaderboard(this.value);
+            const scoreType = this.value;
+            updateLeaderboard(scoreType);
         });
     }
  
@@ -141,4 +188,3 @@ document.addEventListener("DOMContentLoaded", () => {
     // Esponi globalmente la funzione
     window.updateLeaderboard = updateLeaderboard;
 });
- 

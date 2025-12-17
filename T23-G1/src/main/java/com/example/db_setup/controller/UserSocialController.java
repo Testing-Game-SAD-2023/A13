@@ -48,12 +48,17 @@ public class UserSocialController {
 
     // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
     @GetMapping("/player/by/profile/{profileId}")
-    public Player getUserByProfile(@PathVariable("profileId") int profileId) {
-        Player player = playerService.getPlayerByProfile(profileId);
-
-        return player; // 200 OK con i risultati
+    public ResponseEntity<?> getUserByProfile(@PathVariable("profileId") int profileId) {
+        try {
+            Player player = playerService.getPlayerByProfile(profileId);
+            return ResponseEntity.ok(player); // 200 OK
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore imprevisto.");
+        }
     }
-
+    
     
 
 
