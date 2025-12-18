@@ -79,7 +79,7 @@ Le immagini sono memorizzate nel filesystem, all'interno del volume T0 nel path 
  
 Le estensioni supportate sono: `"image/png"`, `"image/jpeg"`, `"image/jpg"`, `"image/xbm"`, `"image/tif"`, `"image/jfif"`, `"image/ico"`, `"image/gif"`, `"image/svg"`, `"image/svgz"`, `"image/webp"`,`"image/bmp"`, `"image/pjp"`, `"image/apng"`, `"image/pjpeg"`, `"image/avif"`.
  
-Nel caso delle lineeGuida, non essendoci il nome della classe, ci sarà come primo termine "generic" (in minuscolo per evitare che si confonda con il nome di una classe).
+Nel caso delle lineeGuida, non essendoci il nome della classe, il formato dell'immagine è il seguente: `{order}.{estensione}`
 
 ### Separazione delle responsabilità
 Una delle problematiche riscontrate nella vecchia versione del codice riguardava la mancata separazione degli interessi, delle logiche e delle responsabilità tra i vari componenti del sistema. Alcuni blocchi, come ad esempio i controller, si trovavano a gestire, oltre la logica di controllo, anche altre logiche che non rientravano nel loro interesse, o in alcuni casi, creando ridondanza. 
@@ -163,4 +163,4 @@ L'interfacciamento tra i vari container utilizza l'API Gateway come intermediari
 Uno dei vincoli della task era preservare l'indipendenza del T1. Dunque le interazioni avute con altri gruppi riguardano il formato dei suggerimenti e la struttura della classe Scalata, informazioni utili specialmente per il microservizio T5.
 
 ## 3. Possibili integrazioni
-Una possibilità futura è quella di bloccare le operazioni su dei suggerimenti utilizzati in una partita in corso, in modo tale da preservare l'integrità dei dati. Ovviamente per tale implementazione, in altri microservizi dovrà essere aggiunto un componente che possa tener traccia proprio delle partite in corso. 
+Una possibilità futura è quella di bloccare le operazioni di modifica dei suggerimenti relativi alle classi utilizzate durante una partita in corso, in modo tale da preservare l'integrità dei dati. Ovviamente per tale implementazione, in altri microservizi dovrà essere aggiunto un componente che possa tener traccia proprio delle partite in corso.

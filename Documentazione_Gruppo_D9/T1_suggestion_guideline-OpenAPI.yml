@@ -1,0 +1,314 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition degli endpoint relativi ai Suggerimenti e alle Linee Guida esposti dal microservizio T1
+  version: v0
+servers:
+  - url: http://t1-controller:8081
+paths:
+  /suggestions/upload:
+    post:
+      tags:
+        - suggestion-controller
+      operationId: uploadSuggestions
+      description: API per effettuare l'UPSERT dei suggerimenti di una classe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassUTSuggestionsDTO"
+      responses:
+        "200":
+          description: Suggerimenti caricati con successo.
+        "404":
+          description: Classe non trovata.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /suggestions/upload/{className}/{order}:
+    post:
+      tags:
+        - suggestion-controller
+      operationId: uploadSuggestionImage
+      description: API per effettuare l'UPSERT dell'immagine di un suggerimento di una classe
+      parameters:
+        - name: className
+          in: path
+          required: true
+          description: Il nome della classe a cui aggiungere il suggerimento
+          schema:
+            type: string
+        - name: order
+          in: path
+          required: true
+          description: Il numero progressivo del suggerimento tra quelli della classe selezionata a cui aggiungere l'immagine
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Il file immagine da caricare (MultipartFile)
+      responses:
+        "200":
+          description: Immagine caricata con successo.
+        "404":
+          description: Classe o Suggerimento non trovati.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /suggestions/{className}:
+    get:
+      tags:
+        - suggestion-controller
+      operationId: getSuggestions
+      description: API per effettuare la READ dei suggerimenti di una classe
+      parameters:
+        - name: className
+          in: path
+          required: true
+          description: Il nome della classe a cui aggiungere il suggerimento
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Suggerimenti letti con successo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassUTSuggestionsDTO"
+        "404":
+          description: Classe non trovata.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /suggestions/{className}/{order}:
+    delete:
+      tags:
+        - suggestion-controller
+      operationId: deleteSuggestion
+      description: API per effettuare la DELETE di un suggerimento di una classe
+      parameters:
+        - name: className
+          in: path
+          required: true
+          description: Il nome della classe a cui cancellare il suggerimento
+          schema:
+            type: string
+        - name: order
+          in: path
+          required: true
+          description: Il numero progressivo del suggerimento tra quelli della classe selezionata da cancellare
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suggerimento eliminato con successo.
+        "404":
+          description: Classe o Suggerimento non trovato.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /suggestions/image/{className}/{order}:
+    delete:
+      tags:
+        - suggestion-controller
+      operationId: deleteSuggestionImage
+      description: API per effettuare la DELETE di un'immagine di un suggerimento di una classe
+      parameters:
+        - name: className
+          in: path
+          required: true
+          description: Il nome della classe a cui si riferisce il suggerimento
+          schema:
+            type: string
+        - name: order
+          in: path
+          required: true
+          description: Il numero progressivo del suggerimento tra quelli della classe selezionata
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Immagine del suggerimento eliminata con successo.
+        "404":
+          description: Classe o Suggerimento non trovato.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+
+  # ----------- GUIDELINES
+  /guidelines/upload:
+    post:
+      tags:
+        - guideline-controller
+      operationId: uploadGuidelines
+      description: API per effettuare l'UPSERT delle linee guida
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/GuidelineDTO"
+              example: [{"order":1,"hint":"Testo Linea Guida 1"}, {"order":2,"hint":"Testo Linea Guida 2"}]
+        required: true
+      responses:
+        "200":
+          description: Suggerimenti caricati con successo.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /guidelines/upload/{order}:
+    post:
+      tags:
+        - guideline-controller
+      operationId: uploadGuidelineImage
+      description: API per effettuare l'UPSERT dell'immagine di una linea guida
+      parameters:
+        - name: order
+          in: path
+          required: true
+          description: Il numero progressivo della linea guida a cui aggiungere l'immagine
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Il file immagine da caricare (MultipartFile)
+      responses:
+        "200":
+          description: Immagine caricata con successo.
+        "404":
+          description: Linea guida non trovata.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /guidelines:
+    get:
+      tags:
+        - guideline-controller
+      operationId: getGuidelines
+      description: API per effettuare la READ delle linee guida
+      responses:
+        "200":
+          description: Linee guida caricate con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GuidelineDTO"
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /guidelines/{order}:
+    delete:
+      tags:
+        - guideline-controller
+      operationId: deleteGuideline
+      description: API per effettuare la DELETE di una linea guida
+      parameters:
+        - name: order
+          in: path
+          required: true
+          description: Il numero progressivo della linea guida da cancellare.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Linea guida eliminata con successo.
+        "404":
+          description: Linea guida non trovato.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+  /guidelines/image/{order}:
+    delete:
+      tags:
+        - guideline-controller
+      operationId: deleteGuidelineImage
+      description: API per effettuare la DELETE dell'immagine associata ad una linea guida
+      parameters:
+        - name: order
+          in: path
+          required: true
+          description: Il numero progressivo della linea guida a cui cancellare l'immagine.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Immagine della linea guida eliminata con successo.
+        "404":
+          description: Linea guida non trovato.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Si è verificato un errore interno.
+
+components:
+  schemas:
+    ClassUTSuggestionsDTO:
+      type: object
+      properties:
+        className:
+          type: string
+          description: Il nome della classe a cui aggiungere i suggerimenti
+          example: "Calcolatrice"
+        suggestions:
+          type: array
+          description: Lista dei suggerimenti da caricare
+          items:
+            $ref: '#/components/schemas/SuggestionDTO'
+          example: [{"order":1, "hint":"Testo Suggerimento 1", "level":"LOW"},{"order":2, "hint":"Testo Suggerimento 2", "level":"MEDIUM"}]
+    SuggestionDTO:
+      type: object
+      properties:
+        order:
+          type: integer
+        hint:
+          type: string
+        level:
+          type: string
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+    GuidelineDTO:
+      type: object
+      properties:
+        order:
+          type: integer
+        hint:
+          type: string

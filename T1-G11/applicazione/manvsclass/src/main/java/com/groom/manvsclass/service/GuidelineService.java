@@ -59,7 +59,7 @@ public class GuidelineService {
         String imageName = image.getOriginalFilename();
         if (imageName.contains(".")) {
             String imageExtension = imageName.substring(imageName.lastIndexOf("."));
-            imageName = "Generic_" + order + imageExtension;
+            imageName = order + imageExtension;
         }
 
         try {

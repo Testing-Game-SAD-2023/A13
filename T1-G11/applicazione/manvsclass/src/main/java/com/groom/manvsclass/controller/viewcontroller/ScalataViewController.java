@@ -1,4 +1,4 @@
-package com.groom.manvsclass.controller.view;
+package com.groom.manvsclass.controller.viewcontroller;
 
 import com.groom.manvsclass.service.JwtService;
 import org.springframework.stereotype.Controller;

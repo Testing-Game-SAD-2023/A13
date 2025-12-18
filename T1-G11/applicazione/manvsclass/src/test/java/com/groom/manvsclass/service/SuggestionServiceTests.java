@@ -900,34 +900,6 @@ public class SuggestionServiceTests {
         suggestionTestUtils.assertEquals(suggestion, suggestionCaptor.getValue());
     }
 
-//    /**
-//     * Effettua un test del metodo {@link SuggestionService#deleteSuggestionImage} con
-//     * suggerimento presente nel database, con nessuna immagine associata.
-//     */
-//    @Test
-//    void testDeleteSuggestionImage_Success_NoImage() throws IOException {
-//        String className = "Calcolatrice";
-//        int order = 1;
-//
-//        Suggestion suggestion = createBaseSuggestion(null);
-//        suggestion.setImage(null);  // non ha immagine
-//
-//        when(suggestionRepository.findByClassUT_NameAndOrder(className, order))
-//                .thenReturn(Optional.of(suggestion));
-//
-//        suggestionService.deleteSuggestionImage(className, order);
-//
-//        // VERIFICA CHIAMATE SUGGESTION REPOSITORY
-//
-//        verify(suggestionRepository, times(1)).findByClassUT_NameAndOrder(className, order);
-//
-//        // verifica che deleteImage NON sia stato chiamato (non c'era immagine)
-//        verify(imageService, never()).deleteImage(any());
-//
-//        // verifica che save NON sia stato chiamato (non c'era niente da fare)
-//        verify(suggestionRepository, never()).save(any());
-//    }
-
     /**
      * Effettua un test del metodo {@link SuggestionService#deleteSuggestionImage} con
      * suggerimento non presente nel database.
