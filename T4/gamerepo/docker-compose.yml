@@ -27,8 +27,8 @@ services:
       timeout: 60s
       retries: 5
       start_period: 80s
-    ports:
-      - "5432:5432"
+    expose:
+      - 5432
     networks:
       - global-network
     restart: always

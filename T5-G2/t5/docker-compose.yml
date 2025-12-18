@@ -6,7 +6,7 @@ services:
     container_name: t5-redis
     restart: always
     expose:
-      - "6379:6379"
+      - 6379
     networks:
       - global-network
   app:
@@ -16,7 +16,7 @@ services:
     expose:
       - 8085
     environment:
-      - REDIS_HOST=redis
+      - REDIS_HOST=t5-redis
       - REDIS_PORT=6379
     depends_on:
       - redis

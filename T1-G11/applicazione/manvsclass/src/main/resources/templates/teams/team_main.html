@@ -1,4 +1,4 @@
-<!--CARMINE: Inserimento della pagina di gestione di teams-->
+<!--CARMINE: Inserimento della pagina di gestione di teamMongoDBS-->
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.css">
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js" defer></script>
 
-    <link rel='stylesheet' href="/t1/css/teams.css"><!--aggiunta del css della pagina-->
+    <link rel='stylesheet' href="/t1/css/teamMongoDBS.css"><!--aggiunta del css della pagina-->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="header">
         <span class="icon">
             <a href="/home_adm">
-                <img src="/t1/css/Images/admin-logo-1.png" alt="icon">
+                <img src="/t1/css/Images/adminMongoDB-logo-1.png" alt="icon">
             </a>
         </span>
         <div class="title-header">
@@ -31,14 +31,14 @@
     <div class="search-section">
         <!-- Barra di ricerca centrale -->
         <div class="search-container">
-            <input type="text" class="search-bar" placeholder="Cerca team">
+            <input type="text" class="search-bar" placeholder="Cerca teamMongoDB">
             <button class="search-button">
                 <i class="search">🔍</i>
             </button>
         </div>
     </div>
     <!--Sezione Team-->
-   <div id="team-section">
+   <div id="teamMongoDB-section">
     <div class="section-header">
         <h2>I tuoi Team</h2>
         <div class="filter-container">
@@ -53,7 +53,7 @@
             </select>
         </div>
     </div>
-    <!--Inserimento dinamico dei team -->
+    <!--Inserimento dinamico dei teamMongoDB -->
         <div id="folders" class="folder-container">
 
         </div>
@@ -61,12 +61,12 @@
         </div>
         
     
-    <!--Finestra modale per inserimento di un team-->
+    <!--Finestra modale per inserimento di un teamMongoDB-->
     <div id="modalContainerTeam">
 
     </div>
 
-    <!--Per il caricamento degli assignment, ci mette 6 secondi dato che manda anche email-->
+    <!--Per il caricamento degli assignmentMongoDB, ci mette 6 secondi dato che manda anche email-->
     <div id="loadingScreen" class="loading-overlay" style="display: none;">
         <div class="spinner"></div>
         <p>Loading...</p>
@@ -75,7 +75,7 @@
 
 
     <!--Sezione Assignment-->
-    <div id="assignment-section">
+    <div id="assignmentMongoDB-section">
         <div class="section-header">
             <h2>I tuoi Assignment</h2>
             <div class="filter-container">
@@ -83,7 +83,7 @@
                     <p id="button-header-p">+ Add Assignment</p>
                 </button>
                 <p>Filter by:</p>
-                <select id="dropdown-container-assignment"> 
+                <select id="dropdown-container-assignmentMongoDB">
                     <option value="default">Default</option>
                     <option value="creation">Creation</option>
                     <option value="end">End</option>
@@ -91,7 +91,7 @@
             </div>
         </div>
         <!--Inserimento dinamico degli assigment-->
-        <div id="assignment-folder-container" class="assignment-container">
+        <div id="assignmentMongoDB-folder-container" class="assignmentMongoDB-container">
 
         </div>
         <p id="viewAllLink-Assignment" class="view-all-link">View All</p>
@@ -105,7 +105,7 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.js" defer></script>
-    <script src="t1/js/teams.js"></script>
+    <script src="t1/js/teamMongoDBS.js"></script>
     <script src="t1/js/team_tour.js"></script>
     
     

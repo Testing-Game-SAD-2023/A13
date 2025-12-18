@@ -173,7 +173,23 @@ async function callUploadOpponent(body) {
     }, async response => await response.json());
 }
 
+async function callGetHints(queryParams) {
+    const url = `${APIS.GET_HINTS}?${queryParams}`;
+    return await returnDataOnSuccessTemplate({
+        url: url,
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' }
+    }, async response => await response.json());
+}
 
+async function callUploadHints(formData) {
+    // Non passiamo Content-Type, il browser lo imposta correttamente con boundary per FormData
+    return await returnDataOnSuccessTemplate({
+        url: APIS.UPLOAD_HINTS,
+        method: "POST",
+        body: formData // FormData è gestito dal browser
+    }, async response => await response.text());
+}
 
 
 

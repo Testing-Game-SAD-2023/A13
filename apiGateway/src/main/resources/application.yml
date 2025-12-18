@@ -2,13 +2,17 @@ server:
   port: 8090
 
 spring:
-  redis: 
-    host: redis_rate_limiter
-    port: 6380
-    timeout: 20000  
+  redis:
+    #host: redis_rate_limiter
+    host: t5-redis
+    port: 6379
+    #host: localhost
+    #port: 6380
+    #port: 6380
+    timeout: 20000
   
   cache:
-    type: redis 
+    type: redis
 
   cloud:
     gateway:

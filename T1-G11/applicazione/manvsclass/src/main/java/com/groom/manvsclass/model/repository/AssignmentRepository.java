@@ -1,16 +1,15 @@
-//Modifica 07/12/2024: Creazione AssignmentRepository
-
 package com.groom.manvsclass.model.repository;
 
-import com.groom.manvsclass.model.Assignment;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.groom.manvsclass.model.entity.AssignmentEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface AssignmentRepository extends MongoRepository<Assignment, String> {
+@Repository
+public interface AssignmentRepository extends JpaRepository<AssignmentEntity, String> {
 
-    List<Assignment> findByTeamId(String idTeam);
+    List<AssignmentEntity> findByTeam_IdTeam(String idTeam);
 
-    List<Assignment> findAllByTeamIdIn(List<String> teamIds);
-
+    List<AssignmentEntity> findByTeam_IdTeamIn(List<String> teamIds);
 }

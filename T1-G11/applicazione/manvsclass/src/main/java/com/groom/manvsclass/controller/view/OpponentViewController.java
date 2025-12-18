@@ -1,7 +1,7 @@
 package com.groom.manvsclass.controller.view;
 
-import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.repository.ClassRepository;
+import com.groom.manvsclass.model.entity.ClassUTEntity;
+import com.groom.manvsclass.model.repository.ClassUTRepository;
 import com.groom.manvsclass.service.OpponentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +18,15 @@ import java.util.List;
 @Controller
 @RequestMapping("/opponents")
 public class OpponentViewController {
-    private final ClassRepository classRepository;
     private final OpponentService opponentService;
     private final Logger logger = LoggerFactory.getLogger(OpponentViewController.class);
+    private ClassUTRepository classUTRepository;
 
-
-    public OpponentViewController(ClassRepository classRepository, OpponentService opponentService) {
-        this.classRepository = classRepository;
+    public OpponentViewController(
+            OpponentService opponentService,
+            ClassUTRepository classUTRepository) {
         this.opponentService = opponentService;
+        this.classUTRepository = classUTRepository;
     }
 
     @GetMapping("/main")
@@ -34,7 +35,7 @@ public class OpponentViewController {
             @RequestParam(value = "filterByDifficulty", required = false) String filterByDifficulty,
             @RequestParam(value = "search", required = false) String search
     ) {
-        List<ClassUT> classUTList;
+        List<ClassUTEntity> classUTList;
 
         if (filterByDifficulty != null && !filterByDifficulty.isBlank()) {
             classUTList = opponentService.filterByDifficulty(filterByDifficulty);
@@ -42,10 +43,10 @@ public class OpponentViewController {
             classUTList = switch (sortBy) {
                 case "Date" -> opponentService.orderByDate();
                 case "Name" -> opponentService.orderByName();
-                default -> classRepository.findAll();
+                default -> classUTRepository.findAll();
             };
         } else {
-            classUTList = classRepository.findAll();
+            classUTList = classUTRepository.findAll();
         }
 
         // Applichiamo la ricerca testuale

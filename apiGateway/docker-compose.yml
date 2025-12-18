@@ -7,7 +7,8 @@ services:
     depends_on:
       - redis_cache
     environment:
-      REDIS_HOST: redis_cache
+      #REDIS_HOST: redis_cache
+      REDIS_HOST: t5-redis
       REDIS_PORT: 6379
     ports:
       - "8090:8090"

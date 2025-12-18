@@ -1,8 +1,11 @@
 package com.groom.manvsclass.model.repository;
 
-import com.groom.manvsclass.model.Operation;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.groom.manvsclass.model.entity.OperationEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface OperationRepository extends MongoRepository<Operation, String> {
+@Repository
+public interface OperationRepository extends JpaRepository<OperationEntity, Integer> {
 
+    void deleteByClassName(String className);
 }
