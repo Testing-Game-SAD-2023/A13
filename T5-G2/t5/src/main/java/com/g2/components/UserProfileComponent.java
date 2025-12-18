@@ -69,7 +69,7 @@ public class UserProfileComponent extends GenericObjectComponent {
         this.friendID = friendID;
     }
 
-    /**
+    /** MODIFICATO OK.
      * Esegue la logica per recuperare il profilo utente dal servizio e
      * inserirlo nel modello.
      *
@@ -81,7 +81,7 @@ public class UserProfileComponent extends GenericObjectComponent {
             // Inserisce i dati del profilo utente nel modello con la chiave specificata
             User user = serviceManager.handleRequest("T23", "GetUser", User.class, this.userID);
             if (this.isFriendProfile) {
-                User friendUser = (User) serviceManager.handleRequest("T23", "GetUser", this.friendID);
+                User friendUser = (User) serviceManager.handleRequest("T23", "GetUserByProfile", this.friendID); // ============== cambiata la action da GetUser a GetUserByProfile
                 this.model.put("user", friendUser);
                 this.model.put("viewID", user.getUserProfile().getId());
             } else {

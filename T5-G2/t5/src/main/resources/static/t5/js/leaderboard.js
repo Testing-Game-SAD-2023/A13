@@ -1,134 +1,190 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Configurazione paginazione (numero di righe per pagina)
-    const rowsPerPage = 3;
-
-    // Riferimenti agli elementi DOM
+document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.querySelector("#leaderboardTable tbody");
     const pagination = document.getElementById("pagination");
     const selector = document.getElementById("scoreTypeSelector");
-
-    const SCORE_CONFIG = {
-        exp: { label: i18nExperience },
-        wins: { label: i18nWins }
-        // Aggiungere nuove metriche QUI
+    const sortLabel = document.getElementById("scoreTypeLabel"); // Assicurati di aggiungere questo span accanto al select
+    const rowsPerPage = window.rowsPerPage || 3;
+    const playerEmail = window.playerEmail || "";
+ 
+    if (!tableBody || !pagination) return;
+ 
+    const i18n = window.LEADERBOARD_i18n || {
+        experience: "Esperienza",
+        wins: "Vittorie",
+        rank_label: "Posizione",
+        name_label: "Nome",
+        surname_label: "Cognome",
+        email_label: "Email",
+        sort_label: "Ordina per:"
     };
-
-    /**
-     * Aggiorna la classifica in base al tipo di punteggio selezionato (esperienza o vittorie).
-     * Riordina le righe, calcola i rank con dense ranking e aggiorna il badge del giocatore.
-     * @param {string} scoreType - Tipo di punteggio: "exp" (esperienza) o "wins" (vittorie)
-     */
+ 
+    const SCORE_CONFIG = {
+        exp: i18n.experience,
+        wins: i18n.wins
+    };
+ 
+    // Aggiorna label e opzioni select con i18n
+    const scoreTypeLabel = document.getElementById("scoreTypeLabel");
+    if (scoreTypeLabel) scoreTypeLabel.textContent = i18n.sort_label;
+ 
+    if (selector) {
+        selector.querySelector('option[value="exp"]').textContent = i18n.experience;
+        selector.querySelector('option[value="wins"]').textContent = i18n.wins;
+    }
+ 
+ 
+    // Aggiorna header tabella
+    const headerRow = document.querySelector("#leaderboardTable thead tr");
+    if (headerRow) {
+        headerRow.innerHTML = `
+            <th>${i18n.rank_label}</th>
+            <th>${i18n.name_label}</th>
+            <th>${i18n.surname_label}</th>
+            <th>${i18n.email_label}</th>
+            <th>${SCORE_CONFIG[window.defaultScoreType || "exp"]}</th>
+        `;
+    }
+ 
+    // Aggiorna label Ordina per:
+    if (sortLabel) {
+        sortLabel.textContent = i18n.sort_label;
+    }
+ 
+    let leaderboardLoaded = false;
+ 
+    async function loadLeaderboard(userId) {
+        try {
+            const response = await fetch(`/leaderboard/${userId}`);
+            if (response.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+            const data = await response.json();
+            populateLeaderboard(data.leaderboard || []);
+        } catch (err) {
+            console.error("Errore fetch leaderboard:", err);
+        }
+    }
+ 
+    function populateLeaderboard(players) {
+        tableBody.innerHTML = "";
+ 
+        players.forEach(player => {
+            const row = document.createElement("tr");
+            row.dataset.email = player.email;
+            row.innerHTML = `
+                <td class="rank"></td>
+                <td>${player.name}</td>
+                <td>${player.surname}</td>
+                <td>${player.email}</td>
+                <td class="player-score" data-exp="${player.exp}" data-wins="${player.wins}">${player.exp}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+ 
+        updateLeaderboard(window.defaultScoreType || "exp");
+    }
+ 
     function updateLeaderboard(scoreType) {
         const rows = Array.from(tableBody.querySelectorAll("tr"));
-
-        // Aggiorna il contenuto delle celle dei punteggi
+ 
+        // Aggiorna contenuto punteggi
         rows.forEach(row => {
             const scoreCell = row.querySelector(".player-score");
-            scoreCell.textContent = scoreCell.dataset[scoreType];
+            if (scoreCell) scoreCell.textContent = scoreCell.dataset[scoreType];
         });
-
-        // Ordina le righe in ordine decrescente per punteggio
+ 
+        // Ordina righe
         rows.sort((a, b) => {
-            const scoreA = parseInt(a.querySelector(".player-score").dataset[scoreType]);
-            const scoreB = parseInt(b.querySelector(".player-score").dataset[scoreType]);
+            const scoreA = parseInt(a.querySelector(".player-score").dataset[scoreType] || 0);
+            const scoreB = parseInt(b.querySelector(".player-score").dataset[scoreType] || 0);
             return scoreB - scoreA;
         });
-
-        // Svuota la tabella per reinserire le righe ordinate
+ 
         tableBody.innerHTML = "";
-        // Inizializza i valori per ordinare la tabella
-        let playerRank = null;
-        let playerScore = null;
-        let currentRank = 1;
-        let lastScore = null;
-
-        // Ciclo per reinserire le righe ordinate e calcolare il rank
+        let playerRank = null, playerScore = null, currentRank = 1, lastScore = null;
+ 
         rows.forEach((row, index) => {
-            const score = parseInt(row.querySelector(".player-score").dataset[scoreType]);
-            // Incrementa il rank solo se il punteggio è diverso dal precedente (dense ranking)
-            if (index > 0 && score !== lastScore) {
-                currentRank++;
-            }
+            const score = parseInt(row.querySelector(".player-score").dataset[scoreType] || 0);
+            if (index > 0 && score !== lastScore) currentRank++;
             lastScore = score;
-            // Assegna il rank alla cella della posizione
-            row.querySelector(".rank").textContent = currentRank;
-
-            // Evidenzia la riga del giocatore corrente
+ 
+            const rankCell = row.querySelector(".rank");
+            if (rankCell) rankCell.textContent = currentRank;
+ 
             row.classList.remove("highlight-row");
             if (row.dataset.email === playerEmail) {
                 row.classList.add("highlight-row");
                 playerRank = currentRank;
                 playerScore = score;
             }
+ 
             tableBody.appendChild(row);
         });
-
-        // Aggiorna il badge del giocatore con posizione e punteggio correnti
-        if (playerRank !== null) {
-            document.getElementById("playerPositionBadge").textContent = "# " + playerRank;
-            document.getElementById("playerScoreBadge").textContent =
-                SCORE_CONFIG[scoreType].label + ": " + playerScore;
+ 
+        // Aggiorna header colonna punteggio
+        const headerRow = document.querySelector("#leaderboardTable thead tr");
+        if (headerRow) {
+            headerRow.cells[4].textContent = SCORE_CONFIG[scoreType] || scoreType;
         }
-
-        // Ricrea la paginazione e mostra la prima pagina
+ 
         setupPagination();
         showPage(1);
     }
-
-    /**
-     * Mostra una specifica pagina della tabella nascondendo tutte le altre righe.
-     * @param {number} page - Numero della pagina da visualizzare (1-based)
-     */
+ 
     function showPage(page) {
         const rows = tableBody.querySelectorAll("tr");
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
-
-        rows.forEach((row, i) => {
-            row.style.display = (i >= start && i < end) ? "" : "none";
-        });
+        rows.forEach((row, i) => row.style.display = (i >= start && i < end) ? "" : "none");
     }
-
-    /**
-     * Crea i controlli di paginazione in base al numero totale di righe.
-     * Genera un pulsante per ogni pagina e gestisce lo stato attivo.
-     */
+ 
     function setupPagination() {
         const rows = tableBody.querySelectorAll("tr");
         const pageCount = Math.ceil(rows.length / rowsPerPage);
-
         pagination.innerHTML = "";
-
-        // Ciclo di generazione dei pulsanti 1, 2, 3...
-        // Assegna a ciascuno l'evento click per cambiare l'UI e visualizzare la pagina con showPage(i).
+ 
         for (let i = 1; i <= pageCount; i++) {
             const li = document.createElement("li");
             li.classList.add("page-item");
             if (i === 1) li.classList.add("active");
-
+ 
             const link = document.createElement("a");
             link.classList.add("page-link");
             link.href = "#";
             link.innerText = i;
-
-            // Gestisce il click sul pulsante di paginazione
-            link.addEventListener("click", function (e) {
+ 
+            link.addEventListener("click", e => {
                 e.preventDefault();
                 document.querySelectorAll(".page-item").forEach(p => p.classList.remove("active"));
                 li.classList.add("active");
                 showPage(i);
             });
-
+ 
             li.appendChild(link);
             pagination.appendChild(li);
         }
     }
-
-    // Inizializza la classifica con il punteggio "esperienza"
-    updateLeaderboard("exp");
-
-    // Listener per il cambio del tipo di punteggio (esperienza/vittorie)
-    selector.addEventListener("change", function () {
-        updateLeaderboard(this.value);
-    });
+ 
+    // Gestione cambio tipo punteggio
+    if (selector) {
+        selector.addEventListener("change", function () {
+            const scoreType = this.value;
+            updateLeaderboard(scoreType);
+        });
+    }
+ 
+    // Caricamento dati al click sul tab Leaderboard
+    const leaderboardTab = document.getElementById("pills-leaderboard-tab");
+    if (leaderboardTab) {
+        leaderboardTab.addEventListener("shown.bs.tab", () => {
+            if (leaderboardLoaded) return;
+            leaderboardLoaded = true;
+            const userId = document.body.dataset.userid;
+            loadLeaderboard(userId);
+        });
+    }
+ 
+    // Esponi globalmente la funzione
+    window.updateLeaderboard = updateLeaderboard;
 });

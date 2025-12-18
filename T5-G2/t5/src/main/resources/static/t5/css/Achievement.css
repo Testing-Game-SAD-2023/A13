@@ -1,0 +1,83 @@
+.progress_container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+.progress-svg {
+    transform: rotate(-90deg);
+}
+.progress_background {
+    fill: none;
+    stroke: #333;
+    stroke-width: 12;
+}
+.progress_fill {
+    fill: none;
+    stroke: #2193b0;
+    stroke-width: 12;
+    stroke-linecap: round;
+    stroke-dasharray: 314;
+    stroke-dashoffset: 314;
+    transition: stroke-dashoffset 1.5s ease-in-out;
+}
+.progress_value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+.achievements-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px 0;
+    width: 100%;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    background-color: #222;
+    border-radius: 8px;
+    padding: 10px;
+    gap: 10px;
+    min-width: 250px;
+    width: 100%;
+}
+
+.achievement-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.class-ut {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2193b0;
+    margin-top: 20px;
+    padding: 5px 0;
+    border-bottom: 2px solid #2193b0;
+}
+
+.robot-difficulty {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 10px;
+    color: #ffcc00;
+}
+
+.achievement-info h6 {
+    margin: 0;
+    font-size: 0.95rem;
+}
+.achievement-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #aaa;
+}
+ 

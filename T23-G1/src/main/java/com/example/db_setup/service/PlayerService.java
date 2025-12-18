@@ -83,6 +83,22 @@ public class PlayerService {
         return player.get();
     }
 
+
+    // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
+    public Player getPlayerByProfile(int profileId) {
+
+        UserProfile profile = userProfileRepository.findByID(profileId);
+        if (profile == null) {
+            throw new UserNotFoundException("Profilo non trovato");
+        }
+    
+        return playerRepository.findById(profile.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("Player non trovato"));
+    }
+    
+    
+
+
     public List<Player> getUserListByEmail(String email) {
         return playerRepository.findByUserProfileEmailLike(email);
     }

@@ -15,20 +15,45 @@
  *   limitations under the License.
  */
 
+
+
 document.addEventListener("DOMContentLoaded", function () {
+
     const profilePictures = document.querySelectorAll(".profile-picture");
     const bioInput = document.getElementById("bio-input");
     const saveButton = document.getElementById("save-button");
-    const userData = document.getElementById("user-data");
-    const userEmailElement = document.getElementById("user-email"); // Inserisce l'email direttamente dal server
-    const userEmail = userEmailElement ? userEmailElement.textContent.trim() : null;
+    
+    // ============================== MODIFICATO (player al posto di user)
+    // L'HTML usa id="player-data", quindi il JS deve leggere questo id. Prima cercavi "user-data", che NON ESISTEVA → userData era null → errore in console
+    const userData = document.getElementById("player-data"); // modifica
+    
+    // ============================== MODIFICATO (player al posto di user)
+    // L'HTML usa un pulsante con id="player-email" (non user-email). Ora il JS legge correttamente l'email dal testo del pulsante.
+    const userEmailElement = document.getElementById("player-email");
+    
+    // ============================== MODIFICATO: input hidden email per UserUtil.js
+    const emailInput = document.getElementById("email");
+
+    // ============================== MODIFICATO: div notifications per notification.js
+    const notificationsDiv = document.getElementById("notifications");
+    
 
     // Ottieni i dati dell'utente
     const currentBio = userData.dataset.currentBio;
     const currentImage = userData.dataset.currentImage;
+    const userEmail = userEmailElement ? userEmailElement.textContent.trim() : null;
 
-    // Inizializza le variabili con i valori correnti
-    let selectedImage = null;
+
+    // Inizializza le variabili con i valori correnti 
+
+    // ============================== MODIFICATO
+    // Prima selectedImage era null, quindi se l'utente non cliccava nessuna immagine il profilo veniva salvato con "null".
+    // Ora invece parte dall'immagine corrente salvata nel DB (currentImage).
+    let selectedImage = currentImage; 
+
+    // ============================== AGGIUNTA: Recupera l'input nickname dall'HTML
+    const nicknameInput = document.getElementById("nickname-input");
+
 
     // Gestione della selezione delle immagini
     profilePictures.forEach((img) => {
@@ -44,6 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
         saveButton.addEventListener("click", async function () {
             const newBio = bioInput.value.trim();
 
+
+            // ============================== AGGIUNTA: Legge il valore del nickname dall'input
+            const nicknameValue = nicknameInput ? nicknameInput.value.trim() : ""; 
+
+
             // Usa i valori correnti se non sono stati modificati
             const bioToSend = newBio || currentBio;
             const imageToSend = selectedImage || currentImage;
@@ -54,14 +84,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 formData.append("bio", bioToSend);
                 formData.append("profilePicturePath", imageToSend);
 
-                //QUA c'era update-profile
-                const response = await fetch("/update_profile", {
+                formData.append("nickname", nicknameValue); //AGGIUNTO
+
+
+                // ============================== MODIFICA (aggiunta /api/gameEngine per comunicazione da front-end)
+                const response = await fetch("/api/gameEngine/update_profile", {  
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
                     body: formData.toString(),
                 });
+
 
                 if (response.ok) {
                     alert("Profilo aggiornato con successo!");
@@ -82,3 +116,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+

@@ -45,6 +45,24 @@ public class UserSocialController {
         return players; // 200 OK con i risultati
     }
 
+
+    // =========================================== neeeeeeeeeeeeeeeeeeeeeeew
+    @GetMapping("/player/by/profile/{profileId}")
+    public ResponseEntity<?> getUserByProfile(@PathVariable("profileId") int profileId) {
+        try {
+            Player player = playerService.getPlayerByProfile(profileId);
+            return ResponseEntity.ok(player); // 200 OK
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Si è verificato un errore imprevisto.");
+        }
+    }
+    
+    
+
+
+
     //Modifica 04/12/2024 Giuleppe: Aggiunta rotta
     @PostMapping("/getStudentiTeam")
     public ResponseEntity<?> getStudentiTeam(@RequestBody List<String> idsStudenti) {
