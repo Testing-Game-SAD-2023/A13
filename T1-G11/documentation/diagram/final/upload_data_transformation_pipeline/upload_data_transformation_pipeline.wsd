@@ -20,7 +20,33 @@ end note
 
 partition "**Stage 1: Initial File Processing**" #FFF9C4 {
   :Controller receives HTTP POST;
+  
   :OpponentService validates input;
+  note right
+    **Multi-step validation:**
+    
+    1. File presence check:
+       - classUTFile not null/empty
+       - robotTestsZip not null/empty
+       → FileUploadException
+    
+    2. JSON parsing:
+       - Parse classUTDetails to ClassUT object
+       → ClassValidationException
+    
+    3. JavaMetadataExtractor:
+       - Extract class name from .java file
+       - Verify class declaration exists
+       - Verify name matches form input
+       → ClassValidationException
+    
+    4. FormValidation:
+       - Class name length (1-30)
+       - Description length (≤150)
+       - Category count (≤3), length (≤30)
+       - Difficulty value validation
+       → ClassValidationException
+  end note
   
   :ClassUTUploadService\nsaves original file;
   note right
@@ -225,7 +251,7 @@ note right
   FileUploadResponse {
     fileName: "Calculator.java"
     size: 1234
-    downloadUri: "/api/.../download/Calculator"
+    downloadUri: "/downloadFile"
     errorMessage: null
   }
 end note
@@ -233,6 +259,22 @@ end note
 :Browser displays success modal;
 
 stop
+
+note left
+  **Error Handling (GlobalExceptionHandler)**
+  
+  At any stage, exceptions are caught:
+  - FileUploadException → 400 Bad Request
+  - ClassValidationException → 400 Bad Request
+  - RobotProcessingException → 400 Bad Request
+  - ExternalServiceException → 500 Internal Server Error
+  - OpponentNotFoundException → 404 Not Found
+  - CoverageNotFoundException → 404 Not Found
+  - ScoreNotFoundException → 404 Not Found
+  
+  All errors return localized messages
+  from properties files (IT/EN)
+end note
 
 note right
   Pipeline Summary:

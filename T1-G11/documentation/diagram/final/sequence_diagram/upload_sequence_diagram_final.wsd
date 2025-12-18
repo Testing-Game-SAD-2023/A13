@@ -1,4 +1,4 @@
-@startuml Upload Class and Opponents Sequence
+@startuml Upload_Sequence_Diagram_Final
 
 !define CONTROLLER_COLOR #E1F5FE
 !define SERVICE_COLOR #FFF3E0
@@ -30,6 +30,40 @@ activate Controller
 
 Controller -> OpponentSvc: uploadClassAndOpponents(classUTFile, classUTDetails, robotTestsZip)
 activate OpponentSvc
+
+' Validate and Parse ClassUT Details
+OpponentSvc -> OpponentSvc: validate file presence
+note right
+  Check:
+  - classUTFile not null/empty
+  - robotTestsZip not null/empty
+  Throws FileUploadException if invalid
+end note
+
+OpponentSvc -> OpponentSvc: parse JSON to ClassUT
+note right
+  ClassUTDetailsDTO.parseFromJson(classUTDetails)
+  Throws ClassValidationException if JSON invalid
+end note
+
+OpponentSvc -> OpponentSvc: JavaMetadataExtractor.getClassNameFromJavaSourceFile()
+note right
+  Extract class name from .java file
+  Verify:
+  - Class declaration exists
+  - Class name matches form input
+  Throws ClassValidationException if mismatch
+end note
+
+OpponentSvc -> OpponentSvc: FormValidation.validateClassUT(classe)
+note right
+  Validates ClassUT object:
+  - Class name length (1-30 chars)
+  - Description length (≤150 chars)
+  - Category count (≤3) and length (≤30 each)
+  - Difficulty: Beginner/Intermediate/Advanced
+  Returns false if invalid → ClassValidationException
+end note
 
 ' Save ClassUT File
 OpponentSvc -> ClassUploadSvc: saveClassUTFile(fileName, name, file)
@@ -92,13 +126,25 @@ loop for each Robot Folder
         deactivate JavaSvc
         
         ' Generate missing coverage if needed
-        alt Coverage Missing
+        alt Evosuite Coverage Missing
             OpponentUploadSvc -> CoverageSvc: generateMissingEvoSuiteCoverage(classUTName, srcPackage, zip)
             activate CoverageSvc
             CoverageSvc --> OpponentUploadSvc: EvosuiteCoverageDTO
             deactivate CoverageSvc
             
-            OpponentUploadSvc -> FileSvc: writeStringToFile(coverage, file)
+            OpponentUploadSvc -> FileSvc: writeStringToFile(statistics.csv, file)
+            activate FileSvc
+            FileSvc --> OpponentUploadSvc: written
+            deactivate FileSvc
+        end
+        
+        alt Jacoco Coverage Missing
+            OpponentUploadSvc -> CoverageSvc: generateMissingJacocoCoverage(classUTName, zip)
+            activate CoverageSvc
+            CoverageSvc --> OpponentUploadSvc: JacocoCoverageDTO
+            deactivate CoverageSvc
+            
+            OpponentUploadSvc -> FileSvc: writeStringToFile(coveragetot.xml, file)
             activate FileSvc
             FileSvc --> OpponentUploadSvc: written
             deactivate FileSvc
@@ -155,5 +201,61 @@ deactivate OpponentSvc
 
 Controller --> Admin: 200 OK (FileUploadResponse)
 deactivate Controller
+
+== Error Handling and Rollback ==
+
+group Exception Occurs During Upload
+    note over OpponentSvc
+        On any exception during upload process:
+        - FileUploadException
+        - ClassValidationException
+        - RobotProcessingException
+        - IOException
+    end note
+    
+    OpponentSvc -> OpponentSvc: performRollback(classUTName)
+    activate OpponentSvc
+    
+    OpponentSvc -> ClassUploadSvc: rollbackClassUTMetadata(classUTName)
+    activate ClassUploadSvc
+    ClassUploadSvc -> ClassRepo: deleteByName(classUTName)
+    activate ClassRepo
+    ClassRepo --> ClassUploadSvc: deleted
+    deactivate ClassRepo
+    deactivate ClassUploadSvc
+    
+    OpponentSvc -> OpponentRepo: deleteByClassUT(classUTName)
+    activate OpponentRepo
+    OpponentRepo --> OpponentSvc: deleted
+    deactivate OpponentRepo
+    
+    OpponentSvc -> OpponentSvc: apiGatewayClient.callDeleteAllClassUTOpponents()
+    note right: Notify external services to delete opponents
+    
+    OpponentSvc -> OpponentUploadSvc: rollbackOpponentFiles(classUTName)
+    activate OpponentUploadSvc
+    OpponentUploadSvc -> FileSvc: deleteDirectoryRecursively(opponentPath)
+    activate FileSvc
+    FileSvc --> OpponentUploadSvc: deleted
+    deactivate FileSvc
+    deactivate OpponentUploadSvc
+    
+    OpponentSvc -> ClassUploadSvc: rollbackClassUTFile(classUTName)
+    activate ClassUploadSvc
+    ClassUploadSvc -> FileSvc: deleteDirectoryRecursively(classUTPath)
+    activate FileSvc
+    FileSvc --> ClassUploadSvc: deleted
+    deactivate FileSvc
+    deactivate ClassUploadSvc
+    
+    deactivate OpponentSvc
+    
+    OpponentSvc --> Controller: throw exception
+    Controller --> Admin: Error Response (GlobalExceptionHandler)
+    note right
+        Returns localized error message
+        with appropriate HTTP status
+    end note
+end
 
 @enduml

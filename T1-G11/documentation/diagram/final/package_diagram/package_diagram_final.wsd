@@ -1,0 +1,133 @@
+@startuml Package_Diagram_final
+
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!include ICONURL/common.puml
+!include ICONURL/font-awesome-5/layer_group.puml
+
+skinparam packageStyle rectangle
+skinparam linetype polyline
+skinparam nodesep 20
+skinparam ranksep 40
+
+' Top Row - Frontend and Controller
+package "Frontend Layer" <<Rectangle>> #LightBlue {
+  package "templates" {
+    [opponents_upload.html]
+    [dashboard.html]
+  }
+  
+  package "static/t1/js" {
+    [opponents_upload.js]
+    [api.js]
+    [endpoints.js]
+  }
+}
+
+package "Controller Layer" <<Rectangle>> #LightGreen {
+  [OpponentController]
+  [GlobalExceptionHandler]
+}
+
+' Second Row - Service Layer Split
+package "Service Layer - Core" <<Rectangle>> #LightYellow {
+  [OpponentService]
+  [CoverageService]
+}
+
+package "Service Layer - Upload" <<Rectangle>> #FFF9C4 {
+  [UploadOpponentService]
+  [ClassUTUploadService]
+  [FileStorageService]
+  [JavaSourceFileService]
+  [OpponentTransformationService]
+  [OpponentPersistenceService]
+}
+
+' Third Row - Supporting Services
+package "Service Layer - Support" <<Rectangle>> #FFFACD {
+  [CoverageReader]
+  [ScoreBuilder]
+}
+
+package "Exception Layer" <<Rectangle>> #FFE4E1 {
+  [FileUploadException]
+  [ClassValidationException]
+  [RobotProcessingException]
+  [ExternalServiceException]
+}
+
+' Fourth Row - Utilities and Config
+package "Utility Layer" <<Rectangle>> #LightCoral {
+  [JavaMetadataExtractor]
+  [LevelExtractor]
+  [OpponentPathResolver]
+  [FileUploadResponse]
+  [FileDownloadUtil]
+}
+
+package "Config Layer" <<Rectangle>> #LightGoldenRodYellow {
+  [FormValidation]
+}
+
+package "API Layer" <<Rectangle>> #Lavender {
+  [ApiGatewayClient]
+  [RestExchangeTemplateHelper]
+}
+
+' Fifth Row - Persistence
+package "Persistence Layer" <<Rectangle>> #LightGray {
+  package "Repositories" {
+    [OpponentRepository]
+    [ClassRepository]
+  }
+  
+  package "Models" {
+    [Opponent]
+    [ClassUT]
+  }
+}
+
+' External Services - Compact
+cloud "External" {
+  [API Gateway]
+  [Coverage Services]
+}
+
+database "MongoDB" {
+  [opponents]
+  [classes]
+}
+
+' Key Relationships Only
+[opponents_upload.js] --> [api.js]
+[api.js] --> [OpponentController]
+[OpponentController] --> [OpponentService]
+
+[OpponentService] --> [UploadOpponentService]
+[OpponentService] --> [ClassUTUploadService]
+[OpponentService] ..> [FormValidation]
+[OpponentService] ..> [JavaMetadataExtractor]
+
+[UploadOpponentService] --> [FileStorageService]
+[UploadOpponentService] --> [JavaSourceFileService]
+[UploadOpponentService] --> [OpponentTransformationService]
+
+[OpponentTransformationService] --> [OpponentPersistenceService]
+[OpponentTransformationService] --> [CoverageReader]
+[OpponentTransformationService] --> [ScoreBuilder]
+
+[OpponentService] --> [OpponentRepository]
+[OpponentService] --> [ClassRepository]
+[OpponentPersistenceService] --> [OpponentRepository]
+
+[CoverageService] --> [ApiGatewayClient]
+[ApiGatewayClient] --> [API Gateway]
+
+[GlobalExceptionHandler] ..> [FileUploadException]
+[GlobalExceptionHandler] ..> [ClassValidationException]
+[GlobalExceptionHandler] ..> [RobotProcessingException]
+
+[OpponentRepository] --> [opponents]
+[ClassRepository] --> [classes]
+
+@enduml
