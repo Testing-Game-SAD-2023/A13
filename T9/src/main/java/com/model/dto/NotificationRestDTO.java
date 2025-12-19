@@ -2,17 +2,65 @@ package com.model.dto;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(
+        name = "NotificationRestDTO",
+        description = "DTO che rappresenta una notifica restituita dalle API REST"
+)
 public class NotificationRestDTO {
 
+    @Schema(
+            description = "Identificativo univoco della notifica",
+            example = "1001",
+            accessMode = Schema.AccessMode.READ_ONLY
+    )
     private Long id;
+
+    @Schema(
+            description = "Identificativo dell'utente destinatario della notifica",
+            example = "42",
+            requiredMode = Schema.RequiredMode.REQUIRED
+    )
     private Long userId;
+
+    @Schema(
+            description = "Tipo di notifica (es. INFO, WARNING, ERROR)",
+            example = "INFO"
+    )
     private String type;
+
+    @Schema(
+            description = "Titolo della notifica",
+            example = "Nuovo messaggio"
+    )
     private String title;
+
+    @Schema(
+            description = "Corpo testuale della notifica",
+            example = "Hai ricevuto un nuovo messaggio"
+    )
     private String body;
+
+    @Schema(
+            description = "Indica se la notifica è già stata letta dall'utente",
+            example = "false"
+    )
     private boolean read;
+
+    @Schema(
+            description = "Data e ora di creazione della notifica in formato UTC (ISO-8601)",
+            example = "2024-05-01T10:15:30Z",
+            type = "string",
+            format = "date-time",
+            accessMode = Schema.AccessMode.READ_ONLY
+    )
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Instant createdAt;
 
-    public NotificationRestDTO() {}
+    public NotificationRestDTO() {
+    }
 
     public NotificationRestDTO(Long id,
                                Long userId,
@@ -30,7 +78,7 @@ public class NotificationRestDTO {
         this.createdAt = createdAt;
     }
 
-    // Getter & Setter
+    // ===== GETTERS & SETTERS =====
 
     public Long getId() {
         return id;
