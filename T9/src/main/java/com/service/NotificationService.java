@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import com.service.sse.SseConnectionManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,20 +28,31 @@ public class NotificationService {
     private final NotificationMapper notificationMapper;
     private final ReplyProducer replyProducer;
     private final NotificationRestMapper restMapper; // Mapper per le API REST
+    private final SseConnectionManager sseManager;
 
     // Costruttore unificato con tutte le dipendenze
     public NotificationService(NotificationRepository notificationRepository,
                                NotificationMapper notificationMapper,
                                ReplyProducer replyProducer,
-                               NotificationRestMapper restMapper) {
+                               NotificationRestMapper restMapper,
+                               SseConnectionManager sseManager) {
         this.notificationRepository = notificationRepository;
         this.notificationMapper = notificationMapper;
         this.replyProducer = replyProducer;
         this.restMapper = restMapper;
+        this.sseManager = sseManager;
     }
 
     // =========================================================================
-    // METODI MESSAGING (Dal primo blocco di codice)
+    // METODO ISCRIZIONE SSE
+    // =========================================================================
+
+    public SseEmitter subscribe(Long userId) {
+        return sseManager.subscribe(userId);
+    }
+
+    // =========================================================================
+    // METODI MESSAGING
     // =========================================================================
 
     /**
@@ -56,6 +69,11 @@ public class NotificationService {
             // 2. Salvataggio sul DB
             Notification saved = notificationRepository.save(notification);
             log.info("Notifica salvata con id={}", saved.getId());
+
+            // Converto l'entità salvata nel DTO che invio al frontend
+            NotificationRestDTO restDTO = restMapper.toDTO(saved);
+            // Invio l'evento live
+            sseManager.dispatch(saved.getUserId(), restDTO);
 
             // 3. Costruzione risposta
             NotificationResponseDTO response = new NotificationResponseDTO(
@@ -88,7 +106,7 @@ public class NotificationService {
         }
     }
     // =========================================================================
-    // METODI REST API (Dal secondo blocco di codice)
+    // METODI REST API
     // =========================================================================
 
     // Recupera notifiche di un utente con filtri semplici:

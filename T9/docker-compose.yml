@@ -43,7 +43,7 @@ services:
         SPRING_RABBITMQ_USERNAME: guest
         SPRING_RABBITMQ_PASSWORD: guest
     ports:
-      - "8090:8080"
+      - "8089:8080"
     networks:
       - global-network
     restart: always

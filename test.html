@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Notifiche T9</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body { padding-top: 20px; }
+        .text-gray-dark { color: #d0d0d0; }
+        /* Cursore pointer per i bottoni */
+        .btn-link { cursor: pointer; }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR FINTA -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Gamification T9 Test</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+<div class="container" style="margin-top: 60px;">
+    <!-- Barra Controlli -->
+    <div class="d-flex align-items-center justify-content-between p-3 my-3 rounded shadow-sm bg-dark-subtle">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <span class="text-white fw-bold">User ID: <span id="displayUserId"></span></span>
+            <!-- Bottone Refresh -->
+            <button id="btnRefresh" class="btn btn-primary btn-sm">
+                <i class="bi bi-arrow-clockwise"></i> Ricarica
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista Notifiche -->
+    <div class="my-3 p-3 bg-body rounded shadow-sm bg-dark-subtle">
+        <h6 class="border-bottom pb-2 mb-0">Ultime Notifiche (da T9)</h6>
+        <div id="notifications-container">
+            <p class="text-center text-muted py-3">Caricamento...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Configurazione Globale
+    const USER_ID = 42; // ID UTENTE DI TEST (CABALATO)
+    const T9_URL = "http://localhost:8089";
+
+    $(document).ready(function () {
+        $("#displayUserId").text(USER_ID);
+
+        // Carica notifiche all'avvio
+        fetchNotifications();
+
+        $("#btnRefresh").click(function() {
+            fetchNotifications();
+        });
+    });
+
+    // --- FUNZIONI ---
+
+    function fetchNotifications() {
+        console.log(`Richiedo notifiche a T9 per user: ${USER_ID}...`);
+
+        $.ajax({
+            url: `${T9_URL}/notifications/${USER_ID}`,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                $("#notifications-container").empty();
+
+                // Gestione array o Page object
+                let list = Array.isArray(data) ? data : (data.content || []);
+
+                if (list.length === 0) {
+                    $("#notifications-container").html("<p class='text-center text-muted py-3'>Nessuna notifica trovata.</p>");
+                    return;
+                }
+
+                list.forEach(notification => {
+                    $("#notifications-container").append(createNotificationHtml(notification));
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Errore AJAX:", error);
+                $("#notifications-container").html(`
+                    <div class="alert alert-danger m-3">
+                        <strong>Errore di connessione a T9!</strong><br>
+                        Status: ${xhr.status} ${xhr.statusText}
+                    </div>
+                `);
+            }
+        });
+    }
+
+    function deleteNotification(notifId) {
+        if(!confirm("Vuoi davvero eliminare questa notifica?")) return;
+
+        $.ajax({
+            url: `${T9_URL}/notifications/${USER_ID}/${notifId}`,
+            method: "DELETE",
+            success: function () {
+                // Ricarica la lista dopo la cancellazione
+                fetchNotifications();
+            },
+            error: function (xhr) {
+                alert("Errore durante la cancellazione: " + xhr.status);
+            }
+        });
+    }
+
+    function createNotificationHtml(notification) {
+        // Mappa colori per tipo
+        const colorMap = {
+            "Info": "#0d6efd",       // Blu
+            "Team": "#ffc107",       // Giallo
+            "Achievement": "#dc3545" // Rosso
+        };
+        const color = colorMap[notification.type] || "#6c757d";
+
+        // Formatta data (se presente)
+        let dateStr = "";
+        if(notification.createdAt) {
+            dateStr = new Date(notification.createdAt).toLocaleString();
+        }
+
+        // Stile per notifica letta/non letta (opzionale)
+        const opacityClass = notification.read ? "opacity-50" : "opacity-100";
+
+        return `
+            <div class="d-flex align-items-start pt-3 border-bottom notification-item ${opacityClass}">
+                <!-- Icona -->
+                <div class="me-3">
+                    <div class="rounded d-flex align-items-center justify-content-center text-white"
+                         style="width: 32px; height: 32px; background-color: ${color};">
+                        <i class="bi bi-bell-fill" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+
+                <!-- Contenuto -->
+                <div class="flex-grow-1 pb-3 mb-0 small lh-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong class="d-block text-white">${notification.title || "Notifica"}</strong>
+                        <small class="text-muted">${dateStr}</small>
+                    </div>
+                    <!-- Usa .body invece di .message -->
+                    <span class="text-gray-dark">${notification.body || ""}</span>
+                </div>
+
+                <!-- Azioni -->
+                <div class="ms-2">
+                     <button class="btn btn-sm btn-link text-decoration-none text-secondary"
+                             onclick="deleteNotification(${notification.id})"
+                             title="Elimina">
+                        <i class="bi bi-trash"></i>
+                     </button>
+                </div>
+            </div>
+        `;
+    }
+</script>
+
+</body>
+</html>
