@@ -1,7 +1,7 @@
 package com.t10;
 
-import com.t10.communication.NotificationProducer;
-import com.t10.model.dto.NotificationDTO;
+import com.a13.notification.client.dto.NotificationDTO;       // Import dalla Libreria
+import com.a13.notification.client.service.NotificationProducer; // Import dalla Libreria
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -14,33 +14,37 @@ public class AchievementTestRunner implements CommandLineRunner {
 
     private final NotificationProducer notificationProducer;
 
+    // Iniettiamo il Producer fornito dalla libreria condivisa
     public AchievementTestRunner(NotificationProducer notificationProducer) {
         this.notificationProducer = notificationProducer;
     }
 
     @Override
     public void run(String... args) {
+        log.info("=== T10 TEST RUNNER AVVIATO ===");
+
         // Simula "Achievement sbloccato"
         Long userId = 42L;
         String type = "ACHIEVEMENT_UNLOCKED";
         String title = "Achievement sbloccato!";
         String body = "Complimenti, hai sbloccato l'obiettivo 'Primo test completato'.";
 
+        // Creiamo il DTO usando la classe della libreria
         NotificationDTO dto = new NotificationDTO();
         dto.setUserId(userId);
         dto.setType(type);
         dto.setTitle(title);
         dto.setBody(body);
 
-        // Stampa i campi che inserirà nel DTO
-        log.info("T10 - Creo DTO notifica:");
-        log.info("  userId={} | type={} | title={} | body={}",
-                dto.getUserId(), dto.getType(), dto.getTitle(), dto.getBody());
+        // NOTA: Non serve più settare manualmente la replyTo qui.
+        // Il NotificationProducer della libreria leggerà 'notification.reply.queue'
+        // dalle proprietà e la imposterà da solo.
 
-        // Invio tramite RabbitMQ al servizio T9
+        log.info("T10 - Invio notifica per User {}: '{}'", userId, title);
+
+        // Invio tramite la libreria
         notificationProducer.sendCreateNotification(dto);
 
-        log.info("T10 - DTO inviato, in attesa della risposta sulla coda {}",
-                com.t10.communication.ClientRabbitConfig.REPLY_QUEUE);
+        log.info("T10 - Notifica inviata al broker (Fire-and-Forget). Lavoro terminato.");
     }
 }

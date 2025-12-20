@@ -1,7 +1,8 @@
 package com.mapper;
 
 import com.model.Notification;
-import com.model.dto.NotificationDTO;
+// IMPORTA IL DTO DALLA LIBRERIA CONDIVISA
+import com.a13.notification.client.dto.NotificationDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,20 +16,17 @@ public class NotificationMapper {
             return null;
         }
 
+        // Creando la nuova Entity, il suo costruttore fa già: this.createdAt = Instant.now();
         Notification notification = new Notification();
 
-        // Campi principali
+        // Campi principali (copiati dal DTO)
         notification.setUserId(dto.getUserId());
         notification.setType(dto.getType());
         notification.setTitle(dto.getTitle());
         notification.setBody(dto.getBody());
 
-        // createdAt:
-        // - se il chiamante l'ha valorizzato, lo usiamo
-        // - altrimenti lasciamo che il costruttore/entity usi Instant.now()
-        if (dto.getCreatedAt() != null) {
-            notification.setCreatedAt(dto.getCreatedAt());
-        }
+        // createdAt: NON viene più letto dal DTO.
+        // L'Entity userà il suo default (Instant.now()).
 
         // isRead rimane al valore di default (false)
 
@@ -36,7 +34,7 @@ public class NotificationMapper {
     }
 
     /**
-     * Facoltativo: converte da entity a DTO, utile se vuoi rispondere via RabbitMQ.
+     * Facoltativo: converte da entity a DTO.
      */
     public NotificationDTO toDto(Notification notification, String replyTo) {
         if (notification == null) {
@@ -48,7 +46,9 @@ public class NotificationMapper {
         dto.setType(notification.getType());
         dto.setTitle(notification.getTitle());
         dto.setBody(notification.getBody());
-        dto.setCreatedAt(notification.getCreatedAt());
+
+        // createdAt: NON viene copiato nel DTO perché il campo non esiste più nella libreria.
+
         dto.setReplyTo(replyTo);
 
         return dto;

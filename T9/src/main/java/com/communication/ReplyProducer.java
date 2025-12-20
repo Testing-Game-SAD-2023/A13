@@ -1,6 +1,6 @@
 package com.communication;
 
-import com.model.dto.NotificationResponseDTO;
+import com.a13.notification.client.dto.NotificationResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

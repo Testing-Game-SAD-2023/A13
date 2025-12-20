@@ -1,6 +1,10 @@
-package com.t10.model.dto;
+package com.a13.notification.client.dto;
 
-public class NotificationDTO {
+import java.io.Serializable;
+
+public class NotificationDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L; // Buona pratica per Serializable
 
     private Long userId;
     private String type;
@@ -56,5 +60,16 @@ public class NotificationDTO {
     }
     public void setReplyTo(String replyTo) {
         this.replyTo = replyTo;
+    }
+
+    // toString per loggare facilmente cosa stai inviando
+    @Override
+    public String toString() {
+        return "NotificationDTO{" +
+                "userId=" + userId +
+                ", type='" + type + '\'' +
+                ", title='" + title + '\'' +
+                ", replyTo='" + replyTo + '\'' +
+                '}';
     }
 }

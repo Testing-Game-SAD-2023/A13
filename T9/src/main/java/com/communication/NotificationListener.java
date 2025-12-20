@@ -1,6 +1,6 @@
 package com.communication;
 
-import com.model.dto.NotificationDTO;
+import com.a13.notification.client.dto.NotificationDTO;
 import com.service.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

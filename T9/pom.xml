@@ -71,6 +71,13 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.a13</groupId>
+            <artifactId>notification-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

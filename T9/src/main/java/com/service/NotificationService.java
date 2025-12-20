@@ -3,21 +3,27 @@ package com.service;
 import com.communication.ReplyProducer;
 import com.mapper.NotificationMapper;
 import com.model.Notification;
-import com.model.dto.NotificationDTO;
-import com.model.dto.NotificationResponseDTO;
+
+// === IMPORT DALLA LIBRERIA CONDIVISA (Quelli che usi per RabbitMQ) ===
+import com.a13.notification.client.dto.NotificationDTO;
+import com.a13.notification.client.dto.NotificationResponseDTO;
+// ======================================================================
+
+// DTO LOCALI (Quelli che usi per le API REST verso il frontend)
 import com.model.dto.NotificationRestDTO;
 import com.model.mapper.NotificationRestMapper;
-import com.model.repository.NotificationRepository; // Presumo questo sia il package corretto per la Repository
+import com.model.repository.NotificationRepository;
+
+import com.service.sse.SseConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import com.service.sse.SseConnectionManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Optional;
+
 
 @Service
 public class NotificationService {
