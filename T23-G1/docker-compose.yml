@@ -6,7 +6,6 @@ volumes:
 services:
   db:
     image: mysql:latest
-    platform: linux/amd64
     container_name: t23-mysql_db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -29,21 +28,28 @@ services:
     restart: always
 
   app:
-    image: mick0974/a13:t23-g1
     container_name: t23-controller
-    expose:
-      - 8082
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: mick0974/a13:t23-g1
+
     depends_on:
       db:
-        condition: service_healthy # parte solo se il db è attivo
+        condition: service_healthy
+
     environment:
-      DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}  # Usa il nome del DB definito nel .env
+      DB_URL: jdbc:mysql://db:3306/studentsrepo
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      JWT_KEY_SECRET: ${JWT_KEY_SECRET}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      JWT_KEY_SECRET: mySecretKey
+      MAIL_PASSWORD: uofjilbsnraczxbk
+
+    expose:
+      - "8082"
+
     networks:
       - global-network
 

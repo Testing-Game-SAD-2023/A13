@@ -16,7 +16,6 @@ package com.g2.interfaces;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.model.NotificationResponse;
 import com.g2.model.User;
-import com.g2.model.dto.PlayerDTO;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.model.dto.PlayerProgressDTO;
 import com.g2.model.dto.UpdateGameProgressDTO;
@@ -69,7 +68,6 @@ public class T23Service extends BaseService {
         registerGetUserActions();
         registerUserProfileActions();
         registerPlayerStatusActions();
-        registerPlayerActions();
     }
 
     /*
@@ -108,8 +106,8 @@ public class T23Service extends BaseService {
         ));
 
         registerAction("GetUser", new ServiceActionDefinition(
-                params -> getUser((Long) params[0]),
-                Long.class
+                params -> getUser((String) params[0]),
+                String.class
         ));
 
         registerAction("GetUsersByList", new ServiceActionDefinition(
@@ -129,9 +127,10 @@ public class T23Service extends BaseService {
                 String.class, String.class, String.class
         ));
 
+        // follow/unfollow: usiamo Long perché l'ID nel JWT e nel resto del sistema è un playerId (Long)
         registerAction("followUser", new ServiceActionDefinition(
-                params -> followUser((Integer) params[0], (Integer) params[1]),
-                Integer.class, Integer.class
+                params -> followUser((Long) params[0], (Long) params[1]),
+                Long.class, Long.class
         ));
 
         registerAction("getFollowers", new ServiceActionDefinition(
@@ -142,6 +141,11 @@ public class T23Service extends BaseService {
         registerAction("getFollowing", new ServiceActionDefinition(
                 params -> getFollowing((String) params[0]),
                 String.class
+        ));
+
+        registerAction("isFollowing", new ServiceActionDefinition(
+                params -> isFollowing((Long) params[0], (Long) params[1]),
+                Long.class, Long.class
         ));
     }
 
@@ -177,16 +181,6 @@ public class T23Service extends BaseService {
         ));
     }
 
-    private void registerPlayerActions(){
-        registerAction("getAllPlayers", new ServiceActionDefinition(
-            params -> getAllPlayers()
-        ));
-    }
-
-    private List<PlayerDTO> getAllPlayers() {
-        final String endpoint = "/players";
-        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>(){});
-    }
 
     private GameProgressDTO createPlayerProgressAgainstOpponent(long playerId, GameMode gameMode, String classUT, String type, OpponentDifficulty difficulty) {
         final String endpoint = "/players/%s/progression/against".formatted(playerId);
@@ -254,20 +248,20 @@ public class T23Service extends BaseService {
 
     // Metodo per ottenere la lista degli utenti
     private List<User> getUsers() {
-        final String endpoint = "/players/students_list";
+        final String endpoint = "/student/students_list";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {
         });
     }
 
-    private User getUser(long userId) {
-        final String endpoint = "/players/students_list/" + userId;
+    private User getUser(String userId) {
+        final String endpoint = "/student/students_list/" + userId;
         return callRestGET(endpoint, null, User.class);
     }
 
     //Do una lista di ID e mi ritorna una lista di User
     // Implementata a mano perchè un po' strana è una POST che ottiene dati come una GET
     private List<User> getUserByList(List<String> idsStudenti) {
-        final String endpoint = "/players/getStudentiTeam";
+        final String endpoint = "/student/getStudentiTeam";
         // Crea un oggetto HttpEntity con i dati che vogliamo inviare (la lista degli ID)
         HttpEntity<List<String>> requestEntity = new HttpEntity<>(idsStudenti);
         // Esegui la chiamata POST all'endpoint
@@ -370,25 +364,40 @@ public class T23Service extends BaseService {
      *   il targetUserId + chi viene seguito
      *   il authUserId è chi segue
      */
-    public String followUser(Integer targetUserId, Integer authUserId) {
+    public Boolean followUser(Long targetUserId, Long authUserId) {
         final String endpoint = "/profile/toggle_follow";
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("targetUserId", String.valueOf(targetUserId));
-        map.add("authUserId", String.valueOf(authUserId));
-        return callRestPost(endpoint, map, null, String.class);
+        // T23 espone followerId (chi segue) e followingId (chi viene seguito)
+        map.add("followerId", String.valueOf(authUserId));
+        map.add("followingId", String.valueOf(targetUserId));
+
+        // toggle_follow ritorna un boolean: true = ora segue, false = ora non segue
+        return callRestPost(endpoint, map, null, Boolean.class);
     }
 
-    public List<User> getFollowers(String userId) {
+    public Boolean isFollowing(Long authUserId, Long targetUserId) {
+        final String endpoint = "/profile/isFollowing";
+        Map<String, String> queryParams = Map.of(
+                "followerId", String.valueOf(authUserId),
+                "followingId", String.valueOf(targetUserId)
+        );
+        return callRestGET(endpoint, queryParams, Boolean.class);
+    }
+
+    /**
+     * T23 restituisce una lista di UserProfile (non User). Qui usiamo Map per evitare coupling.
+     */
+    public List<Map<String, Object>> getFollowers(String userId) {
         final String endpoint = "/profile/followers";
         Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
+        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<Map<String, Object>>>() {
         });
     }
 
-    public List<User> getFollowing(String userId) {
+    public List<Map<String, Object>> getFollowing(String userId) {
         final String endpoint = "/profile/following";
         Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
+        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<Map<String, Object>>>() {
         });
     }
 }

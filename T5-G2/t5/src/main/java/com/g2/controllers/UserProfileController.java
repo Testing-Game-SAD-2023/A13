@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.components.GenericObjectComponent;
 import com.g2.components.PageBuilder;
 import com.g2.components.UserProfileComponent;
-import com.g2.components.LeaderboardComponent;
 import com.g2.interfaces.ServiceManager;
 import com.g2.model.GameConfigData;
 import com.g2.model.User;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
 /*
  * Tutte le chiamate legate al profilo utente
  */
@@ -40,6 +38,7 @@ public class UserProfileController {
     private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
     private final ServiceManager serviceManager;
     private GameConfigData gameConfigData = null;
+
     @Value("${config.gamification.file}")
     private String gamificationConFile;
 
@@ -55,7 +54,7 @@ public class UserProfileController {
             File file = new File("%s/%s".formatted(System.getProperty("user.dir"), gamificationConFile.replace("/", File.separator)));
             this.gameConfigData = objectMapper.readValue(file, GameConfigData.class);
         } catch (IOException e) {
-            logger.info("[PostConstruct init] Error in loading gamification_config.json, using default values: {}", e.getMessage());
+            logger.info("[PostConstruct init] Error in loading game_config.json, using default values: {}", e.getMessage());
             this.gameConfigData = new GameConfigData(10, 5, 1);
         }
     }
@@ -63,32 +62,32 @@ public class UserProfileController {
     @GetMapping("/SearchFriend")
     public String showSearchFriendPage(Model model) {
         PageBuilder searchPage = new PageBuilder(serviceManager, "search", model, JwtRequestContext.getJwtToken());
-        // search_page.SetAuth();  // Gestisce l'autenticazione
         return searchPage.handlePageRequest();
     }
 
+    /**
+     * PROFILO PERSONALE (NUOVO T9)
+     * Questa rotta ora rende direttamente il template t9_profile.html
+     * (i dati vengono caricati via JS chiamando il microservizio T9 attraverso i gateway)
+     */
     @GetMapping("/profile")
     public String profilePagePersonal(Model model) {
-        PageBuilder profilePage = new PageBuilder(serviceManager, "profile", model, JwtRequestContext.getJwtToken());
-
-        Long userId = profilePage.getUserId();
-        profilePage.setObjectComponents(new UserProfileComponent(serviceManager, false, userId));
-        return profilePage.handlePageRequest();
+        return "t9_profile";
     }
 
     @GetMapping("/friend/{playerID}")
     public String friendProfilePage(Model model, @PathVariable("playerID") Long playerID) {
-        PageBuilder profile = new PageBuilder(serviceManager, "profile", model, JwtRequestContext.getJwtToken());
+        // Pagina profilo di un altro utente (read-only + follow/unfollow)
+        PageBuilder page = new PageBuilder(serviceManager, "friend_profile", model, JwtRequestContext.getJwtToken());
 
-        Long userId = profile.getUserId();
-        if (userId.equals(playerID)) {
+        Long userId = page.getUserId();
+        if (userId != null && userId.equals(playerID)) {
             return "redirect:/profile";
         }
 
-        profile.setObjectComponents(
-                new UserProfileComponent(serviceManager, true, userId, playerID)
-        );
-        return profile.handlePageRequest();
+        // Passiamo solo l'ID al template: i dati vengono caricati via JS (T9 + T23)
+        model.addAttribute("friendId", playerID);
+        return page.handlePageRequest();
     }
 
     @GetMapping("/Team")
@@ -108,9 +107,7 @@ public class UserProfileController {
     @GetMapping("/Achievement")
     public String showAchievements(Model model) {
         PageBuilder achievement = new PageBuilder(serviceManager, "Achivement", model, JwtRequestContext.getJwtToken());
-        /*
-         * Richiedo a T4 lo stato del giocatore
-         */
+
         PlayerProgressDTO playerProgress = (PlayerProgressDTO) serviceManager.handleRequest("T23", "getPlayerProgressAgainstAllOpponent", achievement.getUserId());
         List<GameProgressDTO> achievements = playerProgress.getGameProgressesDTO();
         Set<String> globalAchievements = playerProgress.getGlobalAchievements();
@@ -125,22 +122,9 @@ public class UserProfileController {
         return achievement.handlePageRequest();
     }
 
-//    Handler per la costruzione della pagina contenente la classifica
-//    La pagina è costruita utilizzando un ObjectComponent "riempito" da un LogicComponent
-    @GetMapping("/leaderboard")
-    public String showLeaderboard(Model model) {
-        PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
-        GenericObjectComponent leaderboardObjectComponent = new GenericObjectComponent(null, null);
-        LeaderboardComponent leaderboardComponent = new LeaderboardComponent(leaderboardObjectComponent, leaderboardPage.getUserId(), serviceManager);
-        leaderboardPage.setLogicComponents(leaderboardComponent);
-        leaderboardPage.setObjectComponents(leaderboardObjectComponent);
-        return leaderboardPage.handlePageRequest();
-    }
-
     @GetMapping("/Notification")
     public String showProfileNotificationPage(Model model) {
         PageBuilder notificationPage = new PageBuilder(serviceManager, "notification", model, JwtRequestContext.getJwtToken());
-
         return notificationPage.handlePageRequest();
     }
 
@@ -155,9 +139,7 @@ public class UserProfileController {
      *
      */
     @GetMapping("/profile/{playerID}")
-    public String profilePage(Model model,
-                              @PathVariable(value = "playerID") Long playerID) {
-
+    public String profilePage(Model model, @PathVariable(value = "playerID") Long playerID) {
         PageBuilder profile = new PageBuilder(serviceManager, "profile", model, JwtRequestContext.getJwtToken());
         profile.setObjectComponents(
                 new UserProfileComponent(serviceManager, false, playerID)
@@ -187,10 +169,9 @@ public class UserProfileController {
         PageBuilder editProfilePage = new PageBuilder(serviceManager, "Edit_Profile", model, JwtRequestContext.getJwtToken());
         User user = (User) serviceManager.handleRequest("T23", "GetUser", editProfilePage.getUserId());
         if (user == null) {
-            //Qua gestisco utente sbagliato
             return "error";
         }
-        // Prendiamo le risorse dal servizio UserProfileService
+
         List<String> images = getProfilePictures();
         editProfilePage.setObjectComponents(
                 new GenericObjectComponent("user", user),
@@ -198,5 +179,4 @@ public class UserProfileController {
         );
         return editProfilePage.handlePageRequest();
     }
-
 }

@@ -78,12 +78,16 @@
     let currentPage = 0;
     let pageSize = 10;
 
+    // Browser -> Nginx (/api...) -> rewrite -> API Gateway -> T9 (/api/profiles/...)
+    // Quindi dal browser dobbiamo chiamare /api/api/profiles/...
+    const T9_SEARCH_BASE = "/api/api/profiles/search";
+
     $("#init_alert").show();
 
     // Funzione per eseguire la ricerca
     function searchUserProfiles(searchTerm, page, size) {
         $.ajax({
-            url: "/searchUserProfiles",
+            url: T9_SEARCH_BASE,
             type: "GET",
             data: {
                 searchTerm: searchTerm,
@@ -91,6 +95,9 @@
                 size: size
             },
             dataType: "json",
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(response) {
                 console.log("Risultati della ricerca:", response);
                 // Nascondi l'alert quando i risultati sono stati caricati
@@ -118,18 +125,36 @@
         }
 
         data.content.forEach(user => {
+            // T9 potrebbe esporre campi con nomi diversi a seconda del DTO/versione.
+            // Normalizziamo lato UI per evitare risultati "vuoti" (es. vedere solo l'ID).
+            const userId = user.userId ?? user.id ?? user.playerId ?? user.playerID;
+            const nickname = user.nickname ?? user.username;
+            const fullName = `${user.name ?? ""} ${user.surname ?? ""}`.trim();
+            const email = user.email ?? "";
+
+            const displayName = (nickname && nickname.trim())
+              ? nickname
+              : (fullName && fullName.trim())
+                ? fullName
+                : (email && email.trim())
+                  ? email
+                  : (userId != null ? `User #${userId}` : "Utente");
+
+            const secondary = (displayName === email || !email) ? "" : email;
+
+            const avatar = user.profilePicturePath ? user.profilePicturePath : 'default.png';
             resultsContainer.append(
                 `<div class="col mb-4">
                     <div class="card">
                         <div class="card-body p-4 d-flex align-items-center gap-3">
-                            <img src=${'/t5/images/profileImages/' + user.profilePicturePath}
-                            alt="twbs" width="32" height="32" 
+                            <img src=${'/t5/images/profileImages/' + avatar}
+                            alt="Avatar" width="32" height="32" 
                             class="rounded-circle flex-shrink-0">
                             <div class="text-start">
-                                <h5 class="fw-semibold mb-0">${user.name + " " + user.surname}</h5>
-                                <span class="fs-5 d-flex align-items-center">${user.email}</span>
+                                <h5 class="fw-semibold mb-0">${displayName}</h5>
+                                ${secondary ? `<span class="fs-6 d-flex align-items-center text-muted">${secondary}</span>` : ""}
                             </div>
-                            <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${user.userId}">Link</a>                     
+                            <a class="btn btn-primary py-1 px-2 ms-auto" href="/friend/${userId}">Apri</a>
                         </div>
                     </div>
                 </div>`
