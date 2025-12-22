@@ -30,14 +30,51 @@ public class UserSocialService {
         this.notificationService = notificationService;
     }
 
+    /**
+     * Risolve un profilo a partire da una stringa ID che può essere:
+     * - l'ID interno del profilo (profiles.ID, Integer)
+     * - oppure l'ID del player (profiles.player_id, Long)
+     *
+     * Nel resto dell'app (JWT, UI, altri microservizi) circola quasi sempre il playerId.
+     * Per evitare incoerenze, il social graph accetta entrambi.
+     */
+    private UserProfile resolveProfile(String idStr, String notFoundMessage) {
+        if (idStr == null || idStr.isBlank()) {
+            throw new UserNotFoundException(notFoundMessage);
+        }
+
+        // 1) Prova come profileId (Integer)
+        try {
+            Integer profileId = Integer.valueOf(idStr);
+            return userProfileRepository.findById(profileId)
+                    .orElseGet(() -> {
+                        // 2) Se non trovato come profileId, prova come playerId (Long)
+                        try {
+                            Long playerId = Long.valueOf(idStr);
+                            UserProfile byPlayer = userProfileRepository.findByPlayer_ID(playerId);
+                            if (byPlayer != null) return byPlayer;
+                        } catch (NumberFormatException ignored) {
+                            // ignore
+                        }
+                        throw new UserNotFoundException(notFoundMessage);
+                    });
+        } catch (NumberFormatException ex) {
+            // Non è un Integer: prova direttamente come playerId (Long)
+            try {
+                Long playerId = Long.valueOf(idStr);
+                UserProfile byPlayer = userProfileRepository.findByPlayer_ID(playerId);
+                if (byPlayer != null) return byPlayer;
+            } catch (NumberFormatException ignored) {
+                // ignore
+            }
+            throw new UserNotFoundException(notFoundMessage);
+        }
+    }
+
     // Verifica se un utente ne segue un altro
     public boolean isFollowing(String followerIdStr, String followingIdStr) {
-        Integer followerId = Integer.valueOf(followerIdStr);
-        Integer followingId = Integer.valueOf(followingIdStr);
-        UserProfile follower = userProfileRepository.findById(followerId)
-                .orElseThrow(() -> new UserNotFoundException(generateFollowerNotFoundMessage(followerIdStr)));
-        UserProfile following = userProfileRepository.findById(followingId)
-                .orElseThrow(() -> new UserNotFoundException(generateFollowingNotFoundMessage(followingIdStr)));
+        UserProfile follower = resolveProfile(followerIdStr, generateFollowerNotFoundMessage(followerIdStr));
+        UserProfile following = resolveProfile(followingIdStr, generateFollowingNotFoundMessage(followingIdStr));
 
         return userFollowRepository.existsByFollowerAndFollowing(follower, following);
     }
@@ -49,14 +86,8 @@ public class UserSocialService {
      */
     @Transactional
     public boolean toggleFollow(String followerIdStr, String followingIdStr) {
-
-        Integer followerId = Integer.valueOf(followerIdStr);
-        Integer followingId = Integer.valueOf(followingIdStr);
-
-        UserProfile follower = userProfileRepository.findById(followerId)
-                .orElseThrow(() -> new UserNotFoundException(generateFollowerNotFoundMessage(followerIdStr)));
-        UserProfile following = userProfileRepository.findById(followingId)
-                .orElseThrow(() -> new UserNotFoundException(generateFollowingNotFoundMessage(followingIdStr)));
+        UserProfile follower = resolveProfile(followerIdStr, generateFollowerNotFoundMessage(followerIdStr));
+        UserProfile following = resolveProfile(followingIdStr, generateFollowingNotFoundMessage(followingIdStr));
 
         if (userFollowRepository.existsByFollowerAndFollowing(follower, following)) {
             // Se già segue, rimuovilo (unfollow)
@@ -79,9 +110,7 @@ public class UserSocialService {
 
     public List<UserProfile> getFollowers(String userIdStr) {
         try {
-            Integer userId = Integer.valueOf(userIdStr);
-            UserProfile user = userProfileRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException(generateUserNotFoundMessage(userIdStr)));
+            UserProfile user = resolveProfile(userIdStr, generateUserNotFoundMessage(userIdStr));
             return userFollowRepository.findFollowersByUserProfile(user);
         } catch (UserNotFoundException e) {
             // Log dell'eccezione
@@ -97,9 +126,7 @@ public class UserSocialService {
 
     public List<UserProfile> getFollowing(String userIdStr) {
         try {
-            Integer userId = Integer.valueOf(userIdStr);
-            UserProfile user = userProfileRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException(generateUserNotFoundMessage(userIdStr)));
+            UserProfile user = resolveProfile(userIdStr, generateUserNotFoundMessage(userIdStr));
             return userFollowRepository.findFollowingByUserProfile(user);
         } catch (UserNotFoundException e) {
             // Log dell'eccezione

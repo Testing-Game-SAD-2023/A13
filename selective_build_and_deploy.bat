@@ -15,7 +15,7 @@ rem Creazione della rete Docker se non esiste
 docker network ls | findstr /C:"global-network" >nul || docker network create global-network
 
 :: Chiedi all'utente quali servizi costruire
-echo Enter the numbers of the services to build and deploy, separated by spaces (0-10) or type 'all' to build them all:
+echo Enter the numbers of the services to build and deploy, separated by spaces (0-11) or type 'all' to build them all:
 echo 0 - commons
 echo 1 - T1-G11
 echo 2 - T23-G1
@@ -27,12 +27,12 @@ echo 7 - ui_gateway
 echo 8 - api_gateway
 echo 9 - T0
 echo 10 - db-backup
-echo 11 - observability stack
+echo 11 - T9 Profile Service
 set /p SELECTION=Scelte (es. 0 1 2 o 'all'):
 
 :: Se l'utente ha scelto "all", builda tutto
 if /i "%SELECTION%"=="all" (
-    set SELECTION=0 1 2 3 4 5 6 7 8 9 10
+    set SELECTION=0 1 2 3 4 5 6 7 8 9 10 11
 )
 
 :: Loop per ciascuna selezione
@@ -66,8 +66,7 @@ for %%i in (%SELECTION%) do (
         cd /d "%ROOT_DIR%"
     ) else if %%i==3 (
         echo Building T4-G18
-        cd /d "%ROOT_DIR%\T4\gamerepo"
-        :: call mvn clean package -DskipTests=true || (echo Error in T4-G18 build & exit /b 1)
+        cd /d "%ROOT_DIR%\T4"
         docker build -t mick0974/a13:t4-g18 .
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
@@ -101,10 +100,11 @@ for %%i in (%SELECTION%) do (
         echo Building T8-G21
         cd /d "%ROOT_DIR%\T8-G21\T8"
         call mvn clean package || (echo Error in T8-G21 build & exit /b 1)
+        cd /d "%ROOT_DIR%"
         docker build -t mick0974/a13:t8-g21 .
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
-            echo Error deploying T1-G11
+            echo Error deploying T8-G21
             exit /b 1
         )
         cd /d "%ROOT_DIR%"
@@ -129,7 +129,7 @@ for %%i in (%SELECTION%) do (
         )
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
-            echo Error deploying T1-G11
+            echo Error deploying api_gateway
             exit /b 1
         )
         cd /d "%ROOT_DIR%"
@@ -155,17 +155,19 @@ for %%i in (%SELECTION%) do (
         docker build -t mick0974/a13:db-backup .
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
-        echo Error deploying db-backup
-        exit /b 1
+            echo Error deploying db-backup
+            exit /b 1
         )
         cd /d "%ROOT_DIR%"
-    ) else if %%i==10 (
-        echo Building observability stack
-        cd /d "%ROOT_DIR%\observability
+    ) else if %%i==11 (
+        echo Building T9 Profile Service
+        cd /d "%ROOT_DIR%\T9"
+        call mvn clean package -DskipTests=true -Dspring.profiles.active=prod || (echo Error in T9 build & exit /b 1)
+        docker build -t mick0974/a13:t9-profile-service .
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
-        echo Error deploying observability stack
-        exit /b 1
+            echo Error deploying T9 Profile Service
+            exit /b 1
         )
         cd /d "%ROOT_DIR%"
     ) else (

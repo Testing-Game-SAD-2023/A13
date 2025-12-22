@@ -12,6 +12,15 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Intege
 
     UserProfile findByID(Integer ID);
 
+    /**
+     * Lookup del profilo tramite l'ID del Player (cioè l'userId che circola nel resto del sistema e nel JWT).
+     *
+     * Nota: l'ID primario del profilo (Integer) non coincide con playerId (Long).
+     * Questa query permette al servizio social (follow/unfollow) di funzionare anche se gli viene passato
+     * direttamente il playerId.
+     */
+    UserProfile findByPlayer_ID(Long playerId);
+
     // Ricerca per nome, cognome, email o nickname con LIKE
     @Query("SELECT u FROM UserProfile u WHERE " +
             "LOWER(u.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +

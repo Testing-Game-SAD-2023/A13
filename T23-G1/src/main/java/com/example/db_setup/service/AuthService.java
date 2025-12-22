@@ -1,6 +1,10 @@
 package com.example.db_setup.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.client.RestTemplate;
 import com.example.db_setup.model.*;
+import java.util.HashMap;
+import java.util.Map;
 import com.example.db_setup.model.repository.AdminRepository;
 import com.example.db_setup.model.repository.PasswordResetTokenRepository;
 import com.example.db_setup.model.repository.PlayerRepository;
@@ -49,6 +53,13 @@ public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
+    // RestTemplate usato per chiamare T9
+    private final RestTemplate restTemplate;
+
+    // Base URL del servizio T9 (es: http://t9-app:8089/api/profiles)
+    @Value("${app.t9.profile-base-url}")
+    private String t9ProfileBaseUrl;
+
     private final AuthenticationManager userAuthManager;
     private final AuthenticationManager adminAuthManager;
     private final PlayerRepository playerRepository;
@@ -63,9 +74,20 @@ public class AuthService {
     private final PlayerService playerService;
     private final AdminService adminService;
 
-    public AuthService(@Qualifier("playerAuthManager") AuthenticationManager userAuthManager, @Qualifier("adminAuthManager") AuthenticationManager adminAuthManager,
-                       PlayerRepository playerRepository, AdminRepository adminRepository, JwtProvider jwtProvider, PasswordEncoder encoder, RefreshTokenService refreshTokenService, RefreshTokenRepository refreshTokenRepository,
-                       PasswordResetTokenService passwordResetTokenService, PasswordResetTokenRepository passwordResetTokenRepository, EmailService emailService, PlayerService playerService, AdminService adminService) {
+    public AuthService(@Qualifier("playerAuthManager") AuthenticationManager userAuthManager,
+                       @Qualifier("adminAuthManager") AuthenticationManager adminAuthManager,
+                       PlayerRepository playerRepository,
+                       AdminRepository adminRepository,
+                       JwtProvider jwtProvider,
+                       PasswordEncoder encoder,
+                       RefreshTokenService refreshTokenService,
+                       RefreshTokenRepository refreshTokenRepository,
+                       PasswordResetTokenService passwordResetTokenService,
+                       PasswordResetTokenRepository passwordResetTokenRepository,
+                       EmailService emailService,
+                       PlayerService playerService,
+                       AdminService adminService,
+                       RestTemplate restTemplate) {
         this.userAuthManager = userAuthManager;
         this.adminAuthManager = adminAuthManager;
         this.playerRepository = playerRepository;
@@ -79,6 +101,7 @@ public class AuthService {
         this.emailService = emailService;
         this.playerService = playerService;
         this.adminService = adminService;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -103,7 +126,41 @@ public class AuthService {
         if (playerRepository.findByUserProfileEmail(email).isPresent())
             throw new UserAlreadyExistsException("mail");
 
-        return playerService.addNewPlayer(name, surname, email, encoder.encode(password), studies);
+        // 1) creo il player come prima
+        Player player = playerService.addNewPlayer(
+                name, surname, email, encoder.encode(password), studies
+        );
+
+        // 2) provo a chiedere a T9 di inizializzare il profilo con i dati REALI
+        try {
+            String url = String.format("%s/%d/init", t9ProfileBaseUrl, player.getID());
+
+            com.example.db_setup.model.UserProfile up = player.getUserProfile();
+
+            String realName = (up != null && up.getName() != null) ? up.getName() : name;
+            String realSurname = (up != null && up.getSurname() != null) ? up.getSurname() : surname;
+            String realEmail = (up != null && up.getEmail() != null) ? up.getEmail() : email;
+
+            // se il nickname è "default_nickname" lo consideriamo placeholder e NON lo mandiamo
+            String realNickname = null;
+            if (up != null && up.getNickname() != null && !"default_nickname".equals(up.getNickname())) {
+                realNickname = up.getNickname();
+            }
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("name", realName);
+            payload.put("surname", realSurname);
+            payload.put("email", realEmail);
+            payload.put("nickname", realNickname);
+
+            restTemplate.postForEntity(url, payload, Void.class);
+            logger.info("Creato/aggiornato profilo T9 per player {}", player.getID());
+        } catch (Exception ex) {
+            // IMPORTANTISSIMO: non bloccare la registrazione se T9 è giù o risponde 500
+            logger.warn("Impossibile creare/aggiornare profilo T9 per player {}: {}", player.getID(), ex.getMessage());
+        }
+
+        return player;
     }
 
     /**
@@ -155,6 +212,33 @@ public class AuthService {
 
         Player player = userOpt.get();
         ResponseCookie refreshCookie = refreshTokenService.generateRefreshToken(player);
+
+        // sincronizzo (o ripulisco) il profilo T9 ad ogni login
+        try {
+            String url = String.format("%s/%d/init", t9ProfileBaseUrl, player.getID());
+
+            com.example.db_setup.model.UserProfile up = player.getUserProfile();
+
+            String realName = (up != null) ? up.getName() : null;
+            String realSurname = (up != null) ? up.getSurname() : null;
+            String realEmail = (up != null && up.getEmail() != null) ? up.getEmail() : email;
+
+            String realNickname = null;
+            if (up != null && up.getNickname() != null && !"default_nickname".equals(up.getNickname())) {
+                realNickname = up.getNickname();
+            }
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("name", realName);
+            payload.put("surname", realSurname);
+            payload.put("email", realEmail);
+            payload.put("nickname", realNickname);
+
+            restTemplate.postForEntity(url, payload, Void.class);
+            logger.info("Sincronizzato profilo T9 per player {} al login", player.getID());
+        } catch (Exception ex) {
+            logger.warn("Impossibile sincronizzare profilo T9 per player {} al login: {}", player.getID(), ex.getMessage());
+        }
 
         return new String[]{jwtCookie.toString(), refreshCookie.toString()};
     }

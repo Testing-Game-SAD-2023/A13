@@ -1,278 +1,318 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Log di verifica
-    console.log("DOM completamente caricato e analizzato");
-    // Inizializza la funzionalità di ricerca amici
-    initFriendSearch();
-    // Inizializza la ricerca per i tab
-    setupTabSearch();
-    // Inizializza la gestione notifiche
-    initNotifications();
-    // Gestione dei tab dei trofei
-    initTrophyTabs();
-    // Aggiungi stile per il testo evidenziato
-    addHighlightStyle();
-});
+// Browser -> Nginx (/api...) -> rewrite -> API Gateway -> T9 (/api/profiles/...)
+// Quindi dal browser dobbiamo chiamare /api/api/profiles/...
+const API_BASE = "/api/api/profiles";
 
-function initFriendSearch() {
-    const searchInput = document.querySelector('#friend-search-input');
-    const suggestionsContainer = document.querySelector('#friend-suggestions');
-    
-    let debounceTimeout;
+// UI Gateway inoltra /t5 -> T5, quindi usiamo un endpoint alias in T5
+const SOCIAL_BASE = "/t5/social";
 
-    if (searchInput && suggestionsContainer) {
-        searchInput.addEventListener("input", function () {
-            const query = searchInput.value.trim();
-            suggestionsContainer.style.display = "none"; // Nascondi subito i suggerimenti
 
-            if (!isValidEmail(query)) {
-                console.log("Email non valida per regex");
-                return;
-            }
 
-            // Cancella il timeout precedente se l'utente sta ancora digitando
-            clearTimeout(debounceTimeout);
+const avatarFiles = [
+  "default.png",
+  "men-1.png",
+  "men-2.png",
+  "men-3.png",
+  "men-4.png",
+  "women-1.png",
+  "women-2.png",
+  "women-3.png",
+  "women-4.png",
+];
 
-            // Aggiungi un nuovo timeout per la ricerca
-            debounceTimeout = setTimeout(async function () {
-                try {
-                    if (email) {
-                        const user = await fetchUserByEmail(query);
-                        if (user) {
-                            displayUserSuggestions(user, suggestionsContainer);
-                        } 
-                    } else {
-                        suggestionsContainer.style.display = "none";
-                    }
-                } catch (error) {
-                    console.error("Errore di rete:", error);
-                }
-            }, 500); // Timeout di 500ms dopo l'ultimo carattere digitato
+function setCssVars(themeColor, accentColor) {
+  if (themeColor) document.documentElement.style.setProperty("--profile-bg", themeColor);
+  if (accentColor) document.documentElement.style.setProperty("--profile-accent", accentColor);
+}
+
+function showSavedOk() {
+  const el = document.getElementById("savedOk");
+  if (!el) return;
+  el.style.display = "block";
+  clearTimeout(showSavedOk._t);
+  showSavedOk._t = setTimeout(() => (el.style.display = "none"), 1800);
+}
+
+function showNicknameError(msg) {
+  const el = document.getElementById("nicknameError");
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? "block" : "none";
+}
+
+function renderVisibilityBadge(isPublic) {
+  const badge = document.getElementById("visibilityBadge");
+  if (!badge) return;
+  if (isPublic) {
+    badge.textContent = "Public";
+    badge.className = "badge text-bg-success";
+  } else {
+    badge.textContent = "Private";
+    badge.className = "badge text-bg-dark";
+  }
+}
+
+async function apiFetch(url, options = {}) {
+  const resp = await fetch(url, {
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+    ...options,
+  });
+
+  const text = await resp.text();
+  let body = null;
+  try {
+    body = text ? JSON.parse(text) : null;
+  } catch {
+    body = text;
+  }
+
+  if (!resp.ok) {
+    const err = new Error("API error");
+    err.status = resp.status;
+    err.body = body;
+    throw err;
+  }
+
+  return body;
+}
+
+function renderAvatarPicker(currentFile) {
+  const container = document.getElementById("avatarPicker");
+  if (!container) return;
+
+  container.innerHTML = "";
+  avatarFiles.forEach((file) => {
+    const img = document.createElement("img");
+    img.src = `/t5/images/profileImages/${file}`;
+    img.alt = file;
+    if (file === currentFile) img.classList.add("selected");
+
+    img.addEventListener("click", async () => {
+      try {
+        const updated = await apiFetch(`${API_BASE}/me/avatar`, {
+          method: "PUT",
+          body: JSON.stringify({ profilePicturePath: file }),
         });
+
+        document.querySelectorAll("#avatarPicker img").forEach((i) => i.classList.remove("selected"));
+        img.classList.add("selected");
+
+        const avatarImg = document.getElementById("avatarImg");
+        if (avatarImg) avatarImg.src = `/t5/images/profileImages/${updated.profilePicturePath || file}`;
+        showSavedOk();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to update avatar");
+      }
+    });
+
+    container.appendChild(img);
+  });
+}
+
+function normalizeColor(value, fallback) {
+  if (typeof value !== "string") return fallback;
+  const v = value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) return v;
+  return fallback;
+}
+
+function formatLastMatch(value) {
+  if (!value) return "-";
+  try {
+    const dt = new Date(value);
+    if (!Number.isNaN(dt.getTime())) {
+      return dt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
     }
+  } catch {
+    // ignore
+  }
+  return String(value).split("T")[0] || "-";
 }
 
-// Funzione per validare l'email
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+async function loadSocialCounts() {
+  const followersEl = document.getElementById("followersCount");
+  const followingEl = document.getElementById("followingCount");
+  if (!followersEl || !followingEl) return;
+
+  try {
+    const counts = await apiFetch(`${SOCIAL_BASE}/me/counts`, { method: "GET" });
+
+    const followers = counts?.followersCount ?? counts?.followers ?? 0;
+    const following = counts?.followingCount ?? counts?.following ?? 0;
+
+    followersEl.textContent = String(followers);
+    followingEl.textContent = String(following);
+  } catch (e) {
+    console.warn("Failed to load social counts", e);
+    followersEl.textContent = "0";
+    followingEl.textContent = "0";
+  }
 }
 
-// Funzione per recuperare l'utente tramite email
-async function fetchUserByEmail(email) {
-    const url = new URL("/user_by_email", window.location.origin);
-    url.searchParams.append("email", email);
+async function loadProfile() {
+  showNicknameError("");
 
-    const response = await fetch(url, { method: "GET", headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+  const profile = await apiFetch(`${API_BASE}/me`);
 
-    if (response.ok) {
-        const user = await response.json();
-        return user;
+  document.getElementById("nicknameText").textContent = profile.nickname ?? "";
+  document.getElementById("nameText").textContent = `${profile.name ?? ""} ${profile.surname ?? ""}`.trim();
+  document.getElementById("nicknameInput").value = profile.nickname ?? "";
+  document.getElementById("bioInput").value = profile.bio ?? "";
+
+  const avatarFile = profile.profilePicturePath || "default.png";
+  document.getElementById("avatarImg").src = `/t5/images/profileImages/${avatarFile}`;
+  renderAvatarPicker(avatarFile);
+
+  const played = profile.matchesPlayed ?? 0;
+  const won = profile.matchesWon ?? 0;
+  const last = profile.lastMatchAt ?? null;
+
+  const mpEl = document.getElementById("matchesPlayed");
+  const mwEl = document.getElementById("matchesWon");
+  const lmEl = document.getElementById("lastMatch");
+  if (mpEl) mpEl.textContent = String(played);
+  if (mwEl) mwEl.textContent = String(won);
+  if (lmEl) lmEl.textContent = formatLastMatch(last);
+
+  const theme = profile.themeColor || "#0b1b2b";
+  const accent = profile.accentColor || "#198754";
+  const pub = profile.publicProfile !== false;
+
+  document.getElementById("themeColor").value = normalizeColor(theme, "#0b1b2b");
+  document.getElementById("accentColor").value = normalizeColor(accent, "#198754");
+
+  const publicSwitch = document.getElementById("publicSwitch");
+  if (publicSwitch) publicSwitch.checked = pub;
+
+  setCssVars(theme, accent);
+  renderVisibilityBadge(pub);
+
+  await loadSocialCounts();
+}
+
+function bindHandlers() {
+  const refreshBtn = document.getElementById("refreshBtn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", async () => {
+      try {
+        await loadProfile();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to refresh profile");
+      }
+    });
+  }
+
+  const saveNicknameBtn = document.getElementById("saveNicknameBtn");
+  if (saveNicknameBtn) {
+    saveNicknameBtn.addEventListener("click", async () => {
+      const nickname = document.getElementById("nicknameInput").value.trim();
+      try {
+        const updated = await apiFetch(`${API_BASE}/me/nickname`, {
+          method: "PUT",
+          body: JSON.stringify({ nickname }),
+        });
+
+        document.getElementById("nicknameText").textContent = updated.nickname ?? nickname;
+        showSavedOk();
+        showNicknameError("");
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) {
+          showNicknameError("Nickname già in uso. Scegline un altro.");
+        } else {
+          showNicknameError("Errore nel salvataggio del nickname.");
+        }
+      }
+    });
+  }
+
+  const saveBioBtn = document.getElementById("saveBioBtn");
+  if (saveBioBtn) {
+    saveBioBtn.addEventListener("click", async () => {
+      const bio = document.getElementById("bioInput").value;
+      try {
+        const updated = await apiFetch(`${API_BASE}/me/bio`, {
+          method: "PUT",
+          body: JSON.stringify({ bio }),
+        });
+        document.getElementById("bioInput").value = updated.bio ?? bio;
+        showSavedOk();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to save bio");
+      }
+    });
+  }
+
+  const generateBioBtn = document.getElementById("generateBioBtn");
+  if (generateBioBtn) {
+    generateBioBtn.addEventListener("click", async () => {
+      const btn = document.getElementById("generateBioBtn");
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML =
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+
+      try {
+        const updated = await apiFetch(`${API_BASE}/me/generate-bio`, { method: "POST" });
+        document.getElementById("bioInput").value = updated.bio ?? "";
+        showSavedOk();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to generate bio");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+      }
+    });
+  }
+
+  const savePrefsBtn = document.getElementById("savePrefsBtn");
+  if (savePrefsBtn) {
+    savePrefsBtn.addEventListener("click", async () => {
+      const themeColor = document.getElementById("themeColor").value;
+      const accentColor = document.getElementById("accentColor").value;
+      const publicProfile = document.getElementById("publicSwitch").checked;
+
+      try {
+        const updated = await apiFetch(`${API_BASE}/me/preferences`, {
+          method: "PUT",
+          body: JSON.stringify({ themeColor, accentColor, publicProfile }),
+        });
+
+        setCssVars(updated.themeColor || themeColor, updated.accentColor || accentColor);
+        renderVisibilityBadge(updated.publicProfile !== false);
+        showSavedOk();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to save preferences");
+      }
+    });
+  }
+
+  const themeColorEl = document.getElementById("themeColor");
+  const accentColorEl = document.getElementById("accentColor");
+  if (themeColorEl) themeColorEl.addEventListener("input", (e) => setCssVars(e.target.value, null));
+  if (accentColorEl) accentColorEl.addEventListener("input", (e) => setCssVars(null, e.target.value));
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  bindHandlers();
+
+  try {
+    await loadProfile();
+  } catch (e) {
+    console.error(e);
+    if (e.status === 401) {
+      alert("Non autenticato. Fai login di nuovo.");
+      window.location.href = "/login";
     } else {
-        console.error("Errore durante la ricerca del profilo:", response.statusText);
-        return null;
+      alert("Failed to load profile");
     }
-}
-
-// Funzione per visualizzare i suggerimenti degli utenti
-function displayUserSuggestions(user, suggestionsContainer) {
-    const profile = user.userProfile;
-    
-    suggestionsContainer.innerHTML = "";
-    if (profile && user.email) {
-        const profileInfo = createProfileInfo(user);
-        suggestionsContainer.appendChild(profileInfo);
-        suggestionsContainer.style.display = "block";
-    }
-}
-
-// Crea e restituisce il contenitore per i dettagli del profilo
-function createProfileInfo(user) {
-    const profileInfo = document.createElement('div');
-    profileInfo.className = 'profile-info';
-
-    const userDetails = document.createElement('div');
-    userDetails.className = 'user-details';
-
-    const userName = document.createElement('span');
-    userName.className = 'name';
-    userName.textContent = `${user.name} ${user.surname}`;
-
-    const userEmail = document.createElement('span');
-    userEmail.className = 'email';
-    userEmail.textContent = user.email;
-
-    userDetails.appendChild(userName);
-    userDetails.appendChild(userEmail);
-
-    const profileBtn = createProfileButton(user);
-    profileInfo.appendChild(userDetails);
-    profileInfo.appendChild(profileBtn);
-
-    return profileInfo;
-}
-
-// Crea il bottone per visualizzare il profilo
-function createProfileButton(user) {
-    const profileBtn = document.createElement('button');
-    profileBtn.className = 'btn btn-custom btn-sm';
-    profileBtn.textContent = "Visualizza Profilo";
-    profileBtn.onclick = function () {
-        location.href = `/friend/${user.id}`;
-    };
-    return profileBtn;
-}
-
-// Funzione per la ricerca amici nei tab
-function setupTabSearch() {
-    const searchInputs = document.querySelectorAll('.tab-search');
-    searchInputs.forEach(searchInput => {
-        searchInput.addEventListener('input', function () {
-            handleTabSearch(this);
-        });
-    });
-}
-
-// Gestisce la ricerca all'interno di un tab
-function handleTabSearch(searchInput) {
-    const searchTerm = searchInput.value.toLowerCase();
-    const targetTab = searchInput.getAttribute('data-search-target');
-    const container = document.querySelector(`#${targetTab}-content .friends-list`);
-    const friendItems = container.querySelectorAll('.friend-item');
-
-    friendItems.forEach(item => {
-        const name = item.querySelector('h5').textContent.toLowerCase();
-        const email = item.querySelector('p').textContent.toLowerCase();
-
-        if (name.includes(searchTerm) || email.includes(searchTerm)) {
-            item.classList.remove('hidden');
-            highlightText(item, searchTerm);
-        } else {
-            item.classList.add('hidden');
-        }
-    });
-}
-
-// Funzione per evidenziare il testo
-function highlightText(item, searchTerm) {
-    if (searchTerm === '') {
-        item.querySelector('h5').innerHTML = item.querySelector('h5').textContent;
-        item.querySelector('p').innerHTML = item.querySelector('p').textContent;
-        return;
-    }
-
-    const nameElement = item.querySelector('h5');
-    const emailElement = item.querySelector('p');
-
-    const highlightMatch = (text, term) => {
-        const regex = new RegExp(`(${term})`, 'gi');
-        return text.replace(regex, '<span class="highlight">$1</span>');
-    };
-
-    nameElement.innerHTML = highlightMatch(nameElement.textContent, searchTerm);
-    emailElement.innerHTML = highlightMatch(emailElement.textContent, searchTerm);
-}
-
-// Aggiungi stile per il testo evidenziato
-function addHighlightStyle() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .highlight {
-            background-color: rgba(0, 123, 255, 0.2);
-            padding: 0 2px;
-            border-radius: 3px;
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-// Funzione per gestire i tab dei trofei
-function initTrophyTabs() {
-    const trophyTabs = document.querySelectorAll('#trophyTabs button[data-bs-toggle="tab"]');
-    trophyTabs.forEach(tab => {
-        tab.addEventListener('shown.bs.tab', function (event) {
-            console.log(`Tab attivo: ${event.target.id}`);
-        });
-    });
-}
-
-// Funzione per inizializzare la gestione delle notifiche
-function initNotifications() {
-    const notificationsList = document.querySelector('.notifications-list');
-    if (notificationsList) {
-        const userEmail = document.querySelector('#user-email')?.textContent.trim();
-        notificationsList.addEventListener('click', async function (e) {
-            const notificationItem = e.target.closest('.notification-item');
-            if (!notificationItem) return;
-
-            const notificationId = notificationItem.getAttribute('data-notification-id');
-            if (!notificationId) return;
-
-            // Gestione pulsante "Leggi"
-            if (e.target.classList.contains('read-btn')) {
-                await handleMarkAsRead(notificationItem, userEmail, notificationId);
-            }
-
-            // Gestione pulsante "Elimina"
-            if (e.target.classList.contains('delete-btn')) {
-                await handleDeleteNotification(notificationItem, userEmail, notificationId);
-            }
-        });
-    }
-}
-
-// Funzione per segnare la notifica come letta
-async function handleMarkAsRead(notificationItem, userEmail, notificationId) {
-    try {
-        const formData = new URLSearchParams();
-        formData.append("email", userEmail);
-        formData.append("notificationID", notificationId);
-        const response = await fetch("/update_notification", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: formData.toString(),
-        });
-
-        if (response.ok) {
-            const statusBadge = notificationItem.querySelector('.notification-status-badge');
-            statusBadge.textContent = 'Letta';
-            statusBadge.classList.remove('status-unread');
-            statusBadge.classList.add('status-read');
-        } else {
-            const errorMessage = await response.text();
-            alert("Errore nella lettura della notifica: " + errorMessage);
-        }
-    } catch (error) {
-        console.error("Errore di rete:", error);
-        alert("Errore di rete. Riprova più tardi.");
-    }
-}
-
-// Funzione per eliminare la notifica
-async function handleDeleteNotification(notificationItem, userEmail, notificationId) {
-    try {
-        const formData = new URLSearchParams();
-        formData.append("email", userEmail);
-        formData.append("notificationID", notificationId);
-        const response = await fetch("/remove_notification", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: formData.toString(),
-        });
-
-        if (response.ok) {
-            notificationItem.remove();
-            if (!document.querySelector('.notification-item')) {
-                const noNotificationsMsg = document.createElement('p');
-                noNotificationsMsg.className = 'no-notifications';
-                noNotificationsMsg.textContent = 'Nessuna notifica disponibile.';
-                notificationsList.parentElement.appendChild(noNotificationsMsg);
-            }
-        } else {
-            const errorMessage = await response.text();
-            alert("Errore nell'eliminazione della notifica: " + errorMessage);
-        }
-    } catch (error) {
-        console.error("Errore di rete:", error);
-        alert("Errore di rete. Riprova più tardi.");
-    }
-}
+  }
+});
