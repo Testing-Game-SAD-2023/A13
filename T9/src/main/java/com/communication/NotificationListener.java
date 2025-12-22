@@ -2,6 +2,8 @@ package com.communication;
 
 import com.a13.notification.client.dto.NotificationDTO;
 import com.service.NotificationService;
+import io.github.springwolf.core.asyncapi.annotations.AsyncListener;
+import io.github.springwolf.core.asyncapi.annotations.AsyncOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -23,20 +25,20 @@ public class NotificationListener {
      * Ascolta la coda di ingresso delle notifiche.
      * Il nome della coda deve coincidere con quello definito in RabbitMQConfig.
      */
+    @AsyncListener(operation = @AsyncOperation(
+            channelName = "notifications.create.queue",
+            payloadType = NotificationDTO.class,
+            description = "Elabora notifiche asincrone ricevute sulla coda notifications.create.queue"
+    ))
     @RabbitListener(queues = RabbitMQConfig.NOTIFICATION_QUEUE)
     public void handleNotificationMessage(@Payload NotificationDTO dto) {
         log.info("Ricevuto messaggio su coda {} per userId={}, type={}",
                 RabbitMQConfig.NOTIFICATION_QUEUE, dto.getUserId(), dto.getType());
 
         try {
-            // Delega al service la logica applicativa:
-            // - mapping DTO -> entity
-            // - salvataggio su DB
-            // - eventuale risposta su replyTo
             notificationService.processIncomingNotification(dto);
         } catch (Exception e) {
             log.error("Errore durante l'elaborazione della notifica da DTO", e);
-            // qui in futuro potresti aggiungere DLQ, retry, ecc.
         }
     }
 }

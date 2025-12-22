@@ -39,18 +39,22 @@ public class NotificationController {
 
     @Operation(
             summary = "Sottoscrizione SSE alle notifiche",
-            description = "Apre una connessione Server-Sent Events persistente per ricevere notifiche in tempo reale"
+            description = "Apre una connessione Server-Sent Events. Il server invierà eventi contenenti oggetti NotificationRestDTO."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "Connessione SSE stabilita"
+                    description = "Connessione SSE stabilita",
+                    content = @Content(
+                            mediaType = MediaType.TEXT_EVENT_STREAM_VALUE,
+                            schema = @Schema(implementation = NotificationRestDTO.class)
+                    )
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "UserId non valido"
+                    responseCode = "400", description = "UserId non valido", content = @Content
             )
     })
+    // 👇👇👇 MANCAVA QUESTO! 👇👇👇
     @GetMapping(
             path = "/subscribe/{userId}",
             produces = MediaType.TEXT_EVENT_STREAM_VALUE
@@ -65,6 +69,7 @@ public class NotificationController {
     ) {
         return notificationService.subscribe(userId);
     }
+
 
     // ============================
     // GET ALL NOTIFICATIONS

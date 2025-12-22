@@ -30,5 +30,12 @@
             <version>2.15.3</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.2.20</version> <!-- O una versione recente -->
+        </dependency>
+
     </dependencies>
 </project>
