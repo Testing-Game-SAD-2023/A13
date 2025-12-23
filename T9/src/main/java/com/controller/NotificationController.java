@@ -54,7 +54,6 @@ public class NotificationController {
                     responseCode = "400", description = "UserId non valido", content = @Content
             )
     })
-    // 👇👇👇 MANCAVA QUESTO! 👇👇👇
     @GetMapping(
             path = "/subscribe/{userId}",
             produces = MediaType.TEXT_EVENT_STREAM_VALUE

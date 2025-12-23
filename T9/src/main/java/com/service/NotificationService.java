@@ -76,20 +76,17 @@ public class NotificationService {
             Notification saved = notificationRepository.save(notification);
             log.info("Notifica salvata con id={}", saved.getId());
 
-            // Converto l'entità salvata nel DTO che invio al frontend
+            // 3. Invio live al frontend
             NotificationRestDTO restDTO = restMapper.toDTO(saved);
-            // Invio l'evento live
             sseManager.dispatch(saved.getUserId(), restDTO);
 
-            // 3. Costruzione risposta
-            NotificationResponseDTO response = new NotificationResponseDTO(
-                    saved.getId(),
-                    "OK",
-                    "Notification created successfully"
-            );
-
-            // 4. Invio risposta, se il chiamante ha fornito una coda di reply
+            // 4. Invio risposta solo se è stata richiesta
             if (dto.getReplyTo() != null && !dto.getReplyTo().isBlank()) {
+                NotificationResponseDTO response = new NotificationResponseDTO(
+                        saved.getId(),
+                        "OK",
+                        "Notification created successfully"
+                );
                 replyProducer.sendReply(dto.getReplyTo(), response);
             } else {
                 log.info("Nessuna replyTo fornita, non invio risposta");
@@ -98,7 +95,6 @@ public class NotificationService {
         } catch (Exception ex) {
             log.error("Errore durante l'elaborazione della notifica", ex);
 
-            // In caso di errore, se esiste una replyTo, prova a inviare un esito di errore
             if (dto.getReplyTo() != null && !dto.getReplyTo().isBlank()) {
                 NotificationResponseDTO errorResponse = new NotificationResponseDTO(
                         null,
@@ -108,9 +104,10 @@ public class NotificationService {
                 replyProducer.sendReply(dto.getReplyTo(), errorResponse);
             }
 
-            // qui eventualmente potresti rilanciare l'eccezione per far scattare retry/DLQ
+            // eventualmente rilancia ex per retry/DLQ
         }
     }
+
     // =========================================================================
     // METODI REST API
     // =========================================================================

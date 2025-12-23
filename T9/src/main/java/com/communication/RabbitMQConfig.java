@@ -77,7 +77,6 @@ public class RabbitMQConfig {
     }
 
     /**
-     * QUESTO È IL PEZZO CHE MANCAVA!
      * Configura la "fabbrica" dei listener (quelli che ascoltano le code)
      * per usare il nostro convertitore JSON invece di quello standard.
      */
