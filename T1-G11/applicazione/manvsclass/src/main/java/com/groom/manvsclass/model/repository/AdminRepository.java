@@ -1,9 +1,15 @@
 package com.groom.manvsclass.model.repository;
 
-import com.groom.manvsclass.model.Admin;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.groom.manvsclass.model.entity.AdminEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface AdminRepository extends JpaRepository<AdminEntity, String> {
 
-public interface AdminRepository extends MongoRepository<Admin, String> {
-    long count();  // Questo metodo conta automaticamente tutti i documenti nella collezione `Admin`
+    AdminEntity findByInvitationToken(String invitationToken);
+
+    AdminEntity findByResetToken(String resetToken);
+
+    AdminEntity findByUsername(String username);
 }

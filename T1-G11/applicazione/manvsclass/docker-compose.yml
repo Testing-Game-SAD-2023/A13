@@ -1,6 +1,21 @@
 name: t1
 
 services:
+  postgres-db:
+    image: "postgres:14-alpine3.17"
+    container_name: t1-postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: t1-g11
+      POSTGRES_PASSWORD: '947!"p1Yv;qf'
+      POSTGRES_DB: manvsclass
+    expose:
+      - 5432
+    volumes:
+      - postgres_data_t1:/var/lib/postgresql/data
+    networks:
+      - global-network
+
   controller:
     image: mick0974/a13:t1-g11
     container_name: t1-controller
@@ -8,13 +23,14 @@ services:
     expose:
       - 8081
     environment:
-      MONGODB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
-      MONGODB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      SPRING_DATASOURCE_URL: jdbc:postgresql://t1-postgres-db:5432/manvsclass
+      SPRING_DATASOURCE_USERNAME: t1-g11
+      SPRING_DATASOURCE_PASSWORD: '947!"p1Yv;qf'
     depends_on:
-      - mongo_db
+      - postgres-db
     volumes:
       - ./FilesUpload:/Files-Upload
       - VolumeT0:/VolumeT0
@@ -26,18 +42,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  mongo_db:
-    image: "mongo:6.0.6"
-    container_name: t1-mongo_db
-    restart: always
-    expose:
-      - "27017:27017"
-    volumes:
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-      - mongodb_data_volume:/data/db
-    networks:
-      - global-network
-
 networks:
   global-network:
     external: true
@@ -45,4 +49,4 @@ networks:
 volumes:
   VolumeT0:
     external: true
-  mongodb_data_volume:
+  postgres_data_t1:

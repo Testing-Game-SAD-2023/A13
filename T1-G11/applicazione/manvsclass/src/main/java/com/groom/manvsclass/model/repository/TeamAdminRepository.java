@@ -1,20 +1,20 @@
 package com.groom.manvsclass.model.repository;
 
-import com.groom.manvsclass.model.TeamAdmin;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.groom.manvsclass.model.entity.TeamAdminEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface TeamAdminRepository extends MongoRepository<TeamAdmin, String> {
+public interface TeamAdminRepository extends JpaRepository<TeamAdminEntity, String> {
 
-    // Trova tutte le associazioni per un determinato Admin
-    TeamAdmin findByAdminId(String adminId);
+    Optional<TeamAdminEntity> findByAdmin_Email(String email);
 
-    // Trova tutte l'associazione relativa ad un determinato Team
-    TeamAdmin findByTeamId(String teamId);
+    Optional<TeamAdminEntity> findByTeam_IdTeam(String teamId);
 
-    // Trova tutte le associazioni per un determinato Admin (questa è una versione più generica)
-    List<TeamAdmin> findAllByAdminId(String adminId);  // metodo che restituisce tutte le associazioni per un admin
+    List<TeamAdminEntity> findAllByAdmin_Email(String email);
+
+    boolean existsByAdmin_EmailAndTeam_IdTeam(String email, String teamId);
 }

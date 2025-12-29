@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title th:text="#{hints_upload_page_title}">Carica Suggerimenti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            margin-top: 20px;
+        }
+        .file_manager .file {
+            position: relative;
+            border-radius: .55rem;
+            overflow: hidden;
+            padding: 0 !important;
+        }
+        .file_manager .file .icon {
+            text-align: center;
+            padding: 15px 10px;
+        }
+        .file_manager .file .icon i {
+            font-size: 30px;
+            color: #777;
+        }
+        .card {
+            background: #fff;
+            transition: .5s;
+            border: 0;
+            margin-bottom: 30px;
+            border-radius: .55rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+
+    <div class="text-center mb-4">
+        <h2 th:text="#{hints_upload_title}">Caricamento Suggerimenti</h2>
+    </div>
+
+    <div class="card bg-light mb-4 border-info">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="card-title text-info">
+                        <i class="fa fa-info-circle"></i> <span th:text="#{hints_upload_help_title}">Hai bisogno di aiuto?</span>
+                    </h5>
+                    <p class="card-text" th:text="#{hints_upload_help_desc}">Scarica il template...</p>
+                </div>
+                <div class="col-md-4 text-right">
+                    <a href="/hints/template" target="_blank" class="btn btn-outline-info btn-block">
+                        <i class="fa fa-download"></i> <span th:text="#{hints_upload_btn_download}">Scarica Template</span>
+                    </a>
+                </div>
+            </div>
+
+            <button class="btn btn-link pl-0 mt-2" type="button" data-toggle="collapse" data-target="#jsonRulesCollapse" aria-expanded="false" aria-controls="jsonRulesCollapse">
+                <i class="fa fa-chevron-down"></i> <span th:text="#{hints_upload_btn_show_rules}">Mostra Regole</span>
+            </button>
+
+            <div class="collapse mt-3" id="jsonRulesCollapse">
+                <div class="card card-body">
+                    <h6 th:text="#{hints_upload_rules_title}">Struttura JSON:</h6>
+                    <ul class="small text-muted mb-3">
+                        <li th:utext="#{hints_upload_rules_list_1}">Array objects...</li>
+                        <li th:utext="#{hints_upload_rules_list_2}">Mandatory fields...</li>
+                        <li th:utext="#{hints_upload_rules_list_3}">Type Class...</li>
+                        <li th:utext="#{hints_upload_rules_list_4}">Images...</li>
+                    </ul>
+
+                    <pre style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #ddd; font-size: 0.9em;"><code>[
+  {
+    <span style="color: #d63384">"type"</span>: <span style="color: #0d6efd">"GENERIC"</span>,
+    <span style="color: #d63384">"name"</span>: "Titolo Suggerimento",
+    <span style="color: #d63384">"content"</span>: "Il contenuto del suggerimento...",
+    <span style="color: #d63384">"imageUri"</span>: "immagine1.png" <span style="color: #999">// Opzionale</span>
+  },
+  {
+    <span style="color: #d63384">"type"</span>: <span style="color: #0d6efd">"CLASS"</span>,
+    <span style="color: #d63384">"classUTName"</span>: "Calcolatrice.java", <span style="color: #999">// Obbligatorio per type CLASS</span>
+    <span style="color: #d63384">"name"</span>: "Titolo Specifico",
+    <span style="color: #d63384">"content"</span>: "Suggerimento per questa classe..."
+  }
+]</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form id="uploadHintsForm">
+                <div class="form-group">
+                    <label for="hintsFile" th:text="#{hints_upload_file}">File JSON (*)</label>
+                    <input type="file" class="form-control-file" id="hintsFile" accept=".json" required>
+                    <small class="form-text text-muted" th:text="#{hints_upload_file_descr}">Carica un file JSON...</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="hintImages" th:text="#{hints_upload_images}">Immagini (Opzionale)</label>
+                    <input type="file" class="form-control-file" id="hintImages" accept="image/*" multiple>
+                    <small class="form-text text-muted" th:text="#{hints_upload_images_descr}">Allega le immagini...</small>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <button type="button" onclick="window.location.href='/hints/main'" class="btn btn-secondary" th:text="#{uploadRobots_go_back}">Indietro</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-upload"></i> <span th:text="#{hints_upload_button}">Carica</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Messaggio</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="successMessageContent">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    const errors = {
+        notHandled: /*[[#{error.nothandled}]]*/ "Si è verificato un errore, riprova più tardi"
+    };
+</script>
+
+<script th:src="@{/t1/js/utils/endpoints.js}"></script>
+<script th:src="@{/t1/js/utils/api.js}"></script>
+<script th:src="@{/t1/js/utils/cookie_util.js}"></script>
+<script th:src="@{/t1/js/utils/renderErrors.js}"></script>
+
+<script th:src="@{/t1/js/hints/hints_upload.js(v=3)}"></script>
+
+</body>
+</html>

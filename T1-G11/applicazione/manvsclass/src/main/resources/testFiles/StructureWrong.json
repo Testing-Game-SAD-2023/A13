@@ -1,0 +1,14 @@
+[
+    {
+        "content": "Assicurati che tutti i tuoi metodi di test siano annotati con @Test e che siano pubblici e non statici.",
+		"imageUri": "image2.png"
+    },
+    {
+        "type": "generic"
+    },
+    {
+		"content": "Aggiungi questo metodo di test per verificare che la divisione per zero sollevi l'eccezione corretta.",
+		"type": "class",
+		"imageUri": "image1.png"
+	}
+]

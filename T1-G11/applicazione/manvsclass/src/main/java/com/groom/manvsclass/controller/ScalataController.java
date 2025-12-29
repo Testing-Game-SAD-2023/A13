@@ -1,6 +1,6 @@
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.model.Scalata;
+import com.groom.manvsclass.model.entity.ScalataEntity;
 import com.groom.manvsclass.service.ScalataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,8 +19,8 @@ public class ScalataController {
     }
 
     @PostMapping("/configureScalata")
-    public ResponseEntity<?> uploadScalata(@RequestBody Scalata scalata, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
-        return scalataService.uploadScalata(scalata, jwt);
+    public ResponseEntity<?> uploadScalata(@RequestBody ScalataEntity scalataEntity, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+        return scalataService.uploadScalata(scalataEntity, jwt);
     }
 
     @GetMapping("/scalate_list")

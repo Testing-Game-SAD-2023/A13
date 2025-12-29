@@ -15,4 +15,4 @@ COPY target/manvsclass-0.0.1-SNAPSHOT.jar /app/manvsclass.jar
 WORKDIR /app
 
 EXPOSE 8080
-CMD ["java","-jar", "-Dspring.profiles.active=prod", "manvsclass.jar"]
+CMD ["java", "-Dspring.profiles.active=prod", "-jar", "manvsclass.jar"]

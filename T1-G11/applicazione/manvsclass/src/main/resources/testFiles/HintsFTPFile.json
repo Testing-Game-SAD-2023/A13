@@ -1,0 +1,16 @@
+[
+  {
+    "type": "CLASS",
+    "classUTName": "FTPFile.java",
+    "name": "Gestione Matrice dei Permessi",
+    "content": "Analizza il campo privato '_permissions'. Nota come viene inizializzato nel costruttore come un array bidimensionale boolean[3][3] per mappare le costanti di accesso (USER, GROUP, WORLD) sui permessi (READ, WRITE, EXECUTE).",
+    "imageUri": "image1.png"
+  },
+  {
+    "type": "CLASS",
+    "classUTName": "FTPFile.java",
+    "name": "Logica toFormattedString",
+    "content": "Esamina il metodo 'toFormattedString'. Questo metodo è progettato per replicare il formato di listing dei file Unix (es. 'drwxr-xr-x'). Presta attenzione a come gestisce la formattazione delle date e la conversione della TimeZone.",
+    "imageUri": "image2.png"
+  }
+]

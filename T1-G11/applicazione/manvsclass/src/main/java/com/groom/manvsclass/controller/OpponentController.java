@@ -1,8 +1,8 @@
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.Opponent;
 import com.groom.manvsclass.model.dto.OpponentSummaryDTO;
+import com.groom.manvsclass.model.entity.ClassUTEntity;
+import com.groom.manvsclass.model.entity.OpponentEntity;
 import com.groom.manvsclass.service.OpponentService;
 import com.groom.manvsclass.util.filesystem.upload.FileUploadResponse;
 import org.slf4j.Logger;
@@ -43,24 +43,24 @@ public class OpponentController {
 
 
     @PostMapping("/update/{name}")
-    public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUT newContent, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
+    public ResponseEntity<String> modificaClasse(@PathVariable String name, @RequestBody ClassUTEntity newContent, @CookieValue(name = "jwt", required = false) String jwt, HttpServletRequest request) {
         return opponentService.modificaClasse(name, newContent, jwt, request);
     }
 
 
     // OPPONENTS ENDPOINT
     @GetMapping("")
-    public ResponseEntity<List<Opponent>> getAllOpponents() {
+    public ResponseEntity<List<OpponentEntity>> getAllOpponents() {
         return ResponseEntity.ok(opponentService.getAllOpponents());
     }
 
     @GetMapping("/classes/summary")
     public ResponseEntity<List<String>> getAllClassesAsSummary() {
         logger.info("[GET /classes/summary] Request received");
-        List<ClassUT> classes = opponentService.getAllClassUTs();
+        List<ClassUTEntity> classes = opponentService.getAllClassUTs();
         logger.info("[GET /classes/summary] Classes found: {}", classes);
         List<String> classesAsSummary = new ArrayList<>();
-        for (ClassUT c : classes) {
+        for (ClassUTEntity c : classes) {
             classesAsSummary.add(c.getName());
         }
 
@@ -70,20 +70,20 @@ public class OpponentController {
     @GetMapping("/summary")
     public ResponseEntity<List<OpponentSummaryDTO>> getAllOpponentsAsSummary() {
         logger.info("[GET /summary] Request received");
-        List<Opponent> opponents = opponentService.getAllOpponents();
-        logger.info("[GET /summary] Opponents found: {}", opponents);
+        List<OpponentEntity> opponentEntityList = opponentService.getAllOpponents();
+        logger.info("[GET /summary] Opponents found: {}", opponentEntityList);
         List<OpponentSummaryDTO> response = new ArrayList<>();
-        for (Opponent opponent : opponents) {
-            response.add(new OpponentSummaryDTO(opponent.getClassUT(),
-                    opponent.getOpponentType(), opponent.getOpponentDifficulty()));
+        for (OpponentEntity opponentEntity : opponentEntityList) {
+            response.add(new OpponentSummaryDTO(opponentEntity.getClassUt().getName(),
+                    opponentEntity.getOpponentType(), opponentEntity.getOpponentDifficulty()));
         }
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{classUT}/{opponentType}/{opponentDifficulty}/score")
-    public ResponseEntity<Opponent> getOpponentData(@PathVariable("classUT") String classUT,
-                                                    @PathVariable("opponentType") String type,
-                                                    @PathVariable("opponentDifficulty") OpponentDifficulty difficulty) {
+    public ResponseEntity<OpponentEntity> getOpponentData(@PathVariable("classUT") String classUT,
+                                                          @PathVariable("opponentType") String type,
+                                                          @PathVariable("opponentDifficulty") OpponentDifficulty difficulty) {
         return ResponseEntity.ok(opponentService.getOpponentData(classUT, type, difficulty));
     }
 

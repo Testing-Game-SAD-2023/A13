@@ -21,8 +21,8 @@
 
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.model.ClassUT;
-import com.groom.manvsclass.model.interaction;
+import com.groom.manvsclass.model.entity.ClassUTEntity;
+import com.groom.manvsclass.model.entity.InteractionEntity;
 import com.groom.manvsclass.service.AdminService;
 import com.groom.manvsclass.util.Util;
 import org.springframework.http.ResponseEntity;
@@ -52,28 +52,28 @@ public class HomeController {
     }
 
     @PostMapping("/newinteraction")
-    public ResponseEntity<interaction> uploadInteraction(@RequestBody interaction interazione) {
-        interaction savedInteraction = utilsService.uploadInteraction(interazione);
-        return ResponseEntity.ok(savedInteraction);
+    public ResponseEntity<InteractionEntity> uploadInteraction(@RequestBody InteractionEntity interazione) {
+        InteractionEntity savedInteractionEntity = utilsService.uploadInteraction(interazione);
+        return ResponseEntity.ok(savedInteractionEntity);
     }
 
     @GetMapping("/Cfilterby/{category}")
-    public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<List<ClassUTEntity>> filtraClassi(@PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
         return adminService.filtraClassi(category, jwt);
     }
 
     @GetMapping("/Cfilterby/{text}/{category}")
-    public ResponseEntity<List<ClassUT>> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<List<ClassUTEntity>> filtraClassi(@PathVariable String text, @PathVariable String category, @CookieValue(name = "jwt", required = false) String jwt) {
         return adminService.filtraClassi(text, category, jwt);
     }
 
     @GetMapping("/interaction")
-    public List<interaction> elencaInt() {
+    public List<InteractionEntity> elencaInt() {
         return utilsService.elencaInt();
     }
 
     @GetMapping("/findReport")
-    public List<interaction> elencaReport() {
+    public List<InteractionEntity> elencaReport() {
         return utilsService.elencaReport();
     }
 
@@ -88,7 +88,7 @@ public class HomeController {
     }
 
     @PostMapping("/deleteint/{id}")
-    public interaction eliminaInteraction(@PathVariable int id) {
+    public InteractionEntity eliminaInteraction(@PathVariable int id) {
         return utilsService.eliminaInteraction(id);
     }
 }
