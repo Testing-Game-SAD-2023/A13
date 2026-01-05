@@ -11,9 +11,9 @@ public class NotificationProducer {
     private static final Logger log = LoggerFactory.getLogger(NotificationProducer.class);
 
     private final RabbitTemplate rabbitTemplate;
-    private final String replyQueue; // Ora è final e iniettato dal costruttore
+    private final String replyQueue;
 
-    // Costruttore aggiornato: riceve sia il template che la coda
+    // Costruttore che riceve sia il template che la coda
     public NotificationProducer(RabbitTemplate rabbitTemplate, String replyQueue) {
         this.rabbitTemplate = rabbitTemplate;
         this.replyQueue = replyQueue;
@@ -24,7 +24,8 @@ public class NotificationProducer {
      * @param dto il DTO della notifica da creare
      */
     public void sendCreateNotification(NotificationDTO dto) {
-        // Se il servizio ospite ha configurato una coda di risposta, la impostiamo
+
+        // Se il servizio ospite ha configurato una coda di risposta, la imposto
         if (replyQueue != null && !replyQueue.isEmpty() && !replyQueue.equals("null")) {
             dto.setReplyTo(replyQueue);
         }

@@ -3,21 +3,21 @@ package com.a13.notification.client.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 
-@Schema(description = "Oggetto di trasferimento dati per la creazione di una notifica")
+@Schema(description = "Data Transfer Object per la creazione di una notifica")
 public class NotificationDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Schema(
             description = "Identificativo univoco dell'utente destinatario",
-            example = "101",
+            example = "1",
             requiredMode = Schema.RequiredMode.REQUIRED
     )
     private Long userId;
 
     @Schema(
-            description = "Categoria della notifica (es. INFO, WARNING, ERROR)",
-            example = "INFO"
+            description = "Categoria della notifica",
+            example = "ACHIEVEMENT_UNLOCKED"
     )
     private String type;
 
@@ -50,7 +50,6 @@ public class NotificationDTO implements Serializable {
         this.replyTo = replyTo;
     }
 
-    // Getters e Setters rimangono uguali...
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 

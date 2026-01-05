@@ -6,7 +6,7 @@ public class NotificationResponseDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // Id della notifica creata nel DB
+    // ID della notifica creata nel DB
     private Long notificationId;
 
     // Esito dell'operazione (es. "OK", "ERROR")
