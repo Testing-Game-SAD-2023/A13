@@ -26,7 +26,7 @@ public class RabbitMQConfig {
     public static final String NOTIFICATION_EXCHANGE = NotificationConfig.EXCHANGE;
     public static final String ROUTING_KEY = NotificationConfig.ROUTING_KEY;
 
-    // Nome della coda fisica del server T9
+    // Nome della coda fisica del servizio di notifica
     public static final String NOTIFICATION_QUEUE = "notifications.create.queue";
 
     @PostConstruct
@@ -36,7 +36,7 @@ public class RabbitMQConfig {
         log.info("Queue: {}", NOTIFICATION_QUEUE);
         log.info("Routing Key: {}", ROUTING_KEY);
     }
-    //
+
     @Bean
     public Queue notificationQueue() {
         log.info("Crezione della Queue: {}", NOTIFICATION_QUEUE);
@@ -64,7 +64,6 @@ public class RabbitMQConfig {
 
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
 
-
         DefaultClassMapper classMapper = new DefaultClassMapper();
         classMapper.setTrustedPackages("*");
 
@@ -85,7 +84,7 @@ public class RabbitMQConfig {
         return factory;
     }
 
-    // RabbitTemplate per INVIARE messaggi (es. risposte) usando JSON
+    // RabbitTemplate per inviare messaggi (es. risposte) usando JSON
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
                                          Jackson2JsonMessageConverter messageConverter) {

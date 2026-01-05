@@ -11,7 +11,7 @@ public class JacksonConfig {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule()); // supporto per Instant, LocalDateTime, ecc.
+        mapper.registerModule(new JavaTimeModule()); // supporto per Instant, traduce correttamente in json
         return mapper;
     }
 }
