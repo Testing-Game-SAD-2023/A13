@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
-
+/**
+ * Classe per la generazione delle notifiche di risposta laddove il servizio mittente ne necessiti
+ * */
 @Component
 public class ReplyProducer {
 
@@ -18,7 +20,7 @@ public class ReplyProducer {
     }
 
     /**
-     * Invia una risposta sulla coda indicata da replyTo.
+     * Invia una risposta sulla coda indicata, se presente, nel campo replyTo del DTO ricevuto.
      */
     public void sendReply(String replyToQueue, NotificationResponseDTO responseDTO) {
         if (replyToQueue == null || replyToQueue.isBlank()) {

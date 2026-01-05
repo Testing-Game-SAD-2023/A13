@@ -10,6 +10,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+/**
+ *Listener per i messaggi di notifica asincroni provenienti da RabbitMQ.
+ *Ascolta la coda configurata e delega l'elaborazione al NotificationService.
+ *
+ * */
 @Component
 public class NotificationListener {
 
@@ -38,7 +43,7 @@ public class NotificationListener {
         try {
             notificationService.processIncomingNotification(dto);
         } catch (Exception e) {
-            log.error("Errore durante l'elaborazione della notifica da DTO", e);
+            log.error("Errore durante l'elaborazione della notifica", e);
         }
     }
 }

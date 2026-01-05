@@ -22,11 +22,11 @@ public class RabbitMQConfig {
 
     private static final Logger log = LoggerFactory.getLogger(RabbitMQConfig.class);
 
-    // Usa le costanti della libreria condivisa
+    // Utilizzo delle costanti della libreria condivisa
     public static final String NOTIFICATION_EXCHANGE = NotificationConfig.EXCHANGE;
     public static final String ROUTING_KEY = NotificationConfig.ROUTING_KEY;
 
-    // Questa è specifica del server T9 (il nome della sua coda fisica)
+    // Nome della coda fisica del server T9
     public static final String NOTIFICATION_QUEUE = "notifications.create.queue";
 
     @PostConstruct
@@ -36,33 +36,29 @@ public class RabbitMQConfig {
         log.info("Queue: {}", NOTIFICATION_QUEUE);
         log.info("Routing Key: {}", ROUTING_KEY);
     }
-
+    //
     @Bean
     public Queue notificationQueue() {
-        log.info("Creando Queue: {}", NOTIFICATION_QUEUE);
+        log.info("Crezione della Queue: {}", NOTIFICATION_QUEUE);
         return new Queue(NOTIFICATION_QUEUE, true);
     }
 
     @Bean
     public TopicExchange notificationExchange() {
-        log.info("Creando Exchange: {}", NOTIFICATION_EXCHANGE);
+        log.info("Creazione dell'Exchange: {}", NOTIFICATION_EXCHANGE);
         return new TopicExchange(NOTIFICATION_EXCHANGE);
     }
 
     @Bean
     public Binding notificationBinding() {
-        log.info("Creando Binding tra Queue e Exchange");
+        log.info("Crezione Binding tra Queue e Exchange");
         return BindingBuilder
                 .bind(notificationQueue())
                 .to(notificationExchange())
                 .with(ROUTING_KEY);
     }
 
-    /**
-     * Converter JSON configurato per:
-     * 1. Usare il tuo ObjectMapper (gestione date corretta).
-     * 2. Fidarsi dei package esterni (risolve l'errore MessageConversionException).
-     */
+
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper objectMapper) {
         // Passiamo l'objectMapper custom (quello di JacksonConfig) al costruttore
