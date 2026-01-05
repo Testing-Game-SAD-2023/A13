@@ -3,26 +3,20 @@ package com.service;
 import com.communication.ReplyProducer;
 import com.mapper.NotificationMapper;
 import com.model.Notification;
-
-// === IMPORT DALLA LIBRERIA CONDIVISA (Quelli che usi per RabbitMQ) ===
-import com.a13.notification.client.dto.NotificationDTO;
-import com.a13.notification.client.dto.NotificationResponseDTO;
-// ======================================================================
-
-// DTO LOCALI (Quelli che usi per le API REST verso il frontend)
 import com.model.dto.NotificationRestDTO;
 import com.model.mapper.NotificationRestMapper;
 import com.model.repository.NotificationRepository;
-
 import com.service.sse.SseConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.util.List;
 import java.util.stream.Collectors;
+// import dalla libreria T-shared-Notification
+import com.a13.notification.client.dto.NotificationDTO;
+import com.a13.notification.client.dto.NotificationResponseDTO;
 
 
 @Service
@@ -33,10 +27,10 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final ReplyProducer replyProducer;
-    private final NotificationRestMapper restMapper; // Mapper per le API REST
+    private final NotificationRestMapper restMapper;
     private final SseConnectionManager sseManager;
 
-    // Costruttore unificato con tutte le dipendenze
+
     public NotificationService(NotificationRepository notificationRepository,
                                NotificationMapper notificationMapper,
                                ReplyProducer replyProducer,
@@ -49,38 +43,30 @@ public class NotificationService {
         this.sseManager = sseManager;
     }
 
-    // =========================================================================
-    // METODO ISCRIZIONE SSE
-    // =========================================================================
-
+    // Iscrizione all'sse
     public SseEmitter subscribe(Long userId) {
         return sseManager.subscribe(userId);
     }
 
-    // =========================================================================
-    // METODI MESSAGING
-    // =========================================================================
 
-    /**
-     * Gestisce una richiesta di creazione notifica arrivata via RabbitMQ.
-     */
+    // Gestisce una richiesta di creazione notifica di un altro servizio arrivata via RabbitMQ.
     @Transactional
     public void processIncomingNotification(NotificationDTO dto) {
         log.info("Elaborazione notifica per userId={}, type={}", dto.getUserId(), dto.getType());
 
         try {
-            // 1. DTO -> Entity
+            // DTO -> Entity
             Notification notification = notificationMapper.toEntity(dto);
 
-            // 2. Salvataggio sul DB
+            // Salvataggio sul DB
             Notification saved = notificationRepository.save(notification);
             log.info("Notifica salvata con id={}", saved.getId());
 
-            // 3. Invio live al frontend
+            // Invio live al frontend tramite sse
             NotificationRestDTO restDTO = restMapper.toDTO(saved);
             sseManager.dispatch(saved.getUserId(), restDTO);
 
-            // 4. Invio risposta solo se è stata richiesta
+            // Invio risposta (opzionale, solo se è stata richiesta)
             if (dto.getReplyTo() != null && !dto.getReplyTo().isBlank()) {
                 NotificationResponseDTO response = new NotificationResponseDTO(
                         saved.getId(),
@@ -103,19 +89,14 @@ public class NotificationService {
                 );
                 replyProducer.sendReply(dto.getReplyTo(), errorResponse);
             }
-
-            // eventualmente rilancia ex per retry/DLQ
         }
     }
 
-    // =========================================================================
-    // METODI REST API
-    // =========================================================================
+    // Metodi REST API esposti dal controller
 
     // Recupera notifiche di un utente con filtri semplici:
     // - read = false  -> solo non lette (priorità)
     // - type != null  -> solo di quel tipo
-    // Se entrambi presenti, diamo priorità a "non lette".
     @Transactional(readOnly = true)
     public List<NotificationRestDTO> getUserNotifications(Long userId,
                                                           Boolean read,
@@ -124,11 +105,11 @@ public class NotificationService {
         List<Notification> notifications;
 
         if (Boolean.FALSE.equals(read)) {
-            // filtro: solo non lette (Priorità 1)
+            // filtro: solo non lette
             notifications = notificationRepository
                     .findByUserIdAndIsReadFalseOrderByCreatedAtDesc(userId);
-        } else if (type != null && !type.isBlank()) { // Aggiunto !type.isBlank() per robustezza
-            // filtro: solo per tipo (Priorità 2, se 'read' non è esplicitamente false)
+        } else if (type != null && !type.isBlank()) {
+            // filtro: solo per tipo
             notifications = notificationRepository
                     .findByUserIdAndTypeOrderByCreatedAtDesc(userId, type);
         } else {
@@ -142,8 +123,11 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
+    // Recupera la specifica notifica di un utente
     @Transactional(readOnly = true)
     public NotificationRestDTO getNotification(Long userId, Long notificationId) {
+
+        // filtro per l'id della notifica richiesta
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
 
@@ -154,6 +138,7 @@ public class NotificationService {
         return restMapper.toDTO(notification);
     }
 
+    // Segna come letta una notifica
     @Transactional
     public void markNotificationAsRead(Long userId, Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
@@ -163,13 +148,13 @@ public class NotificationService {
             throw new IllegalArgumentException("Notification does not belong to this user");
         }
 
-        // Utilizza il save() per l'update in caso di modifica (è efficiente grazie a Transactional e Session)
         if (!notification.isRead()) {
             notification.setRead(true);
             notificationRepository.save(notification);
         }
     }
 
+    // Elimina una notifica
     @Transactional
     public void deleteNotification(Long userId, Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
@@ -182,11 +167,12 @@ public class NotificationService {
         notificationRepository.delete(notification);
     }
 
+    // Elimina tutte le notifiche di un utente
     @Transactional
     public void clearNotificationsByUser(Long userId) {
         List<Notification> notifications =
                 notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        // delete(Iterable) di JPA è efficiente
+
         notificationRepository.deleteAll(notifications);
     }
 }

@@ -33,7 +33,6 @@
             <version>1.6.0</version>
         </dependency>
 
-        <!-- NOTA: Si chiama 'springwolf-amqp', SENZA '-plugin' -->
         <dependency>
             <groupId>io.github.springwolf</groupId>
             <artifactId>springwolf-amqp</artifactId>
@@ -46,15 +45,12 @@
             <version>1.6.0</version>
         </dependency>
 
-
-
         <!-- OPENAPI: Documentazione Sincrona (Swagger) -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
         </dependency>
-
 
         <!-- JPA + Postgres -->
         <dependency>
@@ -85,7 +81,7 @@
             <version>1.0.0</version>
         </dependency>
 
-        <!-- Lombok (Opzionale) -->
+        <!-- Lombok  -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
