@@ -33,9 +33,9 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    // ============================
+
     // SSE SUBSCRIPTION
-    // ============================
+
 
     @Operation(
             summary = "Sottoscrizione SSE alle notifiche",
@@ -70,9 +70,9 @@ public class NotificationController {
     }
 
 
-    // ============================
+
     // GET ALL NOTIFICATIONS
-    // ============================
+
 
     @Operation(
             summary = "Recupera tutte le notifiche di un utente",
@@ -120,9 +120,9 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    // ============================
+
     // GET SINGLE NOTIFICATION
-    // ============================
+
 
     @Operation(
             summary = "Recupera una singola notifica",
@@ -165,9 +165,9 @@ public class NotificationController {
         return ResponseEntity.ok(dto);
     }
 
-    // ============================
+
     // MARK AS READ
-    // ============================
+
 
     @Operation(
             summary = "Segna una notifica come letta",
@@ -204,9 +204,9 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
-    // ============================
+
     // DELETE SINGLE NOTIFICATION
-    // ============================
+
 
     @Operation(
             summary = "Elimina una notifica",
@@ -243,9 +243,9 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
-    // ============================
+
     // DELETE ALL NOTIFICATIONS
-    // ============================
+
 
     @Operation(
             summary = "Elimina tutte le notifiche di un utente",
