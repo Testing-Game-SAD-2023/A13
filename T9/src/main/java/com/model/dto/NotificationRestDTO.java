@@ -78,7 +78,7 @@ public class NotificationRestDTO {
         this.createdAt = createdAt;
     }
 
-    // ===== GETTERS & SETTERS =====
+
 
     public Long getId() {
         return id;

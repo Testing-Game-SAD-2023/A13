@@ -75,7 +75,7 @@ public class Notification {
         return createdAt;
     }
 
-    // In genere non si cambia createdAt, ma il setter può servire a JPA
+
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
