@@ -1,7 +1,7 @@
 package com.communication;
 
-import com.a13.notification.client.config.NotificationConfig; // IMPORT LIBRERIA
-import com.fasterxml.jackson.databind.ObjectMapper; // IMPORT per usare il tuo JacksonConfig
+import com.a13.notification.client.config.NotificationConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory; // IMPORT NECESSARIO
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
@@ -61,20 +61,20 @@ public class RabbitMQConfig {
 
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper objectMapper) {
-        // Passiamo l'objectMapper custom (quello di JacksonConfig) al costruttore
+
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
 
-        // Creiamo un ClassMapper per dire a Jackson: "Fidati di queste classi!"
+
         DefaultClassMapper classMapper = new DefaultClassMapper();
-        classMapper.setTrustedPackages("*"); // "*" si fida di tutto (DTO esterni inclusi)
+        classMapper.setTrustedPackages("*");
 
         converter.setClassMapper(classMapper);
         return converter;
     }
 
     /**
-     * Configura la "fabbrica" dei listener (quelli che ascoltano le code)
-     * per usare il nostro convertitore JSON invece di quello standard.
+     * Configurazione della Factory dei listener per l'utilizzo del convrtitore custom piuttosto che quello
+     * standard
      */
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
