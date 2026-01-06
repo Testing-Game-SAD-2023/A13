@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: manvsclass
     expose:
       - 5432
+    ports:
+      - 5433:5432
     volumes:
       - postgres_data_t1:/var/lib/postgresql/data
     networks:
