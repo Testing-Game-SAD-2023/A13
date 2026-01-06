@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface ScalataRepository extends JpaRepository<ScalataEntity, String> {
 
-    List<ScalataEntity> findByUsernameContainingIgnoreCase(String username);
+    List<ScalataEntity> findByAdminUsernameContainingIgnoreCase(String username);
 
     List<ScalataEntity> findByScalataNameContainingIgnoreCase(String scalataName);
 

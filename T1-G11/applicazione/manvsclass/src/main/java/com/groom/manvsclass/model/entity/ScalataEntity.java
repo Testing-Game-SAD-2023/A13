@@ -19,7 +19,10 @@ public class ScalataEntity {
     @Id
     private String scalataName;
 
-    private String username;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "username", referencedColumnName = "email")
+    private AdminEntity admin;
+
     @Column(name = "scalata_description", nullable = false)
     private String scalataDescription;
 

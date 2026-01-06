@@ -1,6 +1,8 @@
 package com.groom.manvsclass.service.implementation;
 
+import com.groom.manvsclass.model.entity.AdminEntity;
 import com.groom.manvsclass.model.entity.ScalataEntity;
+import com.groom.manvsclass.model.repository.AdminRepository;
 import com.groom.manvsclass.model.repository.ScalataRepository;
 import com.groom.manvsclass.service.JwtService;
 import com.groom.manvsclass.service.ScalataService;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
@@ -21,6 +24,8 @@ public class ScalataServiceImpl implements ScalataService {
     private JwtService jwtService;
     @Autowired
     private ScalataRepository scalataRepository;
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Override
     public ResponseEntity<?> uploadScalata(ScalataEntity scalataEntity, String jwt) {
@@ -28,8 +33,15 @@ public class ScalataServiceImpl implements ScalataService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /configureScalata) Attenzione, non sei loggato!");
         }
 
+        String adminEmail = jwtService.getAdminFromJwt(jwt);
+        if (adminEmail == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("(POST /configureScalata) Attenzione, non sei loggato!");
+        }
+
+        AdminEntity adminEntity = adminRepository.findById(adminEmail).orElse(null);
+
         ScalataEntity new_scalataEntity = new ScalataEntity();
-        new_scalataEntity.setUsername(new_scalataEntity.getUsername());
+        new_scalataEntity.setAdmin(adminEntity);
         new_scalataEntity.setScalataName(new_scalataEntity.getScalataName());
         new_scalataEntity.setScalataDescription(new_scalataEntity.getScalataDescription());
         new_scalataEntity.setNumberOfRounds(new_scalataEntity.getNumberOfRounds());
@@ -69,5 +81,6 @@ public class ScalataServiceImpl implements ScalataService {
             return new ResponseEntity<>(scalataEntity, HttpStatus.OK);
         }
     }
+
 
 }
