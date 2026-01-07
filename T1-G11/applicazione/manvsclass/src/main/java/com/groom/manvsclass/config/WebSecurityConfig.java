@@ -20,34 +20,36 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // Disabilita CSRF
-                .cors().and()     // Abilita CORS
+                .csrf().disable()
+                .cors().and()
 
                 .authorizeRequests()
-                // === 1. RISORSE STATICHE (CSS, JS, IMMAGINI) ===
+                // === 1. SWAGGER & OPENAPI (AGGIUNTO PER RISOLVERE ERRORE 403) ===
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                // === 2. RISORSE STATICHE ===
                 .antMatchers("/t1/**", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
                 .antMatchers("/favicon.ico").permitAll()
 
-                // === 2. UPLOAD IMMAGINI (CRUCIALE PER IL TUO PROBLEMA) ===
+                // === 3. UPLOAD IMMAGINI (TaskR2) ===
                 .antMatchers("/uploads/**").permitAll()
 
-                // === 3. PAGINE FRONTEND (DASHBOARD, HINTS, ETC.) ===
-                // Aggiungi qui tutte le pagine che vuoi vedere senza essere bloccato
+                // === 4. PAGINE FRONTEND ===
                 .antMatchers("/dashboard/**").permitAll()
-                .antMatchers("/hints/**").permitAll()      // Sblocca /hints/main e /hints/upload
+                .antMatchers("/hints/**").permitAll()
                 .antMatchers("/opponents/**").permitAll()
                 .antMatchers("/team/**").permitAll()
                 .antMatchers("/scalata/**").permitAll()
 
-                // === 4. AUTENTICAZIONE E SISTEMA ===
+                // === 5. AUTENTICAZIONE E SISTEMA ===
                 .antMatchers("/auth/**", "/login", "/register", "/api/login").permitAll()
-                .antMatchers("/error").permitAll() // Fondamentale per vedere i messaggi di errore
+                .antMatchers("/error").permitAll()
 
-                // === 5. TUTTO IL RESTO RICHIEDE LOGIN ===
+                // === 6. PROTEZIONE API DI BUSINESS ===
+                // Gli endpoint delle API (non le pagine) dovrebbero restare protetti
                 .anyRequest().authenticated()
                 .and()
 
-                // Gestione sessione stateless (se usi JWT gestito manualmente)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -66,4 +68,6 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
+
 }

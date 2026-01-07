@@ -44,6 +44,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         customLogger.info("[AuthTokenFilter] Authenticating request {} {}", request.getMethod(), request.getRequestURI());
 
+        String path = request.getServletPath();
+        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         Cookie jwtCookie = WebUtils.getCookie(request, "jwt");
         Cookie refreshCookie = WebUtils.getCookie(request, "jwt-refresh");
 
