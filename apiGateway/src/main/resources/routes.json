@@ -40,5 +40,11 @@
     "path": "/t8/**",
     "method": "GET",
     "targetService": "http://localhost:8088"
+  },
+  {
+    "name": "tnotification-service",
+    "path": "/tnotification/**",
+    "method": "GET, POST, PATCH, DELETE",
+    "targetService": "http://localhost:8089"
   }
 ]

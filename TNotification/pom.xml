@@ -11,9 +11,9 @@
     </parent>
 
     <groupId>com.g2</groupId>
-    <artifactId>t9-notification</artifactId>
+    <artifactId>tnotification</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>t9-notification</name>
+    <name>tnotification</name>
 
     <properties>
         <java.version>17</java.version>

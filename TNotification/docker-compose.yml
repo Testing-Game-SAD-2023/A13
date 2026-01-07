@@ -1,4 +1,4 @@
-name: t9
+name: tnotification
 
 volumes:
   notification_db_data:
@@ -7,7 +7,7 @@ services:
   # Database Postgres
   notification-db:
     image: postgres:16
-    container_name: t9-notification-db
+    container_name: tnotification-notification-db
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE}
       POSTGRES_USER: ${POSTGRES_USERNAME}
@@ -27,21 +27,21 @@ services:
     restart: always
 
   # Servizio Notifiche
-  notification-service:
+  tnotification:
     build: .
-    container_name: t9-notification-service
+    container_name: tnotification-service
     depends_on:
       notification-db:
         condition: service_healthy
     environment:
-        DB_URL: jdbc:postgresql://notification-db:5432/${POSTGRES_DATABASE}
-        POSTGRES_DATABASE: ${POSTGRES_DATABASE}
-        POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        SPRING_RABBITMQ_HOST: tb-rabbitmq
-        SPRING_RABBITMQ_PORT: 5672
-        SPRING_RABBITMQ_USERNAME: guest
-        SPRING_RABBITMQ_PASSWORD: guest
+      DB_URL: jdbc:postgresql://notification-db:5432/${POSTGRES_DATABASE}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_RABBITMQ_HOST: tb-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
     ports:
       - "8089:8080"
     networks:
