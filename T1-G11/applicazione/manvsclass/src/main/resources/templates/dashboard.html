@@ -1,6 +1,6 @@
 <!--REFACTORING TOTALE (5/12/2024): Restyling pagina-->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <!--MODIFICA (17/04/2024) : FontAwesome import-->
     <script
@@ -101,6 +101,11 @@
         <h3 th:text="#{homeAdmin_scalata}"></h3>
         <p th:text="#{homeAdmin_scalata_descr}"></p>
       </div>
+      <div class="button-hints button-generics">
+          <div class="icon">💡</div>
+          <h3 th:text="#{homeAdmin_hints}">Suggerimenti</h3>
+          <p th:text="#{homeAdmin_hints_descr}">Gestisci i suggerimenti generici e di classe</p>
+      </div>
     </div>
 
     <script th:inline="javascript">
@@ -113,6 +118,9 @@
       const homeAdmin_scalata_descr = /*[[#{homeAdmin_scalata_descr}]]*/ "Crescita continua";
       const homeAdmin_class = /*[[#{homeAdmin_class}]]*/ "Classi";
       const homeAdmin_class_descr = /*[[#{homeAdmin_class_descr}]]*/ "Aggiungi le tue classi di test";
+      const homeAdmin_hints = /*[[#{homeAdmin_hints}]]*/ "Suggerimenti";
+      const homeAdmin_hints_descr = /*[[#{homeAdmin_hints_descr}]]*/ "Gestisci i suggerimenti di gioco e di classe UT.";
+
     </script>
 
     <!--FINE MODIFICA-->

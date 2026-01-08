@@ -1,28 +1,17 @@
 package com.groom.manvsclass.model.repository;
 
-import com.groom.manvsclass.model.Scalata;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.groom.manvsclass.model.entity.ScalataEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/*
- * ScalataRepository extends MongoRepository with:
- * 'Scalata' as the domain type and
- * 'String' as the type of the id field
- *
- * ScalataRepository inherits several methods such as:
- * save(), findOne(), findAll(), count(), delete(), ... and
- * this allow to perform CRUD operation on the 'Scalata' objects
- */
-public interface ScalataRepository extends MongoRepository<Scalata, String> {
+@Repository
+public interface ScalataRepository extends JpaRepository<ScalataEntity, String> {
 
-    // Returns all the Scalata objects with the given author
-    List<Scalata> findByUsernameContaining(String username);
+    List<ScalataEntity> findByAdminUsernameContainingIgnoreCase(String username);
 
-    // Returns all the Scalata objects with the given rounds
-    List<Scalata> findByNumberOfRoundsContaining(int numberOfRounds);
+    List<ScalataEntity> findByScalataNameContainingIgnoreCase(String scalataName);
 
-    // Returns all the Scalata objects with the given name
-    List<Scalata> findByScalataNameContaining(String scalataName);
-
+    List<ScalataEntity> findByNumberOfRounds(int numberOfRounds);
 }

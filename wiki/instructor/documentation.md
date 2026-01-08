@@ -177,6 +177,62 @@ steps:
    ![access\_docker\_volume.png](images/access_docker_volume.png)
 2. From there, you can browse the volume’s contents, view files, and download any files of interest.
 
+
+# Hints Management Guide
+
+This section describes the **Hints Management** functionality, which allows instructors to provide students with suggestions—either generic or specific to a Java class—to help them during the challenge.
+
+## Overview
+The current version of the system allows an instructor to:
+1. **Bulk Upload Hints**: Import multiple hints via a structured JSON file.
+2. **Manage Images**: Associate physical images to hints to provide visual aid.
+3. **Categorize Hints**: Distinguish between "Generic" hints (valid for any game) and "Class" hints (specific to a Class Under Test).
+4. **Interactive Management**: View, update, delete, and reorder hints through the dashboard.
+
+## Accessing Hints Management
+To manage hints, you must be logged in as an Administrator:
+1. From the main **Dashboard**, click the new **Hints** button:
+   ![dashboard_hints.png](images/dashboard_hints.png) 
+2. You will be redirected to the Hints main page, where you can choose to see the list of generic or class hints: ![dashboard_hints.png](images/main_hints.png)
+
+## Bulk Upload Interface
+To populate the system, use the **Hint Upload** dashboard. This interface streamlines the process of adding multiple hints at once.
+
+![hint_upload_ui.png](images/hint_upload.png) 
+### Step-by-Step Upload
+1. **Download JSON Template**: Click the button in the top right to download a pre-formatted JSON file. This ensures your data follows the required schema.
+2. **Review Rules**: Click **"Show Example & Rules"** to expand a detailed guide on how to fill each field correctly.
+3. **Select JSON File**: Use the **"Choose File"** button under "Hints JSON File (*)" to select your completed JSON.
+4. **Attach Images (Optional)**: If your hints reference images (via the `imageUri` field), use the **"Choose Files"** button to select all relevant image files (.png, .jpg).
+5. **Execute Upload**: Click **"Upload Hints"** to process the file. The system will validate the JSON and store both the data in PostgreSQL and the files in the File System.
+### JSON Structure Specification
+The system expects an array of objects with the following fields:
+- `type`: Must be `GENERIC` or `CLASS`.
+- `name`: The title of the hint.
+- `content`: The descriptive text.
+- `classUTName`: (Required for `CLASS` type) The exact name of the associated Java class (e.g., `FTPFile.java`).
+- `imageUri`: (Optional) The filename of the image included in the upload.
+
+Example:
+```json
+[
+  {
+    "type": "CLASS",
+    "classUTName": "FTPFile.java",
+    "name": "Check permissions",
+    "content": "Remember to verify if the user has write access.",
+    "imageUri": "perm_help.png"
+  }
+]
+```
+
+## Advanced Management
+After uploading, you can manage individual hints from the main list:
+- **Sequential Ordering**: Use the **UP/DOWN** arrows to change the order. The `order` field in the database is automatically updated to reflect the new sequence. ![hint_ordering.png](images/hint_ordering.png)
+- **Smart Updates**: When updating a hint, you can change the text content or replace the image. The system automatically deletes the old physical file to save space. ![hint_detail.png](images/hint_detail.png) ![hint_update.png](images/hint_update.png)
+- **Flexible Deletion**: You can delete hints by specific class (e.g., all hints for `Calcolatrice.java`) or by individual order index. ![hint_delete_by_class.png](images/hint_delete_by_class.png)
+
+
 ### Volume Structure
 
 The T0 volume (named as 'VolumeT0') serves as a shared file system for all services. It has two primary purposes:

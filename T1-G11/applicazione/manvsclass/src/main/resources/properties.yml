@@ -1,21 +1,28 @@
 server:
   error:
     include-message: always
+
 spring:
-  data:
-    mongodb:
-	auto-index-creation: true
-	authentication-database: admin
-	username: root
-	password: osimhen
-	database : manvsclass
-	port:27017
-	host:localhost
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migrations
+
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://t1-postgres-db:5432/manvsclass}
+    username: ${POSTGRES_USERNAME:t1-g11}
+    password: ${POSTGRES_PASSWORD:'947!"p1Yv;qf'}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+t1:
+  upload-dir: ${UPLOAD_DIR:C:\Users\rosa9\D6-taskR2\T1-G11\applicazione\manvsclass\FilesUpload}
+
 logging:
   level:
     org:
       springframework:
-        data:
-          mongodb:
-            core:
-              MongoTemplate: DEBUG

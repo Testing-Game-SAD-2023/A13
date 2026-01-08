@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{homeAdmin_hints}">Suggerimenti</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/t1/css/class.css" rel="stylesheet">
+    <style>
+        /* Stili specifici per i suggerimenti */
+        details.generic-hint summary {
+            background-color: #f3f3f3;
+            font-weight: bold;
+        }
+        details.class-hint summary {
+            background-color: #e6f7ff;
+        }
+        /* Assicura che il testo nelle modali sia sempre leggibile */
+        .modal-body, .modal-title {
+            color: #212529;
+        }
+    </style>
+</head>
+
+<body>
+<div id="main-content" class="file_manager">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a id="navDashboardAdmin" class="navbar-brand" href="/#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
+                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Zm9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382l.045-.148ZM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z" />
+                    </svg>
+                </a>
+                <a id="navHintsMain" class="navbar-brand" href="/#" th:text="#{homeAdmin_hints}">Suggerimenti</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a id="navDashboardAdmin2" class="nav-link" href="/#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="navHintsUpload" class="nav-link" href="/#" th:text="#{hints_navbar_add}">Carica Suggerimenti</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <br><br><br>
+
+        <div id="main-view-container">
+            <div id="initial-buttons" class="d-flex justify-content-around mb-4">
+                <button type="button" id="viewGenericHintsBtn" class="btn btn-primary btn-lg">
+                    <i class="fa fa-list"></i> Visualizza Suggerimenti Generici
+                </button>
+                <button type="button" id="viewClassHintsBtn" class="btn btn-info btn-lg">
+                    <i class="fa fa-list"></i> Visualizza Suggerimenti di Classe
+                </button>
+            </div>
+
+            <div id="dynamic-content">
+                <p id="loading-message" class="text-info" style="display:none;">Caricamento...</p>
+                <p id="no-hints-message" class="text-warning" style="display:none;">Nessun suggerimento trovato.</p>
+            </div>
+        </div>
+        <br>
+    </div>
+</div>
+
+<div class="modal fade" id="editHintModal" tabindex="-1" role="dialog" aria-labelledby="editHintModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editHintModalLabel" th:text="#{ui.hint.modal.title}">Modifica Suggerimento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editHintForm">
+                    <input type="hidden" id="editHintId">
+
+                    <div class="form-group">
+                        <label for="editHintName" th:text="#{ui.hint.modal.label.name}">Titolo (Name)</label>
+                        <input type="text" class="form-control" id="editHintName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editHintContent" th:text="#{ui.hint.modal.label.content}">Contenuto</label>
+                        <textarea class="form-control" id="editHintContent" rows="5" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editHintImage" th:text="#{ui.hint.modal.label.image.new}">Nuova Immagine (Opzionale)</label>
+                        <input type="file" class="form-control-file" id="editHintImage" accept="image/*">
+                        <small class="form-text text-muted" th:text="#{ui.hint.modal.help.image}">Carica un file solo se vuoi sostituire l'immagine attuale.</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{ui.hint.btn.cancel}">Annulla</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditHint()" th:text="#{ui.hint.btn.save}">Salva Modifiche</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel" th:text="#{ui.hint.title.success}">Successo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="reloadCurrentHintDetail()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="successMessageContent" th:text="#{ui.hint.msg.success.update}">Suggerimento aggiornato con successo.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="reloadCurrentHintDetail()" th:text="#{ui.hint.btn.continue}">
+                    Continua
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"> <div class="modal-header">
+            <h5 class="modal-title" id="confirmModalLabel" th:text="#{ui.hint.modal.confirm.title}">Conferma</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+            <div class="modal-body">
+                <p id="confirmModalBody" class="text-dark">Sei sicuro?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{ui.hint.btn.no}">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmModalBtn" th:text="#{ui.hint.btn.yes}">Procedi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:src="@{/t1/js/utils/endpoints.js}"></script>
+<script th:src="@{/t1/js/utils/api.js}"></script>
+<script th:src="@{/t1/js/utils/cookie_util.js}"></script>
+<script th:src="@{/t1/js/utils/renderErrors.js}"></script>
+
+<script th:inline="javascript">
+    const serverMessages = {
+        loading_generic: /*[[#{ui.hint.loading.generic}]]*/ 'Loading...',
+        loading_classes: /*[[#{ui.hint.loading.classes}]]*/ 'Loading...',
+        loading_detail: /*[[#{ui.hint.loading.detail}]]*/ 'Loading...',
+        loading_class_hints: /*[[#{ui.hint.loading.specific}]]*/ 'Loading {0}...',
+
+        back_selection: /*[[#{ui.hint.back.selection}]]*/ 'Back',
+        back_list: /*[[#{ui.hint.back.list}]]*/ 'Back',
+        back_class_list: /*[[#{ui.hint.back.classlist}]]*/ 'Back',
+
+        btn_delete_all_generic: /*[[#{ui.hint.btn.delete.all.generic}]]*/ 'Del All',
+        btn_delete_all_class: /*[[#{ui.hint.btn.delete.all.class}]]*/ 'Del All',
+        btn_delete_all_specific: /*[[#{ui.hint.btn.delete.specific}]]*/ 'Del {0}',
+        btn_edit: /*[[#{ui.hint.btn.edit}]]*/ 'Edit',
+        btn_delete: /*[[#{ui.hint.btn.delete}]]*/ 'Delete',
+        btn_save: /*[[#{ui.hint.btn.save}]]*/ 'Save',
+        btn_cancel: /*[[#{ui.hint.btn.cancel}]]*/ 'Cancel',
+        btn_continue: /*[[#{ui.hint.btn.continue}]]*/ 'Continue',
+
+        placeholder_search: /*[[#{ui.hint.placeholder.search}]]*/ 'Search...',
+        btn_search: /*[[#{ui.hint.btn.search}]]*/ 'Search',
+        placeholder_class: /*[[#{ui.hint.placeholder.class}]]*/ 'Search Class...',
+        placeholder_simple: /*[[#{ui.hint.placeholder.simple}]]*/ 'Search...',
+
+        title_generic: /*[[#{ui.hint.title.generic}]]*/ 'Generic',
+        title_classes: /*[[#{ui.hint.title.classes}]]*/ 'Classes',
+        title_class_detail: /*[[#{ui.hint.title.specific}]]*/ 'Hints {0}',
+        title_detail: /*[[#{ui.hint.title.detail}]]*/ 'Detail {0}',
+        title_success: /*[[#{ui.hint.title.success}]]*/ 'Success',
+        title_error: /*[[#{ui.hint.title.error}]]*/ 'Error',
+
+        col_actions: /*[[#{ui.hint.col.actions}]]*/ 'Actions',
+        col_order: /*[[#{ui.hint.col.order}]]*/ 'Order',
+        col_title: /*[[#{ui.hint.col.title}]]*/ 'Title',
+        col_content: /*[[#{ui.hint.col.content}]]*/ 'Content',
+        col_type: /*[[#{ui.hint.col.type}]]*/ 'Type',
+        col_class_name: /*[[#{ui.hint.col.classname}]]*/ 'Class Name',
+        col_hint_count: /*[[#{ui.hint.col.count}]]*/ 'Count',
+
+        label_title: /*[[#{ui.hint.label.title}]]*/ 'Title:',
+        label_type: /*[[#{ui.hint.label.type}]]*/ 'Type:',
+        label_order: /*[[#{ui.hint.label.order}]]*/ 'Order:',
+        label_content: /*[[#{ui.hint.label.content}]]*/ 'Content:',
+        label_image: /*[[#{ui.hint.label.image}]]*/ 'Image:',
+        label_creator: /*[[#{ui.hint.label.creator}]]*/ 'Creator:',
+        label_date: /*[[#{ui.hint.label.date}]]*/ 'Date:',
+        label_no_image: /*[[#{ui.hint.label.noimage}]]*/ 'No img',
+
+        msg_no_generic: /*[[#{ui.hint.msg.no.generic}]]*/ 'No hints',
+        msg_no_classes: /*[[#{ui.hint.msg.no.classes}]]*/ 'No classes',
+        msg_no_hints: /*[[#{ui.hint.msg.no.hints}]]*/ 'No hints',
+        msg_detail_not_found: /*[[#{ui.hint.msg.detail.notfound}]]*/ 'Not found',
+        msg_success_update: /*[[#{ui.hint.msg.success.update}]]*/ 'Updated',
+        msg_error_fetch: /*[[#{ui.hint.msg.error.fetch}]]*/ 'Error {0}',
+
+        msg_confirm_delete_all_generic: /*[[#{ui.hint.confirm.del.all.generic}]]*/ 'Confirm?',
+        msg_confirm_delete_all_class: /*[[#{ui.hint.confirm.del.all.class}]]*/ 'Confirm?',
+        msg_confirm_delete_specific: /*[[#{ui.hint.confirm.del.specific}]]*/ 'Confirm {0}?',
+        msg_confirm_delete_single: /*[[#{ui.hint.confirm.del.single}]]*/ 'Confirm?'
+    };
+
+    // Fallback error (opzionale)
+    const errors = {
+        notHandled: /*[[#{error.nothandled}]]*/ "Si è verificato un errore, riprova più tardi"
+    };
+</script>
+
+<script th:src="@{/t1/js/hints/hints_main.js(v=2)}"></script>
+
+</body>
+</html>

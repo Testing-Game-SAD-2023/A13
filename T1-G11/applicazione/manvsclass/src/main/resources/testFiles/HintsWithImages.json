@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Regole Base @Test",
+        "content": "Assicurati che tutti i tuoi metodi di test siano annotati con @Test e che siano pubblici e non statici.",
+        "type": "generic",
+        "imageUri": "image2.png"
+    },
+    {
+        "name": "Introduzione a Mockito",
+        "content": "Quando devi simulare il comportamento di un oggetto complesso o esterno (ad esempio un database o un servizio HTTP), usa Mockito per creare una versione fittizia (mock) dell'oggetto.",
+        "type": "generic"
+    },
+    {
+        "name": "Eccezione Divisione per Zero",
+        "classUTName": "Calcolatrice.java",
+        "content": "Aggiungi questo metodo di test per verificare che la divisione per zero sollevi l'eccezione corretta.",
+        "type": "class",
+        "imageUri": "image1.png"
+    },
+    {
+        "name": "Test Metodo Somma",
+        "classUTName": "Calcolatrice.java",
+        "content": "Implementa un test semplice per verificare che la somma di due numeri interi positivi restituisca il risultato atteso.",
+        "type": "class"
+    },
+    {
+        "name": "Gestione Numeri Negativi",
+        "classUTName": "Calcolatrice.java",
+        "content": "Verifica che la calcolatrice gestisca correttamente le operazioni (come la sottrazione) quando uno o entrambi gli input sono numeri negativi.",
+        "type": "class"
+    }
+]

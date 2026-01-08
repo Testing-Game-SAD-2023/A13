@@ -1,7 +1,7 @@
 package com.groom.manvsclass.controller;
 
-import com.groom.manvsclass.model.Team;
-import com.groom.manvsclass.service.TeamModificationRequest;
+import com.groom.manvsclass.model.dto.TeamUpdate;
+import com.groom.manvsclass.model.entity.TeamEntity;
 import com.groom.manvsclass.service.TeamService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +20,8 @@ public class TeamController {
 
     // Endpoint per aggiungere un nuovo team
     @PostMapping("/creaTeam")
-    public ResponseEntity<?> creaTeam(@RequestBody Team team, @CookieValue(name = "jwt", required = false) String jwt) {
-        return teamService.creaTeam(team, jwt);
+    public ResponseEntity<?> creaTeam(@RequestBody TeamEntity teamEntity, @CookieValue(name = "jwt", required = false) String jwt) {
+        return teamService.creaTeam(teamEntity, jwt);
     }
 
     @GetMapping("/visualizzaTeams")
@@ -42,7 +42,7 @@ public class TeamController {
 
     // Endpoint per modificare il nome di un team
     @PutMapping("/modificaNomeTeam")
-    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamModificationRequest request, @CookieValue(name = "jwt", required = false) String jwt) {
+    public ResponseEntity<?> modificaNomeTeam(@RequestBody TeamUpdate request, @CookieValue(name = "jwt", required = false) String jwt) {
         return teamService.modificaNomeTeam(request, jwt);
     }
 
@@ -67,15 +67,15 @@ public class TeamController {
      * Queste chiamate sono accedibili a un utente se fa parte di quel team
      */
     @GetMapping("/ottieniTeamByStudentId")
-    public ResponseEntity<Team> getTeamByStudentId(@RequestParam("StudentId") String idStudente) {
+    public ResponseEntity<TeamEntity> getTeamByStudentId(@RequestParam("StudentId") String idStudente) {
         // Invoca il servizio per recuperare il team in base all'ID dello studente
-        Team team = teamService.getTeamByStudentId(idStudente);
+        TeamEntity teamEntity = teamService.getTeamByStudentId(idStudente);
         // Se il team non viene trovato, restituisce un 404 Not Found
-        if (team == null) {
+        if (teamEntity == null) {
             return ResponseEntity.notFound().build();
         }
         // Se il team viene trovato, restituisce un 200 OK con il team in formato JSON
-        return ResponseEntity.ok(team);
+        return ResponseEntity.ok(teamEntity);
     }
 
     @GetMapping("/GetStudentTeam")
