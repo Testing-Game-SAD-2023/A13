@@ -114,6 +114,13 @@ spring:
             - Path=/gameEngine/**
           filters:
             - RewritePath=/gameEngine/(?<segment>.*), /${segment}
+        - id: tnotification-route
+          uri: http://tnotification-service:8080
+          predicates:
+              - Path=/tnotification/**
+          filters:
+            - RewritePath=/tnotification/(?<segment>.*), /notifications/${segment}
+            - name: AuthenticationFilter
 
 # Configurazioni aggiuntive per il logging e altre personalizzazioni
 logging:

@@ -1,0 +1,21 @@
+name: tb-rabbitmq
+
+volumes:
+  rabbitmq_data:
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: tb-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"      # AMQP per gli altri servizi
+      - "15672:15672"    # interfaccia web di RabbitMQ
+    networks:
+      - global-network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+networks:
+  global-network:
+    external: true

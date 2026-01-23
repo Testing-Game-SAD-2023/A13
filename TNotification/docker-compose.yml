@@ -1,0 +1,53 @@
+name: tnotification
+
+volumes:
+  notification_db_data:
+
+services:
+  # Database Postgres
+  notification-db:
+    image: postgres:16
+    container_name: tnotification-notification-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - notification_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME} -d ${POSTGRES_DATABASE}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    networks:
+      - global-network
+    ports:
+      - "5433:5432"
+    restart: always
+
+  # Servizio Notifiche
+  tnotification:
+    build: .
+    container_name: tnotification-service
+    depends_on:
+      notification-db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://notification-db:5432/${POSTGRES_DATABASE}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_RABBITMQ_HOST: tb-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    ports:
+      - "8089:8080"
+    networks:
+      - global-network
+    restart: always
+
+networks:
+  global-network:
+    external: true
