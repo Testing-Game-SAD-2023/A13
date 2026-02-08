@@ -1,6 +1,22 @@
 server:
   port: 8090
 
+# Configurazione OpenTelemetry con OpenTelemetry Protocol e OpenTelemetry Collector
+otel:
+  resource:
+    attributes:
+      service:
+        name: API Gateway
+  traces:
+    exporter: otlp
+  metrics:
+    exporter: otlp
+  exporter:
+    otlp:
+      traces:
+        endpoint: "http://otel-collector:4317"
+        protocol: grpc
+
 spring:
   redis: 
     host: redis_rate_limiter

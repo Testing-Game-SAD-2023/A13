@@ -61,10 +61,14 @@ cd "$ROOT_DIR/T0"
 docker compose up -d || { echo "Error deploying T0"; exit 1; }
 cd "$ROOT_DIR"
 
-# Build T0
 echo "Deploying db-backup"
 cd "$ROOT_DIR/db-backup"
 docker compose up -d || { echo "Error deploying db-backup"; exit 1; }
+cd "$ROOT_DIR"
+
+echo "Deploying observability stack"
+cd "$ROOT_DIR/observability"
+docker compose up -d || { echo "Error observability stack"; exit 1; }
 cd "$ROOT_DIR"
 
 # Avvio script di configurazione finale

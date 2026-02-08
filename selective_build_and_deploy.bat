@@ -27,6 +27,7 @@ echo 7 - ui_gateway
 echo 8 - api_gateway
 echo 9 - T0
 echo 10 - db-backup
+echo 11 - observability stack
 set /p SELECTION=Scelte (es. 0 1 2 o 'all'):
 
 :: Se l'utente ha scelto "all", builda tutto
@@ -65,7 +66,8 @@ for %%i in (%SELECTION%) do (
         cd /d "%ROOT_DIR%"
     ) else if %%i==3 (
         echo Building T4-G18
-        cd /d "%ROOT_DIR%\T4"
+        cd /d "%ROOT_DIR%\T4\gamerepo"
+        :: call mvn clean package -DskipTests=true || (echo Error in T4-G18 build & exit /b 1)
         docker build -t mick0974/a13:t4-g18 .
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
@@ -99,7 +101,6 @@ for %%i in (%SELECTION%) do (
         echo Building T8-G21
         cd /d "%ROOT_DIR%\T8-G21\T8"
         call mvn clean package || (echo Error in T8-G21 build & exit /b 1)
-        cd /d "%ROOT_DIR%"
         docker build -t mick0974/a13:t8-g21 .
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
@@ -150,11 +151,20 @@ for %%i in (%SELECTION%) do (
         cd /d "%ROOT_DIR%"
     ) else if %%i==10 (
         echo Building db-backup
-        cd /d "%ROOT_DIR%\db-backup
+        cd /d "%ROOT_DIR%\db-backup"
         docker build -t mick0974/a13:db-backup .
         docker compose up -d
         if %ERRORLEVEL% neq 0 (
         echo Error deploying db-backup
+        exit /b 1
+        )
+        cd /d "%ROOT_DIR%"
+    ) else if %%i==10 (
+        echo Building observability stack
+        cd /d "%ROOT_DIR%\observability
+        docker compose up -d
+        if %ERRORLEVEL% neq 0 (
+        echo Error deploying observability stack
         exit /b 1
         )
         cd /d "%ROOT_DIR%"

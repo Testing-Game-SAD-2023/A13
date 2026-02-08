@@ -1,0 +1,143 @@
+.leaderboard-card {
+    background-color: #1f1f1f;
+    border-radius: 12px;
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+}
+
+.leaderboard-card-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.leaderboard-card-left .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #d10b4f;
+}
+
+.leaderboard-card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.leaderboard-card-info .name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0;
+    color: #ffffff;
+}
+
+.leaderboard-card-info .email {
+    font-size: 0.9rem;
+    color: #bbbbbb;
+    margin: 2px 0 0 0;
+}
+
+.leaderboard-card-right .position {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #d10b4f;
+    margin: 0 0 5px 0;
+}
+
+.leaderboard-card-score {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.leaderboard-table {
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.leaderboard-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table thead th {
+    padding: 12px 16px;
+    background-color: #2a2a2a;
+    color: #d10b4f;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.leaderboard-table tbody td {
+    padding: 12px 16px;
+    color: #ddd;
+}
+
+.leaderboard-table tbody tr:nth-child(odd) {
+    background-color: #262626;
+}
+
+.leaderboard-table tbody tr:nth-child(even) {
+    background-color: #1e1e1e;
+}
+
+.leaderboard-table tbody tr:hover {
+    background-color: rgba(209, 11, 79, 0.15);
+}
+
+.highlight-row {
+    background-color: rgba(209, 11, 79, 0.35) !important;
+    color: #fff;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination .page-item .page-link {
+    color: #ccc;
+    background-color: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    margin: 0 3px;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #d10b4f;
+    border-color: #d10b4f;
+    color: #fff;
+}
+
+.page-link:hover {
+    background-color: #3a3a3a;
+    color: #fff;
+}
+
+select#scoreTypeSelector {
+    background-color: #2a2a2a;
+    color: #d10b4f;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 6px 8px;
+    border-radius: 4px;
+}
+
+select#scoreTypeSelector option {
+    background-color: #1f1f1f;
+    color: #fff;
+}

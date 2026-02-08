@@ -1,164 +1,76 @@
 <!DOCTYPE html>
 <html lang="it" data-bs-theme="dark">
 <head>
-    <div th:replace ="fragments/header :: header"></div>
-    <title>Team</title>
+    <meta charset="UTF-8">
+    <title>Teams</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
-
-<body >
-
+<body>
 <!-- NAVBAR -->
 <div th:replace="fragments/navbar :: navbar"></div>
 
-<div class="container-fluid">
-    <div class="row mt-3" th:if="${response != null}">
-        <!-- Main -->
-        <div class="col-9 d-flex flex-column my-2 gap-3">
-                <!-- Nome Team-->
-                <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
-                    <h1 class="display-4 fst-italic">
-                        Team 
-                        <span th:if="${response.team != null}" th:text="${response.team.name}">Name</span>
-                        <span th:unless="${response.team != null}">No team name available</span>
-                    </h1>
-                </div>
-                <!-- TASKS -->
-                <div class="card text-body-emphasis bg-body-secondary">
-                    <h4 class="card-title mb-4 p-2"> 
-                        Assignments
-                    </h4>
-                    <div class="card-body overflow-y-auto p-0" style="max-height: 380px; min-height: 380px;">
-                        <!-- Se ci sono assignments -->
-                        <div class="my-3 mx-1 rounded card" 
-                            th:if="${response.assignments != null and !response.assignments.empty}"
-                            th:each="assignment : ${response.assignments}">
-                            <!-- task -->
-                            <div class="d-flex align-content-center justify-content-between 
-                                        text-body-secondary pt-3 border-bottom card-body" 
-                                        
-                                        >
-                                <!-- INFO -->
-                                <div>
-                                    <p class="pb-3 mb-0 small lh-sm ">
-                                    <strong class="d-block text-gray-dark">
-                                        <span th:if="${assignment != null and assignment.titolo != null}" 
-                                        th:text="${assignment.titolo}">
-                                            Title
-                                        </span> 
-                                        <p>
-                                            <span th:if="${assignment != null and assignment.descrizione != null}" th:text="${assignment.descrizione}">
-                                                Description
-                                            </span>
-                                            <span th:unless="${assignment != null and assignment.descrizione != null}">No description available</span>
-                                        </p>
-                                    </strong>
-                                    </p>
-                                </div>
-                                <!-- Stato info extra-->
-                                <div>
-                                    <span class="badge text-bg-primary">Primary</span>
-                                </div>
-                            </div>
-                            <div class="card-footer text-body-secondary ">
-                                Creation Date:
-                                <span th:if="${assignment != null and assignment.dataCreazione != null}"
-                                        th:text="${#dates.format(assignment.dataCreazione, 'yyyy-MM-dd')}">
-                                    Creation Date
-                                </span>
-                                <span th:unless="${assignment != null and assignment.dataCreazione != null}">
-                                    No creation date available
-                                </span>
-                                &nbsp;-&nbsp;Due Date: 
-                                <span th:if="${assignment != null and assignment.dataScadenza != null}"
-                                        th:text="${#dates.format(assignment.dataScadenza, 'yyyy-MM-dd')}">
-                                    Due Date
-                                </span>
-                                <span th:unless="${assignment != null and assignment.dataScadenza != null}">
-                                    No due date available
-                                </span>
-                            </div>
-                        </div>
-                        <!-- Se non ci sono assignments -->
-                        <div class="my-3 mx-1"
-                            th:if="${response.assignments == null and response.assignments.empty}">
-                            
-                            <div class="alert alert-primary" role="alert">
-                                Nessun Assignment disponibile.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        </div>
-        <!-- Scheda INFO -->
-        <div class="col-3 d-flex flex-column my-2 gap-3">
-            <!-- INFO TEAM-->
-            <div class="card">
-                <div class="card-header">
-                    Info
-                </div>
-                <div class="card-body">
-                    <p>Team Creation Date: 
-                        <span th:if="${response.team != null and response.team.creationDate != null}"
-                            th:text="${#dates.format(response.team.creationDate, 'yyyy-MM-dd')}">
-                            Creation Date
-                        </span>
-                        <span th:unless="${response.team != null and response.team.creationDate != null}">No creation date available</span>
-                    </p>
-                    
-                    <p>Number of Students: 
-                        <span th:if="${response.team != null and response.team.numStudenti != null}" th:text="${response.team.numStudenti}">
-                            Number of Students
-                        </span>
-                        <span th:unless="${response.team != null and response.team.numStudenti != null}">No student data available</span>
-                    </p>
-                </div>
-            </div> 
-            <!-- Lista membri -->
-            <div class="card">
-                <div class="card-header">
-                    Membri
-                </div>
-                <!-- lista vera e propria-->
-                <div class="list-group list-group-flush overflow-y-auto" style="max-height: 300px;">
-                    <!-- membri esistono-->
-                    <a th:if="${membri != null and !membri.empty}" th:each="membro : ${membri}" 
-                        href="#"  th:href="@{'/friend/' + ${membro.id}}"
-                        class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-                        <div class="d-flex gap-2 w-100 justify-content-start align-content-center">
-                            <img th:src="${membro.userProfile.profilePicturePath != null ? '/t5/images/profileImages/' + membro.userProfile.profilePicturePath : '/t5/images/sample_propic.jpg'}"
-                            alt="twbs" width="32" height="32" 
-                            class="rounded-circle flex-shrink-0">
-                            <div>
-                                <h6 th:text="${membro.name + ' ' + membro.surname}" class="mb-0">
-                                    nome cognome 
-                                </h6>
-                                <p class="mb-0 opacity-7" th:text="${membro.email}">
-                                    email 
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                
-                    <!-- Membri non esisto -->
-                    <li th:if="${membri == null or membri.empty}" class="mb-1">
-                        Nessun Membro trovato.
-                    </li>
-                </div>
-            </div> 
+<!-- PAGE -->
+<div class="container my-5">
+    <!-- Titolo + Bottoni -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Teams</h3>
+        <div class="d-flex gap-2">
+            <!-- Bottone che mostra il form -->
+            <button class="btn btn-success d-flex align-items-center gap-2 px-3 py-2"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#createTeamForm">
+                <i class="bi bi-plus-circle"></i>
+                <span class="fw-bold">Crea Team</span>
+            </button>
+            <!-- Bottone Aggiungi Team -->
+            <a href="/join_team" class="btn btn-primary d-flex align-items-center gap-2 px-3 py-2">
+                <i class="bi bi-people-fill"></i>
+                <span class="fw-bold">Aggiungi Team</span>
+            </a>
         </div>
     </div>
-    <div class="row mt-3" th:unless="${response != null}">
-        <div class="container">
-            <div class="alert alert-primary" role="alert">
-                Non fai parte di nessun Team ! 
+
+    <!-- Form di creazione team (collassabile) -->
+    <div class="collapse mb-4" id="createTeamForm">
+        <div class="card card-body">
+            <form th:action="@{/create_team}" method="post" enctype="multipart/form-data" th:object="${teamForm}">
+                <div class="mb-3">
+                    <label for="teamName" class="form-label">Nome Team</label>
+                    <input type="text" class="form-control" id="teamName" th:field="*{teamName}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="teamImage" class="form-label">Immagine Team</label>
+                    <input type="file" class="form-control" id="teamImage" name="teamImage" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-success">Crea</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Barra di ricerca -->
+    <div class="position-relative mb-4">
+        <input type="text" class="form-control search-chat py-2 ps-5" id="text-srh_teams" placeholder="Search Teams">
+        <i class="ti ti-search position-absolute top-50 start-0 translate-middle-y text-dark ms-3"></i>
+    </div>
+
+    <!-- Lista Teams -->
+    <div class="row row-cols-1 row-cols-md-2 g-4" id="teams_block">
+        <!-- Ciclo Thymeleaf per mostrare i team -->
+        <div class="col" th:each="response : ${teams}">
+            <div class="card h-100 text-center p-3">
+                <!-- Immagine del team -->
+                <img th:src="@{${response.team.teamImagePath}}" class="img-fluid rounded mb-3" alt="Team Image">
+                <!-- Nome del team -->
+                <h5 class="fw-bold" th:text="${response.team.teamName}">Nome Team</h5>
+                <!-- Descrizione -->
+                <p class="text-muted" th:text="${response.team.description}">Descrizione breve del team...</p>
+                <!-- Link alla pagina del team -->
+                <a th:href="@{'/team/' + ${response.team.id}}" class="btn btn-outline-primary">Vai al Team</a>
             </div>
         </div>
     </div>
 </div>
 
-
-<div th:replace="fragments/footer :: footer"></div>
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

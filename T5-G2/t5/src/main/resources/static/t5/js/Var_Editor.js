@@ -73,21 +73,21 @@ var console_robot = CodeMirror.fromTextArea(
 */
 
 function getParameterByName(name) {
-	const url = window.location.href;
-	name = name.replace(/[\[\]]/g, "\\$&");
-	const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-	const results = regex.exec(url);
-	if (!results) return null;
-	if (!results[2]) return "";
-	return decodeURIComponent(results[2].replace(/\+/g, " "));
+    const url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    const results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return "";
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
 function GetMode() {
-	const mode = getParameterByName("mode");
-	if (mode) {
-		const trimmed = mode.replace(/[^a-zA-Z0-9\s]/g, " ").trim();
-		return trimmed;
-	}
+    const mode = getParameterByName("mode");
+    if (mode) {
+        const trimmed = mode.replace(/[^a-zA-Z0-9\s]/g, " ").trim();
+        return trimmed;
+    }
     return null;
 }
 
@@ -95,7 +95,7 @@ function GetClassName(){
     const ClassName = getParameterByName("ClassUT");
     if (ClassName){
         const trimmed = ClassName.replace(/[^a-zA-Z0-9\s]/g, " ").trim();
-		return trimmed; 
+        return trimmed;
     }
     return null;
 }

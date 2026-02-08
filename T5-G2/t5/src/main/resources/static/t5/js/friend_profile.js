@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const followButton = document.getElementById('followButton');
     if (followButton) {
         followButton.addEventListener('click', async function() {
-            const FriendUserId = this.getAttribute('data-user-id'); 
+            const FriendUserId = this.getAttribute('data-user-id');
             const userId = parseInt(parseJwt(getCookie("jwt")).userId);
             console.log('Clicked! UserId:', FriendUserId);
             // Creazione del Form Data per la richiesta
