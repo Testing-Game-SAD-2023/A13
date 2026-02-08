@@ -9,81 +9,95 @@ skinparam linetype polyline
 skinparam nodesep 20
 skinparam ranksep 40
 
+' Color definitions for change tracking
+!define NEW_COLOR #C8E6C9
+!define UPDATED_COLOR #FFF9C4
+!define DELETED_COLOR #FFCDD2
+!define UNCHANGED_COLOR #E3F2FD
+
+legend top left
+  |= Color |= Status |
+  | <back:#C8E6C9>   </back> | New in V2 |
+  | <back:#FFF9C4>   </back> | Updated from V1 |
+  | <back:#FFCDD2>   </back> | Deleted from V1 |
+  | <back:#E3F2FD>   </back> | Unchanged |
+endlegend
+
 ' Top Row - Frontend and Controller
-package "Frontend Layer" <<Rectangle>> #LightBlue {
+package "Frontend Layer" <<Rectangle>> #E3F2FD {
   package "templates" {
-    [opponents_upload.html]
-    [dashboard.html]
+    [opponents_upload.html] UNCHANGED_COLOR
+    [dashboard.html] UNCHANGED_COLOR
   }
   
   package "static/t1/js" {
-    [opponents_upload.js]
-    [api.js]
-    [endpoints.js]
+    [opponents_upload.js] UNCHANGED_COLOR
+    [api.js] UNCHANGED_COLOR
+    [endpoints.js] UNCHANGED_COLOR
   }
 }
 
-package "Controller Layer" <<Rectangle>> #LightGreen {
-  [OpponentController]
-  [GlobalExceptionHandler]
+package "Controller Layer" <<Rectangle>> #FFF9C4 {
+  [OpponentController] #FFF9C4
+  [GlobalExceptionHandler] #C8E6C9
 }
 
 ' Second Row - Service Layer Split
-package "Service Layer - Core" <<Rectangle>> #LightYellow {
-  [OpponentService]
-  [CoverageService]
+package "Service Layer - Core" <<Rectangle>> #FFF9C4 {
+  [OpponentService] #FFF9C4
+  [CoverageService] #C8E6C9
 }
 
-package "Service Layer - Upload" <<Rectangle>> #FFF9C4 {
-  [UploadOpponentService]
-  [ClassUTUploadService]
-  [FileStorageService]
-  [JavaSourceFileService]
-  [OpponentTransformationService]
-  [OpponentPersistenceService]
+package "Service Layer - Upload" <<Rectangle>> #C8E6C9 {
+  [UploadOpponentService] #FFF9C4
+  [ClassUTUploadService] #C8E6C9
+  [FileStorageService] #FFF9C4
+  [JavaSourceFileService] #C8E6C9
+  [OpponentTransformationService] #C8E6C9
+  [OpponentPersistenceService] #C8E6C9
 }
 
 ' Third Row - Supporting Services
-package "Service Layer - Support" <<Rectangle>> #FFFACD {
-  [CoverageReader]
-  [ScoreBuilder]
+package "Service Layer - Support" <<Rectangle>> #C8E6C9 {
+  [CoverageReader] #C8E6C9
+  [ScoreBuilder] #C8E6C9
 }
 
-package "Exception Layer" <<Rectangle>> #FFE4E1 {
-  [FileUploadException]
-  [ClassValidationException]
-  [RobotProcessingException]
-  [ExternalServiceException]
+package "Exception Layer" <<Rectangle>> #C8E6C9 {
+  [FileUploadException] #C8E6C9
+  [ClassValidationException] #C8E6C9
+  [RobotProcessingException] #C8E6C9
+  [ExternalServiceException] #C8E6C9
 }
 
 ' Fourth Row - Utilities and Config
-package "Utility Layer" <<Rectangle>> #LightCoral {
-  [JavaMetadataExtractor]
-  [LevelExtractor]
-  [OpponentPathResolver]
-  [FileUploadResponse]
-  [FileDownloadUtil]
+package "Utility Layer" <<Rectangle>> #C8E6C9 {
+  [JavaMetadataExtractor] #C8E6C9
+  [LevelExtractor] #C8E6C9
+  [OpponentPathResolver] #C8E6C9
+  [FileUploadResponse] #E3F2FD
+  [FileDownloadUtil] #E3F2FD
 }
 
-package "Config Layer" <<Rectangle>> #LightGoldenRodYellow {
-  [FormValidation]
+package "Config Layer" <<Rectangle>> #C8E6C9 {
+  [FormValidation] #C8E6C9
 }
 
-package "API Layer" <<Rectangle>> #Lavender {
-  [ApiGatewayClient]
-  [RestExchangeTemplateHelper]
+package "API Layer" <<Rectangle>> #E3F2FD {
+  [ApiGatewayClient] #E3F2FD
+  [RestExchangeTemplateHelper] #E3F2FD
 }
 
 ' Fifth Row - Persistence
-package "Persistence Layer" <<Rectangle>> #LightGray {
+package "Persistence Layer" <<Rectangle>> #E3F2FD {
   package "Repositories" {
-    [OpponentRepository]
-    [ClassRepository]
+    [OpponentRepository] #E3F2FD
+    [ClassRepository] #E3F2FD
   }
   
   package "Models" {
-    [Opponent]
-    [ClassUT]
+    [Opponent] #E3F2FD
+    [ClassUT] #E3F2FD
   }
 }
 
@@ -129,5 +143,20 @@ database "MongoDB" {
 
 [OpponentRepository] --> [opponents]
 [ClassRepository] --> [classes]
+
+' Deleted Components from V1 (shown for reference)
+package "Deleted from V1" <<Rectangle>> #FFCDD2 {
+  [FileUploadUtil] #FFCDD2
+  [FileOperationUtil] #FFCDD2
+  [OperationRepository] #FFCDD2
+}
+
+note right of [FileUploadUtil]
+  Replaced by ClassUTUploadService
+end note
+
+note right of [FileOperationUtil]
+  Merged into FileStorageService
+end note
 
 @enduml
