@@ -287,8 +287,9 @@ public class UserProfileController {
         return achievement.handlePageRequest();
     }
 
+
     //    Handler per la costruzione della pagina contenente la classifica
-//    La pagina è costruita utilizzando un ObjectComponent "riempito" da un LogicComponent
+
     @GetMapping("/leaderboard")
     public String showLeaderboard(Model model) {
         PageBuilder leaderboardPage = new PageBuilder(serviceManager, "Leaderboard", model, JwtRequestContext.getJwtToken());
@@ -298,7 +299,6 @@ public class UserProfileController {
         leaderboardPage.setObjectComponents(leaderboardObjectComponent);
         return leaderboardPage.handlePageRequest();
     }
-
 
 
     @PostMapping("/update_profile")
@@ -336,7 +336,6 @@ public class UserProfileController {
                     .body("Errore durante l'aggiornamento del profilo: " + e.getMessage());
         }
     }
-
 
 
 

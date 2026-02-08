@@ -71,6 +71,7 @@ public class T23Service extends BaseService {
         registerPlayerStatusActions();
         registerPlayerActions();
         registerMessageActions(); //aggiunta 08/12/2025
+
     }
 
 
@@ -181,12 +182,22 @@ public class T23Service extends BaseService {
 
     }
 
+    private void registerPlayerActions(){
+        registerAction("getAllPlayers", new ServiceActionDefinition(
+            params -> getAllPlayers()
+        ));
+    }
 
     private List<PlayerDTO> getAllPlayers() {
         final String endpoint = "/players";
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>(){});
+    }
+
+    /*private List<PlayerDTO> getAllPlayers() {
+        final String endpoint = "/players";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>() {
         });
-    }
+    }*/
 
     private GameProgressDTO createPlayerProgressAgainstOpponent(long playerId, GameMode gameMode, String classUT, String type, OpponentDifficulty difficulty) {
         final String endpoint = "/players/%s/progression/against".formatted(playerId);
@@ -404,13 +415,13 @@ public class T23Service extends BaseService {
 
         return callRestPost(endpoint, requestBody, null, null, Boolean.class);
     }
-
+/*
     private void registerPlayerActions() {
         registerAction("getAllPlayers", new ServiceActionDefinition(
                 params -> getAllPlayers()
         ));
     }
-
+*/
     private java.util.List<com.g2.model.Message> getInboxMessages(Long userId) {
         final String endpoint = "/messages/inbox/" + userId;
         return callRestGET(endpoint, null,
