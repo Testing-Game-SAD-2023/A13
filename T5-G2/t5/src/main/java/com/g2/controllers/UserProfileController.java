@@ -7,6 +7,7 @@ import com.g2.components.UserProfileComponent;
 import com.g2.interfaces.ServiceManager;
 import com.g2.model.GameConfigData;
 import com.g2.model.User;
+import com.g2.model.UserProfile;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.model.dto.PlayerProgressDTO;
 import com.g2.model.dto.ResponseTeamComplete;
@@ -21,6 +22,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +59,7 @@ public class UserProfileController {
             File file = new File("%s/%s".formatted(System.getProperty("user.dir"), gamificationConFile.replace("/", File.separator)));
             this.gameConfigData = objectMapper.readValue(file, GameConfigData.class);
         } catch (IOException e) {
-            logger.info("[PostConstruct init] Error in loading game_config.json, using default values: {}", e.getMessage());
+            logger.info("[PostConnstruct init] Error in loading game_config.json, using default values: {}", e.getMessage());
             this.gameConfigData = new GameConfigData(10, 5, 1);
         }
     }
@@ -66,12 +71,57 @@ public class UserProfileController {
         return searchPage.handlePageRequest();
     }
 
+    //quando il giocatore richiede una lista dei suoi seguiti
+    @GetMapping("/profile/social/following/{playerID}")
+    public ResponseEntity<List<User>> getFollowing(@PathVariable Long playerID) {
+        List<User> users = (List<User>) serviceManager.handleRequest(
+                "T23", "getFollowing", playerID
+        );
+        return ResponseEntity.ok(users);
+    }
+
+    //quando il giocatore richiede una lista di chi lo segue
+    @GetMapping("/profile/social/followers/{playerID}")
+    public ResponseEntity<List<User>> getFollowers(@PathVariable Long playerID) {
+        List<User> users = (List<User>) serviceManager.handleRequest(
+                "T23", "getFollowers", playerID
+        );
+        return ResponseEntity.ok(users);
+    }
+
+    //quando il giocatore richiede una lista di tutti i profili
+    @GetMapping("/profile/social/allUsers")
+    public ResponseEntity<List<UserProfile>> getUsers(
+            @RequestParam String searchTerm
+    ) {
+                List<UserProfile> result = (List<UserProfile>) serviceManager.handleRequest(
+                "T23",
+                "searchUserProfiles",
+                searchTerm
+        );
+
+        return ResponseEntity.ok(result);
+    }
+
+    //unita pagina profilo e pagina Achievements, quindi qui vengono presi anche i progressi del giocatore
     @GetMapping("/profile")
     public String profilePagePersonal(Model model) {
         PageBuilder profilePage = new PageBuilder(serviceManager, "profile", model, JwtRequestContext.getJwtToken());
 
         Long userId = profilePage.getUserId();
         profilePage.setObjectComponents(new UserProfileComponent(serviceManager, false, userId));
+
+        PlayerProgressDTO playerProgress = (PlayerProgressDTO) serviceManager.handleRequest("T23", "getPlayerProgressAgainstAllOpponent", userId);
+        List<GameProgressDTO> achievements = playerProgress.getGameProgressesDTO();
+        Set<String> globalAchievements = playerProgress.getGlobalAchievements();
+        model.addAttribute("gamemode_achievements", achievements);
+        model.addAttribute("general_achievements", globalAchievements);
+        model.addAttribute("userCurrentExperience", playerProgress.getExperiencePoints());
+
+        model.addAttribute("startingLevel", gameConfigData.getStartingLevel());
+        model.addAttribute("expPerLevel", gameConfigData.getExpPerLevel());
+        model.addAttribute("maxLevel", gameConfigData.getMaxLevel());
+
         return profilePage.handlePageRequest();
     }
 
@@ -102,26 +152,6 @@ public class UserProfileController {
             model.addAttribute("membri", membri);
         }
         return teamPage.handlePageRequest();
-    }
-
-    @GetMapping("/Achievement")
-    public String showAchievements(Model model) {
-        PageBuilder achievement = new PageBuilder(serviceManager, "Achivement", model, JwtRequestContext.getJwtToken());
-        /*
-         * Richiedo a T4 lo stato del giocatore
-         */
-        PlayerProgressDTO playerProgress = (PlayerProgressDTO) serviceManager.handleRequest("T23", "getPlayerProgressAgainstAllOpponent", achievement.getUserId());
-        List<GameProgressDTO> achievements = playerProgress.getGameProgressesDTO();
-        Set<String> globalAchievements = playerProgress.getGlobalAchievements();
-        model.addAttribute("gamemode_achievements", achievements);
-        model.addAttribute("general_achievements", globalAchievements);
-        model.addAttribute("userCurrentExperience", playerProgress.getExperiencePoints());
-
-        model.addAttribute("startingLevel", gameConfigData.getStartingLevel());
-        model.addAttribute("expPerLevel", gameConfigData.getExpPerLevel());
-        model.addAttribute("maxLevel", gameConfigData.getMaxLevel());
-
-        return achievement.handlePageRequest();
     }
 
     @GetMapping("/Notification")
@@ -169,6 +199,26 @@ public class UserProfileController {
         return images;
     }
 
+    //Quando il giocatore richiede di salvare il proprio profilo
+    @PostMapping("/profile/save")
+    public ResponseEntity<Void> saveProfile(@RequestParam String email,
+                                            @RequestParam String bio,
+                                            @RequestParam String nickname,
+                                            @RequestParam String avatar) {
+
+        String jwt = JwtRequestContext.getJwtToken();
+        serviceManager.handleRequest(
+                "T23",
+                "UpdateProfile",
+                email,
+                avatar,
+                nickname,
+                bio
+        );
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/edit_profile")
     public String showEditProfile(Model model) {
         PageBuilder editProfilePage = new PageBuilder(serviceManager, "Edit_Profile", model, JwtRequestContext.getJwtToken());
@@ -185,5 +235,39 @@ public class UserProfileController {
         );
         return editProfilePage.handlePageRequest();
     }
+
+    //Quando il giocatore richiede lo storico delle sue partite
+    @GetMapping("/profile/game-history/{playerId}")
+    public ResponseEntity<List<GameProgressDTO>> getGameHistory(
+            @PathVariable Long playerId
+    ) {
+
+        @SuppressWarnings("unchecked")
+        List<GameProgressDTO> history =
+                (List<GameProgressDTO>) serviceManager.handleRequest(
+                        "T23",
+                        "GetPlayerGameHistory",
+                        playerId
+                );
+
+        return ResponseEntity.ok(history);
+    }
+
+    //Quando il giocatore richiede di follow/unfollow un altro giocatore
+    @PostMapping("/profile/toggle_follow")
+    public ResponseEntity<Void> toggleFollow(
+            @RequestParam Long profileId,
+            @RequestParam Long targetUserId) {
+
+        serviceManager.handleRequest(
+                "T23",
+                "ToggleFollow",
+                profileId,
+                targetUserId
+        );
+
+        return ResponseEntity.ok().build();
+    }
+
 
 }

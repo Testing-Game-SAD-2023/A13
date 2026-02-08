@@ -10,11 +10,12 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface GameProgressMapper {
 
-    @Mapping(source = "winner", target = "won")
+    @Mapping(source = "winner", target = "winner")
     @Mapping(source = "gameProgress.opponent.gameMode", target = "gameMode")
     @Mapping(source = "gameProgress.opponent.classUT", target = "classUT")
     @Mapping(source = "gameProgress.opponent.type", target = "type")
     @Mapping(source = "gameProgress.opponent.difficulty", target = "difficulty")
+    @Mapping(source = "achievements", target = "achievements")
     GameProgressDTO gameProgressToGameProgressDTO(GameProgress gameProgress);
 
     List<GameProgressDTO> gameProgressToGameProgressDTOList(List<GameProgress> gameProgresses);

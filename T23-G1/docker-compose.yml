@@ -15,8 +15,8 @@ services:
     volumes:
       - ./mysql_init/init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data_volume:/var/lib/mysql
-    expose:
-      - 3306
+    ports:
+      - "3306:3306"
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}" ]
       interval: 30s

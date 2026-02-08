@@ -3,15 +3,19 @@ package com.example.db_setup.model.repository;
 import com.example.db_setup.model.GameProgress;
 import com.example.db_setup.model.Opponent;
 import com.example.db_setup.model.PlayerProgress;
+import com.example.db_setup.model.dto.gamification.GameProgressDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
+import java.util.List;
+
 
 import java.util.Optional;
 
 public interface GameProgressRepository extends JpaRepository<GameProgress, Long> {
+
     @Query("""
                 SELECT gp FROM GameProgress gp
                 JOIN gp.opponent o
@@ -29,6 +33,16 @@ public interface GameProgressRepository extends JpaRepository<GameProgress, Long
             @Param("type") String type,
             @Param("difficulty") OpponentDifficulty difficulty
     );
+
+    @Query("""
+                SELECT gp
+                FROM GameProgress gp
+                LEFT JOIN FETCH gp.opponent o
+                JOIN gp.playerProgress pp
+                WHERE pp.player.id = :playerId
+            """)
+    List<GameProgress> findGameProgressByPlayer(@Param("playerId") Long playerId);
+
 
     Optional<GameProgress> getGameProgressByPlayerProgressAndOpponent(PlayerProgress playerProgress, Opponent opponent);
 }

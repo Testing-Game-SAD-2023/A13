@@ -121,7 +121,7 @@ public class PlayerStatService {
         GameProgressDTO currentGameProgress = (GameProgressDTO) serviceManager.handleRequest("T23", "getPlayerProgressAgainstOpponent", playerId, gameMode, classUT, robotType, difficulty);
         logger.info("[handleExperiencePoints] Progresso sulla partita corrente: {}", currentGameProgress);
 
-        if (currentGameProgress.isWon()) {
+        if (currentGameProgress.isWinner()) {
             logger.info("[handleExperiencePoints] L'utente ha già battuto questo avversario, nessun punto esperienza verrà fornito");
             return 0;
         }

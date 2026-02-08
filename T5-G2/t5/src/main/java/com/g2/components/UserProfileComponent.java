@@ -18,6 +18,7 @@ package com.g2.components;
 
 import com.g2.interfaces.ServiceManager;
 import com.g2.model.User;
+import com.g2.model.dto.PlayerProgressDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,9 +80,9 @@ public class UserProfileComponent extends GenericObjectComponent {
     public Map<String, Object> getModel() {
         try {
             // Inserisce i dati del profilo utente nel modello con la chiave specificata
-            User user = serviceManager.handleRequest("T23", "GetUser", User.class, this.userID);
+            User user = serviceManager.handleRequest("T23", "GetUser", User.class, String.valueOf(this.userID));
             if (this.isFriendProfile) {
-                User friendUser = (User) serviceManager.handleRequest("T23", "GetUser", this.friendID);
+                User friendUser = (User) serviceManager.handleRequest("T23", "GetUser", String.valueOf(this.friendID));
                 this.model.put("user", friendUser);
                 this.model.put("viewID", user.getUserProfile().getId());
             } else {
@@ -89,6 +90,7 @@ public class UserProfileComponent extends GenericObjectComponent {
                 this.model.put("user", user);
                 this.model.put("viewID", null);
             }
+
             this.model.put("isFriendProfile", isFriendProfile);
             return this.model;
         } catch (Exception e) {

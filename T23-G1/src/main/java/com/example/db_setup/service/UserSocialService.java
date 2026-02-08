@@ -48,75 +48,78 @@ public class UserSocialService {
      * seguendo il target, aggiunge il follow
      */
     @Transactional
-    public boolean toggleFollow(String followerIdStr, String followingIdStr) {
+    public boolean toggleFollow(String profileIdStr, String targetUserIdStr) {
 
-        Integer followerId = Integer.valueOf(followerIdStr);
-        Integer followingId = Integer.valueOf(followingIdStr);
+        Integer profileId = Integer.valueOf(profileIdStr);
+        Integer targetUserId = Integer.valueOf(targetUserIdStr);
 
-        UserProfile follower = userProfileRepository.findById(followerId)
-                .orElseThrow(() -> new UserNotFoundException(generateFollowerNotFoundMessage(followerIdStr)));
-        UserProfile following = userProfileRepository.findById(followingId)
-                .orElseThrow(() -> new UserNotFoundException(generateFollowingNotFoundMessage(followingIdStr)));
+        UserProfile profile = userProfileRepository.findById(profileId)
+                .orElseThrow(() -> new UserNotFoundException(generateFollowerNotFoundMessage(profileIdStr)));
+        UserProfile targetUser = userProfileRepository.findById(targetUserId)
+                .orElseThrow(() -> new UserNotFoundException(generateFollowingNotFoundMessage(targetUserIdStr)));
 
-        if (userFollowRepository.existsByFollowerAndFollowing(follower, following)) {
+        if (userFollowRepository.existsByFollowerAndFollowing(profile, targetUser)) {
             // Se già segue, rimuovilo (unfollow)
-            userFollowRepository.deleteByFollowerAndFollowing(follower, following);
+            userFollowRepository.deleteByFollowerAndFollowing(profile, targetUser);
             return false; // Ora NON segue più
         } else {
             // Se non segue, aggiungilo (follow)
-            userFollowRepository.save(new UserFollow(follower, following));
+            userFollowRepository.save(new UserFollow(profile, targetUser));
             /*
              * Notifica
              */
             String title = "Hai un nuovo follower";
-            String message = "L'utente " + follower.getNickname() + " ha inizato a seguirti";
+            String message = "L'utente " + profile.getNickname() + " ha inizato a seguirti";
 
-            notificationService.saveNotification(following.getPlayer().getID(), title, message, "info"
+            notificationService.saveNotification(targetUser.getPlayer().getID(), title, message, "info"
             );
             return true; // Ora sta seguendo
         }
     }
 
-    public List<UserProfile> getFollowers(String userIdStr) {
+    public List<UserProfile> getFollowers(Long userIdL) {
+        System.out.println("[DEBUG] getFollowers chiamato con userIdL=" + userIdL);
         try {
-            Integer userId = Integer.valueOf(userIdStr);
-            UserProfile user = userProfileRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException(generateUserNotFoundMessage(userIdStr)));
-            return userFollowRepository.findFollowersByUserProfile(user);
+            UserProfile user = userProfileRepository.findByPlayerID(userIdL);
+
+            List<UserProfile> followers = userFollowRepository.findFollowersByUserProfile(user);
+            // Log dei risultati
+            logger.info("[DEBUG] Follower trovati per userId {}: {}", userIdL, followers);
+
+            return followers;
         } catch (UserNotFoundException e) {
-            // Log dell'eccezione
-            logger.error("Eccezione durante il recupero dei follower per l'utente con ID " + userIdStr, e);
-            // Rilancio dell'eccezione
+            logger.error("Eccezione durante il recupero dei follower per l'utente con ID " + userIdL, e);
             throw e;
         } catch (Exception e) {
-            // Gestione di altre eccezioni generiche, se necessario
-            logger.error("Errore imprevisto durante il recupero dei follower per l'utente con ID " + userIdStr, e);
-            throw e; // Rilancia l'eccezione generica
+            logger.error("Errore imprevisto durante il recupero dei follower per l'utente con ID " + userIdL, e);
+            throw e;
         }
     }
 
-    public List<UserProfile> getFollowing(String userIdStr) {
+    public List<UserProfile> getFollowing(Long userIdL) {
+        System.out.println("[DEBUG] getFollowing chiamato con userIdL=" + userIdL);
         try {
-            Integer userId = Integer.valueOf(userIdStr);
-            UserProfile user = userProfileRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException(generateUserNotFoundMessage(userIdStr)));
-            return userFollowRepository.findFollowingByUserProfile(user);
+
+            UserProfile user = userProfileRepository.findByPlayerID(userIdL);
+
+            List<UserProfile> following = userFollowRepository.findFollowingByUserProfile(user);
+            // Log dei risultati
+            logger.info("[DEBUG] Utenti seguiti da userId {}: {}", userIdL, following);
+
+            return following;
         } catch (UserNotFoundException e) {
-            // Log dell'eccezione
-            logger.error("Eccezione durante il recupero degli utenti seguiti per l'utente con ID " + userIdStr, e);
-            // Rilancio dell'eccezione
+            logger.error("Eccezione durante il recupero degli utenti seguiti per l'utente con ID " + userIdL, e);
             throw e;
         } catch (Exception e) {
-            // Gestione di altre eccezioni generiche, se necessario
-            logger.error("Errore imprevisto durante il recupero degli utenti seguiti per l'utente con ID " + userIdStr, e);
-            throw e; // Rilancia l'eccezione generica
+            logger.error("Errore imprevisto durante il recupero degli utenti seguiti per l'utente con ID " + userIdL, e);
+            throw e;
         }
     }
+
 
     // Metodo di ricerca per nome, cognome, email o nickname
-    public Page<UserProfile> searchUserProfiles(String searchTerm, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return userProfileRepository.searchByNameSurnameEmailOrNickname(searchTerm, pageable);
+    public List<UserProfile> searchUserProfiles(String searchTerm) {
+        return userProfileRepository.searchByNameSurnameEmailOrNickname(searchTerm);
     }
 
     /*

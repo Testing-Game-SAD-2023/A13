@@ -1,6 +1,6 @@
-FROM openjdk:8-slim
+FROM eclipse-temurin:17-jdk-alpine
 
-RUN apt-get update && apt-get install -y bash && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache bash maven
 
 WORKDIR /generator
 RUN mkdir -p /generator/EvosuiteGenerator /generator/RandoopGenerator

@@ -1,3 +1,4 @@
+
 package com.example.db_setup.service.exception;
 
 import lombok.Getter;

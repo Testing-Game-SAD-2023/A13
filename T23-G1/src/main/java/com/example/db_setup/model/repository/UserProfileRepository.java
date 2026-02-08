@@ -7,10 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, Integer> {
 
     UserProfile findByID(Integer ID);
+
+    UserProfile findByPlayerID(Long playerID);
 
     // Ricerca per nome, cognome, email o nickname con LIKE
     @Query("SELECT u FROM UserProfile u WHERE " +
@@ -18,5 +22,5 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Intege
             "LOWER(u.surname) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(u.nickname) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-    Page<UserProfile> searchByNameSurnameEmailOrNickname(String searchTerm, Pageable pageable);
+    List<UserProfile> searchByNameSurnameEmailOrNickname(String searchTerm);
 }

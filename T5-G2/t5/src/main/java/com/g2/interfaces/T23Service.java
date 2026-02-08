@@ -16,6 +16,7 @@ package com.g2.interfaces;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2.model.NotificationResponse;
 import com.g2.model.User;
+import com.g2.model.UserProfile;
 import com.g2.model.dto.GameProgressDTO;
 import com.g2.model.dto.PlayerProgressDTO;
 import com.g2.model.dto.UpdateGameProgressDTO;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.data.domain.Page;
 import testrobotchallenge.commons.models.dto.auth.JwtValidationResponseDTO;
 import testrobotchallenge.commons.models.opponent.GameMode;
 import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
@@ -37,6 +39,7 @@ import testrobotchallenge.commons.models.opponent.OpponentDifficulty;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 
 @Service
 public class T23Service extends BaseService {
@@ -123,22 +126,27 @@ public class T23Service extends BaseService {
 
     private void registerUserProfileActions() {
         registerAction("UpdateProfile", new ServiceActionDefinition(
-                params -> updateProfile((String) params[0], (String) params[1], (String) params[2]),
-                String.class, String.class, String.class
+                params -> updateProfile((String) params[0], (String) params[1], (String) params[2], (String) params[3]),
+                String.class, String.class, String.class, String.class
         ));
 
-        registerAction("followUser", new ServiceActionDefinition(
-                params -> followUser((Integer) params[0], (Integer) params[1]),
-                Integer.class, Integer.class
+        registerAction("ToggleFollow", new ServiceActionDefinition(
+                params -> ToggleFollow((Long) params[0], (Long) params[1]),
+                Long.class, Long.class
         ));
 
         registerAction("getFollowers", new ServiceActionDefinition(
-                params -> getFollowers((String) params[0]),
-                String.class
+                params -> getFollowers((Long) params[0]),
+                Long.class
         ));
 
         registerAction("getFollowing", new ServiceActionDefinition(
-                params -> getFollowing((String) params[0]),
+                params -> getFollowing((Long) params[0]),
+                Long.class
+        ));
+
+        registerAction("searchUserProfiles", new ServiceActionDefinition(
+                params -> searchUserProfiles((String) params[0]),
                 String.class
         ));
     }
@@ -173,6 +181,12 @@ public class T23Service extends BaseService {
         registerAction("updateGlobalAchievements", new ServiceActionDefinition(
                 params -> updateGlobalAchievements((long) params[0], (Set<String>) params[1]), Long.class, Set.class
         ));
+
+        registerAction("GetPlayerGameHistory", new ServiceActionDefinition(
+                params -> getPlayerGameHistory((Long) params[0]),
+                Long.class
+        ));
+
     }
 
 
@@ -242,13 +256,13 @@ public class T23Service extends BaseService {
 
     // Metodo per ottenere la lista degli utenti
     private List<User> getUsers() {
-        final String endpoint = "/student/students_list";
+        final String endpoint = "/players/searchStudents";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<User>>() {
         });
     }
 
     private User getUser(String userId) {
-        final String endpoint = "/student/students_list/" + userId;
+        final String endpoint = "/players/students_list/" + userId;
         return callRestGET(endpoint, null, User.class);
     }
 
@@ -278,14 +292,21 @@ public class T23Service extends BaseService {
     }
 
     // Metodo per modificare il profilo di un utente
-    private Boolean updateProfile(String userEmail, String bio, String imagePath) {
+    private Boolean updateProfile(String email, String imagePath, String nick, String bio) {
+
         final String endpoint = "/profile/update_profile";
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add(EMAIL_FIELD, userEmail);
+        map.add("email", email);
+        map.add("nickname", nick);
         map.add("bio", bio);
         map.add("profilePicturePath", imagePath);
-        return callRestPost(endpoint, map, null, Boolean.class);
+
+        Boolean result = callRestPost(endpoint, map, null, Boolean.class);
+
+        return result;
     }
+
+
 
     private User getUserByEmail(String userEmail) {
         final String endpoint = "/profile/user_by_email";
@@ -355,28 +376,61 @@ public class T23Service extends BaseService {
 
     /*
      *   Metodo per follow/unfollow di un utente
-     *   il targetUserId + chi viene seguito
-     *   il authUserId è chi segue
+     *   il targetUserId è il profilo che viene selezionato
+     *   il profileId è il profilo che seleziona
      */
-    public String followUser(Integer targetUserId, Integer authUserId) {
+    public Boolean ToggleFollow(Long profileId, Long targetUserId) {
         final String endpoint = "/profile/toggle_follow";
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+
+        map.add("profileId", String.valueOf(profileId));
         map.add("targetUserId", String.valueOf(targetUserId));
-        map.add("authUserId", String.valueOf(authUserId));
-        return callRestPost(endpoint, map, null, String.class);
+        return callRestPost(endpoint, map, null, Boolean.class);
     }
 
-    public List<User> getFollowers(String userId) {
-        final String endpoint = "/profile/followers";
-        Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
-        });
+    //metodo per ottenere tutti i followers di un profilo a partire dal suo id
+    public List<UserProfile> getFollowers(Long userId) {
+        final String endpoint = "/profile/followers/" + userId;
+        return callRestGET(
+                endpoint,
+                null,
+                new ParameterizedTypeReference<List<UserProfile>>() {}
+        );
     }
 
-    public List<User> getFollowing(String userId) {
-        final String endpoint = "/profile/following";
-        Map<String, String> queryParams = Map.of("userId", userId);
-        return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
-        });
+    //metodo per ottenere tutti i following di un profilo a partire dal suo id
+    public List<UserProfile> getFollowing(Long userId) {
+        final String endpoint = "/profile/following/" + userId;
+        return callRestGET(
+                endpoint,
+                null,
+                new ParameterizedTypeReference<List<UserProfile>>() {}
+        );
     }
+
+    //metodo per la ricerca dei profili dei giocatori partendo da un termine di ricerca
+    public List<UserProfile> searchUserProfiles(String searchTerm) {
+        final String endpoint = "/profile/searchUserProfiles";
+
+        Map<String, String> params = new HashMap<>();
+        params.put("searchTerm", searchTerm);
+
+        return callRestGET(
+                endpoint,
+                params,
+                new ParameterizedTypeReference<List<UserProfile>>() {}
+        );
+    }
+
+    //metodo per ottenere lo storico delle partite di un giocatore
+    private List<GameProgressDTO> getPlayerGameHistory(Long playerId) {
+        final String endpoint = "/games/player/" + playerId;
+
+        return callRestGET(
+                endpoint,
+                null,
+                new ParameterizedTypeReference<List<GameProgressDTO>>() {}
+        );
+    }
+
 }

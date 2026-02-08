@@ -63,7 +63,7 @@ public class PlayerController {
         return playerService.searchStudents(request);
     }
 
-
+    //modificato tipo di ritorno
     @GetMapping("/players/students_list/{ID}")
     @ResponseBody
     public Player getStudent(@PathVariable String ID) {

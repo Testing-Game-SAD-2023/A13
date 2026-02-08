@@ -1,5 +1,5 @@
 # Usa un'immagine di base con Java installato
-FROM openjdk:17-jdk
+FROM eclipse-temurin:17-jdk-alpine
 
 # Copia il tuo JAR nel container
 COPY ./target/t5-0.0.1-SNAPSHOT.jar /app/

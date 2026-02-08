@@ -16,6 +16,6 @@ public class GameProgressDTO {
     private GameMode gameMode;
     private String type;
     private OpponentDifficulty difficulty;
-    private boolean isWon;
+    private boolean isWinner;
     private Set<String> achievements;
 }

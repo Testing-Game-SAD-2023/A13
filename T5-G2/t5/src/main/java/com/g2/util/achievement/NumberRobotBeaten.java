@@ -42,7 +42,7 @@ public class NumberRobotBeaten {
      * @return {@code true} se è stata vinta almeno una partita, {@code false} altrimenti
      */
     private static Boolean firstMatchWon(List<GameProgressDTO> gameProgresses) {
-        return gameProgresses != null && gameProgresses.stream().anyMatch(GameProgressDTO::isWon);
+        return gameProgresses != null && gameProgresses.stream().anyMatch(GameProgressDTO::isWinner);
     }
 
     /**
@@ -52,6 +52,6 @@ public class NumberRobotBeaten {
      * @return {@code true} se sono state vinte almeno tre partite, {@code false} altrimenti
      */
     private static Boolean thirdMatchWon(List<GameProgressDTO> gameProgresses) {
-        return gameProgresses != null && gameProgresses.stream().filter(GameProgressDTO::isWon).count() >= 3;
+        return gameProgresses != null && gameProgresses.stream().filter(GameProgressDTO::isWinner).count() >= 3;
     }
 }
