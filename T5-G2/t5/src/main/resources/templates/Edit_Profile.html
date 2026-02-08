@@ -5,36 +5,59 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
+
+    <!-- Aggiungo solo la definizione di d-none (minimo necessario) -->
+    <style>
+        .d-none {
+            display: none !important;
+        }
+    </style>
+
     <link rel="stylesheet" href="/t5/css/profile-edit.css">
+    <script src="/t5/js/profile-edit.js" defer></script>
 </head>
 <body>
-    <!-- Header con il pulsante -->
-    <header class="header">
-        <a href="/profile" class="profile-link">
-            <button id="player-email" class="profile-button" th:text="${player.email}">Torna al profilo utente</button>
-        </a>
-    </header>
-    <!-- Dati utente nascosti -->
-    <div id="player-data"
-        th:data-current-bio="${player.userProfile.bio}"
-        th:data-current-image="${player.userProfile.profilePicturePath}"
-        hidden>
+<!-- Header con pulsante di ritorno -->
+<header class="header">
+    <a href="/profile" class="profile-link">
+        <button id="user-email" class="profile-button" th:text="${player.email}">Torna al profilo utente</button>
+    </a>
+</header>
+
+<!-- Dati utente nascosti per JS -->
+<div id="player-data"
+     th:data-current-bio="${player.userProfile.bio}"
+     th:data-current-image="${player.userProfile.profilePicturePath}"
+     th:data-email="${player.email}"
+     hidden>
+</div>
+
+<main class="content">
+    <!-- Campo per la bio -->
+    <div class="form-group">
+        <label for="bio-input">Bio</label>
+        <textarea id="bio-input" th:text="${bio}" placeholder="Scrivi qualcosa su di te"></textarea>
     </div>
-    <!-- Contenuto principale -->
-    <main class="content">
-        <!-- Sezione immagini profilo -->
-        <div id="profile-pictures">
-            <img th:each="image : ${images}"
-                th:src="@{/t5/images/profileImages/{image}(image=${image})}"
-                th:class="${image == propic ? 'profile-picture selected' : 'profile-picture'}"
-                alt="Profile Picture" />
-        </div>
-        <!-- Campo per la bio -->
-        <textarea id="bio-input" th:text="${bio}"></textarea>
-        <!-- Pulsante per salvare -->
-        <button id="save-button" th:text="#{editProfile.save}">Salva</button>
-    </main>
-    <div th:replace="fragments/footer :: footer"></div>
-    <script src="/t5/js/profile-edit.js"></script>
+
+    <!-- Selezione immagine profilo -->
+    <div id="profile-pictures">
+        <img th:each="image : ${images}"
+             th:src="@{/t5/images/profileImages/{image}(image=${image})}"
+             th:class="${image == propic ? 'profile-picture selected' : 'profile-picture'}"
+             alt="Profile Picture" />
+    </div>
+
+    <!-- Messaggi di esito -->
+    <div class="alert alert-success d-none" id="profileSuccess">
+        Profilo aggiornato con successo.
+    </div>
+    <div class="alert alert-danger d-none" id="profileError">
+        Errore nell'aggiornamento del profilo: biografia troppo lunga.
+    </div>
+    <!-- Pulsante per salvare -->
+    <button type="button" id="save-button" th:text="#{editProfile.save}">Salva</button>
+</main>
+
+<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

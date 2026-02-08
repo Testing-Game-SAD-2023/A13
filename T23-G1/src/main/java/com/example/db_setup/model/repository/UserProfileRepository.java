@@ -12,7 +12,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Intege
 
     UserProfile findByID(Integer ID);
 
-    // Ricerca per nome, cognome, email o nickname con LIKE
+    UserProfile findByPlayer_ID(Long playerId);  // usa il campo player -> ID
+
     @Query("SELECT u FROM UserProfile u WHERE " +
             "LOWER(u.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(u.surname) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
@@ -20,3 +21,4 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Intege
             "LOWER(u.nickname) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     Page<UserProfile> searchByNameSurnameEmailOrNickname(String searchTerm, Pageable pageable);
 }
+

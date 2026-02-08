@@ -1,471 +1,471 @@
 <!DOCTYPE html>
 <html data-bs-theme="dark" id="html-root">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Editor</title>
-		<link
-			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-			rel="stylesheet"
-			integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-			crossorigin="anonymous"
-		/>
-		<link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-		/>
-		<!-- CodeMirror JavaScript -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
-		<!-- code mirror-->
-		<!-- CodeMirror CSS -->
-		<link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
-		<link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
-		<link rel="stylesheet" href="./t5/codemirror/theme/mdn-like.css" />
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editor</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous"
+    />
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <!-- CodeMirror JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <!-- code mirror-->
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="./t5/codemirror/lib/codemirror.css" />
+    <link rel="stylesheet" href="./t5/codemirror/theme/material-darker.css" />
+    <link rel="stylesheet" href="./t5/codemirror/theme/mdn-like.css" />
 
-		<link rel="stylesheet" href="/t5/css/main_style.css" />
+    <link rel="stylesheet" href="/t5/css/main_style.css" />
 
-		<style>
-			.bg-coverage-success {
-				background-color: rgba(0, 200, 83, 0.4) !important; /* Verde brillante con 40% di opacità */
-			}
+    <style>
+        .bg-coverage-success {
+            background-color: rgba(0, 200, 83, 0.4) !important; /* Verde brillante con 40% di opacità */
+        }
 
-			.bg-coverage-warning {
-				background-color: rgba(255, 234, 0, 0.5) !important; /* Giallo evidenziatore con 50% di opacità */
-			}
+        .bg-coverage-warning {
+            background-color: rgba(255, 234, 0, 0.5) !important; /* Giallo evidenziatore con 50% di opacità */
+        }
 
-			.bg-coverage-danger {
-				background-color: rgba(213, 0, 0, 0.4) !important; /* Rosso acceso con 40% di opacità */
-			}
+        .bg-coverage-danger {
+            background-color: rgba(213, 0, 0, 0.4) !important; /* Rosso acceso con 40% di opacità */
+        }
 
-			.no-select {
-				user-select: none; /* Per browser moderni */
-				-webkit-user-select: none; /* Per Safari */
-				-moz-user-select: none; /* Per Firefox */
-				-ms-user-select: none; /* Per Internet Explorer */
-			}
+        .no-select {
+            user-select: none; /* Per browser moderni */
+            -webkit-user-select: none; /* Per Safari */
+            -moz-user-select: none; /* Per Firefox */
+            -ms-user-select: none; /* Per Internet Explorer */
+        }
 
-			.icon-fade {
-				opacity: 0; /* Inizialmente invisibile */
-				transition: opacity 0.3s ease; /* Transizione per l'opacità */
-			}
+        .icon-fade {
+            opacity: 0; /* Inizialmente invisibile */
+            transition: opacity 0.3s ease; /* Transizione per l'opacità */
+        }
 
-			.icon-visible {
-				opacity: 1; /* Completamente visibile */
-			}
+        .icon-visible {
+            opacity: 1; /* Completamente visibile */
+        }
 
-			.CodeMirror {
-				height: 100%; /* Assicura che l'editor utilizzi il 100% dello spazio disponibile */
-			}
-			.covered-line {
-				border-left: 4px solid green; /* Colore del bordo a sinistra */
-			}
-			.uncovered-line {
-				border-left: 4px solid red; /* Colore del bordo a sinistra */
-			}
-			.partially-covered-line {
-				border-left: 4px solid #FF5733; /* Colore del bordo a sinistra */
-			}
+        .CodeMirror {
+            height: 100%; /* Assicura che l'editor utilizzi il 100% dello spazio disponibile */
+        }
+        .covered-line {
+            border-left: 4px solid green; /* Colore del bordo a sinistra */
+        }
+        .uncovered-line {
+            border-left: 4px solid red; /* Colore del bordo a sinistra */
+        }
+        .partially-covered-line {
+            border-left: 4px solid #FF5733; /* Colore del bordo a sinistra */
+        }
 
-			#card_user,
-			#card_robot {
-				height: 95.6vh;
-				width: 49.7vw;
-				overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
-			}
+        #card_user,
+        #card_robot {
+            height: 95.6vh;
+            width: 49.7vw;
+            overflow-y: hidden; /* Nasconde contenuti che potrebbero fuoriuscire */
+        }
 
-			#section_editor {
-				height: calc(
-					100vh - 250px
-				); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
-			}
+        #section_editor {
+            height: calc(
+                    100vh - 250px
+            ); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+        }
 
-			#section_UT {
-				height: calc(
-					100vh - 250px
-				); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
-			}
+        #section_UT {
+            height: calc(
+                    100vh - 250px
+            ); /* Esempio di altezza basata sull'altezza del viewport meno un valore fisso */
+        }
 
-			.CodeMirror-vscrollbar {
-				overflow: hidden; /* Nasconde la scrollbar */
-			}
+        .CodeMirror-vscrollbar {
+            overflow: hidden; /* Nasconde la scrollbar */
+        }
 
-			.highlight {
-				background-color: yellow;
-				color: black;
-			}
+        .highlight {
+            background-color: yellow;
+            color: black;
+        }
 
-			.border-secondary-subtle {
- 				 --bs-border-opacity: 1;
-  				border-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-border-opacity)) !important;
-			}
-			
-			.border-secondary-subtle:hover{
-				cursor:n-resize;
-				transition: border-color 3s ease; 
-				border-color: rgba(var(--bs-primary-bg-rgb), var(--bs-border-opacity)) !important;
-			}
-		</style>
-	</head>
+        .border-secondary-subtle {
+            --bs-border-opacity: 1;
+            border-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-border-opacity)) !important;
+        }
 
-	<body class="overflow-y-hidden">
-		<!-- NAV-->
-		<nav class="nav bg-body-tertiary border border-bottom-0">
-			<div class="container-fluid px-0">
-				<div class="d-flex justify-content-between">
-					<!-- GO BACK -->
-					<div>
-						<a
-							id="go_back_button"
-							href="/main"
-							class="btn btn-sm"
-							tabindex="-1"
-							role="button"
-							aria-disabled="true"
-						>
-							<i class="bi bi-arrow-90deg-left" th:text="#{indietro}"></i>
-						</a>
-					</div>
-					<div class="text-center d-flex flex-column align-items-center">
-						<a class="navbar-brand" id="Nome_modalita"></a>
-						<div id="timer">
-							<p id="timerDisplay"></p>
-						</div>
-					</div>
+        .border-secondary-subtle:hover{
+            cursor:n-resize;
+            transition: border-color 3s ease;
+            border-color: rgba(var(--bs-primary-bg-rgb), var(--bs-border-opacity)) !important;
+        }
+    </style>
+</head>
 
-					<div>
-							<!-- Language -->
-							<button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-								<i id="dropdownIcon">
-									<!-- English icon-->
-									<svg width="14px" height="14px"enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
-								</i>
-							</button>
-							<div class="dropdown-menu dropdown-menu-end p-0">
-								<div class="list-group">
-									<!-- English -->
-									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="en">
-										<div class="d-flex justify-content-between">
-											<h6>
-												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
-											</h6>
-											<h6>
-												English
-											</h6>
-										</div>
-									</a>
-									<!-- Italian -->
-									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="it">
-										<div class="d-flex justify-content-between">
-											<h6>
-												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"/><path d="m0 256c0 110.071 69.472 203.906 166.957 240.077v-480.154c-97.485 36.171-166.957 130.006-166.957 240.077z" fill="#6da544"/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
-											</h6>
-											<h6>
-												Italian 
-											</h6>
-										</div>
-									</a>
-									<!-- Spanish -->
-									<a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="es">
-										<div class="d-flex justify-content-between">
-											<h6>
-												<svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m0 256c0 31.314 5.633 61.31 15.923 89.043l240.077 22.261 240.077-22.261c10.29-27.733 15.923-57.729 15.923-89.043s-5.633-61.31-15.923-89.043l-240.077-22.261-240.077 22.261c-10.29 27.733-15.923 57.729-15.923 89.043z" fill="#ffda44"/><g fill="#d80027"><path d="m496.077 166.957c-36.171-97.484-130.006-166.957-240.077-166.957s-203.906 69.473-240.077 166.957z"/><path d="m15.923 345.043c36.171 97.484 130.006 166.957 240.077 166.957s203.906-69.473 240.077-166.957z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
-											</h6>
-											<h6>
-												Spanish
-											</h6>
-										</div>
-									</a>									 
-								</div>
-							</div>
-							<!-- Setting -->
-							<button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-								<i class="bi bi-gear-fill"></i>
-							</button>
-							<div class="dropdown-menu dropdown-menu-end p-0">
-								<div class="list-group">
-									<!-- Tema -->
-									<a class="list-group-item list-group-item-action p-2" aria-current="true">
-										<div class="d-flex justify-content-between align-baseline">
-											<h6 class="my-1 mx-1" th:text="#{tema}"> </h6>
-											<div class="form-check form-switch mt-1">
-												<input class="form-check-input" type="checkbox" role="switch" id="chk_theme">
-											</div>
-										</div>
-									</a>
-									<!-- Font size -->
-									<a class="list-group-item list-group-item-action p-2" aria-current="true">
-										<div class="d-flex gap-5 justify-content-between">
-											<h6 class="my-1 mx-1" th:text="#{grandezza_carattere}"> </h6>
-											<div class="input-group my-2 input-group-sm" >
-												<button class="btn btn-outline-secondary" type="button" id="decrement-button">
-													<i class="bi bi-dash"></i>
-												</button>
-												<input type="text" class="form-control" id="font-size-input" placeholder="16" style="width:10px; text-align: center;">
-												<button class="btn btn-outline-secondary" type="button" id="increment-button">
-													<i class="bi bi-plus"></i>
-												</button>
-											</div>
-										</div>
-									</a>									
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-			</div>
-		</nav>
+<body class="overflow-y-hidden">
+<!-- NAV-->
+<nav class="nav bg-body-tertiary border border-bottom-0">
+    <div class="container-fluid px-0">
+        <div class="d-flex justify-content-between">
+            <!-- GO BACK -->
+            <div>
+                <a
+                        id="go_back_button"
+                        href="/main"
+                        class="btn btn-sm"
+                        tabindex="-1"
+                        role="button"
+                        aria-disabled="true"
+                >
+                    <i class="bi bi-arrow-90deg-left" th:text="#{indietro}"></i>
+                </a>
+            </div>
+            <div class="text-center d-flex flex-column align-items-center">
+                <a class="navbar-brand" id="Nome_modalita"></a>
+                <div id="timer">
+                    <p id="timerDisplay"></p>
+                </div>
+            </div>
 
-		<!-- DASHBOARD -->
-		<div class="card-group">
-				<!-- PRIMA COLONNA-->
-				<div class="card rounded-0" id="card_user">
-					<!-- EDITOR-->
-					<div class="card-header p-0">
-						<nav class="navbar bg-body-tertiary p-2">
-							<span class="navbar-brand lead my-0 py-0" th:text="#{modifica}"></span>
-							<div class="">
-								<!-- UNDO e REDO -->
-								<button type="button" class="btn" id="undo-button">
-									<i class="bi bi-arrow-90deg-left"></i>
-								</button>
-								<button type="button" class="btn" id="redo-button">
-									<i class="bi bi-arrow-90deg-right"></i>
-								</button>
-								<!-- COVERAGE -->
-								<button
-									class="btn btn-primary"
-									type="button"
-									id="coverageButton"
-								>
-									<div id="loading_cov">
+            <div>
+                <!-- Language -->
+                <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i id="dropdownIcon">
+                        <!-- English icon-->
+                        <svg width="14px" height="14px"enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+                    </i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end p-0">
+                    <div class="list-group">
+                        <!-- English -->
+                        <a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="en">
+                            <div class="d-flex justify-content-between">
+                                <h6>
+                                    <svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><g fill="#0052b4"><path d="m52.92 100.142c-20.109 26.163-35.272 56.318-44.101 89.077h133.178z"/><path d="m503.181 189.219c-8.829-32.758-23.993-62.913-44.101-89.076l-89.075 89.076z"/><path d="m8.819 322.784c8.83 32.758 23.993 62.913 44.101 89.075l89.074-89.075z"/><path d="m411.858 52.921c-26.163-20.109-56.317-35.272-89.076-44.102v133.177z"/><path d="m100.142 459.079c26.163 20.109 56.318 35.272 89.076 44.102v-133.176z"/><path d="m189.217 8.819c-32.758 8.83-62.913 23.993-89.075 44.101l89.075 89.075z"/><path d="m322.783 503.181c32.758-8.83 62.913-23.993 89.075-44.101l-89.075-89.075z"/><path d="m370.005 322.784 89.075 89.076c20.108-26.162 35.272-56.318 44.101-89.076z"/></g><g fill="#d80027"><path d="m509.833 222.609h-220.44-.001v-220.442c-10.931-1.423-22.075-2.167-33.392-2.167-11.319 0-22.461.744-33.391 2.167v220.44.001h-220.442c-1.423 10.931-2.167 22.075-2.167 33.392 0 11.319.744 22.461 2.167 33.391h220.44.001v220.442c10.931 1.423 22.073 2.167 33.392 2.167 11.317 0 22.461-.743 33.391-2.167v-220.44-.001h220.442c1.423-10.931 2.167-22.073 2.167-33.392 0-11.317-.744-22.461-2.167-33.391z"/><path d="m322.783 322.784 114.236 114.236c5.254-5.252 10.266-10.743 15.048-16.435l-97.802-97.802h-31.482z"/><path d="m189.217 322.784h-.002l-114.235 114.235c5.252 5.254 10.743 10.266 16.435 15.048l97.802-97.804z"/><path d="m189.217 189.219v-.002l-114.236-114.237c-5.254 5.252-10.266 10.743-15.048 16.435l97.803 97.803h31.481z"/><path d="m322.783 189.219 114.237-114.238c-5.252-5.254-10.743-10.266-16.435-15.047l-97.802 97.803z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+                                </h6>
+                                <h6>
+                                    English
+                                </h6>
+                            </div>
+                        </a>
+                        <!-- Italian -->
+                        <a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="it">
+                            <div class="d-flex justify-content-between">
+                                <h6>
+                                    <svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"/><path d="m0 256c0 110.071 69.472 203.906 166.957 240.077v-480.154c-97.485 36.171-166.957 130.006-166.957 240.077z" fill="#6da544"/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+                                </h6>
+                                <h6>
+                                    Italian
+                                </h6>
+                            </div>
+                        </a>
+                        <!-- Spanish -->
+                        <a class="list-group-item list-group-item-action language_select" aria-current="true" data-lang="es">
+                            <div class="d-flex justify-content-between">
+                                <h6>
+                                    <svg width="16px" height="16px" enable-background="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m0 256c0 31.314 5.633 61.31 15.923 89.043l240.077 22.261 240.077-22.261c10.29-27.733 15.923-57.729 15.923-89.043s-5.633-61.31-15.923-89.043l-240.077-22.261-240.077 22.261c-10.29 27.733-15.923 57.729-15.923 89.043z" fill="#ffda44"/><g fill="#d80027"><path d="m496.077 166.957c-36.171-97.484-130.006-166.957-240.077-166.957s-203.906 69.473-240.077 166.957z"/><path d="m15.923 345.043c36.171 97.484 130.006 166.957 240.077 166.957s203.906-69.473 240.077-166.957z"/></g><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
+                                </h6>
+                                <h6>
+                                    Spanish
+                                </h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <!-- Setting -->
+                <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    <i class="bi bi-gear-fill"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end p-0">
+                    <div class="list-group">
+                        <!-- Tema -->
+                        <a class="list-group-item list-group-item-action p-2" aria-current="true">
+                            <div class="d-flex justify-content-between align-baseline">
+                                <h6 class="my-1 mx-1" th:text="#{tema}"> </h6>
+                                <div class="form-check form-switch mt-1">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="chk_theme">
+                                </div>
+                            </div>
+                        </a>
+                        <!-- Font size -->
+                        <a class="list-group-item list-group-item-action p-2" aria-current="true">
+                            <div class="d-flex gap-5 justify-content-between">
+                                <h6 class="my-1 mx-1" th:text="#{grandezza_carattere}"> </h6>
+                                <div class="input-group my-2 input-group-sm" >
+                                    <button class="btn btn-outline-secondary" type="button" id="decrement-button">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <input type="text" class="form-control" id="font-size-input" placeholder="16" style="width:10px; text-align: center;">
+                                    <button class="btn btn-outline-secondary" type="button" id="increment-button">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="card-group">
+    <!-- PRIMA COLONNA-->
+    <div class="card rounded-0" id="card_user">
+        <!-- EDITOR-->
+        <div class="card-header p-0">
+            <nav class="navbar bg-body-tertiary p-2">
+                <span class="navbar-brand lead my-0 py-0" th:text="#{modifica}"></span>
+                <div class="">
+                    <!-- UNDO e REDO -->
+                    <button type="button" class="btn" id="undo-button">
+                        <i class="bi bi-arrow-90deg-left"></i>
+                    </button>
+                    <button type="button" class="btn" id="redo-button">
+                        <i class="bi bi-arrow-90deg-right"></i>
+                    </button>
+                    <!-- COVERAGE -->
+                    <button
+                            class="btn btn-primary"
+                            type="button"
+                            id="coverageButton"
+                    >
+                        <div id="loading_cov">
 										<span
-											class="spinner-border spinner-border-sm"
-											aria-hidden="true"
-											style="display: none"
-										></span>
-										<i
-											id="loading_icon_1"
-											class="bi bi-play-fill"
-											aria-hidden="true"
-										></i>
-										<span role="status" data-title="Play" th:text="#{tasto_play}"></span>
-										<!-- Icona nascosta -->
-									</div>
-								</button>
-								<!-- MENU BUTTON -->
-								<button
-									type="button"
-									id="utente_menu"
-									class="btn btn-sm dropdown-toggle-split my-0"
-									data-bs-toggle="dropdown"
-									aria-expanded="false"
-									data-bs-auto-close="outside"
-									aria-haspopup="true"
-								>
-									<i class="bi bi-three-dots-vertical"></i>
-								</button>
-								<!-- MENU OPZIONI -->
-								<div
-									class="dropdown-menu shadow dropdown-menu-end"
-									aria-labelledby="navbarDropdownMenuLink"
-									style="width: 400px"
-								>
-									<div class="container-fluid p-0">
-										<div class="tab-content" id="myTabContent">
-											<!-- MENU -->
-											<div
-												class="tab-pane fade show active"
-												id="paneA"
-												role="tabpanel"
-												aria-labelledby="pane-A"
-											>
-												<ol class="breadcrumb m-0 px-2">
-													<li class="breadcrumb-item">
-														<strong>Menu</strong>
-													</li>
-													<li
-														class="breadcrumb-item active"
-														aria-current="page"
-													>
-														CTRL+D
-													</li>
-												</ol>
-												<div class="list-group list-group-flush">
-													<button
-														type="button"
-														onclick="showTabPane('paneB')"
-														class="list-group-item list-group-item-action"
-														aria-current="true"
-													>
-														<i class="bi bi-clock-history" th:text="#{storico}"></i>														
-													</button>
-													<button
-														type="button"
-														onclick="showTabPane('paneC')"
-														class="list-group-item list-group-item-action"
-													>
-														<i class="bi bi-upload"></i> Upload
-													</button>
-													<button
-														type="button"
-														id="DownloadButton"
-														class="list-group-item list-group-item-action"
-													>
-														<i class="bi bi-download"></i> Download
-													</button>
-													<button
-														type="button"
-														onclick="showTabPane('paneD')"
-														class="list-group-item list-group-item-action"
-													>
-														<i class="bi bi-search" th:text="#{cerca_sostituisci}"></i> 
-													</button>
-												</div>
-											</div>
-											<!-- STORICO-->
-											<div
-												class="tab-pane fade overflow-y-auto"
-												id="paneB"
-												role="tabpanel"
-												aria-labelledby="pane-B"
-											>
-												<div class="d-flex">
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item mb-2 mx-2"
-													>
-														<i class="bi bi-arrow-left"></i>
-													</button>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item">Menu</li>
-														<li
-															class="breadcrumb-item active"
-															aria-current="page" th:text="#{storico}"
-														>
-															
-														</li>
-													</ol>
-												</div>
-												<ol
-													id="storico_list"
-													class="list-group list-group-flush list-group-numbered overflow-auto border-top"
-													style="max-height: 150px"
-												>
-													<li
-														id="placeholder-item"
-														class="list-group-item d-flex justify-content-between align-items-start"
-													>
-														<div class="ms-2 me-auto">
-															<div class="fw-bold" th:text="#{no_turni}">
-															</div>
-														</div>
-													</li>
-												</ol>
-											</div>
-											<!-- UPLOAD -->
-											<div
-												class="tab-pane fade"
-												id="paneC"
-												role="tabpanel"
-												aria-labelledby="pane-C"
-											>
-												<div class="d-flex">
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item mb-2 mx-2"
-													>
-														<i class="bi bi-arrow-left"></i>
-													</button>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item">Menu</li>
-														<li
-															class="breadcrumb-item active"
-															aria-current="page"
-														>
-															Upload
-														</li>
-													</ol>
-												</div>
-												<input
-													class="container-fluid form-control"
-													id="fileInput"
-													type="file"
-												/>
-											</div>
-											<!-- SEARCH -->
-											<div
-												class="tab-pane fade"
-												id="paneD"
-												role="tabpanel"
-												aria-labelledby="pane-D"
-											>
-												<div class="d-flex">
-													<button
-														type="button"
-														onclick="showTabPane('paneA')"
-														class="list-group-item mb-2 mx-2"
-													>
-														<i class="bi bi-arrow-left"></i>
-													</button>
-													<ol class="breadcrumb m-0 px-2">
-														<li class="breadcrumb-item">Menu</li>
-														<li
-															class="breadcrumb-item active"
-															aria-current="page"
-															th:text="#{cerca_sostituisci}"
-														>
-														</li>
-													</ol>
-												</div>
-												<div class="input-group mb-3 px-2">
-													<button
-														class="btn btn-primary"
-														type="button"
-														id="searchButton"
-													>
-														<i class="bi bi-search"></i>
-													</button>
-													<input
-														type="text"
-														id="searchTerm"
-														class="form-control border-secondary"
-														placeholder="Cerca"
-														aria-label="Cerca"
-													/>
-													<span
-														class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger"
-														id="SearchItems"
-														style="display: none"
-													>
+                                                class="spinner-border spinner-border-sm"
+                                                aria-hidden="true"
+                                                style="display: none"
+                                        ></span>
+                            <i
+                                    id="loading_icon_1"
+                                    class="bi bi-play-fill"
+                                    aria-hidden="true"
+                            ></i>
+                            <span role="status" data-title="Play" th:text="#{tasto_play}"></span>
+                            <!-- Icona nascosta -->
+                        </div>
+                    </button>
+                    <!-- MENU BUTTON -->
+                    <button
+                            type="button"
+                            id="utente_menu"
+                            class="btn btn-sm dropdown-toggle-split my-0"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            data-bs-auto-close="outside"
+                            aria-haspopup="true"
+                    >
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <!-- MENU OPZIONI -->
+                    <div
+                            class="dropdown-menu shadow dropdown-menu-end"
+                            aria-labelledby="navbarDropdownMenuLink"
+                            style="width: 400px"
+                    >
+                        <div class="container-fluid p-0">
+                            <div class="tab-content" id="myTabContent">
+                                <!-- MENU -->
+                                <div
+                                        class="tab-pane fade show active"
+                                        id="paneA"
+                                        role="tabpanel"
+                                        aria-labelledby="pane-A"
+                                >
+                                    <ol class="breadcrumb m-0 px-2">
+                                        <li class="breadcrumb-item">
+                                            <strong>Menu</strong>
+                                        </li>
+                                        <li
+                                                class="breadcrumb-item active"
+                                                aria-current="page"
+                                        >
+                                            CTRL+D
+                                        </li>
+                                    </ol>
+                                    <div class="list-group list-group-flush">
+                                        <button
+                                                type="button"
+                                                onclick="showTabPane('paneB')"
+                                                class="list-group-item list-group-item-action"
+                                                aria-current="true"
+                                        >
+                                            <i class="bi bi-clock-history" th:text="#{storico}"></i>
+                                        </button>
+                                        <button
+                                                type="button"
+                                                onclick="showTabPane('paneC')"
+                                                class="list-group-item list-group-item-action"
+                                        >
+                                            <i class="bi bi-upload"></i> Upload
+                                        </button>
+                                        <button
+                                                type="button"
+                                                id="DownloadButton"
+                                                class="list-group-item list-group-item-action"
+                                        >
+                                            <i class="bi bi-download"></i> Download
+                                        </button>
+                                        <button
+                                                type="button"
+                                                onclick="showTabPane('paneD')"
+                                                class="list-group-item list-group-item-action"
+                                        >
+                                            <i class="bi bi-search" th:text="#{cerca_sostituisci}"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- STORICO-->
+                                <div
+                                        class="tab-pane fade overflow-y-auto"
+                                        id="paneB"
+                                        role="tabpanel"
+                                        aria-labelledby="pane-B"
+                                >
+                                    <div class="d-flex">
+                                        <button
+                                                type="button"
+                                                onclick="showTabPane('paneA')"
+                                                class="list-group-item mb-2 mx-2"
+                                        >
+                                            <i class="bi bi-arrow-left"></i>
+                                        </button>
+                                        <ol class="breadcrumb m-0 px-2">
+                                            <li class="breadcrumb-item">Menu</li>
+                                            <li
+                                                    class="breadcrumb-item active"
+                                                    aria-current="page" th:text="#{storico}"
+                                            >
+
+                                            </li>
+                                        </ol>
+                                    </div>
+                                    <ol
+                                            id="storico_list"
+                                            class="list-group list-group-flush list-group-numbered overflow-auto border-top"
+                                            style="max-height: 150px"
+                                    >
+                                        <li
+                                                id="placeholder-item"
+                                                class="list-group-item d-flex justify-content-between align-items-start"
+                                        >
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold" th:text="#{no_turni}">
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                </div>
+                                <!-- UPLOAD -->
+                                <div
+                                        class="tab-pane fade"
+                                        id="paneC"
+                                        role="tabpanel"
+                                        aria-labelledby="pane-C"
+                                >
+                                    <div class="d-flex">
+                                        <button
+                                                type="button"
+                                                onclick="showTabPane('paneA')"
+                                                class="list-group-item mb-2 mx-2"
+                                        >
+                                            <i class="bi bi-arrow-left"></i>
+                                        </button>
+                                        <ol class="breadcrumb m-0 px-2">
+                                            <li class="breadcrumb-item">Menu</li>
+                                            <li
+                                                    class="breadcrumb-item active"
+                                                    aria-current="page"
+                                            >
+                                                Upload
+                                            </li>
+                                        </ol>
+                                    </div>
+                                    <input
+                                            class="container-fluid form-control"
+                                            id="fileInput"
+                                            type="file"
+                                    />
+                                </div>
+                                <!-- SEARCH -->
+                                <div
+                                        class="tab-pane fade"
+                                        id="paneD"
+                                        role="tabpanel"
+                                        aria-labelledby="pane-D"
+                                >
+                                    <div class="d-flex">
+                                        <button
+                                                type="button"
+                                                onclick="showTabPane('paneA')"
+                                                class="list-group-item mb-2 mx-2"
+                                        >
+                                            <i class="bi bi-arrow-left"></i>
+                                        </button>
+                                        <ol class="breadcrumb m-0 px-2">
+                                            <li class="breadcrumb-item">Menu</li>
+                                            <li
+                                                    class="breadcrumb-item active"
+                                                    aria-current="page"
+                                                    th:text="#{cerca_sostituisci}"
+                                            >
+                                            </li>
+                                        </ol>
+                                    </div>
+                                    <div class="input-group mb-3 px-2">
+                                        <button
+                                                class="btn btn-primary"
+                                                type="button"
+                                                id="searchButton"
+                                        >
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                        <input
+                                                type="text"
+                                                id="searchTerm"
+                                                class="form-control border-secondary"
+                                                placeholder="Cerca"
+                                                aria-label="Cerca"
+                                        />
+                                        <span
+                                                class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger"
+                                                id="SearchItems"
+                                                style="display: none"
+                                        >
 													</span>
-												</div>
-												<div class="input-group mb-2 px-2">
-													<button
-														class="btn btn-primary"
-														type="button"
-														id="startReplace"
-													>
-														<i class="bi bi-arrow-left-right"></i>
-													</button>
-													<input
-														type="text"
-														id="replaceTerm"
-														class="form-control border-secondary"
-														placeholder="Sostituisci"
-														aria-label="Sostituisci"
-													/>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</nav>
-					</div>
-					<div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_editor">
+                                    </div>
+                                    <div class="input-group mb-2 px-2">
+                                        <button
+                                                class="btn btn-primary"
+                                                type="button"
+                                                id="startReplace"
+                                        >
+                                            <i class="bi bi-arrow-left-right"></i>
+                                        </button>
+                                        <input
+                                                type="text"
+                                                id="replaceTerm"
+                                                class="form-control border-secondary"
+                                                placeholder="Sostituisci"
+                                                aria-label="Sostituisci"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="card-body m-0 p-0 overflow-y-auto overflow-x-auto" id="section_editor">
 						<textarea id="Editor_utente">
 /*Compila i campi "Nome" e "Cognome" con le informazioni richieste
 Nome: "inserire il proprio nome"
@@ -522,362 +522,362 @@ public class TestClasse {
 }
 
 						</textarea>
-					</div>
-					<!-- CONSOLE -->
-					<div class="card-header border-top p-0">
-						<div id="divider_Console" class="border border-3 border-secondary-subtle"></div>
-						<nav class="navbar bg-body-tertiary p-1">
-							<span class="navbar-brand lead my-0 py-0"> Console </span>
-							<div>
-								<button
-									type="button"
-									class="btn btn-sm toggleButton"
-									id="close_console_utente"
-									data-icon1="bi-arrow-bar-down"
-									data-icon2="bi-arrow-bar-up"
-								>
-									<i class="bi bi-arrow-bar-down"></i>
-								</button>
-							</div>
-						</nav>
-					</div>
-					<div
-						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-						id="section_console"
-					>
-						<textarea id="Console_utente"> </textarea>
-					</div>
-					<div class="card-footer text-body-secondary py-0 px-1">
-						<small class="pl-5">
-							<i class="bi bi-exclamation-triangle-fill"></i> 
-						</small>
-						<small class="pr-2" id="warning_compiler">
-							0
-						</small>						
-						<small class="pr-2">
-							<i class="bi bi-x-circle"></i>
-						</small>
-						<small class="pr-2" id="error_compiler">
-							0
-						</small>
-					</div>
-				</div>
-				<!-- SECONDA COLONNA-->
-				<div class="card rounded-0" id="card_robot">
-					<!-- CLASS UNDER TEST-->
-					<div class="card-header p-0">
-						<nav class="navbar bg-body-tertiary p-2">
+        </div>
+        <!-- CONSOLE -->
+        <div class="card-header border-top p-0">
+            <div id="divider_Console" class="border border-3 border-secondary-subtle"></div>
+            <nav class="navbar bg-body-tertiary p-1">
+                <span class="navbar-brand lead my-0 py-0"> Console </span>
+                <div>
+                    <button
+                            type="button"
+                            class="btn btn-sm toggleButton"
+                            id="close_console_utente"
+                            data-icon1="bi-arrow-bar-down"
+                            data-icon2="bi-arrow-bar-up"
+                    >
+                        <i class="bi bi-arrow-bar-down"></i>
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div
+                class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+                id="section_console"
+        >
+            <textarea id="Console_utente"> </textarea>
+        </div>
+        <div class="card-footer text-body-secondary py-0 px-1">
+            <small class="pl-5">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </small>
+            <small class="pr-2" id="warning_compiler">
+                0
+            </small>
+            <small class="pr-2">
+                <i class="bi bi-x-circle"></i>
+            </small>
+            <small class="pr-2" id="error_compiler">
+                0
+            </small>
+        </div>
+    </div>
+    <!-- SECONDA COLONNA-->
+    <div class="card rounded-0" id="card_robot">
+        <!-- CLASS UNDER TEST-->
+        <div class="card-header p-0">
+            <nav class="navbar bg-body-tertiary p-2">
 							<span class="navbar-brand lead my-0 py-0" th:text="#{classe_ut}">
 							</span>
-							<div class="">
-								<!-- INFO BUTTON -->
-								<span
-									class="d-inline-block mx-3"
-									tabindex="0"
-									id="popover_info"
-									data-bs-toggle="popover"
-									data-bs-trigger="hover focus"
-									data-bs-title="Game info"
-									data-bs-placement="bottom"
-									data-bs-content="prova"
-								>
+                <div class="">
+                    <!-- INFO BUTTON -->
+                    <span
+                            class="d-inline-block mx-3"
+                            tabindex="0"
+                            id="popover_info"
+                            data-bs-toggle="popover"
+                            data-bs-trigger="hover focus"
+                            data-bs-title="Game info"
+                            data-bs-placement="bottom"
+                            data-bs-content="prova"
+                    >
 									<i class="bi bi-info-circle"></i>
 								</span>
-								<!-- SUBMIT /RUN -->
-								<button class="btn btn-success" type="button" id="runButton">
-									<div id="loading_run">
+                    <!-- SUBMIT /RUN -->
+                    <button class="btn btn-success" type="button" id="runButton">
+                        <div id="loading_run">
 										<span
-											class="spinner-border spinner-border-sm"
-											aria-hidden="true"
-											style="display: none"
-										></span>
-										<i
-											id="loading_icon_1"
-											class="bi bi-play-fill"
-											aria-hidden="true"
-										></i>
-										<span role="status" data-title="Submit" th:text="#{submit}"></span>
-										<!-- Icona nascosta -->
-									</div>
-								</button>
-							</div>
-						</nav>
-					</div>
-					<div
-						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-						id="section_UT"
-					>
-						<textarea id="Editor_Robot" th:text="${classeUT}"> </textarea>
-					</div>
-					<!-- COMPARE RESULT -->
-					<div class="card-header border-top p-0">
-						<div id="divider_result" class="border border-3 border-secondary-subtle"></div>
-						<nav class="navbar bg-body-tertiary p-1">
-							<span class="navbar-brand lead my-0 py-0" th:text="#{risultati}"> </span>
-							<div>
-								<button
-									type="button"
-									class="btn btn-sm toggleButton"
-									id="close_console_result"
-									data-icon1="bi-arrow-bar-down"
-									data-icon2="bi-arrow-bar-up"
-								>
-									<i class="bi bi-arrow-bar-down"></i>
-								</button>
-							</div>
-						</nav>
-					</div>
-					<div
-						class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
-						id="section_result"
-					>
-						<textarea id="Console_Robot"> </textarea>
-					</div>
-					<div class="card-footer text-body-secondary py-0 px-1" id="status_compiler">
-						<small class="pl-5">
-							<i
-								id="loading_icon_1"
-								class="bi bi-server"
-								aria-hidden="true"
-							></i>
-							<div class="spinner-border spinner-border-sm" role="status" 
-								aria-hidden="true"
-								style="display: none">
-							</div>
-						</small>
-						<small class="pr-2" id="status_text" th:text="#{pronto}">
-						</small>						
-					</div>
-				</div>
-			</div>
-		</div>
+                                                class="spinner-border spinner-border-sm"
+                                                aria-hidden="true"
+                                                style="display: none"
+                                        ></span>
+                            <i
+                                    id="loading_icon_1"
+                                    class="bi bi-play-fill"
+                                    aria-hidden="true"
+                            ></i>
+                            <span role="status" data-title="Submit" th:text="#{submit}"></span>
+                            <!-- Icona nascosta -->
+                        </div>
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div
+                class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+                id="section_UT"
+        >
+            <textarea id="Editor_Robot" th:text="${classeUT}"> </textarea>
+        </div>
+        <!-- COMPARE RESULT -->
+        <div class="card-header border-top p-0">
+            <div id="divider_result" class="border border-3 border-secondary-subtle"></div>
+            <nav class="navbar bg-body-tertiary p-1">
+                <span class="navbar-brand lead my-0 py-0" th:text="#{risultati}"> </span>
+                <div>
+                    <button
+                            type="button"
+                            class="btn btn-sm toggleButton"
+                            id="close_console_result"
+                            data-icon1="bi-arrow-bar-down"
+                            data-icon2="bi-arrow-bar-up"
+                    >
+                        <i class="bi bi-arrow-bar-down"></i>
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div
+                class="card-body m-0 p-0 overflow-y-auto overflow-x-auto"
+                id="section_result"
+        >
+            <textarea id="Console_Robot"> </textarea>
+        </div>
+        <div class="card-footer text-body-secondary py-0 px-1" id="status_compiler">
+            <small class="pl-5">
+                <i
+                        id="loading_icon_1"
+                        class="bi bi-server"
+                        aria-hidden="true"
+                ></i>
+                <div class="spinner-border spinner-border-sm" role="status"
+                     aria-hidden="true"
+                     style="display: none">
+                </div>
+            </small>
+            <small class="pr-2" id="status_text" th:text="#{pronto}">
+            </small>
+        </div>
+    </div>
+</div>
+</div>
 
-		<!-- Modal INFO-->
-		<div
-			class="modal fade"
-			id="Modal"
-			tabindex="-1"
-			aria-labelledby="Modal"
-			aria-hidden="true"
-		>
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="Modal_title">Modal title</h1>
-						<button
-							type="button"
-							class="btn-close"
-							data-bs-dismiss="modal"
-							aria-label="Close"
-						></button>
-					</div>
-					<div class="modal-body" id="Modal_body">...</div>
-					<div class="modal-footer" id="Modal_footer"></div>
-				</div>
-			</div>
-		</div>
+<!-- Modal INFO-->
+<div
+        class="modal fade"
+        id="Modal"
+        tabindex="-1"
+        aria-labelledby="Modal"
+        aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="Modal_title">Modal title</h1>
+                <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body" id="Modal_body">...</div>
+            <div class="modal-footer" id="Modal_footer"></div>
+        </div>
+    </div>
+</div>
 
-		<!-- Modal ERROR-->
-		<div
-			class="modal fade"
-			id="Modal_error"
-			tabindex="-1"
-			aria-labelledby="Modal"
-			aria-hidden="true"
-		>
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5">
-						<i class="bi bi-clipboard-x"></i>
-						ERROR
-						<strong id="modal_error_title"> </strong>
-					</h1>
-				</div>
-				<div class="modal_error_body" id="Modal_body">
-					prova 
-				</div>
-				<div class="modal_error_footer" id="Modal_footer">
-					prova
-				</div>
-			</div>
-		</div>
-	</div>
+<!-- Modal ERROR-->
+<div
+        class="modal fade"
+        id="Modal_error"
+        tabindex="-1"
+        aria-labelledby="Modal"
+        aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">
+                    <i class="bi bi-clipboard-x"></i>
+                    ERROR
+                    <strong id="modal_error_title"> </strong>
+                </h1>
+            </div>
+            <div class="modal_error_body" id="Modal_body">
+                prova
+            </div>
+            <div class="modal_error_footer" id="Modal_footer">
+                prova
+            </div>
+        </div>
+    </div>
+</div>
 
-		<!-- FOOTER -->
-		<div th:replace="fragments/footer :: footer"></div>
-		<script th:inline="javascript">
-			const mode_sfida        	= /*[[#{modalità_sfida}]]*/ '';
-			const mode_allenamento  	= /*[[#{modalità_allenamento}]]*/ '';
-			const mode_scalata      	= /*[[#{modalità_scalata}]]*/ '';
-			const status_sending    	= /*[[#{stato_invio}]]*/ '';
-			const status_loading    	= /*[[#{stato_caricamento}]]*/ '';
-			const status_compiling 	 	= /*[[#{stato_compilazione}]]*/ '';
-			const status_ready      	= /*[[#{stato_pronto}]]*/ '';
-			const status_error      	= /*[[#{stato_errore}]]*/ '';
-			const status_turn_end   	= /*[[#{stato_turno_finito}]]*/ '';
-			const status_game_end   	= /*[[#{stato_partita_finita}]]*/ '';
-			const status_exit_game 	    = /*[[#{stato_uscita_partita}]]*/ '';
-			const status_inizia_partita = /*[[#{inizia_partita}]]*/ '';
-			const match_in_corso    	= /*[[#{match_in_corso}]]*/ '';
-			const loading           	= /*[[#{caricamento}]]*/ '';
-			const ClasseUT           	= /*[[#{classe_ut}]]*/ '';		
-			const Difficolta           	= /*[[#{gamemode_difficulty}]]*/ '';
-			const score_partita_text    = /*[[#{partita_punteggio}]]*/ '';
-			const vai_home    			= /*[[#{home}]]*/ '';
-			const confirmationMessage   = /*[[#{confirmationMessage}]]*/ '';
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
+<script th:inline="javascript">
+    const mode_sfida        	= /*[[#{modalità_sfida}]]*/ '';
+    const mode_allenamento  	= /*[[#{modalità_allenamento}]]*/ '';
+    const mode_scalata      	= /*[[#{modalità_scalata}]]*/ '';
+    const status_sending    	= /*[[#{stato_invio}]]*/ '';
+    const status_loading    	= /*[[#{stato_caricamento}]]*/ '';
+    const status_compiling 	 	= /*[[#{stato_compilazione}]]*/ '';
+    const status_ready      	= /*[[#{stato_pronto}]]*/ '';
+    const status_error      	= /*[[#{stato_errore}]]*/ '';
+    const status_turn_end   	= /*[[#{stato_turno_finito}]]*/ '';
+    const status_game_end   	= /*[[#{stato_partita_finita}]]*/ '';
+    const status_exit_game 	    = /*[[#{stato_uscita_partita}]]*/ '';
+    const status_inizia_partita = /*[[#{inizia_partita}]]*/ '';
+    const match_in_corso    	= /*[[#{match_in_corso}]]*/ '';
+    const loading           	= /*[[#{caricamento}]]*/ '';
+    const ClasseUT           	= /*[[#{classe_ut}]]*/ '';
+    const Difficolta           	= /*[[#{gamemode_difficulty}]]*/ '';
+    const score_partita_text    = /*[[#{partita_punteggio}]]*/ '';
+    const vai_home    			= /*[[#{home}]]*/ '';
+    const confirmationMessage   = /*[[#{confirmationMessage}]]*/ '';
 
-			const unlockedNewAchievementMessage = {
-				title: /*[[#{achievements_unlocked_title}]]*/ "Complimenti, hai sbloccato dei nuovi achievements",
-				descr: /*[[#{achievements_unlocked_text}]]*/ "Hai sbloccato i seguenti nuovi achievements:"
-			};
-			const previousGameObject	= /*[[${previousGameObject}]]*/ {};
-			const achievementData = {
-				"instructions": {
-					name: /*[[#{instructions_name}]]*/ "Coverage Master",
-					descr: /*[[#{instructions_descr}]]*/ "Ottenuto superando il robot nel numero di istruzioni coperte per la classe sotto test."
-				},
-				"instructionsAndWeakMutation": {
-					name: /*[[#{instructionsAndWeakMutation_name}]]*/ "Signore delle Weak Mutation",
-					descr: /*[[#{instructionsAndWeakMutation_descr}]]*/ "Ottenuto superando il robot sia nel numero di istruzioni coperte che nella metrica weakMutation."
-				},
-				"firstMatchWon": {
-					name: /*[[#{firstMatchWon_text}]]*/ "Primi passi",
-					descr: /*[[#{firstMatchWon_descr}]]*/ "Ottenuto vincendo la tua prima partita."
-				},
-				"thirdMatchWon": {
-					name: /*[[#{thirdMatchWon_text}]]*/ "In ritmo",
-					descr: /*[[#{thirdMatchWon_descr}]]*/ "Ottenuto vincendo la tua terza partita."
-				},
-				"allBeatenOneClass": {
-					name: /*[[#{allBeatenOneClass_text}]]*/ "Classe completata",
-					descr: /*[[#{allBeatenOneClass_descr}]]*/ "Ottenuto superando tutti gli avversari di una classe."
-				},
-				"allBeatenTwoClass": {
-					name: /*[[#{allBeatenTwoClass_text}]]*/ "Doppia padronanza",
-					descr: /*[[#{allBeatenTwoClass_descr}]]*/ "Ottenuto superando tutti gli avversari di due classi."
-				}
-			};
+    const unlockedNewAchievementMessage = {
+        title: /*[[#{achievements_unlocked_title}]]*/ "Complimenti, hai sbloccato dei nuovi achievements",
+        descr: /*[[#{achievements_unlocked_text}]]*/ "Hai sbloccato i seguenti nuovi achievements:"
+    };
+    const previousGameObject	= /*[[${previousGameObject}]]*/ {};
+    const achievementData = {
+        "instructions": {
+            name: /*[[#{instructions_name}]]*/ "Coverage Master",
+            descr: /*[[#{instructions_descr}]]*/ "Ottenuto superando il robot nel numero di istruzioni coperte per la classe sotto test."
+        },
+        "instructionsAndWeakMutation": {
+            name: /*[[#{instructionsAndWeakMutation_name}]]*/ "Signore delle Weak Mutation",
+            descr: /*[[#{instructionsAndWeakMutation_descr}]]*/ "Ottenuto superando il robot sia nel numero di istruzioni coperte che nella metrica weakMutation."
+        },
+        "firstMatchWon": {
+            name: /*[[#{firstMatchWon_text}]]*/ "Primi passi",
+            descr: /*[[#{firstMatchWon_descr}]]*/ "Ottenuto vincendo la tua prima partita."
+        },
+        "thirdMatchWon": {
+            name: /*[[#{thirdMatchWon_text}]]*/ "In ritmo",
+            descr: /*[[#{thirdMatchWon_descr}]]*/ "Ottenuto vincendo la tua terza partita."
+        },
+        "allBeatenOneClass": {
+            name: /*[[#{allBeatenOneClass_text}]]*/ "Classe completata",
+            descr: /*[[#{allBeatenOneClass_descr}]]*/ "Ottenuto superando tutti gli avversari di una classe."
+        },
+        "allBeatenTwoClass": {
+            name: /*[[#{allBeatenTwoClass_text}]]*/ "Doppia padronanza",
+            descr: /*[[#{allBeatenTwoClass_descr}]]*/ "Ottenuto superando tutti gli avversari di due classi."
+        }
+    };
 
-			const gameEndData = {
-				game_score: /*[[#{game_score}]]*/ "Hai terminato la tua partita con un punteggio",
-				game_end: /*[[#{game_end}]]*/ "Partita terminata",
-				game_win: /*[[#{game_win}]]*/ "Complimenti, hai vinto!",
-				game_lose: /*[[#{game_lose}]]*/ "Peccato, il robot ha vinto questa volta.",
-				game_exp: {
-					zero: /*[[#{game_exp_zero}]]*/ "Non hai guadagnato punti esperienza perché hai già sconfitto questo robot. Prova a batterne un altro!",
-					base: /*[[#{game_exp_base}]]*/ "Hai guadagnato",
-					one: /*[[#{game_exp_one}]]*/ "1 punto esperienza!",
-					multi: /*[[#{game_exp_multi}]]*/ "punti esperienza!"
-				},
-				game_retry: /*[[#{game_retry}]]*/ "Riprova e migliora la tua strategia!",
-				game_remember_save: /*[[#{game_remember_save}]]*/ "Ricorda: puoi salvare il codice localmente. Premi \"\u22EE\" e poi \"Download\" per scaricarlo, oppure clicca su \"Indietro\" per tornare alla home.",
-			};
-			const errorMessages = {
-				"429": /*[[#{error_429}]]*/ "Il server sta gestendo un numero elevato di richieste. Ti preghiamo di attendere un momento prima di riprovare.",
-				"504": /*[[#{error_504}]]*/ "Il server ha impiegato troppo tempo per rispondere. Ti invitiamo a riprovare più tardi."
-			}
-			const terminalMessages = {
-				results: /*[[#{results}]]*/ "Risultati",
-				your_points: /*[[#{your_points}]]*/ "Il tuo punteggio",
-				robot_points: /*[[#{robot_points}]]*/ "Il punteggio del robot",
-				coverage_capitalized: /*[[#{coverage_capitalized}]]*/ "Copertura",
-				lines: /*[[#{lines}]]*/ "linee",
-				instructions: /*[[#{instructions}]]*/ "istruzioni",
-				covered: /*[[#{covered}]]*/ "coperte",
-				missed: /*[[#{missed}]]*/ "mancate",
-				compilation_error: /*[[#{compilation_error}]]*/ "Ci sono stati errori di compilazione, controlla la console!",
-				you_can_win: /*[[#{you_can_win}]]*/ "Puoi vincere la partita!",
-				your_evosuite_points: /*[[#{your_evosuite_points}]]*/ "Il tuo punteggio EvoSuite!",
-				robot_evosuite_points: /*[[#{robot_evosuite_points}]]*/ "Il punteggio EvoSuite del robot!",
-				points_descr: /*[[#{points_descr}]]*/ "In basso trovi il dettaglio dei livelli di copertura raggiunti sia dai tuoi test che da quelli del Robot - Chi vincerà la battaglia dei Bug?",
-				you_cant_win: /*[[#{you_cant_win}]]*/ "Ci sei quasi! Il Robot è ancora in vantaggio, ma lo stai raggiungendo in fretta. Aggiungi qualche test case in più alla tua suite e conquista la vittoria - i bug non hanno scampo!",
-				you: /*[[#{you}]]*/ "You",
-				robot: /*[[#{robot_title}]]*/ "Robot",
-				metrics: /*[[#{metrics}]]*/ "Metriche",
-				your_instruction_coverage: /*[[#{your_instruction_coverage}]]*/ "La tua copertura delle Istruzioni",
-				robot_instruction_coverage: /*[[#{robot_instruction_coverage}]]*/ "La copertura del robot delle Istruzioni",
-				jacoco_table_title: /*[[#{jacoco_table_title}]]*/ "Metriche di copertura JaCoCo",
-				evosuite_table_title: /*[[#{evosuite_table_title}]]*/ "Metriche di copertura EvoSuite",
-			}
+    const gameEndData = {
+        game_score: /*[[#{game_score}]]*/ "Hai terminato la tua partita con un punteggio",
+        game_end: /*[[#{game_end}]]*/ "Partita terminata",
+        game_win: /*[[#{game_win}]]*/ "Complimenti, hai vinto!",
+        game_lose: /*[[#{game_lose}]]*/ "Peccato, il robot ha vinto questa volta.",
+        game_exp: {
+            zero: /*[[#{game_exp_zero}]]*/ "Non hai guadagnato punti esperienza perché hai già sconfitto questo robot. Prova a batterne un altro!",
+            base: /*[[#{game_exp_base}]]*/ "Hai guadagnato",
+            one: /*[[#{game_exp_one}]]*/ "1 punto esperienza!",
+            multi: /*[[#{game_exp_multi}]]*/ "punti esperienza!"
+        },
+        game_retry: /*[[#{game_retry}]]*/ "Riprova e migliora la tua strategia!",
+        game_remember_save: /*[[#{game_remember_save}]]*/ "Ricorda: puoi salvare il codice localmente. Premi \"\u22EE\" e poi \"Download\" per scaricarlo, oppure clicca su \"Indietro\" per tornare alla home.",
+    };
+    const errorMessages = {
+        "429": /*[[#{error_429}]]*/ "Il server sta gestendo un numero elevato di richieste. Ti preghiamo di attendere un momento prima di riprovare.",
+        "504": /*[[#{error_504}]]*/ "Il server ha impiegato troppo tempo per rispondere. Ti invitiamo a riprovare più tardi."
+    }
+    const terminalMessages = {
+        results: /*[[#{results}]]*/ "Risultati",
+        your_points: /*[[#{your_points}]]*/ "Il tuo punteggio",
+        robot_points: /*[[#{robot_points}]]*/ "Il punteggio del robot",
+        coverage_capitalized: /*[[#{coverage_capitalized}]]*/ "Copertura",
+        lines: /*[[#{lines}]]*/ "linee",
+        instructions: /*[[#{instructions}]]*/ "istruzioni",
+        covered: /*[[#{covered}]]*/ "coperte",
+        missed: /*[[#{missed}]]*/ "mancate",
+        compilation_error: /*[[#{compilation_error}]]*/ "Ci sono stati errori di compilazione, controlla la console!",
+        you_can_win: /*[[#{you_can_win}]]*/ "Puoi vincere la partita!",
+        your_evosuite_points: /*[[#{your_evosuite_points}]]*/ "Il tuo punteggio EvoSuite!",
+        robot_evosuite_points: /*[[#{robot_evosuite_points}]]*/ "Il punteggio EvoSuite del robot!",
+        points_descr: /*[[#{points_descr}]]*/ "In basso trovi il dettaglio dei livelli di copertura raggiunti sia dai tuoi test che da quelli del Robot - Chi vincerà la battaglia dei Bug?",
+        you_cant_win: /*[[#{you_cant_win}]]*/ "Ci sei quasi! Il Robot è ancora in vantaggio, ma lo stai raggiungendo in fretta. Aggiungi qualche test case in più alla tua suite e conquista la vittoria - i bug non hanno scampo!",
+        you: /*[[#{you}]]*/ "You",
+        robot: /*[[#{robot_title}]]*/ "Robot",
+        metrics: /*[[#{metrics}]]*/ "Metriche",
+        your_instruction_coverage: /*[[#{your_instruction_coverage}]]*/ "La tua copertura delle Istruzioni",
+        robot_instruction_coverage: /*[[#{robot_instruction_coverage}]]*/ "La copertura del robot delle Istruzioni",
+        jacoco_table_title: /*[[#{jacoco_table_title}]]*/ "Metriche di copertura JaCoCo",
+        evosuite_table_title: /*[[#{evosuite_table_title}]]*/ "Metriche di copertura EvoSuite",
+    }
 
-			const modalButtonText = {
-				close: /*[[#{close}]]*/ "Chiudi",
-				go_to_home: /*[[#{go_to_home}]]*/ "Vai alla home",
-			}
-		</script>
+    const modalButtonText = {
+        close: /*[[#{close}]]*/ "Chiudi",
+        go_to_home: /*[[#{go_to_home}]]*/ "Vai alla home",
+    }
+</script>
 
-		<!-- CODEMIRROR -->
-		<script
-			th:src="@{/t5/codemirror/lib/codemirror.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/mode/clike/clike.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/fold/foldcode.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/search/searchcursor.js}"
-			th:inline="javascript"
-		></script>
-		<script
-			th:src="@{/t5/codemirror/addon/search/search.js}"
-			th:inline="javascript"
-		></script>
+<!-- CODEMIRROR -->
+<script
+        th:src="@{/t5/codemirror/lib/codemirror.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/mode/clike/clike.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/fold/foldcode.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/fold/foldgutter.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/fold/brace-fold.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/fold/xml-fold.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/edit/matchbrackets.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/edit/closebrackets.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/edit/trailingspace.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/search/searchcursor.js}"
+        th:inline="javascript"
+></script>
+<script
+        th:src="@{/t5/codemirror/addon/search/search.js}"
+        th:inline="javascript"
+></script>
 
-		<!-- FILE JS GUI -->
-		<script
-			th:src="@{/t5/js/Var_Editor.js}"
-			th:inline="javascript"
-		>
-		</script>
-		<script
-			th:src="@{/t5/js/Util_Editor.js}"
-			th:inline="javascript"
-		>
-		</script>
-		<script
-			th:src="@{/t5/js/REST_Editor.js}"
-			th:inline="javascript"
-		>
-		</script>
-		<script
-			th:src="@{/t5/js/Button_Editor.js}"
-			th:inline="javascript"
-		>
-		</script>
-		<script
-			th:src="@{/t5/js/GUI_Editor.js}"
-			th:inline="javascript"
-		>
-		</script>
-	</body>
+<!-- FILE JS GUI -->
+<script
+        th:src="@{/t5/js/Var_Editor.js}"
+        th:inline="javascript"
+>
+</script>
+<script
+        th:src="@{/t5/js/Util_Editor.js}"
+        th:inline="javascript"
+>
+</script>
+<script
+        th:src="@{/t5/js/REST_Editor.js}"
+        th:inline="javascript"
+>
+</script>
+<script
+        th:src="@{/t5/js/Button_Editor.js}"
+        th:inline="javascript"
+>
+</script>
+<script
+        th:src="@{/t5/js/GUI_Editor.js}"
+        th:inline="javascript"
+>
+</script>
+</body>
 </html>

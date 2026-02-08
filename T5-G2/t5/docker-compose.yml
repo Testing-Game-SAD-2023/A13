@@ -6,7 +6,7 @@ services:
     container_name: t5-redis
     restart: always
     expose:
-      - "6379:6379"
+      - "6379"
     networks:
       - global-network
   app:

@@ -288,4 +288,22 @@ public class PlayerService {
         return responseList;
     }
 
+    /*@Transactional
+    public Player updateUserProfile(String email, String bio, String profilePicturePath) {
+        Player player = getUserByEmail(email);
+        if (player == null) throw new UserNotFoundException();
+
+        UserProfile profile = player.getUserProfile();
+        if (profile == null) {
+            profile = new UserProfile();
+            player.setUserProfile(profile);
+        }
+
+        profile.setBio(bio);
+        profile.setProfilePicturePath(profilePicturePath);
+        userProfileRepository.save(profile);
+
+        return player;
+    } */
+
 }

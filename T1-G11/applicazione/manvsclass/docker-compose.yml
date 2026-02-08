@@ -31,7 +31,7 @@ services:
     container_name: t1-mongo_db
     restart: always
     expose:
-      - "27017:27017"
+      - "27017"
     volumes:
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - mongodb_data_volume:/data/db

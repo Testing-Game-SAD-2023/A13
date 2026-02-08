@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.db_setup.model.dto.UserSearchProfileDTO;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
@@ -133,6 +135,38 @@ public class UserSocialService {
 
     private String generateUserNotFoundMessage(String userIdStr) {
         return "User con ID %s non trovato".formatted(userIdStr);
+    }
+
+    public Page<UserSearchProfileDTO> searchUserProfilesWithFollowing(String searchTerm,
+                                                                      int followerProfileId,
+                                                                      int page,
+                                                                      int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<UserProfile> pageResult =
+                userProfileRepository.searchByNameSurnameEmailOrNickname(searchTerm, pageable);
+
+        UserProfile follower = userProfileRepository.findById(followerProfileId)
+                .orElseThrow(() -> new UserNotFoundException(generateUserNotFoundMessage(
+                        String.valueOf(followerProfileId))));
+
+        List<UserSearchProfileDTO> content = pageResult.getContent().stream()
+                .map(u -> {
+                    Integer userIdValue = u.getPlayer() != null ? (int) u.getPlayer().getID() : null;
+                    boolean isFollowing = userFollowRepository.existsByFollowerAndFollowing(follower, u);
+                    return new UserSearchProfileDTO(
+                            u.getID(),              // id del profilo
+                            userIdValue,            // userId del player
+                            u.getName(),
+                            u.getSurname(),
+                            u.getEmail(),
+                            u.getProfilePicturePath(),
+                            isFollowing
+                    );
+                })
+                .toList();
+
+        return new PageImpl<>(content, pageable, pageResult.getTotalElements());
     }
 
 }

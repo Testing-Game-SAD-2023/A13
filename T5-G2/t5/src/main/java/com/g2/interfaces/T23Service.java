@@ -70,7 +70,10 @@ public class T23Service extends BaseService {
         registerUserProfileActions();
         registerPlayerStatusActions();
         registerPlayerActions();
+        registerMessageActions(); //aggiunta 08/12/2025
+
     }
+
 
     /*
      * Di seguito sono riportati i metodi in cui è stato scomposto il costruttore per ridurne la dimensione e risolvere l'issue di SonarQube
@@ -175,6 +178,8 @@ public class T23Service extends BaseService {
         registerAction("updateGlobalAchievements", new ServiceActionDefinition(
                 params -> updateGlobalAchievements((long) params[0], (Set<String>) params[1]), Long.class, Set.class
         ));
+
+
     }
 
     private void registerPlayerActions(){
@@ -187,6 +192,12 @@ public class T23Service extends BaseService {
         final String endpoint = "/players";
         return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>(){});
     }
+
+    /*private List<PlayerDTO> getAllPlayers() {
+        final String endpoint = "/players";
+        return callRestGET(endpoint, null, new ParameterizedTypeReference<List<PlayerDTO>>() {
+        });
+    }*/
 
     private GameProgressDTO createPlayerProgressAgainstOpponent(long playerId, GameMode gameMode, String classUT, String type, OpponentDifficulty difficulty) {
         final String endpoint = "/players/%s/progression/against".formatted(playerId);
@@ -296,8 +307,10 @@ public class T23Service extends BaseService {
         map.add(EMAIL_FIELD, userEmail);
         map.add("bio", bio);
         map.add("profilePicturePath", imagePath);
+        map.add("nickname", ""); // <-- aggiunto così non fa 400
         return callRestPost(endpoint, map, null, Boolean.class);
     }
+
 
     private User getUserByEmail(String userEmail) {
         final String endpoint = "/profile/user_by_email";
@@ -391,4 +404,79 @@ public class T23Service extends BaseService {
         return callRestGET(endpoint, queryParams, new ParameterizedTypeReference<List<User>>() {
         });
     }
+
+    public Boolean sendMessage(Long senderId, Long receiverId, String content) {
+        final String endpoint = "/messages/new";
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("senderId", senderId);
+        requestBody.put("receiverId", receiverId);
+        requestBody.put("content", content);
+
+        return callRestPost(endpoint, requestBody, null, null, Boolean.class);
+    }
+/*
+    private void registerPlayerActions() {
+        registerAction("getAllPlayers", new ServiceActionDefinition(
+                params -> getAllPlayers()
+        ));
+    }
+*/
+    private java.util.List<com.g2.model.Message> getInboxMessages(Long userId) {
+        final String endpoint = "/messages/inbox/" + userId;
+        return callRestGET(endpoint, null,
+                new ParameterizedTypeReference<java.util.List<com.g2.model.Message>>() {
+                });
+    }
+
+    private void registerMessageActions() {
+        registerAction("sendMessage", new ServiceActionDefinition(
+                params -> sendMessage((Long) params[0], (Long) params[1], (String) params[2]),
+                Long.class, Long.class, String.class
+        ));
+
+        registerAction("GetInboxMessages", new ServiceActionDefinition(
+                params -> getInboxMessages((Long) params[0]),
+                Long.class
+        ));
+        registerAction("GetOutboxMessages", new ServiceActionDefinition(
+                params -> getOutboxMessages((Long) params[0]),
+                Long.class
+        ));
+
+        registerAction("DeleteMessage", new ServiceActionDefinition(
+                params -> {
+                    deleteMessage((Long) params[0], (Long) params[1]);
+                    return null;
+                },
+                Long.class, Long.class
+        ));
+
+
+    }
+    private void deleteMessage(Long messageId, Long userId) {
+        final String endpoint = "/messages/" + messageId;
+
+        Map<String, String> queryParams = Map.of(
+                "userId", String.valueOf(userId)
+        );
+
+        // DELETE /userService/messages/{id}?userId=...
+        callRestDelete(endpoint, queryParams);
+    }
+
+    private java.util.List<com.g2.model.Message> getOutboxMessages(Long userId) {
+        final String endpoint = "/messages/outbox/" + userId;
+        return callRestGET(
+                endpoint,
+                null,
+                new ParameterizedTypeReference<java.util.List<com.g2.model.Message>>() {}
+        );
+    }
+
+
+
+
+
+
 }
